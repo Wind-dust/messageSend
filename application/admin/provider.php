@@ -11,7 +11,9 @@
 
 // 应用容器绑定定义
 return [
-    'administrator'          => app\common\action\admin\Administrator::class,
-    'admin'           => app\common\action\admin\Admin::class,
-    'adminLog'        => app\common\action\admin\AdminLog::class,
+    'administrator' => app\common\action\admin\Administrator::class,
+    'admin'         => app\common\action\admin\Admin::class,
+    'adminLog'      => app\common\action\admin\AdminLog::class,
+    'user'          => app\common\action\admin\User::class,
+    'provinces'     => app\common\action\admin\Provinces::class,
 ];

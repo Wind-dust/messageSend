@@ -4,10 +4,9 @@ namespace app\common\action\index;
 
 use app\common\action\notify\Note;
 use app\facade\DbAdmin;
+use app\facade\DbAdministrator;
 use app\facade\DbImage;
-use app\facade\DbOrder;
 use app\facade\DbProvinces;
-use app\facade\DbRights;
 use app\facade\DbUser;
 use Config;
 use Env;
@@ -497,6 +496,22 @@ class User extends CommonIndex {
             $uid = DbUser::addUser($data); //添加后生成的uid
             Db::commit();
             return ['code' => '200', 'con_id' => $conId];
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009'];
+        }
+    }
+
+    public function recordUserQualification($conId,$data){
+        $uid = $this->getUidByConId($conId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+
+        Db::startTrans();
+        try {
+            $uid = DbAdministrator::addUserQualificationRecord($data); //添加后生成的uid
+            Db::commit();
         } catch (\Exception $e) {
             Db::rollback();
             return ['code' => '3009'];

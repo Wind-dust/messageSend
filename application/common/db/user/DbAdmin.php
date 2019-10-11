@@ -8,6 +8,7 @@ use app\common\model\AdminPermissionsRelation;
 use app\common\model\Menu;
 use app\common\model\PermissionsApi;
 use app\common\model\PermissionsGroup;
+use app\common\model\AdminRemittance;
 use app\common\model\User;
 use think\Db;
 

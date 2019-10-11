@@ -11,7 +11,8 @@
 
 // 应用容器绑定定义
 return [
-    'user'          => app\common\action\index\Users::class,
+    'user'              => app\common\action\index\Users::class,
+    'provinces'         => app\common\action\admin\Provinces::class,
     // 'solution'        => app\common\action\index\Solution::class,
     // 'product'         => app\common\action\index\Product::class,
     // 'applicationcase' => app\common\action\index\ApplicationCase::class,

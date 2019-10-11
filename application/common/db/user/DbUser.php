@@ -20,6 +20,22 @@ class DbUser {
         return $user;
     }
 
+    public function getUserInfo($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '') {
+        $obj = Users::field($field)->where($where);
+        if (!empty($orderBy) && !empty($sc)) {
+            $obj = $obj->order($orderBy, $sc);
+        }
+        if (!empty($limit)) {
+            $obj = $obj->limit($limit);
+        }
+        if ($row === true) {
+            $obj = $obj->findOrEmpty();
+        } else {
+            $obj = $obj->select();
+        }
+        return $obj->toArray();
+    }
+
     /**
      * 添加验证码日志
      * @param $data

@@ -107,6 +107,8 @@ CREATE TABLE `yx_users` (
   `mobile` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '手机号',
   `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'email',
   `money` decimal(10,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '剩余金额（现金）',
+  `user_status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '账户服务状态 1停止服务 2启用服务',
+  `reservation_service` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '可否预用服务 1不可 2可以',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间',
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
@@ -114,6 +116,24 @@ CREATE TABLE `yx_users` (
   UNIQUE INDEX `p_uid`(`id`, `pid`) USING BTREE,
   UNIQUE INDEX `index_mobile`(`mobile`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
+
+DROP TABLE IF EXISTS `yx_admin_remittance`;
+CREATE TABLE `yx_admin_remittance` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `initiate_admin_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发起操作人',
+  `audit_admin_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '审核人',
+  `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '收款账户',
+  `mobile` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '收款账户手机号',
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '状态 1.待审核 2.已审核 3.取消',
+  `credit` int(10) NOT NULL DEFAULT '0' COMMENT '收款数量',
+  `message` varchar(100) NOT NULL DEFAULT '' COMMENT '详细描述',
+  `admin_message` varchar(100) NOT NULL DEFAULT '' COMMENT '审核查看描述',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='cms 服务手动充值';
 
 -- ----------------------------
 -- Table structure for pz_user_con
@@ -128,7 +148,22 @@ CREATE TABLE `yx_user_con`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uniq_con_id`(`con_id`) USING BTREE,
   UNIQUE INDEX `uniq_uid`(`uid`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 440 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户con_id和uid关系' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户con_id和uid关系' ROW_FORMAT = Dynamic;
+
+DROP TABLE IF EXISTS `yx_areas`;
+CREATE TABLE `yx_areas` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `pid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '父级id',
+  `code` char(12) NOT NULL DEFAULT '' COMMENT '统计用区划代码',
+  `level` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '层级',
+  `area_name` varchar(20) NOT NULL DEFAULT '' COMMENT '区域名',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `index_pid` (`pid`,`delete_time`) USING BTREE,
+  KEY `index_level` (`level`,`delete_time`) USING BTREE,
+  KEY `index_area_name` (`area_name`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='省市区关系表';
 
 -- ----------------------------
 -- Table structure for pz_log_vercode
@@ -229,7 +264,8 @@ DROP TABLE IF EXISTS `yx_business`;
 CREATE TABLE `yx_business` (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '服务名称',
-  `price` decimal(10,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '统一价格', 
+  `price` decimal(10,5) UNSIGNED NOT NULL DEFAULT 0.00000 COMMENT '统一服务价格', 
+  `donate_num` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '赠送数量',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间',
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
@@ -239,11 +275,11 @@ CREATE TABLE `yx_business` (
 DROP TABLE IF EXISTS `yx_user_equities`;
 CREATE TABLE `yx_user_equities` (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `uid` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
-  `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '用户id',
-  `price` decimal(10,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '统一价格',
-  `agency_price` decimal(10,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '代理价格',
-  `num_balance` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '条数余额',
+  `uid` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '用户id',
+  `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
+  `price` decimal(10,5) UNSIGNED NOT NULL DEFAULT 0.00000 COMMENT '统一服务价格', 
+  `agency_price` decimal(10,5) UNSIGNED NOT NULL DEFAULT 0.00000 COMMENT '代理价格',
+  `num_balance` int(10) NOT NULL DEFAULT 0 COMMENT '条数余额',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间',
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
@@ -267,7 +303,7 @@ CREATE TABLE `yx_user_qualification` (
   `user_supp_address` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '主办单位通讯地址(街道门牌号级)',
   `investor` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '投资人或主管单位',
   `entity_responsible_person_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '负责人姓名',
-  `entity_responsible_person_identity_types` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '负责人证件类型(参照【主办单位证件类型】)',
+  `entity_responsible_person_identity_types` tinyint(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '负责人证件类型(参照【主办单位证件类型】)',
   `entity_responsible_person_identity_num` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '负责人证件号码',
   `entity_responsible_person_mobile_phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT ' 联系方式1',
   `entity_responsible_person_phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '联系方式2',
@@ -314,23 +350,29 @@ CREATE TABLE `yx_user_qualification_record` (
 DROP TABLE IF EXISTS `yx_model_temeplate`;
 CREATE TABLE `yx_model_temeplate` (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板',
+  `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板标题',
+  `template_id` char(23) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板id',
+  `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
   `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板内容',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间',
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
-  PRIMARY KEY (`id`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY (`template_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '平台模板' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `yx_user_model`;
 CREATE TABLE `yx_user_model` (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `uid` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '用户id',
-  `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板',
+  `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
+  `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板标题',
+  `template_id` char(23) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板id',
   `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板内容',
   `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态:1,提交申请;2,可用;3,审核通过;4,审核不通过;5,停用',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间',
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
-  PRIMARY KEY (`id`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY (`template_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户自定义模板' ROW_FORMAT = Dynamic;

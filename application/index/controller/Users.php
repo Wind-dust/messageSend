@@ -5,9 +5,9 @@ use app\index\MyController;
 class Users extends MyController {
     protected $beforeActionList = [
         //        'isLogin',//所有方法的前置操作
-                'isLogin' => ['except' => 'login,quickLogin,userRegistered,resetPassword,sendVercode,wxaccredit,wxregister'], //除去getFirstCate其他方法都进行second前置操作
-                //        'three'  => ['only' => 'hello,data'],//只有hello,data方法进行three前置操作
-            ];
+        'isLogin' => ['except' => 'login,quickLogin,userRegistered,resetPassword,sendVercode,wxaccredit,wxregister'], //除去getFirstCate其他方法都进行second前置操作
+        //        'three'  => ['only' => 'hello,data'],//只有hello,data方法进行three前置操作
+    ];
 
     /**
      * @api              {post} / 用户注册
@@ -41,7 +41,7 @@ class Users extends MyController {
         if (checkEmail($email) === false) {
             return ['code' => '3003'];
         }
-        if (!in_array($user_type,[ 1, 2])) {
+        if (!in_array($user_type, [1, 2])) {
             return ['code' => '3006'];
         }
         if (empty($nick_name)) {
@@ -162,17 +162,17 @@ class Users extends MyController {
      * @author rzc
      */
     public function quickLogin() {
-        $apiName       = classBasename($this) . '/' . __function__;
-        $mobile        = trim($this->request->post('mobile'));
-        $vercode       = trim($this->request->post('vercode'));
+        $apiName = classBasename($this) . '/' . __function__;
+        $mobile  = trim($this->request->post('mobile'));
+        $vercode = trim($this->request->post('vercode'));
         if (checkMobile($mobile) === false) {
             return ['code' => '3001']; //手机号格式错误
         }
         if (checkVercode($vercode) === false) {
             return ['code' => '3004'];
         }
-        
-        $result   = $this->app->user->quickLogin($mobile, $vercode);
+
+        $result = $this->app->user->quickLogin($mobile, $vercode);
         $this->apiLog($apiName, [$mobile, $vercode], $result['code'], '');
 //        $dd       = [$result, ['mobile' => $mobile, 'vercode' => $vercode, 'buid' => $buid]];
         //        Db::table('pz_log_error')->insert(['title' => '/index/user/getintegraldetail', 'data' => json_encode($dd)]);
@@ -207,7 +207,6 @@ class Users extends MyController {
         return $res;
     }
 
-
     /**
      * @api              {post} / 开通分配子账户
      * @apiDescription   apportionSonUser
@@ -226,9 +225,9 @@ class Users extends MyController {
      * @author rzc
      */
 
-     public function apportionSonUser(){
-        $apiName = classBasename($this) . '/' . __function__;
-        $conId   = trim($this->request->post('con_id'));
+    public function apportionSonUser() {
+        $apiName   = classBasename($this) . '/' . __function__;
+        $conId     = trim($this->request->post('con_id'));
         $nick_name = trim($this->request->post('nick_name'));
         $user_type = trim($this->request->post('user_type'));
         $passwd    = trim($this->request->post('passwd'));
@@ -246,8 +245,92 @@ class Users extends MyController {
         if (checkPassword($passwd) === false) {
             return ['code' => '3005'];
         }
-        $result  = $this->app->user->apportionSonUser($conId, $nick_name, $user_type, $passwd, $mobile, $email);
+        $result = $this->app->user->apportionSonUser($conId, $nick_name, $user_type, $passwd, $mobile, $email);
         $this->apiLog($apiName, [$conId, $nick_name, $user_type, $passwd, $mobile, $email], $result['code'], $conId);
         return $result;
-     }
+    }
+
+    /**
+     * @api              {post} / 账户资质提交
+     * @apiDescription   recordUserQualification
+     * @apiGroup         index_user
+     * @apiName          recordUserQualification
+     * @apiParam (入参) {String} con_id
+     * @apiParam (入参) {String} id
+     * @apiParam (入参) {String} company_name 主办单位或者主办人全称
+     * @apiParam (入参) {Int} company_type 主办单位性质:1,国防机构;2,政府机关;3,事业单位;4,企业;5,个人;6社会团体;7,民办非企业单位;8,基金会;9,律师执业机构;10,外国在华文化中心;11,群众性团体组织;12,司法鉴定机构;13,宗教团体;14,境外机构;15,医疗机构;16,公证机构
+     * @apiParam (入参) {Int} company_certificate_type 主办单位证件类型:1,营业执照（个人或企业）;3,组织机构代码证;4,事业单位法人证书;5,部队代号;9,组织机构代码证;12,组织机构代码证;13,统一社会信用代码证书;23,军队单位对外有偿服务许可证;27,外国企业常驻代表机构登记证
+     * @apiParam (入参) {String} company_certificate_num 主办单位证件号码
+     * @apiParam (入参) {Int} province_id 省份id
+     * @apiParam (入参) {Int} city_id 城市id
+     * @apiParam (入参) {Int} county_id 地区id
+     * @apiParam (入参) {String} organizers_name 主办单位或主办人名称
+     * @apiParam (入参) {String} identity_address 主办单位证件住所
+     * @apiParam (入参) {String} mailingAddress_address 主办单位通讯地址(地区级)
+     * @apiParam (入参) {String} user_supp_address 主办单位通讯地址(街道门牌号级)
+     * @apiParam (入参) {String} investor 投资人或主管单位
+     * @apiParam (入参) {String} entity_responsible_person_name 负责人姓名
+     * @apiParam (入参) {Int} entity_responsible_person_identity_types 负责人证件类型(参照【主办单位证件类型】)
+     * @apiParam (入参) {Int} entity_responsible_person_identity_num 负责人证件号码
+     * @apiParam (入参) {Int} entity_responsible_person_mobile_phone 联系方式1
+     * @apiParam (入参) {Int} entity_responsible_person_phone 联系方式2
+     * @apiParam (入参) {Int} entity_responsible_person_msn 应急联系电话
+     * @apiParam (入参) {Int} entity_responsible_person_email 电子邮件地址
+     * @apiParam (入参) {Int} [entity_remark] 留言
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id不存在或者不为数字 / 3002:price格式错误 / 3003:price不能小于0 / 3004:登录失败
+     * @apiSampleRequest /admin/user/recordUserQualification
+     * @return array
+     * @author rzc
+     */
+    public function recordUserQualification() {
+        $apiName                                  = classBasename($this) . '/' . __function__;
+        $conId                                    = trim($this->request->post('con_id'));
+        $company_name                             = trim($this->request->post('company_name'));
+        $company_type                             = trim($this->request->post('company_type'));
+        $company_certificate_type                 = trim($this->request->post('company_certificate_type'));
+        $company_certificate_num                  = trim($this->request->post('company_certificate_num'));
+        $province_id                              = trim($this->request->post('province_id'));
+        $city_id                                  = trim($this->request->post('city_id'));
+        $county_id                                = trim($this->request->post('county_id'));
+        $organizers_name                          = trim($this->request->post('organizers_name'));
+        $identity_address                         = trim($this->request->post('identity_address'));
+        $mailingAddress_address                   = trim($this->request->post('mailingAddress_address'));
+        $user_supp_address                        = trim($this->request->post('user_supp_address'));
+        $investor                                 = trim($this->request->post('investor'));
+        $entity_responsible_person_name           = trim($this->request->post('entity_responsible_person_name'));
+        $entity_responsible_person_identity_types = trim($this->request->post('entity_responsible_person_identity_types'));
+        $entity_responsible_person_identity_num   = trim($this->request->post('entity_responsible_person_identity_num'));
+        $entity_responsible_person_mobile_phone   = trim($this->request->post('entity_responsible_person_mobile_phone'));
+        $entity_responsible_person_phone          = trim($this->request->post('entity_responsible_person_phone'));
+        $entity_responsible_person_msn            = trim($this->request->post('entity_responsible_person_msn'));
+        $entity_responsible_person_email          = trim($this->request->post('entity_responsible_person_email'));
+        $entity_remark                            = trim($this->request->post('entity_remark'));
+
+        $data = [];
+        $data = [
+            'company_name'                             => $company_name,
+            'company_type'                             => $company_type,
+            'company_certificate_type'                 => $company_certificate_type,
+            'company_certificate_num'                  => $company_certificate_num,
+            'province_id'                              => $province_id,
+            'city_id'                                  => $city_id,
+            'county_id'                                => $county_id,
+            'organizers_name'                          => $organizers_name,
+            'identity_address'                         => $identity_address,
+            'mailingAddress_address'                   => $mailingAddress_address,
+            'user_supp_address'                        => $user_supp_address,
+            'investor'                                 => $investor,
+            'entity_responsible_person_name'           => $entity_responsible_person_name,
+            'entity_responsible_person_identity_types' => $entity_responsible_person_identity_types,
+            'entity_responsible_person_identity_num'   => $entity_responsible_person_identity_num,
+            'entity_responsible_person_mobile_phone'   => $entity_responsible_person_mobile_phone,
+            'entity_responsible_person_phone'          => $entity_responsible_person_phone,
+            'entity_responsible_person_msn'            => $entity_responsible_person_msn,
+            'entity_responsible_person_email'          => $entity_responsible_person_email,
+            'entity_remark'                            => $entity_remark,
+        ];
+        $result = $this->app->user->recordUserQualification($conId, $data);
+        // $this->apiLog($apiName, [$conId, $nick_name, $user_type, $passwd, $mobile, $email], $result['code'], $conId);
+        return $result;
+    }
 }
