@@ -20,6 +20,11 @@ class DbUser {
         return $user;
     }
 
+    public function getUserOne($where, $field) {
+        $user = Users::where($where)->field($field)->findOrEmpty()->toArray();
+        return $user;
+    }
+
     public function getUserInfo($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '') {
         $obj = Users::field($field)->where($where);
         if (!empty($orderBy) && !empty($sc)) {

@@ -517,4 +517,52 @@ class User extends CommonIndex {
             return ['code' => '3009'];
         }
     }
+
+    public function seetingUserEquities($conId, $mobile, $business_id, $agency_price){
+        $business = DbAdministrator::getBusiness(['id' => $business_id],'*',true);
+        if (empty($business)) {
+            return ['code' => '3007'];
+        }
+        $uid = $this->getUidByConId($conId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $user_equities = DbAdministrator::getUserEquities(['business_id' => $business_id,'uid' => $uid],'*',true);
+        if (empty($user_equities)) {
+            return ['code' => '3003'];
+        }
+        if ($agency_price < $user_equities['agency_price']){
+            return ['code' => '3004'];
+        }
+        $son_user = DbUser::getUserOne(['mobile' => $mobile], 'id,pid');
+        if (empty($son_user) || $uid != $son_user['pid']) {
+            return ['code' => '3008'];
+        }
+        if (DbAdministrator::getUserEquities(['uid' => $son_user['id'], 'business_id' => $business_id],'id',true)) {
+            return ['code' => '3005'];
+        }
+        $data = [];
+        $data = [
+            'business_id' => $business_id,
+            'num_balance' => $business['donate_num'],
+            'uid'         => $uid,
+        ];
+        if ($agency_price){
+            if ($agency_price < $business['price']){
+                return ['code' => '3004'];
+            }
+            $data['agency_price'] = $agency_price;
+        }else {
+            $data['agency_price'] = $business['price'];
+        }
+        Db::startTrans();
+        try {
+            DbUser::addUserEquities($data);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
+    }
 }
