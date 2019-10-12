@@ -376,3 +376,29 @@ CREATE TABLE `yx_user_model` (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY (`template_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户自定义模板' ROW_FORMAT = Dynamic;
+
+DROP TABLE IF EXISTS `yx_blacklist`;
+CREATE TABLE `yx_blacklist` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `mobile` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '接收手机',
+  `source` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '来源：1.运营商;2.平台',
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '备注',
+  `update_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间',
+  `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `mobile_del` (`mobile`,`delete_time`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '黑名单' ROW_FORMAT = Dynamic;
+
+DROP TABLE IF EXISTS `yx_whitelist`;
+CREATE TABLE `yx_whitelist` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `mobile` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '接收手机',
+  `source` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '来源：1.平台',
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '备注',
+  `update_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间',
+  `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `mobile_del` (`mobile`,`delete_time`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '白名单' ROW_FORMAT = Dynamic;
