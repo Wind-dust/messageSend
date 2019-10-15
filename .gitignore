@@ -2,16 +2,16 @@
 *.log
 .env
 thinkphp/
- public/doc/
- SQL/
- public/MP_verify_FLAOOUUBgu3VQ7F9.txt
- public/MP_verify_w6CmTQqWzUxpdkVW.txt
- application/console/com/LocalScript.php
+public/doc/
+SQL/
+public/MP_verify_FLAOOUUBgu3VQ7F9.txt
+public/MP_verify_w6CmTQqWzUxpdkVW.txt
+application/console/com/LocalScript.php
 
- apidoc.json
- *.sh
- vendor/
- composer.json
- composer.lock
- invoice.json
- apidoc.json
+apidoc.json
+*.sh
+vendor/
+composer.json
+composer.lock
+invoice.json
+apidoc.json
