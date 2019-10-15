@@ -14,3 +14,4 @@ thinkphp/
  composer.json
  composer.lock
  invoice.json
+ apidoc.json

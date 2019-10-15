@@ -23,17 +23,17 @@
     "url": "",
     "version": "0.0.0",
     "filename": "./public/doc/main.js",
-    "group": "D__Dev_Dev_Data_www_MessageSend_public_doc_main_js",
-    "groupTitle": "D__Dev_Dev_Data_www_MessageSend_public_doc_main_js",
+    "group": "D__Dev_Dev_Data_www_messageSend_public_doc_main_js",
+    "groupTitle": "D__Dev_Dev_Data_www_messageSend_public_doc_main_js",
     "name": ""
   },
   {
     "type": "post",
     "url": "/",
-    "title": "添加关于我们",
-    "description": "<p>addAboutus</p>",
-    "group": "admin_Aboutus",
-    "name": "addAboutus",
+    "title": "添加服务类型",
+    "description": "<p>addBusiness</p>",
+    "group": "admin_Administrator",
+    "name": "addBusiness",
     "parameter": {
       "fields": {
         "入参": [
@@ -49,35 +49,21 @@
             "type": "String",
             "optional": false,
             "field": "title",
-            "description": "<p>标题</p>"
+            "description": "<p>title</p>"
           },
           {
             "group": "入参",
             "type": "String",
             "optional": false,
-            "field": "image_path",
-            "description": "<p>图片路径</p>"
+            "field": "price",
+            "description": "<p>服务价格(最多保留小数点后5位)</p>"
           },
           {
             "group": "入参",
             "type": "Number",
             "optional": true,
-            "field": "jump_content",
-            "description": "<p>跳转内容</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "order",
-            "description": "<p>排序</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "content",
-            "description": "<p>简介</p>"
+            "field": "donate_num",
+            "description": "<p>赠送数量，默认0</p>"
           }
         ]
       }
@@ -90,27 +76,27 @@
             "type": "String",
             "optional": false,
             "field": "code",
-            "description": "<p>200:成功 / 3001:标题为空 / 3002:图片不存在 / 3003:内容为空 / 3009:添加失败 / 3010:图片没有上传过</p>"
+            "description": "<p>200:成功 / 3001:标题为空 / 3002:price格式错误 / 3003:price不能小于0 / 3004:登录失败</p>"
           }
         ]
       }
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/aboutus/addAboutus"
+        "url": "http://127.0.0.1:1006/admin/administrator/addBusiness"
       }
     ],
     "version": "0.0.0",
-    "filename": "./application/admin/controller/Aboutus.php",
-    "groupTitle": "admin_Aboutus"
+    "filename": "./application/admin/controller/Administrator.php",
+    "groupTitle": "admin_Administrator"
   },
   {
     "type": "post",
     "url": "/",
-    "title": "获取关于我们",
-    "description": "<p>getAboutus</p>",
-    "group": "admin_Aboutus",
-    "name": "getAboutus",
+    "title": "审核服务充值",
+    "description": "<p>aduitRechargeApplication</p>",
+    "group": "admin_Administrator",
+    "name": "aduitRechargeApplication",
     "parameter": {
       "fields": {
         "入参": [
@@ -124,23 +110,149 @@
           {
             "group": "入参",
             "type": "String",
-            "optional": true,
+            "optional": false,
             "field": "id",
-            "description": "<p>查询详情</p>"
+            "description": ""
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "status",
+            "description": "<p>状态 2.已审核 3.取消</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>审核留言</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "返回": [
+          {
+            "group": "返回",
+            "type": "String",
+            "optional": false,
+            "field": "code",
+            "description": "<p>200:成功 / 3001:id不存在或者不为数字 / 3002:status格式错误 / 3003:已审核 / 3004:登录失败</p>"
+          }
+        ]
+      }
+    },
+    "sampleRequest": [
+      {
+        "url": "http://127.0.0.1:1006/admin/administrator/aduitRechargeApplication"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./application/admin/controller/Administrator.php",
+    "groupTitle": "admin_Administrator"
+  },
+  {
+    "type": "post",
+    "url": "/",
+    "title": "账户资质审核",
+    "description": "<p>auditUserQualification</p>",
+    "group": "admin_Administrator",
+    "name": "auditUserQualification",
+    "parameter": {
+      "fields": {
+        "入参": [
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "cms_con_id",
+            "description": ""
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "status",
+            "description": "<p>审核状态:1,已提交;2,审核中;3,审核通过;4,审核不通过</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "返回": [
+          {
+            "group": "返回",
+            "type": "String",
+            "optional": false,
+            "field": "code",
+            "description": "<p>200:成功 / 3001:id不存在或者不为数字 / 3002:status码错误 / 3003:该资质已审核</p>"
+          }
+        ]
+      }
+    },
+    "sampleRequest": [
+      {
+        "url": "http://127.0.0.1:1006/admin/administrator/auditUserQualification"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./application/admin/controller/Administrator.php",
+    "groupTitle": "admin_Administrator"
+  },
+  {
+    "type": "post",
+    "url": "/",
+    "title": "获取服务类型",
+    "description": "<p>getBusiness</p>",
+    "group": "admin_Administrator",
+    "name": "getBusiness",
+    "parameter": {
+      "fields": {
+        "入参": [
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "cms_con_id",
+            "description": ""
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": ""
           },
           {
             "group": "入参",
             "type": "String",
             "optional": false,
             "field": "page",
-            "description": "<p>页码</p>"
+            "description": "<p>页码 默认1</p>"
           },
           {
             "group": "入参",
             "type": "String",
             "optional": false,
             "field": "pageNum",
-            "description": "<p>条数</p>"
+            "description": "<p>条数 默认10</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "getall",
+            "description": "<p>1 获取全部</p>"
           }
         ]
       }
@@ -160,20 +272,20 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/aboutus/getAboutus"
+        "url": "http://127.0.0.1:1006/admin/administrator/getBusiness"
       }
     ],
     "version": "0.0.0",
-    "filename": "./application/admin/controller/Aboutus.php",
-    "groupTitle": "admin_Aboutus"
+    "filename": "./application/admin/controller/Administrator.php",
+    "groupTitle": "admin_Administrator"
   },
   {
     "type": "post",
     "url": "/",
-    "title": "修改关于我们",
-    "description": "<p>updateAboutus</p>",
-    "group": "admin_Aboutus",
-    "name": "updateAboutus",
+    "title": "服务充值列表",
+    "description": "<p>getRechargeApplication</p>",
+    "group": "admin_Administrator",
+    "name": "getRechargeApplication",
     "parameter": {
       "fields": {
         "入参": [
@@ -190,181 +302,20 @@
             "optional": false,
             "field": "id",
             "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "title",
-            "description": "<p>标题</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "image_path",
-            "description": "<p>图片路径</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "jump_content",
-            "description": "<p>跳转内容</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "order",
-            "description": "<p>排序</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "content",
-            "description": "<p>简介</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3001:id不存在或者不为数字 / 3002:用户不存在 / 3003:密码错误 / 3004:登录失败</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/admin/aboutus/updateAboutus"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/admin/controller/Aboutus.php",
-    "groupTitle": "admin_Aboutus"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "添加应用案例",
-    "description": "<p>addApplicationCase</p>",
-    "group": "admin_ApplicationCase",
-    "name": "addApplicationCase",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "cms_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "title",
-            "description": "<p>标题</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "image_path",
-            "description": "<p>图片路径</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "jump_content",
-            "description": "<p>跳转内容</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "order",
-            "description": "<p>排序</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "content",
-            "description": "<p>简介</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3001:标题为空 / 3002:图片不存在 / 3003:内容为空 / 3009:添加失败 / 3010:图片没有上传过</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/admin/ApplicationCase/addApplicationCase"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/admin/controller/ApplicationCase.php",
-    "groupTitle": "admin_ApplicationCase"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "获取应用案例",
-    "description": "<p>getApplicationCase</p>",
-    "group": "admin_ApplicationCase",
-    "name": "getApplicationCase",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "cms_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "id",
-            "description": "<p>查询详情</p>"
           },
           {
             "group": "入参",
             "type": "String",
             "optional": false,
             "field": "page",
-            "description": "<p>页码</p>"
+            "description": "<p>页码 默认1</p>"
           },
           {
             "group": "入参",
             "type": "String",
             "optional": false,
             "field": "pageNum",
-            "description": "<p>条数</p>"
+            "description": "<p>条数 默认10</p>"
           }
         ]
       }
@@ -377,27 +328,83 @@
             "type": "String",
             "optional": false,
             "field": "code",
-            "description": "<p>200:成功 / 3001:页码不能为空 / 3002:用户不存在 / 3003:密码错误 / 3004:登录失败</p>"
+            "description": "<p>200:成功 / 3001:id不存在或者不为数字 / 3002:price格式错误 / 3003:price不能小于0 / 3004:登录失败</p>"
           }
         ]
       }
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/ApplicationCase/getApplicationCase"
+        "url": "http://127.0.0.1:1006/admin/administrator/getRechargeApplication"
       }
     ],
     "version": "0.0.0",
-    "filename": "./application/admin/controller/ApplicationCase.php",
-    "groupTitle": "admin_ApplicationCase"
+    "filename": "./application/admin/controller/Administrator.php",
+    "groupTitle": "admin_Administrator"
   },
   {
     "type": "post",
     "url": "/",
-    "title": "修改应用案例",
-    "description": "<p>updateApplicationCase</p>",
-    "group": "admin_ApplicationCase",
-    "name": "updateApplicationCase",
+    "title": "获取该用户该服务价格",
+    "description": "<p>getUserEquities</p>",
+    "group": "admin_Administrator",
+    "name": "getUserEquities",
+    "parameter": {
+      "fields": {
+        "入参": [
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "cms_con_id",
+            "description": ""
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "mobile",
+            "description": "<p>账户手机号</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "business_id",
+            "description": "<p>业务服务id</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "返回": [
+          {
+            "group": "返回",
+            "type": "String",
+            "optional": false,
+            "field": "code",
+            "description": "<p>200:成功 / 3001:business_id不存在或者不是数字 / 3002:用户不存在 / 3003:price不能小于0 / 3004:登录失败</p>"
+          }
+        ]
+      }
+    },
+    "sampleRequest": [
+      {
+        "url": "http://127.0.0.1:1006/admin/administrator/getUserEquities"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./application/admin/controller/Administrator.php",
+    "groupTitle": "admin_Administrator"
+  },
+  {
+    "type": "post",
+    "url": "/",
+    "title": "账户资质列表",
+    "description": "<p>getUserQualificationRecord</p>",
+    "group": "admin_Administrator",
+    "name": "getUserQualificationRecord",
     "parameter": {
       "fields": {
         "入参": [
@@ -414,188 +421,20 @@
             "optional": false,
             "field": "id",
             "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "title",
-            "description": "<p>标题</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "image_path",
-            "description": "<p>图片路径</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "jump_content",
-            "description": "<p>跳转内容</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "order",
-            "description": "<p>排序</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "content",
-            "description": "<p>简介</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3001:id不存在或者不为数字 / 3002:用户不存在 / 3003:密码错误 / 3004:登录失败</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/admin/ApplicationCase/updateApplicationCase"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/admin/controller/ApplicationCase.php",
-    "groupTitle": "admin_ApplicationCase"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "添加下载中心",
-    "description": "<p>addDownloadCenter</p>",
-    "group": "admin_DownloadCenter",
-    "name": "addDownloadCenter",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "cms_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "title",
-            "description": "<p>标题</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "image_path",
-            "description": "<p>图片路径</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "jump_content",
-            "description": "<p>跳转内容</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "order",
-            "description": "<p>排序</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "type",
-            "description": "<p>类型 1，服务类；2，行业平台，3验证码，4综合SMS平台</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "content",
-            "description": "<p>简介</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3001:标题为空 / 3002:图片不存在 / 3003:内容为空 / 3004:类型错误 / 3009:添加失败 / 3010:图片没有上传过</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/admin/downloadcenter/addDownloadCenter"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/admin/controller/DownloadCenter.php",
-    "groupTitle": "admin_DownloadCenter"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "获取下载中心",
-    "description": "<p>getDownloadCenter</p>",
-    "group": "admin_DownloadCenter",
-    "name": "getDownloadCenter",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "cms_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "id",
-            "description": "<p>查询详情</p>"
           },
           {
             "group": "入参",
             "type": "String",
             "optional": false,
             "field": "page",
-            "description": "<p>页码</p>"
+            "description": "<p>页码 默认1</p>"
           },
           {
             "group": "入参",
             "type": "String",
             "optional": false,
             "field": "pageNum",
-            "description": "<p>条数</p>"
+            "description": "<p>条数 默认10</p>"
           }
         ]
       }
@@ -608,27 +447,90 @@
             "type": "String",
             "optional": false,
             "field": "code",
-            "description": "<p>200:成功 / 3001:页码不能为空 / 3002:用户不存在 / 3003:密码错误 / 3004:登录失败</p>"
+            "description": "<p>200:成功 / 3001:id不存在或者不为数字 / 3002:price格式错误 / 3003:price不能小于0 / 3004:登录失败</p>"
           }
         ]
       }
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/downloadcenter/getDownloadCenter"
+        "url": "http://127.0.0.1:1006/admin/administrator/getUserQualificationRecord"
       }
     ],
     "version": "0.0.0",
-    "filename": "./application/admin/controller/DownloadCenter.php",
-    "groupTitle": "admin_DownloadCenter"
+    "filename": "./application/admin/controller/Administrator.php",
+    "groupTitle": "admin_Administrator"
   },
   {
     "type": "post",
     "url": "/",
-    "title": "修改下载中心",
-    "description": "<p>updateDownloadCenter</p>",
-    "group": "admin_DownloadCenter",
-    "name": "updateDownloadCenter",
+    "title": "服务充值申请",
+    "description": "<p>rechargeApplication</p>",
+    "group": "admin_Administrator",
+    "name": "rechargeApplication",
+    "parameter": {
+      "fields": {
+        "入参": [
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "cms_con_id",
+            "description": ""
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "mobile",
+            "description": "<p>充值账户手机号</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "business_id",
+            "description": "<p>业务服务id</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "num",
+            "description": "<p>充值条数</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "返回": [
+          {
+            "group": "返回",
+            "type": "String",
+            "optional": false,
+            "field": "code",
+            "description": "<p>200:成功 / 3001:手机号格式错误 / 3002:business_id不存在或者不为数字 / 3003:用户不存在 / 3003:price不能小于0 / 3004:该用户没有该服务，无法充值</p>"
+          }
+        ]
+      }
+    },
+    "sampleRequest": [
+      {
+        "url": "http://127.0.0.1:1006/admin/administrator/rechargeApplication"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./application/admin/controller/Administrator.php",
+    "groupTitle": "admin_Administrator"
+  },
+  {
+    "type": "post",
+    "url": "/",
+    "title": "修改服务类型",
+    "description": "<p>updateBusiness</p>",
+    "group": "admin_Administrator",
+    "name": "updateBusiness",
     "parameter": {
       "fields": {
         "入参": [
@@ -657,36 +559,15 @@
             "group": "入参",
             "type": "String",
             "optional": true,
-            "field": "image_path",
-            "description": "<p>图片路径</p>"
+            "field": "price",
+            "description": "<p>服务价格(最多保留小数点后5位)</p>"
           },
           {
             "group": "入参",
             "type": "Number",
             "optional": true,
-            "field": "jump_content",
-            "description": "<p>跳转内容</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "order",
-            "description": "<p>排序</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "type",
-            "description": "<p>类型 1，服务类；2，行业平台，3验证码，4综合SMS平台</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "content",
-            "description": "<p>简介</p>"
+            "field": "donate_num",
+            "description": "<p>赠送数量，默认0</p>"
           }
         ]
       }
@@ -699,27 +580,27 @@
             "type": "String",
             "optional": false,
             "field": "code",
-            "description": "<p>200:成功 / 3001:id不存在或者不为数字 / 3002:类型错误 / 3003:密码错误 / 3004:登录失败</p>"
+            "description": "<p>200:成功 / 3001:id不存在或者不为数字 / 3002:price格式错误 / 3003:price不能小于0 / 3004:登录失败</p>"
           }
         ]
       }
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/downloadcenter/updateDownloadCenter"
+        "url": "http://127.0.0.1:1006/admin/administrator/updateBusiness"
       }
     ],
     "version": "0.0.0",
-    "filename": "./application/admin/controller/DownloadCenter.php",
-    "groupTitle": "admin_DownloadCenter"
+    "filename": "./application/admin/controller/Administrator.php",
+    "groupTitle": "admin_Administrator"
   },
   {
     "type": "post",
     "url": "/",
-    "title": "添加产品类型",
-    "description": "<p>addProduct</p>",
-    "group": "admin_Product",
-    "name": "addProduct",
+    "title": "获取会员列表",
+    "description": "<p>getUsers</p>",
+    "group": "admin_Users",
+    "name": "getUsers",
     "parameter": {
       "fields": {
         "入参": [
@@ -732,104 +613,34 @@
           },
           {
             "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "title",
-            "description": "<p>标题</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "image_path",
-            "description": "<p>图片路径</p>"
+            "type": "Number",
+            "optional": true,
+            "field": "mobile",
+            "description": "<p>手机号</p>"
           },
           {
             "group": "入参",
             "type": "Number",
-            "optional": true,
-            "field": "jump_content",
-            "description": "<p>跳转内容</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "order",
-            "description": "<p>排序</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "content",
-            "description": "<p>简介</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3001:标题为空 / 3002:图片不存在 / 3003:内容为空 / 3009:添加失败 / 3010:图片没有上传过</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/admin/product/addProduct"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/admin/controller/Product.php",
-    "groupTitle": "admin_Product"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "获取产品类型",
-    "description": "<p>getProduct</p>",
-    "group": "admin_Product",
-    "name": "getProduct",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "cms_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "id",
-            "description": "<p>查询详情</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
             "optional": false,
             "field": "page",
             "description": "<p>页码</p>"
           },
           {
             "group": "入参",
-            "type": "String",
+            "type": "Number",
             "optional": false,
-            "field": "pageNum",
-            "description": "<p>条数</p>"
+            "field": "pagenum",
+            "description": "<p>查询条数</p>"
           }
         ]
-      }
+      },
+      "examples": [
+        {
+          "title": "(data) {Array} 返回用户列表",
+          "content": "[\n\"code\":\"200\",返回code码\n\"totle\":\"82\",总记录条数\n {\"id\":9,\"tel\":15502123212,\n  \"name\":\"喜蓝葡萄酒\",\n  \"status\":\"1\",\n  \"image\":\"\",\"title\":\"\",\n  \"desc\":\"江浙沪皖任意2瓶包邮，其他地区参考实际支付运费\"\n },\n]",
+          "type": "json"
+        }
+      ]
     },
     "success": {
       "fields": {
@@ -839,27 +650,113 @@
             "type": "String",
             "optional": false,
             "field": "code",
-            "description": "<p>200:成功 / 3001:页码不能为空 / 3002:用户不存在 / 3003:密码错误 / 3004:登录失败</p>"
+            "description": "<p>200:成功 / 3000:用户列表空 / 3001:手机号格式错误 / 3002:页码和查询条数只能是数字</p>"
+          },
+          {
+            "group": "返回",
+            "type": "String",
+            "optional": false,
+            "field": "totle",
+            "description": "<p>总结果条数</p>"
+          }
+        ],
+        "data": [
+          {
+            "group": "data",
+            "type": "object_array",
+            "optional": false,
+            "field": "data",
+            "description": "<p>结果</p>"
+          },
+          {
+            "group": "data",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>用户ID</p>"
+          },
+          {
+            "group": "data",
+            "type": "String",
+            "optional": false,
+            "field": "user_type",
+            "description": "<p>用户类型1.普通账户2.总店账户</p>"
+          },
+          {
+            "group": "data",
+            "type": "String",
+            "optional": false,
+            "field": "user_identity",
+            "description": "<p>用户身份1.普通,2.钻石会员3.创业店主4.boss合伙人</p>"
+          },
+          {
+            "group": "data",
+            "type": "String",
+            "optional": false,
+            "field": "sex",
+            "description": "<p>用户性别 1.男 2.女 3.未确认</p>"
+          },
+          {
+            "group": "data",
+            "type": "String",
+            "optional": false,
+            "field": "nick_name",
+            "description": "<p>微信昵称</p>"
+          },
+          {
+            "group": "data",
+            "type": "String",
+            "optional": false,
+            "field": "true_name",
+            "description": "<p>真实姓名</p>"
+          },
+          {
+            "group": "data",
+            "type": "String",
+            "optional": false,
+            "field": "brithday",
+            "description": "<p>生日</p>"
+          },
+          {
+            "group": "data",
+            "type": "String",
+            "optional": false,
+            "field": "avatar",
+            "description": "<p>微信头像</p>"
+          },
+          {
+            "group": "data",
+            "type": "String",
+            "optional": false,
+            "field": "mobile",
+            "description": "<p>手机号</p>"
+          },
+          {
+            "group": "data",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": "<p>email</p>"
           }
         ]
       }
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/product/getProduct"
+        "url": "http://127.0.0.1:1006/admin/User/getUsers"
       }
     ],
     "version": "0.0.0",
-    "filename": "./application/admin/controller/Product.php",
-    "groupTitle": "admin_Product"
+    "filename": "./application/admin/controller/User.php",
+    "groupTitle": "admin_Users"
   },
   {
     "type": "post",
     "url": "/",
-    "title": "修改产品类型",
-    "description": "<p>updateProduct</p>",
-    "group": "admin_Product",
-    "name": "updateProduct",
+    "title": "设置用户信息",
+    "description": "<p>seetingUser</p>",
+    "group": "admin_Users",
+    "name": "seetingUser",
     "parameter": {
       "fields": {
         "入参": [
@@ -872,45 +769,24 @@
           },
           {
             "group": "入参",
-            "type": "String",
+            "type": "Int",
             "optional": false,
-            "field": "id",
-            "description": ""
+            "field": "uid",
+            "description": "<p>账户id</p>"
           },
           {
             "group": "入参",
-            "type": "String",
+            "type": "Int",
             "optional": true,
-            "field": "title",
-            "description": "<p>标题</p>"
+            "field": "user_status",
+            "description": "<p>账户服务状态 1停止服务 2启用服务</p>"
           },
           {
             "group": "入参",
-            "type": "String",
+            "type": "Int",
             "optional": true,
-            "field": "image_path",
-            "description": "<p>图片路径</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "jump_content",
-            "description": "<p>跳转内容</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "order",
-            "description": "<p>排序</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "content",
-            "description": "<p>简介</p>"
+            "field": "reservation_service",
+            "description": "<p>可否预用服务 1不可 2可以</p>"
           }
         ]
       }
@@ -923,19 +799,82 @@
             "type": "String",
             "optional": false,
             "field": "code",
-            "description": "<p>200:成功 / 3001:id不存在或者不为数字 / 3002:用户不存在 / 3003:密码错误 / 3004:登录失败</p>"
+            "description": "<p>200:成功 / 3000:用户列表空 / 3001:user_status格式错误 / 3002:reservation_service格式错误 / 3003:uid格式错误</p>"
           }
         ]
       }
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/product/updateProduct"
+        "url": "http://127.0.0.1:1006/admin/user/seetingUser"
       }
     ],
     "version": "0.0.0",
-    "filename": "./application/admin/controller/Product.php",
-    "groupTitle": "admin_Product"
+    "filename": "./application/admin/controller/User.php",
+    "groupTitle": "admin_Users"
+  },
+  {
+    "type": "post",
+    "url": "/",
+    "title": "设置用户服务项目",
+    "description": "<p>seetingUserEquities</p>",
+    "group": "admin_Users",
+    "name": "seetingUserEquities",
+    "parameter": {
+      "fields": {
+        "入参": [
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "cms_con_id",
+            "description": ""
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>账户id</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": false,
+            "field": "business_id",
+            "description": "<p>服务id</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": true,
+            "field": "agency_price",
+            "description": "<p>代理价格，默认统一服务价格</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "返回": [
+          {
+            "group": "返回",
+            "type": "String",
+            "optional": false,
+            "field": "code",
+            "description": "<p>200:成功 / 3001:business_id格式错误或者不存在 / 3002:agency_price格式错误 / 3003:uid格式错误 / 3004:代理价格不能低于统一服务价 / 3005:该服务已添加 / 3006:子账户服务无法设置</p>"
+          }
+        ]
+      }
+    },
+    "sampleRequest": [
+      {
+        "url": "http://127.0.0.1:1006/admin/user/seetingUserEquities"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./application/admin/controller/User.php",
+    "groupTitle": "admin_Users"
   },
   {
     "type": "post",
@@ -2267,10 +2206,10 @@
   {
     "type": "post",
     "url": "/",
-    "title": "添加轮播",
-    "description": "<p>addBanner</p>",
-    "group": "admin_banner",
-    "name": "addBanner",
+    "title": "获取区级列表",
+    "description": "<p>getArea</p>",
+    "group": "admin_provinces",
+    "name": "getArea",
     "parameter": {
       "fields": {
         "入参": [
@@ -2283,38 +2222,10 @@
           },
           {
             "group": "入参",
-            "type": "String",
+            "type": "Number",
             "optional": false,
-            "field": "title",
-            "description": "<p>标题</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "image_path",
-            "description": "<p>图片路径</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "jump_type",
-            "description": "<p>跳转类型1路径</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "jump_content",
-            "description": "<p>跳转内容</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "order",
-            "description": "<p>排序</p>"
+            "field": "cityId",
+            "description": "<p>市级id</p>"
           }
         ]
       }
@@ -2327,27 +2238,50 @@
             "type": "String",
             "optional": false,
             "field": "code",
-            "description": "<p>200:成功 / 3001:标题为空 / 3002:用户不存在 / 3003:密码错误 / 3004:登录失败</p>"
+            "description": "<p>200:成功 / 3000:区列表空 / 3001:市级id不存在 / 3002:市级id只能是数字</p>"
+          },
+          {
+            "group": "返回",
+            "type": "String",
+            "optional": false,
+            "field": "data",
+            "description": "<p>结果</p>"
+          }
+        ],
+        "data": [
+          {
+            "group": "data",
+            "type": "String",
+            "optional": false,
+            "field": "area_name",
+            "description": "<p>名称</p>"
+          },
+          {
+            "group": "data",
+            "type": "Number",
+            "optional": false,
+            "field": "pid",
+            "description": "<p>父级id</p>"
           }
         ]
       }
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/banner/addBanner"
+        "url": "http://127.0.0.1:1006/admin/provinces/getArea"
       }
     ],
     "version": "0.0.0",
-    "filename": "./application/admin/controller/Banner.php",
-    "groupTitle": "admin_banner"
+    "filename": "./application/admin/controller/Provinces.php",
+    "groupTitle": "admin_provinces"
   },
   {
     "type": "post",
     "url": "/",
-    "title": "获取轮播",
-    "description": "<p>getBanner</p>",
-    "group": "admin_banner",
-    "name": "getBanner",
+    "title": "获取市级列表",
+    "description": "<p>getCity</p>",
+    "group": "admin_provinces",
+    "name": "getCity",
     "parameter": {
       "fields": {
         "入参": [
@@ -2360,24 +2294,10 @@
           },
           {
             "group": "入参",
-            "type": "String",
+            "type": "Number",
             "optional": false,
-            "field": "id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "page",
-            "description": "<p>页码</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "pageNum",
-            "description": "<p>条数</p>"
+            "field": "provinceId",
+            "description": "<p>省级id</p>"
           }
         ]
       }
@@ -2390,27 +2310,50 @@
             "type": "String",
             "optional": false,
             "field": "code",
-            "description": "<p>200:成功 / 3001:页码不能为空 / 3002:用户不存在 / 3003:密码错误 / 3004:登录失败</p>"
+            "description": "<p>200:成功 / 3000:市列表空 / 3001:省级id不存在 / 3002:省级id只能是数字</p>"
+          },
+          {
+            "group": "返回",
+            "type": "Array",
+            "optional": false,
+            "field": "data",
+            "description": "<p>结果</p>"
+          }
+        ],
+        "data": [
+          {
+            "group": "data",
+            "type": "String",
+            "optional": false,
+            "field": "area_name",
+            "description": "<p>名称</p>"
+          },
+          {
+            "group": "data",
+            "type": "Number",
+            "optional": false,
+            "field": "pid",
+            "description": "<p>父级id</p>"
           }
         ]
       }
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/banner/getBanner"
+        "url": "http://127.0.0.1:1006/admin/provinces/getCity"
       }
     ],
     "version": "0.0.0",
-    "filename": "./application/admin/controller/Banner.php",
-    "groupTitle": "admin_banner"
+    "filename": "./application/admin/controller/Provinces.php",
+    "groupTitle": "admin_provinces"
   },
   {
     "type": "post",
     "url": "/",
-    "title": "修改轮播",
-    "description": "<p>updateBanner</p>",
-    "group": "admin_banner",
-    "name": "updateBanner",
+    "title": "省市列表",
+    "description": "<p>getProvinceCity</p>",
+    "group": "admin_provinces",
+    "name": "getProvinceCity",
     "parameter": {
       "fields": {
         "入参": [
@@ -2420,48 +2363,6 @@
             "optional": false,
             "field": "cms_con_id",
             "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "title",
-            "description": "<p>标题</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "image_path",
-            "description": "<p>图片路径</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "jump_type",
-            "description": "<p>跳转类型1路径</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "jump_content",
-            "description": "<p>跳转内容</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "order",
-            "description": "<p>排序</p>"
           }
         ]
       }
@@ -2474,27 +2375,50 @@
             "type": "String",
             "optional": false,
             "field": "code",
-            "description": "<p>200:成功 / 3001:id不存在或者不为数字 / 3002:用户不存在 / 3003:密码错误 / 3004:登录失败</p>"
+            "description": "<p>200:成功 / 3000:省市区列表为空</p>"
+          },
+          {
+            "group": "返回",
+            "type": "Array",
+            "optional": false,
+            "field": "data",
+            "description": "<p>结果</p>"
+          }
+        ],
+        "data": [
+          {
+            "group": "data",
+            "type": "String",
+            "optional": false,
+            "field": "area_name",
+            "description": "<p>名称</p>"
+          },
+          {
+            "group": "data",
+            "type": "Number",
+            "optional": false,
+            "field": "pid",
+            "description": "<p>父级id</p>"
           }
         ]
       }
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/banner/updateBanner"
+        "url": "http://127.0.0.1:1006/admin/provinces/getProvinceCity"
       }
     ],
     "version": "0.0.0",
-    "filename": "./application/admin/controller/Banner.php",
-    "groupTitle": "admin_banner"
+    "filename": "./application/admin/controller/Provinces.php",
+    "groupTitle": "admin_provinces"
   },
   {
     "type": "post",
     "url": "/",
-    "title": "添加解决方案",
-    "description": "<p>addSolution</p>",
-    "group": "admin_solution",
-    "name": "addSolution",
+    "title": "获取运费模版的剩余可选省市列表",
+    "description": "<p>getProvinceCityByfreight</p>",
+    "group": "admin_provinces",
+    "name": "getProvinceCityByfreight",
     "parameter": {
       "fields": {
         "入参": [
@@ -2507,38 +2431,17 @@
           },
           {
             "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "title",
-            "description": "<p>标题</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "image_path",
-            "description": "<p>图片路径</p>"
-          },
-          {
-            "group": "入参",
             "type": "Number",
-            "optional": true,
-            "field": "jump_content",
-            "description": "<p>跳转内容</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "order",
-            "description": "<p>排序</p>"
+            "optional": false,
+            "field": "freight_id",
+            "description": "<p>运费模版详情id</p>"
           },
           {
             "group": "入参",
             "type": "Number",
             "optional": false,
-            "field": "content",
-            "description": "<p>简介</p>"
+            "field": "freight_detail_id",
+            "description": "<p>运费模版价格详情id</p>"
           }
         ]
       }
@@ -2551,159 +2454,49 @@
             "type": "String",
             "optional": false,
             "field": "code",
-            "description": "<p>200:成功 / 3001:标题为空 / 3002:图片不存在 / 3003:内容为空 / 3009:添加失败 / 3010:图片没有上传过</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/admin/solution/addSolution"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/admin/controller/Solution.php",
-    "groupTitle": "admin_solution"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "获取解决方案",
-    "description": "<p>getSolution</p>",
-    "group": "admin_solution",
-    "name": "getSolution",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "cms_con_id",
-            "description": ""
+            "description": "<p>200:成功 / 3001:运费模版Id必须为数字 / 3002:运费模版价格详情id必须为数字</p>"
           },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "page",
-            "description": "<p>页码</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "pageNum",
-            "description": "<p>条数</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
           {
             "group": "返回",
+            "type": "Array",
+            "optional": false,
+            "field": "data",
+            "description": "<p>结果</p>"
+          }
+        ],
+        "data": [
+          {
+            "group": "data",
             "type": "String",
             "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3001:页码不能为空 / 3002:用户不存在 / 3003:密码错误 / 3004:登录失败</p>"
+            "field": "area_name",
+            "description": "<p>名称</p>"
+          },
+          {
+            "group": "data",
+            "type": "Number",
+            "optional": false,
+            "field": "pid",
+            "description": "<p>父级id</p>"
+          },
+          {
+            "group": "data",
+            "type": "Number",
+            "optional": false,
+            "field": "status",
+            "description": "<p>1.可选的 2.已选的</p>"
           }
         ]
       }
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/solution/getSolution"
+        "url": "http://127.0.0.1:1006/admin/provinces/getprovincecitybyfreight"
       }
     ],
     "version": "0.0.0",
-    "filename": "./application/admin/controller/Solution.php",
-    "groupTitle": "admin_solution"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "修改解决方案",
-    "description": "<p>updateSolution</p>",
-    "group": "admin_solution",
-    "name": "updateSolution",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "cms_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "title",
-            "description": "<p>标题</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "image_path",
-            "description": "<p>图片路径</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "jump_content",
-            "description": "<p>跳转内容</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "order",
-            "description": "<p>排序</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "content",
-            "description": "<p>简介</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3001:id不存在或者不为数字 / 3002:用户不存在 / 3003:密码错误 / 3004:登录失败</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/admin/solution/updateSolution"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/admin/controller/Solution.php",
-    "groupTitle": "admin_solution"
+    "filename": "./application/admin/controller/Provinces.php",
+    "groupTitle": "admin_provinces"
   },
   {
     "type": "post",
@@ -3195,6 +2988,92 @@
   {
     "type": "post",
     "url": "/",
+    "title": "开通分配子账户",
+    "description": "<p>apportionSonUser</p>",
+    "group": "index_user",
+    "name": "apportionSonUser",
+    "parameter": {
+      "fields": {
+        "入参": [
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "con_id",
+            "description": ""
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "nick_name",
+            "description": "<p>子账户用户名</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "user_type",
+            "description": "<p>账户类型1.个人账户2.企业账户</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "mobile",
+            "description": "<p>手机号</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": true,
+            "field": "email",
+            "description": "<p>手机号</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "返回": [
+          {
+            "group": "返回",
+            "type": "String",
+            "optional": false,
+            "field": "code",
+            "description": "<p>200:成功 3000:没有该用户 / 3001:手机号格式错误 / 3002:缺少con_id / 3003:conId有误查不到uid</p>"
+          },
+          {
+            "group": "返回",
+            "type": "Array",
+            "optional": false,
+            "field": "data",
+            "description": "<p>用户信息</p>"
+          }
+        ],
+        "data": [
+          {
+            "group": "data",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>用户加密id</p>"
+          }
+        ]
+      }
+    },
+    "sampleRequest": [
+      {
+        "url": "http://127.0.0.1:1006/index/user/apportionSonUser"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./application/index/controller/Users.php",
+    "groupTitle": "index_user"
+  },
+  {
+    "type": "post",
+    "url": "/",
     "title": "通过con_id获取用户信息",
     "description": "<p>getUser</p>",
     "group": "index_user",
@@ -3295,6 +3174,307 @@
   {
     "type": "post",
     "url": "/",
+    "title": "账号密码登录",
+    "description": "<p>login</p>",
+    "group": "index_user",
+    "name": "login",
+    "parameter": {
+      "fields": {
+        "入参": [
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "mobile",
+            "description": "<p>接收的手机号</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>密码</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "返回": [
+          {
+            "group": "返回",
+            "type": "String",
+            "optional": false,
+            "field": "code",
+            "description": "<p>200:成功  3001:手机格式有误 / 3002:账号不存在 / 3003:密码错误 / 3004:登录失败</p>"
+          },
+          {
+            "group": "返回",
+            "type": "Array",
+            "optional": false,
+            "field": "data",
+            "description": "<p>用户信息</p>"
+          }
+        ]
+      }
+    },
+    "sampleRequest": [
+      {
+        "url": "http://127.0.0.1:1006/index/user/login"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./application/index/controller/Users.php",
+    "groupTitle": "index_user"
+  },
+  {
+    "type": "post",
+    "url": "/",
+    "title": "手机快捷登录",
+    "description": "<p>quickLogin</p>",
+    "group": "index_user",
+    "name": "quickLogin",
+    "parameter": {
+      "fields": {
+        "入参": [
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "mobile",
+            "description": "<p>接收的手机号</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "vercode",
+            "description": "<p>验证码</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "返回": [
+          {
+            "group": "返回",
+            "type": "String",
+            "optional": false,
+            "field": "code",
+            "description": "<p>200:成功  3001:手机格式有误  / 3002:code码错误 / 3004:验证码格式有误 / 3005:新用户需授权 / 3006:验证码错误 / 3009:该微信号已绑定手机号</p>"
+          },
+          {
+            "group": "返回",
+            "type": "Array",
+            "optional": false,
+            "field": "data",
+            "description": "<p>用户信息</p>"
+          }
+        ]
+      }
+    },
+    "sampleRequest": [
+      {
+        "url": "http://127.0.0.1:1006/index/user/quicklogin"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./application/index/controller/Users.php",
+    "groupTitle": "index_user"
+  },
+  {
+    "type": "post",
+    "url": "/",
+    "title": "账户资质提交",
+    "description": "<p>recordUserQualification</p>",
+    "group": "index_user",
+    "name": "recordUserQualification",
+    "parameter": {
+      "fields": {
+        "入参": [
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "con_id",
+            "description": ""
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "company_name",
+            "description": "<p>主办单位或者主办人全称</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": false,
+            "field": "company_type",
+            "description": "<p>主办单位性质:1,国防机构;2,政府机关;3,事业单位;4,企业;5,个人;6社会团体;7,民办非企业单位;8,基金会;9,律师执业机构;10,外国在华文化中心;11,群众性团体组织;12,司法鉴定机构;13,宗教团体;14,境外机构;15,医疗机构;16,公证机构</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": false,
+            "field": "company_certificate_type",
+            "description": "<p>主办单位证件类型:1,营业执照（个人或企业）;3,组织机构代码证;4,事业单位法人证书;5,部队代号;9,组织机构代码证;12,组织机构代码证;13,统一社会信用代码证书;23,军队单位对外有偿服务许可证;27,外国企业常驻代表机构登记证</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "company_certificate_num",
+            "description": "<p>主办单位证件号码</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": false,
+            "field": "province_id",
+            "description": "<p>省份id</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": false,
+            "field": "city_id",
+            "description": "<p>城市id</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": false,
+            "field": "county_id",
+            "description": "<p>地区id</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "organizers_name",
+            "description": "<p>主办单位或主办人名称</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "identity_address",
+            "description": "<p>主办单位证件住所</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "mailingAddress_address",
+            "description": "<p>主办单位通讯地址(地区级)</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "user_supp_address",
+            "description": "<p>主办单位通讯地址(街道门牌号级)</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "investor",
+            "description": "<p>投资人或主管单位</p>"
+          },
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "entity_responsible_person_name",
+            "description": "<p>负责人姓名</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": false,
+            "field": "entity_responsible_person_identity_types",
+            "description": "<p>负责人证件类型(参照【主办单位证件类型】)</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": false,
+            "field": "entity_responsible_person_identity_num",
+            "description": "<p>负责人证件号码</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": false,
+            "field": "entity_responsible_person_mobile_phone",
+            "description": "<p>联系方式1</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": false,
+            "field": "entity_responsible_person_phone",
+            "description": "<p>联系方式2</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": false,
+            "field": "entity_responsible_person_msn",
+            "description": "<p>应急联系电话</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": false,
+            "field": "entity_responsible_person_email",
+            "description": "<p>电子邮件地址</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": true,
+            "field": "entity_remark",
+            "description": "<p>留言</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "返回": [
+          {
+            "group": "返回",
+            "type": "String",
+            "optional": false,
+            "field": "code",
+            "description": "<p>200:成功 / 3001:id不存在或者不为数字 / 3002:price格式错误 / 3003:price不能小于0 / 3004:登录失败</p>"
+          }
+        ]
+      }
+    },
+    "sampleRequest": [
+      {
+        "url": "http://127.0.0.1:1006/index/user/recordUserQualification"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./application/index/controller/Users.php",
+    "groupTitle": "index_user"
+  },
+  {
+    "type": "post",
+    "url": "/",
     "title": "重置密码",
     "description": "<p>resetPassword</p>",
     "group": "index_user",
@@ -3349,6 +3529,69 @@
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:1006/index/user/resetpassword"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./application/index/controller/Users.php",
+    "groupTitle": "index_user"
+  },
+  {
+    "type": "post",
+    "url": "/",
+    "title": "设置子账户用户服务项目",
+    "description": "<p>seetingUserEquities</p>",
+    "group": "index_user",
+    "name": "seetingUserEquities",
+    "parameter": {
+      "fields": {
+        "入参": [
+          {
+            "group": "入参",
+            "type": "String",
+            "optional": false,
+            "field": "con_id",
+            "description": ""
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": false,
+            "field": "mobile",
+            "description": "<p>账户手机号</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": false,
+            "field": "business_id",
+            "description": "<p>服务id</p>"
+          },
+          {
+            "group": "入参",
+            "type": "Int",
+            "optional": true,
+            "field": "agency_price",
+            "description": "<p>代理价格，默认统一代理商服务价格</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "返回": [
+          {
+            "group": "返回",
+            "type": "String",
+            "optional": false,
+            "field": "code",
+            "description": "<p>200:成功 / 3001:手机号格式错误 / 3002:agency_price格式错误 / 3003:母账户无该项服务业务 / 3004:代理价格不能低于服务商价格 / 3005:该服务已添加 / 3006:子账户服务无法设置 / 3007:business_id格式错误或者不存在 / 3008:该账户非此账户的子账户</p>"
+          }
+        ]
+      }
+    },
+    "sampleRequest": [
+      {
+        "url": "http://127.0.0.1:1006/index/user/seetingUserEquities"
       }
     ],
     "version": "0.0.0",
