@@ -83,7 +83,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/administrator/addBusiness"
+        "url": "http://127.0.0.1:1007/admin/administrator/addBusiness"
       }
     ],
     "version": "0.0.0",
@@ -146,7 +146,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/administrator/aduitRechargeApplication"
+        "url": "http://127.0.0.1:1007/admin/administrator/aduitRechargeApplication"
       }
     ],
     "version": "0.0.0",
@@ -202,7 +202,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/administrator/auditUserQualification"
+        "url": "http://127.0.0.1:1007/admin/administrator/auditUserQualification"
       }
     ],
     "version": "0.0.0",
@@ -272,7 +272,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/administrator/getBusiness"
+        "url": "http://127.0.0.1:1007/admin/administrator/getBusiness"
       }
     ],
     "version": "0.0.0",
@@ -335,7 +335,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/administrator/getRechargeApplication"
+        "url": "http://127.0.0.1:1007/admin/administrator/getRechargeApplication"
       }
     ],
     "version": "0.0.0",
@@ -391,7 +391,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/administrator/getUserEquities"
+        "url": "http://127.0.0.1:1007/admin/administrator/getUserEquities"
       }
     ],
     "version": "0.0.0",
@@ -454,7 +454,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/administrator/getUserQualificationRecord"
+        "url": "http://127.0.0.1:1007/admin/administrator/getUserQualificationRecord"
       }
     ],
     "version": "0.0.0",
@@ -517,7 +517,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/administrator/rechargeApplication"
+        "url": "http://127.0.0.1:1007/admin/administrator/rechargeApplication"
       }
     ],
     "version": "0.0.0",
@@ -587,7 +587,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/administrator/updateBusiness"
+        "url": "http://127.0.0.1:1007/admin/administrator/updateBusiness"
       }
     ],
     "version": "0.0.0",
@@ -743,7 +743,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/User/getUsers"
+        "url": "http://127.0.0.1:1007/admin/User/getUsers"
       }
     ],
     "version": "0.0.0",
@@ -806,7 +806,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/user/seetingUser"
+        "url": "http://127.0.0.1:1007/admin/user/seetingUser"
       }
     ],
     "version": "0.0.0",
@@ -869,7 +869,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/user/seetingUserEquities"
+        "url": "http://127.0.0.1:1007/admin/user/seetingUserEquities"
       }
     ],
     "version": "0.0.0",
@@ -932,7 +932,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/addadmin"
+        "url": "http://127.0.0.1:1007/admin/admin/addadmin"
       }
     ],
     "version": "0.0.0",
@@ -988,7 +988,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/addadminpermissions"
+        "url": "http://127.0.0.1:1007/admin/admin/addadminpermissions"
       }
     ],
     "version": "0.0.0",
@@ -1065,7 +1065,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/addpermissionsapi"
+        "url": "http://127.0.0.1:1007/admin/admin/addpermissionsapi"
       }
     ],
     "version": "0.0.0",
@@ -1121,7 +1121,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/addpermissionsgroup"
+        "url": "http://127.0.0.1:1007/admin/admin/addpermissionsgroup"
       }
     ],
     "version": "0.0.0",
@@ -1177,7 +1177,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/addpermissionsgrouppower"
+        "url": "http://127.0.0.1:1007/admin/admin/addpermissionsgrouppower"
       }
     ],
     "version": "0.0.0",
@@ -1228,7 +1228,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/cmsmenu"
+        "url": "http://127.0.0.1:1007/admin/admin/cmsmenu"
       }
     ],
     "version": "0.0.0",
@@ -1286,7 +1286,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/cmsmenuone"
+        "url": "http://127.0.0.1:1007/admin/admin/cmsmenuone"
       }
     ],
     "version": "0.0.0",
@@ -1342,7 +1342,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/deladminpermissions"
+        "url": "http://127.0.0.1:1007/admin/admin/deladminpermissions"
       }
     ],
     "version": "0.0.0",
@@ -1398,7 +1398,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/editmenu"
+        "url": "http://127.0.0.1:1007/admin/admin/editmenu"
       }
     ],
     "version": "0.0.0",
@@ -1461,7 +1461,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/editpermissionsapi"
+        "url": "http://127.0.0.1:1007/admin/admin/editpermissionsapi"
       }
     ],
     "version": "0.0.0",
@@ -1524,7 +1524,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/editpermissionsgroup"
+        "url": "http://127.0.0.1:1007/admin/admin/editpermissionsgroup"
       }
     ],
     "version": "0.0.0",
@@ -1594,7 +1594,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/getadmingroup"
+        "url": "http://127.0.0.1:1007/admin/admin/getadmingroup"
       }
     ],
     "version": "0.0.0",
@@ -1664,7 +1664,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/getadmininfo"
+        "url": "http://127.0.0.1:1007/admin/admin/getadmininfo"
       }
     ],
     "version": "0.0.0",
@@ -1727,7 +1727,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/getAdminUsers"
+        "url": "http://127.0.0.1:1007/admin/admin/getAdminUsers"
       }
     ],
     "version": "0.0.0",
@@ -1797,7 +1797,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/getgroupinfo"
+        "url": "http://127.0.0.1:1007/admin/admin/getgroupinfo"
       }
     ],
     "version": "0.0.0",
@@ -1881,7 +1881,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/getpermissionsapi"
+        "url": "http://127.0.0.1:1007/admin/admin/getpermissionsapi"
       }
     ],
     "version": "0.0.0",
@@ -1972,7 +1972,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/getpermissionsapione"
+        "url": "http://127.0.0.1:1007/admin/admin/getpermissionsapione"
       }
     ],
     "version": "0.0.0",
@@ -2035,7 +2035,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/getpermissionsgroupadmin"
+        "url": "http://127.0.0.1:1007/admin/admin/getpermissionsgroupadmin"
       }
     ],
     "version": "0.0.0",
@@ -2084,7 +2084,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/getpermissionslist"
+        "url": "http://127.0.0.1:1007/admin/admin/getpermissionslist"
       }
     ],
     "version": "0.0.0",
@@ -2133,7 +2133,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/login"
+        "url": "http://127.0.0.1:1007/admin/admin/login"
       }
     ],
     "version": "0.0.0",
@@ -2196,7 +2196,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/admin/midifypasswd"
+        "url": "http://127.0.0.1:1007/admin/admin/midifypasswd"
       }
     ],
     "version": "0.0.0",
@@ -2268,7 +2268,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/provinces/getArea"
+        "url": "http://127.0.0.1:1007/admin/provinces/getArea"
       }
     ],
     "version": "0.0.0",
@@ -2340,7 +2340,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/provinces/getCity"
+        "url": "http://127.0.0.1:1007/admin/provinces/getCity"
       }
     ],
     "version": "0.0.0",
@@ -2405,7 +2405,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/provinces/getProvinceCity"
+        "url": "http://127.0.0.1:1007/admin/provinces/getProvinceCity"
       }
     ],
     "version": "0.0.0",
@@ -2491,7 +2491,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/provinces/getprovincecitybyfreight"
+        "url": "http://127.0.0.1:1007/admin/provinces/getprovincecitybyfreight"
       }
     ],
     "version": "0.0.0",
@@ -2549,7 +2549,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/upload/uploadfile"
+        "url": "http://127.0.0.1:1007/admin/upload/uploadfile"
       }
     ],
     "version": "0.0.0",
@@ -2607,383 +2607,12 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/admin/upload/uploadmultifile"
+        "url": "http://127.0.0.1:1007/admin/upload/uploadmultifile"
       }
     ],
     "version": "0.0.0",
     "filename": "./application/admin/controller/Upload.php",
     "groupTitle": "admin_upload"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "关于我们",
-    "description": "<p>getAboutus</p>",
-    "group": "index_Aboutus",
-    "name": "getAboutus",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "aboutus_id",
-            "description": "<p>对应商品id</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "page",
-            "description": "<p>页码</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "pageNum",
-            "description": "<p>条数</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3000:未获取到数据 / 3002.type参数错误 / 3003.pid参数错误</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/index/aboutus/getAboutus"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/index/controller/aboutus.php",
-    "groupTitle": "index_Aboutus"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "应用案例",
-    "description": "<p>getApplicationCase</p>",
-    "group": "index_ApplicationCase",
-    "name": "getApplicationCase",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "applicationCase_id",
-            "description": "<p>对应商品id</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "page",
-            "description": "<p>页码</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "pageNum",
-            "description": "<p>条数</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3000:未获取到数据 / 3002.type参数错误 / 3003.pid参数错误</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/index/applicationCase/getApplicationCase"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/index/controller/ApplicationCase.php",
-    "groupTitle": "index_ApplicationCase"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "下载中心",
-    "description": "<p>getDownloadCenter</p>",
-    "group": "index_DownloadCenter",
-    "name": "getDownloadCenter",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "downloadCenter_id",
-            "description": "<p>对应商品id</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "page",
-            "description": "<p>页码</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "pageNum",
-            "description": "<p>条数</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3000:未获取到数据 / 3002.type参数错误 / 3003.pid参数错误</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/index/downloadCenter/getDownloadCenter"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/index/controller/DownloadCenter.php",
-    "groupTitle": "index_DownloadCenter"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "用户留言",
-    "description": "<p>addGuestbook</p>",
-    "group": "index_Guestbook",
-    "name": "addGuestbook",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "name",
-            "description": "<p>姓名</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "unit",
-            "description": "<p>单位</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "mobile",
-            "description": "<p>手机</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "phone",
-            "description": "<p>座机</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "qq",
-            "description": "<p>QQ</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "type",
-            "description": "<p>产品线:1,短信验证码；2，行业手机彩信，3，语言验证，4行业营销短信，5企业流量 6国际业务</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "email",
-            "description": "<p>邮箱</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "message",
-            "description": "<p>留言</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3001:手机号码错误 / 3000:未获取到数据 / 3002.type参数错误 / 3003.qq格式错误 / 3004:邮箱校验错误 / 3005:名称为空或者长度超出30个字符 / 3006:单位为空或者长度超出50个字符</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/index/guestbook/addGuestbook"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/index/controller/Guestbook.php",
-    "groupTitle": "index_Guestbook"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "产品中心",
-    "description": "<p>getProduct</p>",
-    "group": "index_Product",
-    "name": "getProduct",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "product_id",
-            "description": "<p>对应商品id</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "page",
-            "description": "<p>页码</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "pageNum",
-            "description": "<p>条数</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3000:未获取到数据 / 3002.type参数错误 / 3003.pid参数错误</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/index/product/getProduct"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/index/controller/Product.php",
-    "groupTitle": "index_Product"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "解决方案",
-    "description": "<p>getSolution</p>",
-    "group": "index_Solution",
-    "name": "getSolution",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": true,
-            "field": "solution_id",
-            "description": "<p>对应商品id</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "page",
-            "description": "<p>页码</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "pageNum",
-            "description": "<p>条数</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3000:未获取到数据 / 3002.type参数错误 / 3003.pid参数错误</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/index/solution/getSolution"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/index/controller/Solution.php",
-    "groupTitle": "index_Solution"
   },
   {
     "type": "post",
@@ -3064,7 +2693,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/index/user/apportionSonUser"
+        "url": "http://127.0.0.1:1007/index/user/apportionSonUser"
       }
     ],
     "version": "0.0.0",
@@ -3164,7 +2793,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/index/user/getuser"
+        "url": "http://127.0.0.1:1007/index/user/getuser"
       }
     ],
     "version": "0.0.0",
@@ -3220,7 +2849,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/index/user/login"
+        "url": "http://127.0.0.1:1007/index/user/login"
       }
     ],
     "version": "0.0.0",
@@ -3276,7 +2905,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/index/user/quicklogin"
+        "url": "http://127.0.0.1:1007/index/user/quicklogin"
       }
     ],
     "version": "0.0.0",
@@ -3465,7 +3094,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/index/user/recordUserQualification"
+        "url": "http://127.0.0.1:1007/index/user/recordUserQualification"
       }
     ],
     "version": "0.0.0",
@@ -3528,7 +3157,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/index/user/resetpassword"
+        "url": "http://127.0.0.1:1007/index/user/resetpassword"
       }
     ],
     "version": "0.0.0",
@@ -3591,7 +3220,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/index/user/seetingUserEquities"
+        "url": "http://127.0.0.1:1007/index/user/seetingUserEquities"
       }
     ],
     "version": "0.0.0",
@@ -3647,7 +3276,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/index/user/sendvercode"
+        "url": "http://127.0.0.1:1007/index/user/sendvercode"
       }
     ],
     "version": "0.0.0",
@@ -3724,7 +3353,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/index/user/userRegistered"
+        "url": "http://127.0.0.1:1007/index/user/userRegistered"
       }
     ],
     "version": "0.0.0",
@@ -3780,7 +3409,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/notify/note/getSms"
+        "url": "http://127.0.0.1:1007/notify/note/getSms"
       }
     ],
     "version": "0.0.0",
@@ -3829,7 +3458,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/notify/note/sendcontent"
+        "url": "http://127.0.0.1:1007/notify/note/sendcontent"
       }
     ],
     "version": "0.0.0",
@@ -3878,7 +3507,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/notify/note/sendSms"
+        "url": "http://127.0.0.1:1007/notify/note/sendSms"
       }
     ],
     "version": "0.0.0",
@@ -3941,7 +3570,7 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/pay/pay/pay"
+        "url": "http://127.0.0.1:1007/pay/pay/pay"
       }
     ],
     "version": "0.0.0",
@@ -3990,1013 +3619,11 @@
     },
     "sampleRequest": [
       {
-        "url": "http://127.0.0.1:1006/pay/pay/wxPayCallback"
+        "url": "http://127.0.0.1:1007/pay/pay/wxPayCallback"
       }
     ],
     "version": "0.0.0",
     "filename": "./application/pay/controller/Pay.php",
     "groupTitle": "pay_wxpay"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "删除商品详情和轮播图",
-    "description": "<p>delPromoteImage</p>",
-    "group": "supadmin_promote",
-    "name": "delPromoteImage",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "cms_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "image_path",
-            "description": "<p>商品id</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3001:图片不能为空 / 3002:图片不存在 / 3003:上传失败</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/supadmin/promote/delPromoteImage"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/supadmin/controller/Promote.php",
-    "groupTitle": "supadmin_promote"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "活动图片详情",
-    "description": "<p>getPromoteimagedetail</p>",
-    "group": "supadmin_promote",
-    "name": "getPromoteimagedetail",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "cms_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "promote_id",
-            "description": "<p>活动id</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3002:promote_id不存在</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/supadmin/promote/getPromoteimagedetail"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/supadmin/controller/Promote.php",
-    "groupTitle": "supadmin_promote"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "推广活动报名列表",
-    "description": "<p>getSupPromoteSignUp</p>",
-    "group": "supadmin_promote",
-    "name": "getSupPromoteSignUp",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "sup_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "promote_id",
-            "description": "<p>活动ID</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "page",
-            "description": "<p>页数</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "page_num",
-            "description": "<p>每页条数(默认10)</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "study_name",
-            "description": "<p>姓名</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "study_mobile",
-            "description": "<p>电话</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "sex",
-            "description": "<p>性别 1男 2女</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "start_time",
-            "description": "<p>开始时间</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": true,
-            "field": "end_time",
-            "description": "<p>结束时间</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3000:列表为空 / 3001:page错误 / 3002:promote_id错误 / 3003:时间格式错误 / 3004:性别格式错误</p>"
-          },
-          {
-            "group": "返回",
-            "type": "Array",
-            "optional": false,
-            "field": "data",
-            "description": ""
-          }
-        ],
-        "data": [
-          {
-            "group": "data",
-            "type": "Int",
-            "optional": false,
-            "field": "id",
-            "description": ""
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "study_name",
-            "description": "<p>学员姓名</p>"
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "study_mobile",
-            "description": "<p>学员手机号</p>"
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "sex",
-            "description": "<p>性别 1男 2女</p>"
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "age",
-            "description": "<p>年龄</p>"
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "signinfo",
-            "description": "<p>报名内容</p>"
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "create_time",
-            "description": "<p>报名时间</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/supadmin/promote/getSupPromoteSignUp"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/supadmin/controller/Promote.php",
-    "groupTitle": "supadmin_promote"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "对商品图进行排序",
-    "description": "<p>sortPromoteimagedetail</p>",
-    "group": "supadmin_promote",
-    "name": "sortImageDetail",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "cms_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "image_path",
-            "description": "<p>商品id</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "order_by",
-            "description": "<p>排序</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3001:图片不能为空 / 3002:图片不存在 / 3003:排序字段只能为数字或者排序最大为999 / 3004:修改失败</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/supadmin/promote/sortPromoteimagedetail"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/supadmin/controller/Promote.php",
-    "groupTitle": "supadmin_promote"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "提交活动详情和轮播图",
-    "description": "<p>uploadPromoteImages</p>",
-    "group": "supadmin_promote",
-    "name": "uploadPromoteImages",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "cms_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "image_type",
-            "description": "<p>图片类型 1.详情图 2.轮播图</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Number",
-            "optional": false,
-            "field": "promote_id",
-            "description": "<p>活动id</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Array",
-            "optional": false,
-            "field": "images",
-            "description": "<p>图片集合</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3001:图片类型有误 / 3002:商品id只能是数字 / 3003:图片不能空 / 3004:商品id不存在 / 3005:图片没有上传过 / 3006:上传失败</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/supadmin/promote/uploadPromoteImages"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/supadmin/controller/Promote.php",
-    "groupTitle": "supadmin_promote"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "上传单个图片",
-    "description": "<p>uploadFile</p>",
-    "group": "supadmin_upload",
-    "name": "uploadFilee",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "sup_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "file",
-            "optional": false,
-            "field": "image",
-            "description": "<p>图片</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功  / 3001:上传的不是图片 / 3002:上传图片不能超过2M / 3003:上传失败 / 3004:上传文件不能为空</p>"
-          }
-        ],
-        "data": [
-          {
-            "group": "data",
-            "type": "Array",
-            "optional": false,
-            "field": "data",
-            "description": "<p>结果</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/supadmin/upload/uploadfile"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/supadmin/controller/Upload.php",
-    "groupTitle": "supadmin_upload"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "添加推广",
-    "description": "<p>addPromote</p>",
-    "group": "supadmin_user",
-    "name": "addPromote",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "sup_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "title",
-            "description": "<p>标题</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "big_image",
-            "description": "<p>大图</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "share_title",
-            "description": "<p>微信转发分享标题</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "share_image",
-            "description": "<p>微信转发分享图片</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "share_count",
-            "description": "<p>需要分享次数</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "bg_image",
-            "description": "<p>分享成功页面图片</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3001:title不能为空 / 3002:share_title不能为空 / 3003:big_image未上传 / 3004:share_image未上传 / 3005:bg_image未上传 / 3006:big_image图片没有上传过 / 3007:share_image图片没有上传过 / 3008:bg_image图片没有上传过 / 3009:share_count有误 / 3010:添加失败</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/supadmin/user/addpromote"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/supadmin/controller/User.php",
-    "groupTitle": "supadmin_user"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "编辑推广",
-    "description": "<p>editPromote</p>",
-    "group": "supadmin_user",
-    "name": "editPromote",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "sup_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "Int",
-            "optional": false,
-            "field": "id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "title",
-            "description": "<p>标题</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "big_image",
-            "description": "<p>大图</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "share_title",
-            "description": "<p>微信转发分享标题</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "share_image",
-            "description": "<p>微信转发分享图片</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Int",
-            "optional": false,
-            "field": "share_count",
-            "description": "<p>需要分享次数</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "bg_image",
-            "description": "<p>分享成功页面图片</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 /3000:推广活动不存在 / 3001:title不能为空 / 3002:share_title不能为空 / 3006:big_image图片没有上传过 / 3007:share_image图片没有上传过 / 3008:bg_image图片没有上传过 / 3009:share_count有误 / 3010:修改失败</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/supadmin/user/editpromote"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/supadmin/controller/User.php",
-    "groupTitle": "supadmin_user"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "推广活动详情",
-    "description": "<p>getPromoteInfo</p>",
-    "group": "supadmin_user",
-    "name": "getPromoteInfo",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "sup_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "Int",
-            "optional": false,
-            "field": "id",
-            "description": ""
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3000:列表为空 / 3001:id错误 / 3002:详情id不存在</p>"
-          },
-          {
-            "group": "返回",
-            "type": "Array",
-            "optional": false,
-            "field": "data",
-            "description": ""
-          }
-        ],
-        "data": [
-          {
-            "group": "data",
-            "type": "Int",
-            "optional": false,
-            "field": "id",
-            "description": ""
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "title",
-            "description": "<p>标题</p>"
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "big_image",
-            "description": "<p>大图</p>"
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "share_title",
-            "description": "<p>微信转发分享标题</p>"
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "share_image",
-            "description": "<p>微信转发分享图片</p>"
-          },
-          {
-            "group": "data",
-            "type": "Int",
-            "optional": false,
-            "field": "share_count",
-            "description": "<p>需要分享次数</p>"
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "bg_image",
-            "description": "<p>分享成功页面图片</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/supadmin/user/getpromoteinfo"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/supadmin/controller/User.php",
-    "groupTitle": "supadmin_user"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "推广活动列表",
-    "description": "<p>getPromoteList</p>",
-    "group": "supadmin_user",
-    "name": "getPromoteList",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "sup_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "Int",
-            "optional": false,
-            "field": "page",
-            "description": "<p>页数</p>"
-          },
-          {
-            "group": "入参",
-            "type": "Int",
-            "optional": true,
-            "field": "page_num",
-            "description": "<p>每页条数(默认10)</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3000:列表为空 / 3001:page错误</p>"
-          },
-          {
-            "group": "返回",
-            "type": "Array",
-            "optional": false,
-            "field": "data",
-            "description": ""
-          }
-        ],
-        "data": [
-          {
-            "group": "data",
-            "type": "Int",
-            "optional": false,
-            "field": "id",
-            "description": ""
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "title",
-            "description": "<p>标题</p>"
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "big_image",
-            "description": "<p>大图</p>"
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "share_title",
-            "description": "<p>微信转发分享标题</p>"
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "share_image",
-            "description": "<p>微信转发分享图片</p>"
-          },
-          {
-            "group": "data",
-            "type": "Int",
-            "optional": false,
-            "field": "share_count",
-            "description": "<p>需要分享次数</p>"
-          },
-          {
-            "group": "data",
-            "type": "String",
-            "optional": false,
-            "field": "bg_image",
-            "description": "<p>分享成功页面图片</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/supadmin/user/getpromoteList"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/supadmin/controller/User.php",
-    "groupTitle": "supadmin_user"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "获取管理员信息",
-    "description": "<p>getSupUser</p>",
-    "group": "supadmin_user",
-    "name": "getSupUser",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "sup_con_id",
-            "description": ""
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功  / 5000:请重新登录 2.5001:账号已停用</p>"
-          },
-          {
-            "group": "返回",
-            "type": "Array",
-            "optional": false,
-            "field": "data",
-            "description": "<p>用户信息</p>"
-          },
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "admin_name",
-            "description": "<p>管理员名</p>"
-          },
-          {
-            "group": "返回",
-            "type": "data",
-            "optional": false,
-            "field": "stype",
-            "description": "<p>用户类型 1.后台管理员 2.超级管理员</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/supadmin/user/getsupuser"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/supadmin/controller/User.php",
-    "groupTitle": "supadmin_user"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "修改密码",
-    "description": "<p>resetPassword</p>",
-    "group": "supadmin_user",
-    "name": "resetPassword",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "sup_con_id",
-            "description": ""
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "passwd",
-            "description": "<p>用户密码</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "new_passwd1",
-            "description": "<p>新密码</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "new_passwd2",
-            "description": "<p>确认密码</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3001:密码错误 / 3002:密码必须为6-16个任意字符 / 3003:老密码不能为空 / 3004:密码确认有误  / 3005:修改密码失败</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/supadmin/user/resetpassword"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/supadmin/controller/User.php",
-    "groupTitle": "supadmin_user"
-  },
-  {
-    "type": "post",
-    "url": "/",
-    "title": "后台登录",
-    "description": "<p>sup_login</p>",
-    "group": "supadmin_user",
-    "name": "sup_login",
-    "parameter": {
-      "fields": {
-        "入参": [
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "mobile",
-            "description": "<p>手机号</p>"
-          },
-          {
-            "group": "入参",
-            "type": "String",
-            "optional": false,
-            "field": "passwd",
-            "description": "<p>密码</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "返回": [
-          {
-            "group": "返回",
-            "type": "String",
-            "optional": false,
-            "field": "code",
-            "description": "<p>200:成功 / 3001:手机号密码不能为空 / 3002:用户不存在 / 3003:密码错误 / 3004:登录失败</p>"
-          }
-        ]
-      }
-    },
-    "sampleRequest": [
-      {
-        "url": "http://127.0.0.1:1006/supadmin/user/login"
-      }
-    ],
-    "version": "0.0.0",
-    "filename": "./application/supadmin/controller/User.php",
-    "groupTitle": "supadmin_user"
   }
 ]
