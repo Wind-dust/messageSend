@@ -24,6 +24,9 @@ class Phpredis {
             if (!empty($this->redis_config['password'])) {
                 $redis->auth($this->redis_config["password"]);
             }
+            if (!empty($this->redis_config['select'])) {
+                $redis->select($this->redis_config['select']);
+            }
             self::$conn = $redis;
         }
     }

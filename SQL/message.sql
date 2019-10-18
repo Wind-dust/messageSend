@@ -93,6 +93,20 @@ CREATE TABLE `yx_permissions_group`  (
   UNIQUE INDEX `uniq_group_name`(`group_name`, `delete_time`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '权限分组名称' ROW_FORMAT = Dynamic;
 
+CREATE TABLE `yx_permissions_api` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `menu_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '所属菜单',
+  `api_name` varchar(50) NOT NULL DEFAULT '' COMMENT '接口url',
+  `stype` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '接口curd权限 1.增 2.删 3.改 4.查',
+  `cn_name` varchar(50) NOT NULL DEFAULT '' COMMENT '权限名称',
+  `content` varchar(200) NOT NULL DEFAULT '' COMMENT '权限的详细描述',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uniq_api_name` (`api_name`,`delete_time`) USING BTREE,
+  KEY `index_meun_id` (`menu_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4 COMMENT='Api接口权限';
+
 -- -----------------------------
 -- 业务功能表
 -- -----------------------------
