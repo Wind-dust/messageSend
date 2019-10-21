@@ -255,6 +255,7 @@ class Administrator extends AdminController {
      * @apiParam (入参) {String} id
      * @apiParam (入参) {String} page 页码 默认1
      * @apiParam (入参) {String} pageNum 条数 默认10
+     * @apiParam (入参) {String} [getall] 传1获取全部 
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id不存在或者不为数字 / 3002:price格式错误 / 3003:price不能小于0 / 3004:登录失败
      * @apiSampleRequest /admin/administrator/getRechargeApplication
      * @return array
@@ -265,11 +266,12 @@ class Administrator extends AdminController {
         $id       = trim($this->request->post('id'));
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
+        $getall  = trim($this->request->post('getall'));
         $page     = is_numeric($page) ? $page : 1;
         $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
         intval($page);
         intval($pageNum);
-        $result = $this->app->administrator->getRechargeApplication($page, $pageNum, $id);
+        $result = $this->app->administrator->getRechargeApplication($page, $pageNum, $id, $getall);
         // $this->apiLog($apiName, [$page, $pageNum], $result['code'], '');
         return $result;
     }

@@ -18,6 +18,21 @@ CREATE TABLE `yx_admin`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
+DROP TABLE IF EXISTS `yx_permissions_api`;
+CREATE TABLE `yx_permissions_api` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `menu_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '所属菜单',
+  `api_name` varchar(50) NOT NULL DEFAULT '' COMMENT '接口url',
+  `stype` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '接口curd权限 1.增 2.删 3.改 4.查',
+  `cn_name` varchar(50) NOT NULL DEFAULT '' COMMENT '权限名称',
+  `content` varchar(200) NOT NULL DEFAULT '' COMMENT '权限的详细描述',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uniq_api_name` (`api_name`,`delete_time`) USING BTREE,
+  KEY `index_meun_id` (`menu_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Api接口权限';
+
 -- ----------------------------
 -- Table structure for yx_admin_permissions_group
 -- ----------------------------
@@ -285,6 +300,8 @@ CREATE TABLE `yx_business` (
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '业务类型及定价' ROW_FORMAT = Dynamic;
+
+DROP TABLE IF EXISTS `yx_`
 
 DROP TABLE IF EXISTS `yx_user_equities`;
 CREATE TABLE `yx_user_equities` (
