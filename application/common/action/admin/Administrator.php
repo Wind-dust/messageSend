@@ -65,7 +65,7 @@ class Administrator extends CommonIndex {
     }
 
     public function updateBusiness($id, $title, $price, $donate_num = 0) {
-        $Business = DbBusiness::getBusiness(['id' => $id], 'id', true);
+        $Business = DbAdministrator::getBusiness(['id' => $id], 'id', true);
         if (empty($Business)) {
             return ['code' => '3001'];
         }
@@ -80,7 +80,7 @@ class Administrator extends CommonIndex {
         }
         Db::startTrans();
         try {
-            $updateRes = DbBusiness::editBusiness($data, $id);
+            $updateRes = DbAdministrator::editBusiness($data, $id);
             if ($updateRes) {
                 Db::commit();
                 return ['code' => '200'];
