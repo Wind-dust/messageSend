@@ -61,6 +61,12 @@ class DbUser {
         return $obj->select()->toArray();
     }
 
+
+    public function updateUserCon($data, $id) {
+        $UserCon = new UserCon;
+        return $UserCon->save($data,['id' => $id]);
+    }
+
     /**
      * 添加验证码日志
      * @param $data
