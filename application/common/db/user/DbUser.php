@@ -41,6 +41,10 @@ class DbUser {
         return $obj->toArray();
     }
 
+    public function getUserInfoCount($where){
+        return Users::where($where)->count();
+    }
+
     /**
      * 添加验证码日志
      * @param $data
