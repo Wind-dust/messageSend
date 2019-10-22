@@ -13,9 +13,6 @@ return [
     'curl'                  => $commandPath . 'Curl',
     'user'                  => $commandPath . 'User',
     'areas'                 => $commandPath . 'Areas',
-    'order'                 => $commandPath . 'Order',
-    'temporaryscript'       => $commandPath . 'Temporaryscript',
+    'cmpp'                  => $commandPath . 'Cmpp',
     'localscript'           => $commandPath . 'LocalScript',
-    'modelmessage'          => $commandPath . 'ModelMessage',
-    'wechatgraphicmaterial' => $commandPath . 'WeChatGraphicMaterial',
 ];

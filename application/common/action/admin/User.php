@@ -34,7 +34,7 @@ class User extends CommonIndex {
         }
         foreach ($result as $key => $value) {
             $result[$key]['has_qualification'] = 0;
-            if (DbAdministrator::getUserQualification(['uid' => $value['uid']], 'id', true)) {
+            if (DbAdministrator::getUserQualification(['uid' => $value['id']], 'id', true)) {
                 $result[$key]['has_qualification'] = 1;
             }
         }

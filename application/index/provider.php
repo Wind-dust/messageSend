@@ -13,6 +13,7 @@
 return [
     'user'              => app\common\action\index\Users::class,
     'provinces'         => app\common\action\admin\Provinces::class,
+    'send'              => app\common\action\admin\Send::class,
     // 'solution'        => app\common\action\index\Solution::class,
     // 'product'         => app\common\action\index\Product::class,
     // 'applicationcase' => app\common\action\index\ApplicationCase::class,
