@@ -205,7 +205,7 @@ class Administrator extends CommonIndex {
         if ($adminRemittance['status'] > 1){
             return ['code' => '3003'];
         }
-        $userEquities = DbAdministrator::getUserEquities(['uid' => $adminRemittance['uid'],'business_id' => $adminRemittance['business_id']],'id',true);
+        $userEquities = DbAdministrator::getUserEquities(['uid' => $adminRemittance['uid'],'business_id' => $adminRemittance['business_id']],'id,num_balance',true);
         Db::startTrans();
         try {
             $updateRes = DbAdministrator::editAdminRemittance(['status' => $status, 'message' => $message],$id);
@@ -226,6 +226,7 @@ class Administrator extends CommonIndex {
             return ['code' => '200'];
 
         } catch (\Exception $e) {
+            exception($e);
             Db::rollback();
             return ['code' => '3009']; //修改失败
         }
