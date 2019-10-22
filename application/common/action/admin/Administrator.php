@@ -158,7 +158,7 @@ class Administrator extends CommonIndex {
         if (empty($business)) {
             return ['code' => '3002'];
         }
-        if (!DbAdministrator::getUserEquities(['business_id' => $business_id, 'uid' => $user['id']])){
+        if (!DbAdministrator::getUserEquities(['business_id' => $business_id, 'uid' => $user['id']],'id')){
             return ['code' => '3004'];
         }
         $data = [];
