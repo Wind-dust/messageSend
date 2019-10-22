@@ -173,7 +173,7 @@ class Administrator extends CommonIndex {
 
         Db::startTrans();
         try {
-            $updateRes = DbAdministrator::AdminRemittance($data);
+            $updateRes = DbAdministrator::addAdminRemittance($data);
             Db::commit();
             return ['code' => '200'];
 
