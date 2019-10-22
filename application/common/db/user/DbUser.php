@@ -46,6 +46,22 @@ class DbUser {
     }
 
     /**
+     * 获取con_id记录
+     * @param $where
+     * @param $field
+     * @param bool $row
+     * @return array
+     * @author zyr
+     */
+    public function getUserCon($where, $field, $row = false) {
+        $obj = UserCon::where($where)->field($field);
+        if ($row === true) {
+            return $obj->findOrEmpty()->toArray();
+        }
+        return $obj->select()->toArray();
+    }
+
+    /**
      * 添加验证码日志
      * @param $data
      * @return mixed
