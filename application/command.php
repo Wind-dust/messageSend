@@ -14,5 +14,6 @@ return [
     'user'                  => $commandPath . 'User',
     'areas'                 => $commandPath . 'Areas',
     'cmpp'                  => $commandPath . 'Cmpp',
+    'cmppsubmit'            => $commandPath . 'Cmppsubmit',
     'localscript'           => $commandPath . 'LocalScript',
 ];
