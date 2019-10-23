@@ -69,7 +69,7 @@ class User extends CommonIndex {
             Db::commit();
             return ['code' => '200', 'con_id' => $conId];
         } catch (\Exception $e) {
-            // exception($e);
+            exception($e);
             Db::rollback();
             return ['code' => '3004'];
 
