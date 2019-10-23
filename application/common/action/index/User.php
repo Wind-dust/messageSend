@@ -57,7 +57,8 @@ class User extends CommonIndex {
             } else {
                 DbUser::updateUserCon(['con_id' => $conId], $userCon['id']);
                 $this->redis->hDel($this->redisConIdUid, $userCon['con_id']);
-                $this->redis->zDelete($this->redisConIdTime, $userCon['con_id']);
+                // $this->redis->zDelete($this->redisConIdTime, $userCon['con_id']);
+                $this->redis->zRem($this->redisConIdTime, $userCon['con_id']);
             }
             
             $this->redis->zAdd($this->redisConIdTime, time(), $conId);
