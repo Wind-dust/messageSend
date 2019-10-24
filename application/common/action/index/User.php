@@ -481,7 +481,7 @@ class User extends CommonIndex {
             return ['code' => '3003'];
         }
         if (empty($this->checkAccount($mobile))) {
-            return ['code' => '3005'];//该手机号已注册
+            return ['code' => '3006'];//该手机号已注册
         }
         $cipherPassword = $this->getPassword($passwd, $this->cipherUserKey); //加密后的password
         $data = [

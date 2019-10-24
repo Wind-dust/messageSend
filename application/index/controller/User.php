@@ -216,6 +216,7 @@ class User extends MyController {
      * @apiParam (入参) {String} nick_name 子账户用户名
      * @apiParam (入参) {String} user_type 账户类型1.个人账户2.企业账户
      * @apiParam (入参) {String} mobile 手机号
+     * @apiParam (入参) {String} passwd 密码
      * @apiParam (入参) {String} [email] 手机号
      * @apiSuccess (返回) {String} code 200:成功 3000:没有该用户 / 3001:手机号格式错误 / 3002:缺少con_id / 3003:conId有误查不到uid
      * @apiSuccess (返回) {Array} data 用户信息
