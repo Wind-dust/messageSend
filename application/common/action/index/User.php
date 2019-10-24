@@ -568,4 +568,25 @@ class User extends CommonIndex {
             return ['code' => '3009']; //修改失败
         }
     }
+
+    public function getUserEquitises($conId){
+        $uid = $this->getUidByConId($conId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $user_equities = DbAdministrator::getUserEquities(['uid' => $uid],'*',false);
+        if (empty($user_equities)) {
+            return ['code' => '200', 'userEquities' => []];;
+        }
+        foreach ($user_equities as $key => $equitise) {
+            $user_equities[$key]['business_name'] = DbAdministrator::getBusiness(['id' => $equitise['business_id']],'title',true)['title'];
+            unset($user_equities[$key]['id']);
+            unset($user_equities[$key]['uid']);
+            unset($user_equities[$key]['business_id']);
+            unset($user_equities[$key]['update_time']);
+            unset($user_equities[$key]['create_time']);
+            unset($user_equities[$key]['delete_time']);
+        }
+        return ['code' => '200', 'userEquities' => $user_equities];
+    }
 }
