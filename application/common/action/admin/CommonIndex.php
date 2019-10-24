@@ -44,13 +44,13 @@ class CommonIndex {
             $this->redis->zAdd($this->redisCmsConIdTime, time(), $cmsConId); //更新时间
             $adminId = $this->redis->hGet($this->redisCmsConIdUid, $cmsConId);
             if (empty($adminId)) {
-                $this->redis->zDelete($this->redisCmsConIdTime, $cmsConId);
+                $this->redis->zRem($this->redisCmsConIdTime, $cmsConId);
                 $this->redis->hDel($this->redisCmsConIdUid, $cmsConId);
                 return ['code' => '5000'];
             }
             $adminInfo = DbAdmin::getAdminInfo(['id' => $adminId], 'status', true);
             if (empty($adminInfo)) {
-                $this->redis->zDelete($this->redisCmsConIdTime, $cmsConId);
+                $this->redis->zRem($this->redisCmsConIdTime, $cmsConId);
                 $this->redis->hDel($this->redisCmsConIdUid, $cmsConId);
                 return ['code' => '5000'];
             }
@@ -59,7 +59,7 @@ class CommonIndex {
             }
             return ['code' => '200'];
         }
-        $this->redis->zDelete($this->redisCmsConIdTime, $cmsConId);
+        $this->redis->zRem($this->redisCmsConIdTime, $cmsConId);
         $this->redis->hDel($this->redisCmsConIdUid, $cmsConId);
         return ['code' => '5000'];
     }

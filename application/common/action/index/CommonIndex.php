@@ -67,7 +67,7 @@ class CommonIndex {
                     return ['code' => '200'];
                 }
             }
-            $this->redis->zDelete($this->redisConIdTime, $conId);
+            $this->redis->zRem($this->redisConIdTime, $conId);
             $this->redis->hDel($this->redisConIdUid, $conId);
         }
         return ['code' => '5000'];
