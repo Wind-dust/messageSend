@@ -582,7 +582,7 @@ class User extends CommonIndex {
             $user_equities[$key]['business_name'] = DbAdministrator::getBusiness(['id' => $equitise['business_id']],'title',true)['title'];
             unset($user_equities[$key]['id']);
             unset($user_equities[$key]['uid']);
-            unset($user_equities[$key]['business_id']);
+            // unset($user_equities[$key]['business_id']);
             unset($user_equities[$key]['update_time']);
             unset($user_equities[$key]['create_time']);
             unset($user_equities[$key]['delete_time']);
