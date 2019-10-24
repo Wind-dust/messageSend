@@ -514,6 +514,7 @@ class User extends CommonIndex {
         try {
             $uid = DbAdministrator::addUserQualificationRecord($data); //添加后生成的uid
             Db::commit();
+            return ['code' => '200'];
         } catch (\Exception $e) {
             Db::rollback();
             return ['code' => '3009'];
