@@ -57,14 +57,14 @@ class User extends CommonIndex {
             } else {
                 DbUser::updateUserCon(['con_id' => $conId], $userCon['id']);
                 $this->redis->hDel($this->redisConIdUid, $userCon['con_id']);
-                // $this->redis->zDelete($this->redisConIdTime, $userCon['con_id']);
+                // $this->redis->zRem($this->redisConIdTime, $userCon['con_id']);
                 $this->redis->zRem($this->redisConIdTime, $userCon['con_id']);
             }
             
             $this->redis->zAdd($this->redisConIdTime, time(), $conId);
             $conUid = $this->redis->hSet($this->redisConIdUid, $conId, $uid);
             if ($conUid === false) {
-                $this->redis->zDelete($this->redisConIdTime, $conId);
+                $this->redis->zRem($this->redisConIdTime, $conId);
                 $this->redis->hDel($this->redisConIdUid, $conId);
             }
             Db::commit();
@@ -419,7 +419,7 @@ class User extends CommonIndex {
             $this->redis->zAdd($this->redisConIdTime, time(), $conId);
             $conUid = $this->redis->hSet($this->redisConIdUid, $conId, $uid);
             if ($conUid === false) {
-                $this->redis->zDelete($this->redisConIdTime, $conId);
+                $this->redis->zRem($this->redisConIdTime, $conId);
                 $this->redis->hDel($this->redisConIdUid, $conId);
                 Db::rollback();
             }
@@ -454,12 +454,12 @@ class User extends CommonIndex {
             }
             if (!empty($userCon)) {
                 $this->redis->hDel($this->redisConIdUid, $userCon['con_id']);
-                $this->redis->zDelete($this->redisConIdTime, $userCon['con_id']);
+                $this->redis->zRem($this->redisConIdTime, $userCon['con_id']);
             }
             $this->redis->zAdd($this->redisConIdTime, time(), $conId);
             $conUid = $this->redis->hSet($this->redisConIdUid, $conId, $uid);
             if ($conUid === false) {
-                $this->redis->zDelete($this->redisConIdTime, $conId);
+                $this->redis->zRem($this->redisConIdTime, $conId);
                 $this->redis->hDel($this->redisConIdUid, $conId);
                 Db::rollback();
             }
