@@ -9,7 +9,7 @@ class LogImage extends Model {
     use SoftDelete;
     protected $pk = 'id';
     // 设置当前模型对应的完整数据表名称
-    protected $table = 'pz_log_image';
+    protected $table = 'yx_log_image';
     // 设置当前模型的数据库连接
     protected $connection = '';
     protected $deleteTime = 'delete_time';
