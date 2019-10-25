@@ -119,6 +119,9 @@ class Administrator extends CommonIndex {
                 if ($status == 3) {
                     unset($record['id']);
                     unset($record['status']);
+                    unset($record['update_time']);
+                    unset($record['create_time']);
+                    unset($record['delete_time']);
                     DbAdministrator::addUserQualification($record);
                     //开通账户使用权限
                     DbUser::updateUser(['user_status' => 2], $record['uid']);
@@ -129,7 +132,7 @@ class Administrator extends CommonIndex {
             Db::rollback();
             return ['code' => '3009']; //修改失败
         } catch (\Exception $e) {
-            exception($e);
+            // exception($e);
             Db::rollback();
             return ['code' => '3009']; //修改失败
         }
