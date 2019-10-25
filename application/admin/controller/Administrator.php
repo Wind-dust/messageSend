@@ -153,14 +153,14 @@ class Administrator extends AdminController {
 
     /**
      * @api              {post} / 账户资质审核
-     * @apiDescription   auditUserQualification
+     * @apiDescription   auditUserQualificationRecord
      * @apiGroup         admin_Administrator
-     * @apiName          auditUserQualification
+     * @apiName          auditUserQualificationRecord
      * @apiParam (入参) {String} cms_con_id
      * @apiParam (入参) {String} id
      * @apiParam (入参) {String} status 审核状态:1,已提交;2,审核中;3,审核通过;4,审核不通过
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id不存在或者不为数字 / 3002:status码错误 / 3003:该资质已审核
-     * @apiSampleRequest /admin/administrator/auditUserQualification
+     * @apiSampleRequest /admin/administrator/auditUserQualificationRecord
      * @return array
      * @author rzc
      */
