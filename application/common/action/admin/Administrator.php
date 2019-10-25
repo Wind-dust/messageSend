@@ -129,6 +129,7 @@ class Administrator extends CommonIndex {
             Db::rollback();
             return ['code' => '3009']; //修改失败
         } catch (\Exception $e) {
+            exception($e);
             Db::rollback();
             return ['code' => '3009']; //修改失败
         }
