@@ -235,4 +235,73 @@ class Administrator extends CommonIndex {
             return ['code' => '3009']; //修改失败
         }
     }
+
+    public function getChannel(){
+        $result = DbAdministrator::getChannel([], 'id,channel_name', false);
+        return ['code' => '200', 'channel_list' => $result];
+    }
+
+    public function distributeUserChannel($channel_id, $user_phone, $priority){
+        $channel =  DbAdministrator::getChannel(['id' => $channel_id], 'id', true);
+        if (empty($channel)){
+            return ['code' => '3002'];
+        }
+        $user = DbUser::getUserInfo(['mobile' => $mobile], 'id', true);
+        if (empty($user)){
+            return ['code' => '3004'];
+        }
+        if (DbAdministrator::getUserChannel(['uid' => $user['id'],'channel_id' => $channel_id],'id',true)) {
+            return ['code' => '3005'];
+        }
+        $data = [];
+        $data = [
+            'channel_id' => $channel_id,
+            'uid' => $user['id'],
+            'priority' => $priority,
+        ];
+        Db::startTrans();
+        try {
+            DbAdministrator::addUserChannel($data);
+            Db::commit();
+            return ['code' => '200'];
+
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function updateUserChannel($id, $priority){
+        $userchannel = DbAdministrator::getUserChannel(['id' => $id],'id',true);
+        if (empty($userchannel)){
+            return ['code' => '3001'];
+        }
+        Db::startTrans();
+        try {
+            DbAdministrator::editUserChannel(['priority' => $priority],$id);
+            Db::commit();
+            return ['code' => '200'];
+
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function delUserChannel($id){
+        $userchannel = DbAdministrator::getUserChannel(['id' => $id],'id',true);
+        if (empty($userchannel)){
+            return ['code' => '3001'];
+        }
+        Db::startTrans();
+        try {
+            DbAdministrator::delUserChannel($id);
+            Db::commit();
+            return ['code' => '200'];
+
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
+    }
 }

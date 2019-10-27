@@ -9,6 +9,8 @@ use app\common\model\UserQualification;
 use app\common\model\UserQualificationRecord;
 use app\common\model\ExpenseLog;
 use app\common\model\ServiceConsumptionLog;
+use app\common\model\Channel;
+use app\common\model\UserChannel;
 use think\Db;
 
 class DbAdministrator {
@@ -159,5 +161,41 @@ class DbAdministrator {
     public function editServiceConsumptionLog($data, $id) {
         $ServiceConsumptionLog = new ServiceConsumptionLog;
         return $ServiceConsumptionLog->save($data, ['id' => $id]);
+    }
+
+    public function getChannel($where, $field, $row = false, $orderBy = '', $limit = '') {
+        $obj = Channel::field($field)->where($where);
+        return $this->getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function addChannel($data) {
+        $Channel = new Channel;
+        $Channel->save($data);
+        return $Channel->id;
+    }
+
+    public function editChannel($data, $id) {
+        $Channel = new Channel;
+        return $Channel->save($data, ['id' => $id]);
+    }
+
+    public function getUserChannel($where, $field, $row = false, $orderBy = '', $limit = '') {
+        $obj = UserChannel::field($field)->where($where);
+        return $this->getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function addUserChannel($data) {
+        $UserChannel = new UserChannel;
+        $UserChannel->save($data);
+        return $UserChannel->id;
+    }
+
+    public function editUserChannel($data, $id) {
+        $UserChannel = new UserChannel;
+        return $UserChannel->save($data, ['id' => $id]);
+    }
+
+    public function delUserChannel($id){
+        return UserChannel::destory($id);
     }
 }

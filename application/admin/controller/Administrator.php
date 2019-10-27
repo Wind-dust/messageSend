@@ -310,4 +310,115 @@ class Administrator extends AdminController {
         // $this->apiLog($apiName, [$page, $pageNum], $result['code'], '');
         return $result;
     }
+
+    /**
+     * @api              {post} / 获取已接入通道
+     * @apiDescription   getChannel
+     * @apiGroup         admin_Administrator
+     * @apiName          getChannel
+     * @apiParam (入参) {String} cms_con_id
+     * @apiSuccess (返回) {String} code 200:成功 
+     * @apiSampleRequest /admin/administrator/getChannel
+     * @return array
+     * @author rzc
+     */
+    public function getChannel(){
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        $result  = $this->app->administrator->getChannel();
+        return $result;
+    }
+
+     /**
+     * @api              {post} / 分配用户通道
+     * @apiDescription   distributeUserChannel
+     * @apiGroup         admin_Administrator
+     * @apiName          distributeUserChannel
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} channel_id 通道ID
+     * @apiParam (入参) {String} user_phone 被设置用户手机号
+     * @apiParam (入参) {String} priority 优先级:1,默认省网优先;2,非接入省网外优先
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:手机号格式错误 / 3002:channel_id格式错误 / 3003:非法的优先级  / 3004:该用户不存在
+     * @apiSampleRequest /admin/administrator/distributeUserChannel
+     * @return array
+     * @author rzc
+     */
+    public function distributeUserChannel(){
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $channel_id = trim($this->request->post('channel_id'));
+        $user_phone = trim($this->request->post('user_phone'));
+        $priority = trim($this->request->post('priority'));
+        if (checkMobile($user_phone) === false) {
+            return ['code' => '3001'];
+        }
+        if (empty($channel_id) || intval($channel_id) < 1 || !is_numeric($channel_id)) {
+            return ['code' => '3002'];
+        }
+        if (!is_array($priority,[1,2])) {
+            return ['code' => '3003'];
+        }
+        $result  = $this->app->administrator->distributeUserChannel(intval($channel_id), intval($user_phone), intval($priority));
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 修改用户该通道的优先级
+     * @apiDescription   updateUserChannel
+     * @apiGroup         admin_Administrator
+     * @apiName          updateUserChannel
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 设置ID
+     * @apiParam (入参) {String} priority 优先级:1,默认省网优先;2,非接入省网外优先
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3003:非法的优先级
+     * @apiSampleRequest /admin/administrator/updateUserChannel
+     * @return array
+     * @author rzc
+     */
+    public function updateUserChannel(){
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id = trim($this->request->post('id'));
+       
+        if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
+            return ['code' => '3001'];
+        }
+        if (!is_array($priority,[1,2])) {
+            return ['code' => '3003'];
+        }
+        $result  = $this->app->administrator->updateUserChannel(intval($id), intval($priority));
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 取消用户使用该通道
+     * @apiDescription   delUserChannel
+     * @apiGroup         admin_Administrator
+     * @apiName          delUserChannel
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 设置ID
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 
+     * @apiSampleRequest /admin/administrator/delUserChannel
+     * @return array
+     * @author rzc
+     */
+    public function delUserChannel(){
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id = trim($this->request->post('id'));
+       
+        if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
+            return ['code' => '3001'];
+        }
+        $result  = $this->app->administrator->delUserChannel(intval($id));
+        return $result;
+    }
 }
