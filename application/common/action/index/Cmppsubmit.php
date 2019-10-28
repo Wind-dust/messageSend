@@ -218,8 +218,8 @@ class Cmppsubmit {
         if ($line) {
             $data = $line . " : " . $data;
         }
-        // file_put_contents(realpath("../")."/cmpp1.log", print_r($data, true) . PHP_EOL, FILE_APPEND);
-        file_put_contents("./cmpp1.log", print_r($data, true) . PHP_EOL, FILE_APPEND);
+        file_put_contents(realpath("../")."/cmpp1.log", print_r($data, true) . PHP_EOL, FILE_APPEND);
+        // file_put_contents("./cmpp1.log", print_r($data, true) . PHP_EOL, FILE_APPEND);
     }
 }
 
