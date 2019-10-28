@@ -4,14 +4,22 @@ namespace app\common\action\index;
 
 class Cmppsubmit {
     // 设置项
-    public $host          = "121.199.15.87"; //服务商ip
-    public $port          = "7890"; //短连接端口号   17890长连接端口号
-    public $Source_Addr   = "992174"; //企业id  企业代码
-    public $Shared_secret = 'shyx11'; //网关登录密码
-    public $Dest_Id       = "1069999999"; //短信接入码 短信端口号
+    // public $host          = "121.199.15.87"; //服务商ip
+    // public $port          = "7890"; //短连接端口号   17890长连接端口号
+    // public $Source_Addr   = "992174"; //企业id  企业代码
+    // public $Shared_secret = 'shyx11'; //网关登录密码
+    // public $Dest_Id       = "1069999999"; //短信接入码 短信端口号
+
+    public $host          = "116.62.88.162"; //服务商ip
+    public $port          = "8592"; //短连接端口号   17890长连接端口号
+    public $Source_Addr   = "101161"; //企业id  企业代码
+    public $Shared_secret = '5hsey6u9'; //网关登录密码
+    public $Dest_Id       = "106928080159"; //短信接入码 短信端口号
+
     public $SP_ID         = "";
     public $SP_CODE       = "";
-    public $Service_Id    = ""; //业务代码   这个是业务代码
+    public $Service_Id    = "217062"; //业务代码   这个是业务代码
+    // public $Service_Id    = ""; //业务代码   这个是业务代码
     public $deliver;
     private $socket;
     private $Sequence_Id = 1;
@@ -210,11 +218,12 @@ class Cmppsubmit {
         if ($line) {
             $data = $line . " : " . $data;
         }
-        file_put_contents(realpath("../")."/cmpp1.log", print_r($data, true) . PHP_EOL, FILE_APPEND);
+        // file_put_contents(realpath("../")."/cmpp1.log", print_r($data, true) . PHP_EOL, FILE_APPEND);
+        file_put_contents("./cmpp1.log", print_r($data, true) . PHP_EOL, FILE_APPEND);
     }
 }
 
 $cmpp = new CMPPSubmit($argv[1],$argv[2]);
 $cmpp->createSocket();
 // $cmpp->cmppConnect();
-$cmpp->cmppSubmit();
+// $cmpp->cmppSubmit();

@@ -246,7 +246,7 @@ class Administrator extends CommonIndex {
         if (empty($channel)){
             return ['code' => '3002'];
         }
-        $user = DbUser::getUserInfo(['mobile' => $mobile], 'id', true);
+        $user = DbUser::getUserInfo(['mobile' => $user_phone], 'id', true);
         if (empty($user)){
             return ['code' => '3004'];
         }
