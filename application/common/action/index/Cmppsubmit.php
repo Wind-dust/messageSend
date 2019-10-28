@@ -224,6 +224,7 @@ class Cmppsubmit {
 }
 
 $cmpp = new CMPPSubmit($argv[1],$argv[2]);
+// print_r($cmpp);die;
 $cmpp->createSocket();
-// $cmpp->cmppConnect();
+$cmpp->cmppConnect();
 $cmpp->cmppSubmit();

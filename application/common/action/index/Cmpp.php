@@ -4,14 +4,22 @@ namespace app\common\action\index;
 
 class Cmpp {
     // 设置项
-    public $host          = "121.199.15.87"; //服务商ip
-    public $port          = "7890"; //7900短连接端口号   7890长连接端口号
-    public $Source_Addr   = "992174"; //企业id  企业代码
-    public $Shared_secret = 'shyx11'; //网关登录密码
-    public $Dest_Id       = "1069999999"; //短信接入码 短信端口号
+    // public $host          = "121.199.15.87"; //服务商ip
+    // public $port          = "7890"; //7900短连接端口号   7890长连接端口号
+    // public $Source_Addr   = "992174"; //企业id  企业代码
+    // public $Shared_secret = 'shyx11'; //网关登录密码
+    // public $Dest_Id       = "1069999999"; //短信接入码 短信端口号
+
+    public $host          = "116.62.88.162"; //服务商ip
+    public $port          = "8592"; //短连接端口号   17890长连接端口号
+    public $Source_Addr   = "101161"; //企业id  企业代码
+    public $Shared_secret = '5hsey6u9'; //网关登录密码
+    public $Dest_Id       = "106928080159"; //短信接入码 短信端口号
+
     public $SP_ID         = "";
     public $SP_CODE       = "";
-    public $Service_Id    = ""; //业务代码   这个是业务代码
+    public $Service_Id    = "217062"; //业务代码   这个是业务代码
+    // public $Service_Id    = ""; //业务代码   这个是业务代码
     public $deliver;
     private $socket;
     private $Sequence_Id = 1;
@@ -88,7 +96,7 @@ class Cmpp {
             echo 1;
             $headData = socket_read($this->socket, 12);
             if ($headData === false) {
-                system("php -f ./smtp465/smtpsenderror.php");
+                // system("php -f ./smtp465/smtpsenderror.php");
                 $this->resets();
             }
         } catch (Exception $e) {
@@ -113,9 +121,6 @@ class Cmpp {
         case 0x00000005:
             $this->cmppDeliver($head['Total_Length'], $Sequence_Id);
             break;
-        case 0x80000005:
-            $this->cmppDeliver($head['Total_Length'], $Sequence_Id);
-            break;
         case 0x00000008:
             $bodyData = pack("C", 1); //数据联络包返回
             $this->send($bodyData, "CMPP_ACTIVE_TEST_RESP", $Sequence_Id);
@@ -138,21 +143,6 @@ class Cmpp {
             $msgidz   = unpack("N", substr($this->bodyData, 0, 8));
             $msgidzz  = '0000' . $msgidz[1];
             $kahao    = $body['Src_terminal_Id'];
-            mysql_connect('localhost', '', '');
-            mysql_select_db('');
-            mysql_query('set names utf8');
-            $data    = trim($data);
-            $sql1    = "select id from socket_yd where msgid='" . $Msg_Id . "'";
-            $chongfu = mysql_query($sql1);
-            $arrs    = array();
-            while ($arr = mysql_fetch_assoc($chongfu)) {
-                $arrs[] = $arr;
-            }
-            if ($arrs == array() || $arrs[0] == null) {
-                $sql = "insert into socket_yd set msgid='" . $Msg_Id . "',kahao='" . $kahao . "', content='" . addslashes($data) . "', add_time='" . date('Y-m-d H:i:s') . "'";
-                mysql_query($sql);
-            }
-            mysql_close();
             //echo $Msg_Id."\n";
             echo $data . "\n";
             echo $Msg_Id . '...' . $kahao . "\n";

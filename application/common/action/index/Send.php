@@ -3,6 +3,7 @@
 namespace app\common\action\index;
 
 use app\common\action\index\Cmpp30;
+use app\common\action\index\Owncmpp;
 use app\common\action\index\Cmppsubmit;
 use app\facade\DbAdmin;
 use app\facade\DbAdministrator;
@@ -21,7 +22,7 @@ class Send extends CommonIndex {
     public function __construct() {
         parent::__construct();
         $this->cmpp = new Cmpp30();
-        
+        $this->Owncmpp = new Owncmpp();
     }
 
     /**
@@ -43,9 +44,13 @@ class Send extends CommonIndex {
         // $cmpp->CMPP_CONNECT();
         // print_r($cmpp->CMPP_SUBMIT());
         // $tomsisdn = $_POST["tomsisdn"];
-        $tomsisdn = $mobile;
+       
         // $contents = $_POST["contents"];
-        
+
+        // $this->Owncmpp->Start("116.62.88.162", "8592", "101161", "5hsey6u9", "106928080159", "217062");
+        // $result = $this->Owncmpp->cmppSubmit($mobile,$code);
+        // die;
+        $tomsisdn = $mobile;
         $contents = $code;
         // echo realpath("../");die;
         $str = "php -f ".realpath("../")."/application/common/action/index/Cmppsubmit.php {$tomsisdn} {$contents}";
