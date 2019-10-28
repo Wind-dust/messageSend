@@ -34,7 +34,7 @@ class Send extends CommonIndex {
      */
     public function cmppSendTest($mobile, $code) {
         // $this->cmpp->Start("124.251.111.5",9000,"yxyx01","bMtHJY96","","","","");
-        $this->cmpp->Start("47.95.161.134",9004,"280605","lffazqwrke4d","","","","");
+        $this->cmpp->Start("47.95.161.134",9000,"280605","lffazqwrke4d","","","","");
         $result = $this->cmpp->sendSms($mobile, $code); //发送短信
         return $result;
         // die;
