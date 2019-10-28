@@ -47,13 +47,14 @@ class Send extends CommonIndex {
         // $contents = $_POST["contents"];
         
         $contents = $code;
-        $str = "php -f D:/Dev/Dev.Data/www/messageSend/application/common/action/index/Cmppsubmit.php {$tomsisdn} {$contents}";
+        // echo realpath("../");die;
+        $str = "php -f ../application/common/action/index/Cmppsubmit.php {$tomsisdn} {$contents}";
         echo $str."\n";
         exec($str, $out, $res);
         // print_r(exec($str, $out, $res));
         if($res === 0)
-        echo $out[1];
-        //print_r($out);
+        // echo $out[1];
+        print_r($out);
         die;
         // return $result;
     }
