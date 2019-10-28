@@ -2,7 +2,7 @@
 
 namespace app\common\action\index;
 
-use app\common\action\index\Cmpp;
+use app\common\action\index\Cmpp30;
 use app\common\action\index\Cmppsubmit;
 use app\facade\DbAdmin;
 use app\facade\DbAdministrator;
@@ -20,7 +20,7 @@ class Send extends CommonIndex {
 
     public function __construct() {
         parent::__construct();
-        $this->cmpp = new Cmpp();
+        $this->cmpp = new Cmpp30();
         
     }
 
@@ -33,9 +33,9 @@ class Send extends CommonIndex {
      * @author zyr
      */
     public function cmppSendTest($mobile, $code) {
-        $this->cmpp->Start("124.251.111.5",9000,"yxyx01","bMtHJY96","","","","");
-        $result = $this->cmpp->sendSms($mobile, $code); //发送短信
-        return $result;
+        // $this->cmpp->Start("124.251.111.5",7900,"yxyx01","bMtHJY96","","","","");
+        // $result = $this->cmpp->sendSms($mobile, $code); //发送短信
+        // return $result;
         // die;
         // $cmpp = new Cmppsubmit($mobile,$code);
         // ;
