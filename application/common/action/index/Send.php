@@ -33,9 +33,9 @@ class Send extends CommonIndex {
      * @author zyr
      */
     public function cmppSendTest($mobile, $code) {
-        // $this->cmpp->Start("124.251.111.5",9000,"yxyx01","bMtHJY96","","","","");
-        // $result = $this->cmpp->sendSms($mobile, $code); //发送短信
-        // return $result;
+        $this->cmpp->Start("124.251.111.5",9000,"yxyx01","bMtHJY96","","","","");
+        $result = $this->cmpp->sendSms($mobile, $code); //发送短信
+        return $result;
         // die;
         // $cmpp = new Cmppsubmit($mobile,$code);
         // ;
@@ -48,7 +48,7 @@ class Send extends CommonIndex {
         
         $contents = $code;
         // echo realpath("../");die;
-        $str = "php -f ../application/common/action/index/Cmppsubmit.php {$tomsisdn} {$contents}";
+        $str = "php -f ".realpath("../")."/application/common/action/index/Cmppsubmit.php {$tomsisdn} {$contents}";
         echo $str."\n";
         exec($str, $out, $res);
         // print_r(exec($str, $out, $res));
