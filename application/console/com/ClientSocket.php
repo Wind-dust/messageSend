@@ -101,7 +101,7 @@ class ClientSocket extends Pzlife {
                 socket_write($socket, $headData . $bodyData, $Total_Length);
                 echo 'client write success' . PHP_EOL;
                 $headData = socket_read($socket, 1024);
-                $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
+                // $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                 print_r($bodyData);
                 // echo 'server return message is:' . PHP_EOL . $headData;
                 // $headData = socket_read($socket, 1024);
