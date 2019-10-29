@@ -16,4 +16,6 @@ return [
     'cmpp'                  => $commandPath . 'Cmpp',
     'cmppsubmit'            => $commandPath . 'Cmppsubmit',
     'localscript'           => $commandPath . 'LocalScript',
+    'serversocket'           => $commandPath . 'ServerSocket',
+    'clientsocket'           => $commandPath . 'ClientSocket',
 ];
