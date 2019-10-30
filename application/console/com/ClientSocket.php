@@ -9,7 +9,7 @@ use Env;
 use think\Db;
 
 class ClientSocket extends Pzlife {
-    public function Client() {
+    public function Client($content) {
         //创建一个socket套接流
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         /****************设置socket连接选项，这两个步骤你可以省略*************/
@@ -18,17 +18,27 @@ class ClientSocket extends Pzlife {
         //发送套接流的最大超时时间为6秒
         // socket_set_option($socket, SOL_SOCKET, SO_SNDTIMEO, array("sec" => 6, "usec" => 0));
         /****************设置socket连接选项，这两个步骤你可以省略*************/
-
-        //连接服务端的套接流，这一步就是使客户端与服务器端的套接流建立联系
-        $host          = "116.62.88.162"; //服务商ip
-        $port          = "8592"; //短连接端口号   17890长连接端口号
-        $Source_Addr   = "101161"; //企业id  企业代码
-        $Shared_secret = '5hsey6u9'; //网关登录密码
-        $Service_Id    = "217062";
-        $Dest_Id       = "106928080159"; //短信接入码 短信端口号
+        $contdata = $this->content($content);
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $Sequence_Id   = 1;
-        $SP_ID         = "";
+        // print_r($contdata);die;
+        $host          = $contdata['host']; //服务商ip
+        $port          = $contdata['port']; //短连接端口号   17890长连接端口号
+        $Source_Addr   = $contdata['Source_Addr']; //企业id  企业代码
+        $Shared_secret = $contdata['Shared_secret']; //网关登录密码
+        $Service_Id    = $contdata['Service_Id'];
+        $Dest_Id       = $contdata['Dest_Id'];//短信接入码 短信端口号
+        $Sequence_Id   = $contdata['Sequence_Id'];
+        $SP_ID         = $contdata['SP_ID'];
+        //连接服务端的套接流，这一步就是使客户端与服务器端的套接流建立联系
+        // $host          = "116.62.88.162"; //服务商ip
+        // $port          = "8592"; //短连接端口号   17890长连接端口号
+        // $Source_Addr   = "101161"; //企业id  企业代码
+        // $Shared_secret = '5hsey6u9'; //网关登录密码
+        // $Service_Id    = "217062";
+        // $Dest_Id       = "106928080159"; //短信接入码 短信端口号
+       
+        // $Sequence_Id   = 1;
+        // $SP_ID         = "";
         // $host          = "127.0.0.1"; //服务商ip
         // $port          = "8888"; //短连接端口号   17890长连接端口号
         // $Source_Addr   = ""; //企业id  企业代码
@@ -97,11 +107,11 @@ class ClientSocket extends Pzlife {
                 $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                 socket_connect($socket, $host, $port);
                 socket_write($socket, $headData . $bodyData, $Total_Length);
-                // $headData = socket_read($socket, 1024);
+                $headData = socket_read($socket, 1024);
             
-                do {
-                    $headData = socket_read($socket, 1024);
-                } while ($headData);
+                // do {
+                //     $headData = socket_read($socket, 1024);
+                // } while ($headData);
                 echo 'client write success' . PHP_EOL.$headData;
                 // socket_close($socket);//工作完毕，关闭套接流
                 // $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
@@ -146,7 +156,47 @@ class ClientSocket extends Pzlife {
             //     }
             // }    
         }
+        $i = 1;
+        do {
+            $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+            socket_connect($socket, $host, $port);
+            $AuthenticatorSource = md5($Source_Addr . pack("a9", "") . $Shared_secret . date('mdHis'), true);
+            $bodyData            = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, date('mdHis'));
+             $Total_Length        = strlen($bodyData) + 12;
+             $headData            = pack("NNN", $Total_Length, 0x80000001, 1);
+            socket_write($socket, $headData . $bodyData, $Total_Length);
+            //$i = $i-1;
+            sleep(15); //等待时间，进行下一次操作
+            echo 1;
+        } while ($i > 0);
         // socket_close($socket);//工作完毕，关闭套接流
        
+    }
+
+    public function content($content){
+        if ($content == 1) { //测试
+            return [
+                'host'          => "127.0.0.1", //服务商ip
+                'port'          => "8888", //短连接端口号   17890长连接端口号
+                'Source_Addr'   => "", //企业id  企业代码
+                'Shared_secret' => '', //网关登录密码
+                'Service_Id'    => "",
+                'Dest_Id'       => "", //短信接入码 短信端口号
+                'Sequence_Id'   => 1,
+                'SP_ID'         => "",
+            ];
+        } elseif ($content == 2) { //三体
+            return [
+                'host'          => "116.62.88.162", //服务商ip
+                'port'          => "8592", //短连接端口号   17890长连接端口号
+                'Source_Addr'   => "101161", //企业id  企业代码
+                'Shared_secret' => '5hsey6u9', //网关登录密码
+                'Service_Id'    => "217062",
+                'Dest_Id'       => "106928080159", //短信接入码 短信端口号
+                'Sequence_Id'   => 1,
+                'SP_ID'         => "",
+            ];
+            
+        }
     }
 }

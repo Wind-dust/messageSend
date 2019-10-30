@@ -36,7 +36,8 @@ class ServerSocket extends Pzlife {
 
                 echo 'server receive is :' . $string . PHP_EOL; //PHP_EOL为php的换行预定义常量
                 if ($string != false) {
-                    $return_client = 'server receive is : ' . $string . PHP_EOL;
+                    // $return_client = 'server receive is : ' . $string . PHP_EOL;
+                    $return_client ='server status is : '. 1 . PHP_EOL;
                     /*向socket_accept的套接流写入信息，也就是回馈信息给socket_bind()所绑定的主机客户端*/
                     socket_write($accept_resource, $return_client, strlen($return_client));
                     /*socket_write的作用是向socket_create的套接流写入信息，或者向socket_accept的套接流写入信息*/
