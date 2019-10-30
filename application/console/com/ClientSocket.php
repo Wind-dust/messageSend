@@ -29,12 +29,12 @@ class ClientSocket extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $Sequence_Id   = 1;
         $SP_ID         = "";
-        // $host          = "127.0.0.1"; //服务商ip
-        // $port          = "8888"; //短连接端口号   17890长连接端口号
-        // $Source_Addr   = ""; //企业id  企业代码
-        // $Shared_secret = ''; //网关登录密码
-        // $Service_Id    = "";
-        // $Dest_Id       = ""; //短信接入码 短信端口号
+        $host          = "127.0.0.1"; //服务商ip
+        $port          = "8888"; //短连接端口号   17890长连接端口号
+        $Source_Addr   = ""; //企业id  企业代码
+        $Shared_secret = ''; //网关登录密码
+        $Service_Id    = "";
+        $Dest_Id       = ""; //短信接入码 短信端口号
         $mobile        = 15201926171;
         $code          = '短信发送测试';
         if (socket_connect($socket, $host, $port) == false) {
@@ -94,16 +94,15 @@ class ClientSocket extends Pzlife {
                     $Sequence_Id = $Sequence_Id + 1;
                 }
                 $headData = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                // print_r(socket_write($socket, $headData . $bodyData, $Total_Length));die;
-                // print_r($headData);
                 $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                 socket_connect($socket, $host, $port);
                 socket_write($socket, $headData . $bodyData, $Total_Length);
                 // $headData = socket_read($socket, 1024);
-                // echo 'client write success' . PHP_EOL.$headData;
+            
                 do {
-                    
-                } while (socket_read($socket, 1024));
+                    $headData = socket_read($socket, 1024);
+                } while ($headData);
+                echo 'client write success' . PHP_EOL.$headData;
                 // socket_close($socket);//工作完毕，关闭套接流
                 // $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                 print_r($headData);
