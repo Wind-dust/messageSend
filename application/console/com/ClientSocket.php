@@ -81,7 +81,7 @@ class ClientSocket extends Pzlife {
                 $bodyData .= pack("a" . $len, $code);
                 $bodyData .= pack("a20", "00000000000000000000");
                 // send($bodyData, "CMPP_SUBMIT", $Msg_Id);
-                $Command_Id   = 0x00000004;
+                $Command_Id   = 0x00000004;// 短信发送
                 $Total_Length = strlen($bodyData) + 12;
                 if ($Msg_Id != 0) {
                     $Sequence_Id = $Msg_Id;
@@ -99,10 +99,15 @@ class ClientSocket extends Pzlife {
                 $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                 socket_connect($socket, $host, $port);
                 socket_write($socket, $headData . $bodyData, $Total_Length);
-                echo 'client write success' . PHP_EOL;
-                $headData = socket_read($socket, 1024);
+                // $headData = socket_read($socket, 1024);
+                // echo 'client write success' . PHP_EOL.$headData;
+                do {
+                    
+                } while (socket_read($socket, 1024));
+                socket_close($socket);//工作完毕，关闭套接流
                 // $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
-                print_r($bodyData);
+                print_r($headData);
+                // echo 1;
                 // echo 'server return message is:' . PHP_EOL . $headData;
                 // $headData = socket_read($socket, 1024);
                 // print_r($headData);
@@ -140,8 +145,9 @@ class ClientSocket extends Pzlife {
             //     while ($callback = socket_read($socket, 1024)) {
             //         echo 'server return message is:' . PHP_EOL . $callback;
             //     }
-            // }
+            // }    
         }
-        socket_close($socket);//工作完毕，关闭套接流
+        // socket_close($socket);//工作完毕，关闭套接流
+       
     }
 }

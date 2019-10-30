@@ -47,7 +47,7 @@ class ServerSocket extends Pzlife {
                 socket_close($accept_resource);
             }
         } while (true);
-        socket_close($socket);
+        // socket_close($socket);
     }
 
 }
