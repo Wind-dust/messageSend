@@ -29,12 +29,12 @@ class ClientSocket extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $Sequence_Id   = 1;
         $SP_ID         = "";
-        $host          = "127.0.0.1"; //服务商ip
-        $port          = "8888"; //短连接端口号   17890长连接端口号
-        $Source_Addr   = ""; //企业id  企业代码
-        $Shared_secret = ''; //网关登录密码
-        $Service_Id    = "";
-        $Dest_Id       = ""; //短信接入码 短信端口号
+        // $host          = "127.0.0.1"; //服务商ip
+        // $port          = "8888"; //短连接端口号   17890长连接端口号
+        // $Source_Addr   = ""; //企业id  企业代码
+        // $Shared_secret = ''; //网关登录密码
+        // $Service_Id    = "";
+        // $Dest_Id       = ""; //短信接入码 短信端口号
         $mobile        = 15201926171;
         $code          = '短信发送测试';
         if (socket_connect($socket, $host, $port) == false) {
