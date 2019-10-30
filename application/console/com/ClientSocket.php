@@ -104,7 +104,7 @@ class ClientSocket extends Pzlife {
                 do {
                     
                 } while (socket_read($socket, 1024));
-                socket_close($socket);//工作完毕，关闭套接流
+                // socket_close($socket);//工作完毕，关闭套接流
                 // $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                 print_r($headData);
                 // echo 1;
