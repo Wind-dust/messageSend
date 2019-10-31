@@ -370,12 +370,12 @@ class ClientSocket extends Pzlife {
                 //     echo  base_convert($headData .$bodyData, 16, 2);die;
                 // }
                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
-                    // echo 'fail to write' . socket_strerror(socket_last_error());
+                    echo 'fail to write' . socket_strerror(socket_last_error());
                 } else {
-                    // echo 'client write success' . PHP_EOL;
+                    echo 'client write success' . PHP_EOL;
                     //读取服务端返回来的套接流信息
                     $headData = socket_read($socket, 1024);
-                    // echo 'server return message is:' . PHP_EOL . $headData;
+                    echo 'server return message is:' . PHP_EOL . $headData;
                 }
                 $i++;
                 // echo $i."\n";
