@@ -304,6 +304,7 @@ class ClientSocket extends Pzlife {
                 }
                 $i++;
                 echo $i."\n";
+                sleep(2); //等待时间，进行下一次操作
             } while (true);
             // while (true) {
                 
