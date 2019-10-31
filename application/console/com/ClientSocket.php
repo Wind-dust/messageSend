@@ -287,7 +287,7 @@ class ClientSocket extends Pzlife {
                         }
                     } else {
                         $bodyData            = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
-                        $Command_Id          = 0x80000001;
+                        $Command_Id          = 0x00000001;
                         $Sequence_Id         = 1;
                     }
                     //没有号码发送时 发送连接请求
