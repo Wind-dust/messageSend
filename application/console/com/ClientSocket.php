@@ -227,7 +227,8 @@ class ClientSocket extends Pzlife {
         
         $mobile = 15201926171;
         $code   = '短信发送测试';
-        // $this->redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
+        $this->redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
+        die;
         // $send = $this->redis->lPop($redisMessageCodeSend);
         // print_r($send);
         // die;

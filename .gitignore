@@ -10,6 +10,8 @@ application/console/com/LocalScript.php
 
 apidoc.json
 *.sh
-
+vendor/
+composer.json
+composer.lock
 invoice.json
 apidoc.json
