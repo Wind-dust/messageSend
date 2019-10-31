@@ -10,7 +10,7 @@ use think\Db;
 
 class ClientSocket extends Pzlife {
 
-    private $redis;
+    protected $redis;
 
     private function redisInit() {
         $this->redis = Phpredis::getConn();
