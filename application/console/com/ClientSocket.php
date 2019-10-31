@@ -211,13 +211,13 @@ class ClientSocket extends Pzlife {
 
     public function SocketClientLong($content) {
         // $this->redisInit();
-        $this->redis = Phpredis::getConn();
+        $redis = Phpredis::getConn();
         $redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend');
         $mobile = 15201926171;
         $code   = '短信发送测试';
         // print_r($redisMessageCodeSend);die;
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
-        $this->redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
+        // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $contdata = $this->content($content);
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
@@ -253,7 +253,8 @@ class ClientSocket extends Pzlife {
                     // socket_write($socket, $headData . $bodyData, $Total_Length);
                 }else{
                     //当有号码发送需求时 进行提交
-                    $send = $this->redis->lPop($redisMessageCodeSend);
+                    // $send = $this->redis->lPop($redisMessageCodeSend);
+                    $send = [];
                     if ($send) {
                         $send = json_decode($send,true);
                         $mobile = $send['mobile'];
