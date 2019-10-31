@@ -240,6 +240,7 @@ class ClientSocket extends Pzlife {
             date_default_timezone_set('PRC');
             $i = 1;
             do {
+                $time = 0;
                 $Version             = 0x20;
                 $Timestamp           = date('mdHis');
                 $AuthenticatorSource = md5($Source_Addr . pack("a9", "") . $Shared_secret . $Timestamp, true);
@@ -255,10 +256,12 @@ class ClientSocket extends Pzlife {
                     //当有号码发送需求时 进行提交
                     // $send = $this->redis->lPop($redisMessageCodeSend);
                     $send = [];
-                    if ($send) {
+                    if ($i == 2) {
                         $send = json_decode($send,true);
-                        $mobile = $send['mobile'];
-                        $code = $send['code'];
+                        // $mobile = $send['mobile'];
+                        // $code = $send['code'];
+                        $mobile = 15201926171;
+                        $code   = '短信发送测试';
                         $Timestamp           = date('mdHis');
                         $Msg_Id = rand(1, 100);
                         //$bodyData = pack("a8", $Msg_Id);
@@ -285,10 +288,12 @@ class ClientSocket extends Pzlife {
                             }
                             $Sequence_Id = $Sequence_Id + 1;
                         }
+                        $time = 1;
                     } else {
                         $bodyData            = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
-                        $Command_Id          = 0x00000001;
+                        $Command_Id          = 0x00000008;//保持连接
                         $Sequence_Id         = 1;
+                        $time = 15;
                     }
                     //没有号码发送时 发送连接请求
                 }
@@ -304,7 +309,7 @@ class ClientSocket extends Pzlife {
                 }
                 $i++;
                 echo $i."\n";
-                sleep(2); //等待时间，进行下一次操作
+                sleep($time); //等待时间，进行下一次操作
             } while (true);
             // while (true) {
                 
