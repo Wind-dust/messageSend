@@ -210,7 +210,8 @@ class ClientSocket extends Pzlife {
     }
 
     public function SocketClientLong($content) {
-        $this->redisInit();
+        // $this->redisInit();
+        $this->redis = Phpredis::getConn();
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $contdata = $this->content($content);
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
