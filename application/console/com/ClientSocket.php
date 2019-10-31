@@ -212,9 +212,11 @@ class ClientSocket extends Pzlife {
     public function SocketClientLong($content) {
         // $this->redisInit();
         $redis = Phpredis::getConn();
-        $redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend');
-        $mobile = 15201926171;
-        $code   = '短信发送测试';
+        // $redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend');
+        // $code   = '短信发送测试';
+        
+        // echo $code;
+        // die;
         // print_r($redisMessageCodeSend);die;
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
@@ -262,16 +264,20 @@ class ClientSocket extends Pzlife {
                         // $code = $send['code'];
                         $mobile = 15201926171;
                         $code   = '短信发送测试';
+                        $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
+                        // print_r($code);die;
                         $Timestamp           = date('mdHis');
                         $uer_num = 1;//本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
-                        $Msg_Id = rand(1, 100);
+                        // $Msg_Id = rand(1, 100);
+                        $Msg_Id = '';
                         $bodyData = pack("a8",$Msg_Id); //Msg_Id |Unsigned Integer |8 | 信息标识，由 SP 侧短信网关本身产生， 本处填空
                         $bodyData .= pack('I','1'); //Pk_total |Unsigned Integer |1 |相同 Msg_Id 的信息总条数，从 1 开始 
                         $bodyData .= pack('I','1'); //Pk_number |Unsigned Integer |1 |相同 Msg_Id 的信息序号，从 1 开始 
                         $bodyData .= pack('I','1'); //Registered_Delivery |Unsigned Integer| 1| 是否要求返回状态确认报告： 0：不需要 1：需要 2：产生 SMC 话单 （该类型短信仅供网关计费使用，不发 送给目的终端) 
                         $bodyData .= pack('I','1'); //Msg_level |Unsigned Integer| 1 |信息级别
-                        $bodyData .= pack("a10", $Service_Id); //Service_Id |Octet String| 10 |业务类型，是数字、字母和符号的组合。
-                        // $bodyData .= pack('I',0); //Fee_UserType  |Unsigned Integer | 1|计费用户类型字段 0：对目的终端 MSISDN 计费； 1：对源终端 MSISDN 计费； 2：对 SP 计费; 3：表示本字段无效，对谁计费参见 Fee_terminal_Id 字段。 
+                        $bodyData .= pack("a10", $Source_Addr); //可以为企业代码
+                        // $bodyData .= pack("a10", $Service_Id); //Service_Id |Octet String| 10 |业务类型，是数字、字母和符号的组合。
+                        $bodyData .= pack('I',''); //Fee_UserType  |Unsigned Integer | 1|计费用户类型字段 0：对目的终端 MSISDN 计费； 1：对源终端 MSISDN 计费； 2：对 SP 计费; 3：表示本字段无效，对谁计费参见 Fee_terminal_Id 字段。 
                         
                         $bodyData .= pack("a21",''); //Fee_terminal_Id |21 Unsigned |Integer |被计费用户的号码（如本字节填空，则表 示本字段无效，对谁计费参见 Fee_UserType 字段，本字段与 Fee_UserType 字段互斥）
                         $bodyData .= pack("I",0); //TP_pId |1 |Unsigned Integer |GSM协议类型。详细是解释请参考 GSM03.40 中的 9.2.3.9
