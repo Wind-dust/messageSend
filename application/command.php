@@ -18,4 +18,5 @@ return [
     'localscript'           => $commandPath . 'LocalScript',
     'serversocket'           => $commandPath . 'ServerSocket',
     'clientsocket'           => $commandPath . 'ClientSocket',
+    'officeexcel'           => $commandPath . 'OfficeExcel',
 ];

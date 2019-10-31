@@ -45,7 +45,7 @@ class ServerSocket extends Pzlife {
                     echo 'socket_read is fail';
                 }
                 /*socket_close的作用是关闭socket_create()或者socket_accept()所建立的套接流*/
-                socket_close($accept_resource);
+                // socket_close($accept_resource);
             }
         } while (true);
         // socket_close($socket);

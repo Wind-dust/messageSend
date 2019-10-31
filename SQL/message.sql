@@ -433,3 +433,35 @@ CREATE TABLE `yx_whitelist` (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `mobile_del` (`mobile`,`delete_time`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '白名单' ROW_FORMAT = Dynamic;
+
+DROP TABLE IF EXISTS `yx_number_segment`;
+CREATE TABLE `yx_number_segment` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `mobile` char(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '接收手机',
+  `source` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '来源：1.移动;2.联通;3.电信;4,虚拟运营商',
+  `name` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '备注',
+  `update_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间',
+  `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `mobile_source` (`mobile`,`source`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '三网号码段' ROW_FORMAT = Dynamic;
+
+DROP TABLE IF EXISTS `yx_number_source`;
+CREATE TABLE `yx_number_source` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `mobile` char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '接收手机',
+  `source` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '来源：1.移动;2.联通;3.电信;4,虚拟运营商',
+  `source_name` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '备注',
+  `province_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '省id',
+  `province` varchar(20) NOT NULL DEFAULT '' COMMENT '区域名',
+  `city_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '市id',
+  `city` varchar(20) NOT NULL DEFAULT '' COMMENT '区域名',
+  `update_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间',
+  `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `mobile_source` (`mobile`,`source`) USING BTREE,
+  UNIQUE INDEX `mobile`(`mobile`) USING BTREE,
+  UNIQUE INDEX `mobile_source_proinvice`(`mobile`, `source`, `province`, `city_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '三网号码归属省份及运营商' ROW_FORMAT = Dynamic;

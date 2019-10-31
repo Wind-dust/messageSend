@@ -4,6 +4,7 @@
         "qiniu/php-sdk": "^7.2",
         "overtrue/pinyin": "~4.0",
         "topthink/think-worker": "2.0.12",
-        "workerman/mysql": "^1.0"
+        "workerman/mysql": "^1.0",
+        "phpoffice/phpexcel": "^1.8"
     }
 }
