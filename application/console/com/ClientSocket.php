@@ -257,7 +257,7 @@ class ClientSocket extends Pzlife {
                     // $send = $this->redis->lPop($redisMessageCodeSend);
                     $send = [];
                     if ($i == 2) {
-                        $send = json_decode($send,true);
+                        // $send = json_decode($send,true);
                         // $mobile = $send['mobile'];
                         // $code = $send['code'];
                         $mobile = 15201926171;
