@@ -74,6 +74,9 @@ class OfficeExcel extends Pzlife {
             }else if ($row['city']== '巴彦淖尔盟') {
                 $row['city'] = '巴彦淖尔市';
             }
+            else if ($row['city']== '乌兰察布盟') {
+                $row['city'] = '乌兰察布市';
+            }
             $mobile_city = $this->getCity($row['city']);
             if ($mobile_city == false) {
                 echo $row['city'].'is not found';die;
