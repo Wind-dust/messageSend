@@ -317,7 +317,7 @@ class ClientSocket extends Pzlife {
                         $bodyData .= pack("a17",''); //At_Time |17 |Octet String |定时发送时间，格式遵循 SMPP3.3 协议 
                         $bodyData .= pack("a21", $Dest_Id); //Src_Id |21 |Octet String |源号码 SP 的服务代码或前缀为服务代码的长号 码, 网关将该号码完整的填到 SMPP 协议 Submit_SM消息相应的source_addr字段， 该号码最终在用户手机上显示为短消息 的主叫号码 (接入码)
                         $bodyData .= pack("I", $uer_num); //DestUsr_tl |1 |Unsigned Integer |接收信息的用户数量(小于 100 个用户) 
-                        $bodyData .= pack("a21*".$uer_num, $mobile); //Dest_terminal_Id | 21*DestUsr_tl |Octet String |接收短信的 MSISDN 号码 
+                        $bodyData .= pack("a"."21*".$uer_num, $mobile); //Dest_terminal_Id | 21*DestUsr_tl |Octet String |接收短信的 MSISDN 号码 
                         $len = strlen($code);
                         $bodyData .= pack("I", $len); //Msg_Length |1 |Unsigned Integer |信息长度(Msg_Fmt 值为 0 时：<160 个字 节；其它<=140 个字节) 
                         $bodyData .= pack("a" . $len, $code);
