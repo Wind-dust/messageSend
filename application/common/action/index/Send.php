@@ -34,6 +34,11 @@ class Send extends CommonIndex {
      * @author zyr
      */
     public function cmppSendTest($mobile, $code) {
+
+        //设置参数，并且转换成16进制数字显示
+        print(bin2hex(pack("C", 1))."\n");
+        die;
+
         // $this->cmpp->Start("124.251.111.5",9000,"yxyx01","bMtHJY96","","","","");
         // $result = $this->cmpp->sendSms($mobile, $code); //发送短信
         // return $result;

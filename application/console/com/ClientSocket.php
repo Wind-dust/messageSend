@@ -236,7 +236,7 @@ class ClientSocket extends Pzlife {
         // print_r($send);
         // die;
         // echo strlen("000000e30000000400089bf7000000000000000001010101313031313136000000000200000000000000000000000000000000000000000000000831303131313630323030300000003139313130313138303730373033322b0000000000000000000000000000000000003130363932383038303134383135323600000000000131353133353631363833360000000000000000000044301073a98d5a661f7403301160a876849a8c8bc17801662fff1a003900340038003000340039ff0c8bf752ff544a8bc94ed64ebaff0c534a5c0f65f651856709654830020000000000000000");
-        // echo strlen("000000c90000000400000002000000000000000001000000010000000100000000000000323137303632000000000000000031353230313932363137310000000000000000000000000000000000000f000000313031313631320000000000000000000000000000000000000000000000000000000000000000000000000000000000313036393238303830313539000000000000000000010000003135323031393236313731000000000000000000000c000000b6ccd0c5b7a2cbcdb2e2cad40000000000000000");
+        echo strlen("000000c90000000400000002000000000000000001000000010000000100000000000000323137303632000000000000000031353230313932363137310000000000000000000000000000000000000f000000313031313631320000000000000000000000000000000000000000000000000000000000000000000000000000000000313036393238303830313539000000000000000000010000003135323031393236313731000000000000000000000c000000b6ccd0c5b7a2cbcdb2e2cad40000000000000000");
         // die;
         if (socket_connect($socket, $host, $port) == false) {
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
@@ -271,18 +271,20 @@ class ClientSocket extends Pzlife {
                         // $Timestamp = date('mdHis');
                         $uer_num   = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
                         // $Msg_Id = rand(1, 100);
-                        $Msg_Id   = '';
-                        $bodyData = (pack('I',pack("a8", $Msg_Id))); //Msg_Id |Unsigned Integer |8 | 信息标识，由 SP 侧短信网关本身产生， 本处填空
-                        $bodyData = $bodyData . pack('I', 1); //Pk_total |Unsigned Integer |1 |相同 Msg_Id 的信息总条数，从 1 开始
-                        $bodyData = $bodyData . pack('I', 1); //Pk_number |Unsigned Integer |1 |相同 Msg_Id 的信息序号，从 1 开始
-                        $bodyData = $bodyData . pack('I', 1); //Registered_Delivery |Unsigned Integer| 1| 是否要求返回状态确认报告： 0：不需要 1：需要 2：产生 SMC 话单 （该类型短信仅供网关计费使用，不发 送给目的终端)
-                        $bodyData = $bodyData . pack('I', ''); //Msg_level |Unsigned Integer| 1 |信息级别
+                        // $Msg_Id   = '';
+                        $Msg_Id   = 1;
+                        $bodyData = pack("a8", $Msg_Id);
+                        // $bodyData = (pack('I',pack("a8", $Msg_Id))); //Msg_Id |Unsigned Integer |8 | 信息标识，由 SP 侧短信网关本身产生， 本处填空
+                        $bodyData = $bodyData . pack('C', 1); //Pk_total |Unsigned Integer |1 |相同 Msg_Id 的信息总条数，从 1 开始
+                        $bodyData = $bodyData . pack('C', 1); //Pk_number |Unsigned Integer |1 |相同 Msg_Id 的信息序号，从 1 开始
+                        $bodyData = $bodyData . pack('C', 1); //Registered_Delivery |Unsigned Integer| 1| 是否要求返回状态确认报告： 0：不需要 1：需要 2：产生 SMC 话单 （该类型短信仅供网关计费使用，不发 送给目的终端)
+                        $bodyData = $bodyData . pack('C', ''); //Msg_level |Unsigned Integer| 1 |信息级别
                         // $bodyData .= pack("a10", $Source_Addr); //可以为企业代码
                         $bodyData = $bodyData . pack("a10", $Service_Id); //Service_Id |Octet String| 10 |业务类型，是数字、字母和符号的组合。
-                        $bodyData = $bodyData . pack('I', ''); //Fee_UserType  |Unsigned Integer | 1|计费用户类型字段 0：对目的终端 MSISDN 计费； 1：对源终端 MSISDN 计费； 2：对 SP 计费; 3：表示本字段无效，对谁计费参见 Fee_terminal_Id 字段。
+                        $bodyData = $bodyData . pack('C', ''); //Fee_UserType  |Unsigned Integer | 1|计费用户类型字段 0：对目的终端 MSISDN 计费； 1：对源终端 MSISDN 计费； 2：对 SP 计费; 3：表示本字段无效，对谁计费参见 Fee_terminal_Id 字段。
 
                         $bodyData = $bodyData . pack("a21", $mobile); //Fee_terminal_Id |21 Unsigned Integer |被计费用户的号码（如本字节填空，则表 示本字段无效，对谁计费参见 Fee_UserType 字段，本字段与 Fee_UserType 字段互斥）
-                        $bodyData = $bodyData . pack("I", 0); //TP_pId |1 |Unsigned Integer |GSM协议类型。详细是解释请参考 GSM03.40 中的 9.2.3.9
+                        $bodyData = $bodyData . pack("C", 0); //TP_pId |1 |Unsigned Integer |GSM协议类型。详细是解释请参考 GSM03.40 中的 9.2.3.9
                         /**
                          * TP_udhi ：0代表内容体里不含有协议头信息
                          * 1代表内容含有协议头信息（长短信，push短信等都是在内容体上含有头内容的）当设置内容体包含协议头
@@ -308,8 +310,8 @@ class ClientSocket extends Pzlife {
                          **/
                         /* 字符串长度（包括中文）超出70字 为长短信 超过70字的，拆成多条发送，一般使用6位协议头，每条短信除去6字节协议头，剩余134字节存放剩余内容 */
                         /* 一般在发长短信的时候，tp_udhi设置为1，然后短信内容需要拆分成多条，每条内容之前，加上协议头 */
-                        $bodyData = $bodyData . pack("I", 0); //TP_udhi |1 |Unsigned |Integer |GSM协议类型。详细是解释请参考 GSM03.40 中的 9.2.3.23,仅使用 1 位，右 对齐
-                        $bodyData = $bodyData . pack("I", 15); //Msg_Fmt |1 |Unsigned |Integer |信息格式   0：ASCII 串   3：短信写卡操作   4：二进制信息   8：UCS2 编码 15：含 GBK 汉字(GBK编码内容与Msg_Fmt一致)
+                        $bodyData = $bodyData . pack("C", 0); //TP_udhi |1 |Unsigned |Integer |GSM协议类型。详细是解释请参考 GSM03.40 中的 9.2.3.23,仅使用 1 位，右 对齐
+                        $bodyData = $bodyData . pack("C", 15); //Msg_Fmt |1 |Unsigned |Integer |信息格式   0：ASCII 串   3：短信写卡操作   4：二进制信息   8：UCS2 编码 15：含 GBK 汉字(GBK编码内容与Msg_Fmt一致)
 
                         $bodyData = $bodyData . pack("a6", $Source_Addr); //Msg_src |6 |Octet String |信息内容来源(账号)
                         $bodyData = $bodyData . pack("a2", 02);
@@ -318,13 +320,14 @@ class ClientSocket extends Pzlife {
                         $bodyData = $bodyData . pack("a17", ''); //ValId_Time |17 |Octet |String 存活有效期，格式遵循 SMPP3.3 协议
                         $bodyData = $bodyData . pack("a17", ''); //At_Time |17 |Octet String |定时发送时间，格式遵循 SMPP3.3 协议
                         $bodyData = $bodyData . pack("a21", $Dest_Id); //Src_Id |21 |Octet String |源号码 SP 的服务代码或前缀为服务代码的长号 码, 网关将该号码完整的填到 SMPP 协议 Submit_SM消息相应的source_addr字段， 该号码最终在用户手机上显示为短消息 的主叫号码 (接入码)
-                        $bodyData = $bodyData . pack("I", $uer_num); //DestUsr_tl |1 |Unsigned Integer |接收信息的用户数量(小于 100 个用户)
+                        $bodyData = $bodyData . pack("C", $uer_num); //DestUsr_tl |1 |Unsigned Integer |接收信息的用户数量(小于 100 个用户)
                         $p_n      = 21 * $uer_num;
                         $bodyData = $bodyData . pack("a" . $p_n, $mobile); //Dest_terminal_Id | 21*DestUsr_tl |Octet String |接收短信的 MSISDN 号码
                         $len      = strlen($code);
-                        $bodyData = $bodyData . pack("I", $len); //Msg_Length |1 |Unsigned Integer |信息长度(Msg_Fmt 值为 0 时：<160 个字 节；其它<=140 个字节)
+                        $bodyData = $bodyData . pack("C", $len); //Msg_Length |1 |Unsigned Integer |信息长度(Msg_Fmt 值为 0 时：<160 个字 节；其它<=140 个字节)
                         $bodyData = $bodyData . pack("a" . $len, $code); // Msg_Content |Msg_length |Octet String |信息内容 
-                        $bodyData = $bodyData . pack('I',pack("a8", '')); //Reserve |8 |Octet String |保留 
+                        $bodyData = $bodyData . pack("a8", '');
+                        // $bodyData = $bodyData . pack('I',pack("a8", '')); //Reserve |8 |Octet String |保留 
 
                         // $bodyData = pack("a8", $Msg_Id);
                         /*    $bodyData = pack("N", $Msg_Id) . pack("N", "00000000");
@@ -375,7 +378,7 @@ class ClientSocket extends Pzlife {
                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
                     echo 'fail to write' . socket_strerror(socket_last_error());
                 } else {
-                    echo 'client write success' . PHP_EOL;
+                    echo 'client write success:' . PHP_EOL.print(bin2hex($headData . $bodyData)."\n");
                     //读取服务端返回来的套接流信息
                     $headData = socket_read($socket, 1024);
                     echo 'server return message is:' . PHP_EOL . $headData;

@@ -24,9 +24,9 @@ class Send extends MyController {
     public function cmppSendTest() {
         $apiName   = classBasename($this) . '/' . __function__;
         $phone = trim($this->request->post('phone'));//手机号
-        if (!checkMobile($phone)) {
-            return ['code' => 3001];
-        }
+        // if (!checkMobile($phone)) {
+        //     return ['code' => 3001];
+        // }
         $code   = trim($this->request->post('code'));//验证码
         $result = $this->app->send->cmppSendTest($phone, $code);
         // $this->apiLog($apiName, [$Banner_id, $source], $result['code'], '');
