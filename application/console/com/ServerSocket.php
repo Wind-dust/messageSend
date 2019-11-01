@@ -33,11 +33,12 @@ class ServerSocket extends Pzlife {
                 /*读取客户端传过来的资源，并转化为字符串*/
                 $string = socket_read($accept_resource, 1024);
                 /*socket_read的作用就是读出socket_accept()的资源并把它转化为字符串*/
-
-                echo 'server receive is :' . $string . PHP_EOL; //PHP_EOL为php的换行预定义常量
+                $v = base_convert($string, 16, 2);
+                echo 'server receive is :' . $v . PHP_EOL; //PHP_EOL为php的换行预定义常量
                 if ($string != false) {
                     // $return_client = 'server receive is : ' . $string . PHP_EOL;
-                    $return_client ='server status is : '. 1 . PHP_EOL;
+                    $v = base_convert($string, 16, 2);
+                    $return_client ='server receive is : '. PHP_EOL. $v;
                     /*向socket_accept的套接流写入信息，也就是回馈信息给socket_bind()所绑定的主机客户端*/
                     socket_write($accept_resource, $return_client, strlen($return_client));
                     /*socket_write的作用是向socket_create的套接流写入信息，或者向socket_accept的套接流写入信息*/
