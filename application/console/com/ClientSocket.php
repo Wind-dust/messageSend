@@ -235,6 +235,9 @@ class ClientSocket extends Pzlife {
         // $send = $this->redis->lPop($redisMessageCodeSend);
         // print_r($send);
         // die;
+        // echo strlen("000000e30000000400089bf7000000000000000001010101313031313136000000000200000000000000000000000000000000000000000000000831303131313630323030300000003139313130313138303730373033322b0000000000000000000000000000000000003130363932383038303134383135323600000000000131353133353631363833360000000000000000000044301073a98d5a661f7403301160a876849a8c8bc17801662fff1a003900340038003000340039ff0c8bf752ff544a8bc94ed64ebaff0c534a5c0f65f651856709654830020000000000000000");
+        // echo strlen("000000c90000000400000002000000000000000001000000010000000100000000000000323137303632000000000000000031353230313932363137310000000000000000000000000000000000000f000000313031313631320000000000000000000000000000000000000000000000000000000000000000000000000000000000313036393238303830313539000000000000000000010000003135323031393236313731000000000000000000000c000000b6ccd0c5b7a2cbcdb2e2cad40000000000000000");
+        // die;
         if (socket_connect($socket, $host, $port) == false) {
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
@@ -265,11 +268,11 @@ class ClientSocket extends Pzlife {
                         $code   = '短信发送测试';
                         $code   = mb_convert_encoding($code, 'GBK', 'UTF-8');
                         // print_r($code);die;
-                        $Timestamp = date('mdHis');
+                        // $Timestamp = date('mdHis');
                         $uer_num   = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
                         // $Msg_Id = rand(1, 100);
                         $Msg_Id   = '';
-                        $bodyData = pack("a8", $Msg_Id); //Msg_Id |Unsigned Integer |8 | 信息标识，由 SP 侧短信网关本身产生， 本处填空
+                        $bodyData = (pack('I',pack("a8", $Msg_Id))); //Msg_Id |Unsigned Integer |8 | 信息标识，由 SP 侧短信网关本身产生， 本处填空
                         $bodyData = $bodyData . pack('I', 1); //Pk_total |Unsigned Integer |1 |相同 Msg_Id 的信息总条数，从 1 开始
                         $bodyData = $bodyData . pack('I', 1); //Pk_number |Unsigned Integer |1 |相同 Msg_Id 的信息序号，从 1 开始
                         $bodyData = $bodyData . pack('I', 1); //Registered_Delivery |Unsigned Integer| 1| 是否要求返回状态确认报告： 0：不需要 1：需要 2：产生 SMC 话单 （该类型短信仅供网关计费使用，不发 送给目的终端)
@@ -278,7 +281,7 @@ class ClientSocket extends Pzlife {
                         $bodyData = $bodyData . pack("a10", $Service_Id); //Service_Id |Octet String| 10 |业务类型，是数字、字母和符号的组合。
                         $bodyData = $bodyData . pack('I', ''); //Fee_UserType  |Unsigned Integer | 1|计费用户类型字段 0：对目的终端 MSISDN 计费； 1：对源终端 MSISDN 计费； 2：对 SP 计费; 3：表示本字段无效，对谁计费参见 Fee_terminal_Id 字段。
 
-                        $bodyData = $bodyData . pack("a21", $mobile); //Fee_terminal_Id |21 Unsigned |Integer |被计费用户的号码（如本字节填空，则表 示本字段无效，对谁计费参见 Fee_UserType 字段，本字段与 Fee_UserType 字段互斥）
+                        $bodyData = $bodyData . pack("a21", $mobile); //Fee_terminal_Id |21 Unsigned Integer |被计费用户的号码（如本字节填空，则表 示本字段无效，对谁计费参见 Fee_UserType 字段，本字段与 Fee_UserType 字段互斥）
                         $bodyData = $bodyData . pack("I", 0); //TP_pId |1 |Unsigned Integer |GSM协议类型。详细是解释请参考 GSM03.40 中的 9.2.3.9
                         /**
                          * TP_udhi ：0代表内容体里不含有协议头信息
@@ -320,8 +323,8 @@ class ClientSocket extends Pzlife {
                         $bodyData = $bodyData . pack("a" . $p_n, $mobile); //Dest_terminal_Id | 21*DestUsr_tl |Octet String |接收短信的 MSISDN 号码
                         $len      = strlen($code);
                         $bodyData = $bodyData . pack("I", $len); //Msg_Length |1 |Unsigned Integer |信息长度(Msg_Fmt 值为 0 时：<160 个字 节；其它<=140 个字节)
-                        $bodyData = $bodyData . pack("a" . $len, $code);
-                        $bodyData = $bodyData . pack("a8", '');
+                        $bodyData = $bodyData . pack("a" . $len, $code); // Msg_Content |Msg_length |Octet String |信息内容 
+                        $bodyData = $bodyData . pack('I',pack("a8", '')); //Reserve |8 |Octet String |保留 
 
                         // $bodyData = pack("a8", $Msg_Id);
                         /*    $bodyData = pack("N", $Msg_Id) . pack("N", "00000000");
