@@ -187,10 +187,10 @@ class ClientSocket extends Pzlife {
             return [
                 'host'          => "127.0.0.1", //服务商ip
                 'port'          => "8888", //短连接端口号   17890长连接端口号
-                'Source_Addr'   => "", //企业id  企业代码
-                'Shared_secret' => '', //网关登录密码
-                'Service_Id'    => "",
-                'Dest_Id'       => "", //短信接入码 短信端口号
+                'Source_Addr'   => "101161", //企业id  企业代码
+                'Shared_secret' => '5hsey6u9', //网关登录密码
+                'Service_Id'    => "217062",
+                'Dest_Id'       => "106928080159", //短信接入码 短信端口号
                 'Sequence_Id'   => 1,
                 'SP_ID'         => "",
             ];
@@ -279,7 +279,7 @@ class ClientSocket extends Pzlife {
                         // $bodyData .= pack("a10", $Service_Id); //Service_Id |Octet String| 10 |业务类型，是数字、字母和符号的组合。
                         $bodyData .= pack('I',''); //Fee_UserType  |Unsigned Integer | 1|计费用户类型字段 0：对目的终端 MSISDN 计费； 1：对源终端 MSISDN 计费； 2：对 SP 计费; 3：表示本字段无效，对谁计费参见 Fee_terminal_Id 字段。 
                         
-                        $bodyData .= pack("a21",''); //Fee_terminal_Id |21 Unsigned |Integer |被计费用户的号码（如本字节填空，则表 示本字段无效，对谁计费参见 Fee_UserType 字段，本字段与 Fee_UserType 字段互斥）
+                        $bodyData .= pack("a21",$mobile); //Fee_terminal_Id |21 Unsigned |Integer |被计费用户的号码（如本字节填空，则表 示本字段无效，对谁计费参见 Fee_UserType 字段，本字段与 Fee_UserType 字段互斥）
                         $bodyData .= pack("I",0); //TP_pId |1 |Unsigned Integer |GSM协议类型。详细是解释请参考 GSM03.40 中的 9.2.3.9
                         /**
                          * TP_udhi ：0代表内容体里不含有协议头信息
