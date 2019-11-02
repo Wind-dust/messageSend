@@ -211,6 +211,14 @@ class ClientSocket extends Pzlife {
     public function SocketClientLong($content) {
         // $this->redisInit();
         $redis = Phpredis::getConn();
+        // $a_time = 0;
+        
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $master               = 300; //通道最大提交量
+        $security_coefficient = 0.8; //通道饱和系数
+        $security_master      = $master * $security_coefficient;
+
+        
         // $redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend');
         // $code   = '短信发送测试';
 
@@ -221,7 +229,7 @@ class ClientSocket extends Pzlife {
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $contdata = $this->content($content);
-        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+
         $host          = $contdata['host']; //服务商ip
         $port          = $contdata['port']; //短连接端口号   17890长连接端口号
         $Source_Addr   = $contdata['Source_Addr']; //企业id  企业代码
@@ -234,9 +242,6 @@ class ClientSocket extends Pzlife {
         // die;
         // $send = $this->redis->lPop($redisMessageCodeSend);
         // print_r($send);
-        // die;
-        // echo strlen("000000e30000000400089bf7000000000000000001010101313031313136000000000200000000000000000000000000000000000000000000000831303131313630323030300000003139313130313138303730373033322b0000000000000000000000000000000000003130363932383038303134383135323600000000000131353133353631363833360000000000000000000044301073a98d5a661f7403301160a876849a8c8bc17801662fff1a003900340038003000340039ff0c8bf752ff544a8bc94ed64ebaff0c534a5c0f65f651856709654830020000000000000000");
-        echo strlen("000000c90000000400000002000000000000000001000000010000000100000000000000323137303632000000000000000031353230313932363137310000000000000000000000000000000000000f000000313031313631320000000000000000000000000000000000000000000000000000000000000000000000000000000000313036393238303830313539000000000000000000010000003135323031393236313731000000000000000000000c000000b6ccd0c5b7a2cbcdb2e2cad40000000000000000");
         // die;
         if (socket_connect($socket, $host, $port) == false) {
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
@@ -258,8 +263,20 @@ class ClientSocket extends Pzlife {
                     // socket_write($socket, $headData . $bodyData, $Total_Length);
                 } else {
                     //当有号码发送需求时 进行提交
+                    /* redis 读取需要发送的数据 */
                     // $send = $this->redis->lPop($redisMessageCodeSend);
                     $send = [];
+                    //每秒最大发送条数
+                    do {
+                        $i = 1;
+
+                        do {
+                            $i++;
+                            echo $i . "\n";
+                        } while ($i <= $security_master);
+                        sleep(1);
+                    } while ($send);
+                    die;
                     if ($i == 2) {
                         // $send = json_decode($send,true);
                         // $mobile = $send['mobile'];
@@ -269,7 +286,7 @@ class ClientSocket extends Pzlife {
                         $code   = mb_convert_encoding($code, 'GBK', 'UTF-8');
                         // print_r($code);die;
                         // $Timestamp = date('mdHis');
-                        $uer_num   = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
+                        $uer_num = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
                         // $Msg_Id = rand(1, 100);
                         // $Msg_Id   = '';
                         $Msg_Id   = 1;
@@ -325,9 +342,9 @@ class ClientSocket extends Pzlife {
                         $bodyData = $bodyData . pack("a" . $p_n, $mobile); //Dest_terminal_Id | 21*DestUsr_tl |Octet String |接收短信的 MSISDN 号码
                         $len      = strlen($code);
                         $bodyData = $bodyData . pack("C", $len); //Msg_Length |1 |Unsigned Integer |信息长度(Msg_Fmt 值为 0 时：<160 个字 节；其它<=140 个字节)
-                        $bodyData = $bodyData . pack("a" . $len, $code); // Msg_Content |Msg_length |Octet String |信息内容 
+                        $bodyData = $bodyData . pack("a" . $len, $code); // Msg_Content |Msg_length |Octet String |信息内容
                         $bodyData = $bodyData . pack("a8", '');
-                        // $bodyData = $bodyData . pack('I',pack("a8", '')); //Reserve |8 |Octet String |保留 
+                        // $bodyData = $bodyData . pack('I',pack("a8", '')); //Reserve |8 |Octet String |保留
 
                         // $bodyData = pack("a8", $Msg_Id);
                         /*    $bodyData = pack("N", $Msg_Id) . pack("N", "00000000");
@@ -378,7 +395,7 @@ class ClientSocket extends Pzlife {
                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
                     echo 'fail to write' . socket_strerror(socket_last_error());
                 } else {
-                    echo 'client write success:' . PHP_EOL.print(bin2hex($headData . $bodyData)."\n");
+                    echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
                     //读取服务端返回来的套接流信息
                     $headData = socket_read($socket, 1024);
                     echo 'server return message is:' . PHP_EOL . $headData;

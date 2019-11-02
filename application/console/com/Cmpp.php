@@ -447,4 +447,73 @@ class Cmpp extends Pzlife {
         $data = "";
         $this->_SendPDU(CMPP_ACTIVE_TEST, "", $data);
     }
+
+    //当有号码发送需求时 进行提交
+    /* redis 读取需要发送的数据 */
+    // $send = $this->redis->lPop($redisMessageCodeSend);
+
+    //每秒最大发送条数
+
+    function sendtest($content) {
+        //发送链接请求
+        $redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $master               = 300; //通道最大提交量
+        $security_coefficient = 0.8; //通道饱和系数
+        $security_master      = $master * $security_coefficient;
+        $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        $contdata = $this->content($content);
+
+        $host          = $contdata['host']; //服务商ip
+        $port          = $contdata['port']; //短连接端口号   17890长连接端口号
+        $Source_Addr   = $contdata['Source_Addr']; //企业id  企业代码
+        $Shared_secret = $contdata['Shared_secret']; //网关登录密码
+        $Service_Id    = $contdata['Service_Id'];
+        $Dest_Id       = $contdata['Dest_Id']; //短信接入码 短信端口号
+        $Sequence_Id   = $contdata['Sequence_Id'];
+        $SP_ID         = $contdata['SP_ID'];
+
+        $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
+        $Timestamp           = date('mdHis');
+        $AuthenticatorSource = md5($Source_Addr . pack("a9", "") . $Shared_secret . $Timestamp, true);
+        $bodyData            = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
+        $Command_Id          = 0x00000001;
+        // $Total_Length        = strlen($bodyData) + 12;
+        $Sequence_Id  = 1;
+        $Total_Length = strlen($bodyData) + 12;
+        $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+        if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
+            echo 'fail to write' . socket_strerror(socket_last_error());die; //通道连接失败
+        }
+
+        $redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend');
+
+        $time = 15;
+        while (true) {
+
+            sleep($time);
+        }
+        do {
+            $i    = 1;
+           
+           
+                do {
+                    $send = $this->redis->lPop($redisMessageCodeSend);
+                    if ($send) {
+                        $send   = json_decode($send, true);
+                        $mobile = $send['mobile'];
+                        $code   = $send['code'];
+                        $code   = mb_convert_encoding($code, 'GBK', 'UTF-8');
+                        $i++;
+                    }
+                    
+                    echo $i . "\n";
+                } while ($i <= $security_master);
+                $time = 1;
+            
+            sleep($time);
+        } while (true);
+
+    }
+
 }

@@ -73,11 +73,18 @@ class OfficeExcel extends Pzlife {
                 $row['city'] = '阿拉善盟';
             }else if ($row['city']== '巴彦淖尔盟') {
                 $row['city'] = '巴彦淖尔市';
-            }
-            else if ($row['city']== '乌兰察布盟') {
+            }else if ($row['city']== '乌兰察布盟') {
                 $row['city'] = '乌兰察布市';
+            }else if ($row['city']== '江汉（天门/仙桃/潜江）区') {
+                $row['city'] = '江汉（天门/仙桃/潜江）区';
             }
-            $mobile_city = $this->getCity($row['city']);
+            if ($row['city'] != '江汉（天门/仙桃/潜江）区') {
+                $mobile_city = $this->getCity($row['city']);
+            }else {
+                $mobile_city['id'] = 1917;
+                $mobile_city['area_name'] = '江汉（天门/仙桃/潜江）区';
+            }
+           
             if ($mobile_city == false) {
                 echo $row['city'].'is not found';die;
             }

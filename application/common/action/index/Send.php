@@ -36,7 +36,21 @@ class Send extends CommonIndex {
     public function cmppSendTest($mobile, $code) {
 
         //设置参数，并且转换成16进制数字显示
+        $time = time();
+        $i = 1;
+        $a_time = 0;
+        do {
+            echo $i."\n";
+            $i++;
+            $a_time = time();
+        } while ($a_time < $time);
+
         print(bin2hex(pack("C", 1))."\n");
+        // echo $mobile."\n";die;
+        //时间格式二进制转换
+        //   echo (string) decbin(date("m",time())).decbin(date("d",time())).decbin(date("H",time())).decbin(date("i",time())).decbin(date("s",time())).decbin(101161);
+        
+        // print_r(strlen(decbin($mobile)));
         die;
 
         // $this->cmpp->Start("124.251.111.5",9000,"yxyx01","bMtHJY96","","","","");
