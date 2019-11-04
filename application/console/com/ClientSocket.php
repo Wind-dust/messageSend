@@ -445,6 +445,7 @@ class ClientSocket extends Pzlife {
                     echo 'fail to write' . socket_strerror(socket_last_error());
                 } else {
                     echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
+                    continue;
                     //读取服务端返回来的套接流信息
                     $headData = socket_read($socket, 1024);
                     echo $headData."\n";
