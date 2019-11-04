@@ -337,7 +337,7 @@ class ClientSocket extends Pzlife
                         // $code = $send['code'];
                         $mobile = 15201926171;
                         $code   = '【气象祝福】阳光眷顾，天空展颜一片蔚蓝，但昼夜温差较大，极易发生感冒，请注意增减衣服保暖防寒，祝您身体健康。 '; //带签名
-                        $code   = '短信发送测试'; //带签名
+                        // $code   = '短信发送测试'; //带签名
                         $code   = mb_convert_encoding($code, 'GBK', 'UTF-8');
                         // print_r($code);die;
                         // $Timestamp = date('mdHis');
