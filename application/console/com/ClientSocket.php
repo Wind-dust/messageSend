@@ -447,7 +447,8 @@ class ClientSocket extends Pzlife {
                     echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
                     //读取服务端返回来的套接流信息
                     $headData = socket_read($socket, 1024);
-                    print_r($headData);
+                    echo $headData."\n";
+                    // print_r($headData);
                     $v = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                     switch ($v['Command_Id'] & 0x0fffffff) {
                         case 0x80000001:
