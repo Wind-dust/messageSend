@@ -297,6 +297,7 @@ class ClientSocket extends Pzlife {
         } else {
             date_default_timezone_set('PRC');
             $i = 1;
+            $Sequence_Id = 1;
             do {
                 $time                = 0;
                 $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
@@ -306,7 +307,7 @@ class ClientSocket extends Pzlife {
                     $bodyData   = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                     $Command_Id = 0x00000001;
                     // $Total_Length        = strlen($bodyData) + 12;
-                    $Sequence_Id = 1;
+                    
                     // $headData            = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                     // print_r($headData);die;
                     // socket_write($socket, $headData . $bodyData, $Total_Length);
@@ -338,7 +339,7 @@ class ClientSocket extends Pzlife {
                         $uer_num = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
                         // $Msg_Id = rand(1, 100);
                         // $Msg_Id   = '';
-                        $Msg_Id   = 1;
+                        $Msg_Id   = time().$mobile;
                         $bodyData = pack("a8", $Msg_Id);
                         // $bodyData = (pack('I',pack("a8", $Msg_Id))); //Msg_Id |Unsigned Integer |8 | 信息标识，由 SP 侧短信网关本身产生， 本处填空
                         $bodyData = $bodyData . pack('C', 1); //Pk_total |Unsigned Integer |1 |相同 Msg_Id 的信息总条数，从 1 开始
@@ -413,7 +414,7 @@ class ClientSocket extends Pzlife {
                         if ($Msg_Id != 0) {
                             $Sequence_Id = $Msg_Id;
                         } else {
-                            if ($Sequence_Id < 10) {
+                            if ($Sequence_Id < pow(2,16) -1) {
                                 $Sequence_Id = $Sequence_Id;
                             } else {
                                 $Sequence_Id = 1;
@@ -424,7 +425,7 @@ class ClientSocket extends Pzlife {
                     } else {
                         $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                         $Command_Id  = 0x00000008; //保持连接
-                        $Sequence_Id = 1;
+                        $Sequence_Id = $Sequence_Id + 1;
                         $time        = 15;
                     }
                     //没有号码发送时 发送连接请求
@@ -447,7 +448,7 @@ class ClientSocket extends Pzlife {
                     echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
                     
                     //读取服务端返回来的套接流信息
-                  /*   $headData = socket_read($socket, 1024);
+                    $headData = socket_read($socket, 1024);
                     echo $headData."\n";
                     // print_r($headData);
                     $v = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
@@ -471,7 +472,7 @@ class ClientSocket extends Pzlife {
                             // $back_Command_Id   = 0x80000008; //连接应答
                             echo 'server return message is:' . PHP_EOL . '未知Command_Id'. "\n";
                         break;
-                    } */
+                    }
                     // echo 'server return message is:' . PHP_EOL . $headData;
                 }
                 $i++;
