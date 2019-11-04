@@ -339,7 +339,8 @@ class ClientSocket extends Pzlife {
                         $uer_num = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
                         // $Msg_Id = rand(1, 100);
                         // $Msg_Id   = '';
-                        $Msg_Id   = time().$mobile;
+                        // $Msg_Id   = time().$mobile;
+                        $Msg_Id   = time().$i;
                         $bodyData = pack("a8", $Msg_Id);
                         // $bodyData = (pack('I',pack("a8", $Msg_Id))); //Msg_Id |Unsigned Integer |8 | 信息标识，由 SP 侧短信网关本身产生， 本处填空
                         $bodyData = $bodyData . pack('C', 1); //Pk_total |Unsigned Integer |1 |相同 Msg_Id 的信息总条数，从 1 开始
