@@ -332,7 +332,7 @@ class ClientSocket extends Pzlife {
                         // $mobile = $send['mobile'];
                         // $code = $send['code'];
                         $mobile = 15201926171;
-                        $code   = '短信发送测试';
+                        $code   = '【气象祝福】阳光眷顾，天空展颜一片蔚蓝，但昼夜温差较大，极易发生感冒，请注意增减衣服保暖防寒，祝您身体健康。 ';//带签名
                         $code   = mb_convert_encoding($code, 'GBK', 'UTF-8');
                         // print_r($code);die;
                         // $Timestamp = date('mdHis');
@@ -449,7 +449,7 @@ class ClientSocket extends Pzlife {
                     echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
                     
                     //读取服务端返回来的套接流信息
-                  /*   $headData = socket_read($socket, 1024);
+                    $headData = socket_read($socket, 1024);
                     echo $headData."\n";
                     // print_r($headData);
                     $v = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
@@ -473,7 +473,7 @@ class ClientSocket extends Pzlife {
                             // $back_Command_Id   = 0x80000008; //连接应答
                             echo 'server return message is:' . PHP_EOL . '未知Command_Id'. "\n";
                         break;
-                    } */
+                    }
                     // echo 'server return message is:' . PHP_EOL . $headData;
                 }
                 $i++;
