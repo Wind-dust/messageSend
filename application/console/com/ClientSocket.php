@@ -247,7 +247,7 @@ class ClientSocket extends Pzlife {
                 'host'          => "47.96.157.156", //服务商ip
                 'port'          => "7890", //短连接端口号   17890长连接端口号
                 'Source_Addr'   => "997474", //企业id  企业代码
-                'Shared_secret' => 'Yhdbbn ', //网关登录密码
+                'Shared_secret' => 'Yhdbbn', //网关登录密码
                 'Service_Id'    => "997474", //业务代码
                 'template_id'   => "", //模板id
                 'Dest_Id'       => "1069024", //短信接入码 短信端口号 服务代码
