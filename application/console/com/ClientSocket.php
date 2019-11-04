@@ -337,7 +337,9 @@ class ClientSocket extends Pzlife
                     //     sleep(1);
                     // } while ($send);
                     // die;
-                    if ($i == 2) {
+                    
+                    // if ($i >1) {
+                       if ($i ) {
                         // $send = json_decode($send,true);
                         // $mobile = $send['mobile'];
                         // $code = $send['code'];
