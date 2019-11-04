@@ -433,7 +433,7 @@ class ClientSocket extends Pzlife
                             }
                             $Sequence_Id = $Sequence_Id + 1;
                         }
-                        if ($i > security_master) {
+                        if ($i > $security_master) {
                             $time = 1;
                             $i = 0;
                         } else {
