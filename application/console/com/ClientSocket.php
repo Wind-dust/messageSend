@@ -448,7 +448,7 @@ class ClientSocket extends Pzlife {
                     echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
                     
                     //读取服务端返回来的套接流信息
-                    $headData = socket_read($socket, 1024);
+                  /*   $headData = socket_read($socket, 1024);
                     echo $headData."\n";
                     // print_r($headData);
                     $v = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
@@ -472,7 +472,7 @@ class ClientSocket extends Pzlife {
                             // $back_Command_Id   = 0x80000008; //连接应答
                             echo 'server return message is:' . PHP_EOL . '未知Command_Id'. "\n";
                         break;
-                    }
+                    } */
                     // echo 'server return message is:' . PHP_EOL . $headData;
                 }
                 $i++;
