@@ -275,7 +275,6 @@ class ClientSocket extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
 
 
-
         // $redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend');
         // $code   = '短信发送测试';
 
@@ -298,6 +297,7 @@ class ClientSocket extends Pzlife
         $master_num               = $contdata['master_num']; //通道最大提交量
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
+        // echo $security_master;die;
         // die;
         // $send = $this->redis->lPop($redisMessageCodeSend);
         // print_r($send);
@@ -326,20 +326,9 @@ class ClientSocket extends Pzlife
                     /* redis 读取需要发送的数据 */
                     // $send = $this->redis->lPop($redisMessageCodeSend);
                     // $send = [];
-                    //每秒最大发送条数
-                    // do {
-                    //     $i = 1;
-
-                    //     do {
-                    //         $i++;
-                    //         echo $i . "\n";
-                    //     } while ($i <= $security_master);
-                    //     sleep(1);
-                    // } while ($send);
-                    // die;
                     
                     // if ($i >1) {
-                       if ($i ) {
+                    if ($i) {
                         // $send = json_decode($send,true);
                         // $mobile = $send['mobile'];
                         // $code = $send['code'];
@@ -435,11 +424,10 @@ class ClientSocket extends Pzlife
                             }
                             $Sequence_Id = $Sequence_Id + 1;
                         }
+                        $time = 0;
                         if ($i > $security_master) {
                             $time = 1;
                             $i = 0;
-                        } else {
-                            $time = 0;
                         }
                     } else {
                         $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
@@ -464,41 +452,67 @@ class ClientSocket extends Pzlife
                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
                     echo 'fail to write' . socket_strerror(socket_last_error());
                 } else {
-                    echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
+                    // echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
 
                     //读取服务端返回来的套接流信息
-                    // $headData = socket_read($socket, 1024);
+                    $headData = socket_read($socket, 1024);
                     // echo $headData . "\n";
                     // print_r($headData);
-                    /* 
-                    00-00-00-91-00-00-00-05-1E-33-71-8F-B2-45-88-1F-04-1F-DB-B2-31-30-36-39-30-32-34-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-31-35-32-30-31-39-32-36-31-37-31-00-00-00-00-00-00-00-00-00-00-01-3C-B2-45-3E-9F-04-1F-D7-82-44-45-4C-49-56-52-44-31-39-31-31-30-34-31-37-32-30-31-39-31-31-30-34-31-37-32-31-31-35-32-30-31-39-32-36-31-37-31-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00 */
-                    // $v = unpack("NTotal_Length/NCommand_Id/NSequence_Id/CResult", $headData);
-                    // print_r($v);
-                    /*  switch ($v['Command_Id'] & 0x0fffffff) {
+                    // $headData = "00-00-00-91-00-00-00-05-1E-33-71-8F-B2-45-88-1F-04-1F-DB-B2-31-30-36-39-30-32-34-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-31-35-32-30-31-39-32-36-31-37-31-00-00-00-00-00-00-00-00-00-00-01-3C-B2-45-3E-9F-04-1F-D7-82-44-45-4C-49-56-52-44-31-39-31-31-30-34-31-37-32-30-31-39-31-31-30-34-31-37-32-31-31-35-32-30-31-39-32-36-31-37-31-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00" ;
+                    // $headData = str_replace("-", '', $headData);
+                    // print_r($headData);die;
+                    $v = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
+                    $Sequence_Id = $v['Sequence_Id'];
+                    // 处理body
+
+                    switch ($v['Command_Id'] & 0x0fffffff) {
                         case 0x80000001:
                             // $body = unpack("CStatus/a16AuthenticatorISMG/CVersion", $bodyData);//收到连接请求
-                            echo 'server return message is:' . PHP_EOL . '连接成功'. "\n";
+                            echo 'server return message is:' . PHP_EOL . '连接成功' . "\n";
                             // $bodyData = pack("C", 1);
                             break;
                         case 0x80000004;
-                        // $bodyData = pack("C", 1);
-                            echo 'server return message is:' . PHP_EOL . '发送任务提交成功'. "\n";
+                            // $bodyData = pack("C", 1);
+                            echo 'server return message is:' . PHP_EOL . '发送任务提交成功' . "\n";
                             break;
                         case  0x80000008; //保持连接
                             // $bodyData = pack("C", 1);
                             // $back_Command_Id   = 0x80000008; //连接应答
-                            echo 'server return message is:' . PHP_EOL . '保持心跳中'. "\n";
-                        break;
+                            echo 'server return message is:' . PHP_EOL . '保持心跳中' . "\n";
+                            break;
+                        case  0x00000005; //短信下发，需要回复回复码0x80000005 
+                            $bodyData = socket_read($socket, $v['Total_Length'] - 12);
+                            // print_r($v);
+                            $contentlen = $v['Total_Length'] - 109;
+                            // $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a32Src_terminal_Id/CSrc_terminal_type/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a20LinkID", $this->bodyData);
+                            // print_r($bodyData);die;
+                            $body       = unpack("a8Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CSrc_terminal_type/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a8Reserved", $bodyData);
+                            var_dump($body);
+                            // die;
+                            if ($body['Msg_Length'] > 0) {
+                                $data = $body['Msg_Content'];
+                                //$Msg_Id = $body['Msg_Id'];
+                                $Msg_Id   = ($body['Msg_Id1'] & 0x0fffffff);
+                                $Msg_Idfu = $body['Msg_Id2'];
+                                $msgidz   = unpack("N", substr($this->bodyData, 0, 8));
+                                $msgidzz  = '0000' . $msgidz[1];
+                                $kahao    = $body['Src_terminal_Id'];
+                                //echo $Msg_Id."\n";
+                                echo $data . "\n";
+                                echo $Msg_Id . '...' . $kahao . "\n";
+                                // $this->cmppDeliverResp($msgidzz, $Msg_Idfu, $Sequence_Id);
+                            }
+                            break;
                         default:
                             // $bodyData = pack("C", 1);
                             // $back_Command_Id   = 0x80000008; //连接应答
-                            echo 'server return message is:' . PHP_EOL . '未知Command_Id'. "\n";
-                        break;
-                    } */
+                            echo 'server return message is:' . PHP_EOL . '未知Command_Id' . "\n";
+                            break;
+                    }
                     // echo 'server return message is:' . PHP_EOL . $headData;
                 }
                 $i++;
-                echo $i."\n";
+                echo $i . "\n";
                 sleep($time); //等待时间，进行下一次操作
             } while (true);
             /*  while ($headData = socket_read($socket, 1024)) {
