@@ -9,11 +9,13 @@ use Env;
 use function Qiniu\json_decode;
 use think\Db;
 
-class ServerSocket extends Pzlife {
+class ServerSocket extends Pzlife
+{
 
     // private $bodyData;
 
-    public function Service($content) {
+    public function Service($content)
+    {
         $contdata = $this->content($content);
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
 
@@ -37,7 +39,7 @@ class ServerSocket extends Pzlife {
         if (socket_listen($socket, 4) == false) {
             echo 'server listen fail:' . socket_strerror(socket_last_error());
         }
-//让服务器无限获取客户端传过来的信息
+        //让服务器无限获取客户端传过来的信息
         do {
             /*接收客户端传过来的信息*/
             $accept_resource = socket_accept($socket);
@@ -46,43 +48,68 @@ class ServerSocket extends Pzlife {
             if ($accept_resource !== false) {
                 /*读取客户端传过来的资源，并转化为字符串*/
                 $string = socket_read($accept_resource, 1024);
+                echo $string;die;
                 /*socket_read的作用就是读出socket_accept()的资源并把它转化为字符串*/
                 // $v = base_convert($string, 16, 2);
-               
+
                 // echo 'server receive is :' . $v . PHP_EOL; //PHP_EOL为php的换行预定义常量
                 if ($string != false) {
-                    $string = base_convert($string, 16, 2);
-                    // $return_client = 'server receive is : ' . $string . PHP_EOL;
-                    $v = base_convert($string, 16, 2);
-                    $return_client ='server receive is : '. PHP_EOL. $v;
-                    $v = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $string);
-                    // $bodyData = socket_read($socket, $v['Total_Length'] - 12);
+                    // $string = base_convert($string, 16, 2);
+                    // // $return_client = 'server receive is : ' . $string . PHP_EOL;
+                    // $old_v = base_convert($string, 16, 2);
+                    // $return_client = 'server receive is : ' . PHP_EOL . $v;
+                    // echo $old_v."\n";
+                    $v = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $string);  
+                    print_r($v);die;             
+                    // $string = join('',$this->string2bytes($string));
+                    // $bodyData = substr($string, 48);
+                    // echo $string."\n";
+                    // echo $bodyData;die;
+                    // $bodyData = $this->string2bytes($bodyData);
+                    // echo pack('N', $v['Total_Length']);
+                    // die;
+                    // $body = unpack("a6Source_Addr/a16AuthenticatorISMG/CVersion/NTimestamp", $bodyData); //收到连接请求
+                    // print_r(0x20);
+                    // echo "\n";
+                    // print_r($body);die;
+                    // echo $bodyData;die;
+                    
+                    // $body = unpack("CStatus/a16AuthenticatorISMG/CVersion", $bodyData);//收到连接请求
+                    // 
+                    // "a6a16CN"
+                    // print_r($body['Source_Addr'] & 0x0fffffff);
+                    // die;
+                    // print_r($v['Total_Length'] - 12);die;
                     switch ($v['Command_Id'] & 0x0fffffff) {
                         case 0x00000001:
                             // $body = unpack("CStatus/a16AuthenticatorISMG/CVersion", $bodyData);//收到连接请求
+
+                            // print_r($bodyData);die;
+                            // $this->checkContent($body, "CMPP_CONNECT");
                             $back_Command_Id   = 0x80000001; //连接应答
-                            $bodyData = pack("C", 1);
+                            echo "收到连接请求";
                             break;
                         case 0x00000004;
-                        $bodyData = pack("C", 1);
+                            $bodyData = pack("C", 1);
                             $back_Command_Id   = 0x80000004; //发送应答
-                           
+
                             break;
                         case  0x00000008; //保持连接
                             $bodyData = pack("C", 1);
                             $back_Command_Id   = 0x80000008; //连接应答
-                          
-                        break;
+
+                            break;
                         default:
                             $bodyData = pack("C", 1);
                             $back_Command_Id   = 0x80000008; //连接应答
-                        break;
+                            break;
                     }
+                    // socket_close($socket);
                     $Total_Length = strlen($bodyData) + 12;
                     $headData     = pack("NNN", $Total_Length, $back_Command_Id, $Sequence_Id);
                     // socket_write($socket, $headData . $bodyData, $Total_Length);
-                    print_r($v);
-                    print_r($back_Command_Id);
+
+                    // print_r($back_Command_Id);
                     /*向socket_accept的套接流写入信息，也就是回馈信息给socket_bind()所绑定的主机客户端*/
                     socket_write($accept_resource, $headData . $bodyData, $Total_Length);
                     /*socket_write的作用是向socket_create的套接流写入信息，或者向socket_accept的套接流写入信息*/
@@ -96,8 +123,9 @@ class ServerSocket extends Pzlife {
         // socket_close($socket);
     }
 
-    public function content($content) {
-        if ($content == 1) { //测试
+    public function content($content)
+    {
+        if ($content == 1) { //本机测试
             return [
                 'host'          => "127.0.0.1", //服务商ip
                 'port'          => "8888", //短连接端口号   17890长连接端口号
@@ -111,4 +139,21 @@ class ServerSocket extends Pzlife {
         }
     }
 
+    public function checkContent($bodyData, $commamd)
+    {
+        if ($commamd == 'CMPP_CONNECT') {
+            $body = unpack("a6Source_Addr/a16AuthenticatorSource/CVersion/NTimestamp", $bodyData);
+            print_r($body);
+        }
+    }
+
+    function string2bytes($str)
+    {
+        $bytes = array();
+        for ($i = 0; $i < strlen($str); $i++) {
+            $tmp = substr($str, $i, 1);
+            $bytes[] = bin2hex($tmp);
+        }
+        return $bytes;
+    }
 }

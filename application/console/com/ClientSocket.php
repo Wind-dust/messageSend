@@ -2,11 +2,11 @@
 
 namespace app\console\com;
 
-use app\console\Pzlife;
-use cache\Phpredis;
-use Config;
 use Env;
+use Config;
 use think\Db;
+use cache\Phpredis;
+use app\console\Pzlife;
 
 class ClientSocket extends Pzlife
 {
@@ -327,8 +327,9 @@ class ClientSocket extends Pzlife
                     // $send = $this->redis->lPop($redisMessageCodeSend);
                     // $send = [];
                     
-                    // if ($i >1) {
-                    if ($i) {
+                    if ($i == 2) {//测试判断语句
+                        die;
+                    // if ($i) {//正式使用语句
                         // $send = json_decode($send,true);
                         // $mobile = $send['mobile'];
                         // $code = $send['code'];
@@ -355,6 +356,7 @@ class ClientSocket extends Pzlife
 
                         $bodyData = $bodyData . pack("a21", $mobile); //Fee_terminal_Id |21 Unsigned Integer |被计费用户的号码（如本字节填空，则表 示本字段无效，对谁计费参见 Fee_UserType 字段，本字段与 Fee_UserType 字段互斥）
                         $bodyData = $bodyData . pack("C", 0); //TP_pId |1 |Unsigned Integer |GSM协议类型。详细是解释请参考 GSM03.40 中的 9.2.3.9
+                        
                         /**
                          * TP_udhi ：0代表内容体里不含有协议头信息
                          * 1代表内容含有协议头信息（长短信，push短信等都是在内容体上含有头内容的）当设置内容体包含协议头
@@ -439,32 +441,24 @@ class ClientSocket extends Pzlife
                 }
                 $Total_Length = strlen($bodyData) + 12;
                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                // echo '<pre>';
-                // var_dump( $headData . $bodyData);
-                // echo '</pre>';
-
-                // echo "/n";
-                // print_r();
-                // if ($i ==2 ){
-
-                //     echo  base_convert($headData .$bodyData, 16, 2);die;
-                // }
-                if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
+                echo $headData.$bodyData;
+                // echo strlen($headData);die;
+                if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {//写入失败，还原发送信息并关闭端口
                     echo 'fail to write' . socket_strerror(socket_last_error());
                 } else {
                     // echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
 
                     //读取服务端返回来的套接流信息
-                    $headData = socket_read($socket, 1024);
+                    // $headData = socket_read($socket, 1024);
                     // echo $headData . "\n";
                     // print_r($headData);
                     // $headData = "00-00-00-91-00-00-00-05-1E-33-71-8F-B2-45-88-1F-04-1F-DB-B2-31-30-36-39-30-32-34-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-31-35-32-30-31-39-32-36-31-37-31-00-00-00-00-00-00-00-00-00-00-01-3C-B2-45-3E-9F-04-1F-D7-82-44-45-4C-49-56-52-44-31-39-31-31-30-34-31-37-32-30-31-39-31-31-30-34-31-37-32-31-31-35-32-30-31-39-32-36-31-37-31-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00" ;
                     // $headData = str_replace("-", '', $headData);
                     // print_r($headData);die;
-                    $v = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
+                  /*   $v = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                     $Sequence_Id = $v['Sequence_Id'];
                     // 处理body
-
+                    $bodyData = socket_read($socket, $v['Total_Length'] - 12);
                     switch ($v['Command_Id'] & 0x0fffffff) {
                         case 0x80000001:
                             // $body = unpack("CStatus/a16AuthenticatorISMG/CVersion", $bodyData);//收到连接请求
@@ -481,7 +475,7 @@ class ClientSocket extends Pzlife
                             echo 'server return message is:' . PHP_EOL . '保持心跳中' . "\n";
                             break;
                         case  0x00000005; //短信下发，需要回复回复码0x80000005 
-                            $bodyData = socket_read($socket, $v['Total_Length'] - 12);
+                            
                             // print_r($v);
                             $contentlen = $v['Total_Length'] - 109;
                             // $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a32Src_terminal_Id/CSrc_terminal_type/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a20LinkID", $this->bodyData);
@@ -506,9 +500,9 @@ class ClientSocket extends Pzlife
                         default:
                             // $bodyData = pack("C", 1);
                             // $back_Command_Id   = 0x80000008; //连接应答
-                            echo 'server return message is:' . PHP_EOL . '未知Command_Id' . "\n";
+                            echo 'server return message is:' . PHP_EOL . '未知Command_Id:'.$v['Command_Id'] . "\n";
                             break;
-                    }
+                    } */
                     // echo 'server return message is:' . PHP_EOL . $headData;
                 }
                 $i++;
