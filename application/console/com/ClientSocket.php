@@ -304,7 +304,7 @@ class ClientSocket extends Pzlife {
             date_default_timezone_set('PRC');
             // socket_read($socket,3072);
             // die;//关闭socket连接，清除缓存数据
-            socket_set_nonblock($socket); //设置非阻塞模式
+            // socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
             do {
