@@ -301,7 +301,30 @@ CREATE TABLE `yx_business` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '业务类型及定价' ROW_FORMAT = Dynamic;
 
-DROP TABLE IF EXISTS `yx_`
+DROP TABLE IF EXISTS `yx_sms_sending_channel`;
+CREATE TABLE `yx_sms_sending_channel` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '通道名称',
+  `channel_type` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '通道类型 1.http 2.cmpp ',
+  `channel_port` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '连接端口,若无端口则不填',
+  `channel_source` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '通道归属:1,中国移动;2,中国联通;3,中国电信;4,三网通',
+  `channel_services` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '通道服务范围:1,行业;2,营销;3,彩信;4,视频',
+  `channel_price` decimal(10,5) UNSIGNED NOT NULL DEFAULT 0.00000 COMMENT '通道价格',
+  `channel_host` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '通道连接主机或者域名',
+  `channel_postway` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'http请求方式:1,get;2,post;CMPP接口不填',
+  `channel_source_addr` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '企业id,企业代码',
+  `channel_shared_secret` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '网关登录密码',
+  `channel_service_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '业务代码',
+  `channel_template_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '模板ID',
+  `channel_dest_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信接入码 短信端口号',
+  `channel_flow_velocity` int(10) UNIQUE NOT NULL DEFAULT 0 COMMENT "通道最大流速/秒",
+  `channel_status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '通道状态:1,空闲;2,正常;3,忙碌;4,停止使用',
+  `error_msg` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '通道错误信息',
+  `update_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间',
+  `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '运营商通道' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `yx_user_equities`;
 CREATE TABLE `yx_user_equities` (
