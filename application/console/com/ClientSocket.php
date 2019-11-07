@@ -275,7 +275,9 @@ class ClientSocket extends Pzlife {
 
         // echo $code;
         // die;
-        // print_r($redisMessageCodeSend);die;
+        //  echo 0x00000008;
+        // print_r(2147483656 == 0x00000008);
+
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -332,7 +334,7 @@ class ClientSocket extends Pzlife {
 
                     if ($i == 0) { //测试判断语句
 
-                    // if ($i) { //正式使用从缓存中读取数据
+                        // if ($i) { //正式使用从缓存中读取数据
                         // $send = json_decode($send,true);
                         // $mobile = $send['mobile'];
                         // $code = $send['code'];
@@ -463,7 +465,7 @@ class ClientSocket extends Pzlife {
                     $headData = socket_read($socket, 12);
                     if ($headData != false) {
                         $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
-                        print_r($head) ;
+                        print_r($head);
                         $bodyData = socket_read($socket, $head['Total_Length'] - 12);
                         // print_r($bodyData);
                         // echo "\n";
@@ -471,7 +473,8 @@ class ClientSocket extends Pzlife {
                         try
                         {
                             $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
-                            if ($head['Command_Id'] & 0x80000001) {
+                            switch ($head['Command_Id'] & 0x0fffffff) {
+                            case 0x80000001:
                                 // echo "接收到连接应答"."\n";
                                 // $bodyData = socket_read($socket, $head['Total_Length'] - 12);
                                 $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
@@ -518,8 +521,8 @@ class ClientSocket extends Pzlife {
                                     }
                                     die;
                                 }
-
-                            } else if ($head['Command_Id'] & 0x80000004) {
+                                break;
+                            case 0x80000004:
                                 $body = unpack("a8Msg_Id/CResult", $bodyData);
                                 print_r($body);
                                 //状态为0 ，消息发送成功
@@ -568,18 +571,33 @@ class ClientSocket extends Pzlife {
 
                                 }
 
-                            } else if ($head['Command_Id'] & 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
+                                break;
+                            case 0x00000005:
                                 $Result     = 0;
                                 $contentlen = $Total_Length - 73;
                                 $body       = unpack("a8Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a8Reserved", $bodyData);
                                 print_r($body);
-                                echo "CMPP_DELIVER:". base_convert($bodyData, 16, 2)."\n";
+                                echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
                                 $callback_Command_Id = 0x80000005;
 
                                 $new_body         = pack("a8", $body['Msg_Id']) . pack("C", $Result);
                                 $new_Total_Length = strlen($new_body) + 12;
                                 $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id']);
                                 socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                                break;
+                            case 0x00000008:
+                                echo "心跳维持中" . "\n";
+                                break;
+                            default:
+                                echo "未声明head['Command_Id']:".$head['Command_Id'];
+                                break;
+                            }
+                            if ($head['Command_Id'] == 0x80000001) {
+
+                            } else if ($head['Command_Id'] == 0x80000004) {
+                                
+                            } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
+                                
                             }
                         }
                         //捕获异常
@@ -595,7 +613,6 @@ class ClientSocket extends Pzlife {
                 //     die;
                 // }
 
-                
                 $i++;
                 // sleep($time); //等待时间，进行下一次操作
                 sleep(1); //等待时间，进行下一次操作
