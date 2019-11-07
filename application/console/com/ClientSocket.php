@@ -310,6 +310,7 @@ class ClientSocket extends Pzlife {
             $i           = 1;
             $Sequence_Id = 1;
             do {
+                echo $i . "\n";
                 $time                = 0;
                 $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
                 $Timestamp           = date('mdHis');
@@ -462,9 +463,9 @@ class ClientSocket extends Pzlife {
                     $headData = socket_read($socket, 12);
                     if ($headData != false) {
                         $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
-                        // print_r($head) ;
+                        print_r($head) ;
                         $bodyData = socket_read($socket, $head['Total_Length'] - 12);
-                        print_r($bodyData);
+                        // print_r($bodyData);
                         // echo "\n";
                         //错误处理机制
                         try
@@ -594,7 +595,7 @@ class ClientSocket extends Pzlife {
                 //     die;
                 // }
 
-                echo $i . "\n";
+                
                 $i++;
                 // sleep($time); //等待时间，进行下一次操作
                 sleep(1); //等待时间，进行下一次操作
