@@ -276,7 +276,9 @@ class ClientSocket extends Pzlife {
         // echo $code;
         // die;
         //  echo 0x00000008;
-        // print_r(2147483656 == 0x00000008);
+        // print_r(21474836492 & 0x0fffffff );
+        // echo 0x00000010;
+        // die;
 
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
@@ -332,7 +334,7 @@ class ClientSocket extends Pzlife {
                     // $send = $this->redis->lPop($redisMessageCodeSend);
                     // $send = [];
 
-                    if ($i == 0) { //测试判断语句
+                    if ($i == 2) { //测试判断语句
 
                         // if ($i) { //正式使用从缓存中读取数据
                         // $send = json_decode($send,true);
@@ -586,19 +588,20 @@ class ClientSocket extends Pzlife {
                                 socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                 break;
                             case 0x00000008:
-                                echo "心跳维持中" . "\n";
+                                echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                                // $body = unpack("C",$bodyData);
                                 break;
                             default:
                                 echo "未声明head['Command_Id']:".$head['Command_Id'];
                                 break;
                             }
-                            if ($head['Command_Id'] == 0x80000001) {
+                            /* if ($head['Command_Id'] == 0x80000001) {
 
                             } else if ($head['Command_Id'] == 0x80000004) {
                                 
                             } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                                 
-                            }
+                            } */
                         }
                         //捕获异常
                          catch (Exception $e) {
