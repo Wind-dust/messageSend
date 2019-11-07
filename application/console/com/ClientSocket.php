@@ -526,7 +526,7 @@ class ClientSocket extends Pzlife {
                                 break;
                             case 0x80000004:
                                 $body = unpack("a8Msg_Id/CResult", $bodyData);
-                                print_r($body);
+                                // print_r($body);
                                 //状态为0 ，消息发送成功
                                 switch ($body['Status']) {
                                 case 0:
@@ -576,7 +576,7 @@ class ClientSocket extends Pzlife {
                                 break;
                             case 0x00000005:
                                 $Result     = 0;
-                                $contentlen = $Total_Length - 73;
+                                $contentlen = $head['Total_Length'] - 73;
                                 $body       = unpack("a8Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a8Reserved", $bodyData);
                                 print_r($body);
                                 echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
