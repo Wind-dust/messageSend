@@ -327,7 +327,7 @@ class ClientSocket extends Pzlife {
                     // $send = $this->redis->lPop($redisMessageCodeSend);
                     // $send = [];
 
-                    if ($i == 2) { //测试判断语句
+                    if ($i == 0) { //测试判断语句
 
                     // if ($i) { //正式使用从缓存中读取数据
                         // $send = json_decode($send,true);
@@ -462,7 +462,7 @@ class ClientSocket extends Pzlife {
                         $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                         // print_r($head) ;
                         $bodyData = socket_read($socket, $head['Total_Length'] - 12);
-                        // print_r($bodyData);
+                        print_r($bodyData);
                         // echo "\n";
                         //错误处理机制
                         try
