@@ -350,8 +350,12 @@ class ClientSocket extends Pzlife {
                         // $Msg_Id = rand(1, 100);
                         // $Msg_Id   = '';
                         // $Msg_Id   = time().$mobile;
-                        $Msg_Id   = strval(time()) . $i;
-                        $bodyData = pack("a8", $Msg_Id);
+                        // $Msg_Id   = strval(time()) . $i;
+                        // $bodyData = pack("a8", $Msg_Id);
+                        $timestring = time();
+                        $num1 = substr($timestring,0,8);
+                        $num2 = substr($timestring,8).$this->combination(rand(1,240));
+                        $bodyData = pack("N",$num1) . pack("N", $num2);
                         // $bodyData = (pack('I',pack("a8", $Msg_Id))); //Msg_Id |Unsigned Integer |8 | 信息标识，由 SP 侧短信网关本身产生， 本处填空
                         $bodyData = $bodyData . pack('C', 1); //Pk_total |Unsigned Integer |1 |相同 Msg_Id 的信息总条数，从 1 开始
                         $bodyData = $bodyData . pack('C', 1); //Pk_number |Unsigned Integer |1 |相同 Msg_Id 的信息序号，从 1 开始
@@ -424,16 +428,7 @@ class ClientSocket extends Pzlife {
                         // send($bodyData, "CMPP_SUBMIT", $Msg_Id);
 
                         $Command_Id = 0x00000004; // 短信发送
-                        if ($Msg_Id != 0) {
-                            $Sequence_Id = $Msg_Id;
-                        } else {
-                            if ($Sequence_Id < pow(2, 16) - 1) {
-                                $Sequence_Id = $Sequence_Id;
-                            } else {
-                                $Sequence_Id = 1;
-                            }
-                            $Sequence_Id = $Sequence_Id + 1;
-                        }
+                        $Sequence_Id = $num1 . $num2;
                         $time = 0;
                         if ($i > $security_master) {
                             $time = 1;
@@ -525,7 +520,7 @@ class ClientSocket extends Pzlife {
                                 }
                                 break;
                             case 0x80000004:
-                                $body = unpack("a8Msg_Id/CResult", $bodyData);
+                                $body = unpack("N2Msg_Id/CResult", $bodyData);
                                 // print_r($body);
                                 //状态为0 ，消息发送成功
                                 switch ($body['Status']) {
@@ -577,7 +572,7 @@ class ClientSocket extends Pzlife {
                             case 0x00000005:
                                 $Result     = 0;
                                 $contentlen = $head['Total_Length'] - 73-12;
-                                $body       = unpack("a8Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a8Reserved", $bodyData);
+                                $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a8Reserved", $bodyData);
                                 print_r($body);
                                 echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
                                 $callback_Command_Id = 0x80000005;
@@ -659,6 +654,7 @@ class ClientSocket extends Pzlife {
         }
     }
 
+    //16进制转2进制
     function StrToBin($str) {
         //1.列出每个字符
         $arr = preg_split('/(?<!^)(?!$)/u', $str);
@@ -671,4 +667,98 @@ class ClientSocket extends Pzlife {
 
         return join('', $arr);
     }
+
+    public function decodeString(){
+        // echo strlen("³½'¹ ");
+        $timestring = time();
+        $num1 = substr($timestring,0,8);
+        $num2 = substr($timestring,8).$this->combination(rand(1,240));
+        echo $num1;
+        echo "\n";
+        echo $num2;
+        
+        $a = pack("N",$num1) . pack("N", $num2);
+        echo $a."\n";
+        print_r(unpack("N2Msg_Id",$a));
+       
+        die;
+       $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","³f󿾧©¬DELIVRD1911071650191107165515201926171AG");
+       
+    }
+
+    /**
+     * 6位数字补齐
+     * @param string $pdu
+     * @return string
+     */
+    function combination($num) {
+        $num = intval($num);
+        $num = strval($num);
+        $new_num = '';
+        switch (strlen($num)) {
+            case 0:
+                $new_num = "000000";
+                break;
+            case 1:
+                $new_num = "00000".$num;
+                break;
+            case 2:
+                $new_num = "0000".$num;
+                break;
+            case 3:
+                $new_num = "000".$num;
+                break;
+            case 4:
+                $new_num = "00".$num;
+                break;
+            case 5:
+                $new_num = "0".$num;
+                break;
+            
+        }
+        return $new_num;
+    }
+
+    /**
+     * PDU数据包转化ASCII数字
+     * @param string $pdu
+     * @return string
+     */
+    public function pduord($pdu) {
+        $ord_pdu = '';
+        for ($i = 0; $i < strlen($pdu); $i++) {
+            $ord_pdu .= sprintf("%02x", ord($pdu[$i])) . ' ';
+        }
+
+        if ($ord_pdu) {
+            $ord_pdu = substr($ord_pdu, 0, -1);
+        }
+
+        return $ord_pdu;
+    }
+
+    /**
+     * 将ascii码转为字符串
+     * @param type $str 要解码的字符串
+     * @param type $prefix 前缀，默认:&#
+     * @return type
+     */
+    function decode($str, $prefix="&#") {
+        $str = str_replace($prefix, "", $str);
+        $a = explode(";", $str);
+        $utf = '';
+        foreach ($a as $dec) {
+          if ($dec < 128) {
+            $utf .= chr($dec);
+          } else if ($dec < 2048) {
+            $utf .= chr(192 + (($dec - ($dec % 64)) / 64));
+            $utf .= chr(128 + ($dec % 64));
+          } else {
+            $utf .= chr(224 + (($dec - ($dec % 4096)) / 4096));
+            $utf .= chr(128 + ((($dec % 4096) - ($dec % 64)) / 64));
+            $utf .= chr(128 + ($dec % 64));
+          }
+        }
+        return $utf;
+      }
 }
