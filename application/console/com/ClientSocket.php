@@ -276,8 +276,11 @@ class ClientSocket extends Pzlife {
         // echo $code;
         // die;
         //  echo 0x00000008;
-        // print_r(21474836492 & 0x0fffffff );
-        // echo 0x00000010;
+        // print_r(655521893 & 0x0fffffff );
+        // // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´&´'pӄELIVRD1911080943191108094315201926171Ȕ26");
+        // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´&´'pӄELIVRD1911080943191108094315201926171Ȕ26");
+        // print_r($arr);die;
+        // // echo 0x00000010;
         // die;
 
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
@@ -355,7 +358,7 @@ class ClientSocket extends Pzlife {
                         $timestring = time();
                         $num1 = substr($timestring,0,8);
                         $num2 = substr($timestring,8).$this->combination($i);
-                        echo "发送的msg_id:".$num1.$num2;
+                        
                         $bodyData = pack("N",$num1) . pack("N", $num2);
                         // $bodyData = (pack('I',pack("a8", $Msg_Id))); //Msg_Id |Unsigned Integer |8 | 信息标识，由 SP 侧短信网关本身产生， 本处填空
                         $bodyData = $bodyData . pack('C', 1); //Pk_total |Unsigned Integer |1 |相同 Msg_Id 的信息总条数，从 1 开始
@@ -429,7 +432,7 @@ class ClientSocket extends Pzlife {
                         // send($bodyData, "CMPP_SUBMIT", $Msg_Id);
 
                         $Command_Id = 0x00000004; // 短信发送
-                        $Sequence_Id = $num1 . $num2;
+                        $Sequence_Id = strval($mobile) . $i;
                         $time = 0;
                         if ($i > $security_master) {
                             $time = 1;
@@ -523,6 +526,8 @@ class ClientSocket extends Pzlife {
                             case 0x80000004:
                                 $body = unpack("N2Msg_Id/CResult", $bodyData);
                                 // print_r($body);
+                                echo "get_CMPP_SUBMIT_RESP"."\n";
+                                print_r($body);
                                 //状态为0 ，消息发送成功
                                 switch ($body['Status']) {
                                 case 0:
@@ -566,7 +571,8 @@ class ClientSocket extends Pzlife {
                                     break;
                                 }
                                 if ($body['Result'] != 0) { //消息发送失败
-
+                                    echo "发送失败" . "\n";
+                                    $error_msg = "其他错误";
                                 }
 
                                 break;
@@ -576,12 +582,12 @@ class ClientSocket extends Pzlife {
                                 $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a8Reserved", $bodyData);
                                 print_r($body);
                                 echo "返回解析Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
-                                echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
+                                // echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
                                 $callback_Command_Id = 0x80000005;
 
                                 $new_body         = pack("N", $body['Msg_Id1']). pack("N", $body['Msg_Id2']). pack("C", $Result);
                                 $new_Total_Length = strlen($new_body) + 12;
-                                $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id']);
+                                $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id2']);
                                 socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                 break;
                             case 0x00000008:
