@@ -354,7 +354,8 @@ class ClientSocket extends Pzlife {
                         // $bodyData = pack("a8", $Msg_Id);
                         $timestring = time();
                         $num1 = substr($timestring,0,8);
-                        $num2 = substr($timestring,8).$this->combination(rand(1,240));
+                        $num2 = substr($timestring,8).$this->combination($i);
+                        echo "发送的msg_id:".$num1.$num2;
                         $bodyData = pack("N",$num1) . pack("N", $num2);
                         // $bodyData = (pack('I',pack("a8", $Msg_Id))); //Msg_Id |Unsigned Integer |8 | 信息标识，由 SP 侧短信网关本身产生， 本处填空
                         $bodyData = $bodyData . pack('C', 1); //Pk_total |Unsigned Integer |1 |相同 Msg_Id 的信息总条数，从 1 开始
@@ -574,10 +575,11 @@ class ClientSocket extends Pzlife {
                                 $contentlen = $head['Total_Length'] - 73-12;
                                 $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a8Reserved", $bodyData);
                                 print_r($body);
+                                echo "返回解析Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
                                 echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
                                 $callback_Command_Id = 0x80000005;
 
-                                $new_body         = pack("a8", $body['Msg_Id']) . pack("C", $Result);
+                                $new_body         = pack("N", $body['Msg_Id1']). pack("N", $body['Msg_Id2']). pack("C", $Result);
                                 $new_Total_Length = strlen($new_body) + 12;
                                 $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id']);
                                 socket_write($socket, $new_headData . $new_body, $new_Total_Length);
