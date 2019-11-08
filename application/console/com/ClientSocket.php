@@ -473,7 +473,7 @@ class ClientSocket extends Pzlife {
                         //错误处理机制
                         try
                         {
-                            $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
+                            // $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                             switch ($head['Command_Id'] & 0x0fffffff) {
                             case 0x80000001:
                                 // echo "接收到连接应答"."\n";
