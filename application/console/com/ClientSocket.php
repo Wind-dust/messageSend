@@ -284,7 +284,7 @@ class ClientSocket extends Pzlife {
         // print_r( unpack("a8",$a));
         // echo $v;
         // // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´&´'pӄELIVRD1911080943191108094315201926171Ȕ26");
-        // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´&´'pӄELIVRD1911080943191108094315201926171Ȕ26");
+        // $arr = unpack("NMsg_Id/a7Stat/a10Submit_time/a10Done_time/","´-@'DELIVRD1911081116191108130815201926171´ґ`");
         // print_r($arr);die;
         // // echo 0x00000010;
         // die;
@@ -549,10 +549,11 @@ class ClientSocket extends Pzlife {
                             } else if ($head['Command_Id'] == 0x80000004) {
                                 $body = unpack("N2Msg_Id/CResult", $bodyData);
                                 // print_r($body);
-                                echo "get_CMPP_SUBMIT_RESP"."\n";
-                                print_r($body);
+                                // echo "get_CMPP_SUBMIT_RESP"."\n";
+                                echo "提交的Sequence_Id:".$head['Sequence_Id'].",解析的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2']."\n";
+                                // print_r($body);
                                 //状态为0 ，消息发送成功
-                                switch ($body['Status']) {
+                                switch ($body['Result']) {
                                 case 0:
                                     echo "发送成功" . "\n";
                                     break;
@@ -601,8 +602,8 @@ class ClientSocket extends Pzlife {
                                 $Result     = 0;
                                 $contentlen = $head['Total_Length'] - 73-12;
                                 $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a8Reserved", $bodyData);
-                                print_r($body);
-                                echo "返回解析Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
+                                // print_r($body);
+                                echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
                                 // echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
                                 $callback_Command_Id = 0x80000005;
 
