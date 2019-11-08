@@ -275,8 +275,14 @@ class ClientSocket extends Pzlife {
 
         // echo $code;
         // die;
-        //  echo 0x00000008;
-        // print_r(655521893 & 0x0fffffff );
+        //  echo 0x80000004;
+        // print_r(15201926171 & 0x0fffffff );
+        // $v = base_convert(time(), 10, 16)."\n";
+        // $a = pack("a8",$v);
+        // echo $v."\n";
+        // echo $a."\n";
+        // print_r( unpack("a8",$a));
+        // echo $v;
         // // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´&´'pӄELIVRD1911080943191108094315201926171Ȕ26");
         // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´&´'pӄELIVRD1911080943191108094315201926171Ȕ26");
         // print_r($arr);die;
@@ -432,7 +438,7 @@ class ClientSocket extends Pzlife {
                         // send($bodyData, "CMPP_SUBMIT", $Msg_Id);
 
                         $Command_Id = 0x00000004; // 短信发送
-                        $Sequence_Id = strval($mobile) . $i;
+                        $Sequence_Id = $i;
                         $time = 0;
                         if ($i > $security_master) {
                             $time = 1;
@@ -443,7 +449,7 @@ class ClientSocket extends Pzlife {
                     } else {
                         $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                         $Command_Id  = 0x00000008; //保持连接
-                        $Sequence_Id = $Sequence_Id + 1;
+                        $Sequence_Id = $i;
                         $time        = 15;
                     }
                     //没有号码发送时 发送连接请求
@@ -474,10 +480,28 @@ class ClientSocket extends Pzlife {
                         try
                         {
                             // $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
-                            switch ($head['Command_Id'] & 0x0fffffff) {
-                            case 0x80000001:
-                                // echo "接收到连接应答"."\n";
-                                // $bodyData = socket_read($socket, $head['Total_Length'] - 12);
+                            // switch ($head['Command_Id'] & 0x0fffffff) {
+                            // case 0x80000001:
+                            //     // echo "接收到连接应答"."\n";
+                            //     // $bodyData = socket_read($socket, $head['Total_Length'] - 12);
+                                
+                            //     break;
+                            // case 0x80000004:
+                                
+
+                            //     break;
+                            // case 0x00000005:
+                                
+                            //     break;
+                            // case 0x00000008:
+                            //     echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                            //     // $body = unpack("C",$bodyData);
+                            //     break;
+                            // default:
+                            //     echo "未声明head['Command_Id']:".$head['Command_Id'];
+                            //     break;
+                            // }
+                            if ($head['Command_Id'] == 0x80000001) {
                                 $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
                                 // print_r($body) ;
                                 switch ($body['Status']) {
@@ -522,8 +546,7 @@ class ClientSocket extends Pzlife {
                                     }
                                     die;
                                 }
-                                break;
-                            case 0x80000004:
+                            } else if ($head['Command_Id'] == 0x80000004) {
                                 $body = unpack("N2Msg_Id/CResult", $bodyData);
                                 // print_r($body);
                                 echo "get_CMPP_SUBMIT_RESP"."\n";
@@ -574,9 +597,7 @@ class ClientSocket extends Pzlife {
                                     echo "发送失败" . "\n";
                                     $error_msg = "其他错误";
                                 }
-
-                                break;
-                            case 0x00000005:
+                            } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                                 $Result     = 0;
                                 $contentlen = $head['Total_Length'] - 73-12;
                                 $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a8Reserved", $bodyData);
@@ -589,22 +610,12 @@ class ClientSocket extends Pzlife {
                                 $new_Total_Length = strlen($new_body) + 12;
                                 $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id2']);
                                 socket_write($socket, $new_headData . $new_body, $new_Total_Length);
-                                break;
-                            case 0x00000008:
+                            }else if ($head['Command_Id'] == 0x00000008) {
                                 echo "心跳维持中" . "\n"; //激活测试,无消息体结构
-                                // $body = unpack("C",$bodyData);
-                                break;
-                            default:
+                            }else {
                                 echo "未声明head['Command_Id']:".$head['Command_Id'];
                                 break;
                             }
-                            /* if ($head['Command_Id'] == 0x80000001) {
-
-                            } else if ($head['Command_Id'] == 0x80000004) {
-                                
-                            } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
-                                
-                            } */
                         }
                         //捕获异常
                          catch (Exception $e) {
