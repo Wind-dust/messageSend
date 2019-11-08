@@ -275,7 +275,8 @@ class ClientSocket extends Pzlife {
 
         // echo $code;
         // die;
-        //  echo 0x80000004;
+        //  echo 0x80000008;
+        //  die;
         // print_r(15201926171 & 0x0fffffff );
         // $v = base_convert(time(), 10, 16)."\n";
         // $a = pack("a8",$v);
@@ -613,9 +614,11 @@ class ClientSocket extends Pzlife {
                                 socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                             }else if ($head['Command_Id'] == 0x00000008) {
                                 echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                            }else if ($head['Command_Id'] ==0x80000008) {
+                                echo "激活测试应答" . "\n"; //激活测试,无消息体结构
                             }else {
                                 echo "未声明head['Command_Id']:".$head['Command_Id'];
-                                break;
+                                // break;
                             }
                         }
                         //捕获异常
