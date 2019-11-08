@@ -602,7 +602,7 @@ class ClientSocket extends Pzlife {
                                 $Result     = 0;
                                 $contentlen = $head['Total_Length'] - 73-12;
                                 $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a8Reserved", $bodyData);
-                                // print_r($body);
+                                print_r($body);
                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
                                 // echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
                                 $callback_Command_Id = 0x80000005;
