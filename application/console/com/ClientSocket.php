@@ -11,9 +11,9 @@ use think\Db;
 
 class ClientSocket extends Pzlife {
 
-    protected $redis;
+    // protected $redis;
 
-    private function redisInit() {
+    private function clientSocketInit() {
         $this->redis = Phpredis::getConn();
         //        $this->connect = Db::connect(Config::get('database.db_config'));
     }
@@ -264,15 +264,22 @@ class ClientSocket extends Pzlife {
     }
 
     public function SocketClientLong($content) {
-        // $this->redisInit();
-        $redis = Phpredis::getConn();
+        // $this->clientSocketInit();
+        $redis    = Phpredis::getConn();
         // $a_time = 0;
-
+        
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
 
-        // $redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend');
+        $redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend:'.$content);
+        
         // $code   = '短信发送测试';
-
+        // print_r($redisMessageCodeSend);die;
+        // echo $redisMessageCodeSend;die;
+        // $send = $redis->lPop("index:meassage:code:send:1");
+        // $send = $redis->rPush($redisMessageCodeSend,"15555555555:12:【品质生活】祝您生活愉快");
+        $send = $redis->lPop($redisMessageCodeSend);
+        // $send = [];
+        print_r($send);die;
         // echo $code;
         // die;
         //  echo 0x80000008;
@@ -285,9 +292,9 @@ class ClientSocket extends Pzlife {
         // print_r( unpack("a8",$a));
         // echo $v;
         // // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´&´'pӄELIVRD1911080943191108094315201926171Ȕ26");
-        $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´6h󿾧>gDELIVRD1911081338191108134415201926171&b");
+        // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´6h󿾧>gDELIVRD1911081338191108134415201926171&b");
         // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´6^'=񃄌IVRD1911081337191108134415201926171²");
-        print_r($arr);die;
+        // print_r($arr);die;
         // // echo 0x00000010;
         // die;
 
@@ -342,9 +349,7 @@ class ClientSocket extends Pzlife {
                 } else {
                     //当有号码发送需求时 进行提交
                     /* redis 读取需要发送的数据 */
-                    // $send = $this->redis->lPop($redisMessageCodeSend);
-                    // $send = [];
-
+                    
                     if ($i == 2) { //测试判断语句
 
                         // if ($i) { //正式使用从缓存中读取数据

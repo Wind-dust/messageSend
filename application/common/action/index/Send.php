@@ -232,8 +232,8 @@ class Send extends CommonIndex
             $id = DbAdministrator::addUserSendTask($data);
             $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
             foreach ($effective_mobile as $key => $value) {
-                // $this->redis->rpush($redisMessageCodeSend.":2",$value,$id.":".$Content); //三体营销通道
-                $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
+                $this->redis->rpush($redisMessageMarketingSend.":2",$value.":".$id.":".$Content); //三体营销通道
+                // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
             }
             $result = "1,".$data['task_no'];
             return $result;
@@ -243,10 +243,35 @@ class Send extends CommonIndex
             $id = DbAdministrator::addUserSendTask($data);
             $redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend');
             foreach ($effective_mobile as $key => $value) {
-                $this->redis->rpush($redisMessageCodeSend.":1",$value,$id.":".$Content); //三体行业通道
+                // $this->redis->hset($redisMessageCodeSend.":1",$value,$id.":".$Content); //三体行业通道
+                $this->redis->rpush($redisMessageCodeSend.":1",$value.":".$id.":".$Content); //三体行业通道
             }
-            $result = "1,".$id;
+            $result = "1,".$data['task_no'];
             return $result;
         }
+    }
+
+    public function getBalanceSmsBatch($Username,$Password){
+        $Password = md5($Password);
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service');
+        if (empty($user)) {
+            return -1;
+        }
+        if ($Password != $user['appkey']) {
+            return -1;
+        }
+        return -2;
+    }
+
+    public function getReceiveSmsBatch($Username,$Password){
+        $Password = md5($Password);
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service');
+        if (empty($user)) {
+            return -1;
+        }
+        if ($Password != $user['appkey']) {
+            return -1;
+        }
+        return -2;
     }
 }

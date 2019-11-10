@@ -80,4 +80,39 @@ class Send extends MyController {
         return $result;
     }
  
+    /**
+     * @api              {post} / 余额查询
+     * @apiDescription   getBalanceSmsBatch
+     * @apiGroup         index_send
+     * @apiName          getBalanceSmsBatch
+     * @apiParam (入参) {String} Username 登录名
+     * @apiParam (入参) {String} Password 登陆密码
+     * @apiSuccess (返回) {String} code 200:成功 / 3000:手机号格式错误 / 3002:passwd密码强度不够 / 3003:邮箱格式错误 / 3004:验证码错误 / 3005:该手机号已注册用户 / 3006:用户类型错误 / 3007:nick_name不能为空
+     * @apiSampleRequest /index/send/getBalanceSmsBatch
+     * @author rzc
+     */
+    public function getBalanceSmsBatch(){
+        $Username = trim($this->request->post('Username'));//登录名
+        $Password = trim($this->request->post('Password'));//登陆密码
+        $result = $this->app->send->getBalanceSmsBatch($Username,$Password);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 状态报告提取
+     * @apiDescription   getReceiveSmsBatch
+     * @apiGroup         index_send
+     * @apiName          getReceiveSmsBatch
+     * @apiParam (入参) {String} Username 登录名
+     * @apiParam (入参) {String} Password 登陆密码
+     * @apiSuccess (返回) {String} code 200:成功 / 3000:手机号格式错误 / 3002:passwd密码强度不够 / 3003:邮箱格式错误 / 3004:验证码错误 / 3005:该手机号已注册用户 / 3006:用户类型错误 / 3007:nick_name不能为空
+     * @apiSampleRequest /index/send/getReceiveSmsBatch
+     * @author rzc
+     */
+    public function getReceiveSmsBatch(){
+        $Username = trim($this->request->post('Username'));//登录名
+        $Password = trim($this->request->post('Password'));//登陆密码
+        $result = $this->app->send->getReceiveSmsBatch($Username,$Password);
+        return $result;
+    }
 }
