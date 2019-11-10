@@ -277,9 +277,7 @@ class ClientSocket extends Pzlife {
         // echo $redisMessageCodeSend;die;
         // $send = $redis->lPop("index:meassage:code:send:1");
         // $send = $redis->rPush($redisMessageCodeSend,"15555555555:12:【品质生活】祝您生活愉快");
-        $send = $redis->lPop($redisMessageCodeSend);
-        // $send = [];
-        print_r($send);die;
+       
         // echo $code;
         // die;
         //  echo 0x80000008;
@@ -349,14 +347,21 @@ class ClientSocket extends Pzlife {
                 } else {
                     //当有号码发送需求时 进行提交
                     /* redis 读取需要发送的数据 */
-                    
+                    $send = $redis->lPop($redisMessageCodeSend);
+                    // $send = [];
+                    // print_r($send);die;
                     if ($i == 2) { //测试判断语句
 
-                        // if ($i) { //正式使用从缓存中读取数据
+                        // if ($send) { //正式使用从缓存中读取数据
                         // $send = json_decode($send,true);
                         // $mobile = $send['mobile'];
                         // $code = $send['code'];
+                        $senddata = [];
+                        $senddata = explode(":",$send);
+
+                        $mobile = $senddata[0];
                         $mobile = 15201926171;
+                        $code   = $senddata[2]; //带签名
                         $code   = '【气象祝福】阳光眷顾，天空展颜一片蔚蓝，但昼夜温差较大，极易发生感冒，请注意增减衣服保暖防寒，祝您身体健康。 '; //带签名
                         // $code   = '短信发送测试'; //带签名
                         // print_r($code);die;
