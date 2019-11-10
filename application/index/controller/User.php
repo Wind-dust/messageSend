@@ -20,7 +20,7 @@ class User extends MyController {
      * @apiParam (入参) {String} mobile 手机号
      * @apiParam (入参) {String} email 邮箱
      * @apiParam (入参) {String} vercode 验证码
-     * @apiSuccess (返回) {String} code 200:成功 / 3000:手机号格式错误 / 3002:passwd密码强度不够 / 3003:邮箱格式错误 / 3004:验证码错误 / 3005:该手机号已注册用户 / 3006:用户类型错误 / 3007:nick_name不能为空
+     * @apiSuccess (返回) {String} code 200:成功 / 3000:手机号格式错误 / 3002:passwd密码强度不够//6-16个字符，至少1个字母和1个数字，其他可以是任意字符 / 3003:邮箱格式错误 / 3004:验证码错误 / 3005:该手机号已注册用户 / 3006:用户类型错误 / 3007:nick_name不能为空
      * @apiSampleRequest /index/user/userRegistered
      * @author rzc
      */
@@ -47,7 +47,7 @@ class User extends MyController {
         if (empty($nick_name)) {
             return ['code' => '3007'];
         }
-        $result = $this->app->users->userRegistered($nick_name, $user_type, $passwd, $mobile, $email, $vercode);
+        $result = $this->app->user->userRegistered($nick_name, $user_type, $passwd, $mobile, $email, $vercode);
         // $this->apiLog($apiName, [$Banner_id, $source], $result['code'], '');
         return $result;
     }

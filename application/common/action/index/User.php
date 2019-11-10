@@ -394,9 +394,9 @@ class User extends CommonIndex {
     public function userRegistered($nick_name, $user_type, $passwd, $mobile, $email, $vercode){
 
         $stype = 1;
-        if ($this->checkVercode($stype, $mobile, $vercode) === false) {
-            return ['code' => '3004']; //验证码错误
-        }
+        // if ($this->checkVercode($stype, $mobile, $vercode) === false) {
+        //     return ['code' => '3004']; //验证码错误
+        // }
 
         if (!empty($this->checkAccount($mobile))) {
             return ['code' => '3005'];//该手机号已注册

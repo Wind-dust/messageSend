@@ -5,7 +5,7 @@ use app\index\MyController;
 class Send extends MyController {
     protected $beforeActionList = [
         //        'isLogin',//所有方法的前置操作
-        'isLogin' => ['except' => 'cmppSendTest'], //除去getFirstCate其他方法都进行second前置操作
+        'isLogin' => ['except' => 'cmppSendTest,smsBatch'], //除去getFirstCate其他方法都进行second前置操作
         //        'three'  => ['only' => 'hello,data'],//只有hello,data方法进行three前置操作
     ];
 
@@ -54,24 +54,26 @@ class Send extends MyController {
         $Mobile = trim($this->request->post('Mobile'));//接收手机号码
         $Dstime = trim($this->request->post('Dstime'));//手机号
         $ip = trim($this->request->ip());
-
         $Mobiles = explode(',',$Mobile);
+        
+        // echo phpinfo();die;
         if (empty($Mobiles)) {
             return 2;
         }
         if (count($Mobiles) > 100){
             return 4;
         }
-        if (strtotime($Dstime)== false) {
+        if (strtotime($Dstime)== false && !empty($Dstime)) {
             return 7;
         }
-        if (strtotime($Dstime) < time()) {
+        if (strtotime($Dstime) < time() && !empty($Dstime)) {
             return 8;
         }
         if (empty($Content) || strlen($Content) > 500) {
             return 3;
         }
-        if (!strpos($Content,'【') || !strpos($Content,'】') || strpos($Content,'】') - strpos($Content,'【') < 2 || strpos($Content,'】') - strpos($Content,'【') > 8) {
+        // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
+        if ( mb_strpos($Content,'】') - mb_strpos($Content,'【') < 2 || mb_strpos($Content,'】') - mb_strpos($Content,'【') > 8) {
             return 6;
         }
         $result = $this->app->send->smsBatch($Username,$Password,$Content,$Mobiles,$Dstime,$ip);
