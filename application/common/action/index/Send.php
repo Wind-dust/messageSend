@@ -14,12 +14,14 @@ use Config;
 use Env;
 use think\Db;
 
-class Send extends CommonIndex {
+class Send extends CommonIndex
+{
     private $cipherUserKey = 'userpass'; //用户密码加密key
     // private $userRedisKey = 'index:user:'; //用户密码加密key
     private $cmpp;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->cmpp    = new Cmpp30();
         $this->Owncmpp = new Owncmpp();
@@ -33,23 +35,24 @@ class Send extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function cmppSendTest($mobile, $code) {
+    public function cmppSendTest($mobile, $code)
+    {
 
         //设置参数，并且转换成16进制数字显示
         $time = time();
         $i = 1;
         $a_time = 0;
         do {
-            echo $i."\n";
+            echo $i . "\n";
             $i++;
             $a_time = time();
         } while ($a_time < $time);
 
-        print(bin2hex(pack("C", 1))."\n");
+        print(bin2hex(pack("C", 1)) . "\n");
         // echo $mobile."\n";die;
         //时间格式二进制转换
         //   echo (string) decbin(date("m",time())).decbin(date("d",time())).decbin(date("H",time())).decbin(date("i",time())).decbin(date("s",time())).decbin(101161);
-        
+
         // print_r(strlen(decbin($mobile)));
         die;
 
@@ -122,69 +125,71 @@ class Send extends CommonIndex {
         $Sequence_Id = $head['Sequence_Id'];
         $bodyData    = socket_read($socket, $head['Total_Length'] - 12);
         switch ($head['Command_Id'] & 0x0fffffff) {
-        case 0x00000001:
-            $body   = unpack("CStatus/a16AuthenticatorISMG/CVersion", $bodyData);
-            $Msg_Id = rand(1, 100);
-            //$bodyData = pack("a8", $Msg_Id);
-            $bodyData = pack("N", $Msg_Id) . pack("N", "00000000");
-            $bodyData .= pack("C", 1) . pack("C", 1);
-            $bodyData .= pack("C", 0) . pack("C", 0);
-            $bodyData .= pack("a10", $Service_Id);
-            $bodyData .= pack("C", 0) . pack("a32", "") . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("a6", $SP_ID) . pack("a2", "02") . pack("a6", "") . pack("a17", "") . pack("a17", "") . pack("a21", $Dest_Id) . pack("C", 1);
-            $bodyData .= pack("a32", $mobile);
-            $bodyData .= pack("C", 0);
-            $len = strlen($code);
-            $bodyData .= pack("C", $len);
-            $bodyData .= pack("a" . $len, $code);
-            $bodyData .= pack("a20", "00000000000000000000");
-            // send($bodyData, "CMPP_SUBMIT", $Msg_Id);
-            $Command_Id   = 0x00000004;
-            $Total_Length = strlen($bodyData) + 12;
-            if ($Msg_Id != 0) {
-                $Sequence_Id = $Msg_Id;
-            } else {
-                if ($Sequence_Id < 10) {
-                    $Sequence_Id = $Sequence_Id;
+            case 0x00000001:
+                $body   = unpack("CStatus/a16AuthenticatorISMG/CVersion", $bodyData);
+                $Msg_Id = rand(1, 100);
+                //$bodyData = pack("a8", $Msg_Id);
+                $bodyData = pack("N", $Msg_Id) . pack("N", "00000000");
+                $bodyData .= pack("C", 1) . pack("C", 1);
+                $bodyData .= pack("C", 0) . pack("C", 0);
+                $bodyData .= pack("a10", $Service_Id);
+                $bodyData .= pack("C", 0) . pack("a32", "") . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("a6", $SP_ID) . pack("a2", "02") . pack("a6", "") . pack("a17", "") . pack("a17", "") . pack("a21", $Dest_Id) . pack("C", 1);
+                $bodyData .= pack("a32", $mobile);
+                $bodyData .= pack("C", 0);
+                $len = strlen($code);
+                $bodyData .= pack("C", $len);
+                $bodyData .= pack("a" . $len, $code);
+                $bodyData .= pack("a20", "00000000000000000000");
+                // send($bodyData, "CMPP_SUBMIT", $Msg_Id);
+                $Command_Id   = 0x00000004;
+                $Total_Length = strlen($bodyData) + 12;
+                if ($Msg_Id != 0) {
+                    $Sequence_Id = $Msg_Id;
                 } else {
-                    $Sequence_Id = 1;
+                    if ($Sequence_Id < 10) {
+                        $Sequence_Id = $Sequence_Id;
+                    } else {
+                        $Sequence_Id = 1;
+                    }
+                    $Sequence_Id = $Sequence_Id + 1;
                 }
-                $Sequence_Id = $Sequence_Id + 1;
-            }
-            $headData = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-            // print_r(socket_write($socket, $headData . $bodyData, $Total_Length));die;
-            print_r($socket);die;
-            socket_write($socket, $headData . $bodyData, $Total_Length);
-            $headData = socket_read($socket, 12);
-            print_r($headData);die;
-            if (empty($headData)) {
-                // $this->log();
-                $code = 0000;
-            }
-            // echo 1;
-            break;
-        // case 0x00000005:
-        //     $this->CMPP_DELIVER($head['Total_Length'],$Sequence_Id);
-        //     break;
-        // case 0x80000005:
-        //     $this->CMPP_DELIVER($head['Total_Length'],$Sequence_Id);
-        //     break;
-        case 0x00000008:
-            echo 2;
-            $bodyData = pack("C", 1);
-            // $this->send($bodyData, "CMPP_ACTIVE_TEST_RESP", $Sequence_Id);
-            break;
-        case 0x00000004:
-            // $this->cmppSubmitResp();
-            echo 3;
-            break;
-        // case 0x80000004:
-        //     $this->CMPP_SUBMIT_RESP();
-        //     break;
-        default:
-            echo 4;
-            $bodyData = pack("C", 1);
-            // $this->send($bodyData, "CMPP_ACTIVE_TEST_RESP", $Sequence_Id);
-            break;
+                $headData = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                // print_r(socket_write($socket, $headData . $bodyData, $Total_Length));die;
+                print_r($socket);
+                die;
+                socket_write($socket, $headData . $bodyData, $Total_Length);
+                $headData = socket_read($socket, 12);
+                print_r($headData);
+                die;
+                if (empty($headData)) {
+                    // $this->log();
+                    $code = 0000;
+                }
+                // echo 1;
+                break;
+                // case 0x00000005:
+                //     $this->CMPP_DELIVER($head['Total_Length'],$Sequence_Id);
+                //     break;
+                // case 0x80000005:
+                //     $this->CMPP_DELIVER($head['Total_Length'],$Sequence_Id);
+                //     break;
+            case 0x00000008:
+                echo 2;
+                $bodyData = pack("C", 1);
+                // $this->send($bodyData, "CMPP_ACTIVE_TEST_RESP", $Sequence_Id);
+                break;
+            case 0x00000004:
+                // $this->cmppSubmitResp();
+                echo 3;
+                break;
+                // case 0x80000004:
+                //     $this->CMPP_SUBMIT_RESP();
+                //     break;
+            default:
+                echo 4;
+                $bodyData = pack("C", 1);
+                // $this->send($bodyData, "CMPP_ACTIVE_TEST_RESP", $Sequence_Id);
+                break;
         }
         // print_r($head['Command_Id']);
         // print_r($bodyData);
@@ -194,4 +199,54 @@ class Send extends CommonIndex {
         die;
     }
 
+    public function smsBatch($Username, $Password, $Content, $Mobiles, $Dstime, $ip)
+    {
+        $Password = md5($Password);
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service');
+        if (empty($user)) {
+            return -1;
+        }
+        if ($Password != $user['appkey']) {
+            return -1;
+        }
+        $effective_mobile = [];
+        foreach ($Mobiles as $key => $value) {
+            if (checkMobile(($value))) {
+                $effective_mobile[] = $value;
+            }
+        }
+        if (empty($effective_mobile)) {
+            return 2;
+        }
+        $send_num = count($effective_mobile);
+        $data = [];
+        $data['uid'] = $user['id'];
+        $data['source'] = $ip;
+        $data['task_content'] = $Content;
+        $data['task_name'] = $Content;
+        $data['mobile_content'] = join(',', $effective_mobile);
+        $data['send_num'] = $send_num;
+        if ($send_num > 1) { //多条号码认定为营销
+            
+            $data['task_no'] = 'mar' . date('ymdHis') . substr(uniqid('',true),15,8);
+            $id = DbAdministrator::addUserSendTask($data);
+            $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
+            foreach ($effective_mobile as $key => $value) {
+                // $this->redis->rpush($redisMessageCodeSend.":2",$value,$id.":".$Content); //三体营销通道
+                $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
+            }
+            $result = "1,".$data['task_no'];
+            return $result;
+        } else { //行业
+            //将行业短信写入任务并写入缓存
+            $data['task_no'] = 'bus' . date('ymdHis') . substr(uniqid('',true),15,8);
+            $id = DbAdministrator::addUserSendTask($data);
+            $redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend');
+            foreach ($effective_mobile as $key => $value) {
+                $this->redis->rpush($redisMessageCodeSend.":1",$value,$id.":".$Content); //三体行业通道
+            }
+            $result = "1,".$id;
+            return $result;
+        }
+    }
 }

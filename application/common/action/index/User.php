@@ -409,6 +409,8 @@ class User extends CommonIndex {
             'nick_name' => $nick_name,
             'user_type' => $user_type,
             'email'     => $email,
+            'appid'     => uniqid(''),
+            'appkey'     => md5('123456'),
         ];
 
         Db::startTrans();

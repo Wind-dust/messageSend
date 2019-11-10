@@ -321,7 +321,7 @@ class ClientSocket extends Pzlife {
             // socket_clear_error($socket);
             // socket_close($socket);
             // die;//关闭socket连接，清除缓存数据
-            // socket_set_nonblock($socket); //设置非阻塞模式
+            socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
             do {

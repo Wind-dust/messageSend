@@ -21,6 +21,7 @@ return [
     ],
     'message' => [
         'redisMessageCodeSend'    => 'index:meassage:code:send',//验证码发送队列
+        'redisMessageMarketingSend'    => 'index:meassage:marketing:send',//验证码发送队列
     ],
 
 

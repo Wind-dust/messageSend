@@ -11,6 +11,7 @@ use app\common\model\ExpenseLog;
 use app\common\model\ServiceConsumptionLog;
 use app\common\model\Channel;
 use app\common\model\UserChannel;
+use app\common\model\UserSendTask;
 use think\Db;
 
 class DbAdministrator {
@@ -197,5 +198,21 @@ class DbAdministrator {
 
     public function delUserChannel($id){
         return UserChannel::destory($id);
+    }
+
+    public function getUserSendTask($where, $field, $row = false, $orderBy = '', $limit = '') {
+        $obj = UserSendTask::field($field)->where($where);
+        return $this->getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function addUserSendTask($data) {
+        $UserSendTask = new UserSendTask;
+        $UserSendTask->save($data);
+        return $UserSendTask->id;
+    }
+
+    public function editUserSendTask($data, $id) {
+        $UserSendTask = new UserSendTask;
+        return $UserSendTask->save($data, ['id' => $id]);
     }
 }

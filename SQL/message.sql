@@ -488,3 +488,42 @@ CREATE TABLE `yx_number_source` (
   UNIQUE INDEX `mobile`(`mobile`) USING BTREE,
   UNIQUE INDEX `mobile_source_proinvice`(`mobile`, `source`, `province`, `city_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '三网号码归属省份及运营商' ROW_FORMAT = Dynamic;
+
+ALTER TABLE `messagesend`.`yx_users` 
+ADD COLUMN `appid` char(13) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '用户APPID' AFTER `nick_name`,
+ADD COLUMN `appkey` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '用户APPkey' AFTER `appid`,
+ADD UNIQUE INDEX `appid`(`appid`) USING BTREE;
+
+CREATE TABLE `yx_user_send_task` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `task_no` char(23) NOT NULL DEFAULT '' COMMENT '任务编号',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `task_name` varchar(255) NOT NULL DEFAULT '' COMMENT '任务名称',
+  `task_content` text COMMENT '发送内容',
+  `mobile_content` text COMMENT '发送号码集合',
+  `source` varchar(50) NOT NULL DEFAULT '' COMMENT '请求源（ip）',
+  `send_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发送数量',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='营销任务表';
+ALTER TABLE `messagesend`.`yx_user_send_task` 
+ADD COLUMN `mobile_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '发送短信' AFTER `task_content`;
+
+CREATE TABLE `yx_user_send_task` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `task_no` char(23) NOT NULL DEFAULT '' COMMENT '任务编号',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `task_name` varchar(255) NOT NULL DEFAULT '' COMMENT '任务名称',
+  `task_content` text COMMENT '发送内容',
+  `mobile_content` text COMMENT '发送号码集合',
+  `source` varchar(50) NOT NULL DEFAULT '' COMMENT '请求源（ip）',
+  `send_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发送数量',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='营销任务表';
+ALTER TABLE `messagesend`.`yx_user_send_task` 
+ADD COLUMN `mobile_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '发送行业短信' AFTER `task_content`;
