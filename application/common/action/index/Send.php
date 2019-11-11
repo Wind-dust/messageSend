@@ -246,7 +246,7 @@ class Send extends CommonIndex
             $redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend');
             foreach ($effective_mobile as $key => $value) {
                 // $this->redis->hset($redisMessageCodeSend.":1",$value,$id.":".$Content); //三体行业通道
-                $this->redis->rpush($redisMessageCodeSend.":1",$value.":".$id.":".$Content); //三体行业通道
+                // $this->redis->rpush($redisMessageCodeSend.":1",$value.":".$id.":".$Content); //三体行业通道
             }
             $result = "1,".$data['task_no'];
             return $result;
