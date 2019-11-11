@@ -38,9 +38,9 @@ class User extends MyController {
         if (checkPassword($passwd) === false) {
             return ['code' => '3002'];
         }
-        if (checkEmail($email) === false) {
-            return ['code' => '3003'];
-        }
+        // if (checkEmail($email) === false) {
+        //     return ['code' => '3003'];
+        // }
         if (!in_array($user_type, [1, 2])) {
             return ['code' => '3006'];
         }
