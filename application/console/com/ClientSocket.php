@@ -291,7 +291,7 @@ class ClientSocket extends Pzlife {
         // echo $v;
         // // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´&´'pӄELIVRD1911080943191108094315201926171Ȕ26");
         // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´6h󿾧>gDELIVRD1911081338191108134415201926171&b");
-        // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´6^'=񃄌IVRD1911081337191108134415201926171²");
+        // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","µº¾'ºDELIVRD1911111443191111145615201926171^¥");
         // print_r($arr);die;
         // // echo 0x00000010;
         // die;
@@ -326,7 +326,7 @@ class ClientSocket extends Pzlife {
             // socket_clear_error($socket);
             // socket_close($socket);
             // die;//关闭socket连接，清除缓存数据
-            socket_set_nonblock($socket); //设置非阻塞模式
+            // socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
             do {
@@ -648,7 +648,7 @@ class ClientSocket extends Pzlife {
                                 $new_body         = pack("N", $body['Msg_Id1']). pack("N", $body['Msg_Id2']). pack("C", $Result);
                                 $new_Total_Length = strlen($new_body) + 12;
                                 $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id2']);
-                                socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                                // socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                             }else if ($head['Command_Id'] == 0x00000008) {
                                 echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                             }else if ($head['Command_Id'] ==0x80000008) {
