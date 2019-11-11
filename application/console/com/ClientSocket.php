@@ -282,7 +282,7 @@ class ClientSocket extends Pzlife {
         // die;
         //  echo 0x80000008;
         //  die;
-        // print_r(15201926171 & 0x0fffffff );
+        // print_r('3049152064' & 0x0fffffff );die;
         // $v = base_convert(time(), 10, 16)."\n";
         // $a = pack("a8",$v);
         // echo $v."\n";
@@ -292,7 +292,7 @@ class ClientSocket extends Pzlife {
         // // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´&´'pӄELIVRD1911080943191108094315201926171Ȕ26");
         // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´6h󿾧>gDELIVRD1911081338191108134415201926171&b");
         // $arr = unpack("I2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","µ»'sDELIVRD1911111456191111150615201926171e韚");
-        // print_r($arr);die;
+        // print_r($arr['Msg_Id1'] & 0x0fffffff);die;
         // // echo 0x00000010;
         // die;
 
@@ -638,12 +638,14 @@ class ClientSocket extends Pzlife {
                                 }
                             } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                                 $Result     = 0;
-                                print_r($head['Total_Length']);
+                                // print_r($head['Total_Length']);
                                 // $contentlen = $head['Total_Length'] - 73-12;
                                 $contentlen = $head['Total_Length'] - 65-12;
                                 // $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a8Reserved", $bodyData);
                                 $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
-                                print_r($body);
+                                $Msg_Content = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/",$body['Msg_Content']);
+                                // $Msg_Content = unpack("a".$body['Msg_Length'],);
+                                print_r($Msg_Content);
                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
                                 // echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
                                 $callback_Command_Id = 0x80000005;
