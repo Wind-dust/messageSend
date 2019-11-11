@@ -291,7 +291,7 @@ class ClientSocket extends Pzlife {
         // echo $v;
         // // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´&´'pӄELIVRD1911080943191108094315201926171Ȕ26");
         // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´6h󿾧>gDELIVRD1911081338191108134415201926171&b");
-        // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","µº¾'ºDELIVRD1911111443191111145615201926171^¥");
+        // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence","µ»'sDELIVRD1911111456191111150615201926171e韚");
         // print_r($arr);die;
         // // echo 0x00000010;
         // die;
@@ -638,6 +638,7 @@ class ClientSocket extends Pzlife {
                                 }
                             } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                                 $Result     = 0;
+                                print_r($head['Total_Length']);
                                 $contentlen = $head['Total_Length'] - 73-12;
                                 $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a8Reserved", $bodyData);
                                 print_r($body);
