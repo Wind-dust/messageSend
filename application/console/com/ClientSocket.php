@@ -270,8 +270,13 @@ class ClientSocket extends Pzlife {
         
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
 
-        $redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend:'.$content);
-        
+        $redisMessageCodeSend = 'index:meassage:code:send:'.$content;//验证码发送任务rediskey
+        $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:'.$content;//行业通知SequenceId
+        $redisMessageCodeMsgId = 'index:meassage:code:msg:id:'.$content;//行业通知SequenceId
+        $redisMessageCodeDeliver = 'index:meassage:code:deliver:'.$content;//行业通知MsgId
+        // echo $redisMessageCodeSend;
+        // $send = Phpredis::getConn()->lPop($redisMessageCodeSend);
+        // print_r($send);die;
         // $code   = '短信发送测试';
         // print_r($redisMessageCodeSend);die;
         // echo $redisMessageCodeSend;die;
@@ -289,6 +294,11 @@ class ClientSocket extends Pzlife {
         // echo $a."\n";
         // print_r( unpack("a8",$a));
         // echo $v;
+        // $str = "´&´'pӄELIVRD1911080943191108094315201926171Ȕ26";
+        // $new = substr($str,0,8);
+        // $new = base_convert($new, 16, 2);
+        // echo $new;die;
+
         // // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´&´'pӄELIVRD1911080943191108094315201926171Ȕ26");
         // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´6h󿾧>gDELIVRD1911081338191108134415201926171&b");
         // $arr = unpack("I2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","µ»'sDELIVRD1911111456191111150615201926171e韚");
@@ -347,22 +357,19 @@ class ClientSocket extends Pzlife {
                 } else {
                     //当有号码发送需求时 进行提交
                     /* redis 读取需要发送的数据 */
-                    // $send = $redis->lPop($redisMessageCodeSend);
+                    $send = $redis->lPop($redisMessageCodeSend);
                     // $send = [];
                     // print_r($send);die;
                     // $send = $this->getSendCodeTask();
-                    if ($i == 2) { //测试判断语句
+                    // if ($i == 2) { //测试判断语句
 
-                        // if ($send) { //正式使用从缓存中读取数据
-                        // $send = json_decode($send,true);
-                        // $mobile = $send['mobile'];
-                        // $code = $send['code'];
-                        // $senddata = [];
-                        // $senddata = explode(":",$send);
+                        if ($send) { //正式使用从缓存中读取数据
+                        $senddata = [];
+                        $senddata = explode(":",$send);
 
-                        // $mobile = $send['mobile_content'];
+                        // $mobile = $senddata['mobile_content'];
                         $mobile = 15201926171;
-                        // $code   = $send['task_content']; //带签名
+                        // $code   = $senddata['task_content']; //带签名
                         $code   = '【气象祝福】阳光眷顾，天空展颜一片蔚蓝，但昼夜温差较大，极易发生感冒，请注意增减衣服保暖防寒，祝您身体健康。 '; //带签名
                         // $code   = '短信发送测试'; //带签名
                         // print_r($code);die;
@@ -451,7 +458,7 @@ class ClientSocket extends Pzlife {
                         // send($bodyData, "CMPP_SUBMIT", $Msg_Id);
 
                         $Command_Id = 0x00000004; // 短信发送
-                        $Sequence_Id = $i;
+                        // $Sequence_Id = $i;
                         $time = 0;
                         // Db::startTrans();
                         // try {
@@ -471,6 +478,7 @@ class ClientSocket extends Pzlife {
                         }
                         // echo $Command_Id;die;
                         // print_r(strlen($bodyData));die;
+                        $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
                     } else {
                         $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                         $Command_Id  = 0x00000008; //保持连接
@@ -574,6 +582,11 @@ class ClientSocket extends Pzlife {
                             } else if ($head['Command_Id'] == 0x80000004) {
                                 $body = unpack("N2Msg_Id/CResult", $bodyData);
                                 print_r($body);
+                                $sequence = $redis->hget($redisMessageCodeSequenceId,$head['Sequence_Id']);
+                                if ($sequence) {
+                                    $redis->hdel($redisMessageCodeSequenceId,$head['Sequence_Id']);
+                                    $redis->hset($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2'],$sequence);
+                                }
                                 // echo "get_CMPP_SUBMIT_RESP"."\n";
                                 // echo "提交的Sequence_Id:".$head['Sequence_Id'].",解析的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2']."\n";
                                 // print_r($body);
@@ -645,6 +658,12 @@ class ClientSocket extends Pzlife {
                                 $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
                                 $Msg_Content = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/",$body['Msg_Content']);
                                 // $Msg_Content = unpack("a".$body['Msg_Length'],);
+
+                                $mesage = $redis->hget($redisMessageCodeMsgId,$Msg_Content['Msg_Id1'].$Msg_Content['Msg_Id2']);
+                                if ($mesage) {
+                                    $redis->hdel($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2']);
+                                    $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
+                                }
                                 print_r($Msg_Content);
                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
                                 // echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
@@ -677,6 +696,10 @@ class ClientSocket extends Pzlife {
                 // }
 
                 $i++;
+                $Sequence_Id++;
+                if ($Sequence_Id > 65536) {
+                    $Sequence_Id = 1;
+                }
                 // sleep($time); //等待时间，进行下一次操作
                 sleep(1); //等待时间，进行下一次操作
             } while (true);
