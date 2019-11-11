@@ -19,4 +19,5 @@ return [
     'serversocket'           => $commandPath . 'ServerSocket',
     'clientsocket'           => $commandPath . 'ClientSocket',
     'officeexcel'           => $commandPath . 'OfficeExcel',
+    'clientsocketsantibusiness'           => $commandPath .'ClientSocketSantiBusiness',
 ];

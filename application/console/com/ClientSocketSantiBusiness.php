@@ -9,7 +9,7 @@ use Env;
 use Exception;
 use think\Db;
 
-class ClientSocket extends Pzlife {
+class ClientSocketSantiBusiness extends Pzlife {
 
     // protected $redis;
 
@@ -264,6 +264,7 @@ class ClientSocket extends Pzlife {
     }
 
     public function SocketClientLong($content) {
+        $content = 2;
         // $this->clientSocketInit();
         $redis    = Phpredis::getConn();
         // $a_time = 0;
@@ -350,20 +351,20 @@ class ClientSocket extends Pzlife {
                     // $send = $redis->lPop($redisMessageCodeSend);
                     // $send = [];
                     // print_r($send);die;
-                    // $send = $this->getSendCodeTask();
-                    if ($i == 2) { //测试判断语句
+                    $send = $this->getSendCodeTask();
+                    // if ($i == 2) { //测试判断语句
 
-                        // if ($send) { //正式使用从缓存中读取数据
+                        if ($send) { //正式使用从缓存中读取数据
                         // $send = json_decode($send,true);
                         // $mobile = $send['mobile'];
                         // $code = $send['code'];
                         // $senddata = [];
                         // $senddata = explode(":",$send);
 
-                        // $mobile = $send['mobile_content'];
-                        $mobile = 15201926171;
-                        // $code   = $send['task_content']; //带签名
-                        $code   = '【气象祝福】阳光眷顾，天空展颜一片蔚蓝，但昼夜温差较大，极易发生感冒，请注意增减衣服保暖防寒，祝您身体健康。 '; //带签名
+                        $mobile = $send['mobile_content'];
+                        // $mobile = 15201926171;
+                        $code   = $send['task_content']; //带签名
+                        // $code   = '【气象祝福】阳光眷顾，天空展颜一片蔚蓝，但昼夜温差较大，极易发生感冒，请注意增减衣服保暖防寒，祝您身体健康。 '; //带签名
                         // $code   = '短信发送测试'; //带签名
                         // print_r($code);die;
                         $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
@@ -453,18 +454,18 @@ class ClientSocket extends Pzlife {
                         $Command_Id = 0x00000004; // 短信发送
                         $Sequence_Id = $i;
                         $time = 0;
-                        // Db::startTrans();
-                        // try {
-                        //     Db::table('yx_user_send_code_task')->update(['send_status' => 2])->where('id',$send['id']);
-                        //     // 提交事务
-                        //     Db::commit();
-                        // } catch (\Exception $e) {
-                        //     // 回滚事务
-                        //     // exception($e);
-                        //     // die;
-                        //     Db::rollback();
+                        Db::startTrans();
+                        try {
+                            Db::table('yx_user_send_code_task')->update(['send_status' => 2])->where('id',$send['id']);
+                            // 提交事务
+                            Db::commit();
+                        } catch (\Exception $e) {
+                            // 回滚事务
+                            // exception($e);
+                            // die;
+                            Db::rollback();
 
-                        // }
+                        }
                         if ($i > $security_master) {
                             $time = 1;
                             $i    = 0;
