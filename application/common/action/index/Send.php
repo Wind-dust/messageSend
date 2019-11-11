@@ -202,7 +202,7 @@ class Send extends CommonIndex
     public function smsBatch($Username, $Password, $Content, $Mobiles, $Dstime, $ip)
     {
         $Password = md5($Password);
-        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service');
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial');
         if (empty($user)) {
             return -1;
         }
@@ -223,24 +223,26 @@ class Send extends CommonIndex
         $data['uid'] = $user['id'];
         $data['source'] = $ip;
         $data['task_content'] = $Content;
-        $data['task_name'] = $Content;
+        
         $data['mobile_content'] = join(',', $effective_mobile);
-        $data['send_num'] = $send_num;
+        
         if ($send_num > 1) { //多条号码认定为营销
-            
+            $data['task_name'] = $Content;
+            $data['send_num'] = $send_num;
+            $data['free_trial'] = 1;
             $data['task_no'] = 'mar' . date('ymdHis') . substr(uniqid('',true),15,8);
             $id = DbAdministrator::addUserSendTask($data);
-            $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
-            foreach ($effective_mobile as $key => $value) {
-                $this->redis->rpush($redisMessageMarketingSend.":2",$value.":".$id.":".$Content); //三体营销通道
-                // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
-            }
+            // $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
+            // foreach ($effective_mobile as $key => $value) {
+            //     $this->redis->rpush($redisMessageMarketingSend.":2",$value.":".$id.":".$Content); //三体营销通道
+            //     // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
+            // }
             $result = "1,".$data['task_no'];
             return $result;
         } else { //行业
             //将行业短信写入任务并写入缓存
             $data['task_no'] = 'bus' . date('ymdHis') . substr(uniqid('',true),15,8);
-            $id = DbAdministrator::addUserSendTask($data);
+            $id = DbAdministrator::addUserSendCodeTask($data);
             $redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend');
             foreach ($effective_mobile as $key => $value) {
                 // $this->redis->hset($redisMessageCodeSend.":1",$value,$id.":".$Content); //三体行业通道
@@ -253,7 +255,7 @@ class Send extends CommonIndex
 
     public function getBalanceSmsBatch($Username,$Password){
         $Password = md5($Password);
-        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service');
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial');
         if (empty($user)) {
             return -1;
         }

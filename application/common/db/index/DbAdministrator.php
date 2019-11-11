@@ -12,6 +12,7 @@ use app\common\model\ServiceConsumptionLog;
 use app\common\model\Channel;
 use app\common\model\UserChannel;
 use app\common\model\UserSendTask;
+use app\common\model\UserSendCodeTask;
 use think\Db;
 
 class DbAdministrator {
@@ -214,5 +215,21 @@ class DbAdministrator {
     public function editUserSendTask($data, $id) {
         $UserSendTask = new UserSendTask;
         return $UserSendTask->save($data, ['id' => $id]);
+    }
+
+    public function getUserSendCodeTask($where, $field, $row = false, $orderBy = '', $limit = '') {
+        $obj = UserSendCodeTask::field($field)->where($where);
+        return $this->getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function addUserSendCodeTask($data) {
+        $UserSendCodeTask = new UserSendCodeTask;
+        $UserSendCodeTask->save($data);
+        return $UserSendCodeTask->id;
+    }
+
+    public function editUserSendCodeTask($data, $id) {
+        $UserSendCodeTask = new UserSendCodeTask;
+        return $UserSendCodeTask->save($data, ['id' => $id]);
     }
 }

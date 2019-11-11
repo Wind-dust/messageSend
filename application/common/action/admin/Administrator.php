@@ -304,4 +304,21 @@ class Administrator extends CommonIndex {
             return ['code' => '3009']; //修改失败
         }
     }
+
+    public function auditUserSendTask($id, $free_trial) {
+        $userchannel = DbAdministrator::getUserSendTask(['id' => $id],'id,mobile_content',true);
+        if (empty($userchannel)){
+            return ['code' => '3001'];
+        }
+        Db::startTrans();
+        try {
+            DbAdministrator::editUserSendTask(['free_trial' => $free_trial],$id);
+            Db::commit();
+            return ['code' => '200'];
+
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
+    }
 }

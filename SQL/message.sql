@@ -128,23 +128,25 @@ CREATE TABLE `yx_permissions_api` (
 
 DROP TABLE IF EXISTS `yx_users`;
 CREATE TABLE `yx_users` (
-  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `pid` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '父级id',
-  `passwd` char(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '用户密码',
-  `nick_name` char(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '用户名',
-  `user_type` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '用户类型1.个人账户2.企业账户',
-  `mobile` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '手机号',
-  `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'email',
-  `money` decimal(10,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '剩余金额（现金）',
-  `user_status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '账户服务状态 1停止服务 2启用服务',
-  `reservation_service` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '可否预用服务 1不可 2可以',
-  `update_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间',
-  `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
-  `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `pid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '父级id',
+  `passwd` char(64) NOT NULL DEFAULT '' COMMENT '用户密码',
+  `nick_name` char(30) NOT NULL DEFAULT '' COMMENT '用户名',
+  `appid` char(13) NOT NULL DEFAULT '' COMMENT '用户APPID',
+  `appkey` char(32) NOT NULL DEFAULT '' COMMENT '用户APPkey',
+  `user_type` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '用户类型1.个人账户2.企业账户',
+  `mobile` char(11) NOT NULL DEFAULT '' COMMENT '手机号',
+  `email` varchar(50) NOT NULL DEFAULT '' COMMENT 'email',
+  `money` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '剩余金额（现金）',
+  `user_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '账户服务状态 1停止服务 2启用服务',
+  `reservation_service` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '可否预用服务 1不可 2可以',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `p_uid`(`id`, `pid`) USING BTREE,
-  UNIQUE INDEX `index_mobile`(`mobile`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
+  UNIQUE KEY `p_uid` (`id`,`pid`) USING BTREE,
+  UNIQUE KEY `index_mobile` (`mobile`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
 DROP TABLE IF EXISTS `yx_admin_remittance`;
 CREATE TABLE `yx_admin_remittance` (
@@ -494,6 +496,7 @@ ADD COLUMN `appid` char(13) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT
 ADD COLUMN `appkey` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '用户APPkey' AFTER `appid`,
 ADD UNIQUE INDEX `appid`(`appid`) USING BTREE;
 
+DROP TABLE IF EXISTS `yx_user_send_task`;
 CREATE TABLE `yx_user_send_task` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `task_no` char(23) NOT NULL DEFAULT '' COMMENT '任务编号',
@@ -503,27 +506,25 @@ CREATE TABLE `yx_user_send_task` (
   `mobile_content` text COMMENT '发送号码集合',
   `source` varchar(50) NOT NULL DEFAULT '' COMMENT '请求源（ip）',
   `send_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发送数量',
+  `free_trial` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1:需要审核;2:审核通过;3:审核不通过',
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
   `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='营销任务表';
-ALTER TABLE `messagesend`.`yx_user_send_task` 
-ADD COLUMN `mobile_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '发送短信' AFTER `task_content`;
 
-CREATE TABLE `yx_user_send_task` (
+DROP TABLE IF EXISTS `yx_user_send_code_task`;
+CREATE TABLE `yx_user_send_code_task` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `task_no` char(23) NOT NULL DEFAULT '' COMMENT '任务编号',
-  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
-  `task_name` varchar(255) NOT NULL DEFAULT '' COMMENT '任务名称',
   `task_content` text COMMENT '发送内容',
-  `mobile_content` text COMMENT '发送号码集合',
+  `mobile_content` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '接收手机',
   `source` varchar(50) NOT NULL DEFAULT '' COMMENT '请求源（ip）',
-  `send_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发送数量',
+  `send_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '1：待发送,2:已发送;3:成功;4:失败',
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
   `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='营销任务表';
-ALTER TABLE `messagesend`.`yx_user_send_task` 
-ADD COLUMN `mobile_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '发送行业短信' AFTER `task_content`;
+ALTER TABLE `messagesend`.`yx_users` 
+ADD COLUMN `free_trial` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1:需要审核;2:无需审核' AFTER `money`;

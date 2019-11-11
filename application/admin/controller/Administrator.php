@@ -384,6 +384,7 @@ class Administrator extends AdminController {
             return ['code' => '3100'];
         }
         $id = trim($this->request->post('id'));
+        $priority = trim($this->request->post('priority'));
        
         if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
             return ['code' => '3001'];
@@ -420,5 +421,54 @@ class Administrator extends AdminController {
         }
         $result  = $this->app->administrator->delUserChannel(intval($id));
         return $result;
+    }
+
+    /**
+     * @api              {post} / 营销任务审核
+     * @apiDescription   auditUserSendTask
+     * @apiGroup         admin_Administrator
+     * @apiName          auditUserSendTask
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 任务id
+     * @apiParam (入参) {String} free_trial 审核状态 2:审核通过;3:审核不通过
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 
+     * @apiSampleRequest /admin/administrator/auditUserSendTask
+     * @return array
+     * @author rzc
+     */
+    public function auditUserSendTask(){
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id = trim($this->request->post('id'));
+        $free_trial = trim($this->request->post('free_trial'));
+       
+        if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
+            return ['code' => '3001'];
+        }
+        if (!is_array($free_trial,[2,3])) {
+            return ['code' => '3003'];
+        }
+        $result =  $this->app->administrator->auditUserSendTask(intval($id), $free_trial);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 分配任务通道
+     * @apiDescription   distributionChannel
+     * @apiGroup         admin_Administrator
+     * @apiName          distributionChannel
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 任务id
+     * @apiParam (入参) {String} free_trial 审核状态 2:审核通过;3:审核不通过
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 
+     * @apiSampleRequest /admin/administrator/distributionChannel
+     * @return array
+     * @author rzc
+     */
+    public function distributionChannel(){
+
     }
 }

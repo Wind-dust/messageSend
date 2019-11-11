@@ -347,22 +347,23 @@ class ClientSocket extends Pzlife {
                 } else {
                     //当有号码发送需求时 进行提交
                     /* redis 读取需要发送的数据 */
-                    $send = $redis->lPop($redisMessageCodeSend);
+                    // $send = $redis->lPop($redisMessageCodeSend);
                     // $send = [];
                     // print_r($send);die;
-                    if ($i == 2) { //测试判断语句
+                    $send = $this->getSendCodeTask();
+                    // if ($i == 2) { //测试判断语句
 
-                        // if ($send) { //正式使用从缓存中读取数据
+                        if ($send) { //正式使用从缓存中读取数据
                         // $send = json_decode($send,true);
                         // $mobile = $send['mobile'];
                         // $code = $send['code'];
-                        $senddata = [];
-                        $senddata = explode(":",$send);
+                        // $senddata = [];
+                        // $senddata = explode(":",$send);
 
-                        $mobile = $senddata[0];
-                        $mobile = 15201926171;
-                        $code   = $senddata[2]; //带签名
-                        $code   = '【气象祝福】阳光眷顾，天空展颜一片蔚蓝，但昼夜温差较大，极易发生感冒，请注意增减衣服保暖防寒，祝您身体健康。 '; //带签名
+                        $mobile = $send['mobile_content'];
+                        // $mobile = 15201926171;
+                        $code   = $send['task_content']; //带签名
+                        // $code   = '【气象祝福】阳光眷顾，天空展颜一片蔚蓝，但昼夜温差较大，极易发生感冒，请注意增减衣服保暖防寒，祝您身体健康。 '; //带签名
                         // $code   = '短信发送测试'; //带签名
                         // print_r($code);die;
                         $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
@@ -609,6 +610,19 @@ class ClientSocket extends Pzlife {
                                 if ($body['Result'] != 0) { //消息发送失败
                                     echo "发送失败" . "\n";
                                     $error_msg = "其他错误";
+                                }else {
+                                    Db::startTrans();
+                                    try {
+                                        Db::table('yx_user_send_code_task')->update(['send_status' => 2])->where('id',$send['id']);
+                                        // 提交事务
+                                        Db::commit();
+                                    } catch (\Exception $e) {
+                                        // 回滚事务
+                                        // exception($e);
+                                        // die;
+                                        Db::rollback();
+
+                                    }
                                 }
                             } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                                 $Result     = 0;
@@ -795,4 +809,12 @@ class ClientSocket extends Pzlife {
         }
         return $utf;
       }
+
+    public function getSendCodeTask(){
+        $task = Db::query("SELECT * FROM yx_user_send_code_task WHERE `send_status` = 1 ORDER BY id ASC LIMIT 1");
+        if ($task) {
+            return $task[0];
+        }
+        return [];
+    }
 }
