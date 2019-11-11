@@ -326,7 +326,7 @@ class ClientSocket extends Pzlife {
             // socket_clear_error($socket);
             // socket_close($socket);
             // die;//关闭socket连接，清除缓存数据
-            // socket_set_nonblock($socket); //设置非阻塞模式
+            socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
             do {
@@ -497,7 +497,7 @@ class ClientSocket extends Pzlife {
                     $headData = socket_read($socket, 12);
                     if ($headData != false) {
                         $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
-                        print_r($head);
+                        // print_r($head);
                         $bodyData = socket_read($socket, $head['Total_Length'] - 12);
                         // print_r($bodyData);
                         // echo "\n";
@@ -573,9 +573,9 @@ class ClientSocket extends Pzlife {
                                 }
                             } else if ($head['Command_Id'] == 0x80000004) {
                                 $body = unpack("N2Msg_Id/CResult", $bodyData);
-                                // print_r($body);
+                                print_r($body);
                                 // echo "get_CMPP_SUBMIT_RESP"."\n";
-                                echo "提交的Sequence_Id:".$head['Sequence_Id'].",解析的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2']."\n";
+                                // echo "提交的Sequence_Id:".$head['Sequence_Id'].",解析的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2']."\n";
                                 // print_r($body);
                                 //状态为0 ，消息发送成功
                                 switch ($body['Result']) {
