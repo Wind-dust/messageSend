@@ -231,7 +231,7 @@ class CmppTest extends Pzlife {
                         // $Msg_Id   = strval(time()) . $i;
                         // $bodyData = pack("a8", $Msg_Id);
                         $timestring = time();
-                        echo "发送时间：".date("Y-m-d H:i:s");
+                        echo "发送时间：".date("Y-m-d H:i:s",time());
                         $num1 = substr($timestring,0,8);
                         $num2 = substr($timestring,8).$this->combination($i);
                         
