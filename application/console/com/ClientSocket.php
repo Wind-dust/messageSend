@@ -196,18 +196,18 @@ class ClientSocket extends Pzlife {
                     $send = $redis->lPop($redisMessageCodeSend);
                     // $send = [];
                     // print_r($send);die;
-                    $send = $this->getSendCodeTask();
+                    // $send = $this->getSendCodeTask();
                     // if ($i == 2) { //测试判断语句
 
                         if ($send) { //正式使用从缓存中读取数据
                         // $senddata = [];
-                        // $senddata = explode(":",$send);
-                        // $mobile = $senddata['mobile_content'];
-                        $mobile = $send['mobile_content'];
+                        $senddata = explode(":",$send);
+                        $mobile = $senddata['mobile_content'];
+                        // $mobile = $send['mobile_content'];
 
                         // $mobile = 15201926171;
-                        // $code   = $senddata['task_content']; //带签名
-                        $code   = $send['task_content']; //带签名
+                        $code   = $senddata['task_content']; //带签名
+                        // $code   = $send['task_content']; //带签名
                         // $code   = '【气象祝福】阳光眷顾，天空展颜一片蔚蓝，但昼夜温差较大，极易发生感冒，请注意增减衣服保暖防寒，祝您身体健康。 '; //带签名
                         // $code   = '短信发送测试'; //带签名
                         // print_r($code);die;
@@ -316,7 +316,7 @@ class ClientSocket extends Pzlife {
                         }
                         // echo $Command_Id;die;
                         // print_r(strlen($bodyData));die;
-                        // $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
+                        $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
                     } else {
                         $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                         $Command_Id  = 0x00000008; //保持连接
