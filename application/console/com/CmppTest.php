@@ -297,7 +297,7 @@ class CmppTest extends Pzlife {
                                 $udh      = pack("cccccc", 5, 0, 3, $Sequence_Id, $num_messages, $j + 1);
                                 $newcode  = $udh . substr($code, $j * $max_len, $max_len);
                                 $len      = strlen($newcode);
-                                echo $len."\n";
+                                // echo $len."\n";
                                 $bodyData = $bodyData . pack("C", $len); //Msg_Length |1 |Unsigned Integer |信息长度(Msg_Fmt 值为 0 时：<160 个字 节；其它<=140 个字节)
                                 $bodyData = $bodyData . pack("a" . $len, $newcode); // Msg_Content |Msg_length |Octet String |信息内容
                                 $bodyData = $bodyData . pack("a8", ''); //Reserve | 8 | Octet String | 保留
@@ -543,7 +543,7 @@ class CmppTest extends Pzlife {
                             if ($Sequence_Id > 65536) {
                                 $Sequence_Id = 1;
                             }
-                            die;
+                            // die;
                             continue;
                         } else { //单条短信
 
