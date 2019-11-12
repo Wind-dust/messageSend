@@ -13,6 +13,7 @@ use app\common\model\Channel;
 use app\common\model\UserChannel;
 use app\common\model\UserSendTask;
 use app\common\model\UserSendCodeTask;
+use app\common\model\UserSendTaskLog;
 use think\Db;
 
 class DbAdministrator {
@@ -231,5 +232,21 @@ class DbAdministrator {
     public function editUserSendCodeTask($data, $id) {
         $UserSendCodeTask = new UserSendCodeTask;
         return $UserSendCodeTask->save($data, ['id' => $id]);
+    }
+
+    public function getUserSendTaskLog($where, $field, $row = false, $orderBy = '', $limit = '') {
+        $obj = UserSendTaskLog::field($field)->where($where);
+        return $this->getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function addUserSendTaskLog($data) {
+        $UserSendTaskLog = new UserSendTaskLog;
+        $UserSendTaskLog->save($data);
+        return $UserSendTaskLog->id;
+    }
+
+    public function editUserSendTaskLog($data, $id) {
+        $UserSendTaskLog = new UserSendTaskLog;
+        return $UserSendTaskLog->save($data, ['id' => $id]);
     }
 }

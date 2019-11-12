@@ -158,7 +158,7 @@ class CmppTest extends Pzlife {
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-
+        $content = 3;
         $contdata = $this->content($content);
 
         $host                 = $contdata['host']; //服务商ip
@@ -206,23 +206,23 @@ class CmppTest extends Pzlife {
                 } else {
                     //当有号码发送需求时 进行提交
                     /* redis 读取需要发送的数据 */
-                    // $send = $redis->lPop($redisMessageCodeSend);
+                    $send = $redis->lPop($redisMessageCodeSend);
                     // $send = [];
                     // print_r($send);die;
                     // $send = $this->getSendCodeTask();
-                    if ($i == 2) { //测试判断语句
+                    // if ($i == 2) { //测试判断语句
 
-                        // if ($send) { //正式使用从缓存中读取数据
-                        // $senddata = [];
-                        // $senddata = explode(":",$send);
+                        if ($send) { //正式使用从缓存中读取数据
+                        $senddata = [];
+                        $senddata = explode(":",$send);
 
-                        // $mobile = $senddata['mobile_content'];
+                        $mobile = $senddata['mobile_content'];
                         $txt_head = 6;
                         $txt_len  = 140;
                         $max_len  = $txt_len - $txt_head;
-                        $mobile   = 15201926171;
-                        // $code   = $senddata['task_content']; //带签名
-                        $code = '【米思米】安全围栏标准组件上市！不用设计，不用外发喷涂，不用组装！低至363.95元，第五天出货！赶紧过来下单吧。https://www.misumi.com.cn/mail/chn-gc19057-ml03/转发无效,详询021-52559388*6197,回T退订。 '; //带签名
+                        // $mobile   = 15201926171;
+                        $code   = $senddata['task_content']; //带签名
+                        // $code = '【米思米】安全围栏标准组件上市！不用设计，不用外发喷涂，不用组装！低至363.95元，第五天出货！赶紧过来下单吧。https://www.misumi.com.cn/mail/chn-gc19057-ml03/转发无效,详询021-52559388*6197,回T退订。 '; //带签名
                         // $code   = '短信发送测试'; //带签名
                         // print_r($code);die;
 
@@ -335,6 +335,7 @@ class CmppTest extends Pzlife {
                                 // }
                                 $Total_Length = strlen($bodyData) + 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
                                 // socket_write($socket, $headData . $bodyData, $Total_Length);
                                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) { //写入失败，还原发送信息并关闭端口
                                     echo 'fail to write' . socket_strerror(socket_last_error());
@@ -423,11 +424,11 @@ class CmppTest extends Pzlife {
                                             } else if ($head['Command_Id'] == 0x80000004) {
                                                 $body = unpack("N2Msg_Id/CResult", $bodyData);
                                                 print_r($body);
-                                                // $sequence = $redis->hget($redisMessageCodeSequenceId,$head['Sequence_Id']);
-                                                // if ($sequence) {
-                                                //     $redis->hdel($redisMessageCodeSequenceId,$head['Sequence_Id']);
-                                                //     $redis->hset($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2'],$sequence);
-                                                // }
+                                                $sequence = $redis->hget($redisMessageCodeSequenceId,$head['Sequence_Id']);
+                                                if ($sequence) {
+                                                    $redis->hdel($redisMessageCodeSequenceId,$head['Sequence_Id']);
+                                                    $redis->hset($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2'],$sequence);
+                                                }
                                                 // echo "get_CMPP_SUBMIT_RESP"."\n";
                                                 // echo "提交的Sequence_Id:".$head['Sequence_Id'].",解析的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2']."\n";
                                                 // print_r($body);
@@ -500,11 +501,11 @@ class CmppTest extends Pzlife {
                                                 $Msg_Content = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/", $body['Msg_Content']);
                                                 // $Msg_Content = unpack("a".$body['Msg_Length'],);
 
-                                                // $mesage = $redis->hget($redisMessageCodeMsgId,$Msg_Content['Msg_Id1'].$Msg_Content['Msg_Id2']);
-                                                // if ($mesage) {
-                                                //     $redis->hdel($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2']);
-                                                //     $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
-                                                // }
+                                                $mesage = $redis->hget($redisMessageCodeMsgId,$Msg_Content['Msg_Id1'].$Msg_Content['Msg_Id2']);
+                                                if ($mesage) {
+                                                    $redis->hdel($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2']);
+                                                    $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
+                                                }
                                                 print_r($Msg_Content);
                                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
                                                 // echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
@@ -644,7 +645,7 @@ class CmppTest extends Pzlife {
                         // echo strlen($code);die;
                         // echo $Command_Id;die;
                         // print_r(strlen($bodyData));die;
-                        // $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
+                        $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
                     } else {
                         $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                         $Command_Id  = 0x00000008; //保持连接

@@ -514,6 +514,19 @@ CREATE TABLE `yx_user_send_task` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='营销任务表';
 
+DROP TABLE IF EXISTS `yx_user_send_task_log`;
+CREATE TABLE `yx_user_send_task_log` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `task_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '任务id',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `mobile` text COMMENT '发送号码集合',
+  `send_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '1：待发送,2:发送中;3:成功;4:失败',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='营销任务日志表';
+
 DROP TABLE IF EXISTS `yx_user_send_code_task`;
 CREATE TABLE `yx_user_send_code_task` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

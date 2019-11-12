@@ -277,6 +277,16 @@ class Send extends CommonIndex
         if ($Password != $user['appkey']) {
             return -1;
         }
-        return -2;
+        $log = DbAdministrator::getUserSendTaskLog(['uid' => $user['id']],'id,mobile,send_status,create_time',false,['id' => 'desc'],50);
+        if (!empty($log)) {
+            $e = '';
+            $result = '';
+            foreach ($log as $key => $value) {
+               $result .= join(',',$value).$e;
+               $e = ';';
+            }
+            return $result;
+        }
+        return 0;
     }
 }
