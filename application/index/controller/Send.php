@@ -115,4 +115,22 @@ class Send extends MyController {
         $result = $this->app->send->getReceiveSmsBatch($Username,$Password);
         return $result;
     }
+
+    /**
+     * @api              {post} / 回复内容接口
+     * @apiDescription   getReceiveSmsBatch
+     * @apiGroup         index_send
+     * @apiName          getReceiveSmsBatch
+     * @apiParam (入参) {String} username 登录名
+     * @apiParam (入参) {String} password 登陆密码
+     * @apiSuccess (返回) {String} code 200:成功 / 3000:手机号格式错误 / 3002:passwd密码强度不够 / 3003:邮箱格式错误 / 3004:验证码错误 / 3005:该手机号已注册用户 / 3006:用户类型错误 / 3007:nick_name不能为空
+     * @apiSampleRequest /index/send/getReceiveSmsBatch
+     * @author rzc
+     */
+    public function getReplaySmsBatch(){
+        $Username = trim($this->request->post('username'));//登录名
+        $Password = trim($this->request->post('password'));//登陆密码
+        $result = $this->app->send->getReplaySmsBatch($Username,$Password);
+        return $result;
+    }
 }

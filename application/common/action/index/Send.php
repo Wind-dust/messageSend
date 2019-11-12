@@ -202,7 +202,7 @@ class Send extends CommonIndex
     public function smsBatch($Username, $Password, $Content, $Mobiles, $Dstime, $ip)
     {
         $Password = md5($Password);
-        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial');
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial',true);
         if (empty($user)) {
             return -1;
         }
@@ -225,20 +225,20 @@ class Send extends CommonIndex
         $data['task_content'] = $Content;
         
         $data['mobile_content'] = join(',', $effective_mobile);
-        
-        if ($send_num > 1) { //多条号码认定为营销
-            $data['task_name'] = $Content;
-            $data['send_num'] = $send_num;
-            $data['free_trial'] = 1;
-            $data['task_no'] = 'mar' . date('ymdHis') . substr(uniqid('',true),15,8);
-            $id = DbAdministrator::addUserSendTask($data);
-            // $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
-            // foreach ($effective_mobile as $key => $value) {
-            //     $this->redis->rpush($redisMessageMarketingSend.":2",$value.":".$id.":".$Content); //三体营销通道
-            //     // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
-            // }
-            $result = "1,".$data['task_no'];
-            return $result;
+        $data['task_name'] = $Content;
+        $data['send_num'] = $send_num;
+        $data['free_trial'] = 1;
+        $data['task_no'] = 'mar' . date('ymdHis') . substr(uniqid('',true),15,8);
+        $id = DbAdministrator::addUserSendTask($data);
+        $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
+        foreach ($effective_mobile as $key => $value) {
+            $this->redis->rpush($redisMessageMarketingSend.":2",$value.":".$id.":".$Content); //三体营销通道
+            // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
+        }
+        $result = "1,".$data['task_no'];
+        return $result;
+/*         if ($send_num > 1) { //多条号码认定为营销
+            
         } else { //行业
             //将行业短信写入任务并写入缓存
             $data['task_no'] = 'bus' . date('ymdHis') . substr(uniqid('',true),15,8);
@@ -250,7 +250,7 @@ class Send extends CommonIndex
             }
             $result = "1,".$data['task_no'];
             return $result;
-        }
+        } */
     }
 
     public function getBalanceSmsBatch($Username,$Password){

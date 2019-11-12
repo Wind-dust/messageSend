@@ -507,6 +507,7 @@ CREATE TABLE `yx_user_send_task` (
   `source` varchar(50) NOT NULL DEFAULT '' COMMENT '请求源（ip）',
   `send_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发送数量',
   `free_trial` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1:需要审核;2:审核通过;3:审核不通过',
+  `send_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '1：待发送,2:发送中;3:成功;4:失败',
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
   `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
