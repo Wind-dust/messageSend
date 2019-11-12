@@ -217,7 +217,7 @@ class CmppTest extends Pzlife {
                         // $senddata = explode(":",$send);
 
                         // $mobile = $senddata['mobile_content'];
-                        $mobile = 15821193682;
+                        $mobile = 15201926171;
                         // $code   = $senddata['task_content']; //带签名
                         $code   = '【优裹徒】您的包裹[中通-733232]已签收，感谢使用'; //带签名
                         // $code   = '短信发送测试'; //带签名
@@ -231,6 +231,7 @@ class CmppTest extends Pzlife {
                         // $Msg_Id   = strval(time()) . $i;
                         // $bodyData = pack("a8", $Msg_Id);
                         $timestring = time();
+                        echo "发送时间：".date("Y-m-d H:i:s");
                         $num1 = substr($timestring,0,8);
                         $num2 = substr($timestring,8).$this->combination($i);
                         
