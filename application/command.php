@@ -10,14 +10,14 @@
 // +----------------------------------------------------------------------
 $commandPath = \think\facade\Config::get('console.command_path');
 return [
-    'curl'                  => $commandPath . 'Curl',
-    'user'                  => $commandPath . 'User',
-    'areas'                 => $commandPath . 'Areas',
-    'cmpp'                  => $commandPath . 'Cmpp',
-    'cmppsubmit'            => $commandPath . 'Cmppsubmit',
-    'localscript'           => $commandPath . 'LocalScript',
-    'serversocket'           => $commandPath . 'ServerSocket',
-    'clientsocket'           => $commandPath . 'ClientSocket',
-    'officeexcel'           => $commandPath . 'OfficeExcel',
-    'clientsocketsantibusiness'           => $commandPath .'ClientSocketSantiBusiness',
+    'curl'         => $commandPath . 'Curl',
+    'user'         => $commandPath . 'User',
+    'areas'        => $commandPath . 'Areas',
+    'cmpp'         => $commandPath . 'Cmpp',
+    'cmppsubmit'   => $commandPath . 'Cmppsubmit',
+    'localscript'  => $commandPath . 'LocalScript',
+    'serversocket' => $commandPath . 'ServerSocket',
+    'clientsocket' => $commandPath . 'ClientSocket',
+    'officeexcel'  => $commandPath . 'OfficeExcel',
+    'cmpptest'     => $commandPath . 'CmppTest',
 ];
