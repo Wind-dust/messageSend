@@ -126,7 +126,6 @@ CREATE TABLE `yx_permissions_api` (
 -- 业务功能表
 -- -----------------------------
 
-DROP TABLE IF EXISTS `yx_users`;
 CREATE TABLE `yx_users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `pid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '父级id',
@@ -138,6 +137,7 @@ CREATE TABLE `yx_users` (
   `mobile` char(11) NOT NULL DEFAULT '' COMMENT '手机号',
   `email` varchar(50) NOT NULL DEFAULT '' COMMENT 'email',
   `money` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '剩余金额（现金）',
+  `free_trial` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '1:需要审核;2:无需审核',
   `user_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '账户服务状态 1停止服务 2启用服务',
   `reservation_service` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '可否预用服务 1不可 2可以',
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
@@ -146,7 +146,7 @@ CREATE TABLE `yx_users` (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `p_uid` (`id`,`pid`) USING BTREE,
   UNIQUE KEY `index_mobile` (`mobile`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
 DROP TABLE IF EXISTS `yx_admin_remittance`;
 CREATE TABLE `yx_admin_remittance` (
@@ -208,7 +208,7 @@ CREATE TABLE `pz_log_vercode`  (
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '发送时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 649 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '验证码发送日志' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '验证码发送日志' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `yx_order`;
 CREATE TABLE `yx_order` (
@@ -310,7 +310,7 @@ CREATE TABLE `yx_sms_sending_channel` (
   `channel_type` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '通道类型 1.http 2.cmpp ',
   `channel_port` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '连接端口,若无端口则不填',
   `channel_source` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '通道归属:1,中国移动;2,中国联通;3,中国电信;4,三网通',
-  `channel_services` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '通道服务范围:1,行业;2,营销;3,彩信;4,视频',
+  `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
   `channel_price` decimal(10,5) UNSIGNED NOT NULL DEFAULT 0.00000 COMMENT '通道价格',
   `channel_host` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '通道连接主机或者域名',
   `channel_postway` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'http请求方式:1,get;2,post;CMPP接口不填',

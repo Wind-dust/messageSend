@@ -241,6 +241,27 @@ class Administrator extends CommonIndex {
         return ['code' => '200', 'channel_list' => $result];
     }
 
+    public function settingChannel($channel_id, $business_id){
+        $channel = DbAdministrator::getChannel(['id' => $channel_id], 'id,channel_name', true);
+        if (empty($channel)) {
+            return ['code' => '3001'];
+        }
+        $business = DbAdministrator::getBusiness(['id' => $business_id], '*', true);
+        if (empty($business)) {
+            return ['code' => '3002'];
+        }
+        Db::startTrans();
+        try {
+            DbAdministrator::editChannel(['business_id' => $business_id],$channel_id);
+            Db::commit();
+            return ['code' => '200'];
+
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
     public function distributeUserChannel($channel_id, $user_phone, $priority){
         $channel =  DbAdministrator::getChannel(['id' => $channel_id], 'id', true);
         if (empty($channel)){

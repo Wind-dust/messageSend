@@ -42,12 +42,15 @@ class User extends CommonIndex {
         return ['code' => '200', 'totle' => $totle, 'result' => $result];
     }
 
-    public function seetingUser($uid, $user_status, $reservation_service) {
+    public function seetingUser($uid, $user_status, $reservation_service, $free_trial) {
         if ($user_status) {
             $data['user_status'] = $user_status;
         }
         if ($reservation_service) {
             $data['reservation_service'] = $reservation_service;
+        }
+        if ($reservation_service) {
+            $data['free_trial'] = $free_trial;
         }
 
         Db::startTrans();

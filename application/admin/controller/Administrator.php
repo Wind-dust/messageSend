@@ -328,6 +328,35 @@ class Administrator extends AdminController {
         return $result;
     }
 
+    /**
+     * @api              {post} / 设置通道归属服务
+     * @apiDescription   settingChannel
+     * @apiGroup         admin_Administrator
+     * @apiName          settingChannel
+     * @apiParam (入参) {Nmuber} channel_id
+     * @apiParam (入参) {Nmuber} business_id
+     * @apiSuccess (返回) {String} code 200:成功  / 3001:channel_id错误 / 3002:business_id错误
+     * @apiSampleRequest /admin/administrator/settingChannel
+     * @return array
+     * @author rzc
+     */
+    public function settingChannel(){
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $channel_id      = trim($this->request->post('channel_id'));
+        $business_id      = trim($this->request->post('business_id'));
+        if (empty($channel_id) || intval($channel_id) < 1 || !is_numeric($channel_id)) {
+            return ['code' => '3001'];
+        }
+        if (empty($business_id) || intval($business_id) < 1 || !is_numeric($business_id)) {
+            return ['code' => '3001'];
+        }
+        $result = $this->app->administrator->settingChannel($channel_id, $business_id);
+    }
+
      /**
      * @api              {post} / 分配用户通道
      * @apiDescription   distributeUserChannel

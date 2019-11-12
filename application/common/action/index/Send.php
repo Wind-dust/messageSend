@@ -218,7 +218,7 @@ class Send extends CommonIndex
         if (empty($effective_mobile)) {
             return 2;
         }
-        $send_num = count($effective_mobile);
+        $send_num = count($Mobiles);
         $data = [];
         $data['uid'] = $user['id'];
         $data['source'] = $ip;
@@ -255,14 +255,17 @@ class Send extends CommonIndex
 
     public function getBalanceSmsBatch($Username,$Password){
         $Password = md5($Password);
-        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial');
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial',true);
+        // print_r($Username);die;
         if (empty($user)) {
             return -1;
         }
         if ($Password != $user['appkey']) {
             return -1;
         }
-        return -2;
+        $result = DbAdministrator::getUserEquities(['uid' => $user['id']],'business_id,num_balance',true);
+
+        return $result['num_balance'];
     }
 
     public function getReceiveSmsBatch($Username,$Password){

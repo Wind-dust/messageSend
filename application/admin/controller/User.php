@@ -73,7 +73,8 @@ class User extends AdminController {
      * @apiParam (入参) {Int} uid 账户id
      * @apiParam (入参) {Int} [user_status] 账户服务状态 1停止服务 2启用服务
      * @apiParam (入参) {Int} [reservation_service] 可否预用服务 1不可 2可以
-     * @apiSuccess (返回) {String} code 200:成功 / 3000:用户列表空 / 3001:user_status格式错误 / 3002:reservation_service格式错误 / 3003:uid格式错误
+     * @apiParam (入参) {Int} [free_trial] 短信发送审核 1:需要审核;2:无需审核
+     * @apiSuccess (返回) {String} code 200:成功 / 3000:用户列表空 / 3001:user_status格式错误 / 3002:reservation_service格式错误 / 3003:uid格式错误 / 3004:free_trial格式错误
      * @apiSampleRequest /admin/user/seetingUser
      * @author rzc
      */
@@ -86,6 +87,7 @@ class User extends AdminController {
         $uid                 = trim($this->request->post('uid'));
         $user_status         = trim($this->request->post('user_status'));
         $reservation_service = trim($this->request->post('reservation_service'));
+        $free_trial = trim($this->request->post('free_trial'));
         if (!in_array($user_status, [1, 2]) && !empty($user_status)) {
             return ['code' => '3001'];
         }
@@ -95,7 +97,10 @@ class User extends AdminController {
         if (!in_array($reservation_service, [1, 2]) && !empty($reservation_service)) {
             return ['code' => '3002'];
         }
-        $result = $this->app->user->seetingUser($uid, $user_status, $reservation_service);
+        if (!in_array($free_trial, [1, 2]) && !empty($free_trial)) {
+            return ['code' => '3004'];
+        }
+        $result = $this->app->user->seetingUser($uid, $user_status, $reservation_service, $free_trial);
         $this->apiLog($apiName, [$cmsConId, $uid, $user_status, $reservation_service], $result['code'], $cmsConId);
         return $result;
     }
