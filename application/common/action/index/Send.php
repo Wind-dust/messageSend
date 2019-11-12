@@ -201,7 +201,7 @@ class Send extends CommonIndex
 
     public function smsBatch($Username, $Password, $Content, $Mobiles, $Dstime, $ip)
     {
-        $Password = md5($Password);
+        // $Password = md5($Password);
         $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial',true);
         if (empty($user)) {
             return -1;
