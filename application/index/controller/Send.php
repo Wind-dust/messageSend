@@ -27,7 +27,7 @@ class Send extends MyController {
         // if (!checkMobile($phone)) {
         //     return ['code' => 3001];
         // }
-        echo phpinfo();die;
+        
         $code   = trim($this->request->post('code'));//验证码
         $result = $this->app->send->cmppSendTest($phone, $code);
         // $this->apiLog($apiName, [$Banner_id, $source], $result['code'], '');
