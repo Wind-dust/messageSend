@@ -254,7 +254,7 @@ class Send extends CommonIndex
     }
 
     public function getBalanceSmsBatch($Username,$Password){
-        $Password = md5($Password);
+        // $Password = md5($Password);
         $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial',true);
         // print_r($Username);die;
         if (empty($user)) {
@@ -269,7 +269,7 @@ class Send extends CommonIndex
     }
 
     public function getReceiveSmsBatch($Username,$Password){
-        $Password = md5($Password);
+        // $Password = md5($Password);
         $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service',true);
         if (empty($user)) {
             return -1;
