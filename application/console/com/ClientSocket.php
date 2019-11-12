@@ -193,22 +193,22 @@ class ClientSocket extends Pzlife {
                 } else {
                     //当有号码发送需求时 进行提交
                     /* redis 读取需要发送的数据 */
-                    $send = $redis->lPop($redisMessageCodeSend);
+                    // $send = $redis->lPop($redisMessageCodeSend);
                     // $send = [];
                     // print_r($send);die;
                     // $send = $this->getSendCodeTask();
-                    // if ($i == 2) { //测试判断语句
+                    if ($i == 2) { //测试判断语句
 
-                        if ($send) { //正式使用从缓存中读取数据
-                        // $senddata = [];
-                        $senddata = explode(":",$send);
-                        $mobile = $senddata['mobile_content'];
+                        // if ($send) { //正式使用从缓存中读取数据
+                        $senddata = [];
+                        // $senddata = explode(":",$send);
+                        // $mobile = $senddata['mobile_content'];
                         // $mobile = $send['mobile_content'];
 
-                        // $mobile = 15201926171;
-                        $code   = $senddata['task_content']; //带签名
+                        $mobile = 15599011983;
+                        // $code   = $senddata['task_content']; //带签名
                         // $code   = $send['task_content']; //带签名
-                        // $code   = '【气象祝福】阳光眷顾，天空展颜一片蔚蓝，但昼夜温差较大，极易发生感冒，请注意增减衣服保暖防寒，祝您身体健康。 '; //带签名
+                        $code   = '【米思米】安全围栏标准组件上市！不用设计，不用外发喷涂，不用组装！低至363.95元，第五天出货！赶紧过来下单吧。https://www.misumi.com.cn/mail/chn-gc19057-ml03/转发无效,详询021-52559388*6197,回T退订。 '; //带签名
                         // $code   = '短信发送测试'; //带签名
                         // print_r($code);die;
                         $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
