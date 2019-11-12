@@ -234,13 +234,14 @@ class CmppTest extends Pzlife {
                         // $Msg_Id   = strval(time()) . $i;
                         // $bodyData = pack("a8", $Msg_Id);
                         $timestring = time();
-                        echo "发送时间：" . date("Y-m-d H:i:s", time());
+                        echo "发送时间：" . date("Y-m-d H:i:s", time())."\n";
                         $num1 = substr($timestring, 0, 8);
                         $num2 = substr($timestring, 8) . $this->combination($i);
                         $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
                         if (strlen($code) > $max_len) {
                             $pos          = 0;
                             $num_messages = ceil(strlen($code) / $max_len);
+                            // echo $num_messages;die;
                             for ($j = 0; $j < $num_messages; $j++) {
                                 $bodyData = pack("N", $num1) . pack("N", $num2);
                                 $bodyData = $bodyData . pack('C', $num_messages); //Pk_total |Unsigned Integer |1 |相同 Msg_Id 的信息总条数，从 1 开始
@@ -294,8 +295,9 @@ class CmppTest extends Pzlife {
                                 $bodyData = $bodyData . pack("a" . $p_n, $mobile); //Dest_terminal_Id | 21*DestUsr_tl |Octet String |接收短信的 MSISDN 号码
                                 // $len      = strlen($code);
                                 $udh      = pack("cccccc", 5, 0, 3, $Sequence_Id, $num_messages, $j + 1);
-                                $newcode  = $udh . substr($code, $i * $max_len, $max_len);
+                                $newcode  = $udh . substr($code, $j * $max_len, $max_len);
                                 $len      = strlen($newcode);
+                                echo $len."\n";
                                 $bodyData = $bodyData . pack("C", $len); //Msg_Length |1 |Unsigned Integer |信息长度(Msg_Fmt 值为 0 时：<160 个字 节；其它<=140 个字节)
                                 $bodyData = $bodyData . pack("a" . $len, $newcode); // Msg_Content |Msg_length |Octet String |信息内容
                                 $bodyData = $bodyData . pack("a8", ''); //Reserve | 8 | Octet String | 保留
@@ -541,6 +543,7 @@ class CmppTest extends Pzlife {
                             if ($Sequence_Id > 65536) {
                                 $Sequence_Id = 1;
                             }
+                            die;
                             continue;
                         } else { //单条短信
 
