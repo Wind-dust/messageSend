@@ -180,7 +180,7 @@ class CmppTest extends Pzlife {
         if (socket_connect($socket, $host, $port) == false) {
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
-            date_default_timezone_set('PRC');
+            // date_default_timezone_set('PRC');
             // socket_read($socket,3072);
             // socket_clear_error($socket);
             // socket_close($socket);
