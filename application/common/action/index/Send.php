@@ -231,10 +231,10 @@ class Send extends CommonIndex
         $data['task_no'] = 'mar' . date('ymdHis') . substr(uniqid('',true),15,8);
         $id = DbAdministrator::addUserSendTask($data);
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
-        foreach ($effective_mobile as $key => $value) {
-            $this->redis->rpush($redisMessageMarketingSend.":2",$value.":".$id.":".$Content); //三体营销通道
-            // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
-        }
+        // foreach ($effective_mobile as $key => $value) {
+        //     $this->redis->rpush($redisMessageMarketingSend.":2",$value.":".$id.":".$Content); //三体营销通道
+        //     // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
+        // }
         $result = "1,".$data['task_no'];
         return $result;
 /*         if ($send_num > 1) { //多条号码认定为营销
