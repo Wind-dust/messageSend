@@ -235,7 +235,8 @@ class Send extends CommonIndex
         //     $this->redis->rpush($redisMessageMarketingSend.":2",$value.":".$id.":".$Content); //三体营销通道
         //     // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
         // }
-        $result = "1,".$data['task_no'];
+        $result = 1;
+        $result .= $data['task_no'];
         return $result;
 /*         if ($send_num > 1) { //多条号码认定为营销
             
