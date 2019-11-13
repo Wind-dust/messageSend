@@ -165,26 +165,26 @@ class Send extends MyController {
         
         // echo phpinfo();die;
         if (empty($Mobiles)) {
-            return 3001;
+            return ['code' => '3001'];
         }
         if (count($Mobiles) > 1000){
-            return 3002;
+            return ['code' => '3002'];
         }
         if (strtotime($Dstime)== false && !empty($Dstime)) {
-            return 3003;
+            return ['code' => '3003'];
         }
         if (strtotime($Dstime) < time() && !empty($Dstime)) {
-            return 3004;
+            return ['code' => '3004'];
         }
         if (empty($Content) || strlen($Content) > 500) {
-            return 3005;
+            return ['code' => '3005'];
         }
         // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
         if ( mb_strpos($Content,'】') - mb_strpos($Content,'【') < 2 || mb_strpos($Content,'】') - mb_strpos($Content,'【') > 8) {
-            return 3006;
+            return ['code' => '3006'];
         }
         if (empty($task_name)) {
-            return 3007;
+            return ['code' => '3007'];
         }
         $result = $this->app->send->getSmsMarketingTask($Username,$Password,$Content,$Mobiles,$Dstime,$ip,$task_name);
         return $result;
@@ -199,7 +199,7 @@ class Send extends MyController {
      * @apiParam (入参) {String} password 登陆密码
      * @apiParam (入参) {String} content 短信内容
      * @apiParam (入参) {String} mobile 接收手机号码
-     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:短信内容为空或者短信内容超出500字符 / 3003:签名长度为2~8个字 / 
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:短信内容为空或者短信内容超出500字符 / 3003:签名长度为2~8个字 / 3004:该账户已被停用 / 3005:该账户没有此项服务 / 3006:余额不足，请先充值 / 3009 :系统错误
      * @apiSampleRequest /index/send/getSmsBuiness
      * @author rzc
      */
@@ -213,14 +213,14 @@ class Send extends MyController {
         
         // echo phpinfo();die;
         if (empty($Mobile) || checkMobile($Mobile) === false) {
-            return 3001;
+            return ['code'=>'3001'];
         }
         if (empty($Content) || strlen($Content) > 500) {
-            return 3002;
+            return ['code'=>'3002'];
         }
         // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
         if ( mb_strpos($Content,'】') - mb_strpos($Content,'【') < 2 || mb_strpos($Content,'】') - mb_strpos($Content,'【') > 8) {
-            return 3003;
+            return ['code'=>'3003'];
         }
         $result = $this->app->send->getSmsBuiness($Username,$Password,$Content,$Mobile,$ip);
         return $result;

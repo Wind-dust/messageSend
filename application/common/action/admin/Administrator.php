@@ -361,7 +361,7 @@ class Administrator extends CommonIndex {
         if (empty($channel)) {
             return ['code' => '3002'];
         }
-        $usertask = DbAdministrator::getUserSendTask(['id' => $id], 'id,uid,mobile_content,task_content,free_trial', true);
+        $usertask = DbAdministrator::getUserSendTask(['id' => $id], 'id,uid,mobile_content,task_content,free_trial,send_num', true);
         if (empty($usertask)) {
             return ['code' => '3001'];
         }
@@ -376,10 +376,13 @@ class Administrator extends CommonIndex {
         Db::startTrans();
         try {
             DbAdministrator::editUserSendTask(['free_trial' => $free_trial,'channel_id' => $channel_id], $id);
-            Db::commit();
+           
             if ($free_trial == 2) {
-                $mobilesend = explode(',',$usertask['mobile_content']);
+                $mobilesend = explode(',',$usertask['task_content']);
                 $effective_mobile = [];
+                $send_length    = mb_strlen($usertask['task_content'], 'utf8');
+                $num = ceil($send_length/65) * $usertask['send_num'];
+                DbAdministrator::modifyBalance($userEquities['id'],$num,'dec');
                 foreach ($mobilesend as $key => $value) {
                     if (checkMobile(($value))) {
                         $effective_mobile[] = $value;
@@ -392,6 +395,7 @@ class Administrator extends CommonIndex {
                     // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
                 }
             }
+            Db::commit();
             return ['code' => '200'];
 
         } catch (\Exception $e) {
