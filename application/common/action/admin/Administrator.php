@@ -237,7 +237,7 @@ class Administrator extends CommonIndex {
     }
 
     public function getChannel() {
-        $result = DbAdministrator::getSmsSendingChannel([], 'id,channel_name', false);
+        $result = DbAdministrator::getSmsSendingChannel([], 'id,title', false);
         return ['code' => '200', 'channel_list' => $result];
     }
 

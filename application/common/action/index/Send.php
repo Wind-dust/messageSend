@@ -329,10 +329,11 @@ return $result;
             return 3000;
         }
         $prefix = substr($Mobile,0,7);
-        $res = DbProvinces::getNumberSource(['mobile' => $prefix],'source,province_id',true);
+        $res = DbProvinces::getNumberSource(['mobile' => $prefix],'source,province_id,province',true);
         //默认青年科技
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
         $id = 3;
+        print_r($res);die;
         if ($res) {
             // return ['3004'];
             if ($res['source'] == 2) {//联通
