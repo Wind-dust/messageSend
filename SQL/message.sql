@@ -535,12 +535,13 @@ CREATE TABLE `yx_user_send_code_task` (
   `task_content` text COMMENT '发送内容',
   `mobile_content` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '接收手机',
   `source` varchar(50) NOT NULL DEFAULT '' COMMENT '请求源（ip）',
-  `send_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '1：待发送,2:已发送;3:成功;4:失败',
+  `send_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '短信发送状态1：待发送,2:已发送;3:成功;4:失败',
+  `source_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '网关状态1：待发送,2:已发送;3:成功;4:失败',
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
   `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='营销任务表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='行业发送记录表';
 ALTER TABLE `messagesend`.`yx_users` 
 ADD COLUMN `free_trial` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1:需要审核;2:无需审核' AFTER `money`;
 

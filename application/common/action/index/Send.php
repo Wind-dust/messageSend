@@ -14,14 +14,12 @@ use Config;
 use Env;
 use think\Db;
 
-class Send extends CommonIndex
-{
+class Send extends CommonIndex {
     private $cipherUserKey = 'userpass'; //用户密码加密key
     // private $userRedisKey = 'index:user:'; //用户密码加密key
     private $cmpp;
 
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
         $this->cmpp    = new Cmpp30();
         $this->Owncmpp = new Owncmpp();
@@ -35,12 +33,11 @@ class Send extends CommonIndex
      * @return array
      * @author zyr
      */
-    public function cmppSendTest($mobile, $code)
-    {
+    public function cmppSendTest($mobile, $code) {
 
         //设置参数，并且转换成16进制数字显示
-        $time = time();
-        $i = 1;
+        $time   = time();
+        $i      = 1;
         $a_time = 0;
         do {
             echo $i . "\n";
@@ -125,71 +122,71 @@ class Send extends CommonIndex
         $Sequence_Id = $head['Sequence_Id'];
         $bodyData    = socket_read($socket, $head['Total_Length'] - 12);
         switch ($head['Command_Id'] & 0x0fffffff) {
-            case 0x00000001:
-                $body   = unpack("CStatus/a16AuthenticatorISMG/CVersion", $bodyData);
-                $Msg_Id = rand(1, 100);
-                //$bodyData = pack("a8", $Msg_Id);
-                $bodyData = pack("N", $Msg_Id) . pack("N", "00000000");
-                $bodyData .= pack("C", 1) . pack("C", 1);
-                $bodyData .= pack("C", 0) . pack("C", 0);
-                $bodyData .= pack("a10", $Service_Id);
-                $bodyData .= pack("C", 0) . pack("a32", "") . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("a6", $SP_ID) . pack("a2", "02") . pack("a6", "") . pack("a17", "") . pack("a17", "") . pack("a21", $Dest_Id) . pack("C", 1);
-                $bodyData .= pack("a32", $mobile);
-                $bodyData .= pack("C", 0);
-                $len = strlen($code);
-                $bodyData .= pack("C", $len);
-                $bodyData .= pack("a" . $len, $code);
-                $bodyData .= pack("a20", "00000000000000000000");
-                // send($bodyData, "CMPP_SUBMIT", $Msg_Id);
-                $Command_Id   = 0x00000004;
-                $Total_Length = strlen($bodyData) + 12;
-                if ($Msg_Id != 0) {
-                    $Sequence_Id = $Msg_Id;
+        case 0x00000001:
+            $body   = unpack("CStatus/a16AuthenticatorISMG/CVersion", $bodyData);
+            $Msg_Id = rand(1, 100);
+            //$bodyData = pack("a8", $Msg_Id);
+            $bodyData = pack("N", $Msg_Id) . pack("N", "00000000");
+            $bodyData .= pack("C", 1) . pack("C", 1);
+            $bodyData .= pack("C", 0) . pack("C", 0);
+            $bodyData .= pack("a10", $Service_Id);
+            $bodyData .= pack("C", 0) . pack("a32", "") . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("a6", $SP_ID) . pack("a2", "02") . pack("a6", "") . pack("a17", "") . pack("a17", "") . pack("a21", $Dest_Id) . pack("C", 1);
+            $bodyData .= pack("a32", $mobile);
+            $bodyData .= pack("C", 0);
+            $len = strlen($code);
+            $bodyData .= pack("C", $len);
+            $bodyData .= pack("a" . $len, $code);
+            $bodyData .= pack("a20", "00000000000000000000");
+            // send($bodyData, "CMPP_SUBMIT", $Msg_Id);
+            $Command_Id   = 0x00000004;
+            $Total_Length = strlen($bodyData) + 12;
+            if ($Msg_Id != 0) {
+                $Sequence_Id = $Msg_Id;
+            } else {
+                if ($Sequence_Id < 10) {
+                    $Sequence_Id = $Sequence_Id;
                 } else {
-                    if ($Sequence_Id < 10) {
-                        $Sequence_Id = $Sequence_Id;
-                    } else {
-                        $Sequence_Id = 1;
-                    }
-                    $Sequence_Id = $Sequence_Id + 1;
+                    $Sequence_Id = 1;
                 }
-                $headData = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                // print_r(socket_write($socket, $headData . $bodyData, $Total_Length));die;
-                print_r($socket);
-                die;
-                socket_write($socket, $headData . $bodyData, $Total_Length);
-                $headData = socket_read($socket, 12);
-                print_r($headData);
-                die;
-                if (empty($headData)) {
-                    // $this->log();
-                    $code = 0000;
-                }
-                // echo 1;
-                break;
-                // case 0x00000005:
-                //     $this->CMPP_DELIVER($head['Total_Length'],$Sequence_Id);
-                //     break;
-                // case 0x80000005:
-                //     $this->CMPP_DELIVER($head['Total_Length'],$Sequence_Id);
-                //     break;
-            case 0x00000008:
-                echo 2;
-                $bodyData = pack("C", 1);
-                // $this->send($bodyData, "CMPP_ACTIVE_TEST_RESP", $Sequence_Id);
-                break;
-            case 0x00000004:
-                // $this->cmppSubmitResp();
-                echo 3;
-                break;
-                // case 0x80000004:
-                //     $this->CMPP_SUBMIT_RESP();
-                //     break;
-            default:
-                echo 4;
-                $bodyData = pack("C", 1);
-                // $this->send($bodyData, "CMPP_ACTIVE_TEST_RESP", $Sequence_Id);
-                break;
+                $Sequence_Id = $Sequence_Id + 1;
+            }
+            $headData = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+            // print_r(socket_write($socket, $headData . $bodyData, $Total_Length));die;
+            print_r($socket);
+            die;
+            socket_write($socket, $headData . $bodyData, $Total_Length);
+            $headData = socket_read($socket, 12);
+            print_r($headData);
+            die;
+            if (empty($headData)) {
+                // $this->log();
+                $code = 0000;
+            }
+            // echo 1;
+            break;
+        // case 0x00000005:
+        //     $this->CMPP_DELIVER($head['Total_Length'],$Sequence_Id);
+        //     break;
+        // case 0x80000005:
+        //     $this->CMPP_DELIVER($head['Total_Length'],$Sequence_Id);
+        //     break;
+        case 0x00000008:
+            echo 2;
+            $bodyData = pack("C", 1);
+            // $this->send($bodyData, "CMPP_ACTIVE_TEST_RESP", $Sequence_Id);
+            break;
+        case 0x00000004:
+            // $this->cmppSubmitResp();
+            echo 3;
+            break;
+        // case 0x80000004:
+        //     $this->CMPP_SUBMIT_RESP();
+        //     break;
+        default:
+            echo 4;
+            $bodyData = pack("C", 1);
+            // $this->send($bodyData, "CMPP_ACTIVE_TEST_RESP", $Sequence_Id);
+            break;
         }
         // print_r($head['Command_Id']);
         // print_r($bodyData);
@@ -199,10 +196,9 @@ class Send extends CommonIndex
         die;
     }
 
-    public function smsBatch($Username, $Password, $Content, $Mobiles, $Dstime, $ip)
-    {
+    public function smsBatch($Username, $Password, $Content, $Mobiles, $Dstime, $ip) {
         // $Password = md5($Password);
-        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial',true);
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return -1;
         }
@@ -218,45 +214,45 @@ class Send extends CommonIndex
         if (empty($effective_mobile)) {
             return 2;
         }
-        $send_num = count($Mobiles);
-        $data = [];
-        $data['uid'] = $user['id'];
-        $data['source'] = $ip;
+        $send_num             = count($Mobiles);
+        $data                 = [];
+        $data['uid']          = $user['id'];
+        $data['source']       = $ip;
         $data['task_content'] = $Content;
-        
-        $data['mobile_content'] = join(',', $effective_mobile);
-        $data['task_name'] = $Content;
-        $data['send_num'] = $send_num;
-        $data['free_trial'] = 1;
-        $data['task_no'] = 'mar' . date('ymdHis') . substr(uniqid('',true),15,8);
-        $id = DbAdministrator::addUserSendTask($data);
+
+        $data['mobile_content']    = join(',', $effective_mobile);
+        $data['task_name']         = $Content;
+        $data['send_num']          = $send_num;
+        $data['free_trial']        = 1;
+        $data['task_no']           = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+        $id                        = DbAdministrator::addUserSendTask($data);
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
         // foreach ($effective_mobile as $key => $value) {
         //     $this->redis->rpush($redisMessageMarketingSend.":2",$value.":".$id.":".$Content); //三体营销通道
         //     // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
         // }
         $result = 1;
-        $result = $result.','.$data['task_no'];
+        $result = $result . ',' . $data['task_no'];
         return $result;
 /*         if ($send_num > 1) { //多条号码认定为营销
-            
-        } else { //行业
-            //将行业短信写入任务并写入缓存
-            $data['task_no'] = 'bus' . date('ymdHis') . substr(uniqid('',true),15,8);
-            $id = DbAdministrator::addUserSendCodeTask($data);
-            $redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend');
-            foreach ($effective_mobile as $key => $value) {
-                // $this->redis->hset($redisMessageCodeSend.":1",$value,$id.":".$Content); //三体行业通道
-                // $this->redis->rpush($redisMessageCodeSend.":1",$value.":".$id.":".$Content); //三体行业通道
-            }
-            $result = "1,".$data['task_no'];
-            return $result;
-        } */
+
+} else { //行业
+//将行业短信写入任务并写入缓存
+$data['task_no'] = 'bus' . date('ymdHis') . substr(uniqid('',true),15,8);
+$id = DbAdministrator::addUserSendCodeTask($data);
+$redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend');
+foreach ($effective_mobile as $key => $value) {
+// $this->redis->hset($redisMessageCodeSend.":1",$value,$id.":".$Content); //三体行业通道
+// $this->redis->rpush($redisMessageCodeSend.":1",$value.":".$id.":".$Content); //三体行业通道
+}
+$result = "1,".$data['task_no'];
+return $result;
+} */
     }
 
-    public function getBalanceSmsBatch($Username,$Password){
+    public function getBalanceSmsBatch($Username, $Password) {
         // $Password = md5($Password);
-        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial',true);
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         // print_r($Username);die;
         if (empty($user)) {
             return -1;
@@ -264,30 +260,68 @@ class Send extends CommonIndex
         if ($Password != $user['appkey']) {
             return -1;
         }
-        $result = DbAdministrator::getUserEquities(['uid' => $user['id']],'business_id,num_balance',true);
+        $result = DbAdministrator::getUserEquities(['uid' => $user['id']], 'business_id,num_balance', true);
 
         return $result['num_balance'];
     }
 
-    public function getReceiveSmsBatch($Username,$Password){
+    public function getReceiveSmsBatch($Username, $Password) {
         // $Password = md5($Password);
-        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service',true);
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service', true);
         if (empty($user)) {
             return -1;
         }
         if ($Password != $user['appkey']) {
             return -1;
         }
-        $log = DbAdministrator::getUserSendTaskLog(['uid' => $user['id']],'id,mobile,send_status,create_time',false,['id' => 'desc'],50);
+        $log = DbAdministrator::getUserSendTaskLog(['uid' => $user['id']], 'id,mobile,send_status,create_time', false, ['id' => 'desc'], 50);
         if (!empty($log)) {
-            $e = '';
+            $e      = '';
             $result = '';
             foreach ($log as $key => $value) {
-               $result .= join(',',$value).$e;
-               $e = ';';
+                $result .= join(',', $value) . $e;
+                $e = ';';
             }
             return $result;
         }
         return 0;
+    }
+
+    public function getSmsMarketingTask($Username, $Password, $Content, $Mobiles, $Dstime, $ip, $task_name) {
+        // $Password = md5($Password);
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return -1;
+        }
+        if ($Password != $user['appkey']) {
+            return -1;
+        }
+        $effective_mobile = [];
+        foreach ($Mobiles as $key => $value) {
+            if (checkMobile(($value))) {
+                $effective_mobile[] = $value;
+            }
+        }
+        if (empty($effective_mobile)) {
+            return 2;
+        }
+        $send_num             = count($Mobiles);
+        $data                 = [];
+        $data['uid']          = $user['id'];
+        $data['source']       = $ip;
+        $data['task_content'] = $Content;
+
+        $data['mobile_content'] = join(',', $Mobiles);
+        $data['task_name']      = $task_name;
+        $data['send_num']       = $send_num;
+        $data['free_trial']     = 1;
+        $data['task_no']        = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+        $id                     = DbAdministrator::addUserSendTask($data);
+        // $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
+        // foreach ($effective_mobile as $key => $value) {
+        //     $this->redis->rpush($redisMessageMarketingSend.":2",$value.":".$id.":".$Content); //三体营销通道
+        //     // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
+        // }
+        return ['code' => '200', 'task_no' =>$data['task_no']];
     }
 }

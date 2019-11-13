@@ -337,9 +337,12 @@ class Administrator extends CommonIndex {
     }
 
     public function auditUserSendTask($id, $free_trial) {
-        $userchannel = DbAdministrator::getUserSendTask(['id' => $id], 'id,mobile_content', true);
+        $userchannel = DbAdministrator::getUserSendTask(['id' => $id], 'id,mobile_content,free_trial', true);
         if (empty($userchannel)) {
             return ['code' => '3001'];
+        }
+        if ($userchannel['free_trial'] >1) {
+            return ['code' => '3003'];
         }
         Db::startTrans();
         try {
@@ -358,12 +361,15 @@ class Administrator extends CommonIndex {
         if (empty($channel)) {
             return ['code' => '3002'];
         }
-        $usertask = DbAdministrator::getUserSendTask(['id' => $id], 'id,uid,mobile_content,task_content', true);
+        $usertask = DbAdministrator::getUserSendTask(['id' => $id], 'id,uid,mobile_content,task_content,free_trial', true);
         if (empty($usertask)) {
             return ['code' => '3001'];
         }
         $userEquities = DbAdministrator::getUserEquities(['uid' => $usertask['uid'], 'business_id' => $business_id], 'id,agency_price', true);
-        $free_trial = 3;
+        if ($usertask['free_trial'] != 2) {
+            return ['code' => '3003'];
+        }
+        $free_trial = 2;
         if ($userEquities['agency_price'] < $channel['channel_price']) {
             $free_trial = 4;
         }

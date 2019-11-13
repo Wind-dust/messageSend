@@ -78,6 +78,7 @@ class Send extends MyController {
             return 6;
         }
         $result = $this->app->send->smsBatch($Username,$Password,$Content,$Mobiles,$Dstime,$ip);
+        //特殊处理输出值
         echo $result;
         die;
         // return $result;
@@ -138,7 +139,7 @@ class Send extends MyController {
     }
 
     /**
-     * @api              {post} / 短信任务接收接口（物流业务）（对外客户）
+     * @api              {post} / 短信任务接收接口（营销业务）（对外客户）
      * @apiDescription   getSmsTask
      * @apiGroup         index_send
      * @apiName          getSmsTask
@@ -148,11 +149,11 @@ class Send extends MyController {
      * @apiParam (入参) {String} taskname 任务名称
      * @apiParam (入参) {String} mobile 接收手机号码
      * @apiParam (入参) {String} dstime 发送时间
-     * @apiSuccess (返回) {String} code 200:成功 / 3001:手机号格式错误 / 3002:单批次手机号码不能超过1000个 / 3003:dstime发送时间格式错误 / 3004:预约发送时间小于当前时间 / 3005:短信内容为空或者短信内容超出500字符 / 3006:签名长度为2~8个字 / 3007:task_name 短信内容不能为空
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:手机号格式错误 / 3002:单批次手机号码不能超过1000个 / 3003:dstime发送时间格式错误 / 3004:预约发送时间小于当前时间 / 3005:短信内容为空或者短信内容超出500字符 / 3006:签名长度为2~8个字 / 3007:task_name 短信标题不能为空
      * @apiSampleRequest /index/send/getSmsTask
      * @author rzc
      */
-    public function getSmsTask() {
+    public function getSmsMarketingTask() {
         $Username = trim($this->request->post('username'));//登录名
         $Password = trim($this->request->post('password'));//登陆密码
         $Content = trim($this->request->post('content'));//短信内容
@@ -185,7 +186,46 @@ class Send extends MyController {
         if (empty($task_name)) {
             return 3007;
         }
-        $result = $this->app->send->getSmsTask($Username,$Password,$Content,$Mobiles,$Dstime,$ip);
+        $result = $this->app->send->getSmsMarketingTask($Username,$Password,$Content,$Mobiles,$Dstime,$ip,$task_name);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 短信任务接收接口（行业）（对外客户）
+     * @apiDescription   getSmsBuiness
+     * @apiGroup         index_send
+     * @apiName          getSmsBuiness
+     * @apiParam (入参) {String} username 登录名
+     * @apiParam (入参) {String} password 登陆密码
+     * @apiParam (入参) {String} content 短信内容
+     * @apiParam (入参) {String} mobile 接收手机号码
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:手机号格式错误 / 3002:短信内容为空或者短信内容超出500字符 / 3003:签名长度为2~8个字 / 
+     * @apiSampleRequest /index/send/getSmsBuiness
+     * @author rzc
+     */
+    public function getSmsBuiness(){
+        $Username = trim($this->request->post('username'));//登录名
+        $Password = trim($this->request->post('password'));//登陆密码
+        $Content = trim($this->request->post('content'));//短信内容
+        $Mobile = trim($this->request->post('mobile'));//接收手机号码
+        $ip = trim($this->request->ip());
+        $Mobiles = explode(',',$Mobile);
+        
+        // echo phpinfo();die;
+        if (empty($Mobiles)) {
+            return 3001;
+        }
+        if (count($Mobiles) > 1000){
+            return 3002;
+        }
+        if (empty($Content) || strlen($Content) > 500) {
+            return 3002;
+        }
+        // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
+        if ( mb_strpos($Content,'】') - mb_strpos($Content,'【') < 2 || mb_strpos($Content,'】') - mb_strpos($Content,'【') > 8) {
+            return 3003;
+        }
+        $result = $this->app->send->getSmsBuiness($Username,$Password,$Content,$Mobiles,$ip);
         return $result;
     }
 }
