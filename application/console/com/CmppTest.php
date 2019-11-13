@@ -220,12 +220,13 @@ class CmppTest extends Pzlife {
                         $senddata = [];
                         $senddata = explode(":",$send);
 
-                        $mobile = $senddata['mobile_content'];
+                        // $mobile = $senddata['mobile_content'];
+                        $mobile = $senddata[0];
                         $txt_head = 6;
                         $txt_len  = 140;
                         $max_len  = $txt_len - $txt_head;
                         // $mobile   = 15201926171;
-                        $code   = $senddata['task_content']; //带签名
+                        $code   = $senddata[2]; //带签名
                         // $code = '【米思米】安全围栏标准组件上市！不用设计，不用外发喷涂，不用组装！低至363.95元，第五天出货！赶紧过来下单吧。https://www.misumi.com.cn/mail/chn-gc19057-ml03/转发无效,详询021-52559388*6197,回T退订。 '; //带签名
                         // $code   = '短信发送测试'; //带签名
                         // print_r($code);die;
