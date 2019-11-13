@@ -312,7 +312,18 @@ return $result;
         $data['send_length']    = mb_strlen($Content);
         $data['free_trial']     = 1;
         $data['task_no']        = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
-        $id                     = DbAdministrator::addUserSendTask($data);
+        
+        Db::startTrans();
+        try {
+
+            $id                     = DbAdministrator::addUserSendTask($data);
+            
+            Db::commit();
+            return ['code' => '200','task_no' =>$data['task_no'] ];
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009'];
+        }
         // $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
         // foreach ($effective_mobile as $key => $value) {
         //     $this->redis->rpush($redisMessageMarketingSend.":2",$value.":".$id.":".$Content); //三体营销通道
