@@ -377,7 +377,7 @@ class Administrator extends CommonIndex {
         try {
             DbAdministrator::editUserSendTask(['free_trial' => $free_trial,'channel_id' => $channel_id], $id);
             Db::commit();
-            if ($free_trial == 3) {
+            if ($free_trial == 2) {
                 $mobilesend = explode(',',$usertask['mobile_content']);
                 $effective_mobile = [];
                 foreach ($mobilesend as $key => $value) {

@@ -132,9 +132,9 @@ class CmppTest extends Pzlife {
         //     $send = $redis ->lPop($redisMessageCodeSend);
         //     print_r($send);
         // } while ($send);
-        $send = $redis ->lPop($redisMessageCodeSend);
+        // $send = $redis ->lPop($redisMessageCodeSend);
         
-        print_r($send);die;
+        // print_r($send);die;
         // $code   = '短信发送测试';
         // print_r($redisMessageCodeSend);die;
         // echo $redisMessageCodeSend;die;
