@@ -386,7 +386,7 @@ class Administrator extends AdminController {
         if (empty($channel_id) || intval($channel_id) < 1 || !is_numeric($channel_id)) {
             return ['code' => '3002'];
         }
-        if (!is_array($priority,[1,2])) {
+        if (!in_array($priority,[1,2])) {
             return ['code' => '3003'];
         }
         $result  = $this->app->administrator->distributeUserChannel(intval($channel_id), intval($user_phone), intval($priority));
@@ -418,7 +418,7 @@ class Administrator extends AdminController {
         if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
             return ['code' => '3001'];
         }
-        if (!is_array($priority,[1,2])) {
+        if (!in_array($priority,[1,2])) {
             return ['code' => '3003'];
         }
         $result  = $this->app->administrator->updateUserChannel(intval($id), intval($priority));
@@ -504,7 +504,7 @@ class Administrator extends AdminController {
         if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
             return ['code' => '3001'];
         }
-        if (!is_array($free_trial,[2,3])) {
+        if (!in_array($free_trial,[2,3])) {
             return ['code' => '3003'];
         }
         $result =  $this->app->administrator->auditUserSendTask(intval($id), $free_trial);
@@ -518,13 +518,33 @@ class Administrator extends AdminController {
      * @apiName          distributionChannel
      * @apiParam (入参) {String} cms_con_id
      * @apiParam (入参) {String} id 任务id
-     * @apiParam (入参) {String} free_trial 审核状态 2:审核通过;3:审核不通过
-     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 
+     * @apiParam (入参) {String} business_id 业务服务id
+     * @apiParam (入参) {String} channel_id 通道ID
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:channel_id格式错误 / 3003:business_id格式错误
      * @apiSampleRequest /admin/administrator/distributionChannel
      * @return array
      * @author rzc
      */
     public function distributionChannel(){
-
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id = trim($this->request->post('id'));
+        $channel_id = trim($this->request->post('channel_id'));
+        $business_id = trim($this->request->post('business_id'));
+       
+        if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
+            return ['code' => '3001'];
+        }
+        if (empty($channel_id) || intval($channel_id) < 1 || !is_numeric($channel_id)) {
+            return ['code' => '3002'];
+        }
+        if (empty($business_id) || intval($business_id) < 1 || !is_numeric($business_id)) {
+            return ['code' => '3003'];
+        }
+        $result =  $this->app->administrator->distributionChannel(intval($id), intval($channel_id), intval($business_id));
+        return $result;
     }
 }

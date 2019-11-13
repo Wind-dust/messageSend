@@ -10,6 +10,7 @@ use app\common\model\UserQualificationRecord;
 use app\common\model\ExpenseLog;
 use app\common\model\ServiceConsumptionLog;
 use app\common\model\Channel;
+use app\common\model\SmsSendingChannel;
 use app\common\model\UserChannel;
 use app\common\model\UserSendTask;
 use app\common\model\UserSendCodeTask;
@@ -180,6 +181,22 @@ class DbAdministrator {
     public function editChannel($data, $id) {
         $Channel = new Channel;
         return $Channel->save($data, ['id' => $id]);
+    }
+
+    public function getSmsSendingChannel($where, $field, $row = false, $orderBy = '', $limit = '') {
+        $obj = SmsSendingChannel::field($field)->where($where);
+        return $this->getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function addSmsSendingChannel($data) {
+        $SmsSendingChannel = new SmsSendingChannel;
+        $SmsSendingChannel->save($data);
+        return $SmsSendingChannel->id;
+    }
+
+    public function editSmsSendingChannel($data, $id) {
+        $SmsSendingChannel = new SmsSendingChannel;
+        return $SmsSendingChannel->save($data, ['id' => $id]);
     }
 
     public function getUserChannel($where, $field, $row = false, $orderBy = '', $limit = '') {

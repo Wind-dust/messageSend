@@ -237,12 +237,12 @@ class Administrator extends CommonIndex {
     }
 
     public function getChannel() {
-        $result = DbAdministrator::getChannel([], 'id,channel_name', false);
+        $result = DbAdministrator::getSmsSendingChannel([], 'id,channel_name', false);
         return ['code' => '200', 'channel_list' => $result];
     }
 
     public function settingChannel($channel_id, $business_id) {
-        $channel = DbAdministrator::getChannel(['id' => $channel_id], 'id,channel_name', true);
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id], 'id,channel_name', true);
         if (empty($channel)) {
             return ['code' => '3001'];
         }
@@ -252,7 +252,7 @@ class Administrator extends CommonIndex {
         }
         Db::startTrans();
         try {
-            DbAdministrator::editChannel(['business_id' => $business_id], $channel_id);
+            DbAdministrator::editSmsSendingChannel(['business_id' => $business_id], $channel_id);
             Db::commit();
             return ['code' => '200'];
 
@@ -263,7 +263,7 @@ class Administrator extends CommonIndex {
     }
 
     public function distributeUserChannel($channel_id, $user_phone, $priority) {
-        $channel = DbAdministrator::getChannel(['id' => $channel_id], 'id', true);
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id], 'id', true);
         if (empty($channel)) {
             return ['code' => '3002'];
         }
@@ -345,6 +345,46 @@ class Administrator extends CommonIndex {
         try {
             DbAdministrator::editUserSendTask(['free_trial' => $free_trial], $id);
             Db::commit();
+            return ['code' => '200'];
+
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function distributionChannel($id,$channel_id,$business_id){
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id,'business_id' => $business_id], 'id,title,channel_price', true);
+        if (empty($channel)) {
+            return ['code' => '3002'];
+        }
+        $usertask = DbAdministrator::getUserSendTask(['id' => $id], 'id,uid,mobile_content,task_content', true);
+        if (empty($usertask)) {
+            return ['code' => '3001'];
+        }
+        $userEquities = DbAdministrator::getUserEquities(['uid' => $usertask['uid'], 'business_id' => $business_id], 'id,agency_price', true);
+        $free_trial = 3;
+        if ($userEquities['agency_price'] < $channel['channel_price']) {
+            $free_trial = 4;
+        }
+        Db::startTrans();
+        try {
+            DbAdministrator::editUserSendTask(['free_trial' => $free_trial,'channel_id' => $channel_id], $id);
+            Db::commit();
+            if ($free_trial == 3) {
+                $mobilesend = explode(',',$usertask['mobile_content']);
+                $effective_mobile = [];
+                foreach ($mobilesend as $key => $value) {
+                    if (checkMobile(($value))) {
+                        $effective_mobile[] = $value;
+                    }
+                }
+                $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
+                foreach ($effective_mobile as $key => $value) {
+                    $this->redis->rpush($redisMessageMarketingSend.":".$channel_id,$value.":".$id.":".$usertask['task_content']); //三体营销通道
+                    // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
+                }
+            }
             return ['code' => '200'];
 
         } catch (\Exception $e) {
