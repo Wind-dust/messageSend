@@ -291,10 +291,10 @@ return $result;
         // $Password = md5($Password);
         $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
-            return -1;
+            return 3000;
         }
         if ($Password != $user['appkey']) {
-            return -1;
+            return 3000;
         }
         $effective_mobile = [];
         foreach ($Mobiles as $key => $value) {
@@ -323,5 +323,9 @@ return $result;
         //     // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
         // }
         return ['code' => '200', 'task_no' =>$data['task_no']];
+    }
+
+    public function getSmsBuiness($Username,$Password,$Content,$Mobiles,$ip){
+
     }
 }

@@ -215,9 +215,6 @@ class Send extends MyController {
         if (empty($Mobiles)) {
             return 3001;
         }
-        if (count($Mobiles) > 1000){
-            return 3002;
-        }
         if (empty($Content) || strlen($Content) > 500) {
             return 3002;
         }
