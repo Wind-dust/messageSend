@@ -119,10 +119,14 @@ class CmppTest extends Pzlife {
 
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $content = 2;
-        $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
-        $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
-        $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
-        $redisMessageCodeDeliver    = 'index:meassage:code:deliver:' . $content; //行业通知MsgId
+        // $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
+        // $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
+        // $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
+        // $redisMessageCodeDeliver    = 'index:meassage:code:deliver:' . $content; //行业通知MsgId
+        $redisMessageCodeSend       = 'index:meassage:marketing:send:' . $content; //验证码发送任务rediskey
+        $redisMessageCodeSequenceId = 'index:meassage:marketing:sequence:id:' . $content; //行业通知SequenceId
+        $redisMessageCodeMsgId      = 'index:meassage:marketing:msg:id:' . $content; //行业通知SequenceId
+        $redisMessageCodeDeliver    = 'index:meassage:marketing:deliver:' . $content; //行业通知MsgId
         // echo $redisMessageCodeSend;die;
         // $send = $redis ->lPop($redisMessageCodeSend);
         // print_r($send);die;
