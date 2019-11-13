@@ -143,8 +143,8 @@ class Send extends MyController {
      * @apiDescription   getSmsTask
      * @apiGroup         index_send
      * @apiName          getSmsTask
-     * @apiParam (入参) {String} username 登录名
-     * @apiParam (入参) {String} password 登陆密码
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
      * @apiParam (入参) {String} content 短信内容
      * @apiParam (入参) {String} taskname 任务名称
      * @apiParam (入参) {String} mobile 接收手机号码
@@ -154,8 +154,8 @@ class Send extends MyController {
      * @author rzc
      */
     public function getSmsMarketingTask() {
-        $Username = trim($this->request->post('username'));//登录名
-        $Password = trim($this->request->post('password'));//登陆密码
+        $appid = trim($this->request->post('appid'));//登录名
+        $appkey = trim($this->request->post('appkey'));//登陆密码
         $Content = trim($this->request->post('content'));//短信内容
         $task_name = trim($this->request->post('taskname'));//任务名称
         $Mobile = trim($this->request->post('mobile'));//接收手机号码
@@ -186,7 +186,7 @@ class Send extends MyController {
         if (empty($task_name)) {
             return ['code' => '3007'];
         }
-        $result = $this->app->send->getSmsMarketingTask($Username,$Password,$Content,$Mobiles,$Dstime,$ip,$task_name);
+        $result = $this->app->send->getSmsMarketingTask($appid,$appkey,$Content,$Mobiles,$Dstime,$ip,$task_name);
         return $result;
     }
 
@@ -195,8 +195,8 @@ class Send extends MyController {
      * @apiDescription   getSmsBuiness
      * @apiGroup         index_send
      * @apiName          getSmsBuiness
-     * @apiParam (入参) {String} username 登录名
-     * @apiParam (入参) {String} password 登陆密码
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
      * @apiParam (入参) {String} content 短信内容
      * @apiParam (入参) {String} mobile 接收手机号码
      * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:短信内容为空或者短信内容超出500字符 / 3003:签名长度为2~8个字 / 3004:该账户已被停用 / 3005:该账户没有此项服务 / 3006:余额不足，请先充值 / 3009 :系统错误
@@ -204,8 +204,8 @@ class Send extends MyController {
      * @author rzc
      */
     public function getSmsBuiness(){
-        $Username = trim($this->request->post('username'));//登录名
-        $Password = trim($this->request->post('password'));//登陆密码
+        $appid = trim($this->request->post('appid'));//登录名
+        $appkey = trim($this->request->post('appkey'));//登陆密码
         $Content = trim($this->request->post('content'));//短信内容
         $Mobile = trim($this->request->post('mobile'));//接收手机号码
         $ip = trim($this->request->ip());
@@ -222,7 +222,7 @@ class Send extends MyController {
         if ( mb_strpos($Content,'】') - mb_strpos($Content,'【') < 2 || mb_strpos($Content,'】') - mb_strpos($Content,'【') > 8) {
             return ['code'=>'3003'];
         }
-        $result = $this->app->send->getSmsBuiness($Username,$Password,$Content,$Mobile,$ip);
+        $result = $this->app->send->getSmsBuiness($appid,$appkey,$Content,$Mobile,$ip);
         return $result;
     }
 }
