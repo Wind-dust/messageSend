@@ -9,7 +9,7 @@ use Env;
 use Exception;
 use think\Db;
 
-class CmppTest extends Pzlife {
+class CmppSantiMarketing extends Pzlife {
 
     // protected $redis;
 
@@ -19,19 +19,7 @@ class CmppTest extends Pzlife {
     }
 
     public function content($content) {
-        if ($content == 1) { //测试
-            return [
-                'host'          => "127.0.0.1", //服务商ip
-                'port'          => "8888", //短连接端口号   17890长连接端口号
-                'Source_Addr'   => "101161", //企业id  企业代码
-                'Shared_secret' => '5hsey6u9', //网关登录密码
-                'Service_Id'    => "217062",
-                'Dest_Id'       => "106928080159", //短信接入码 短信端口号
-                'Sequence_Id'   => 1,
-                'SP_ID'         => "",
-                'master_num'    => 300,
-            ];
-        } elseif ($content == 2) { //三体行业
+        if ($content == 1) { //三体行业
             return [
                 'host'          => "116.62.88.162", //服务商ip
                 'port'          => "8592", //短连接端口号   17890长连接端口号
@@ -44,7 +32,7 @@ class CmppTest extends Pzlife {
                 'SP_ID'         => "",
                 'master_num'    => 300,
             ];
-        } else if ($content == 3) { // 三体营销
+        } else if ($content == 2) { // 三体营销
             return [
                 'host'          => "116.62.88.162", //服务商ip
                 'port'          => "8592", //短连接端口号   17890长连接端口号
@@ -57,7 +45,7 @@ class CmppTest extends Pzlife {
                 'SP_ID'         => "",
                 'master_num'    => 300,
             ];
-        } else if ($content == 4) { //青年科技移动营销
+        } else if ($content == 3) { //青年科技移动营销
             return [
                 'host'          => "47.96.157.156", //服务商ip
                 'port'          => "7890", //短连接端口号   17890长连接端口号
@@ -70,7 +58,7 @@ class CmppTest extends Pzlife {
                 'SP_ID'         => "",
                 'master_num'    => 300,
             ];
-        } else if ($content == 5) { //青年科技移动联通营销
+        } else if ($content == 4) { //青年科技移动联通营销
             return [
                 'host'          => "47.96.157.156", //服务商ip
                 'port'          => "7890", //短连接端口号   17890长连接端口号
@@ -83,7 +71,7 @@ class CmppTest extends Pzlife {
                 'SP_ID'         => "",
                 'master_num'    => 200,
             ];
-        } else if ($content == 6) { //青年科技三网行业
+        } else if ($content == 5) { //青年科技三网行业
             return [
                 'host'          => "47.96.157.156", //服务商ip
                 'port'          => "7890", //短连接端口号   17890长连接端口号
@@ -96,7 +84,7 @@ class CmppTest extends Pzlife {
                 'SP_ID'         => "",
                 'master_num'    => 500,
             ];
-        } else if ($content == 7) { //物流通知账号
+        } else if ($content == 6) { //物流通知账号
             return [
                 'host'          => "47.102.193.199", //服务商ip
                 'port'          => "7890", //短连接端口号   17890长连接端口号
@@ -110,6 +98,19 @@ class CmppTest extends Pzlife {
                 'master_num'    => 300,
             ];
         }
+   /*      if ($content == 1) { //测试
+            return [
+                'host'          => "127.0.0.1", //服务商ip
+                'port'          => "8888", //短连接端口号   17890长连接端口号
+                'Source_Addr'   => "101161", //企业id  企业代码
+                'Shared_secret' => '5hsey6u9', //网关登录密码
+                'Service_Id'    => "217062",
+                'Dest_Id'       => "106928080159", //短信接入码 短信端口号
+                'Sequence_Id'   => 1,
+                'SP_ID'         => "",
+                'master_num'    => 300,
+            ];
+        }  */
     }
 
     public function SocketClientTest($content) {
@@ -128,46 +129,23 @@ class CmppTest extends Pzlife {
         // $redisMessageCodeMsgId      = 'index:meassage:marketing:msg:id:' . $content; //营销行业通知SequenceId
         // $redisMessageCodeDeliver    = 'index:meassage:marketing:deliver:' . $content; //营销行业通知MsgId
         // echo $redisMessageCodeSend;die;
-        do {
-            $send = $redis ->lPop($redisMessageCodeSend);
-            print_r($send);
-        } while ($send);
-        // $send = $redis ->lPop($redisMessageCodeSend);
+        // do {
+        //     $send = $redis ->lPop($redisMessageCodeSend);
+        //     print_r($send);
+        // } while ($send);
+        // // $send = $redis ->lPop($redisMessageCodeSend);
         
-        print_r($send);die;
+        // print_r($send);die;
         // $code   = '短信发送测试';
         // print_r($redisMessageCodeSend);die;
         // echo $redisMessageCodeSend;die;
         // $send = $redis->lPop("index:meassage:code:send:1");
         // $send = $redis->rPush($redisMessageCodeSend,"15555555555:12:【品质生活】祝您生活愉快");
 
-        // echo $code;
-        // die;
-        //  echo 0x80000008;
-        //  die;
-        // print_r('3049152064' & 0x0fffffff );die;
-        // $v = base_convert(time(), 10, 16)."\n";
-        // $a = pack("a8",$v);
-        // echo $v."\n";
-        // echo $a."\n";
-        // print_r( unpack("a8",$a));
-        // echo $v;
-        // $str = "´&´'pӄELIVRD1911080943191108094315201926171Ȕ26";
-        // $new = substr($str,0,8);
-        // $new = base_convert($new, 16, 2);
-        // echo $new;die;
-
-        // // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´&´'pӄELIVRD1911080943191108094315201926171Ȕ26");
-        // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´6h󿾧>gDELIVRD1911081338191108134415201926171&b");
-        // $arr = unpack("I2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","µ»'sDELIVRD1911111456191111150615201926171e韚");
-        // print_r($arr['Msg_Id1'] & 0x0fffffff);die;
-        // // echo 0x00000010;
-        // die;
 
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $content = 3;
         $contdata = $this->content($content);
 
         $host                 = $contdata['host']; //服务商ip
@@ -181,19 +159,11 @@ class CmppTest extends Pzlife {
         $master_num           = $contdata['master_num']; //通道最大提交量
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
-        // echo $security_master;die;
-        // die;
-        // $send = $this->redis->lPop($redisMessageCodeSend);
-        // print_r($send);
-        // die;
+       
         if (socket_connect($socket, $host, $port) == false) {
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
-            // date_default_timezone_set('PRC');
-            // socket_read($socket,3072);
-            // socket_clear_error($socket);
-            // socket_close($socket);
-            // die;//关闭socket连接，清除缓存数据
+           
             socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
@@ -206,21 +176,11 @@ class CmppTest extends Pzlife {
                 if ($i == 1) {
                     $bodyData   = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                     $Command_Id = 0x00000001;
-                    // $Total_Length        = strlen($bodyData) + 12;
-
-                    // $headData            = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                    // print_r($headData);die;
-                    // socket_write($socket, $headData . $bodyData, $Total_Length);
-
+                   
                 } else {
                     //当有号码发送需求时 进行提交
                     /* redis 读取需要发送的数据 */
                     $send = $redis->lPop($redisMessageCodeSend);
-                    // $send = [];
-                    // print_r($send);die;
-                    // $send = $this->getSendCodeTask();
-                    // if ($i == 2) { //测试判断语句
-
                         if ($send) { //正式使用从缓存中读取数据
                         $senddata = [];
                         $senddata = explode(":",$send);
@@ -238,11 +198,6 @@ class CmppTest extends Pzlife {
 
                         // $Timestamp = date('mdHis');
                         $uer_num = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
-                        // $Msg_Id = rand(1, 100);
-                        // $Msg_Id   = '';
-                        // $Msg_Id   = time().$mobile;
-                        // $Msg_Id   = strval(time()) . $i;
-                        // $bodyData = pack("a8", $Msg_Id);
                         $timestring = time();
                         echo "发送时间：" . date("Y-m-d H:i:s", time())."\n";
                         $num1 = substr($timestring, 0, 8);
@@ -311,38 +266,12 @@ class CmppTest extends Pzlife {
                                 $bodyData = $bodyData . pack("C", $len); //Msg_Length |1 |Unsigned Integer |信息长度(Msg_Fmt 值为 0 时：<160 个字 节；其它<=140 个字节)
                                 $bodyData = $bodyData . pack("a" . $len, $newcode); // Msg_Content |Msg_length |Octet String |信息内容
                                 $bodyData = $bodyData . pack("a8", ''); //Reserve | 8 | Octet String | 保留
-                                // $bodyData = $bodyData . pack('I',pack("a8", '')); //Reserve |8 |Octet String |保留
 
-                                // $bodyData = pack("a8", $Msg_Id);
-                                /*    $bodyData = pack("N", $Msg_Id) . pack("N", "00000000");
-                                $bodyData .= pack("C", 1) . pack("C", 1);
-                                $bodyData .= pack("C", 0) . pack("C", 0);
-                                $bodyData .= pack("a10", $Service_Id);
-                                $bodyData .= pack("C", 0) . pack("a32", "") . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("a6", $SP_ID) . pack("a2", "02") . pack("a6", "") . pack("a17", "") . pack("a17", "") . pack("a21", $Dest_Id) . pack("C", 1);
-                                $bodyData .= pack("a32", $mobile);
-                                $bodyData .= pack("C", 0);
-                                $len = strlen($code);
-                                $bodyData .= pack("C", $len);
-                                $bodyData .= pack("a" . $len, $code);
-                                $bodyData .= pack("a20", "00000000000000000000"); */
-                                // print_r($bodyData)."\n";
-                                // send($bodyData, "CMPP_SUBMIT", $Msg_Id);
 
                                 $Command_Id = 0x00000004; // 短信发送
                                 // $Sequence_Id = $i;
                                 $time = 0;
-                                // Db::startTrans();
-                                // try {
-                                //     Db::table('yx_user_send_code_task')->update(['send_status' => 2])->where('id',$send['id']);
-                                //     // 提交事务
-                                //     Db::commit();
-                                // } catch (\Exception $e) {
-                                //     // 回滚事务
-                                //     // exception($e);
-                                //     // die;
-                                //     Db::rollback();
 
-                                // }
                                 $Total_Length = strlen($bodyData) + 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                 $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
@@ -351,10 +280,7 @@ class CmppTest extends Pzlife {
                                     echo 'fail to write' . socket_strerror(socket_last_error());
                                 } else {
                                     // echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
-                                    // if ($i == 2) {
-                                    //     die;
-                                    // }
-                                    //读取服务端返回来的套接流信息
+
                                     $headData = socket_read($socket, 12);
                                     if ($headData != false) {
                                         $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
@@ -365,27 +291,7 @@ class CmppTest extends Pzlife {
                                         //错误处理机制
                                         try
                                         {
-                                            // $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
-                                            // switch ($head['Command_Id'] & 0x0fffffff) {
-                                            // case 0x80000001:
-                                            //     // echo "接收到连接应答"."\n";
-                                            //     // $bodyData = socket_read($socket, $head['Total_Length'] - 12);
 
-                                            //     break;
-                                            // case 0x80000004:
-
-                                            //     break;
-                                            // case 0x00000005:
-
-                                            //     break;
-                                            // case 0x00000008:
-                                            //     echo "心跳维持中" . "\n"; //激活测试,无消息体结构
-                                            //     // $body = unpack("C",$bodyData);
-                                            //     break;
-                                            // default:
-                                            //     echo "未声明head['Command_Id']:".$head['Command_Id'];
-                                            //     break;
-                                            // }
                                             if ($head['Command_Id'] == 0x80000001) {
                                                 $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
                                                 // print_r($body) ;
@@ -439,10 +345,7 @@ class CmppTest extends Pzlife {
                                                     $redis->hdel($redisMessageCodeSequenceId,$head['Sequence_Id']);
                                                     $redis->hset($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2'],$sequence);
                                                 }
-                                                // echo "get_CMPP_SUBMIT_RESP"."\n";
-                                                // echo "提交的Sequence_Id:".$head['Sequence_Id'].",解析的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2']."\n";
-                                                // print_r($body);
-                                                //状态为0 ，消息发送成功
+
                                                 switch ($body['Result']) {
                                                 case 0:
                                                     echo "发送成功" . "\n";
@@ -488,18 +391,7 @@ class CmppTest extends Pzlife {
                                                     echo "发送失败" . "\n";
                                                     $error_msg = "其他错误";
                                                 } else {
-                                                    // Db::startTrans();
-                                                    // try {
-                                                    //     Db::table('yx_user_send_code_task')->update(['send_status' => 2])->where('id',$send['id']);
-                                                    //     // 提交事务
-                                                    //     Db::commit();
-                                                    // } catch (\Exception $e) {
-                                                    //     // 回滚事务
-                                                    //     // exception($e);
-                                                    //     // die;
-                                                    //     Db::rollback();
 
-                                                    // }
                                                 }
                                             } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                                                 $Result = 0;
@@ -616,21 +508,6 @@ class CmppTest extends Pzlife {
                             $bodyData = $bodyData . pack("a8", ''); //Reserve | 8 | Octet String | 保留
                             // $bodyData = $bodyData . pack('I',pack("a8", '')); //Reserve |8 |Octet String |保留
 
-                            // $bodyData = pack("a8", $Msg_Id);
-                            /*    $bodyData = pack("N", $Msg_Id) . pack("N", "00000000");
-                            $bodyData .= pack("C", 1) . pack("C", 1);
-                            $bodyData .= pack("C", 0) . pack("C", 0);
-                            $bodyData .= pack("a10", $Service_Id);
-                            $bodyData .= pack("C", 0) . pack("a32", "") . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("a6", $SP_ID) . pack("a2", "02") . pack("a6", "") . pack("a17", "") . pack("a17", "") . pack("a21", $Dest_Id) . pack("C", 1);
-                            $bodyData .= pack("a32", $mobile);
-                            $bodyData .= pack("C", 0);
-                            $len = strlen($code);
-                            $bodyData .= pack("C", $len);
-                            $bodyData .= pack("a" . $len, $code);
-                            $bodyData .= pack("a20", "00000000000000000000"); */
-                            // print_r($bodyData)."\n";
-                            // send($bodyData, "CMPP_SUBMIT", $Msg_Id);
-
                             $Command_Id = 0x00000004; // 短信发送
                             // $Sequence_Id = $i;
                             $time = 0;
@@ -666,11 +543,7 @@ class CmppTest extends Pzlife {
                 }
                 $Total_Length = strlen($bodyData) + 12;
                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                // if ($i == 2) {
-                // echo $headData.$bodyData."\n";
-                // }
-                // echo $headData.$bodyData;
-                // echo strlen($headData);die;
+
                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) { //写入失败，还原发送信息并关闭端口
                     echo 'fail to write' . socket_strerror(socket_last_error());
                 } else {
@@ -689,27 +562,7 @@ class CmppTest extends Pzlife {
                         //错误处理机制
                         try
                         {
-                            // $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
-                            // switch ($head['Command_Id'] & 0x0fffffff) {
-                            // case 0x80000001:
-                            //     // echo "接收到连接应答"."\n";
-                            //     // $bodyData = socket_read($socket, $head['Total_Length'] - 12);
 
-                            //     break;
-                            // case 0x80000004:
-
-                            //     break;
-                            // case 0x00000005:
-
-                            //     break;
-                            // case 0x00000008:
-                            //     echo "心跳维持中" . "\n"; //激活测试,无消息体结构
-                            //     // $body = unpack("C",$bodyData);
-                            //     break;
-                            // default:
-                            //     echo "未声明head['Command_Id']:".$head['Command_Id'];
-                            //     break;
-                            // }
                             if ($head['Command_Id'] == 0x80000001) {
                                 $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
                                 // print_r($body) ;
@@ -758,15 +611,7 @@ class CmppTest extends Pzlife {
                             } else if ($head['Command_Id'] == 0x80000004) {
                                 $body = unpack("N2Msg_Id/CResult", $bodyData);
                                 print_r($body);
-                                $sequence = $redis->hget($redisMessageCodeSequenceId,$head['Sequence_Id']);
-                                if ($sequence) {
-                                    $redis->hdel($redisMessageCodeSequenceId,$head['Sequence_Id']);
-                                    $redis->hset($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2'],$sequence);
-                                }
-                                // echo "get_CMPP_SUBMIT_RESP"."\n";
-                                // echo "提交的Sequence_Id:".$head['Sequence_Id'].",解析的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2']."\n";
-                                // print_r($body);
-                                //状态为0 ，消息发送成功
+
                                 switch ($body['Result']) {
                                 case 0:
                                     echo "发送成功" . "\n";
