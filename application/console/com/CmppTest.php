@@ -128,8 +128,8 @@ class CmppTest extends Pzlife {
         $redisMessageCodeMsgId      = 'index:meassage:marketing:msg:id:' . $content; //行业通知SequenceId
         $redisMessageCodeDeliver    = 'index:meassage:marketing:deliver:' . $content; //行业通知MsgId
         // echo $redisMessageCodeSend;die;
-        // $send = $redis ->lPop($redisMessageCodeSend);
-        // print_r($send);die;
+        $send = $redis ->lPop($redisMessageCodeSend);
+        print_r($send);die;
         // $code   = '短信发送测试';
         // print_r($redisMessageCodeSend);die;
         // echo $redisMessageCodeSend;die;
