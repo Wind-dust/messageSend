@@ -453,6 +453,33 @@ class Administrator extends AdminController {
     }
 
     /**
+     * @api              {post} / 获取营销任务
+     * @apiDescription   getUserSendTask
+     * @apiGroup         admin_Administrator
+     * @apiName          getUserSendTask
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 任务id
+     * @apiParam (入参) {String} page 页码 默认1
+     * @apiParam (入参) {String} pageNum 条数 默认10
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 
+     * @apiSampleRequest /admin/administrator/getUserSendTask
+     * @return array
+     * @author rzc
+     */
+    public function getUserSendTask() {
+        $id       = trim($this->request->post('id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        $result = $this->app->administrator->getUserSendTask($page, $pageNum, $id);
+        return $result;
+    }
+
+    /**
      * @api              {post} / 营销任务审核
      * @apiDescription   auditUserSendTask
      * @apiGroup         admin_Administrator

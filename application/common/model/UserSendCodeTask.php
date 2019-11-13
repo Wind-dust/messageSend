@@ -14,6 +14,7 @@ class UserSendCodeTask extends Model {
     protected $connection = '';
     protected $deleteTime = 'delete_time';
     protected $defaultSoftDelete = 0;
+    protected $autoWriteTimestamp = true;
     protected $type = [
         'create_time' => 'timestamp:Y-m-d H:i:s',//更新时间
         'delete_time' => 'timestamp:Y-m-d H:i:s',//更新时间

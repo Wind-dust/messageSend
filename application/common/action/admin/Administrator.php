@@ -162,7 +162,7 @@ class Administrator extends CommonIndex {
         if (empty($business)) {
             return ['code' => '3002'];
         }
-        if (!DbAdministrator::getUserEquities(['business_id' => $business_id, 'uid' => $user['id']],'id')){
+        if (!DbAdministrator::getUserEquities(['business_id' => $business_id, 'uid' => $user['id']], 'id')) {
             return ['code' => '3004'];
         }
         $data = [];
@@ -201,30 +201,30 @@ class Administrator extends CommonIndex {
         return ['code' => '200', 'data' => $result];
     }
 
-    public function aduitRechargeApplication($status, $message, $id){
-        $adminRemittance =  DbAdministrator::getAdminRemittance(['id' => $id], '*', true);
+    public function aduitRechargeApplication($status, $message, $id) {
+        $adminRemittance = DbAdministrator::getAdminRemittance(['id' => $id], '*', true);
         if (empty($adminRemittance)) {
             return ['code' => '3001'];
         }
-        if ($adminRemittance['status'] > 1){
+        if ($adminRemittance['status'] > 1) {
             return ['code' => '3003'];
         }
-        $userEquities = DbAdministrator::getUserEquities(['uid' => $adminRemittance['uid'],'business_id' => $adminRemittance['business_id']],'id,num_balance',true);
+        $userEquities = DbAdministrator::getUserEquities(['uid' => $adminRemittance['uid'], 'business_id' => $adminRemittance['business_id']], 'id,num_balance', true);
         Db::startTrans();
         try {
-            $updateRes = DbAdministrator::editAdminRemittance(['status' => $status, 'message' => $message],$id);
+            $updateRes = DbAdministrator::editAdminRemittance(['status' => $status, 'message' => $message], $id);
             if ($status == 2) {
                 $expenseLog = [];
                 $expenseLog = [
-                    'uid' => $adminRemittance['uid'],
+                    'uid'         => $adminRemittance['uid'],
                     'business_id' => $adminRemittance['business_id'],
-                    'money' => $adminRemittance['credit'],
+                    'money'       => $adminRemittance['credit'],
                     'befor_money' => $userEquities['num_balance'],
-                    'after_money' => bcadd($userEquities['num_balance'],$adminRemittance['credit']),
+                    'after_money' => bcadd($userEquities['num_balance'], $adminRemittance['credit']),
                     'change_type' => 3,
                 ];
                 DbAdministrator::addServiceConsumptionLog($expenseLog);
-                DbAdministrator::modifyBalance($userEquities['id'],$adminRemittance['credit'],'inc');
+                DbAdministrator::modifyBalance($userEquities['id'], $adminRemittance['credit'], 'inc');
             }
             Db::commit();
             return ['code' => '200'];
@@ -236,12 +236,12 @@ class Administrator extends CommonIndex {
         }
     }
 
-    public function getChannel(){
+    public function getChannel() {
         $result = DbAdministrator::getChannel([], 'id,channel_name', false);
         return ['code' => '200', 'channel_list' => $result];
     }
 
-    public function settingChannel($channel_id, $business_id){
+    public function settingChannel($channel_id, $business_id) {
         $channel = DbAdministrator::getChannel(['id' => $channel_id], 'id,channel_name', true);
         if (empty($channel)) {
             return ['code' => '3001'];
@@ -252,7 +252,7 @@ class Administrator extends CommonIndex {
         }
         Db::startTrans();
         try {
-            DbAdministrator::editChannel(['business_id' => $business_id],$channel_id);
+            DbAdministrator::editChannel(['business_id' => $business_id], $channel_id);
             Db::commit();
             return ['code' => '200'];
 
@@ -262,23 +262,23 @@ class Administrator extends CommonIndex {
         }
     }
 
-    public function distributeUserChannel($channel_id, $user_phone, $priority){
-        $channel =  DbAdministrator::getChannel(['id' => $channel_id], 'id', true);
-        if (empty($channel)){
+    public function distributeUserChannel($channel_id, $user_phone, $priority) {
+        $channel = DbAdministrator::getChannel(['id' => $channel_id], 'id', true);
+        if (empty($channel)) {
             return ['code' => '3002'];
         }
         $user = DbUser::getUserInfo(['mobile' => $user_phone], 'id', true);
-        if (empty($user)){
+        if (empty($user)) {
             return ['code' => '3004'];
         }
-        if (DbAdministrator::getUserChannel(['uid' => $user['id'],'channel_id' => $channel_id],'id',true)) {
+        if (DbAdministrator::getUserChannel(['uid' => $user['id'], 'channel_id' => $channel_id], 'id', true)) {
             return ['code' => '3005'];
         }
         $data = [];
         $data = [
             'channel_id' => $channel_id,
-            'uid' => $user['id'],
-            'priority' => $priority,
+            'uid'        => $user['id'],
+            'priority'   => $priority,
         ];
         Db::startTrans();
         try {
@@ -292,14 +292,14 @@ class Administrator extends CommonIndex {
         }
     }
 
-    public function updateUserChannel($id, $priority){
-        $userchannel = DbAdministrator::getUserChannel(['id' => $id],'id',true);
-        if (empty($userchannel)){
+    public function updateUserChannel($id, $priority) {
+        $userchannel = DbAdministrator::getUserChannel(['id' => $id], 'id', true);
+        if (empty($userchannel)) {
             return ['code' => '3001'];
         }
         Db::startTrans();
         try {
-            DbAdministrator::editUserChannel(['priority' => $priority],$id);
+            DbAdministrator::editUserChannel(['priority' => $priority], $id);
             Db::commit();
             return ['code' => '200'];
 
@@ -309,9 +309,9 @@ class Administrator extends CommonIndex {
         }
     }
 
-    public function delUserChannel($id){
-        $userchannel = DbAdministrator::getUserChannel(['id' => $id],'id',true);
-        if (empty($userchannel)){
+    public function delUserChannel($id) {
+        $userchannel = DbAdministrator::getUserChannel(['id' => $id], 'id', true);
+        if (empty($userchannel)) {
             return ['code' => '3001'];
         }
         Db::startTrans();
@@ -326,14 +326,24 @@ class Administrator extends CommonIndex {
         }
     }
 
+    public function getUserSendTask($page, $pageNum, $id) {
+        $offset = ($page - 1) * $pageNum;
+        if (!empty($id)) {
+            $result = DbAdministrator::getUserSendTask(['id' => $id], '*', true);
+        } else {
+            $result = DbAdministrator::getUserSendTask([], '*', false, '', $offset . ',' . $pageNum);
+        }
+        return ['code' => '200', 'data' => $result];
+    }
+
     public function auditUserSendTask($id, $free_trial) {
-        $userchannel = DbAdministrator::getUserSendTask(['id' => $id],'id,mobile_content',true);
-        if (empty($userchannel)){
+        $userchannel = DbAdministrator::getUserSendTask(['id' => $id], 'id,mobile_content', true);
+        if (empty($userchannel)) {
             return ['code' => '3001'];
         }
         Db::startTrans();
         try {
-            DbAdministrator::editUserSendTask(['free_trial' => $free_trial],$id);
+            DbAdministrator::editUserSendTask(['free_trial' => $free_trial], $id);
             Db::commit();
             return ['code' => '200'];
 
