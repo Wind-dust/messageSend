@@ -3,6 +3,7 @@
 namespace app\common\db\other;
 
 use app\common\model\Areas;
+use app\common\model\NumberSource;
 
 class DbProvinces {
 
@@ -28,5 +29,10 @@ class DbProvinces {
 
     public function getAreaCount($field, $where){
         return Areas::where($where)->count();
+    }
+
+    public function getNumberSource($where, $field, $row = false, $orderBy = '', $limit = '') {
+        $obj = NumberSource::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
     }
 }

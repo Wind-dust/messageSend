@@ -2,8 +2,6 @@
 
 namespace app\common\action\index;
 
-use app\common\action\index\Cmpp30;
-use app\common\action\index\Cmppsubmit;
 use app\common\action\index\Owncmpp;
 use app\facade\DbAdmin;
 use app\facade\DbAdministrator;
@@ -15,15 +13,6 @@ use Env;
 use think\Db;
 
 class Send extends CommonIndex {
-    private $cipherUserKey = 'userpass'; //用户密码加密key
-    // private $userRedisKey = 'index:user:'; //用户密码加密key
-    private $cmpp;
-
-    public function __construct() {
-        parent::__construct();
-        $this->cmpp    = new Cmpp30();
-        $this->Owncmpp = new Owncmpp();
-    }
 
     /**
      * 账号密码登录
@@ -218,10 +207,16 @@ class Send extends CommonIndex {
         $data                 = [];
         $data['uid']          = $user['id'];
         $data['source']       = $ip;
+        $data['task_name']         = $Content;
+        $start = mb_strpos($Content,'【');
+        $length = mb_strpos($Content,'】') - mb_strpos($Content,'【')+1;
+        $all_length = mb_strlen($Content);
+        $remain = mb_substr($Content,0,$all_length-$length);
+        $Content = '【米思米】'.$remain;
+        // echo $Content;die;
         $data['task_content'] = $Content;
 
         $data['mobile_content']    = join(',', $effective_mobile);
-        $data['task_name']         = $Content;
         $data['send_num']          = $send_num;
         $data['free_trial']        = 1;
         $data['task_no']           = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
@@ -325,7 +320,31 @@ return $result;
         return ['code' => '200', 'task_no' =>$data['task_no']];
     }
 
-    public function getSmsBuiness($Username,$Password,$Content,$Mobiles,$ip){
+    public function getSmsBuiness($Username,$Password,$Content,$Mobile,$ip){
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return 3000;
+        }
+        if ($Password != $user['appkey']) {
+            return 3000;
+        }
+        $prefix = substr($Mobile,0,7);
+        $res = DbProvinces::getNumberSource(['mobile' => $prefix],'source,province_id',true);
+        //默认青年科技
+        $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
+        $id = 3;
+        if ($res) {
+            // return ['3004'];
+            if ($res['source'] == 2) {//联通
+
+            }else if ($res['source'] == 1 && $res['province_id'] == 2495) {//四川移动
+
+            }
+        }
+        //获取号码归属地
+
+        //联通
+
 
     }
 }
