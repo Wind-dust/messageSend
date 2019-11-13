@@ -78,7 +78,9 @@ class Send extends MyController {
             return 6;
         }
         $result = $this->app->send->smsBatch($Username,$Password,$Content,$Mobiles,$Dstime,$ip);
-        return $result;
+        echo $result;
+        die;
+        // return $result;
     }
  
     /**
@@ -143,9 +145,10 @@ class Send extends MyController {
      * @apiParam (入参) {String} username 登录名
      * @apiParam (入参) {String} password 登陆密码
      * @apiParam (入参) {String} content 短信内容
+     * @apiParam (入参) {String} taskname 任务名称
      * @apiParam (入参) {String} mobile 接收手机号码
      * @apiParam (入参) {String} dstime 发送时间
-     * @apiSuccess (返回) {String} code 200:成功 / 3000:手机号格式错误 / 3002:单批次手机号码不能超过1000个 / 3003:邮箱格式错误 / 3004:验证码错误 / 3005:该手机号已注册用户 / 3006:用户类型错误 / 3007:nick_name不能为空
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:手机号格式错误 / 3002:单批次手机号码不能超过1000个 / 3003:dstime发送时间格式错误 / 3004:预约发送时间小于当前时间 / 3005:短信内容为空或者短信内容超出500字符 / 3006:签名长度为2~8个字 / 3007:task_name 短信内容不能为空
      * @apiSampleRequest /index/send/getSmsTask
      * @author rzc
      */
@@ -153,7 +156,7 @@ class Send extends MyController {
         $Username = trim($this->request->post('username'));//登录名
         $Password = trim($this->request->post('password'));//登陆密码
         $Content = trim($this->request->post('content'));//短信内容
-        $task_name = trim($this->request->post('taskname'));//短信内容
+        $task_name = trim($this->request->post('taskname'));//任务名称
         $Mobile = trim($this->request->post('mobile'));//接收手机号码
         $Dstime = trim($this->request->post('dstime'));//手机号
         $ip = trim($this->request->ip());
@@ -161,23 +164,26 @@ class Send extends MyController {
         
         // echo phpinfo();die;
         if (empty($Mobiles)) {
-            return 3000;
-        }
-        if (count($Mobiles) > 1000){
             return 3001;
         }
+        if (count($Mobiles) > 1000){
+            return 3002;
+        }
         if (strtotime($Dstime)== false && !empty($Dstime)) {
-            return 7;
+            return 3003;
         }
         if (strtotime($Dstime) < time() && !empty($Dstime)) {
-            return 8;
+            return 3004;
         }
         if (empty($Content) || strlen($Content) > 500) {
-            return 3;
+            return 3005;
         }
         // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
         if ( mb_strpos($Content,'】') - mb_strpos($Content,'【') < 2 || mb_strpos($Content,'】') - mb_strpos($Content,'【') > 8) {
-            return 6;
+            return 3006;
+        }
+        if (empty($task_name)) {
+            return 3007;
         }
         $result = $this->app->send->getSmsTask($Username,$Password,$Content,$Mobiles,$Dstime,$ip);
         return $result;
