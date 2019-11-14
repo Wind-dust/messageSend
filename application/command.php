@@ -22,4 +22,5 @@ return [
     'cmpptest'     => $commandPath . 'CmppTest',
     'cmppqingniankeji'     => $commandPath . 'CmppQingNianKeJi',
     'cmppsantimarketing'     => $commandPath . 'CmppSantiMarketing',
+    'clientsocketsantibusiness'     => $commandPath . 'ClientSocketSantiBusiness',
 ];
