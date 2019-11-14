@@ -390,7 +390,7 @@ class Administrator extends CommonIndex {
                 }
                 // $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
                 $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-                print_r($redisMessageMarketingSend);die;
+                // print_r($redisMessageMarketingSend);die;
                 foreach ($effective_mobile as $key => $value) {
                     $this->redis->rpush($redisMessageMarketingSend.":".$channel_id,$value.":".$id.":".$usertask['task_content']); //三体营销通道
                     // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道

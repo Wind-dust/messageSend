@@ -140,7 +140,7 @@ class CmppQingNianKeJi extends Pzlife {
         // $redisMessageCodeSequenceId = 'index:meassage:marketing:sequence:id:' . $content; //营销行业通知SequenceId
         // $redisMessageCodeMsgId      = 'index:meassage:marketing:msg:id:' . $content; //营销行业通知SequenceId
         // $redisMessageCodeDeliver    = 'index:meassage:marketing:deliver:' . $content; //营销行业通知MsgId
-        // echo $redisMessageCodeSend;die;
+        echo $redisMessageCodeSend;die;
         // do {
         //     $send = $redis ->lPop($redisMessageCodeSend);
         //     print_r($send);
