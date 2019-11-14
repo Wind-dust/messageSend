@@ -19,7 +19,19 @@ class CmppSantiMarketing extends Pzlife {
     }
 
     public function content($content) {
-        if ($content == 1) { //三体行业
+        return [
+            'host'          => "116.62.88.162", //服务商ip
+            'port'          => "8592", //短连接端口号   17890长连接端口号
+            'Source_Addr'   => "101162", //企业id  企业代码
+            'Shared_secret' => 'uc338qd7', //网关登录密码
+            'Service_Id'    => "101162", //业务代码
+            'template_id'   => "217800", //模板id
+            'Dest_Id'       => "106928080158", //短信接入码 短信端口号 服务代码
+            'Sequence_Id'   => 1,
+            'SP_ID'         => "",
+            'master_num'    => 300,
+        ];
+       /*  if ($content == 1) { //三体行业
             return [
                 'host'          => "116.62.88.162", //服务商ip
                 'port'          => "8592", //短连接端口号   17890长连接端口号
@@ -97,7 +109,7 @@ class CmppSantiMarketing extends Pzlife {
                 'SP_ID'         => "",
                 'master_num'    => 300,
             ];
-        }
+        } */
    /*      if ($content == 1) { //测试
             return [
                 'host'          => "127.0.0.1", //服务商ip
@@ -113,7 +125,7 @@ class CmppSantiMarketing extends Pzlife {
         }  */
     }
 
-    public function SocketClientTest($content) {
+    public function SantiMarketung($content) {
         // $this->clientSocketInit();
         $redis = Phpredis::getConn();
         // $a_time = 0;

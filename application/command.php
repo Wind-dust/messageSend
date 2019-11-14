@@ -21,4 +21,5 @@ return [
     'officeexcel'  => $commandPath . 'OfficeExcel',
     'cmpptest'     => $commandPath . 'CmppTest',
     'cmppqingniankeji'     => $commandPath . 'CmppQingNianKeJi',
+    'cmppsantimarketing'     => $commandPath . 'CmppSantiMarketing',
 ];
