@@ -378,8 +378,11 @@ class Administrator extends CommonIndex {
             DbAdministrator::editUserSendTask(['free_trial' => $free_trial,'channel_id' => $channel_id], $id);
            
             if ($free_trial == 2) {
-                $mobilesend = explode(',',$usertask['task_content']);
+                $mobilesend = explode(',',$usertask['mobile_content']);
                 $effective_mobile = [];
+                if (substr_count($usertask['task_content'],'【米思米】') > 1) {
+                    $usertask['task_content'] = mb_substr($usertask['task_content'],mb_strpos($usertask['task_content'],'】')+1,mb_strlen($usertask['task_content']));
+                }
                 $send_length    = mb_strlen($usertask['task_content'], 'utf8');
                 $num = ceil($send_length/65) * $usertask['send_num'];
                 DbAdministrator::modifyBalance($userEquities['id'],$num,'dec');
