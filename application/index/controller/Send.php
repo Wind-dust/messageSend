@@ -56,7 +56,12 @@ class Send extends MyController {
         $Dstime = trim($this->request->post('dstime'));//手机号
         $ip = trim($this->request->ip());
         $Mobiles = explode(',',$Mobile);
-        
+        if (empty($Username)) {
+            return -1;
+        }
+        if (empty($Password)) {
+            return -1;
+        }
         // echo phpinfo();die;
         if (empty($Mobiles)) {
             return 2;
@@ -98,6 +103,12 @@ class Send extends MyController {
     public function getBalanceSmsBatch(){
         $Username = trim($this->request->post('username'));//登录名
         $Password = trim($this->request->post('password'));//登陆密码
+        if (empty($Username)) {
+            return -1;
+        }
+        if (empty($Password)) {
+            return -1;
+        }
         $result = $this->app->send->getBalanceSmsBatch($Username,$Password);
         return $result;
     }
@@ -116,6 +127,12 @@ class Send extends MyController {
     public function getReceiveSmsBatch(){
         $Username = trim($this->request->post('username'));//登录名
         $Password = trim($this->request->post('password'));//登陆密码
+        if (empty($Username)) {
+            return -1;
+        }
+        if (empty($Password)) {
+            return -1;
+        }
         $result = $this->app->send->getReceiveSmsBatch($Username,$Password);
         return $result;
     }

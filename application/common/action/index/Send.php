@@ -358,6 +358,7 @@ return $result;
         }
          //默认青年科技通知
         $channel_id = 3;
+        $channel_id = 1;//三体行业
         if ($res) {
             // return ['3004'];
             if ($res['source'] == 2) {//联通

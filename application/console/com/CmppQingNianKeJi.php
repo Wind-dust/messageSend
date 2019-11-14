@@ -129,7 +129,7 @@ class CmppQingNianKeJi extends Pzlife {
         // $this->clientSocketInit();
         $redis = Phpredis::getConn();
         // $a_time = 0;
-
+        date_default_timezone_set('PRC'); 
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $content = 3;
         $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
