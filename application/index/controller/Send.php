@@ -228,6 +228,7 @@ class Send extends MyController {
         $ip = trim($this->request->ip());
         // $Mobiles = explode(',',$Mobile);
         
+        // print_r($Content);die;
         // echo phpinfo();die;
         if (empty($Mobile) || checkMobile($Mobile) === false) {
             return ['code'=>'3001'];

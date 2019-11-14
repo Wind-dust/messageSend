@@ -359,6 +359,8 @@ return $result;
             return ['code' => '3006'];
         }
          //默认青年科技通知
+        //  $Content = str_replace("",'',$Content);
+        //  print_r($Content);die;
         $channel_id = 3;
         
         if ($res) {
