@@ -216,7 +216,7 @@ class Send extends MyController {
      * @apiParam (入参) {String} appkey appkey
      * @apiParam (入参) {String} content 短信内容
      * @apiParam (入参) {String} mobile 接收手机号码
-     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:短信内容为空或者短信内容超出500字符 / 3003:签名长度为2~8个字 / 3004:该账户已被停用 / 3005:该账户没有此项服务 / 3006:余额不足，请先充值 / 3009 :系统错误
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:短信内容为空或者短信内容超出500字符 / 3003:签名长度为2~8个字 / 3004:该账户已被停用 / 3005:该账户没有此项服务 / 3006:短信余额不足，请先充值 / 3009 :系统错误
      * @apiSampleRequest /index/send/getSmsBuiness
      * @author rzc
      */
