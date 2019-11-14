@@ -19,7 +19,7 @@ class CmppQingNianKeJi extends Pzlife {
     }
 
     public function content($content) {
-        //本通道只支持青年科技
+        //本通道只支持青年科技行业
         return [
             'host'          => "47.96.157.156", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
@@ -140,7 +140,7 @@ class CmppQingNianKeJi extends Pzlife {
         // $redisMessageCodeSequenceId = 'index:meassage:marketing:sequence:id:' . $content; //营销行业通知SequenceId
         // $redisMessageCodeMsgId      = 'index:meassage:marketing:msg:id:' . $content; //营销行业通知SequenceId
         // $redisMessageCodeDeliver    = 'index:meassage:marketing:deliver:' . $content; //营销行业通知MsgId
-        echo $redisMessageCodeSend;die;
+        // echo $redisMessageCodeSend;die;
         // do {
         //     $send = $redis ->lPop($redisMessageCodeSend);
         //     print_r($send);
