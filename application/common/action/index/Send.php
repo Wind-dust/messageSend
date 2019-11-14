@@ -209,10 +209,12 @@ class Send extends CommonIndex {
         $data['source']       = $ip;
         $data['task_name']         = $Content;
         $start = mb_strpos($Content,'【');
-        $length = mb_strpos($Content,'】') - mb_strpos($Content,'【')+1;
-        $all_length = mb_strlen($Content,'utf8');
-        $remain = mb_substr($Content,0,$all_length-$length);
-        $Content = '【米思米】'.$remain;
+        if ($start != 0) {
+            $length = mb_strpos($Content,'】') - mb_strpos($Content,'【')+1;
+            $all_length = mb_strlen($Content,'utf8');
+            $remain = mb_substr($Content,0,$all_length-$length);
+            $Content = '【米思米】'.$remain;
+        }
         // echo $Content;die;
         $data['task_content'] = $Content;
         $data['send_length']    = mb_strlen($Content);
