@@ -345,9 +345,9 @@ return $result;
         }
         $prefix = substr($Mobile,0,7);
         $res = DbProvinces::getNumberSource(['mobile' => $prefix],'source,province_id,province',true);
-        //默认青年科技
+       
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        $channel_id = 3;
+        
         // print_r($res);die;
         $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'],'business_id' => 6], 'id,num_balance', true);
         if (empty($user_equities) ) {
@@ -356,6 +356,8 @@ return $result;
         if ($user_equities['num_balance'] < 1 && $user['reservation_service'] == 1) {
             return ['code' => '3006'];
         }
+         //默认青年科技通知
+        $channel_id = 3;
         if ($res) {
             // return ['3004'];
             if ($res['source'] == 2) {//联通
@@ -371,7 +373,7 @@ return $result;
         $data['send_status']       = 3;
         $data['task_content']    = $Content;
         $data['send_length']    = mb_strlen($Content, 'utf8');
-        $data['task_no']        = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+        $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
         Db::startTrans();
         try {
 
