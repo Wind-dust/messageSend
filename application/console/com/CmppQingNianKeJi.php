@@ -145,7 +145,8 @@ class CmppQingNianKeJi extends Pzlife {
         //     $send = $redis ->lPop($redisMessageCodeSend);
         //     print_r($send);
         // } while ($send);
-        // $send = $redis ->lPop($redisMessageCodeSend);
+        $send = $redis ->lPop($redisMessageCodeSend);
+        print_r($send);die;
 
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $content = 3;

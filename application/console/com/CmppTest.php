@@ -118,7 +118,7 @@ class CmppTest extends Pzlife {
         // $a_time = 0;
 
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $content = 2;
+        $content = 3;
         $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
         $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
         $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
@@ -167,7 +167,7 @@ class CmppTest extends Pzlife {
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $content = 3;
+        $content = 1;
         $contdata = $this->content($content);
 
         $host                 = $contdata['host']; //服务商ip
