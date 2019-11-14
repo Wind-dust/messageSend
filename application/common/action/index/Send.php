@@ -385,7 +385,7 @@ return $result;
                 $num = ceil($data['send_length']/65);
             }
             DbAdministrator::modifyBalance($user_equities['id'],$num,'dec');
-            $this->redis->rpush($redisMessageMarketingSend.":".$channel_id,$value.":".$bId.":".$Content); //三体营销通道
+            $this->redis->rpush($redisMessageMarketingSend.":".$channel_id,$Mobile.":".$bId.":".$Content); //三体营销通道
             Db::commit();
             return ['code' => '200','task_no' =>$data['task_no'] ];
         } catch (\Exception $e) {
