@@ -361,7 +361,7 @@ class Administrator extends CommonIndex {
         if (empty($channel)) {
             return ['code' => '3002'];
         }
-        $usertask = DbAdministrator::getUserSendTask(['id' => $id], 'id,uid,mobile_content,task_content,free_trial,send_num', true);
+        $usertask = DbAdministrator::getUserSendTask(['id' => $id], 'id,uid,mobile_content,task_content,free_trial,send_num,channel_id', true);
         if (empty($usertask)) {
             return ['code' => '3001'];
         }
