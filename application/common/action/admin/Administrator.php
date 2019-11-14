@@ -366,7 +366,7 @@ class Administrator extends CommonIndex {
             return ['code' => '3001'];
         }
         $userEquities = DbAdministrator::getUserEquities(['uid' => $usertask['uid'], 'business_id' => $business_id], 'id,agency_price', true);
-        if ($usertask['free_trial'] != 2 && $usertask['channel_id']) {
+        if ($usertask['free_trial'] != 2 || $usertask['channel_id']) {
             return ['code' => '3003'];
         }
         $free_trial = 2;
