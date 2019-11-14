@@ -20,4 +20,5 @@ return [
     'clientsocket' => $commandPath . 'ClientSocket',
     'officeexcel'  => $commandPath . 'OfficeExcel',
     'cmpptest'     => $commandPath . 'CmppTest',
+    'cmppqingniankeji'     => $commandPath . 'CmppQingNianKeJi',
 ];
