@@ -384,7 +384,7 @@ class Administrator extends CommonIndex {
                 $num = ceil($send_length/65) * $usertask['send_num'];
                 DbAdministrator::modifyBalance($userEquities['id'],$num,'dec');
                 foreach ($mobilesend as $key => $value) {
-                    if (checkMobile(($value))) {
+                    if (checkMobile($value)) {
                         $effective_mobile[] = $value;
                     }
                 }
