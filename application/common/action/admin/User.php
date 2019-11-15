@@ -101,4 +101,21 @@ class User extends CommonIndex {
             return ['code' => '3009']; //修改失败
         }
     }
+
+    public function getUserInfo($uid){
+        $result = DbUser::getUserInfo(['id' => $uid], '*', true);
+        if (empty($result)) {
+            return ['code' => '3001'];
+        }
+        $user_equies = DbAdministrator::getUserEquities(['uid' => $uid],'id,business_id,num_balance,agency_price',false);
+        if (!empty($user_equies)) {
+            foreach ($user_equies as $key => $value) {
+                $user_equies[$key]['business_name'] = DbAdministrator::getBusiness(['id' => $value['business_id'],'title',true])['title'];
+            }
+        }else{
+            $user_equies = [];
+        }
+
+        return ['code' => '200', 'user_info' => $result,'user_equies' => $user_equies];
+    }
 }

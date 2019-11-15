@@ -125,11 +125,11 @@ class CmppSantiMarketing extends Pzlife {
         }  */
     }
 
-    public function SantiMarketung($content) {
+    public function SantiMarketing($content) {
         // $this->clientSocketInit();
         $redis = Phpredis::getConn();
         // $a_time = 0;
-
+        date_default_timezone_set('PRC');
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $content = 2;
         $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
@@ -734,7 +734,7 @@ class CmppSantiMarketing extends Pzlife {
                     $Sequence_Id = 1;
                 }
                 // sleep($time); //等待时间，进行下一次操作
-                sleep(1); //等待时间，进行下一次操作
+                sleep($time); //等待时间，进行下一次操作
             } while (true);
 
         }

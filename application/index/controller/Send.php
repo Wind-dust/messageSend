@@ -157,9 +157,9 @@ class Send extends MyController {
 
     /**
      * @api              {post} / 短信任务接收接口（营销业务）（对外客户）
-     * @apiDescription   getSmsTask
+     * @apiDescription   getSmsMarketingTask
      * @apiGroup         index_send
-     * @apiName          getSmsTask
+     * @apiName          getSmsMarketingTask
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
      * @apiParam (入参) {String} content 短信内容
@@ -167,7 +167,7 @@ class Send extends MyController {
      * @apiParam (入参) {String} mobile 接收手机号码
      * @apiParam (入参) {String} dstime 发送时间
      * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:单批次手机号码不能超过1000个 / 3003:dstime发送时间格式错误 / 3004:预约发送时间小于当前时间 / 3005:短信内容为空或者短信内容超出500字符 / 3006:签名长度为2~8个字 / 3007:task_name 短信标题不能为空
-     * @apiSampleRequest /index/send/getSmsTask
+     * @apiSampleRequest /index/send/getSmsMarketingTask
      * @author rzc
      */
     public function getSmsMarketingTask() {

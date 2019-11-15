@@ -141,4 +141,25 @@ class User extends AdminController {
         $this->apiLog($apiName, [$cmsConId, $uid, $business_id, $agency_price], $result['code'], $cmsConId);
         return $result;
     }
+
+    /**
+     * @api              {post} / 获取会员详情
+     * @apiDescription   getUserInfo
+     * @apiGroup         admin_Users
+     * @apiName          getUserInfo
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {Int} uid 账户id
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:用户不存在 / 3002:agency_price格式错误 / 3003:uid格式错误 / 3004:代理价格不能低于统一服务价 / 3005:该服务已添加 / 3006:子账户服务无法设置
+     * @apiSampleRequest /admin/user/getUserInfo
+     * @author rzc
+     */
+    public function getUserInfo(){
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        $uid          = trim($this->request->post('uid'));
+        if (empty($uid) || intval($uid) < 1 || !is_numeric($uid)) {
+            return ['code' => '3001'];
+        }
+        $result = $this->app->user->getUserInfo($uid);
+        return $result;
+    }
 }

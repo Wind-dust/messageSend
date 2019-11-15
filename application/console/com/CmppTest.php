@@ -877,7 +877,7 @@ class CmppTest extends Pzlife {
                     $Sequence_Id = 1;
                 }
                 // sleep($time); //等待时间，进行下一次操作
-                sleep(1); //等待时间，进行下一次操作
+                sleep($time); //等待时间，进行下一次操作
             } while (true);
 
         }
