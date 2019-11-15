@@ -355,6 +355,7 @@ class Administrator extends AdminController {
             return ['code' => '3001'];
         }
         $result = $this->app->administrator->settingChannel($channel_id, $business_id);
+        return $result;
     }
 
      /**
