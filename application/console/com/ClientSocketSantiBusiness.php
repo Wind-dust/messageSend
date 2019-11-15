@@ -409,6 +409,11 @@ class ClientSocketSantiBusiness extends Pzlife {
                                                     // }
                                                 }
                                             } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
+                                                $time = 0;
+                                                if ($i > $security_master) {
+                                                    $time = 1;
+                                                    // $i    = 0;
+                                                }
                                                 $Result = 0;
                                                 // print_r($head['Total_Length']);
                                                 // $contentlen = $head['Total_Length'] - 73-12;
@@ -679,6 +684,11 @@ class ClientSocketSantiBusiness extends Pzlife {
                                 }
                             } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                                 $Result = 0;
+                                $time = 0;
+                                if ($i > $security_master) {
+                                    $time = 1;
+                                    // $i    = 0;
+                                }
                                 // print_r($head['Total_Length']);
                                 // $contentlen = $head['Total_Length'] - 73-12;
                                 $contentlen = $head['Total_Length'] - 65 - 12;
