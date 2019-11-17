@@ -112,6 +112,7 @@ class ServerSocket extends Pzlife {
                     // socket_close($socket);
                    
                     if ($status == 0) {
+                        $i           = 1;
                         do {
                             $headData = socket_read($accept_resource, 12);
                             if ($headData != false) {
@@ -164,15 +165,7 @@ class ServerSocket extends Pzlife {
                                     }
                                     $new_bodyData = $new_bodyData.$AuthenticatorISMG.pack("C",0x20);
                                     // echo $new_bodyData;die;
-                                    $Total_Length = strlen($new_bodyData) + 12;
-                                    $new_headData     = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
-                                    // socket_write($socket, $headData . $bodyData, $Total_Length);
-                
-                                    // print_r($back_Command_Id);
-                                    // 向socket_accept的套接流写入信息，也就是回馈信息给socket_bind()所绑定的主机客户端
-                                    // echo $new_headData . $new_bodyData."\n";
-                                    // echo $back_Command_Id."\n";
-                                    socket_write($accept_resource, $new_headData . $new_bodyData, $Total_Length);
+                                   
                                     if ($connect_status != 0) {
                                         socket_close($accept_resource);//验证失败 关闭连接
                                     }
@@ -182,8 +175,9 @@ class ServerSocket extends Pzlife {
                                     $body     = unpack("N2Msg_Id/CPk_total/CPk_number/CRegistered_Delivery/CMsg_level/a10Service_Id/CFee_UserType/a21Fee_terminal_Id/CTP_pId/CTP_udhi/CMsg_Fmt/a6Msg_src/a2FeeType/a6FeeCode/a17ValId_Time/a17At_Time/a21Src_Id/CDestUsr_tl", $bodyData);
                                    
                                     if ($body['Pk_total'] > 1) {//长短信
-                                        print_r($body);die;
+                                        print_r($body);
                                     }else{
+                                        // print_r($body);die;
                                         $Dest_terminal_Id  = 21 * $body['DestUsr_tl'];
                                         $c_length = $Dest_terminal_Id +1;
                                         
@@ -195,9 +189,10 @@ class ServerSocket extends Pzlife {
                                         $bodyData2 = socket_read($accept_resource, $Msg_length);
                                         $Msg_Content = unpack("a".$Msg_length."Msg_Content",$bodyData2);
                                         $sendData = [];
-                                        if ($bodyData['Msg_Fmt'] == 15){
-                                            $message = mb_convert_encoding($Msg_Content['Msg_Content'], 'UTF-8', 'GBK');
-                                        }
+                                        $message = $Msg_Content['Msg_Content'];
+                                        // if ($body['Msg_Fmt'] == 15){
+                                        //     $message = mb_convert_encoding($message, 'UTF-8', 'GBK');
+                                        // }
                                         $sendData = [
                                             'mobile' => $mobile,
                                             'message' => $message,
@@ -207,12 +202,39 @@ class ServerSocket extends Pzlife {
                                         if ($residue> 0) {
                                             socket_read($accept_resource, $residue);
                                         }
+                                        $timestring = time();
+                                        
                                     }
                                     
                                     $back_Command_Id = 0x80000004; //发送应答
+                                    $num1 = substr($timestring, 0, 8);
+                                    $num2 = substr($timestring, 8) . $this->combination($i);
+                                    $new_bodyData = pack("N", $num1) . pack("N", $num2);
+                                    $new_bodyData = $new_bodyData . pack('C', 0); 
+                                    // $Total_Length = strlen($CMPP_SUBMIT_RESP) + 12;
+                                    // $RESP_headData     = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
+                                    // socket_write($accept_resource, $RESP_headData . $CMPP_SUBMIT_RESP, $Total_Length);
+                                   }else if ($head['Command_Id'] == 0x00000008) {
+                                    $bodyData = socket_read($accept_resource, $head['Total_Length'] - 12);
+                                    $new_bodyData = $new_bodyData = pack("a1", '');
+                                    $back_Command_Id = 0x80000008;
+                                   }else {
+                                    $bodyData = socket_read($accept_resource, $head['Total_Length'] - 12);
+                                    $new_bodyData = $new_bodyData = pack("a1", '');
+                                    $back_Command_Id = 0x80000008;
                                    }
 
                             }
+                            $Total_Length = strlen($new_bodyData) + 12;
+                            $new_headData     = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
+                            // socket_write($socket, $headData . $bodyData, $Total_Length);
+        
+                            // print_r($back_Command_Id);
+                            // 向socket_accept的套接流写入信息，也就是回馈信息给socket_bind()所绑定的主机客户端
+                            // echo $new_headData . $new_bodyData."\n";
+                            // echo $back_Command_Id."\n";
+                            socket_write($accept_resource, $new_headData . $new_bodyData, $Total_Length);
+                            $i++;
                         } while (true);
                     }
                 }
@@ -374,6 +396,39 @@ class ServerSocket extends Pzlife {
                 'bin_ip'        => ["127.0.0.1"], //客户端绑定IP
             ];
         }
+    }
+
+    /**
+     * 6位数字补齐
+     * @param string $pdu
+     * @return string
+     */
+    function combination($num) {
+        $num     = intval($num);
+        $num     = strval($num);
+        $new_num = '';
+        switch (strlen($num)) {
+        case 0:
+            $new_num = "000000";
+            break;
+        case 1:
+            $new_num = "00000" . $num;
+            break;
+        case 2:
+            $new_num = "0000" . $num;
+            break;
+        case 3:
+            $new_num = "000" . $num;
+            break;
+        case 4:
+            $new_num = "00" . $num;
+            break;
+        case 5:
+            $new_num = "0" . $num;
+            break;
+
+        }
+        return $new_num;
     }
 
     public function checkContent($bodyData, $commamd) {
