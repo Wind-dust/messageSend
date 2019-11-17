@@ -22,5 +22,5 @@ return [
     'cmpptest'     => $commandPath . 'CmppTest',
     'cmppqingniankeji'     => $commandPath . 'CmppQingNianKeJi',
     'cmppsantimarketing'     => $commandPath . 'CmppSantiMarketing',
-    'CmppTestLocal'     => $commandPath . 'CmppTestLocal',
+    'cmpptestlocal'     => $commandPath . 'CmppTestLocal',
 ];
