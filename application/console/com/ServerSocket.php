@@ -180,9 +180,9 @@ class ServerSocket extends Pzlife {
                                     // $contentlen = $head['Total_Length'] - 12 - 116;
                                     $bodyData = socket_read($accept_resource, 117);
                                     $body     = unpack("N2Msg_Id/CPk_total/CPk_number/CRegistered_Delivery/CMsg_level/a10Service_Id/CFee_UserType/a21Fee_terminal_Id/CTP_pId/CTP_udhi/CMsg_Fmt/a6Msg_src/a2FeeType/a6FeeCode/a17ValId_Time/a17At_Time/a21Src_Id/CDestUsr_tl", $bodyData);
-
+                                   
                                     if ($body['Pk_total'] > 1) {//长短信
-                                        print_r($body);
+                                        print_r($body);die;
                                     }else{
                                         $Dest_terminal_Id  = 21 * $body['DestUsr_tl'];
                                         $c_length = $Dest_terminal_Id +1;
@@ -193,11 +193,14 @@ class ServerSocket extends Pzlife {
                                         $mobile = $body1['Dest_terminal_Id'];
                                         $Msg_length = $body1['Msg_length'];
                                         $bodyData2 = socket_read($accept_resource, $Msg_length);
-                                        $message = unpack("a".$Msg_length."Msg_Content",$bodyData2);
+                                        $Msg_Content = unpack("a".$Msg_length."Msg_Content",$bodyData2);
                                         $sendData = [];
+                                        if ($bodyData['Msg_Fmt'] == 15){
+                                            $message = mb_convert_encoding($Msg_Content['Msg_Content'], 'UTF-8', 'GBK');
+                                        }
                                         $sendData = [
                                             'mobile' => $mobile,
-                                            'message' => $message['Msg_Content'],
+                                            'message' => $message,
                                         ];
                                          print_r($sendData);
                                         $residue = $head['Total_Length'] - 12 -117 -$c_length -$Msg_length;
@@ -387,5 +390,29 @@ class ServerSocket extends Pzlife {
             $bytes[] = bin2hex($tmp);
         }
         return $bytes;
+    }
+        /**
+     * 将ascii码转为字符串
+     * @param type $str 要解码的字符串
+     * @param type $prefix 前缀，默认:&#
+     * @return type
+     */
+    function decode($str, $prefix = "&#") {
+        $str = str_replace($prefix, "", $str);
+        $a   = explode(";", $str);
+        $utf = '';
+        foreach ($a as $dec) {
+            if ($dec < 128) {
+                $utf .= chr($dec);
+            } else if ($dec < 2048) {
+                $utf .= chr(192 + (($dec - ($dec % 64)) / 64));
+                $utf .= chr(128 + ($dec % 64));
+            } else {
+                $utf .= chr(224 + (($dec - ($dec % 4096)) / 4096));
+                $utf .= chr(128 + ((($dec % 4096) - ($dec % 64)) / 64));
+                $utf .= chr(128 + ($dec % 64));
+            }
+        }
+        return $utf;
     }
 }
