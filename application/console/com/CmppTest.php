@@ -871,13 +871,13 @@ class CmppTest extends Pzlife {
                         }
                     }
 
+                    $i++;
+                    $Sequence_Id++;
                 }
                 // if ($i > 1) {
                 //     die;
                 // }
 
-                $i++;
-                $Sequence_Id++;
                 if ($Sequence_Id > 65536) {
                     $Sequence_Id = 1;
                 }
