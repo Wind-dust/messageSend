@@ -470,13 +470,19 @@ class CmppQingNianKeJi extends Pzlife {
                                 //     die;
                                 // }
                                 usleep(3000);
+                                $i++;
                                
                             }
-                            $i++;
+                            
                             $Sequence_Id++;
                             if ($Sequence_Id > 65536) {
                                 $Sequence_Id = 1;
                             }
+                            if ($i > $security_master) {
+                                $time = 1;
+                                $i    = 0;
+                            }
+                            sleep($time); //等待时间，进行下一次操作
                             // die;
                             continue;
                         } else { //单条短信

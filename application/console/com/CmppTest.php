@@ -189,7 +189,7 @@ class CmppTest extends Pzlife {
         if (socket_connect($socket, $host, $port) == false) {
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
-            // date_default_timezone_set('PRC');
+            date_default_timezone_set('PRC');
             // socket_read($socket,3072);
             // socket_clear_error($socket);
             // socket_close($socket);
@@ -547,13 +547,18 @@ class CmppTest extends Pzlife {
                                 //     die;
                                 // }
                                 usleep(3000);
+                                $i++;
                                
                             }
-                            $i++;
                             $Sequence_Id++;
                             if ($Sequence_Id > 65536) {
                                 $Sequence_Id = 1;
                             }
+                            if ($i > $security_master) {
+                                $time = 1;
+                                $i    = 0;
+                            }
+                            sleep($time); //等待时间，进行下一次操作
                             // die;
                             continue;
                         } else { //单条短信
