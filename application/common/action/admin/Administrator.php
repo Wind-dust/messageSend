@@ -365,12 +365,21 @@ class Administrator extends CommonIndex {
         if (empty($usertask)) {
             return ['code' => '3001'];
         }
-        $userEquities = DbAdministrator::getUserEquities(['uid' => $usertask['uid'], 'business_id' => $business_id], 'id,agency_price', true);
+        $userEquities = DbAdministrator::getUserEquities(['uid' => $usertask['uid'], 'business_id' => $business_id], 'id,agency_price,num_balance', true);
         if (empty($userEquities)) {
             return ['code' => '3005'];
         }
-        if ($usertask['free_trial'] != 2 || $usertask['channel_id']) {
+        if ($usertask['free_trial'] != 2 && $usertask['channel_id']) {
             return ['code' => '3004'];
+        }
+        $send_length    = mb_strlen($usertask['task_content'], 'utf8');
+        $num = ceil($send_length/65) * $usertask['send_num'];
+        $user = DbUser::getUserInfo(['id' => $usertask['uid']], 'id,reservation_service,user_status', true);
+        if ($user['user_status'] != 2) {
+            return ['code' => '3006'];
+        }
+        if ($num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
+            return ['code' => '3007'];
         }
         $free_trial = 2;
         if ($userEquities['agency_price'] < $channel['channel_price']) {
@@ -386,8 +395,7 @@ class Administrator extends CommonIndex {
                 if (substr_count($usertask['task_content'],'【米思米】') > 1) {
                     $usertask['task_content'] = mb_substr($usertask['task_content'],mb_strpos($usertask['task_content'],'】')+1,mb_strlen($usertask['task_content']));
                 }
-                $send_length    = mb_strlen($usertask['task_content'], 'utf8');
-                $num = ceil($send_length/65) * $usertask['send_num'];
+               
                 DbAdministrator::modifyBalance($userEquities['id'],$num,'dec');
                 foreach ($mobilesend as $key => $value) {
                     if (checkMobile($value)) {

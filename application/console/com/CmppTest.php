@@ -219,21 +219,22 @@ class CmppTest extends Pzlife {
                     // $send = [];
                     // print_r($send);die;
                     // $send = $this->getSendCodeTask();
-                    // if ($i == 2) { //测试判断语句
+                    if ($i ) { //测试判断语句
 
-                        if ($send) { //正式使用从缓存中读取数据
+                        // if ($send) { //正式使用从缓存中读取数据
                         $senddata = [];
                         $senddata = explode(":",$send);
 
                         // $mobile = $senddata['mobile_content'];
-                        $mobile = $senddata[0];
+                        // $mobile = $senddata[0];
+                        // $code   = $senddata[2]; //带签名
+                        
                         $txt_head = 6;
                         $txt_len  = 140;
                         $max_len  = $txt_len - $txt_head;
-                        // $mobile   = 15201926171;
-                        $code   = $senddata[2]; //带签名
-                        // $code = '【米思米】安全围栏标准组件上市！不用设计，不用外发喷涂，不用组装！低至363.95元，第五天出货！赶紧过来下单吧。https://www.misumi.com.cn/mail/chn-gc19057-ml03/转发无效,详询021-52559388*6197,回T退订。 '; //带签名
-                        // $code   = '短信发送测试'; //带签名
+                        $mobile   = 15201926171;
+                        $code = '【米思米】安全围栏标准组件上市！不用设计，不用外发喷涂，不用组装！低至363.95元，第五天出货！赶紧过来下单吧。https://www.misumi.com.cn/mail/chn-gc19057-ml03/转发无效,详询021-52559388*6197,回T退订。 '; //带签名
+                        $code   = '短信发送测试'; //带签名
                         // print_r($code);die;
 
                         // $Timestamp = date('mdHis');
@@ -345,7 +346,8 @@ class CmppTest extends Pzlife {
                                 // }
                                 $Total_Length = strlen($bodyData) + 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
+                                // $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
+                                $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$send);
                                 // socket_write($socket, $headData . $bodyData, $Total_Length);
                                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) { //写入失败，还原发送信息并关闭端口
                                     echo 'fail to write' . socket_strerror(socket_last_error());
@@ -660,7 +662,8 @@ class CmppTest extends Pzlife {
                         // echo strlen($code);die;
                         // echo $Command_Id;die;
                         // print_r(strlen($bodyData));die;
-                        $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
+                        // $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
+                        $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$send);
                     } else {
                         $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                         $Command_Id  = 0x00000008; //保持连接
