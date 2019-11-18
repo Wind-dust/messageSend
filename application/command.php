@@ -23,4 +23,5 @@ return [
     'cmppqingniankeji'     => $commandPath . 'CmppQingNianKeJi',
     'cmppsantimarketing'     => $commandPath . 'CmppSantiMarketing',
     'cmpptestlocal'     => $commandPath . 'CmppTestLocal',
+    'cmppcreatecodetask' => $commandPath . 'CmppCreateCodeTask',
 ];

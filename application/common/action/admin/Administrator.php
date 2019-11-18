@@ -333,20 +333,31 @@ class Administrator extends CommonIndex {
         } else {
             $result = DbAdministrator::getUserSendTask([], '*', false, '', $offset . ',' . $pageNum);
         }
-        return ['code' => '200', 'data' => $result];
+        $total = DbAdministrator::countUserSendTask([]);
+        return ['code' => '200', 'total' => $total, 'data' => $result];
     }
 
-    public function auditUserSendTask($id, $free_trial) {
-        $userchannel = DbAdministrator::getUserSendTask(['id' => $id], 'id,mobile_content,free_trial', true);
+    public function auditUserSendTask($effective_id = [], $free_trial) {
+        // print_r($effective_id);die;
+        $userchannel = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'id,mobile_content,free_trial', false);
+
         if (empty($userchannel)) {
             return ['code' => '3001'];
         }
-        if ($userchannel['free_trial'] >1) {
-            return ['code' => '3003'];
+        $real_effective_id = [];
+        // print_r($userchannel);die;
+        foreach ($userchannel as $key => $value) {
+            if ($value['free_trial'] > 1) {
+                continue;
+            }
+            $real_effective_id[] = $value['id'];
         }
+
         Db::startTrans();
         try {
-            DbAdministrator::editUserSendTask(['free_trial' => $free_trial], $id);
+            foreach ($real_effective_id as $real => $efid) {
+                DbAdministrator::editUserSendTask(['free_trial' => $free_trial], $efid);
+            }
             Db::commit();
             return ['code' => '200'];
 
@@ -356,25 +367,39 @@ class Administrator extends CommonIndex {
         }
     }
 
-    public function distributionChannel($id,$channel_id,$business_id){
-        $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id,'business_id' => $business_id], 'id,title,channel_price', true);
+    public function distributionChannel($effective_id = [], $channel_id, $business_id) {
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id, 'business_id' => $business_id], 'id,title,channel_price', true);
         if (empty($channel)) {
             return ['code' => '3002'];
         }
-        $usertask = DbAdministrator::getUserSendTask(['id' => $id], 'id,uid,mobile_content,task_content,free_trial,send_num,channel_id', true);
+        $usertask = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,task_content,free_trial,send_num,channel_id', false);
         if (empty($usertask)) {
             return ['code' => '3001'];
         }
-        $userEquities = DbAdministrator::getUserEquities(['uid' => $usertask['uid'], 'business_id' => $business_id], 'id,agency_price,num_balance', true);
+        $num               = 0;
+        $uids              = [];
+        $real_effective_id = [];
+        $real_usertask     = [];
+        foreach ($usertask as $key => $value) {
+            if (!in_array($value['uid'], $uids)) {
+                $uids[] = $value['uid'];
+            }
+            if ($value['free_trial'] == 2 && !$value['channel_id']) {
+                $real_usertask[] = $value;
+                $send_length     = mb_strlen($value['task_content'], 'utf8');
+                $num += ceil($send_length / 65) * $value['send_num'];
+            }
+        }
+        if (count($uids) > 1) {
+            return ['code' => '3008', 'msg' => '一批只能同时分配一个用户的营销任务'];
+        }
+        // print_r($uids[0]);die;
+        $userEquities = DbAdministrator::getUserEquities(['uid' => $uids[0], 'business_id' => $business_id], 'id,agency_price,num_balance', true);
         if (empty($userEquities)) {
             return ['code' => '3005'];
         }
-        if ($usertask['free_trial'] != 2 && $usertask['channel_id']) {
-            return ['code' => '3004'];
-        }
-        $send_length    = mb_strlen($usertask['task_content'], 'utf8');
-        $num = ceil($send_length/65) * $usertask['send_num'];
-        $user = DbUser::getUserInfo(['id' => $usertask['uid']], 'id,reservation_service,user_status', true);
+
+        $user = DbUser::getUserInfo(['id' => $uids[0]], 'id,reservation_service,user_status', true);
         if ($user['user_status'] != 2) {
             return ['code' => '3006'];
         }
@@ -387,32 +412,38 @@ class Administrator extends CommonIndex {
         }
         Db::startTrans();
         try {
-            DbAdministrator::editUserSendTask(['free_trial' => $free_trial,'channel_id' => $channel_id], $id);
-           
+
+            DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
+            foreach ($real_usertask as $key => $value) {
+                DbAdministrator::editUserSendTask(['free_trial' => $free_trial, 'channel_id' => $channel_id], $value['id']);
+            }
+
             if ($free_trial == 2) {
-                $mobilesend = explode(',',$usertask['mobile_content']);
-                $effective_mobile = [];
-                if (substr_count($usertask['task_content'],'【米思米】') > 1) {
-                    $usertask['task_content'] = mb_substr($usertask['task_content'],mb_strpos($usertask['task_content'],'】')+1,mb_strlen($usertask['task_content']));
-                }
-               
-                DbAdministrator::modifyBalance($userEquities['id'],$num,'dec');
-                foreach ($mobilesend as $key => $value) {
-                    if (checkMobile($value)) {
-                        $effective_mobile[] = $value;
+                foreach ($real_usertask as $real => $usertask) {
+                    $mobilesend       = explode(',', $usertask['mobile_content']);
+                    $effective_mobile = [];
+                    if (substr_count($usertask['task_content'], '【米思米】') > 1) {
+                        $usertask['task_content'] = mb_substr($usertask['task_content'], mb_strpos($usertask['task_content'], '】') + 1, mb_strlen($usertask['task_content']));
+                    }
+
+                    foreach ($mobilesend as $key => $value) {
+                        if (checkMobile($value)) {
+                            $effective_mobile[] = $value;
+                        }
+                    }
+                    // $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
+                    $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
+                    // print_r($redisMessageMarketingSend);die;
+                    foreach ($effective_mobile as $key => $value) {
+                        $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, $value . ":" . $usertask['id'] . ":" . $usertask['task_content']); //三体营销通道
+                        if ($res == false) {
+                            Db::rollback();
+                            return ['code' => '3009']; //修改失败
+                        }
+                        // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
                     }
                 }
-                // $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
-                $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-                // print_r($redisMessageMarketingSend);die;
-                foreach ($effective_mobile as $key => $value) {
-                    $res = $this->redis->rpush($redisMessageMarketingSend.":".$channel_id,$value.":".$id.":".$usertask['task_content']); //三体营销通道
-                    if ($res == false) {
-                        Db::rollback();
-                        return ['code' => '3009']; //修改失败
-                    }
-                    // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
-                }
+
             }
             Db::commit();
             return ['code' => '200'];

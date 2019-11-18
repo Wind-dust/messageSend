@@ -32,8 +32,8 @@ class ServerSocket extends Pzlife {
         $free_trial    = $contdata['free_trial']; //是否需要审核 1:需要审核;2:无需审核
         $master_num    = $contdata['master_num']; //通道最大提交量
         $uid           = $contdata['uid']; //通道最大提交量
-        $security_coefficient = 0.8; //通道饱和系数
-        $security_master      = $master_num * $security_coefficient;
+        // $security_coefficient = 0.8; //通道饱和系数
+        $security_master      = $master_num;
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         date_default_timezone_set('PRC');
         /*绑定接收的套接流主机和端口,与客户端相对应*/
@@ -223,7 +223,7 @@ class ServerSocket extends Pzlife {
                                     // $RESP_headData     = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
                                     // socket_write($accept_resource, $RESP_headData . $CMPP_SUBMIT_RESP, $Total_Length);
                                         // print_r($sendData['mobile'].":".$id.":".$sendData['message'].":".$num1.$num2);die;
-                                        $redis->rpush($redisMessageCodeSend,$uid.":".$sendData['mobile'].":".$sendData['message'].":".$num1.$num2); //三体营销通道
+                                        $redis->rpush($redisMessageCodeSend,$uid.":".$sendData['mobile'].":".$sendData['message'].":".$num1.$num2.":".$addr); //三体营销通道
                                         $Total_Length = strlen($new_bodyData) + 12;
                                         $new_headData = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
                                         // socket_write($socket, $headData . $bodyData, $Total_Length);
@@ -265,11 +265,14 @@ class ServerSocket extends Pzlife {
                             }
                           
                             $i++;
-                            if ($i > $security_master) {
+                            if ($i > 65536) {
                                 $time = 1;
                                 $i    = 1;
+                            }else{
+                                $time = 0;
                             }
-                            // sleep($time); //等待时间，进行下一次操作
+                            usleep(1100); //等待时间，进行下一次操作
+                            //sleep($time);
                         } while (true);
                     }
                 }

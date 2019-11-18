@@ -486,9 +486,9 @@ class Administrator extends AdminController {
      * @apiGroup         admin_Administrator
      * @apiName          auditUserSendTask
      * @apiParam (入参) {String} cms_con_id
-     * @apiParam (入参) {String} id 任务id
+     * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
      * @apiParam (入参) {String} free_trial 审核状态 2:审核通过;3:审核不通过
-     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:有效任务ID为空或者不能超过100个 
      * @apiSampleRequest /admin/administrator/auditUserSendTask
      * @return array
      * @author rzc
@@ -501,14 +501,22 @@ class Administrator extends AdminController {
         }
         $id = trim($this->request->post('id'));
         $free_trial = trim($this->request->post('free_trial'));
-       
-        if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
+        $ids = explode(',',$id);
+        $effective_id = [];
+        foreach ($ids as $key => $value) {
+            if (empty($value) || intval($value) < 1 || !is_numeric($value)) {
+                continue;
+            }
+            $effective_id[] = $value;
+        }
+        if (count($effective_id) > 100 || count($effective_id) < 1) {
             return ['code' => '3001'];
         }
+        
         if (!in_array($free_trial,[2,3])) {
             return ['code' => '3003'];
         }
-        $result =  $this->app->administrator->auditUserSendTask(intval($id), $free_trial);
+        $result =  $this->app->administrator->auditUserSendTask($effective_id, $free_trial);
         return $result;
     }
 
@@ -518,7 +526,7 @@ class Administrator extends AdminController {
      * @apiGroup         admin_Administrator
      * @apiName          distributionChannel
      * @apiParam (入参) {String} cms_con_id
-     * @apiParam (入参) {String} id 任务id
+     * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
      * @apiParam (入参) {String} business_id 业务服务id
      * @apiParam (入参) {String} channel_id 通道ID
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:channel_id格式错误 / 3003:business_id格式错误
@@ -536,8 +544,13 @@ class Administrator extends AdminController {
         $channel_id = trim($this->request->post('channel_id'));
         $business_id = trim($this->request->post('business_id'));
        
-        if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
-            return ['code' => '3001'];
+        $ids = explode(',',$id);
+        $effective_id = [];
+        foreach ($ids as $key => $value) {
+            if (empty($value) || intval($value) < 1 || !is_numeric($value)) {
+                continue;
+            }
+            $effective_id[] = $value;
         }
         if (empty($channel_id) || intval($channel_id) < 1 || !is_numeric($channel_id)) {
             return ['code' => '3002'];
@@ -545,7 +558,7 @@ class Administrator extends AdminController {
         if (empty($business_id) || intval($business_id) < 1 || !is_numeric($business_id)) {
             return ['code' => '3003'];
         }
-        $result =  $this->app->administrator->distributionChannel(intval($id), intval($channel_id), intval($business_id));
+        $result =  $this->app->administrator->distributionChannel($effective_id, intval($channel_id), intval($business_id));
         return $result;
     }
 }

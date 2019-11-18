@@ -548,7 +548,7 @@ class CmppTest extends Pzlife {
                                 // if ($i > 1) {
                                 //     die;
                                 // }
-                                usleep(3000);
+                                usleep(3000 / $num_messages);
                                 $i++;
                                
                             }
@@ -560,7 +560,8 @@ class CmppTest extends Pzlife {
                                 $time = 1;
                                 $i    = 0;
                             }
-                            sleep($time); //等待时间，进行下一次操作
+                            // sleep($time); //等待时间，进行下一次操作
+                            // usleep(3000);
                             // die;
                             continue;
                         } else { //单条短信
@@ -885,7 +886,7 @@ class CmppTest extends Pzlife {
                     $Sequence_Id = 1;
                 }
                 // sleep($time); //等待时间，进行下一次操作
-                sleep($time); //等待时间，进行下一次操作
+                usleep(3000); //等待时间，进行下一次操作
             } while (true);
 
         }

@@ -224,6 +224,10 @@ class DbAdministrator {
         return $this->getResult($obj, $row, $orderBy, $limit);
     }
 
+    public function countUserSendTask($where){
+        return UserSendTask::where($where)->count();
+    }
+
     public function addUserSendTask($data) {
         $UserSendTask = new UserSendTask;
         $UserSendTask->save($data);
