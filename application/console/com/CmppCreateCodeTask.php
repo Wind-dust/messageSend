@@ -73,7 +73,7 @@ class CmppCreateCodeTask extends Pzlife {
             $send = $redis->lPop($new_redisMessageCodeSend);
             
             while ($send) {
-                $redis->lPush($new_redisMessageCodeSend);
+                $redis->rPush($new_redisMessageCodeSend);
                 print_r($send);die;
             }
         }
