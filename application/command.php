@@ -21,6 +21,7 @@ return [
     'officeexcel'  => $commandPath . 'OfficeExcel',
     'cmpptest'     => $commandPath . 'CmppTest',
     'cmppqingniankeji'     => $commandPath . 'CmppQingNianKeJi',
+    'clientsocketsantibusiness'     => $commandPath . 'ClientSocketSantiBusiness',
     'cmppsantimarketing'     => $commandPath . 'CmppSantiMarketing',
     'cmpptestlocal'     => $commandPath . 'CmppTestLocal',
     'cmppcreatecodetask' => $commandPath . 'CmppCreateCodeTask',
