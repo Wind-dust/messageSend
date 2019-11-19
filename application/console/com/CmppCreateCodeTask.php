@@ -64,4 +64,18 @@ class CmppCreateCodeTask extends Pzlife {
         }
         return $userInfo[0];
     }
+
+    public function getMessageLog(){
+        $redis = Phpredis::getConn();
+        $redisMessageCodeSend       = 'index:meassage:code:deliver:'; //验证码发送任务rediskey
+        for ($i=0; $i < 5; $i++) { 
+            $new_redisMessageCodeSend = $redisMessageCodeSend.$i;
+            $send = $redis->lPop($new_redisMessageCodeSend);
+            
+            while ($send) {
+                $redis->lPush($new_redisMessageCodeSend);
+                print_r($send);die;
+            }
+        }
+    }
 }
