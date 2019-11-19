@@ -76,9 +76,9 @@ class CmppCreateCodeTask extends Pzlife {
                 $redis->rPush($new_redisMessageCodeSend);
                 // $test = "13861218631:846:【米思米】尊敬的客户，已收到货款56.96元。请将需要下订的报价，在WOS报价订购平台操作到等待付款，或发送米思米报价单/PO单至我司。我司会根据贵司的入帐信息完成下订。贵司已在我司登录联系邮箱，同样的内容也会发送到该邮箱 ，负责人员如有变更或将有变更，请发送邮件至cs@misumi.sh.cn:DELIVRD";
                 $sendData = [];
-                print_r($send);
-                echo "\n";
-                continue;
+                // print_r($send);
+                // echo "\n";
+                // continue;
                 $sendData = explode(':',$send);
                 $sendlog = [];
                 if ($sendData[3] == 'DELIVRD') {
