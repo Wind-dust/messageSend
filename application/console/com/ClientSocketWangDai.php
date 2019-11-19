@@ -460,9 +460,10 @@ class ClientSocketWangDai extends Pzlife {
                                 // }
                                 usleep(4000);
                                 $i++;
-                                $Sequence_Id++;
+                                
 
                             }
+                            $Sequence_Id++;
                             if ($Sequence_Id > 65536) {
                                 $Sequence_Id = 1;
                             }
