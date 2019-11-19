@@ -73,9 +73,45 @@ class CmppCreateCodeTask extends Pzlife {
             $send = $redis->lPop($new_redisMessageCodeSend);
             
             while ($send) {
-                $redis->rPush($new_redisMessageCodeSend);
-                print_r($send);die;
+                // $redis->rPush($new_redisMessageCodeSend);
+                $test = "13861218631:846:【米思米】尊敬的客户，已收到货款56.96元。请将需要下订的报价，在WOS报价订购平台操作到等待付款，或发送米思米报价单/PO单至我司。我司会根据贵司的入帐信息完成下订。贵司已在我司登录联系邮箱，同样的内容也会发送到该邮箱 ，负责人员如有变更或将有变更，请发送邮件至cs@misumi.sh.cn:DELIVRD";
+                $sendData = [];
+                $sendData = explode(':',$send);
+                $sendlog = [];
+                if ($sendData[3] == 'DELIVRD') {
+                    $status = 2;
+                }
+                $sendtask = $this->getSendTask($sendData[1]);
+                $sendlog = [
+                    'task_no' => $sendtask['task_no'],
+                    'uid' => $sendtask['uid'],
+                    'mobile' => $sendData[0],
+                    'status_message' => $sendData[3],
+                    'send_status' => $status,
+                    'send_time' => time(),
+                ];
+                Db::startTrans();
+                try {
+                    //如果是行业
+                    $task_id = Db::table('yx_user_send_task_log')->insertGetId($sendlog);
+
+                    Db::commit();
+                
+                } catch (\Exception $e) {
+                    Db::rollback();
+                }
             }
         }
+        echo "secuss";
+    }
+
+    private function getSendTask($id){
+        $getSendTaskSql = sprintf("select id,uid,task_no from yx_user_send_task where delete_time=0 and id = %d", $id);
+        // print_r($getUserSql);die;
+        $sendTask = Db::query($getSendTaskSql);
+        if (!$sendTask) {
+            return [];
+        }
+        return $sendTask[0];
     }
 }
