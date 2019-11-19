@@ -122,6 +122,19 @@ CREATE TABLE `yx_permissions_api` (
   KEY `index_meun_id` (`menu_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4 COMMENT='Api接口权限';
 
+DROP TABLE IF EXISTS `yx_log_file`;
+CREATE TABLE `yx_log_file` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL DEFAULT '' COMMENT '上传者',
+  `stype` tinyint(3) unsigned NOT NULL DEFAULT '2' COMMENT '1.index 2.admin',
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '2' COMMENT '状态1.完成 2.未完成 3.弃用',
+  `image_path` char(60) NOT NULL DEFAULT '' COMMENT '文件路径',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uniq_image_path` (`image_path`,`delete_time`) USING BTREE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='文件上传日志';
+
 -- -----------------------------
 -- 业务功能表
 -- -----------------------------

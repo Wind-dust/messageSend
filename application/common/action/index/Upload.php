@@ -3,6 +3,7 @@
 namespace app\common\action\index;
 
 use Config;
+use upload\Fileupload;
 use upload\Imageupload;
 use app\facade\DbImage;
 
@@ -11,6 +12,7 @@ class Upload extends CommonIndex {
 
     public function __construct() {
         $this->upload = new Imageupload();
+        $this->fileupload = new Fileupload();
     }
 
     /**
@@ -20,14 +22,15 @@ class Upload extends CommonIndex {
      */
     public function uploadFile($fileInfo) {
         /* 文件名重命名 */
+        print_r($fileInfo);die;
         $filename    = date('Ymd') . '/' . $this->upload->getNewName($fileInfo['name']);
-        $uploadimage = $this->upload->uploadFile($fileInfo['tmp_name'], $filename);
+        $uploadimage = $this->fileupload->uploadFile($fileInfo['tmp_name'], $filename);
         if ($uploadimage) {//上传成功
-            $result = DbImage::saveLogImage($filename);
+            $result = DbImage::saveLogFile($filename);
             if ($result) {
-                return ['code' => '200', 'image_path' => Config::get('qiniu.domain') . '/' . $filename];
+                return ['code' => '200', 'file_path' => Config::get('qiniu.exceldomain') . '/' . $filename];
             } else {
-                $this->delImg($filename);//删除上传的图片
+                $this->delFile($filename);//删除上传的图片
             }
         }
         return ['code' => '3003'];//上传失败
@@ -73,12 +76,12 @@ class Upload extends CommonIndex {
      * 批量删除图片
      * @param $filenameArr
      */
-    private function delImg($filenameArr) {
+    private function delFile($filenameArr) {
         if (!is_array($filenameArr)) {
-            $this->upload->deleteImage($filenameArr);//删除上传的图片
+            $this->upload->deleteFile($filenameArr);//删除上传的图片
         } else {
             foreach ($filenameArr as $v) {
-                $this->upload->deleteImage($v);//删除上传的图片
+                $this->upload->deleteFile($v);//删除上传的图片
             }
         }
     }

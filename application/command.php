@@ -22,7 +22,9 @@ return [
     'cmpptest'     => $commandPath . 'CmppTest',
     'cmppqingniankeji'     => $commandPath . 'CmppQingNianKeJi',
     'clientsocketsantibusiness'     => $commandPath . 'ClientSocketSantiBusiness',
+    'clientsocketjiujiaXintong' => $commandPath . 'ClientSocketJiuJiaXinTong',
     'cmppsantimarketing'     => $commandPath . 'CmppSantiMarketing',
     'cmpptestlocal'     => $commandPath . 'CmppTestLocal',
     'cmppcreatecodetask' => $commandPath . 'CmppCreateCodeTask',
+    'clientSocketwangdai' => $commandPath . 'ClientSocketWangDai',
 ];

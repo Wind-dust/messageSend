@@ -203,21 +203,21 @@ class Send extends CommonIndex {
         if (empty($effective_mobile)) {
             return 2;
         }
-        $send_num             = count($Mobiles);
-        $data                 = [];
-        $data['uid']          = $user['id'];
-        $data['source']       = $ip;
-        $data['task_name']         = $Content;
-        $start = mb_strpos($Content,'【');
+        $send_num          = count($Mobiles);
+        $data              = [];
+        $data['uid']       = $user['id'];
+        $data['source']    = $ip;
+        $data['task_name'] = $Content;
+        $start             = mb_strpos($Content, '【');
         if ($start != 0) {
-            $length = mb_strpos($Content,'】') - mb_strpos($Content,'【')+1;
-            $all_length = mb_strlen($Content,'utf8');
-            $remain = mb_substr($Content,0,$all_length-$length);
-            $Content = '【米思米】'.$remain;
+            $length     = mb_strpos($Content, '】') - mb_strpos($Content, '【') + 1;
+            $all_length = mb_strlen($Content, 'utf8');
+            $remain     = mb_substr($Content, 0, $all_length - $length);
+            $Content    = '【米思米】' . $remain;
         }
         // echo $Content;die;
-        $data['task_content'] = $Content;
-        $data['send_length']    = mb_strlen($Content);
+        $data['task_content']      = $Content;
+        $data['send_length']       = mb_strlen($Content);
         $data['mobile_content']    = join(',', $effective_mobile);
         $data['send_num']          = $send_num;
         $data['free_trial']        = 1;
@@ -314,14 +314,14 @@ return $result;
         $data['send_length']    = mb_strlen($Content);
         $data['free_trial']     = 1;
         $data['task_no']        = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
-        
+
         Db::startTrans();
         try {
 
-            $id                     = DbAdministrator::addUserSendTask($data);
-            
+            $id = DbAdministrator::addUserSendTask($data);
+
             Db::commit();
-            return ['code' => '200','task_no' =>$data['task_no'] ];
+            return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
             Db::rollback();
             return ['code' => '3009'];
@@ -331,10 +331,10 @@ return $result;
         //     $this->redis->rpush($redisMessageMarketingSend.":2",$value.":".$id.":".$Content); //三体营销通道
         //     // $this->redis->hset($redisMessageMarketingSend.":2",$value,$id.":".$Content); //三体营销通道
         // }
-        return ['code' => '200', 'task_no' =>$data['task_no']];
+        return ['code' => '200', 'task_no' => $data['task_no']];
     }
 
-    public function getSmsBuiness($Username,$Password,$Content,$Mobile,$ip){
+    public function getSmsBuiness($Username, $Password, $Content, $Mobile, $ip) {
         $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
@@ -345,41 +345,41 @@ return $result;
         if ($Password != $user['appkey']) {
             return ['code' => '3000'];
         }
-        $prefix = substr($Mobile,0,7);
-        $res = DbProvinces::getNumberSource(['mobile' => $prefix],'source,province_id,province',true);
-       
+        $prefix = substr($Mobile, 0, 7);
+        $res    = DbProvinces::getNumberSource(['mobile' => $prefix], 'source,province_id,province', true);
+
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        
+
         // print_r($res);die;
-        $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'],'business_id' => 6], 'id,num_balance', true);
-        if (empty($user_equities) ) {
+        $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 6], 'id,num_balance', true);
+        if (empty($user_equities)) {
             return ['code' => '3005'];
         }
         if ($user_equities['num_balance'] < 1 && $user['reservation_service'] == 1) {
             return ['code' => '3006'];
         }
-         //默认青年科技通知
+        //默认青年科技通知
         //  $Content = str_replace("",'',$Content);
         //  print_r($Content);die;
         $channel_id = 3;
-        
+
         if ($res) {
             // return ['3004'];
-            if ($res['source'] == 2) {//联通
+            if ($res['source'] == 2) { //联通
 
-            }else if ($res['source'] == 1 ) {//移动
-                $channel_id = 1;//三体行业
-                if ($res['province_id'] == 2495) {//四川移动物流
+            } else if ($res['source'] == 1) { //移动
+                $channel_id = 1; //三体行业
+                if ($res['province_id'] == 2495) { //四川移动物流
 
                 }
             }
         }
-        $data                 = [];
-        $data['uid']          = $user['id'];
-        $data['source']       = $ip;
-        $data['mobile_content']       = $Mobile;
-        $data['send_status']       = 3;
-        $data['task_content']    = $Content;
+        $data                   = [];
+        $data['uid']            = $user['id'];
+        $data['source']         = $ip;
+        $data['mobile_content'] = $Mobile;
+        $data['send_status']    = 3;
+        $data['task_content']   = $Content;
         $data['send_length']    = mb_strlen($Content, 'utf8');
         $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
         Db::startTrans();
@@ -391,18 +391,28 @@ return $result;
                 return ['code' => '3009']; //添加失败
             }
             $num = 1;
-            if ($data['send_length'] > 65 ){
-                $num = ceil($data['send_length']/65);
+            if ($data['send_length'] > 65) {
+                $num = ceil($data['send_length'] / 65);
             }
-            DbAdministrator::modifyBalance($user_equities['id'],$num,'dec');
-            $this->redis->rpush($redisMessageMarketingSend.":".$channel_id,$Mobile.":".$bId.":".$Content); //三体营销通道
+            DbAdministrator::modifyBalance($user_equities['id'], $num, 'dec');
+            $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, $Mobile . ":" . $bId . ":" . $Content); //三体营销通道
             Db::commit();
-            return ['code' => '200','task_no' =>$data['task_no'] ];
+            return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
             Db::rollback();
             return ['code' => '3009'];
         }
 
+    }
+
+    public function readFileContent($filename) {
+        $filename = filtraImage(Config::get('qiniu.exceldomain'), $filename);
+        $logfile  = DbImage::getLogFile($filename); //判断时候有未完成的图片
+        if (empty($logfile)) { //图片不存在
+            return ['code' => '3002']; //图片没有上传过
+        }
+        $file = Config::get('qiniu.exceldomain') . '/' . $filename;
+        ini_set('memory_limit', '3072M');
 
     }
 }

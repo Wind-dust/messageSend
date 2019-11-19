@@ -243,4 +243,23 @@ class Send extends MyController {
         $result = $this->app->send->getSmsBuiness($appid,$appkey,$Content,$Mobile,$ip);
         return $result;
     }
+
+    /**
+     * @api              {post} / 获取表格中手机号，第一列
+     * @apiDescription   readFileContent
+     * @apiGroup         index_send
+     * @apiName          readFileContent
+     * @apiParam (入参) {String} filename 文件名称
+     * @apiSuccess (返回) {String} code 200:成功  / 3001:文件名为空 
+     * @apiSampleRequest /index/send/readFileContent
+     * @author rzc
+     */
+    public function readFileContent(){
+        $filename = trim($this->request->post('filename'));//登录名
+        if (empty($filename)) {
+           return ['code' => '3001'];
+        }
+        $result = $this->app->send->readFileContent($filename);
+        return $result;
+    }
 }

@@ -463,7 +463,9 @@ class CmppSantiMarketing extends Pzlife {
                                 $time = 1;
                                 $i    = 0;
                             }
-                            sleep($time); //等待时间，进行下一次操作
+                            if ($time > 1) {
+                                sleep($time); //等待时间，进行下一次操作
+                            }
                             continue;
                         } else { //单条短信
 
@@ -739,7 +741,11 @@ class CmppSantiMarketing extends Pzlife {
                     $Sequence_Id = 1;
                 }
                 // sleep($time); //等待时间，进行下一次操作
-                sleep($time); //等待时间，进行下一次操作
+                if ($time > 1) {
+                    sleep($time); //等待时间，进行下一次操作
+                }else{
+                    usleep(3000); //等待时间，进行下一次操作
+                }
             } while (true);
 
         }

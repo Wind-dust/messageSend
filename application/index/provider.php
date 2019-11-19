@@ -15,6 +15,7 @@ return [
     'provinces'         => app\common\action\admin\Provinces::class,
     'send'              => app\common\action\index\Send::class,
     'indexLog'          => app\common\action\index\IndexLog::class,
+    'upload'            => app\common\action\index\Upload::class,
     // 'solution'        => app\common\action\index\Solution::class,
     // 'product'         => app\common\action\index\Product::class,
     // 'applicationcase' => app\common\action\index\ApplicationCase::class,
