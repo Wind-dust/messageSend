@@ -129,7 +129,7 @@ class CmppCreateCodeTask extends Pzlife {
         $send = $this->redis->lpop($redisMessageMarketingSend);
         print_r($send);die;
         do {
-            $sendtask = Db::query("SELECT * FROM yx_user_send_task WHERE  `uid` IN (4,6) AND `free_trial` = 1 LIMIT 1");
+            $sendtask = Db::query("SELECT * FROM yx_user_send_task WHERE  `uid` IN (4,6) AND `free_trial` = 1 AND `id` > 3291 LIMIT 1");
             // print_r($sendtask);die;
             $theSend = [];
             if ($sendtask) {

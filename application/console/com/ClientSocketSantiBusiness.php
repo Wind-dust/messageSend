@@ -179,7 +179,7 @@ class ClientSocketSantiBusiness extends Pzlife {
                     /* redis 读取需要发送的数据 */
                     $send = $redis->lPop($redisMessageCodeSend);
                     // $send = [];
-                    print_r($send);die;
+                    // print_r($send);die;
                     // $send = $this->getSendCodeTask();
                     // if ($i == 2) { //测试判断语句
 
