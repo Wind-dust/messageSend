@@ -93,6 +93,9 @@ class CmppCreateCodeTask extends Pzlife {
                     'send_status' => $status,
                     'send_time' => time(),
                 ];
+                if (Db::query("SELECT `id` FROM yx_user_send_task_log WHERE `task_no` = ".$sendlog['task_no']." AND `uid` = ".$sendlog['uid']." AND `mobile` = ".$sendlog['mobile']." AND `status_message` = ".$sendlog['status_message'])) {
+                    continue;
+                }
                 Db::startTrans();
                 try {
                     //如果是行业
