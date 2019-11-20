@@ -46,7 +46,7 @@ class Upload extends MyController {
         if ($info) {
             $type = $info->getExtension();
             if ($type == 'csv') {
-                $type = 'Csv';
+                $type = 'CSV';
             }else if ($type == 'xlsx') {
                 $type = 'Excel2007';
             }elseif ($type == 'xls'){
