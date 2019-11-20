@@ -10,7 +10,7 @@ application/console/com/LocalScript.php
 
 apidoc.json
 *.sh
-vendor/
+
 uploads/
 composer.json
 composer.lock
