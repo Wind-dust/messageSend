@@ -45,6 +45,13 @@ class Upload extends MyController {
         // print_r($info);die;
         if ($info) {
             $type = $info->getExtension();
+            if ($type == 'csv') {
+                $type = 'Csv';
+            }else if ($type == 'xlsx') {
+                $type = 'Excel2007';
+            }elseif ($type == 'xls'){
+                $type = 'Excel2007';
+            }
             $path      = $info->getpathName();
             $objReader = PHPExcel_IOFactory::createReader($type)
                 ->setDelimiter(',')
