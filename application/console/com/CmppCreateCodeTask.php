@@ -124,6 +124,9 @@ class CmppCreateCodeTask extends Pzlife {
     //免审任务客户
     public function MisumiTaskSend() {
         $this->redis                = Phpredis::getConn();
+        $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
+        $send = $this->redis->lpop($redisMessageMarketingSend);
+        print_r($send);die;
         do {
             $sendtask = Db::query("SELECT * FROM yx_user_send_task WHERE  `uid` IN (4,6) AND `free_trial` = 1 LIMIT 1");
             // print_r($sendtask);die;
@@ -133,6 +136,7 @@ class CmppCreateCodeTask extends Pzlife {
                 $num = 0;
                 $mobilesend       = explode(',', $theSend['mobile_content']);
                 $send_length     = mb_strlen($theSend['task_content'], 'utf8');
+                $effective_mobile = [];
                 foreach ($mobilesend as $key => $value) {
                     $num += ceil($send_length / 65) * $theSend['send_num'];
                     if (checkMobile($value)) {
