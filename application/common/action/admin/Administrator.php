@@ -386,8 +386,11 @@ class Administrator extends CommonIndex {
             }
             if ($value['free_trial'] == 2 && !$value['channel_id']) {
                 $real_usertask[] = $value;
+                $mobilesend       = explode(',', $usertask['mobile_content']);
                 $send_length     = mb_strlen($value['task_content'], 'utf8');
-                $num += ceil($send_length / 65) * $value['send_num'];
+                foreach ($mobilesend as $key => $value) {
+                    $num += ceil($send_length / 65) * $value['send_num'];
+                }
             }
         }
         if (count($uids) > 1) {
