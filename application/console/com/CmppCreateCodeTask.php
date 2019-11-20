@@ -125,8 +125,9 @@ class CmppCreateCodeTask extends Pzlife {
     public function MisumiTaskSend() {
         $this->redis                = Phpredis::getConn();
         // $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        // $send = $this->redis->lpop($redisMessageMarketingSend);
-        // print_r($send);die;
+        $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
+        $send = $this->redis->lpop($redisMessageMarketingSend);
+        print_r($send);die;
         do {
             $sendtask = Db::query("SELECT * FROM yx_user_send_task WHERE  `uid` IN (4,6) AND `free_trial` = 1 LIMIT 1");
             // print_r($sendtask);die;
