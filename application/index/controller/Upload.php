@@ -19,7 +19,7 @@ class Upload extends MyController {
      * @apiDescription   uploadUserExcel
      * @apiGroup         index_upload
      * @apiName          uploadUserExcel
-     * @apiParam (入参) {String} filename 表格名称
+     * @apiParam (入参) {String} filename 表格名称 支持文件格式 txt,xlsx,csv,xls
      * @apiSuccess (返回) {String} code 200:成功  / 3001:上传文件不能为空 / 3002:上传失败
      * @apiSuccess (data) {Array} data 结果
      * @apiSampleRequest /index/upload/uploadUserExcel
@@ -37,6 +37,29 @@ class Upload extends MyController {
         //表格拓展类型  xlsx:vnd.openxmlformats-officedocument.spreadsheetml.sheet,xls:vnd.ms-excel,csv:csv
         $fileInfo = $filename->getInfo();
         $fileType = explode('/', $fileInfo['type']);
+        if ($fileType[0] == 'text'){
+            $info = $filename->move('../uploads/text');
+            $type = $info->getExtension();
+            $path      = $info->getpathName();
+            if (empty($path)) {
+                return ['code' => '3002'];
+            }
+            $file = fopen($path, "r");
+            $data=array();
+            $i=0;
+            $phone = '';
+            $j     = '';
+            while(! feof($file))
+            {
+                $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+                // print_r($phone);die;
+                $j = ',';
+                $i++;
+            }
+            fclose($file);
+            $data=array_filter($data);
+            return ['code' => '200','phone' => $phone];
+        }
         if (!in_array($fileType[1], ['vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'vnd.ms-excel', 'csv'])) {
             return ['3001']; //上传的不是表格
         }
@@ -46,47 +69,74 @@ class Upload extends MyController {
         if ($info) {
             $type = $info->getExtension();
             if ($type == 'csv') {
-                $type = 'CSV';
-            }else if ($type == 'xlsx') {
-                $type = 'Excel2007';
-            }elseif ($type == 'xls'){
-                $type = 'Excel2007';
-            }
-            $path      = $info->getpathName();
-            $objReader = PHPExcel_IOFactory::createReader($type)
-                ->setDelimiter(',')
-                ->setInputEncoding('GBK') //不设置将导致中文列内容返回boolean(false)或乱码
-                ->setEnclosure('"')
-                ->setSheetIndex(0);
-            // print_r(realpath("../"). "\yt_area_mobile.csv");die;
+                $type      = 'CSV';
+                $path      = $info->getpathName();
+                $objReader = PHPExcel_IOFactory::createReader($type)
+                    ->setDelimiter(',')
+                    ->setInputEncoding('GBK') //不设置将导致中文列内容返回boolean(false)或乱码
+                    ->setEnclosure('"')
+                    ->setSheetIndex(0);
+                // print_r(realpath("../"). "\yt_area_mobile.csv");die;
 
-            $objPHPExcel = $objReader->load($path);
-            // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
-            //选择标签页
-            $sheet            = $objPHPExcel->getSheet(0); //获取行数与列数,注意列数需要转换
-            $highestRowNum    = $sheet->getHighestRow();
-            $highestColumn    = $sheet->getHighestColumn();
-            $highestColumnNum = PHPExcel_Cell::columnIndexFromString($highestColumn); //取得字段，这里测试表格中的第一行为数据的字段，因此先取出用来作后面数组的键名
-            $filed            = array();for ($i = 0; $i < $highestColumnNum; $i++) {
-                $cellName = PHPExcel_Cell::stringFromColumnIndex($i) . '1';
-                $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
-                $filed[]  = $cellVal;
-            } //开始取出数据并存入数组
-            $phone = '';
-            $j     = '';
-            for ($i = 2; $i <= $highestRowNum; $i++) {
-                $row      = array();
-                $cellName = PHPExcel_Cell::stringFromColumnIndex(0) . $i;
-                $cellVal  = $sheet->getCell($cellName)->getValue();
-                $phone .= $j . $cellVal;
-                $j = ',';
-                // for ($j = 0; $j < $highestColumnNum; $j++) {
+                $objPHPExcel = $objReader->load($path);
+                // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
+                //选择标签页
+                $sheet            = $objPHPExcel->getSheet(0); //获取行数与列数,注意列数需要转换
+                $highestRowNum    = $sheet->getHighestRow();
+                $highestColumn    = $sheet->getHighestColumn();
+                $highestColumnNum = PHPExcel_Cell::columnIndexFromString($highestColumn); //取得字段，这里测试表格中的第一行为数据的字段，因此先取出用来作后面数组的键名
+                $filed            = array();for ($i = 0; $i < $highestColumnNum; $i++) {
+                    $cellName = PHPExcel_Cell::stringFromColumnIndex($i) . '1';
+                    $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
+                    $filed[]  = $cellVal;
+                } //开始取出数据并存入数组
+                $phone = '';
+                $j     = '';
+                for ($i = 1; $i <= $highestRowNum; $i++) {
+                    $row      = array();
+                    $cellName = PHPExcel_Cell::stringFromColumnIndex(0) . $i;
+                    $cellVal  = $sheet->getCell($cellName)->getValue();
+                    $phone .= $j . $cellVal;
+                    $j = ',';
+                    // for ($j = 0; $j < $highestColumnNum; $j++) {
 
-                //     $row[$filed[$j]] = trim($cellVal);
-                // }
-                // $data[] = $row;
+                    //     $row[$filed[$j]] = trim($cellVal);
+                    // }
+                    // $data[] = $row;
+                }
+                return ['code' => '200', 'phone' => $phone];
+            } else if ($type == 'xlsx') {
+                $type = 'Excel2007';
+                $objReader = PHPExcel_IOFactory::createReader($type);
+                $path      = $info->getpathName();
+                $objPHPExcel = $objReader->load($path,$encode='utf-8');//加载文件
+                $sheet = $objPHPExcel->getSheet(0);//取得sheet(0)表
+                $highestRow = $sheet->getHighestRow(); // 取得总行数
+                $phone = '';
+                $j     = '';
+                for ($i=1; $i < $highestRow; $i++) { 
+                    $cellVal = $objPHPExcel->getActiveSheet()->getCell("A".$i)->getValue();
+                    $phone .= $j . $cellVal;
+                    $j = ',';
+                }
+                return ['code' => '200', 'phone' => $phone];
+            } elseif ($type == 'xls') {
+                $type = 'Excel2007';
+                $objReader = PHPExcel_IOFactory::createReader($type);
+                $path      = $info->getpathName();
+                $objPHPExcel = $objReader->load($path,$encode='utf-8');//加载文件
+                $sheet = $objPHPExcel->getSheet(0);//取得sheet(0)表
+                $highestRow = $sheet->getHighestRow(); // 取得总行数
+                $phone = '';
+                $j     = '';
+                for ($i=1; $i < $highestRow; $i++) { 
+                    $cellVal = $objPHPExcel->getActiveSheet()->getCell("A".$i)->getValue();
+                    $phone .= $j . $cellVal;
+                    $j = ',';
+                }
+                return ['code' => '200', 'phone' => $phone];
             }
-            return ['code' => '200', 'phone' => $phone];
+
         } else {
             return ['code' => '3002'];
         }
