@@ -28,7 +28,7 @@ class Upload extends MyController {
     public function uploadUserExcel() {
         // $apiName  = classBasename($this) . '/' . __function__;
         // $conId    = trim($this->request->post('con_id'));
-        echo phpinfo();die;
+        // echo phpinfo();die;
         $filename = $this->request->file('filename');
         // echo $filename->getError();die;
         if (empty($filename)) {
