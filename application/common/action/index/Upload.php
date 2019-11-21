@@ -12,7 +12,7 @@ class Upload extends CommonIndex {
 
     public function __construct() {
         $this->upload = new Imageupload();
-        $this->fileupload = new Fileupload();
+        // $this->fileupload = new Fileupload();
     }
 
     /**
