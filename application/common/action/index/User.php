@@ -593,4 +593,37 @@ class User extends CommonIndex {
         }
         return ['code' => '200', 'userEquities' => $user_equities];
     }
+
+    public function completeInformation($conId,$businesslicense,$logo){
+        $uid = $this->getUidByConId($conId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $user = DbUser::getUser(['id' => $uid]);
+        $image    = filtraImage(Config::get('qiniu.domain'), $logo);
+        $logImage = DbImage::getLogImage($image, 2);//判断时候有未完成的图片
+        if (empty($logImage)) {//图片不存在
+            return ['code' => '3010'];//图片没有上传过
+        }
+        $bimage    = filtraImage(Config::get('qiniu.domain'), $businesslicense);
+        $blogImage = DbImage::getLogImage($bimage, 2);//判断时候有未完成的图片
+        if (empty($blogImage)) {//图片不存在
+            return ['code' => '3010'];//图片没有上传过
+        }
+        if ($user['logo'] && $logo) {
+            return ['code' => '3004','msg' => '已上传logo'];
+        }   
+        if ($user['businesslicense'] && $businesslicense) {
+            return ['code' => '3004','msg' => '已上传营业执照'];
+        }  
+        Db::startTrans();
+        try {
+            DbUser::updateUser(['logo' => $image, 'businesslicense' => $bimage],$uid);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        } 
+    }
 }

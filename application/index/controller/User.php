@@ -385,15 +385,31 @@ class User extends MyController {
     }
 
     /**
-     * @api              {post} / 完善营业执照
-     * @apiDescription   uploadBusinessLicense
+     * @api              {post} / 完善信息
+     * @apiDescription   completeInformation
      * @apiGroup         index_user
-     * @apiName          getUserEquitises
+     * @apiName          completeInformation
+     * @apiParam (入参) {String} businesslicense 营业执照图片地址
      * @apiParam (入参) {String} con_id
-     * @apiSuccess (返回) {String} code 200:成功  3001:手机格式有误 / 3002:账号不存在 / 3003:密码错误 / 3004:登录失败
+     * @apiParam (入参) {String} logo logo图片地址
+     * @apiSuccess (返回) {String} code 200:成功  3001:logo为空或者未上传成功/ 3002:businesslicense为空或者未上传成功 / 3003:用户不存在 / 3004:登录失败
      * @apiSuccess (返回) {Array} data 用户信息
-     * @apiSampleRequest /index/user/uploadBusinessLicense
+     * @apiSampleRequest /index/user/completeInformation
      * @return array
      * @author rzc
      */
+    public function completeInformation(){
+        $conId        = trim($this->request->post('con_id'));
+        $businesslicense        = trim($this->request->post('businesslicense'));
+        $logo        = trim($this->request->post('logo'));
+        if (empty($logo)) {
+            return ['code' => '3001'];
+        }
+        if (empty($businesslicense)) {
+            return ['code' => '3002'];
+        }
+        $result = $this->app->user->completeInformation($conId,$businesslicense,$logo);
+        // $this->apiLog($apiName, [$conId, $nick_name, $user_type, $passwd, $mobile, $email], $result['code'], $conId);
+        return $result;
+    }
 }

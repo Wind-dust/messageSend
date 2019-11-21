@@ -24,5 +24,22 @@ class Users extends Model {
     protected static function init() {
         //TODO:初始化内容
     }
-
+    public function getLogoAttr($value) {
+        if (empty($value)) {
+            return '';
+        }
+        if (stripos($value, 'http') === false) {
+            return Config::get('qiniu.domain') . '/' . $value;
+        }
+        return $value;
+    }
+    public function getBusinesslicenseAttr($value) {
+        if (empty($value)) {
+            return '';
+        }
+        if (stripos($value, 'http') === false) {
+            return Config::get('qiniu.domain') . '/' . $value;
+        }
+        return $value;
+    }
 }
