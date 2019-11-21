@@ -121,7 +121,7 @@ class Upload extends MyController {
                 }
                 return ['code' => '200', 'phone' => $phone];
             } elseif ($type == 'xls') {
-                $type = 'Excel2007';
+                $type = 'Excel5';
                 $objReader = PHPExcel_IOFactory::createReader($type);
                 $path      = $info->getpathName();
                 $objPHPExcel = $objReader->load($path,$encode='utf-8');//加载文件
