@@ -172,11 +172,11 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
 
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+       /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15601607386',
             'mar_task_id' => 15715,
             'content'     => '【中山口腔】5周年庆，11月23-30日，黄石三店同庆，全线诊疗项目 8 折让利回馈、消费就送青花瓷礼盒！39.9元购洁牙卡送食用油。详情询:0714-6268188 回T退订',
-        ]));
+        ])); */
         if (socket_connect($socket, $host, $port) == false) {
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
