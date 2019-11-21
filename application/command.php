@@ -27,4 +27,7 @@ return [
     'cmpptestlocal'     => $commandPath . 'CmppTestLocal',
     'cmppcreatecodetask' => $commandPath . 'CmppCreateCodeTask',
     'clientSocketwangdai' => $commandPath . 'ClientSocketWangDai',
+    'httpchannelsix' => $commandPath . 'HttpChannelSix',
+    'cmppmijiadianxinmarketing' => $commandPath . 'CmppMiJiaDianXinMarketing',
+    'cmppmijialiantongmarketing' => $commandPath . 'CmppMiJiaLianTongMarketing',
 ];
