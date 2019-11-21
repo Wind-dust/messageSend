@@ -372,6 +372,8 @@ return $result;
                 if ($res['province_id'] == 2495) { //四川移动物流
 
                 }
+            }else if ($res['source' == 3]) {//电信
+
             }
         }
         $data                   = [];
@@ -394,8 +396,17 @@ return $result;
             if ($data['send_length'] > 65) {
                 $num = ceil($data['send_length'] / 65);
             }
-            DbAdministrator::modifyBalance($user_equities['id'], $num, 'dec');
-            $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, $Mobile . ":" . $bId . ":" . $Content); //三体营销通道
+            
+            if ($user['free_trial'] == 2) {
+                DbAdministrator::modifyBalance($user_equities['id'], $num, 'dec');
+                $send = [
+                    'mobile' => $Mobile, 
+                    'bus_task_id' => $bId, 
+                    'content' => $Content, 
+                ];
+                $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id,json_encode($send)); //三体营销通道
+                DbAdministrator::editUserSendCodeTask(['send_status' => 2],$bId);
+            }
             Db::commit();
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {

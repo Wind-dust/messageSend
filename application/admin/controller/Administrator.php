@@ -521,6 +521,21 @@ class Administrator extends AdminController {
     }
 
     /**
+     * @api              {post} / 获取行业任务
+     * @apiDescription   getUserSendCodeTask
+     * @apiGroup         admin_Administrator
+     * @apiName          getUserSendCodeTask
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 任务id
+     * @apiParam (入参) {String} page 页码 默认1
+     * @apiParam (入参) {String} pageNum 条数 默认10
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 
+     * @apiSampleRequest /admin/administrator/getUserSendCodeTask
+     * @return array
+     * @author rzc
+     */
+
+    /**
      * @api              {post} / 分配任务通道
      * @apiDescription   distributionChannel
      * @apiGroup         admin_Administrator
