@@ -396,6 +396,9 @@ class Administrator extends CommonIndex {
         if (count($uids) > 1) {
             return ['code' => '3008', 'msg' => '一批只能同时分配一个用户的营销任务'];
         }
+        if (empty($real_usertask)) {
+            return ['code' => '3010','msg' => '待分配的批量任务未空（提交了一批未审核的批量任务）'];
+        }
         // print_r($uids[0]);die;
         $userEquities = DbAdministrator::getUserEquities(['uid' => $uids[0], 'business_id' => $business_id], 'id,agency_price,num_balance', true);
         if (empty($userEquities)) {

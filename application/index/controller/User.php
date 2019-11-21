@@ -184,9 +184,9 @@ class User extends MyController {
      * @apiDescription   login
      * @apiGroup         index_user
      * @apiName          login
-     * @apiParam (入参) {String} mobile 接收的手机号
+     * @apiParam (入参) {String} nick_name 账户名
      * @apiParam (入参) {String} password 密码
-     * @apiSuccess (返回) {String} code 200:成功  3001:手机格式有误 / 3002:账号不存在 / 3003:密码错误 / 3004:登录失败
+     * @apiSuccess (返回) {String} code 200:成功  3001:账户名为空 / 3002:账号不存在 / 3003:密码错误 / 3004:登录失败
      * @apiSuccess (返回) {Array} data 用户信息
      * @apiSampleRequest /index/user/login
      * @return array
@@ -194,16 +194,16 @@ class User extends MyController {
      */
     public function login() {
         $apiName  = classBasename($this) . '/' . __function__;
-        $mobile   = trim($this->request->post('mobile'));
+        $nick_name   = trim($this->request->post('nick_name'));
         $password = trim($this->request->post('password'));
-        if (checkMobile($mobile) === false) {
+        if (empty($nick_name)) {
             return ['code' => '3001']; //手机号格式错误
         }
         if (checkPassword($password) === false) {
             return ['code' => '3005'];
         }
-        $res = $this->app->user->login($mobile, $password);
-        $this->apiLog($apiName, [$mobile, $password], $res['code'], '');
+        $res = $this->app->user->login($nick_name, $password);
+        $this->apiLog($apiName, [$nick_name, $password], $res['code'], '');
         return $res;
     }
 

@@ -30,8 +30,8 @@ class User extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function login($mobile, $password) {
-        $user = DbUser::getUserOne(['mobile' => $mobile], 'id,passwd');
+    public function login($nick_name, $password) {
+        $user = DbUser::getUserOne(['nick_name' => $nick_name], 'id,passwd');
         if (empty($user)) {
             return ['code' => '3002'];
         }
@@ -398,9 +398,9 @@ class User extends CommonIndex {
         //     return ['code' => '3004']; //验证码错误
         // }
 
-        if (!empty($this->checkAccount($mobile))) {
-            return ['code' => '3005'];//该手机号已注册
-        }
+        // if (!empty($this->checkAccount($mobile))) {
+        //     return ['code' => '3005'];//该手机号已注册
+        // }
         $cipherPassword = $this->getPassword($passwd, $this->cipherUserKey); //加密后的password
 
         $data = [
@@ -411,6 +411,7 @@ class User extends CommonIndex {
             'email'     => $email,
             'appid'     => uniqid(''),
             'appkey'     => md5('123456'),
+            'user_status'     => 2,
         ];
 
         Db::startTrans();
@@ -482,9 +483,9 @@ class User extends CommonIndex {
         if (empty($uid)) { //用户不存在
             return ['code' => '3003'];
         }
-        if (!empty($this->checkAccount($mobile))) {
-            return ['code' => '3006'];//该手机号已注册
-        }
+        // if (!empty($this->checkAccount($mobile))) {
+        //     return ['code' => '3006'];//该手机号已注册
+        // }
         $cipherPassword = $this->getPassword($passwd, $this->cipherUserKey); //加密后的password
         $data = [
             'pid'       => $uid,
@@ -493,6 +494,7 @@ class User extends CommonIndex {
             'nick_name' => $nick_name,
             'user_type' => $user_type,
             'email'     => $email,
+            'user_status'     =>2,
         ];
 
         Db::startTrans();

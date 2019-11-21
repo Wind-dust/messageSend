@@ -121,6 +121,18 @@ class CmppCreateCodeTask extends Pzlife {
         return $sendTask[0];
     }
 
+    public function getNewMessageLog(){
+        $redis                = Phpredis::getConn();
+        $redisMessageCodeSend = 'index:meassage:code:new:deliver:'; //验证码发送任务rediskey
+        for ($i = 0; $i < 5; $i++) {
+            $new_redisMessageCodeSend = $redisMessageCodeSend . $i;
+            $send                     = $redis->lPop($new_redisMessageCodeSend);
+            while ($send) {
+                $newsend = json_decode($send);
+            }
+        }
+    }
+
     //免审任务客户
     public function MisumiTaskSend() {
         $this->redis                = Phpredis::getConn();

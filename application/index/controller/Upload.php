@@ -96,7 +96,7 @@ class Upload extends MyController {
                     $row      = array();
                     $cellName = PHPExcel_Cell::stringFromColumnIndex(0) . $i;
                     $cellVal  = $sheet->getCell($cellName)->getValue();
-                    $phone .= $j . $cellVal;
+                    $phone .= $j . trim($cellVal);
                     $j = ',';
                     // for ($j = 0; $j < $highestColumnNum; $j++) {
 
@@ -116,7 +116,7 @@ class Upload extends MyController {
                 $j     = '';
                 for ($i=1; $i < $highestRow; $i++) { 
                     $cellVal = $objPHPExcel->getActiveSheet()->getCell("A".$i)->getValue();
-                    $phone .= $j . $cellVal;
+                    $phone .= $j . trim($cellVal);
                     $j = ',';
                 }
                 return ['code' => '200', 'phone' => $phone];
@@ -131,7 +131,7 @@ class Upload extends MyController {
                 $j     = '';
                 for ($i=1; $i < $highestRow; $i++) { 
                     $cellVal = $objPHPExcel->getActiveSheet()->getCell("A".$i)->getValue();
-                    $phone .= $j . $cellVal;
+                    $phone .= $j . trim($cellVal);
                     $j = ',';
                 }
                 return ['code' => '200', 'phone' => $phone];
