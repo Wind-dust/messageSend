@@ -383,4 +383,17 @@ class User extends MyController {
         // $this->apiLog($apiName, [$conId, $nick_name, $user_type, $passwd, $mobile, $email], $result['code'], $conId);
         return $result;
     }
+
+    /**
+     * @api              {post} / 完善营业执照
+     * @apiDescription   uploadBusinessLicense
+     * @apiGroup         index_user
+     * @apiName          getUserEquitises
+     * @apiParam (入参) {String} con_id
+     * @apiSuccess (返回) {String} code 200:成功  3001:手机格式有误 / 3002:账号不存在 / 3003:密码错误 / 3004:登录失败
+     * @apiSuccess (返回) {Array} data 用户信息
+     * @apiSampleRequest /index/user/uploadBusinessLicense
+     * @return array
+     * @author rzc
+     */
 }

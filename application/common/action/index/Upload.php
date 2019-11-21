@@ -20,17 +20,21 @@ class Upload extends CommonIndex {
      * @param $fileInfo
      * @return array
      */
+    /**
+     * 单个上传图片
+     * @param $fileInfo
+     * @return array
+     */
     public function uploadFile($fileInfo) {
         /* 文件名重命名 */
-        print_r($fileInfo);die;
         $filename    = date('Ymd') . '/' . $this->upload->getNewName($fileInfo['name']);
-        $uploadimage = $this->fileupload->uploadFile($fileInfo['tmp_name'], $filename);
+        $uploadimage = $this->upload->uploadFile($fileInfo['tmp_name'], $filename);
         if ($uploadimage) {//上传成功
-            $result = DbImage::saveLogFile($filename);
+            $result = DbImage::saveLogImage($filename);
             if ($result) {
-                return ['code' => '200', 'file_path' => Config::get('qiniu.exceldomain') . '/' . $filename];
+                return ['code' => '200', 'image_path' => Config::get('qiniu.domain') . '/' . $filename];
             } else {
-                $this->delFile($filename);//删除上传的图片
+                $this->delImg($filename);//删除上传的图片
             }
         }
         return ['code' => '3003'];//上传失败
