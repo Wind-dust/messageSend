@@ -268,7 +268,7 @@ class CmppCreateCodeTask extends Pzlife {
                     // $getSendTaskSql = "select source,province_id,province from yx_number_source where `mobile` = '".$prefix."' LIMIT 1";
                     $prefix = substr(trim($kvalue), 0, 7);
 
-                    $res = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1");
+                    $res = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                     // continue;
                     $newres = array_shift($res);
                     // continue;
