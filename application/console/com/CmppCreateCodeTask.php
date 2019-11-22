@@ -237,7 +237,7 @@ class CmppCreateCodeTask extends Pzlife {
     public function createMessageSendTaskLog() {
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        date_default_timezone_set('PRC');
+        // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15738);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask', 15739);
