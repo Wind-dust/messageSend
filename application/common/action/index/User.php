@@ -652,6 +652,6 @@ class User extends CommonIndex {
         }
         $task_log = DbAdministrator::getUserSendTaskLog(['task_no' => $task['task_no']],'*',false,'',$offset . ',' . $pageNum);
         $total = DbAdministrator::countUserSendTaskLog(['task_no' => $task['task_no']]);
-        return ['code' => '200','task' => $task, 'task_log' => $task_log];
+        return ['code' => '200','task' => $task, 'total' => $total, 'task_log' => $task_log];
     }
 }
