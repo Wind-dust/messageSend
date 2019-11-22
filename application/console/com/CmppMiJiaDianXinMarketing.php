@@ -814,6 +814,26 @@ class CmppMiJiaDianXinMarketing extends Pzlife {
         return join('', $arr);
     }
 
+    private function getSendTask($id) {
+        $getSendTaskSql = sprintf("select * from yx_user_send_task where delete_time=0 and id = %d", $id);
+        // print_r($getUserSql);die;
+        $sendTask = Db::query($getSendTaskSql);
+        if (!$sendTask) {
+            return [];
+        }
+        return $sendTask[0];
+    }
+
+    private function getSendTaskLog($task_no,$mobile) {
+        $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `task_no` = '".$task_no."' and `mobile` = '".$mobile."'";
+        // print_r($getUserSql);die;
+        $sendTask = Db::query($getSendTaskSql);
+        if (!$sendTask) {
+            return [];
+        }
+        return $sendTask[0];
+    }
+
     public function decodeString() {
         // echo strlen("³½'¹ ");
         $timestring = time();
