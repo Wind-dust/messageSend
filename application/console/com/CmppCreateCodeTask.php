@@ -299,7 +299,7 @@ class CmppCreateCodeTask extends Pzlife {
                     //     $channel_id = 2;
                     // }
                     $channel_id = 2;
-                    print_r($mobilesend[$i]);
+                    // print_r($mobilesend[$i]);
                     $send_log = [];
                     $send_log = [
                         'task_no'     => $sendTask['task_no'],
