@@ -435,7 +435,7 @@ class User extends MyController {
         $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
         intval($page);
         intval($pageNum);
-        $result = $this->app->administrator->getUserSubmitTask($page, $pageNum, $ConId);
+        $result = $this->app->user->getUserSubmitTask($page, $pageNum, $ConId);
         return $result;
     }
 
