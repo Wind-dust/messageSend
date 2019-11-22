@@ -443,14 +443,14 @@ class Administrator extends CommonIndex {
                     // $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
                     $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
                     // print_r($redisMessageMarketingSend);die;
-                    if (in_array($channel_id,[6,7,8])) {//组合通道
+                    if (in_array($channel_id,[2,6,7,8])) {//组合通道
                         foreach ($effective_mobile as $key => $value) {
                             $prefix = substr($value, 0, 7);
                             $res    = DbProvinces::getNumberSource(['mobile' => $prefix], 'source,province_id,province', true);
                             if ($res['source'] == 2) { //米加联通营销
                                 $channel_id = 8; 
                             } else if ($res['source'] == 1) { //移动
-                                $channel_id = 6; 
+                                $channel_id = 2; 
                                
                             }else if ($res['source' == 3]) {//米加电信营销
                                 $channel_id = 7; 

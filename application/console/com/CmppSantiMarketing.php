@@ -422,7 +422,11 @@ class CmppSantiMarketing extends Pzlife {
                                                 $mesage = $redis->hget($redisMessageCodeMsgId,$Msg_Content['Msg_Id1'].$Msg_Content['Msg_Id2']);
                                                 if ($mesage) {
                                                     $redis->hdel($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2']);
-                                                    $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
+                                                    $mesage         = json_decode($mesage, true);
+                                                    $mesage['Stat'] = $Msg_Content['Stat'];
+                                                    $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+                                                    $mesage['Done_time'] = $Msg_Content['Done_time'];
+                                                    $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                                                 }
                                                 print_r($Msg_Content);
                                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
@@ -555,7 +559,7 @@ class CmppSantiMarketing extends Pzlife {
                         // echo strlen($code);die;
                         // echo $Command_Id;die;
                         // print_r(strlen($bodyData));die;
-                        $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
+                        $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$send);
                     } else {
                         $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                         $Command_Id  = 0x00000008; //保持连接
@@ -706,7 +710,11 @@ class CmppSantiMarketing extends Pzlife {
                                 $mesage = $redis->hget($redisMessageCodeMsgId,$Msg_Content['Msg_Id1'].$Msg_Content['Msg_Id2']);
                                 if ($mesage) {
                                     $redis->hdel($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2']);
-                                    $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
+                                    $mesage         = json_decode($mesage, true);
+                                    $mesage['Stat'] = $Msg_Content['Stat'];
+                                    $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+                                    $mesage['Done_time'] = $Msg_Content['Done_time'];
+                                    $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                                 }
                                 print_r($Msg_Content);
                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];

@@ -424,6 +424,8 @@ class CmppMiJiaDianXinMarketing extends Pzlife {
                                                     $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                                                     $mesage         = json_decode($mesage, true);
                                                     $mesage['Stat'] = $Msg_Content['Stat'];
+                                                    $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+                                                    $mesage['Done_time'] = $Msg_Content['Done_time'];
                                                     $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                                                 }
                                                 print_r($Msg_Content);
@@ -710,6 +712,8 @@ class CmppMiJiaDianXinMarketing extends Pzlife {
                                     $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                                     $mesage         = json_decode($mesage, true);
                                     $mesage['Stat'] = $Msg_Content['Stat'];
+                                    $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+                                    $mesage['Done_time'] = $Msg_Content['Done_time'];
                                     $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                                 }
                                 print_r($Msg_Content);
