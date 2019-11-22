@@ -397,7 +397,7 @@ class Administrator extends CommonIndex {
                     $real_length = ceil($send_length / 67);
                 }
                 foreach ($mobilesend as $key => $kvalue) {
-                    $num += $real_length* $value['send_num'];
+                    $num += ($real_length* $value['send_num']);
                 }
             }
         }
