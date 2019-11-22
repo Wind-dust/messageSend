@@ -695,6 +695,7 @@ class CmppSantiMarketing2 extends Pzlife {
                             } else if ($head['Command_Id'] == 0x80000004) {
                                 $body = unpack("N2Msg_Id/CResult", $bodyData);
                                 print_r($body);
+                                $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                 if ($sequence) {
                                     $sequence = json_decode($sequence, true);
                                     $sendTask = $this->getSendTask($sequence['mar_task_id']);
@@ -1037,6 +1038,16 @@ class CmppSantiMarketing2 extends Pzlife {
 
     private function getSendTaskLog($task_no,$mobile) {
         $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `task_no` = '".$task_no."' and `mobile` = '".$mobile."'";
+        // print_r($getUserSql);die;
+        $sendTask = Db::query($getSendTaskSql);
+        if (!$sendTask) {
+            return [];
+        }
+        return $sendTask[0];
+    }
+
+    private function getSendTaskLogByMsgid($msgid) {
+        $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `msgid` = '".$msgid."'";
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
         if (!$sendTask) {
