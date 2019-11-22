@@ -396,9 +396,10 @@ class Administrator extends CommonIndex {
                 if ($send_length > 70) {
                     $real_length = ceil($send_length / 67);
                 }
-                foreach ($mobilesend as $key => $kvalue) {
-                    $num += ($real_length* $value['send_num']);
-                }
+                $num += ($real_length* $value['send_num']);
+                // foreach ($mobilesend as $key => $kvalue) {
+                    
+                // }
             }
         }
         // die;
@@ -418,7 +419,7 @@ class Administrator extends CommonIndex {
         if ($user['user_status'] != 2) {
             return ['code' => '3006'];
         }
-        print_r($num);die;
+        // print_r($num);die;
         if ($num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3007'];
         }
