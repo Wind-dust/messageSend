@@ -195,7 +195,6 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
                     $Command_Id = 0x00000001;
 
                 } else {
-                    date_default_timezone_set('PRC');
                     //当有号码发送需求时 进行提交
                     /* redis 读取需要发送的数据 */
                     $send = $redis->lPop($redisMessageCodeSend);
@@ -221,7 +220,7 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
                         $num1 = substr($timestring, 0, 8);
                         $num2 = substr($timestring, 8) . $this->combination($i);
                         $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
-                        if (strlen($code) > 140) {
+                        if (strlen($code) > $max_len) {
                             $pos          = 0;
                             $num_messages = ceil(strlen($code) / $max_len);
                             // echo $num_messages;die;
@@ -291,7 +290,7 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
 
                                 $Total_Length = strlen($bodyData) + 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
+                                $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send_data);
                                 // socket_write($socket, $headData . $bodyData, $Total_Length);
                                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) { //写入失败，还原发送信息并关闭端口
                                     echo 'fail to write' . socket_strerror(socket_last_error());
@@ -425,8 +424,6 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
                                                     $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                                                     $mesage         = json_decode($mesage, true);
                                                     $mesage['Stat'] = $Msg_Content['Stat'];
-                                                    $mesage['Submit_time'] = $Msg_Content['Submit_time'];
-                                                    $mesage['Done_time'] = $Msg_Content['Done_time'];
                                                     $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                                                 }
                                                 print_r($Msg_Content);
@@ -560,7 +557,7 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
                         // echo strlen($code);die;
                         // echo $Command_Id;die;
                         // print_r(strlen($bodyData));die;
-                        $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
+                        $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send_data);
                     } else {
                         $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                         $Command_Id  = 0x00000008; //保持连接
@@ -713,8 +710,6 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
                                     $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                                     $mesage         = json_decode($mesage, true);
                                     $mesage['Stat'] = $Msg_Content['Stat'];
-                                    $mesage['Submit_time'] = $Msg_Content['Submit_time'];
-                                    $mesage['Done_time'] = $Msg_Content['Done_time'];
                                     $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                                 }
                                 print_r($Msg_Content);

@@ -121,15 +121,57 @@ class CmppCreateCodeTask extends Pzlife {
         return $sendTask[0];
     }
 
+    private function getSendTaskLog($task_no,$mobile) {
+        $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `task_no` = '".$task_no."' and `mobile` = '".$mobile."'";
+        // print_r($getUserSql);die;
+        $sendTask = Db::query($getSendTaskSql);
+        if (!$sendTask) {
+            return [];
+        }
+        return $sendTask[0];
+    }
+
     public function getNewMessageLog(){
         $redis                = Phpredis::getConn();
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:'; //验证码发送任务rediskey
+        $content = 2;
+        $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
+        $sequence = $redis->hget($redisMessageCodeSequenceId,2);
+        $sequence = json_decode($sequence,true);
+        $sendTask = $this->getSendTask($sequence['mar_task_id']);
+        $send_log = $this->getSendTaskLog($sendTask['task_no'], $sequence['mobile']);
+        
+        // $msgid = $body['Msg_Id1'].$body['Msg_Id2'];
+        $msgid = 155153131;
+        // print_r($send_log);die;
+        Db::startTrans();
+                try {
+                    if (empty($send_log)) {
+                        Db::table('yx_user_send_task_log')->insert([
+                            'task_no' => $sendTask['task_no'],
+                            'mobile' => $sequence['mobile'],
+                            'msgid' =>$msgid,
+                            'send_status' =>2,
+                            'create_time' =>time( )
+                            ]);
+            
+                    }else{
+                        Db::table('yx_user_send_task_log')->where('id',$send_log['id'])->update(['msgid' => $msgid]);
+                    }
+                    Db::commit();
+                    $sequence = $redis->hdel($redisMessageCodeSequenceId,2);
+        } catch (\Exception $e) {
+            exception($e);
+            Db::rollback();
+                    
+        }
+        
         for ($i = 0; $i < 5; $i++) {
             $new_redisMessageCodeSend = $redisMessageCodeSend . $i;
             $send                     = $redis->lPop($new_redisMessageCodeSend);
             while ($send) {
                 $newsend = json_decode($send);
-                print_r($newsend);die;
+                
             }
         }
     }
