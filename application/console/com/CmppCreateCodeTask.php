@@ -129,6 +129,7 @@ class CmppCreateCodeTask extends Pzlife {
             $send                     = $redis->lPop($new_redisMessageCodeSend);
             while ($send) {
                 $newsend = json_decode($send);
+                print_r($newsend);die;
             }
         }
     }
@@ -194,7 +195,7 @@ class CmppCreateCodeTask extends Pzlife {
     public function createMessageSendTaskLog(){
         $this->redis                = Phpredis::getConn();
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15726);
+        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15726);
         
         while (true) {
             $real_length = 1;
