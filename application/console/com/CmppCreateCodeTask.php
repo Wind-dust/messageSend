@@ -237,7 +237,7 @@ class CmppCreateCodeTask extends Pzlife {
     public function createMessageSendTaskLog(){
         $this->redis                = Phpredis::getConn();
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15726);
+        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15738);
         
         while (true) {
             $real_length = 1;
@@ -252,9 +252,25 @@ class CmppCreateCodeTask extends Pzlife {
                 $real_length = ceil($send_length / 67);
             }
             $real_num = 0;
+            $real_num += $real_length* $sendTask['send_num'];
+            $channel_id = 0;
+            $channel_id = $sendTask['channel_id'];
+            
+            
             foreach ($mobilesend as $key => $kvalue) {
-                $real_num += $real_length* $sendTask['send_num'];
-                
+                $prefix = substr($kvalue, 0, 7);
+                if (in_array($channel_id,[2,6,7,8])){
+                    $res    = $this->getNumberSource($prefix);
+                    print_r($res['source'])."\n";
+                    if ($res['source'] == 2) { //米加联通营销
+                        $channel_id = 8; 
+                    } else if ($res['source'] == 1) { //移动
+                        $channel_id = 2; 
+                       
+                    }else if ($res['source' == 3]) {//米加电信营销
+                        $channel_id = 7; 
+                    }
+                }
                 $send_log = [];
                 $send_log = [
                     'task_no' => $sendTask['task_no'],
@@ -263,9 +279,18 @@ class CmppCreateCodeTask extends Pzlife {
                     'send_status' => 2,
                     'create_time' => time(),
                 ];
+                $sendmessage = [
+                    'mobile' => $kvalue, 
+                    'mar_task_id' => $sendTask['id'], 
+                    'content' => $sendTask['task_content'], 
+                ];
+                if (Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '".$sendTask['task_no']."' AND `mobile` = '".$kvalue."' ")) {
+                    continue;
+                }
                 Db::startTrans();
                 try {   
                     Db::table('yx_user_send_task_log')->insert($send_log);
+                    $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id,json_encode($sendmessage)); //三体营销通道
                     Db::commit();
                 } catch (\Exception $e) {
                     Db::rollback();
@@ -279,5 +304,15 @@ class CmppCreateCodeTask extends Pzlife {
                     Db::rollback();
                 }
         }
+    }
+
+    public function getNumberSource($prefix){
+        $getSendTaskSql = "select source,province_id,province from yx_number_source where delete_time=0 and `mobile` = '".$prefix."'";
+        // print_r($getUserSql);die;
+        $sendTask = Db::query($getSendTaskSql);
+        if (!$sendTask) {
+            return [];
+        }
+        return $sendTask[0];
     }
 }

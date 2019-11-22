@@ -10,6 +10,7 @@ use app\facade\DbUser;
 use cache\Phpredis;
 use Config;
 use Env;
+use Exception;
 use think\Db;
 use third\PHPTree;
 
@@ -434,8 +435,10 @@ class Administrator extends CommonIndex {
             foreach ($real_usertask as $key => $value) {
                 DbAdministrator::editUserSendTask(['free_trial' => $free_trial, 'channel_id' => $channel_id], $value['id']);
             }
-
-            if ($free_trial == 2) {
+            foreach ($real_usertask as $real => $usertask) {
+                $res = $this->redis->rpush("index:meassage:marketing:sendtask",$usertask['id']); //三体营销通道
+            }
+           /*  if ($free_trial == 2) {
                 foreach ($real_usertask as $real => $usertask) {
                     $mobilesend       = explode(',', $usertask['mobile_content']);
                     $effective_mobile = [];
@@ -490,11 +493,13 @@ class Administrator extends CommonIndex {
                     
                 }
 
-            }
+            } */
+            
             Db::commit();
             return ['code' => '200'];
 
         } catch (\Exception $e) {
+            exception($e);
             Db::rollback();
             return ['code' => '3009']; //修改失败
         }
