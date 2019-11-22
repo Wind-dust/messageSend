@@ -191,5 +191,11 @@ class CmppCreateCodeTask extends Pzlife {
         echo "SUCCESS";
     }
 
-    
+    public function createMessageSendTaskLog(){
+        $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
+        do {
+            
+        $send = $this->redis->lpop('index:meassage:marketing:sendtask');
+        } while ($a <= 10);
+    }
 }

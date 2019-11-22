@@ -463,7 +463,7 @@ class User extends MyController {
         $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
         intval($page);
         intval($pageNum);
-        $result = $this->app->administrator->getUserSubmitTaskInfo($page, $pageNum, $ConId, $id);
+        $result = $this->app->user->getUserSubmitTaskInfo($page, $pageNum, $ConId, $id);
         return $result;
     }
 }
