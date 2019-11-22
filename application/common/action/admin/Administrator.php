@@ -389,11 +389,15 @@ class Administrator extends CommonIndex {
             }
             // print_r($value);
             if ($value['free_trial'] == 2 && !$value['channel_id']) {
+                $real_length = 1;
                 $real_usertask[] = $value;
                 $mobilesend       = explode(',', $value['mobile_content']);
                 $send_length     = mb_strlen($value['task_content'], 'utf8');
+                if ($send_length > 70) {
+                    $real_length = ceil($send_length / 67);
+                }
                 foreach ($mobilesend as $key => $kvalue) {
-                    $num += ceil($send_length / 65) * $value['send_num'];
+                    $num += $real_length* $value['send_num'];
                 }
             }
         }
