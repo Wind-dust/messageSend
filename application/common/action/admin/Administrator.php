@@ -396,7 +396,7 @@ class Administrator extends CommonIndex {
             }
         }
         
-        print_r($uids);die;
+        // print_r($uids);die;
         if (count($uids) > 1) {
             return ['code' => '3008', 'msg' => '一批只能同时分配一个用户的营销任务'];
         }
