@@ -313,7 +313,7 @@ class CmppCreateCodeTask extends Pzlife {
                         'mar_task_id' => $sendTask['id'],
                         'content'     => $sendTask['task_content'],
                     ];
-                    if (Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $$mobilesend[$i] . "' ")) {
+                    if (Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $mobilesend[$i] . "' ")) {
                         continue;
                     }
                     Db::startTrans();
