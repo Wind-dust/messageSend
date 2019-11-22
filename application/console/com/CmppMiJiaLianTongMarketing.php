@@ -690,7 +690,7 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
                                 if ($sequence) {
                                     $sequence = json_decode($sequence, true);
                                     $sendTask = $this->getSendTask($sequence['mar_task_id']);
-                                    $send_log = $this->getSendTaskLog($sequence['task_no'], $sequence['mobile']);
+                                    $send_log = $this->getSendTaskLog($sendTask['task_no'], $sequence['mobile']);
 
                                     $msgid = $body['Msg_Id1'].$body['Msg_Id2'];
                                     // $msgid = 155153131;
