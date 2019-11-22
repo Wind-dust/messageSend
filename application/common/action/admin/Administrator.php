@@ -388,7 +388,7 @@ class Administrator extends CommonIndex {
                 $real_usertask[] = $value;
                 $mobilesend       = explode(',', $value['mobile_content']);
                 $send_length     = mb_strlen($value['task_content'], 'utf8');
-                foreach ($mobilesend as $key => $value) {
+                foreach ($mobilesend as $key => $kvalue) {
                     $num += ceil($send_length / 65) * $value['send_num'];
                 }
             }
