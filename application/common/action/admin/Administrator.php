@@ -4,6 +4,7 @@ namespace app\common\action\admin;
 
 use app\common\action\notify\Note;
 use app\facade\DbAdmin;
+use app\facade\DbProvinces;
 use app\facade\DbAdministrator;
 use app\facade\DbUser;
 use cache\Phpredis;
