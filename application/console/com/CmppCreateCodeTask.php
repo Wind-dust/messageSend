@@ -240,9 +240,9 @@ class CmppCreateCodeTask extends Pzlife {
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15738);
-        // $send = $this->redis->rPush('index:meassage:marketing:sendtask', 15739);
-        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15740);
-        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15741);
+        $send = $this->redis->rPush('index:meassage:marketing:sendtask', 15739);
+        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15740);
+        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15741);
         // echo date('Y-m-d H:i:s',time());die;
         while (true) {
             $real_length = 1;
