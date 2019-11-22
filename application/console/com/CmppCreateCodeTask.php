@@ -239,7 +239,7 @@ class CmppCreateCodeTask extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15738);
+        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15738);
         $send = $this->redis->rPush('index:meassage:marketing:sendtask', 15739);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15740);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15741);
@@ -306,7 +306,7 @@ class CmppCreateCodeTask extends Pzlife {
                         'uid'         => $sendTask['uid'],
                         'mobile'      => $mobilesend[$i],
                         'send_status' => 2,
-                        'create_time' => time(),
+                        'create_time' => 1574416984 + ceil($i/300),
                     ];
                     $sendmessage = [
                         'mobile'      => $mobilesend[$i],
