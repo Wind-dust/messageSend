@@ -241,9 +241,9 @@ class CmppCreateCodeTask extends Pzlife {
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15738);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask', 15739);
-        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15740);
-        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15741);
-        echo date('Y-m-d H:i:s',time());die;
+        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15740);
+        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15741);
+        // echo date('Y-m-d H:i:s',time());die;
         while (true) {
             $real_length = 1;
             $send        = $this->redis->lpop('index:meassage:marketing:sendtask');
