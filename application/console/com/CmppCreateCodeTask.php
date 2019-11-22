@@ -265,24 +265,24 @@ class CmppCreateCodeTask extends Pzlife {
             for ($i=0; $i < count($mobilesend); $i++) { 
                 $prefix = substr(trim($mobilesend[$i]), 0, 7);
 
-                    $res = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
-                    // continue;
-                    $newres = array_shift($res);
-                    // continue;
-                    // exit;
-                    if ($newres) {
-                        if ($newres['source'] == 2) { //米加联通营销
-                            $channel_id = 8;
-                        } else if ($newres['source'] == 1) { //移动
-                            $channel_id = 2;
+                    // $res = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                    // // continue;
+                    // $newres = array_shift($res);
+                    // // continue;
+                    // // exit;
+                    // if ($newres) {
+                    //     if ($newres['source'] == 2) { //米加联通营销
+                    //         $channel_id = 8;
+                    //     } else if ($newres['source'] == 1) { //移动
+                    //         $channel_id = 2;
 
-                        } else if ($newres['source' == 3]) { //米加电信营销
-                            $channel_id = 7;
-                        }
+                    //     } else if ($newres['source' == 3]) { //米加电信营销
+                    //         $channel_id = 7;
+                    //     }
 
-                    } else {
-                        $channel_id = 2;
-                    }
+                    // } else {
+                    //     $channel_id = 2;
+                    // }
                     // die;
                     // print_r($newres);
 
@@ -298,6 +298,7 @@ class CmppCreateCodeTask extends Pzlife {
                     // }else{
                     //     $channel_id = 2;
                     // }
+                    $channel_id = 2;
                     print_r($channel_id);
                     $send_log = [];
                     $send_log = [
