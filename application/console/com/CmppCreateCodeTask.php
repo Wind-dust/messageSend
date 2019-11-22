@@ -237,7 +237,7 @@ class CmppCreateCodeTask extends Pzlife {
     public function createMessageSendTaskLog(){
         $this->redis                = Phpredis::getConn();
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15738);
+        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15738);
         
         while (true) {
             $real_length = 1;
