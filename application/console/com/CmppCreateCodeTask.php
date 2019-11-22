@@ -298,32 +298,33 @@ class CmppCreateCodeTask extends Pzlife {
                     // }else{
                     //     $channel_id = 2;
                     // }
-                }
-                print_r($channel_id);
-                $send_log = [];
-                $send_log = [
-                    'task_no'     => $sendTask['task_no'],
-                    'uid'         => $sendTask['uid'],
-                    'mobile'      => $mobilesend[$i],
-                    'send_status' => 2,
-                    'create_time' => time(),
-                ];
-                $sendmessage = [
-                    'mobile'      => $mobilesend[$i],
-                    'mar_task_id' => $sendTask['id'],
-                    'content'     => $sendTask['task_content'],
-                ];
-                if (Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $$mobilesend[$i] . "' ")) {
-                    continue;
-                }
-                Db::startTrans();
-                try {
-                    Db::table('yx_user_send_task_log')->insert($send_log);
-                    $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
-                    Db::commit();
-                } catch (\Exception $e) {
-                    Db::rollback();
-                }
+                    print_r($channel_id);
+                    $send_log = [];
+                    $send_log = [
+                        'task_no'     => $sendTask['task_no'],
+                        'uid'         => $sendTask['uid'],
+                        'mobile'      => $mobilesend[$i],
+                        'send_status' => 2,
+                        'create_time' => time(),
+                    ];
+                    $sendmessage = [
+                        'mobile'      => $mobilesend[$i],
+                        'mar_task_id' => $sendTask['id'],
+                        'content'     => $sendTask['task_content'],
+                    ];
+                    if (Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $$mobilesend[$i] . "' ")) {
+                        continue;
+                    }
+                    Db::startTrans();
+                    try {
+                        Db::table('yx_user_send_task_log')->insert($send_log);
+                        $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
+                        Db::commit();
+                    } catch (\Exception $e) {
+                        Db::rollback();
+                    }
+                
+                
             }
             foreach ($mobilesend as $key => $kvalue) {
                 if (in_array($channel_id, [2, 6, 7, 8])) {
