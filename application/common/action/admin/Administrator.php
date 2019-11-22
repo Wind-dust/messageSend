@@ -459,7 +459,7 @@ class Administrator extends CommonIndex {
                                 $channel_id = 2; 
                                
                             }else if ($res['source' == 3]) {//米加电信营销
-                                $channel_id = 7; 
+                                $channel_id = 2; 
                             }
                             $send = [];
                             $send = [
