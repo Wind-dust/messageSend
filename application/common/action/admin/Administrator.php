@@ -418,6 +418,7 @@ class Administrator extends CommonIndex {
         if ($user['user_status'] != 2) {
             return ['code' => '3006'];
         }
+        print_r($num);die;
         if ($num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3007'];
         }
