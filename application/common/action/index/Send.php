@@ -323,6 +323,7 @@ return $result;
             Db::commit();
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
+            // exception($e);
             Db::rollback();
             return ['code' => '3009'];
         }
