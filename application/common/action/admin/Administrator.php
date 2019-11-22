@@ -387,6 +387,7 @@ class Administrator extends CommonIndex {
             }elseif (!in_array($value['uid'], $uids)) {
                 $uids[] = $value['uid'];
             }
+            // print_r($value);
             if ($value['free_trial'] == 2 && !$value['channel_id']) {
                 $real_usertask[] = $value;
                 $mobilesend       = explode(',', $value['mobile_content']);
@@ -396,7 +397,7 @@ class Administrator extends CommonIndex {
                 }
             }
         }
-        
+        // die;
         // print_r($uids);die;
         if (count($uids) > 1) {
             return ['code' => '3008', 'msg' => '一批只能同时分配一个用户的营销任务'];
