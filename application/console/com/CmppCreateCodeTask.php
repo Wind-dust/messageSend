@@ -262,11 +262,8 @@ class CmppCreateCodeTask extends Pzlife {
             $channel_id = 0;
             $channel_id = $sendTask['channel_id'];
             // print_r($channel_id);die;
-
-            foreach ($mobilesend as $key => $kvalue) {
-                if (in_array($channel_id, [2, 6, 7, 8])) {
-                    // $getSendTaskSql = "select source,province_id,province from yx_number_source where `mobile` = '".$prefix."' LIMIT 1";
-                    $prefix = substr(trim($kvalue), 0, 7);
+            for ($i=0; $i < count($mobilesend); $i++) { 
+                $prefix = substr(trim($mobilesend[$i]), 0, 7);
 
                     $res = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                     // continue;
@@ -307,16 +304,16 @@ class CmppCreateCodeTask extends Pzlife {
                 $send_log = [
                     'task_no'     => $sendTask['task_no'],
                     'uid'         => $sendTask['uid'],
-                    'mobile'      => $kvalue,
+                    'mobile'      => $mobilesend[$i],
                     'send_status' => 2,
                     'create_time' => time(),
                 ];
                 $sendmessage = [
-                    'mobile'      => $kvalue,
+                    'mobile'      => $mobilesend[$i],
                     'mar_task_id' => $sendTask['id'],
                     'content'     => $sendTask['task_content'],
                 ];
-                if (Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $kvalue . "' ")) {
+                if (Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $$mobilesend[$i] . "' ")) {
                     continue;
                 }
                 Db::startTrans();
@@ -326,6 +323,11 @@ class CmppCreateCodeTask extends Pzlife {
                     Db::commit();
                 } catch (\Exception $e) {
                     Db::rollback();
+                }
+            }
+            foreach ($mobilesend as $key => $kvalue) {
+                if (in_array($channel_id, [2, 6, 7, 8])) {
+                    // $getSendTaskSql = "select source,province_id,province from yx_number_source where `mobile` = '".$prefix."' LIMIT 1";
                 }
             }
             Db::startTrans();
