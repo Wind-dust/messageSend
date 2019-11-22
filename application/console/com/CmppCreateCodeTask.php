@@ -208,8 +208,9 @@ class CmppCreateCodeTask extends Pzlife {
             if ($send_length > 70) {
                 $real_length = ceil($send_length / 67);
             }
+            $real_num = 0;
             foreach ($mobilesend as $key => $kvalue) {
-                $real_num = $real_length* $sendTask['send_num'];
+                $real_num += $real_length* $sendTask['send_num'];
                 
                 $send_log = [];
                 $send_log = [
@@ -227,7 +228,13 @@ class CmppCreateCodeTask extends Pzlife {
                     Db::rollback();
                 }
             }
-            
+            Db::startTrans();
+                try {   
+                    Db::table('yx_user_send_task')->where('id',$sendTask['id'])->update(['real_num'=> $real_num]);
+                    Db::commit();
+                } catch (\Exception $e) {
+                    Db::rollback();
+                }
         }
     }
 }
