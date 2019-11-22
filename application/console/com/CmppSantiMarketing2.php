@@ -368,7 +368,7 @@ class CmppSantiMarketing2 extends Pzlife {
                                                     $sendTask = $this->getSendTask($sequence['mar_task_id']);
                                                     $send_log = $this->getSendTaskLog($sendTask['task_no'], $sequence['mobile']);
                 
-                                                    // $msgid = $body['Msg_Id1'].$body['Msg_Id2'];
+                                                    $msgid = $body['Msg_Id1'].$body['Msg_Id2'];
                                                     // $msgid = 155153131;
                                                     // print_r($send_log);die;
                                                     Db::startTrans();
@@ -678,7 +678,7 @@ class CmppSantiMarketing2 extends Pzlife {
                                     $sendTask = $this->getSendTask($sequence['mar_task_id']);
                                     $send_log = $this->getSendTaskLog($sendTask['task_no'], $sequence['mobile']);
 
-                                    // $msgid = $body['Msg_Id1'].$body['Msg_Id2'];
+                                    $msgid = $body['Msg_Id1'].$body['Msg_Id2'];
                                     // $msgid = 155153131;
                                     // print_r($send_log);die;
                                     Db::startTrans();
