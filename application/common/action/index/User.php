@@ -628,4 +628,30 @@ class User extends CommonIndex {
             return ['code' => '3009']; //修改失败
         } 
     }
+
+    public function getUserSubmitTask($page, $pageNum, $conId){
+        $uid = $this->getUidByConId($conId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $offset = ($page - 1) * $pageNum;
+        $result = DbAdministrator::getUserSendTask(['uid' => $uid], '*', false, '', $offset . ',' . $pageNum);
+        $total = DbAdministrator::countUserSendTask(['uid' => $uid]);
+        return ['code' => '200', 'total' => $total, 'data' => $result];
+    }
+
+    public function getUserSubmitTaskInfo($page, $pageNum, $ConId, $id){
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $offset = ($page - 1) * $pageNum;
+        $task = DbAdministrator::getUserSendTask(['id' => $id,'uid' => $uid], '*', true);
+        if (empty($task)) {
+            return ['code' => '3001', 'msg' => '该任务不存在'];
+        }
+        $task_log = DbAdministrator::getUserSendTaskLog(['task_no' => $task['task_no']],'*',false,'',$offset . ',' . $pageNum);
+        $total = DbAdministrator::countUserSendTaskLog(['task_no' => $task['task_no']]);
+        return ['code' => '200','task' => $task, 'task_log' => $task_log];
+    }
 }

@@ -270,4 +270,8 @@ class DbAdministrator {
         $UserSendTaskLog = new UserSendTaskLog;
         return $UserSendTaskLog->save($data, ['id' => $id]);
     }
+
+    public function countUserSendTaskLog($where){
+        return UserSendTaskLog::where($where)->count();
+    }
 }

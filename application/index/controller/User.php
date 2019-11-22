@@ -412,4 +412,58 @@ class User extends MyController {
         // $this->apiLog($apiName, [$conId, $nick_name, $user_type, $passwd, $mobile, $email], $result['code'], $conId);
         return $result;
     }
+
+    /**
+     * @api              {post} / 查询用户提交任务(营销)
+     * @apiDescription   getUserSubmitTask
+     * @apiGroup         index_user
+     * @apiName          getUserSubmitTask
+     * @apiParam (入参) {String} pageNum 
+     * @apiParam (入参) {String} con_id
+     * @apiParam (入参) {String} page 
+     * @apiSuccess (返回) {String} code 200:成功   3003:用户不存在 / 
+     * @apiSuccess (返回) {Array} data 用户信息
+     * @apiSampleRequest /index/user/getUserSubmitTask
+     * @return array
+     * @author rzc
+     */
+    public function getUserSubmitTask(){
+        $ConId = trim($this->request->post('con_id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        $result = $this->app->administrator->getUserSubmitTask($page, $pageNum, $ConId);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 查询用户提交任务详情(营销)
+     * @apiDescription   getUserSubmitTaskInfo
+     * @apiGroup         index_user
+     * @apiName          getUserSubmitTaskInfo
+     * @apiParam (入参) {String} page 
+     * @apiParam (入参) {String} con_id
+     * @apiParam (入参) {String} pageNum 
+     * @apiParam (入参) {String} id 任务id
+     * @apiSuccess (返回) {String} code 200:成功  3001:logo为空或者未上传成功/ 3002:businesslicense为空或者未上传成功 / 3003:用户不存在 / 3004:登录失败
+     * @apiSuccess (返回) {Array} data 用户信息
+     * @apiSampleRequest /index/user/getUserSubmitTaskInfo
+     * @return array
+     * @author rzc
+     */
+    public function getUserSubmitTaskInfo(){
+        $ConId = trim($this->request->post('con_id'));
+        $id = trim($this->request->post('id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        $result = $this->app->administrator->getUserSubmitTaskInfo($page, $pageNum, $ConId, $id);
+        return $result;
+    }
 }

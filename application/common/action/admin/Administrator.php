@@ -468,6 +468,7 @@ class Administrator extends CommonIndex {
                                 'content' => $usertask['task_content'], 
                             ];
                             $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id,json_encode($send)); //三体营销通道
+                            $res = $this->redis->rpush("index:meassage:marketing:sendtask",$usertask['id']); //三体营销通道
                             // $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, $value . ":" . $usertask['id'] . ":" . $usertask['task_content']); //三体营销通道
                             if ($res == false) {
                                 Db::rollback();
