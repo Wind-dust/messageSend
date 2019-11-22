@@ -681,7 +681,7 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
                                         Db::rollback();
 
                                     }
-                                    die;
+                                    // die;
                                 }
                             } else if ($head['Command_Id'] == 0x80000004) {
                                 $body = unpack("N2Msg_Id/CResult", $bodyData);
@@ -690,7 +690,7 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
                                 if ($sequence) {
                                     $sequence = json_decode($sequence, true);
                                     $sendTask = $this->getSendTask($sequence['mar_task_id']);
-                                    $send_log = $this->getSendTaskLog($sendTask['task_no'], $sequence['mobile']);
+                                    $send_log = $this->getSendTaskLog($sequence['task_no'], $sequence['mobile']);
 
                                     $msgid = $body['Msg_Id1'].$body['Msg_Id2'];
                                     // $msgid = 155153131;
