@@ -112,7 +112,7 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     private function getSendTask($id) {
-        $getSendTaskSql = sprintf("select id,uid,task_no from yx_user_send_task where delete_time=0 and id = %d", $id);
+        $getSendTaskSql = sprintf("select * from yx_user_send_task where delete_time=0 and id = %d", $id);
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
         if (!$sendTask) {
@@ -192,10 +192,42 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     public function createMessageSendTaskLog(){
+        $this->redis                = Phpredis::getConn();
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        do {
+        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15726);
+        
+        while (true) {
+            $real_length = 1;
+            $send = $this->redis->lpop('index:meassage:marketing:sendtask');
+            if (empty($send)) {
+                exit('taskId_is_null');
+            }
+            $sendTask = $this->getSendTask($send);
+            $mobilesend       = explode(',', $sendTask['mobile_content']);
+            $send_length     = mb_strlen($sendTask['task_content'], 'utf8');
+            if ($send_length > 70) {
+                $real_length = ceil($send_length / 67);
+            }
+            foreach ($mobilesend as $key => $kvalue) {
+                $real_num = $real_length* $sendTask['send_num'];
+                
+                $send_log = [];
+                $send_log = [
+                    'task_no' => $sendTask['task_no'],
+                    'uid' => $sendTask['uid'],
+                    'mobile' => $kvalue,
+                    'send_status' => 2,
+                    'create_time' => time(),
+                ];
+                Db::startTrans();
+                try {   
+                    Db::table('yx_user_send_task_log')->insert($send_log);
+                    Db::commit();
+                } catch (\Exception $e) {
+                    Db::rollback();
+                }
+            }
             
-        $send = $this->redis->lpop('index:meassage:marketing:sendtask');
-        } while ($a <= 10);
+        }
     }
 }

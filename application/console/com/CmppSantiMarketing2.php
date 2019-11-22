@@ -195,6 +195,8 @@ class CmppSantiMarketing2 extends Pzlife {
                     $Command_Id = 0x00000001;
                    
                 } else {
+                    
+                    date_default_timezone_set('PRC');
                     //当有号码发送需求时 进行提交
                     /* redis 读取需要发送的数据 */
                     $send = $redis->lPop($redisMessageCodeSend);

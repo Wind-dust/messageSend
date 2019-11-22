@@ -534,6 +534,9 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
+    public function getUserSendCodeTask(){
+        
+    }
 
     /**
      * @api              {post} / 分配任务通道

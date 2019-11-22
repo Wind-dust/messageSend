@@ -192,6 +192,8 @@ class CmppSantiMarketing extends Pzlife {
                    
                 } else {
                     //当有号码发送需求时 进行提交
+                    
+        date_default_timezone_set('PRC');
                     /* redis 读取需要发送的数据 */
                     $send = $redis->lPop($redisMessageCodeSend);
                         if ($send) { //正式使用从缓存中读取数据
