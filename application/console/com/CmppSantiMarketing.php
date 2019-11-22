@@ -455,6 +455,28 @@ class CmppSantiMarketing extends Pzlife {
                                                     $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                                     $mesage['Done_time']   = $Msg_Content['Done_time'];
                                                     $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
+                                                    $sendlog = $this->getSendTaskLogByMsgid($Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
+                                                    Db::startTrans();
+                                                    try {
+                                                        if (empty($send_log)) {
+                                                            Db::table('yx_user_send_task_log')->insert([
+                                                                'task_no'     => $mesage['task_no'],
+                                                                'mobile'      => $mesage['mobile'],
+                                                                'msgid'       => $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'],
+                                                                'send_status' => 2,
+                                                                'status_message' => $Msg_Content['Stat'],
+                                                                'create_time' => time(),
+                                                                'send_time' => $Msg_Content['Done_time'],
+                                                            ]);
+
+                                                        } else {
+                                                            Db::table('yx_user_send_task_log')->where('id', $sendlog['id'])->update(['status_message' => $Msg_Content['Stat'],'send_time' => $Msg_Content['Done_time']]);
+                                                        }
+                                                        Db::commit();
+                                                    } catch (\Exception $e) {
+                                                        Db::rollback();
+                                                        return ['code' => '3009']; //修改失败
+                                                    }
                                                 }
                                                 print_r($Msg_Content);
                                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
@@ -775,6 +797,28 @@ class CmppSantiMarketing extends Pzlife {
                                     $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                     $mesage['Done_time']   = $Msg_Content['Done_time'];
                                     $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
+                                    $sendlog = $this->getSendTaskLogByMsgid($Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
+                                    Db::startTrans();
+                                    try {
+                                        if (empty($send_log)) {
+                                            Db::table('yx_user_send_task_log')->insert([
+                                                'task_no'     => $mesage['task_no'],
+                                                'mobile'      => $mesage['mobile'],
+                                                'msgid'       => $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'],
+                                                'send_status' => 2,
+                                                'status_message' => $Msg_Content['Stat'],
+                                                'create_time' => time(),
+                                                'send_time' => $Msg_Content['Done_time'],
+                                            ]);
+
+                                        } else {
+                                            Db::table('yx_user_send_task_log')->where('id', $sendlog['id'])->update(['status_message' => $Msg_Content['Stat'],'send_time' => $Msg_Content['Done_time']]);
+                                        }
+                                        Db::commit();
+                                    } catch (\Exception $e) {
+                                        Db::rollback();
+                                        return ['code' => '3009']; //修改失败
+                                    }
                                 }
                                 print_r($Msg_Content);
                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
@@ -902,6 +946,16 @@ class CmppSantiMarketing extends Pzlife {
 
     private function getSendTaskLog($task_no,$mobile) {
         $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `task_no` = '".$task_no."' and `mobile` = '".$mobile."'";
+        // print_r($getUserSql);die;
+        $sendTask = Db::query($getSendTaskSql);
+        if (!$sendTask) {
+            return [];
+        }
+        return $sendTask[0];
+    }
+
+    private function getSendTaskLogByMsgid($msgid) {
+        $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `msgid` = '".$msgid."'";
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
         if (!$sendTask) {

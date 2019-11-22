@@ -358,6 +358,34 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
                                                 print_r($body);
                                                 $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                                 if ($sequence) {
+                                                    $sequence = json_decode($sequence, true);
+                                                    $sendTask = $this->getSendTask($sequence['mar_task_id']);
+                                                    $send_log = $this->getSendTaskLog($sendTask['task_no'], $sequence['mobile']);
+                
+                                                    $msgid = $body['Msg_Id1'].$body['Msg_Id2'];
+                                                    // $msgid = 155153131;
+                                                    // print_r($send_log);die;
+                                                    Db::startTrans();
+                                                    try {
+                                                        if (empty($send_log)) {
+                                                            Db::table('yx_user_send_task_log')->insert([
+                                                                'task_no'     => $sendTask['task_no'],
+                                                                'mobile'      => $sequence['mobile'],
+                                                                'msgid'       => $msgid,
+                                                                'send_status' => 2,
+                                                                'create_time' => time(),
+                                                            ]);
+                
+                                                        } else {
+                                                            Db::table('yx_user_send_task_log')->where('id', $send_log['id'])->update(['msgid' => $msgid]);
+                                                        }
+                                                        Db::commit();
+                                                        // $sequence = $redis->hdel($redisMessageCodeSequenceId,2);
+                                                    } catch (\Exception $e) {
+                                                        exception($e);
+                                                        Db::rollback();
+                
+                                                    }
                                                     $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                                     $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], $sequence);
                                                 }
@@ -425,6 +453,28 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
                                                     $mesage         = json_decode($mesage, true);
                                                     $mesage['Stat'] = $Msg_Content['Stat'];
                                                     $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
+                                                    $sendlog = $this->getSendTaskLogByMsgid($Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
+                                                    Db::startTrans();
+                                                    try {
+                                                        if (empty($send_log)) {
+                                                            Db::table('yx_user_send_task_log')->insert([
+                                                                'task_no'     => $mesage['task_no'],
+                                                                'mobile'      => $mesage['mobile'],
+                                                                'msgid'       => $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'],
+                                                                'send_status' => 2,
+                                                                'status_message' => $Msg_Content['Stat'],
+                                                                'create_time' => time(),
+                                                                'send_time' => $Msg_Content['Done_time'],
+                                                            ]);
+
+                                                        } else {
+                                                            Db::table('yx_user_send_task_log')->where('id', $sendlog['id'])->update(['status_message' => $Msg_Content['Stat'],'send_time' => $Msg_Content['Done_time']]);
+                                                        }
+                                                        Db::commit();
+                                                    } catch (\Exception $e) {
+                                                        Db::rollback();
+                                                        return ['code' => '3009']; //修改失败
+                                                    }
                                                 }
                                                 print_r($Msg_Content);
                                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
@@ -636,7 +686,38 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
                             } else if ($head['Command_Id'] == 0x80000004) {
                                 $body = unpack("N2Msg_Id/CResult", $bodyData);
                                 print_r($body);
+                                if ($sequence) {
+                                    $sequence = json_decode($sequence, true);
+                                    $sendTask = $this->getSendTask($sequence['mar_task_id']);
+                                    $send_log = $this->getSendTaskLog($sendTask['task_no'], $sequence['mobile']);
 
+                                    $msgid = $body['Msg_Id1'].$body['Msg_Id2'];
+                                    // $msgid = 155153131;
+                                    // print_r($send_log);die;
+                                    Db::startTrans();
+                                    try {
+                                        if (empty($send_log)) {
+                                            Db::table('yx_user_send_task_log')->insert([
+                                                'task_no'     => $sendTask['task_no'],
+                                                'mobile'      => $sequence['mobile'],
+                                                'msgid'       => $msgid,
+                                                'send_status' => 2,
+                                                'create_time' => time(),
+                                            ]);
+
+                                        } else {
+                                            Db::table('yx_user_send_task_log')->where('id', $send_log['id'])->update(['msgid' => $msgid]);
+                                        }
+                                        Db::commit();
+                                        // $sequence = $redis->hdel($redisMessageCodeSequenceId,2);
+                                    } catch (\Exception $e) {
+                                        exception($e);
+                                        Db::rollback();
+
+                                    }
+                                    $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
+                                    $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], $sequence);
+                                }
                                 switch ($body['Result']) {
                                 case 0:
                                     echo "发送成功" . "\n";
@@ -711,6 +792,28 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
                                     $mesage         = json_decode($mesage, true);
                                     $mesage['Stat'] = $Msg_Content['Stat'];
                                     $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
+                                    $sendlog = $this->getSendTaskLogByMsgid($Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
+                                    Db::startTrans();
+                                    try {
+                                        if (empty($send_log)) {
+                                            Db::table('yx_user_send_task_log')->insert([
+                                                'task_no'     => $mesage['task_no'],
+                                                'mobile'      => $mesage['mobile'],
+                                                'msgid'       => $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'],
+                                                'send_status' => 2,
+                                                'status_message' => $Msg_Content['Stat'],
+                                                'create_time' => time(),
+                                                'send_time' => $Msg_Content['Done_time'],
+                                            ]);
+
+                                        } else {
+                                            Db::table('yx_user_send_task_log')->where('id', $sendlog['id'])->update(['status_message' => $Msg_Content['Stat'],'send_time' => $Msg_Content['Done_time']]);
+                                        }
+                                        Db::commit();
+                                    } catch (\Exception $e) {
+                                        Db::rollback();
+                                        return ['code' => '3009']; //修改失败
+                                    }
                                 }
                                 print_r($Msg_Content);
                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
@@ -771,6 +874,16 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
 
     private function getSendTaskLog($task_no,$mobile) {
         $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `task_no` = '".$task_no."' and `mobile` = '".$mobile."'";
+        // print_r($getUserSql);die;
+        $sendTask = Db::query($getSendTaskSql);
+        if (!$sendTask) {
+            return [];
+        }
+        return $sendTask[0];
+    }
+
+    private function getSendTaskLogByMsgid($msgid) {
+        $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `msgid` = '".$msgid."'";
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
         if (!$sendTask) {
