@@ -24,6 +24,7 @@ return [
     'clientsocketsantibusiness'     => $commandPath . 'ClientSocketSantiBusiness',
     'clientsocketjiujiaXintong' => $commandPath . 'ClientSocketJiuJiaXinTong',
     'cmppsantimarketing'     => $commandPath . 'CmppSantiMarketing',
+    'cmppsantimarketing2'     => $commandPath . 'CmppSantiMarketing2',
     'cmpptestlocal'     => $commandPath . 'CmppTestLocal',
     'cmppcreatecodetask' => $commandPath . 'CmppCreateCodeTask',
     'clientSocketwangdai' => $commandPath . 'ClientSocketWangDai',

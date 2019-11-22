@@ -182,6 +182,9 @@ class Send extends MyController {
         if (empty($appid)) {
             return ['code' => '3000'];
         }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
         // echo phpinfo();die;
         if (empty($Mobiles)) {
             return ['code' => '3001'];

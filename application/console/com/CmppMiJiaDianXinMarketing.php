@@ -290,7 +290,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife {
 
                                 $Total_Length = strlen($bodyData) + 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send_data);
+                                $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
                                 // socket_write($socket, $headData . $bodyData, $Total_Length);
                                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) { //写入失败，还原发送信息并关闭端口
                                     echo 'fail to write' . socket_strerror(socket_last_error());
@@ -557,7 +557,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife {
                         // echo strlen($code);die;
                         // echo $Command_Id;die;
                         // print_r(strlen($bodyData));die;
-                        $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send_data);
+                        $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
                     } else {
                         $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                         $Command_Id  = 0x00000008; //保持连接

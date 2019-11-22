@@ -9,7 +9,7 @@ use Env;
 use Exception;
 use think\Db;
 
-class CmppSantiMarketing extends Pzlife {
+class CmppSantiMarketing2 extends Pzlife {
 
     // protected $redis;
 
@@ -25,7 +25,7 @@ class CmppSantiMarketing extends Pzlife {
             'Source_Addr'   => "101162", //企业id  企业代码
             'Shared_secret' => 'uc338qd7', //网关登录密码
             'Service_Id'    => "101162", //业务代码
-            'template_id'   => "217800", //模板id
+            'template_id'   => "218503", //模板id
             'Dest_Id'       => "106928080158", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
@@ -155,7 +155,11 @@ class CmppSantiMarketing extends Pzlife {
         // $send = $redis->lPop("index:meassage:code:send:1");
         // $send = $redis->rPush($redisMessageCodeSend,"15555555555:12:【品质生活】祝您生活愉快");
 
-
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15821193682',
+            'mar_task_id' => 15715,
+            'content'     => '【中山口腔】5周年庆，11月23-30日，黄石三店同庆，全线诊疗项目 8 折让利回馈、消费就送青花瓷礼盒！39.9元购洁牙卡送食用油。详情询:0714-6268188 回T退订',
+        ]));
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
