@@ -179,7 +179,9 @@ class Send extends MyController {
         $Dstime = trim($this->request->post('dstime'));//手机号
         $ip = trim($this->request->ip());
         $Mobiles = explode(',',$Mobile);
-        
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
         // echo phpinfo();die;
         if (empty($Mobiles)) {
             return ['code' => '3001'];
