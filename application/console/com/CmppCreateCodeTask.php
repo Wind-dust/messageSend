@@ -239,8 +239,8 @@ class CmppCreateCodeTask extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15738);
-        $send = $this->redis->rPush('index:meassage:marketing:sendtask', 15739);
+        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15742);
+        $send = $this->redis->rPush('index:meassage:marketing:sendtask', 15743);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15740);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15741);
         // echo date('Y-m-d H:i:s',time());die;
@@ -306,7 +306,7 @@ class CmppCreateCodeTask extends Pzlife {
                         'uid'         => $sendTask['uid'],
                         'mobile'      => $mobilesend[$i],
                         'send_status' => 2,
-                        'create_time' => 1574416984 + ceil($i/300),
+                        'create_time' => time(),
                     ];
                     $sendmessage = [
                         'mobile'      => $mobilesend[$i],
@@ -319,7 +319,7 @@ class CmppCreateCodeTask extends Pzlife {
                     Db::startTrans();
                     try {
                         Db::table('yx_user_send_task_log')->insert($send_log);
-                        $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
+                        // $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
                         Db::commit();
                     } catch (\Exception $e) {
                         Db::rollback();
