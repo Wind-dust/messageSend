@@ -690,7 +690,7 @@ class CmppSantiMarketing2 extends Pzlife {
                                         Db::rollback();
 
                                     }
-                                    die;
+                                    // die;
                                 }
                             } else if ($head['Command_Id'] == 0x80000004) {
                                 $body = unpack("N2Msg_Id/CResult", $bodyData);
