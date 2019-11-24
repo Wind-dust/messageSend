@@ -174,6 +174,7 @@ class CmppCreateCodeTask extends Pzlife {
 
             }
         }
+	exit("success");
     }
 
     //免审任务客户
