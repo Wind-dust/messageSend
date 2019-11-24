@@ -316,7 +316,7 @@ class CmppCreateCodeTask extends Pzlife {
                     ];
                     $has = Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $mobilesend[$i] . "' ");
                     if ($has) {
-                        Db::table('yx_user_send_task_log')->where('id', $has[0]['id'])->update(['real_num' => $real_num, 'send_status' => 3]);
+                        Db::table('yx_user_send_task_log')->where('id', $has[0]['id'])->update(['create_time' => time()-86400]);
                     }
                     Db::startTrans();
                     try {
