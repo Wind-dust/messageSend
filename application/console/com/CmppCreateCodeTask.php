@@ -1,4 +1,3 @@
-
 <?php
 
 namespace app\console\com;
