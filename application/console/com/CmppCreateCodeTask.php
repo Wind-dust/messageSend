@@ -247,7 +247,8 @@ class CmppCreateCodeTask extends Pzlife {
         // echo date('Y-m-d H:i:s',time());die;
         while (true) {
             $real_length = 1;
-            $send        = $this->redis->lpop('index:meassage:marketing:sendtask');
+            // $send        = $this->redis->lpop('index:meassage:marketing:sendtask');
+            $send = 15742;
             if (empty($send)) {
                 exit('taskId_is_null');
             }
@@ -307,15 +308,16 @@ class CmppCreateCodeTask extends Pzlife {
                         'uid'         => $sendTask['uid'],
                         'mobile'      => $mobilesend[$i],
                         'send_status' => 2,
-                        'create_time' => time(),
+                        'create_time' => time()-86400,
                     ];
                     $sendmessage = [
                         'mobile'      => $mobilesend[$i],
                         'mar_task_id' => $sendTask['id'],
                         'content'     => $sendTask['task_content'],
                     ];
-                    if (Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $mobilesend[$i] . "' ")) {
-                        continue;
+                    $has = Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $mobilesend[$i] . "' ");
+                    if ($has) {
+                        Db::table('yx_user_send_task_log')->where('id', $has[0]['id'])->update(['real_num' => $real_num, 'send_status' => 3]);
                     }
                     Db::startTrans();
                     try {
