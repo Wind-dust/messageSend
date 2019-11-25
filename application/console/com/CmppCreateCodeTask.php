@@ -365,7 +365,7 @@ continue;
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
-        $disMessageCodeSend = 'index:meassage:code:new:deliver:'; //验证码发送任务rediskey
+        $redisMessageCodeSend = 'index:meassage:code:new:deliver:'; //验证码发送任务rediskey
         for ($i = 0; $i < 5; $i++) {
             $new_redisMessageCodeSend = $redisMessageCodeSend . $i;
             $send                     = $redis->lPop($new_redisMessageCodeSend);
