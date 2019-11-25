@@ -302,7 +302,7 @@ return $result;
         if (empty($effective_mobile)) {
             return 2;
         }
-        $send_num             = count($Mobiles);
+        $send_num             = count(array_filter($Mobiles));
         $data                 = [];
         $data['uid']          = $user['id'];
         $data['source']       = $ip;

@@ -344,7 +344,7 @@ class CmppSantiMarketing2 extends Pzlife {
                                                 }
                                                 //通道断口处理
                                                 if ($body['Status'] != 0) {
-                                                    socket_close($socket);
+                                                    // socket_close($socket);
                                                     Db::startTrans();
                                                     try {
                                                         // Db::table('yx_sms_sending_channel')->update(['error_msg' => $error_msg,'channel_status' => 4])->where('id',$id);
@@ -357,7 +357,7 @@ class CmppSantiMarketing2 extends Pzlife {
                                                         Db::rollback();
 
                                                     }
-                                                    die;
+                                                    // die;
                                                 }
                                             } else if ($head['Command_Id'] == 0x80000004) {
                                                 $body = unpack("N2Msg_Id/CResult", $bodyData);
@@ -369,9 +369,10 @@ class CmppSantiMarketing2 extends Pzlife {
                                                     $send_log = $this->getSendTaskLog($sendTask['task_no'], $sequence['mobile']);
                 
                                                     $msgid = $body['Msg_Id1'].$body['Msg_Id2'];
+                                                    $sequence['Msg_Id'] = $msgid;
                                                     // $msgid = 155153131;
                                                     // print_r($send_log);die;
-                                                    Db::startTrans();
+                                          /*           Db::startTrans();
                                                     try {
                                                         if (empty($send_log)) {
                                                             Db::table('yx_user_send_task_log')->insert([
@@ -391,9 +392,9 @@ class CmppSantiMarketing2 extends Pzlife {
                                                         exception($e);
                                                         Db::rollback();
                 
-                                                    }
+                                                    } */
                                                     $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
-                                                    $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], $sequence);
+                                                    $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
                                                 }
 
                                                 switch ($body['Result']) {
@@ -462,7 +463,7 @@ class CmppSantiMarketing2 extends Pzlife {
                                                     $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                                     $mesage['Done_time'] = $Msg_Content['Done_time'];
                                                     $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
-                                                    $sendlog = $this->getSendTaskLogByMsgid($Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
+                                      /*               $sendlog = $this->getSendTaskLogByMsgid($Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                                                     Db::startTrans();
                                                     try {
                                                         if (empty($send_log)) {
@@ -483,7 +484,7 @@ class CmppSantiMarketing2 extends Pzlife {
                                                     } catch (\Exception $e) {
                                                         Db::rollback();
                                                         return ['code' => '3009']; //修改失败
-                                                    }
+                                                    } */
                                                 }
                                                 print_r($Msg_Content);
                                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
@@ -506,8 +507,8 @@ class CmppSantiMarketing2 extends Pzlife {
                                         //捕获异常
                                          catch (Exception $e) {
                                             //关闭工作流并修改通道状态
-                                            socket_close($socket);
-                                            exception($e);
+                                            // socket_close($socket);
+                                            // exception($e);
                                         }
                                     }
 
@@ -698,7 +699,8 @@ class CmppSantiMarketing2 extends Pzlife {
                                 $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                 if ($sequence) {
                                     $sequence = json_decode($sequence, true);
-                                    $sendTask = $this->getSendTask($sequence['mar_task_id']);
+                                    $sequence['Msg_Id'] = $body['Msg_Id1'] . $body['Msg_Id2'];
+                                   /*  $sendTask = $this->getSendTask($sequence['mar_task_id']);
                                     $send_log = $this->getSendTaskLog($sendTask['task_no'], $sequence['mobile']);
 
                                     $msgid = $body['Msg_Id1'].$body['Msg_Id2'];
@@ -724,9 +726,10 @@ class CmppSantiMarketing2 extends Pzlife {
                                         exception($e);
                                         Db::rollback();
 
-                                    }
+                                    } */
+                                    
                                     $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
-                                    $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], $sequence);
+                                    $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
                                 }
                                 switch ($body['Result']) {
                                 case 0:
@@ -805,7 +808,7 @@ class CmppSantiMarketing2 extends Pzlife {
                                     $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                     $mesage['Done_time'] = $Msg_Content['Done_time'];
                                     $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
-                                    $sendlog = $this->getSendTaskLogByMsgid($Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
+                                   /*  $sendlog = $this->getSendTaskLogByMsgid($Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                                     Db::startTrans();
                                     try {
                                         if (empty($send_log)) {
@@ -826,7 +829,7 @@ class CmppSantiMarketing2 extends Pzlife {
                                     } catch (\Exception $e) {
                                         Db::rollback();
                                         return ['code' => '3009']; //修改失败
-                                    }
+                                    } */
                                 }
                                 print_r($Msg_Content);
                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
