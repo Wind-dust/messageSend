@@ -343,6 +343,7 @@ class CmppCreateCodeTask extends Pzlife {
             } catch (\Exception $e) {
                 Db::rollback();
             }
+            exit("SUCCESS");
         }
     }
 
