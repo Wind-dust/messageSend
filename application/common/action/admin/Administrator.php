@@ -431,7 +431,7 @@ class Administrator extends CommonIndex {
         Db::startTrans();
         try {
 
-            DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
+            // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
             foreach ($real_usertask as $key => $value) {
                 DbAdministrator::editUserSendTask(['free_trial' => $free_trial, 'channel_id' => $channel_id], $value['id']);
             }

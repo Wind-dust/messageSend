@@ -293,6 +293,18 @@ return $result;
         if ($Password != $user['appkey']) {
             return ['code' => '3000'];
         }
+        $userEquities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 5], 'id,agency_price,num_balance', true);
+        if (empty($userEquities)) {
+            return ['code' => '3005'];
+        }
+        if ($user['user_status'] != 2) {
+            return ['code' => '3006'];
+        }
+        $send_num             = count(array_filter($Mobiles));
+
+        if ($send_num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
+            return ['code' => '3007'];
+        }
         $effective_mobile = [];
         foreach ($Mobiles as $key => $value) {
             if (checkMobile(($value))) {
@@ -302,7 +314,6 @@ return $result;
         if (empty($effective_mobile)) {
             return 2;
         }
-        $send_num             = count(array_filter($Mobiles));
         $data                 = [];
         $data['uid']          = $user['id'];
         $data['source']       = $ip;
@@ -317,7 +328,7 @@ return $result;
 
         Db::startTrans();
         try {
-
+            DbAdministrator::modifyBalance($userEquities['id'], $send_num, 'dec');
             $id = DbAdministrator::addUserSendTask($data);
 
             Db::commit();

@@ -248,7 +248,7 @@ class CmppCreateCodeTask extends Pzlife {
         while (true) {
             $real_length = 1;
             // $send        = $this->redis->lpop('index:meassage:marketing:sendtask');
-            $send = 15742;
+            $send = 15738;
             if (empty($send)) {
                 exit('taskId_is_null');
             }
