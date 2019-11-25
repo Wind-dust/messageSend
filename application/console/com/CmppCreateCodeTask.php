@@ -240,7 +240,7 @@ class CmppCreateCodeTask extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15742);
+        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15738);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask', 15743);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15740);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15741);
@@ -308,7 +308,7 @@ class CmppCreateCodeTask extends Pzlife {
                         'uid'         => $sendTask['uid'],
                         'mobile'      => $mobilesend[$i],
                         'send_status' => 2,
-                        'create_time' => time()-11600,
+                        'create_time' => time()-241022,
                     ];
                     $sendmessage = [
                         'mobile'      => $mobilesend[$i],
@@ -317,9 +317,8 @@ class CmppCreateCodeTask extends Pzlife {
                     ];
                     $has = Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $mobilesend[$i] . "' ");
                     if ($has) {
+                        continue;
                         Db::table('yx_user_send_task_log')->where('id', $has[0]['id'])->update(['create_time' => time()-86400]);
-			
-                    continue;
                     }
                     Db::startTrans();
                     try {
@@ -364,6 +363,7 @@ class CmppCreateCodeTask extends Pzlife {
     public function getSendLog(){
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        // echo time()-1574419068;die;
         // date_default_timezone_set('PRC');
         // $send_task = $this->getSendTask(15743);
         // $mobile =array_filter(explode(',',$send_task['mobile_content'])) ;
