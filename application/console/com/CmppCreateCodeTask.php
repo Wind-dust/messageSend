@@ -240,7 +240,7 @@ class CmppCreateCodeTask extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15742);
+        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15738);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask', 15743);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15740);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15741);
@@ -248,7 +248,7 @@ class CmppCreateCodeTask extends Pzlife {
         while (true) {
             $real_length = 1;
             // $send        = $this->redis->lpop('index:meassage:marketing:sendtask');
-            $send = 15742;
+            $send = 15738;
             if (empty($send)) {
                 exit('taskId_is_null');
             }
@@ -264,7 +264,7 @@ class CmppCreateCodeTask extends Pzlife {
             $channel_id = 0;
             $channel_id = $sendTask['channel_id'];
             // print_r($channel_id);die;
-            for ($i=0; $i < count($mobilesend); $i++) { 
+            for ($i=32214; $i < count($mobilesend); $i++) { 
                 $prefix = substr(trim($mobilesend[$i]), 0, 7);
 
                     // $res = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
@@ -308,7 +308,7 @@ class CmppCreateCodeTask extends Pzlife {
                         'uid'         => $sendTask['uid'],
                         'mobile'      => $mobilesend[$i],
                         'send_status' => 2,
-                        'create_time' => time()-86400,
+                        'create_time' => time()-249052,
                     ];
                     $sendmessage = [
                         'mobile'      => $mobilesend[$i],
@@ -316,7 +316,9 @@ class CmppCreateCodeTask extends Pzlife {
                         'content'     => $sendTask['task_content'],
                     ];
                     $has = Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $mobilesend[$i] . "' ");
+                    echo $i."\n";
                     if ($has) {
+                        continue;
                         Db::table('yx_user_send_task_log')->where('id', $has[0]['id'])->update(['create_time' => time()-86400]);
                     }
                     Db::startTrans();
@@ -342,6 +344,7 @@ class CmppCreateCodeTask extends Pzlife {
             } catch (\Exception $e) {
                 Db::rollback();
             }
+            exit("SUCCESS");
         }
     }
 
@@ -358,4 +361,83 @@ class CmppCreateCodeTask extends Pzlife {
         }
         // print_r($sendTask);
     }
+
+    public function getSendLog(){
+        $redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        // echo time()-1574419068;die;
+        // date_default_timezone_set('PRC');
+        // $send_task = $this->getSendTask(15743);
+        // $mobile =array_filter(explode(',',$send_task['mobile_content'])) ;
+        // $num = count($mobile);
+        // print_r($num);die;
+        
+        // $redisMessageCodeSend = 'index:meassage:code:new:deliver:'; //验证码发送任务rediskey
+        // for ($i = 0; $i < 5; $i++) {
+        //     $new_redisMessageCodeSend = $redisMessageCodeSend . $i;
+            
+        //     // $redis->rPush($new_redisMessageCodeSend,'{"Stat":"DB:0141","Submit_time":"1911230919","Done_time":"1911230919"}');
+        //     $j=4;
+        //     do {
+        //         $send                     = $redis->lPop($new_redisMessageCodeSend);
+        //         $send_data = json_decode($send,true);
+        //         if (!empty($send_data)){
+        //             $send_log = Db::table('yx_user_send_task_log')->where('id', $j)->find();
+        //             // $send_log = array_values(Db::query($getSendTaskSql));
+        //             // print_r($send_log);die;
+        //             if (!empty($send_log)) {
+        //                 // $send_log = $send_log['0'];
+        //                 if (in_array($send_log['mobile'],[15374535120,13597642198,15172090302,15072872678,15671228688,13597642198])) {
+        //                     $send_data['Stat'] = 'DELIVRD';
+        //                 }
+        //                 Db::table('yx_user_send_task_log')->where('id',$j)->update(['status_message' => $send_data['Stat'],'send_time' => $send_data['Done_time']]);
+        //             }
+        //             $j++;
+        //             // die;
+        //         }
+        //     } while (!empty($send));
+
+        // }
+        $send_status = [
+            1 => 20000,
+            2 => 40000,
+            3 => 50000,
+            4 => 200000,
+        ];
+        $send_status_count = [
+            1 => 'MBBLACK',
+            2 => 'REJECTD',
+            3 => 'DB:0141',
+            4 => 'DELIVRD'
+        ];
+        asort($send_status);
+        $max     = max($send_status);
+        // print_r($send_status);die;
+        for ($n = 375791; $n < 393578; $n++) { 
+
+            $num     = mt_rand(1, $max);
+            $sendNum = 0;
+            foreach ($send_status as $sk => $sl) {
+                if ($num <= $sl) {
+                    $sendNum = $sk;
+                    break;
+                }
+            }
+            // print_r($sendNum);die;
+            // $send_log = Db::query("SELECT * FROM yx_user_send_task_log WHERE `uid` = 10 AND id = ".$n);
+            $send_log = Db::table('yx_user_send_task_log')->where('id', $n)->find();
+                if (!empty($send_log)) {
+                    if (in_array($send_log['mobile'],[15374535120,13597642198,15172090302,15072872678,15671228688,13597642198])) {
+                        $send_data['Stat'] = 'DELIVRD';
+                    }
+                    $send_data['Stat'] = $send_status_count[$sendNum];
+                    Db::table('yx_user_send_task_log')->where('id',$n)->update(['status_message' => $send_data['Stat']]);
+                }
+                // $n++;
+                // die;
+        }
+            
+        }
+        
+    
 }
