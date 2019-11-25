@@ -398,10 +398,11 @@ class CmppCreateCodeTask extends Pzlife {
         //     } while (!empty($send));
 
         // }
-        echo time()-1574472176;die;
+        // echo time()-1574472176;die;
         for ($i=325790; $i < 375792; $i++) { 
-            $newtime = time()-1574472176;
-            // Db::table('yx_user_send_task_log')->where('id',$i)->update(['create_time' => $send_data['Stat']]);
+            $newtime = time()-213764;
+            $send_time = time()-213264;
+            Db::table('yx_user_send_task_log')->where('id',$i)->update(['create_time' => $newtime,'send_time' => $send_time]);
         }
         die;
         $send_status = [
