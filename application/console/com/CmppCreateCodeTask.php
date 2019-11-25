@@ -308,7 +308,7 @@ class CmppCreateCodeTask extends Pzlife {
                         'uid'         => $sendTask['uid'],
                         'mobile'      => $mobilesend[$i],
                         'send_status' => 2,
-                        'create_time' => time()-241022,
+                        'create_time' => time()-249052,
                     ];
                     $sendmessage = [
                         'mobile'      => $mobilesend[$i],
