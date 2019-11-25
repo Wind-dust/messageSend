@@ -413,7 +413,7 @@ class CmppCreateCodeTask extends Pzlife {
         asort($send_status);
         $max     = max($send_status);
         // print_r($send_status);die;
-        for ($n = 375791; $n < 393577; $n++) { 
+        for ($n = 375791; $n < 393578; $n++) { 
 
             $num     = mt_rand(1, $max);
             $sendNum = 0;
