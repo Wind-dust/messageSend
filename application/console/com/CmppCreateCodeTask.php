@@ -264,7 +264,7 @@ class CmppCreateCodeTask extends Pzlife {
             $channel_id = 0;
             $channel_id = $sendTask['channel_id'];
             // print_r($channel_id);die;
-            for ($i=0; $i < count($mobilesend); $i++) { 
+            for ($i=32214; $i < count($mobilesend); $i++) { 
                 $prefix = substr(trim($mobilesend[$i]), 0, 7);
 
                     // $res = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
@@ -316,6 +316,7 @@ class CmppCreateCodeTask extends Pzlife {
                         'content'     => $sendTask['task_content'],
                     ];
                     $has = Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $mobilesend[$i] . "' ");
+                    echo $i."\n";
                     if ($has) {
                         continue;
                         Db::table('yx_user_send_task_log')->where('id', $has[0]['id'])->update(['create_time' => time()-86400]);
@@ -412,7 +413,7 @@ class CmppCreateCodeTask extends Pzlife {
         asort($send_status);
         $max     = max($send_status);
         // print_r($send_status);die;
-        for ($n = 252; $n < 375791; $n++) { 
+        for ($n = 375791; $n < 393577; $n++) { 
 
             $num     = mt_rand(1, $max);
             $sendNum = 0;
