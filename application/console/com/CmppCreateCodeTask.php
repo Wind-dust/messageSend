@@ -399,7 +399,11 @@ class CmppCreateCodeTask extends Pzlife {
 
         // }
         // echo time()-1574472176;die;
-        
+        $error = Db::query("SELECT * FROM `yx_user_send_task_log` WHERE `create_time` > `send_time`");
+        foreach ($error as $key => $value) {
+            Db::table('yx_user_send_task_log')->where('id',$value['id'])->update(['send_time' => $value['create_time']+500]);
+        }
+        die;
         for ($i=5001; $i < 231222; $i++) { 
             // $newtime = time()-284402;
             $send_log = Db::table('yx_user_send_task_log')->where('id', $i)->find();
