@@ -31,4 +31,5 @@ return [
     'httpchannelsix' => $commandPath . 'HttpChannelSix',
     'cmppmijiadianxinmarketing' => $commandPath . 'CmppMiJiaDianXinMarketing',
     'cmppmijialiantongmarketing' => $commandPath . 'CmppMiJiaLianTongMarketing',
+    'cmpplanjingmarketing' => $commandPath . 'CmppLanJingMarketing',
 ];

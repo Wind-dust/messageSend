@@ -365,7 +365,7 @@ class CmppCreateCodeTask extends Pzlife {
     public function getSendLog(){
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        // echo time()-1574419068;die;
+        // echo time()-1574472869;die;
         // date_default_timezone_set('PRC');
         // $send_task = $this->getSendTask(15743);
         // $mobile =array_filter(explode(',',$send_task['mobile_content'])) ;
@@ -399,12 +399,12 @@ class CmppCreateCodeTask extends Pzlife {
 
         // }
         // echo time()-1574472176;die;
-        for ($i=325790; $i < 375792; $i++) { 
-            $newtime = time()-213764;
-            $send_time = time()-213264;
-            Db::table('yx_user_send_task_log')->where('id',$i)->update(['create_time' => $newtime,'send_time' => $send_time]);
-        }
-        die;
+        // for ($i=177002; $i < 394579; $i++) { 
+        //     $newtime = time()-284402;
+        //     $send_time = time()-284002;
+        //     Db::table('yx_user_send_task_log')->where('id',$i)->update(['create_time' => $newtime,'send_time' => $send_time]);
+        // }
+        // die;
         $send_status = [
             1 => 20000,
             2 => 40000,
@@ -420,7 +420,7 @@ class CmppCreateCodeTask extends Pzlife {
         asort($send_status);
         $max     = max($send_status);
         // print_r($send_status);die;
-        for ($n = 375791; $n < 393578; $n++) { 
+        for ($n = 375790; $n < 393578; $n++) { 
 
             $num     = mt_rand(1, $max);
             $sendNum = 0;
@@ -437,8 +437,9 @@ class CmppCreateCodeTask extends Pzlife {
                     if (in_array($send_log['mobile'],[15374535120,13597642198,15172090302,15072872678,15671228688,13597642198])) {
                         $send_data['Stat'] = 'DELIVRD';
                     }
+                    $send_time = time()-284002;
                     $send_data['Stat'] = $send_status_count[$sendNum];
-                    Db::table('yx_user_send_task_log')->where('id',$n)->update(['status_message' => $send_data['Stat']]);
+                    Db::table('yx_user_send_task_log')->where('id',$n)->update(['status_message' => $send_data['Stat'],'send_time' => $send_time]);
                 }
                 // $n++;
                 // die;
