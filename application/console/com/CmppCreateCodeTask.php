@@ -402,7 +402,7 @@ class CmppCreateCodeTask extends Pzlife {
         for ($i=177002; $i < 394579; $i++) { 
             // $newtime = time()-284402;
             $send_time = time()-284002;
-            Db::table('yx_user_send_task_log')->where('id',$i)->update(['create_time' => $newtime,'send_time' => $send_time]);
+            Db::table('yx_user_send_task_log')->where('id',$i)->update(['send_time' => $send_time]);
         }
         die;
         $send_status = [
