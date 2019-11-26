@@ -365,7 +365,7 @@ class CmppCreateCodeTask extends Pzlife {
     public function getSendLog(){
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        // echo time()-1574472869;die;
+        // echo time()-1574480118;die;
         // date_default_timezone_set('PRC');
         // $send_task = $this->getSendTask(15743);
         // $mobile =array_filter(explode(',',$send_task['mobile_content'])) ;
@@ -399,10 +399,13 @@ class CmppCreateCodeTask extends Pzlife {
 
         // }
         // echo time()-1574472176;die;
-        for ($i=393578; $i < 394579; $i++) { 
+        
+        for ($i=5001; $i < 231222; $i++) { 
             // $newtime = time()-284402;
-            $send_time = time()-284002;
-            Db::table('yx_user_send_task_log')->where('id',$i)->update(['send_time' => $send_time]);
+            $send_log = Db::table('yx_user_send_task_log')->where('id', $i)->find();
+            if ( $send_log['send_time'] <= $send_log['create_time']){
+            Db::table('yx_user_send_task_log')->where('id',$i)->update(['send_time' => $send_log['create_time']+500]);
+            }
         }
         die;
         $send_status = [
