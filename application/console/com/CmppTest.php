@@ -166,7 +166,9 @@ class CmppTest extends Pzlife {
     $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => 15715,
+            'uid'         => 1,
             'content'     => '【米思米】安全围栏标准组件上市！不用设计，不用外发喷涂，不用组装！低至363.95元，第五天出货！赶紧过来下单吧。https://www.misumi.com.cn/mail/chn-gc19057-ml03/转发无效,详询021-52559388*6197,回T退订。 ',
+            'Submit_time' => date('YMDHM', time()),
         ]));
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
@@ -521,9 +523,11 @@ class CmppTest extends Pzlife {
 
                                                 $mesage = $redis->hget($redisMessageCodeMsgId,$Msg_Content['Msg_Id1'].$Msg_Content['Msg_Id2']);
                                                 if ($mesage) {
-                                                    $redis->hdel($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2']);
-                                                    // print_r($mesage);die;
-                                                    $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
+                                                    $mesage = json_decode($mesage,true);
+                                                    $mesage['Stat'] = $Msg_Content['Stat'];
+                                                    $mesage['Done_time'] = $Msg_Content['Done_time'];
+                                                    $redis->hdel($redisMessageCodeMsgId,$Msg_Content['Msg_Id1'].$Msg_Content['Msg_Id2']);
+                                                    $redis->rpush($redisMessageCodeDeliver,json_encode($mesage));
                                                 }
                                                 print_r($Msg_Content);
                                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
@@ -858,8 +862,11 @@ class CmppTest extends Pzlife {
                                 $mesage = $redis->hget($redisMessageCodeMsgId,$Msg_Content['Msg_Id1'].$Msg_Content['Msg_Id2']);
                                 if ($mesage) {
                                     // print_r($mesage);die;
-                                    $redis->hdel($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2']);
-                                    $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
+                                    $mesage = json_decode($mesage,true);
+                                    $mesage['Stat'] = $Msg_Content['Stat'];
+                                    $mesage['Done_time'] = $Msg_Content['Done_time'];
+                                    $redis->hdel($redisMessageCodeMsgId,$Msg_Content['Msg_Id1'].$Msg_Content['Msg_Id2']);
+                                    $redis->rpush($redisMessageCodeDeliver,json_encode($mesage));
                                 }
                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
                                 // echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
