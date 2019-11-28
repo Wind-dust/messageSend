@@ -319,7 +319,7 @@ class CmppCreateCodeTask extends Pzlife {
                     // echo $i."\n";
                     if ($has) {
                         continue;
-                        Db::table('yx_user_send_task_log')->where('id', $has[0]['id'])->update(['create_time' => time()-86400]);
+                        Db::table('yx_user_send_task_log')->where('id', $has[0]['id'])->update(['create_time' => time()]);
                     }
                     Db::startTrans();
                     try {
