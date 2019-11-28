@@ -240,15 +240,15 @@ class CmppCreateCodeTask extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15738);
+        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15738);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask', 15743);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15740);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15741);
-        // echo date('Y-m-d H:i:s',time());die;
+        // echo time() -1574906657;die;
         while (true) {
             $real_length = 1;
             // $send        = $this->redis->lpop('index:meassage:marketing:sendtask');
-            $send = 15738;
+            $send = 15744;
             if (empty($send)) {
                 exit('taskId_is_null');
             }
@@ -264,7 +264,7 @@ class CmppCreateCodeTask extends Pzlife {
             $channel_id = 0;
             $channel_id = $sendTask['channel_id'];
             // print_r($channel_id);die;
-            for ($i=32214; $i < count($mobilesend); $i++) { 
+            for ($i=0; $i < count($mobilesend); $i++) { 
                 $prefix = substr(trim($mobilesend[$i]), 0, 7);
 
                     // $res = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
@@ -308,7 +308,7 @@ class CmppCreateCodeTask extends Pzlife {
                         'uid'         => $sendTask['uid'],
                         'mobile'      => $mobilesend[$i],
                         'send_status' => 2,
-                        'create_time' => time()-249052,
+                        'create_time' => time()-11971,
                     ];
                     $sendmessage = [
                         'mobile'      => $mobilesend[$i],
@@ -316,7 +316,7 @@ class CmppCreateCodeTask extends Pzlife {
                         'content'     => $sendTask['task_content'],
                     ];
                     $has = Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $mobilesend[$i] . "' ");
-                    echo $i."\n";
+                    // echo $i."\n";
                     if ($has) {
                         continue;
                         Db::table('yx_user_send_task_log')->where('id', $has[0]['id'])->update(['create_time' => time()-86400]);
@@ -332,11 +332,11 @@ class CmppCreateCodeTask extends Pzlife {
                 
                 
             }
-            foreach ($mobilesend as $key => $kvalue) {
-                if (in_array($channel_id, [2, 6, 7, 8])) {
-                    // $getSendTaskSql = "select source,province_id,province from yx_number_source where `mobile` = '".$prefix."' LIMIT 1";
-                }
-            }
+            // foreach ($mobilesend as $key => $kvalue) {
+            //     if (in_array($channel_id, [2, 6, 7, 8])) {
+            //         // $getSendTaskSql = "select source,province_id,province from yx_number_source where `mobile` = '".$prefix."' LIMIT 1";
+            //     }
+            // }
             Db::startTrans();
             try {
                 Db::table('yx_user_send_task')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3]);
