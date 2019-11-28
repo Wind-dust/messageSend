@@ -464,32 +464,33 @@ class CmppCreateCodeTask extends Pzlife {
         // $num = count($mobile);
         // print_r($num);die;
         
-        // $redisMessageCodeSend = 'index:meassage:code:new:deliver:'; //验证码发送任务rediskey
-        // for ($i = 0; $i < 5; $i++) {
-        //     $new_redisMessageCodeSend = $redisMessageCodeSend . $i;
+        $redisMessageCodeSend = 'index:meassage:code:new:deliver:'; //验证码发送任务rediskey
+        for ($i = 0; $i < 5; $i++) {
+            $new_redisMessageCodeSend = $redisMessageCodeSend . $i;
             
-        //     // $redis->rPush($new_redisMessageCodeSend,'{"Stat":"DB:0141","Submit_time":"1911230919","Done_time":"1911230919"}');
-        //     $j=4;
-        //     do {
-        //         $send                     = $redis->lPop($new_redisMessageCodeSend);
-        //         $send_data = json_decode($send,true);
-        //         if (!empty($send_data)){
-        //             $send_log = Db::table('yx_user_send_task_log')->where('id', $j)->find();
-        //             // $send_log = array_values(Db::query($getSendTaskSql));
-        //             // print_r($send_log);die;
-        //             if (!empty($send_log)) {
-        //                 // $send_log = $send_log['0'];
-        //                 if (in_array($send_log['mobile'],[15374535120,13597642198,15172090302,15072872678,15671228688,13597642198])) {
-        //                     $send_data['Stat'] = 'DELIVRD';
-        //                 }
-        //                 Db::table('yx_user_send_task_log')->where('id',$j)->update(['status_message' => $send_data['Stat'],'send_time' => $send_data['Done_time']]);
-        //             }
-        //             $j++;
-        //             // die;
-        //         }
-        //     } while (!empty($send));
+            // $redis->rPush($new_redisMessageCodeSend,'{"Stat":"DB:0141","Submit_time":"1911230919","Done_time":"1911230919"}');
+            // $j=4;
+            do {
+                $send                     = $redis->lPop($new_redisMessageCodeSend);
+                $send_data = json_decode($send,true);
+                if (!empty($send_data)){
+                    // $send_log = Db::table('yx_user_send_task_log')->where('id', $j)->find();
+                    // $send_log = Db::table('yx_user_send_task_log')->where('id', $j)->find();
+                    // $send_log = array_values(Db::query($getSendTaskSql));
+                    // print_r($send_log);die;
+                    if (!empty($send_log)) {
+                        // $send_log = $send_log['0'];
+                        if (in_array($send_log['mobile'],[15374535120,13597642198,15172090302,15072872678,15671228688,13597642198])) {
+                            $send_data['Stat'] = 'DELIVRD';
+                        }
+                        Db::table('yx_user_send_task_log')->where('id',$j)->update(['status_message' => $send_data['Stat'],'send_time' => $send_data['Done_time']]);
+                    }
+                    $j++;
+                    // die;
+                }
+            } while (!empty($send));
 
-        // }
+        }
         // echo time()-1574472176;die;
         $error = Db::query("SELECT * FROM `yx_user_send_task_log` WHERE `create_time` > `send_time`");
         foreach ($error as $key => $value) {
