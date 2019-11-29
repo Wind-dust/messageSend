@@ -129,6 +129,9 @@ class CmppLanJingMarketing extends Pzlife {
                         // $mobile = $senddata['mobile_content'];
                         // $mobile = $senddata[0];
                         $mobile   = $send_data['mobile'];
+                        if (isset($send_data['Dest_Id'])) {
+                            $Dest_Id = $send_data['Dest_Id']; //接入码扩展
+                        }
                         $txt_head = 6;
                         $txt_len  = 140;
                         $max_len  = $txt_len - $txt_head;

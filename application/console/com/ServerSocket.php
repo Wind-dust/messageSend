@@ -185,6 +185,9 @@ class ServerSocket extends Pzlife {
                                     $body      = unpack("N2Msg_Id/CPk_total/CPk_number/CRegistered_Delivery/CMsg_level/a10Service_Id/CFee_UserType/a21Fee_terminal_Id/CTP_pId/CTP_udhi/CMsg_Fmt/a6Msg_src/a2FeeType/a6FeeCode/a17ValId_Time/a17At_Time/a21Src_Id/CDestUsr_tl", $bodyData);
                                     $Pk_total  = $body['Pk_total']; //相同 Msg_Id 的信息总条数
                                     $Pk_number = $body['Pk_number']; //相同 Msg_Id 的信息总条数
+                                    if (strlen($body['Src_Id']) > 15){
+
+                                    }
                                     if ($body['Pk_total'] > 1) { //长短信
 
                                         //DestUsr_tl接收用户数量
@@ -208,6 +211,7 @@ class ServerSocket extends Pzlife {
                                         $sendData = [
                                             'mobile'  => trim($mobile),
                                             'message' => $message,
+                                            'Src_Id' => $body['Src_Id'],//拓展码
                                         ];
                                         // print_r($sendData);
                                         $residue = $head['Total_Length'] - 12 - 117 - $c_length - $Msg_length;
@@ -235,6 +239,7 @@ class ServerSocket extends Pzlife {
                                         $sendData = [
                                             'mobile'  => trim($mobile),
                                             'message' => $message,
+                                            'Src_Id' => $body['Src_Id'],//拓展码
                                         ];
                                         // print_r($sendData);
                                         $residue = $head['Total_Length'] - 12 - 117 - $c_length - $Msg_length;
@@ -256,7 +261,7 @@ class ServerSocket extends Pzlife {
                                     // print_r($sendData['mobile'].":".$id.":".$sendData['message'].":".$num1.$num2);die;
                                     // $redis->rpush($redisMessageCodeSend,$uid.":".$sendData['mobile'].":".$sendData['message'].":".$num1.$num2.":".$addr); //三体营销通道
                                     $sendData['send_msgid'][] = $num1 . $num2;
-                                    $sendData['uid']          = 1;
+                                    $sendData['uid']          = $uid;
                                     $sendData['Submit_time']  = date('YMDHM', time());
                                     // $redis->rpush($redisMessageCodeSend.":1",json_encode($sendData)); //三体营销通道
                                     $has_message = $redis->hget($redisMessageCodeSend . ":1", $head['Sequence_Id']);
