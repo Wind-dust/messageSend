@@ -52,9 +52,10 @@ class ServerSocketShuHe extends Pzlife {
         $i = 1;
         // $Sequence_Id = 1;
         $time = 0;
-        do {
+        
         $accept_resource = socket_accept($socket);
         socket_set_nonblock($accept_resource); //设置非阻塞模式
+        do {
         /*socket_accept的作用就是接受socket_bind()所绑定的主机发过来的套接流*/
 
             if ($accept_resource !== false) {

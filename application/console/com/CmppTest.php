@@ -109,6 +109,19 @@ class CmppTest extends Pzlife {
                 'SP_ID'         => "",
                 'master_num'    => 300,
             ];
+        }elseif ($content == 8){
+            return [
+                'host'          => "47.103.200.251", //服务商ip
+                'port'          => "7890", //短连接端口号   17890长连接端口号
+                'Source_Addr'   => "101101", //企业id  企业代码
+                'Shared_secret' => '5hsey6u9c2', //网关登录密码
+                'Service_Id'    => "101101", //业务代码
+                'template_id'   => "", //模板id
+                'Dest_Id'       => "106929879601", //短信接入码 短信端口号 服务代码
+                'Sequence_Id'   => 1,
+                'SP_ID'         => "",
+                'master_num'    => 300,
+            ];
         }
     }
 
@@ -118,7 +131,7 @@ class CmppTest extends Pzlife {
         // $a_time = 0;
 
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $content = 3;
+        // $content = 3;
         $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
         $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
         $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
@@ -163,13 +176,13 @@ class CmppTest extends Pzlife {
         // print_r($arr['Msg_Id1'] & 0x0fffffff);die;
         // // echo 0x00000010;
         // die;
-    $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15201926171',
-            'mar_task_id' => 15715,
-            'uid'         => 1,
-            'content'     => '【米思米】安全围栏标准组件上市！不用设计，不用外发喷涂，不用组装！低至363.95元，第五天出货！赶紧过来下单吧。https://www.misumi.com.cn/mail/chn-gc19057-ml03/转发无效,详询021-52559388*6197,回T退订。 ',
-            'Submit_time' => date('YMDHM', time()),
-        ]));
+    // $send = $redis->rPush($redisMessageCodeSend, json_encode([
+    //         'mobile'      => '15201926171',
+    //         'mar_task_id' => 15715,
+    //         'uid'         => 1,
+    //         'content'     => '【米思米】安全围栏标准组件上市！不用设计，不用外发喷涂，不用组装！低至363.95元，第五天出货！赶紧过来下单吧。https://www.misumi.com.cn/mail/chn-gc19057-ml03/转发无效,详询021-52559388*6197,回T退订。 ',
+    //         'Submit_time' => date('YMDHM', time()),
+    //     ]));
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -188,8 +201,8 @@ class CmppTest extends Pzlife {
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
 
-        // $host                 = '47.103.200.251'; //服务商ip
-        // $port                 = '7890'; //短连接端口号   17890长连接端口号
+        $host                 = '47.103.200.251'; //服务商ip
+        $port                 = '7890'; //短连接端口号   17890长连接端口号
 
         // echo $security_master;die;
         // die;
