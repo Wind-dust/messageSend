@@ -265,7 +265,7 @@ class ServerSocketShuHe extends Pzlife {
 
                            } else {
                                if ($Pk_total == $Pk_number) {
-                                   // $redis->hdel($redisMessageCodeSend.":1",$head['Sequence_Id']);
+                                   $redis->hdel($redisMessageCodeSend.":1",$head['Sequence_Id']);
                                    $redis->rpush($redisMessageCodeSendReal, json_encode($sendData));
                                } else {
                                    //三体营销通道
@@ -274,7 +274,7 @@ class ServerSocketShuHe extends Pzlife {
                                }
                                // $redis->hset($redisMessageCodeSend.":1",$head['Sequence_Id'],json_encode($sendData)); //三体营销通道
                            }
-
+                           print_r($sendData);
                            $Total_Length = strlen($new_bodyData) + 12;
                            $new_headData = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
                            // socket_write($socket, $headData . $bodyData, $Total_Length);
