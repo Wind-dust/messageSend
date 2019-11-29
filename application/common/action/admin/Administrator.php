@@ -153,10 +153,10 @@ class Administrator extends CommonIndex {
         return ['code' => '200', 'userequities' => $result];
     }
 
-    public function rechargeApplication($cmsConId, $mobile, $business_id, $num) {
+    public function rechargeApplication($cmsConId, $nick_name, $business_id, $num) {
         $adminId = $this->getUidByConId($cmsConId);
         // $adminInfo     = DbAdmin::getAdminInfo(['id' => $adminId], 'id,passwd,status', true);
-        $user = DbUser::getUserInfo(['mobile' => $mobile], 'id', true);
+        $user = DbUser::getUserInfo(['nick_name' => $nick_name], 'id,mobile', true);
         if (empty($user)) {
             return ['code' => '3003'];
         }
@@ -164,6 +164,9 @@ class Administrator extends CommonIndex {
         if (empty($business)) {
             return ['code' => '3002'];
         }
+        // print_r(DbAdministrator::getUserEquities(['business_id' => $business_id, 'uid' => $user['id']], 'id'));
+        // echo Db::getLastSQL();
+        // die;
         if (!DbAdministrator::getUserEquities(['business_id' => $business_id, 'uid' => $user['id']], 'id')) {
             return ['code' => '3004'];
         }
@@ -172,7 +175,7 @@ class Administrator extends CommonIndex {
             'initiate_admin_id' => $adminId,
             'business_id'       => $business_id,
             'uid'               => $user['id'],
-            'mobile'            => $mobile,
+            'mobile'            => $user['mobile'],
             'credit'            => $num,
             'status'            => 1,
         ];

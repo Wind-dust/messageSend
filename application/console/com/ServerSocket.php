@@ -324,18 +324,20 @@ class ServerSocket extends Pzlife {
 
                             }
 
-                            $deliver = [];
-                            $deliver = [
-                                'Stat'        => 'DELIVRD',
-                                'Submit_time' => date('YMDHM', time()),
-                                'Done_time'   => date('YMDHM', time()),
-                                'mobile'      => '15201926171',
-                                'send_msgid'  => [
-                                    "1574938367000004", "1574938367000006",
-                                ],
-                            ];
-                            if ($deliver) {
-                                // $deliver            = json_decode($deliver, true);
+                            // $deliver = [];
+                            // $deliver = [
+                            //     'Stat'        => 'DELIVRD',
+                            //     'Submit_time' => date('YMDHM', time()),
+                            //     'Done_time'   => date('YMDHM', time()),
+                            //     'mobile'      => '15201926171',
+                            //     'send_msgid'  => [
+                            //         "1574938367000004", "1574938367000006",
+                            //     ],
+                            // ];
+                            // $redis->rPush('index:meassage:code:cmppdeliver:'.$uid,json_encode($deliver));
+                            $deliver = $redis->lpop('index:meassage:code:cmppdeliver:'.$uid);//取出用户发送任务
+                            if (!empty($deliver)) {
+                                $deliver            = json_decode($deliver, true);
                                 $deliver_timestring = time();
                                 $deliver_num1       = substr($deliver_timestring, 0, 8);
                                 $deliver_num2       = substr($deliver_timestring, 8) . $this->combination($i);
@@ -375,7 +377,7 @@ class ServerSocket extends Pzlife {
                                         // echo $new_headData . $new_bodyData."\n";
                                         // echo $back_Command_Id."\n";
                                         socket_write($accept_resource, $new_headData . $deliver_bodyData, $Total_Length);
-                                        unset($deliver_Msg_Content);
+                                        // unset($deliver_Msg_Content);
                                     }
                                 }
                             }

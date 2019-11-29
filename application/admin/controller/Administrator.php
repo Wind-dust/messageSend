@@ -231,17 +231,20 @@ class Administrator extends AdminController {
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
             return ['code' => '3100'];
         }
-        $mobile      = trim($this->request->post('mobile'));
+        $nick_name      = trim($this->request->post('nick_name'));
         $business_id = trim($this->request->post('business_id'));
         $num         = trim($this->request->post('num'));
-        if (checkMobile($mobile) === false) {
-            return ['code' => '3001'];
+        // if (checkMobile($mobile) === false) {
+        //     return ['code' => '3001'];
+        // }
+        if (empty($nick_name)) {
+            return ['code' => '3001','msg' => '用户名不存在'];
         }
         if (empty($business_id) || intval($business_id) < 1 || !is_numeric($business_id)) {
             return ['code' => '3002'];
         }
         intval($num);
-        $result = $this->app->administrator->rechargeApplication($cmsConId, $mobile, $business_id, $num);
+        $result = $this->app->administrator->rechargeApplication($cmsConId, $nick_name, $business_id, $num);
         // $this->apiLog($apiName, [$page, $pageNum], $result['code'], '');
         return $result;
     }

@@ -27,7 +27,7 @@ class CmppLanJingMarketing extends Pzlife {
             'Shared_secret' => '888888', //网关登录密码
             'Service_Id'    => "shxjhx", //业务代码
             'template_id'   => "", //模板id
-            'Dest_Id'       => "1069298796", //短信接入码 短信端口号 服务代码
+            'Dest_Id'       => "1069298796", //短信接入码 短信端口号 服务代码 支持10位扩展
             'Sequence_Id'   => 1,
             'SP_ID'         => "shxjhx",
             'master_num'    => 400,
@@ -89,7 +89,11 @@ class CmppLanJingMarketing extends Pzlife {
         if (socket_connect($socket, $host, $port) == false) {
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
-           
+            date_default_timezone_set('PRC');
+            // socket_read($socket,3072);
+            // socket_clear_error($socket);
+            // socket_close($socket);
+            // die;//关闭socket连接，清除缓存数据
             socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
@@ -102,14 +106,23 @@ class CmppLanJingMarketing extends Pzlife {
                 if ($i == 1) {
                     $bodyData   = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                     $Command_Id = 0x00000001;
-                   
+                    // $Total_Length        = strlen($bodyData) + 12;
+
+                    // $headData            = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                    // print_r($headData);die;
+                    // socket_write($socket, $headData . $bodyData, $Total_Length);
+
                 } else {
-                    
-                    date_default_timezone_set('PRC');
                     //当有号码发送需求时 进行提交
                     /* redis 读取需要发送的数据 */
                     $send = $redis->lPop($redisMessageCodeSend);
+                    // $send = [];
+                    // print_r($send);die;
+                    // $send = $this->getSendCodeTask();
+                    // if ($i ) { //测试判断语句
+
                         if ($send) { //正式使用从缓存中读取数据
+                        $senddata = [];
                         $senddata = [];
                         // $senddata = explode(":",$send);
                         $send_data = json_decode($send, true);
@@ -128,12 +141,17 @@ class CmppLanJingMarketing extends Pzlife {
 
                         // $Timestamp = date('mdHis');
                         $uer_num = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
+                        // $Msg_Id = rand(1, 100);
+                        // $Msg_Id   = '';
+                        // $Msg_Id   = time().$mobile;
+                        // $Msg_Id   = strval(time()) . $i;
+                        // $bodyData = pack("a8", $Msg_Id);
                         $timestring = time();
                         echo "发送时间：" . date("Y-m-d H:i:s", time())."\n";
                         $num1 = substr($timestring, 0, 8);
                         $num2 = substr($timestring, 8) . $this->combination($i);
                         $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
-                        if (strlen($code) > 140) {
+                        if (strlen($code) > $max_len) {
                             $pos          = 0;
                             $num_messages = ceil(strlen($code) / $max_len);
                             // echo $num_messages;die;
@@ -196,22 +214,51 @@ class CmppLanJingMarketing extends Pzlife {
                                 $bodyData = $bodyData . pack("C", $len); //Msg_Length |1 |Unsigned Integer |信息长度(Msg_Fmt 值为 0 时：<160 个字 节；其它<=140 个字节)
                                 $bodyData = $bodyData . pack("a" . $len, $newcode); // Msg_Content |Msg_length |Octet String |信息内容
                                 $bodyData = $bodyData . pack("a8", ''); //Reserve | 8 | Octet String | 保留
+                                // $bodyData = $bodyData . pack('I',pack("a8", '')); //Reserve |8 |Octet String |保留
 
+                                // $bodyData = pack("a8", $Msg_Id);
+                                /*    $bodyData = pack("N", $Msg_Id) . pack("N", "00000000");
+                                $bodyData .= pack("C", 1) . pack("C", 1);
+                                $bodyData .= pack("C", 0) . pack("C", 0);
+                                $bodyData .= pack("a10", $Service_Id);
+                                $bodyData .= pack("C", 0) . pack("a32", "") . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("a6", $SP_ID) . pack("a2", "02") . pack("a6", "") . pack("a17", "") . pack("a17", "") . pack("a21", $Dest_Id) . pack("C", 1);
+                                $bodyData .= pack("a32", $mobile);
+                                $bodyData .= pack("C", 0);
+                                $len = strlen($code);
+                                $bodyData .= pack("C", $len);
+                                $bodyData .= pack("a" . $len, $code);
+                                $bodyData .= pack("a20", "00000000000000000000"); */
+                                // print_r($bodyData)."\n";
+                                // send($bodyData, "CMPP_SUBMIT", $Msg_Id);
 
                                 $Command_Id = 0x00000004; // 短信发送
                                 // $Sequence_Id = $i;
                                 $time = 0;
+                                // Db::startTrans();
+                                // try {
+                                //     Db::table('yx_user_send_code_task')->update(['send_status' => 2])->where('id',$send['id']);
+                                //     // 提交事务
+                                //     Db::commit();
+                                // } catch (\Exception $e) {
+                                //     // 回滚事务
+                                //     // exception($e);
+                                //     // die;
+                                //     Db::rollback();
 
+                                // }
                                 $Total_Length = strlen($bodyData) + 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
                                 // $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
+                                $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$send);
                                 // socket_write($socket, $headData . $bodyData, $Total_Length);
                                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) { //写入失败，还原发送信息并关闭端口
                                     echo 'fail to write' . socket_strerror(socket_last_error());
                                 } else {
                                     // echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
-
+                                    // if ($i == 2) {
+                                    //     die;
+                                    // }
+                                    //读取服务端返回来的套接流信息
                                     $headData = socket_read($socket, 12);
                                     if ($headData != false) {
                                         $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
@@ -222,7 +269,27 @@ class CmppLanJingMarketing extends Pzlife {
                                         //错误处理机制
                                         try
                                         {
+                                            // $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
+                                            // switch ($head['Command_Id'] & 0x0fffffff) {
+                                            // case 0x80000001:
+                                            //     // echo "接收到连接应答"."\n";
+                                            //     // $bodyData = socket_read($socket, $head['Total_Length'] - 12);
 
+                                            //     break;
+                                            // case 0x80000004:
+
+                                            //     break;
+                                            // case 0x00000005:
+
+                                            //     break;
+                                            // case 0x00000008:
+                                            //     echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                                            //     // $body = unpack("C",$bodyData);
+                                            //     break;
+                                            // default:
+                                            //     echo "未声明head['Command_Id']:".$head['Command_Id'];
+                                            //     break;
+                                            // }
                                             if ($head['Command_Id'] == 0x80000001) {
                                                 $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
                                                 // print_r($body) ;
@@ -253,7 +320,7 @@ class CmppLanJingMarketing extends Pzlife {
                                                 }
                                                 //通道断口处理
                                                 if ($body['Status'] != 0) {
-                                                    // socket_close($socket);
+                                                    socket_close($socket);
                                                     Db::startTrans();
                                                     try {
                                                         // Db::table('yx_sms_sending_channel')->update(['error_msg' => $error_msg,'channel_status' => 4])->where('id',$id);
@@ -266,46 +333,20 @@ class CmppLanJingMarketing extends Pzlife {
                                                         Db::rollback();
 
                                                     }
-                                                    // die;
+                                                    die;
                                                 }
                                             } else if ($head['Command_Id'] == 0x80000004) {
                                                 $body = unpack("N2Msg_Id/CResult", $bodyData);
                                                 print_r($body);
                                                 $sequence = $redis->hget($redisMessageCodeSequenceId,$head['Sequence_Id']);
                                                 if ($sequence) {
-                                                    $sequence = json_decode($sequence, true);
-                                                    $sendTask = $this->getSendTask($sequence['mar_task_id']);
-                                                    $send_log = $this->getSendTaskLog($sendTask['task_no'], $sequence['mobile']);
-                
-                                                    $msgid = $body['Msg_Id1'].$body['Msg_Id2'];
-                                                    $sequence['Msg_Id'] = $msgid;
-                                                    // $msgid = 155153131;
-                                                    // print_r($send_log);die;
-                                          /*           Db::startTrans();
-                                                    try {
-                                                        if (empty($send_log)) {
-                                                            Db::table('yx_user_send_task_log')->insert([
-                                                                'task_no'     => $sendTask['task_no'],
-                                                                'mobile'      => $sequence['mobile'],
-                                                                'msgid'       => $msgid,
-                                                                'send_status' => 2,
-                                                                'create_time' => time(),
-                                                            ]);
-                
-                                                        } else {
-                                                            Db::table('yx_user_send_task_log')->where('id', $send_log['id'])->update(['msgid' => $msgid]);
-                                                        }
-                                                        Db::commit();
-                                                        // $sequence = $redis->hdel($redisMessageCodeSequenceId,2);
-                                                    } catch (\Exception $e) {
-                                                        exception($e);
-                                                        Db::rollback();
-                
-                                                    } */
-                                                    $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
-                                                    $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
+                                                    $redis->hdel($redisMessageCodeSequenceId,$head['Sequence_Id']);
+                                                    $redis->hset($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2'],$sequence);
                                                 }
-
+                                                // echo "get_CMPP_SUBMIT_RESP"."\n";
+                                                // echo "提交的Sequence_Id:".$head['Sequence_Id'].",解析的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2']."\n";
+                                                // print_r($body);
+                                                //状态为0 ，消息发送成功
                                                 switch ($body['Result']) {
                                                 case 0:
                                                     echo "发送成功" . "\n";
@@ -351,7 +392,18 @@ class CmppLanJingMarketing extends Pzlife {
                                                     echo "发送失败" . "\n";
                                                     $error_msg = "其他错误";
                                                 } else {
+                                                    // Db::startTrans();
+                                                    // try {
+                                                    //     Db::table('yx_user_send_code_task')->update(['send_status' => 2])->where('id',$send['id']);
+                                                    //     // 提交事务
+                                                    //     Db::commit();
+                                                    // } catch (\Exception $e) {
+                                                    //     // 回滚事务
+                                                    //     // exception($e);
+                                                    //     // die;
+                                                    //     Db::rollback();
 
+                                                    // }
                                                 }
                                             } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                                                 $Result = 0;
@@ -365,35 +417,11 @@ class CmppLanJingMarketing extends Pzlife {
 
                                                 $mesage = $redis->hget($redisMessageCodeMsgId,$Msg_Content['Msg_Id1'].$Msg_Content['Msg_Id2']);
                                                 if ($mesage) {
-                                                    $redis->hdel($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2']);
-                                                    // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
-                                                    $mesage         = json_decode($mesage, true);
+                                                    $mesage = json_decode($mesage,true);
                                                     $mesage['Stat'] = $Msg_Content['Stat'];
-                                                    $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                                     $mesage['Done_time'] = $Msg_Content['Done_time'];
-                                                    $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
-                                      /*               $sendlog = $this->getSendTaskLogByMsgid($Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
-                                                    Db::startTrans();
-                                                    try {
-                                                        if (empty($send_log)) {
-                                                            Db::table('yx_user_send_task_log')->insert([
-                                                                'task_no'     => $mesage['task_no'],
-                                                                'mobile'      => $mesage['mobile'],
-                                                                'msgid'       => $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'],
-                                                                'send_status' => 2,
-                                                                'status_message' => $Msg_Content['Stat'],
-                                                                'create_time' => time(),
-                                                                'send_time' => $Msg_Content['Done_time'],
-                                                            ]);
-
-                                                        } else {
-                                                            Db::table('yx_user_send_task_log')->where('id', $sendlog['id'])->update(['status_message' => $Msg_Content['Stat'],'send_time' => $Msg_Content['Done_time']]);
-                                                        }
-                                                        Db::commit();
-                                                    } catch (\Exception $e) {
-                                                        Db::rollback();
-                                                        return ['code' => '3009']; //修改失败
-                                                    } */
+                                                    $redis->hdel($redisMessageCodeMsgId,$Msg_Content['Msg_Id1'].$Msg_Content['Msg_Id2']);
+                                                    $redis->rpush($redisMessageCodeDeliver,json_encode($mesage));
                                                 }
                                                 print_r($Msg_Content);
                                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
@@ -416,8 +444,8 @@ class CmppLanJingMarketing extends Pzlife {
                                         //捕获异常
                                          catch (Exception $e) {
                                             //关闭工作流并修改通道状态
-                                            // socket_close($socket);
-                                            // exception($e);
+                                            socket_close($socket);
+                                            exception($e);
                                         }
                                     }
 
@@ -426,14 +454,13 @@ class CmppLanJingMarketing extends Pzlife {
                                 //     die;
                                 // }
                                 usleep(3000);
-                               
                                 $i++;
+                                
                             }
                             $Sequence_Id++;
                             if ($Sequence_Id > 65536) {
                                 $Sequence_Id = 1;
                             }
-                            // die;
                             if ($i > $security_master) {
                                 $time = 1;
                                 $i    = 0;
@@ -441,6 +468,9 @@ class CmppLanJingMarketing extends Pzlife {
                             if ($time > 1) {
                                 sleep($time); //等待时间，进行下一次操作
                             }
+                            // sleep($time); //等待时间，进行下一次操作
+                            // usleep(3000);
+                            // die;
                             continue;
                         } else { //单条短信
 
@@ -502,6 +532,21 @@ class CmppLanJingMarketing extends Pzlife {
                             $bodyData = $bodyData . pack("a8", ''); //Reserve | 8 | Octet String | 保留
                             // $bodyData = $bodyData . pack('I',pack("a8", '')); //Reserve |8 |Octet String |保留
 
+                            // $bodyData = pack("a8", $Msg_Id);
+                            /*    $bodyData = pack("N", $Msg_Id) . pack("N", "00000000");
+                            $bodyData .= pack("C", 1) . pack("C", 1);
+                            $bodyData .= pack("C", 0) . pack("C", 0);
+                            $bodyData .= pack("a10", $Service_Id);
+                            $bodyData .= pack("C", 0) . pack("a32", "") . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("a6", $SP_ID) . pack("a2", "02") . pack("a6", "") . pack("a17", "") . pack("a17", "") . pack("a21", $Dest_Id) . pack("C", 1);
+                            $bodyData .= pack("a32", $mobile);
+                            $bodyData .= pack("C", 0);
+                            $len = strlen($code);
+                            $bodyData .= pack("C", $len);
+                            $bodyData .= pack("a" . $len, $code);
+                            $bodyData .= pack("a20", "00000000000000000000"); */
+                            // print_r($bodyData)."\n";
+                            // send($bodyData, "CMPP_SUBMIT", $Msg_Id);
+
                             $Command_Id = 0x00000004; // 短信发送
                             // $Sequence_Id = $i;
                             $time = 0;
@@ -526,6 +571,7 @@ class CmppLanJingMarketing extends Pzlife {
                         // echo strlen($code);die;
                         // echo $Command_Id;die;
                         // print_r(strlen($bodyData));die;
+                        // $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
                         $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$send);
                     } else {
                         $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
@@ -537,7 +583,11 @@ class CmppLanJingMarketing extends Pzlife {
                 }
                 $Total_Length = strlen($bodyData) + 12;
                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-
+                // if ($i == 2) {
+                // echo $headData.$bodyData."\n";
+                // }
+                // echo $headData.$bodyData;
+                // echo strlen($headData);die;
                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) { //写入失败，还原发送信息并关闭端口
                     echo 'fail to write' . socket_strerror(socket_last_error());
                 } else {
@@ -556,7 +606,27 @@ class CmppLanJingMarketing extends Pzlife {
                         //错误处理机制
                         try
                         {
+                            // $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
+                            // switch ($head['Command_Id'] & 0x0fffffff) {
+                            // case 0x80000001:
+                            //     // echo "接收到连接应答"."\n";
+                            //     // $bodyData = socket_read($socket, $head['Total_Length'] - 12);
 
+                            //     break;
+                            // case 0x80000004:
+
+                            //     break;
+                            // case 0x00000005:
+
+                            //     break;
+                            // case 0x00000008:
+                            //     echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                            //     // $body = unpack("C",$bodyData);
+                            //     break;
+                            // default:
+                            //     echo "未声明head['Command_Id']:".$head['Command_Id'];
+                            //     break;
+                            // }
                             if ($head['Command_Id'] == 0x80000001) {
                                 $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
                                 // print_r($body) ;
@@ -600,46 +670,20 @@ class CmppLanJingMarketing extends Pzlife {
                                         Db::rollback();
 
                                     }
-                                    // die;
+                                    die;
                                 }
                             } else if ($head['Command_Id'] == 0x80000004) {
                                 $body = unpack("N2Msg_Id/CResult", $bodyData);
                                 print_r($body);
-                                $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
+                                $sequence = $redis->hget($redisMessageCodeSequenceId,$head['Sequence_Id']);
                                 if ($sequence) {
-                                    $sequence = json_decode($sequence, true);
-                                    $sequence['Msg_Id'] = $body['Msg_Id1'] . $body['Msg_Id2'];
-                                   /*  $sendTask = $this->getSendTask($sequence['mar_task_id']);
-                                    $send_log = $this->getSendTaskLog($sendTask['task_no'], $sequence['mobile']);
-
-                                    $msgid = $body['Msg_Id1'].$body['Msg_Id2'];
-                                    // $msgid = 155153131;
-                                    // print_r($send_log);die;
-                                    Db::startTrans();
-                                    try {
-                                        if (empty($send_log)) {
-                                            Db::table('yx_user_send_task_log')->insert([
-                                                'task_no'     => $sendTask['task_no'],
-                                                'mobile'      => $sequence['mobile'],
-                                                'msgid'       => $msgid,
-                                                'send_status' => 2,
-                                                'create_time' => time(),
-                                            ]);
-
-                                        } else {
-                                            Db::table('yx_user_send_task_log')->where('id', $send_log['id'])->update(['msgid' => $msgid]);
-                                        }
-                                        Db::commit();
-                                        // $sequence = $redis->hdel($redisMessageCodeSequenceId,2);
-                                    } catch (\Exception $e) {
-                                        exception($e);
-                                        Db::rollback();
-
-                                    } */
-                                    
-                                    $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
-                                    $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
+                                    $redis->hdel($redisMessageCodeSequenceId,$head['Sequence_Id']);
+                                    $redis->hset($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2'],$sequence);
                                 }
+                                // echo "get_CMPP_SUBMIT_RESP"."\n";
+                                // echo "提交的Sequence_Id:".$head['Sequence_Id'].",解析的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2']."\n";
+                                // print_r($body);
+                                //状态为0 ，消息发送成功
                                 switch ($body['Result']) {
                                 case 0:
                                     echo "发送成功" . "\n";
@@ -708,39 +752,16 @@ class CmppLanJingMarketing extends Pzlife {
                                 $Msg_Content = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/", $body['Msg_Content']);
                                 // $Msg_Content = unpack("a".$body['Msg_Length'],);
 
+                                print_r($Msg_Content);
                                 $mesage = $redis->hget($redisMessageCodeMsgId,$Msg_Content['Msg_Id1'].$Msg_Content['Msg_Id2']);
                                 if ($mesage) {
-                                    $redis->hdel($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2']);
-                                    // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
-                                    $mesage         = json_decode($mesage, true);
+                                    // print_r($mesage);die;
+                                    $mesage = json_decode($mesage,true);
                                     $mesage['Stat'] = $Msg_Content['Stat'];
-                                    $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                     $mesage['Done_time'] = $Msg_Content['Done_time'];
-                                    $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
-                                   /*  $sendlog = $this->getSendTaskLogByMsgid($Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
-                                    Db::startTrans();
-                                    try {
-                                        if (empty($send_log)) {
-                                            Db::table('yx_user_send_task_log')->insert([
-                                                'task_no'     => $mesage['task_no'],
-                                                'mobile'      => $mesage['mobile'],
-                                                'msgid'       => $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'],
-                                                'send_status' => 2,
-                                                'status_message' => $Msg_Content['Stat'],
-                                                'create_time' => time(),
-                                                'send_time' => $Msg_Content['Done_time'],
-                                            ]);
-
-                                        } else {
-                                            Db::table('yx_user_send_task_log')->where('id', $sendlog['id'])->update(['status_message' => $Msg_Content['Stat'],'send_time' => $Msg_Content['Done_time']]);
-                                        }
-                                        Db::commit();
-                                    } catch (\Exception $e) {
-                                        Db::rollback();
-                                        return ['code' => '3009']; //修改失败
-                                    } */
+                                    $redis->hdel($redisMessageCodeMsgId,$Msg_Content['Msg_Id1'].$Msg_Content['Msg_Id2']);
+                                    $redis->rpush($redisMessageCodeDeliver,json_encode($mesage));
                                 }
-                                print_r($Msg_Content);
                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
                                 // echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
                                 $callback_Command_Id = 0x80000005;
@@ -766,17 +787,16 @@ class CmppLanJingMarketing extends Pzlife {
                         }
                     }
 
+                    $i++;
+                    $Sequence_Id++;
                 }
                 // if ($i > 1) {
                 //     die;
                 // }
 
-                $i++;
-                $Sequence_Id++;
                 if ($Sequence_Id > 65536) {
                     $Sequence_Id = 1;
                 }
-                // sleep($time); //等待时间，进行下一次操作
                 if ($time > 1) {
                     sleep($time); //等待时间，进行下一次操作
                 }else{

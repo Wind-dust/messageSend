@@ -10,7 +10,7 @@ use think\Db;
 
 class CmppCreateCodeTask extends Pzlife {
 
-    public function CreateCodeTask() {//CMPP创建单条任务
+    public function CreateCodeTask() {//CMPP创建单条任务营销
         $redis                = Phpredis::getConn();
         $redisMessageCodeSend = 'index:meassage:code:send:task'; //
         $redisMessageCodeSendReal = 'index:meassage:code:send:realtask'; //验证码发送真实任务rediskey CMPP接口 营销
@@ -22,10 +22,19 @@ class CmppCreateCodeTask extends Pzlife {
             // $send = explode(':', $SendText);
             $send = json_decode($SendText,true);
             // $user = $this->getUserInfo($send[0]);
+            // print_r($send);die;
             $user = $this->getUserInfo($send['uid']);
             if (empty($user) || $user['user_status'] == 1) {
                 break;
             }
+            $userEquities = $this->getUserEquities($send['uid'],5);
+            if (empty($userEquities)){
+                break;
+            }
+            if ($userEquities['num_balance'] < 1 && $user['reservation_service'] == 1) {
+                break;
+            }
+            
             $send_code_task                   = [];
             $send_code_task['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
             // $send_code_task['task_content']   = $send[2];
@@ -33,24 +42,34 @@ class CmppCreateCodeTask extends Pzlife {
             // $send_code_task['uid']            = $send[0];
             // $send_code_task['source']         = $send[4];
             // $send_code_task['msg_id']         = $send[3];
-
+            
             $send_code_task['send_msg_id']   = join(',',$send['send_msgid']);
             $send_code_task['uid']            = $send['uid'];
             $send_code_task['task_content']   = $send['message'];
             $send_code_task['submit_time']   = $send['Submit_time'];
             $send_code_task['create_time']   = time();
             $send_code_task['mobile_content']   = $send['mobile'];
+            $send_code_task['send_num']   = 1;
+            $send_code_task['send_length']   = mb_strlen($send['message']);
             // $sendData['uid']          = 1;
             // $sendData['Submit_time']  = date('YMDHM', time());
-
             //免审用户
+            // print_r($send_code_task);die;
             if ($user['free_trial'] == 2) {
                 Db::startTrans();
                 try {
-                    //如果是行业
-                    $task_id = Db::table('yx_user_send_code_task')->insertGetId($send_code_task);
-                    if ($send['uid'] == '') {//单独客户单条任务直接处理
-                        if (checkMobile($send['mobile']) == true) {
+                    $send_code_task['free_trial'] = 2;
+                    if ($userEquities['num_balance'] < 1) {
+                        $send_code_task['free_trial'] = 1;
+                    }
+                    //营销任务
+                    $task_id = Db::table('yx_user_send_task')->insertGetId($send_code_task);
+                    //扣除余额
+                    $new_num_balance = $userEquities['num_balance'] - 1;
+                    Db::table('yx_user_equities')->where('id',$userEquities['id'])->update(['num_balance' => $new_num_balance]);
+                    if ($send['uid'] == '1') {//单独客户单条任务直接处理有余额直接推送发送通道，没有则只提交任务，通过审核后才能发送
+
+                        if (checkMobile($send['mobile'])) {
                             $prefix = substr(trim($send['mobile']), 0, 7);
         
                             $res = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
@@ -74,7 +93,7 @@ class CmppCreateCodeTask extends Pzlife {
                                 ];
                                 $sendmessage = [
                                     'mobile'      => $send['mobile'],
-                                    'mar_task_id' => $send_code_task['id'],
+                                    'mar_task_id' => $task_id,
                                     'content'     => $send['message'],
                                     'uid'     => $send['uid'],
                                     'send_msgid'     => $send['send_msgid'],
@@ -85,7 +104,7 @@ class CmppCreateCodeTask extends Pzlife {
                                 if (!$has) {
                                   
                                     Db::table('yx_user_send_task_log')->insert($send_log);
-                                $res = $this->redis->rpush($redisMessageCodeSend . ":" . $channel_id, json_encode($sendmessage)); //
+                                     $res = $redis->rpush($redisMessageCodeSend . ":" . $channel_id, json_encode($sendmessage)); //
                                 }
                                
                                
@@ -98,11 +117,18 @@ class CmppCreateCodeTask extends Pzlife {
                     Db::commit();
 
                 } catch (\Exception $e) {
+                    $redis->rPush($redisMessageCodeSendReal,$SendText);
+                    exception($e);
                     Db::rollback();
                 }
             } elseif ($user['free_trial'] == 1) { //需审核用户
                 Db::startTrans();
                 try {
+                    $send_code_task['free_trial'] = 1;
+                    $task_id = Db::table('yx_user_send_task')->insertGetId($send_code_task);
+                    //扣除余额
+                    $new_num_balance = $userEquities['num_balance'] - 1;
+                    Db::table('yx_user_equities')->where('id',$userEquities['id'])->update(['num_balance' => $new_num_balance]);
                     Db::commit();
                 } catch (\Exception $e) {
                     Db::rollback();
@@ -122,6 +148,15 @@ class CmppCreateCodeTask extends Pzlife {
             return [];
         }
         return $userInfo[0];
+    }
+
+    private function getUserEquities($uid,$business_id) {
+       
+        $userEquities = Db::query("SELECT `id`,`num_balance` FROM yx_user_equities WHERE  `delete_time` = 0 AND `uid` = ".$uid." AND `business_id` = ". $business_id);
+        if (!$userEquities) {
+            return [];
+        }
+        return $userEquities[0];
     }
 
     public function getMessageLog() {
@@ -465,7 +500,7 @@ class CmppCreateCodeTask extends Pzlife {
         // print_r($num);die;
         
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:'; //验证码发送任务rediskey
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $new_redisMessageCodeSend = $redisMessageCodeSend . $i;
             
             // $redis->rPush($new_redisMessageCodeSend,'{"Stat":"DB:0141","Submit_time":"1911230919","Done_time":"1911230919"}');
@@ -474,18 +509,28 @@ class CmppCreateCodeTask extends Pzlife {
                 $send                     = $redis->lPop($new_redisMessageCodeSend);
                 $send_data = json_decode($send,true);
                 if (!empty($send_data)){
+                    $send_task = Db::table('yx_user_send_task')->where('id,task_no', $send_data['mar_task_id'])->find();
+                    if (empty($send_task)) {
+                        break;
+                    }
+                    $send_log = Db::query("SELECT `id` FROM yx_user_send_task_log WHERE `task_no` = ".$send_task['task_no']." AND `mobile` = ".$send_data['mobile']);
+                    if (isset($send_data['send_msgid'])) {//cmpp通道提交
+                        
+                    }else{
+
+                    }
                     // $send_log = Db::table('yx_user_send_task_log')->where('id', $j)->find();
                     // $send_log = Db::table('yx_user_send_task_log')->where('id', $j)->find();
                     // $send_log = array_values(Db::query($getSendTaskSql));
                     // print_r($send_log);die;
                     if (!empty($send_log)) {
                         // $send_log = $send_log['0'];
-                        if (in_array($send_log['mobile'],[15374535120,13597642198,15172090302,15072872678,15671228688,13597642198])) {
-                            $send_data['Stat'] = 'DELIVRD';
-                        }
-                        Db::table('yx_user_send_task_log')->where('id',$j)->update(['status_message' => $send_data['Stat'],'send_time' => $send_data['Done_time']]);
+                        // if (in_array($send_log['mobile'],[15374535120,13597642198,15172090302,15072872678,15671228688,13597642198])) {
+                        //     $send_data['Stat'] = 'DELIVRD';
+                        // }
+                        // Db::table('yx_user_send_task_log')->where('id',$j)->update(['status_message' => $send_data['Stat'],'send_time' => $send_data['Done_time']]);
                     }
-                    $j++;
+                    // $j++;
                     // die;
                 }
             } while (!empty($send));
