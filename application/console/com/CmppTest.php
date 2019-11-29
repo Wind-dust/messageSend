@@ -207,7 +207,7 @@ class CmppTest extends Pzlife {
             socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
-            echo '连接成功';die;
+            // echo '连接成功';die;
             do {
                 echo $i . "\n";
                 $time                = 0;

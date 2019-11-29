@@ -49,6 +49,10 @@ class ServerSocketShuHe extends Pzlife {
             echo 'server listen fail:' . socket_strerror(socket_last_error());
         }
         /*接收客户端传过来的信息*/
+        $i = 1;
+        // $Sequence_Id = 1;
+        $time = 0;
+        do {
         $accept_resource = socket_accept($socket);
         socket_set_nonblock($accept_resource); //设置非阻塞模式
         /*socket_accept的作用就是接受socket_bind()所绑定的主机发过来的套接流*/
@@ -122,10 +126,7 @@ class ServerSocketShuHe extends Pzlife {
                     // socket_close($socket);
 
                     if ($status == 0) {
-                        $i = 1;
-                        // $Sequence_Id = 1;
-                        $time = 0;
-                        do {
+                       
                             $headData = socket_read($accept_resource, 12);
                             if ($headData != false) {
                                 $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
@@ -435,7 +436,7 @@ class ServerSocketShuHe extends Pzlife {
                             }
                             usleep(1100); //等待时间，进行下一次操作
                             //sleep($time);
-                        } while (true);
+                        
                     }
                 }
                 //捕获异常
@@ -451,7 +452,7 @@ class ServerSocketShuHe extends Pzlife {
                 }
             }
         }
-
+    } while (true);
         // socket_close($socket);
     }
 
@@ -461,8 +462,8 @@ class ServerSocketShuHe extends Pzlife {
         }
         return [
             // 'host'          => "47.103.200.251", //服务商ip
-            'host'          => "127.0.0.1", //服务商ip
-            // 'host'          => "0.0.0.0", //服务商ip
+            // 'host'          => "127.0.0.1", //服务商ip
+            'host'          => "0.0.0.0", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
             'Source_Addr'   => "101101", //企业id  企业代码
             'Shared_secret' => '5hsey6u9c2', //网关登录密码
