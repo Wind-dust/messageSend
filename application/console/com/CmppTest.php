@@ -187,6 +187,10 @@ class CmppTest extends Pzlife {
         $master_num           = $contdata['master_num']; //通道最大提交量
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
+
+        $host                 = '47.103.200.251'; //服务商ip
+        $port                 = '7890'; //短连接端口号   17890长连接端口号
+
         // echo $security_master;die;
         // die;
         // $send = $this->redis->lPop($redisMessageCodeSend);
@@ -203,6 +207,7 @@ class CmppTest extends Pzlife {
             socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
+            echo '连接成功';die;
             do {
                 echo $i . "\n";
                 $time                = 0;
