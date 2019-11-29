@@ -448,6 +448,7 @@ class ServerSocketShuHe extends Pzlife {
             if ($i > 65536) {
                 $time = 1;
                 $i    = 1;
+                $Sequence_Id    = 1;
             } else {
                 $time = 0;
             }
