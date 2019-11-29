@@ -36,6 +36,8 @@ class ServerSocketShuHe extends Pzlife {
         // $security_coefficient = 0.8; //通道饱和系数
         $security_master = $master_num;
         $socket          = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        //打印创建连接
+        print_r($socket);die;
         date_default_timezone_set('PRC');
         /*绑定接收的套接流主机和端口,与客户端相对应*/
         if (socket_bind($socket, $host, $port) == false) {
