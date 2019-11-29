@@ -188,8 +188,8 @@ class CmppTest extends Pzlife {
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
 
-        $host                 = '47.103.200.251'; //服务商ip
-        $port                 = '7890'; //短连接端口号   17890长连接端口号
+        // $host                 = '47.103.200.251'; //服务商ip
+        // $port                 = '7890'; //短连接端口号   17890长连接端口号
 
         // echo $security_master;die;
         // die;
