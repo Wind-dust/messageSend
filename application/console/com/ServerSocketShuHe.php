@@ -191,8 +191,8 @@ class ServerSocketShuHe extends Pzlife {
                                $sendData = [];
                                if ($body['Msg_Fmt'] == 15) {
                                    $message = mb_convert_encoding($message, 'UTF-8', 'GBK');
-                               }if ($body['Msg_Fmt'] == 0){
-                                $message = $this->decode($message);
+                               }elseif ($body['Msg_Fmt'] == 0){
+                                   $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');
                                }
 
                                $sendData = [
@@ -223,7 +223,7 @@ class ServerSocketShuHe extends Pzlife {
                                if ($body['Msg_Fmt'] == 15) {
                                    $message = mb_convert_encoding($message, 'UTF-8', 'GBK');
                                }elseif ($body['Msg_Fmt'] == 0){
-                                   $message = $this->decode($message);
+                                   $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');
                                }
                                $sendData = [
                                    'mobile'  => trim($mobile),

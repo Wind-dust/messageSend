@@ -176,15 +176,21 @@ class CmppTest extends Pzlife {
         // print_r($arr['Msg_Id1'] & 0x0fffffff);die;
         // // echo 0x00000010;
         // die;
-    // $send = $redis->rPush($redisMessageCodeSend, json_encode([
-    //         'mobile'      => '15201926171',
-    //         'mar_task_id' => 15715,
-    //         'uid'         => 1,
-    //         'content'     => '【米思米】安全围栏标准组件上市！不用设计，不用外发喷涂，不用组装！低至363.95元，第五天出货！赶紧过来下单吧。https://www.misumi.com.cn/mail/chn-gc19057-ml03/转发无效,详询021-52559388*6197,回T退订。 ',
-    //         'Submit_time' => date('YMDHM', time()),
-    //     ]));
+    $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15201926171',
+            'mar_task_id' => 15745,
+            'uid'         => 38,
+            'content'     => '【宝洁中国】风倍清去味除菌喷雾~懒人清洁神器，一喷清新！付几套送几套，限量送加湿器 http://weu.me/_4BbkA 回QX退订',
+            'Submit_time' => date('mdHis', time()),
+        ]));
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
+        // $send = $redis->lpop($redisMessageCodeSend);
+        // $send = json_decode($send,true);
+        // $code1 = mb_convert_encoding($send['content'], 'ASCII');
+        // echo $this->decode($code1);die;
+        // $code = mb_convert_encoding($code1, 'UTF-8');
+        // print_r($code);die;
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $content = 1;
         $contdata = $this->content($content);
@@ -201,8 +207,8 @@ class CmppTest extends Pzlife {
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
 
-        $host                 = '47.103.200.251'; //服务商ip
-        $port                 = '7890'; //短连接端口号   17890长连接端口号
+        // $host                 = '47.103.200.251'; //服务商ip
+        // $port                 = '7890'; //短连接端口号   17890长连接端口号
 
         // echo $security_master;die;
         // die;
@@ -275,6 +281,10 @@ class CmppTest extends Pzlife {
                         $num1 = substr($timestring, 0, 8);
                         $num2 = substr($timestring, 8) . $this->combination($i);
                         $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
+                        // $code = mb_convert_encoding($code, 'ASCII', 'UTF-8');
+
+                        // $code = mb_convert_encoding($code, 'UTF-8', 'ASCII');
+                        // print_r($code);die;
                         if (strlen($code) > $max_len) {
                             $pos          = 0;
                             $num_messages = ceil(strlen($code) / $max_len);
@@ -318,7 +328,8 @@ class CmppTest extends Pzlife {
                                 /* 字符串长度（包括中文）超出70字 为长短信 超过70字的，拆成多条发送，一般使用6位协议头，每条短信除去6字节协议头，剩余134字节存放剩余内容 */
                                 /* 一般在发长短信的时候，tp_udhi设置为1，然后短信内容需要拆分成多条，每条内容之前，加上协议头 */
                                 $bodyData = $bodyData . pack("C", 1); //TP_udhi |1 |Unsigned |Integer |GSM协议类型。详细是解释请参考 GSM03.40 中的 9.2.3.23,仅使用 1 位，右 对齐
-                                $bodyData = $bodyData . pack("C", 15); //Msg_Fmt |1 |Unsigned |Integer |信息格式   0：ASCII 串   3：短信写卡操作   4：二进制信息   8：UCS2 编码 15：含 GBK 汉字(GBK编码内容与Msg_Fmt一致)
+                                // $bodyData = $bodyData . pack("C", 15); //Msg_Fmt |1 |Unsigned |Integer |信息格式   0：ASCII 串   3：短信写卡操作   4：二进制信息   8：UCS2 编码 15：含 GBK 汉字(GBK编码内容与Msg_Fmt一致)
+                                $bodyData = $bodyData . pack("C", 0); //Msg_Fmt |1 |Unsigned |Integer |信息格式   0：ASCII 串   3：短信写卡操作   4：二进制信息   8：UCS2 编码 15：含 GBK 汉字(GBK编码内容与Msg_Fmt一致)
 
                                 $bodyData = $bodyData . pack("a6", $Source_Addr); //Msg_src |6 |Octet String |信息内容来源(账号)
                                 $bodyData = $bodyData . pack("a2", 02);
