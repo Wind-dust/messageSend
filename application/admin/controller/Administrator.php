@@ -217,7 +217,7 @@ class Administrator extends AdminController {
      * @apiGroup         admin_Administrator
      * @apiName          rechargeApplication
      * @apiParam (入参) {String} cms_con_id
-     * @apiParam (入参) {String} mobile 充值账户手机号
+     * @apiParam (入参) {String} nick_name 充值账户
      * @apiParam (入参) {String} business_id 业务服务id
      * @apiParam (入参) {String} num 充值条数
      * @apiSuccess (返回) {String} code 200:成功 / 3001:手机号格式错误 / 3002:business_id不存在或者不为数字 / 3003:用户不存在 / 3003:price不能小于0 / 3004:该用户没有该服务，无法充值
