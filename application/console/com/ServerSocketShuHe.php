@@ -134,7 +134,7 @@ class ServerSocketShuHe extends Pzlife {
                            $body      = unpack("N2Msg_Id/CPk_total/CPk_number/CRegistered_Delivery/CMsg_level/a10Service_Id/CFee_UserType/a21Fee_terminal_Id/CTP_pId/CTP_udhi/CMsg_Fmt/a6Msg_src/a2FeeType/a6FeeCode/a17ValId_Time/a17At_Time/a21Src_Id/CDestUsr_tl", $bodyData);
                            $Pk_total  = $body['Pk_total']; //相同 Msg_Id 的信息总条数
                            $Pk_number = $body['Pk_number']; //相同 Msg_Id 的信息总条数
-                           if (strlen($body['Src_Id']) > 17){
+             /*               if (strlen($body['Src_Id']) > 17){
                                $status = 9;
                                $timestring = time();
                                $back_Command_Id = 0x80000004; //发送应答
@@ -172,7 +172,7 @@ class ServerSocketShuHe extends Pzlife {
                                    socket_write($accept_resource, $new_headData . $new_bodyData, $Total_Length);
                                    continue;
                                }
-                           }
+                           } */
                            if ($body['Pk_total'] > 1) { //长短信
 
                                //DestUsr_tl接收用户数量
