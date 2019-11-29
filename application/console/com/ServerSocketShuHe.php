@@ -92,7 +92,7 @@ class ServerSocketShuHe extends Pzlife {
                                     $status       = 4;
                                     $new_bodyData = pack("C", 4); //status | 1 | Unsigned Integer |状态 0：正确 1：消息结构错  2：非法源地址  3：认证错  4：版本太高   5~ ：其他错误
                                 }
-                                if ($body['AuthenticatorSource'] != md5($Source_Addr . pack("a9", "") . $Shared_secret . $Timestamp, true)) {
+                                if ($body['AuthenticatorSource'] != md5($Source_Addr . '000000000' . $Shared_secret . $Timestamp, true)) {
                                     $status       = 3;
                                     $new_bodyData = pack("C", 3); //status | 1 | Unsigned Integer |状态 0：正确 1：消息结构错  2：非法源地址  3：认证错  4：版本太高   5~ ：其他错误
                                 }
