@@ -57,7 +57,8 @@ class ServerSocketShuHe extends Pzlife {
         socket_set_nonblock($accept_resource); //设置非阻塞模式
         do {
         /*socket_accept的作用就是接受socket_bind()所绑定的主机发过来的套接流*/
-
+        //加密验证
+            $Timestamp = date('mdHis');
             if ($accept_resource !== false) {
                 $headData = socket_read($accept_resource, 12);
                 if ($headData != false) {
@@ -83,16 +84,14 @@ class ServerSocketShuHe extends Pzlife {
                                 // $bodyData = socket_read($accept_resource, $head['Total_Length'] - 12);
                                 $body = unpack("a6Source_Addr/a16AuthenticatorSource/CVersion/NTimestamp", $bodyData);
                                 //ip地址绑定
-                                /* if (!in_array($addr, $bin_ip)) {
+                                if (!in_array($addr, $bin_ip)) {
                                     $status       = 2;
                                     $new_bodyData = pack("C", 2); //status | 1 | Unsigned Integer |状态 0：正确 1：消息结构错  2：非法源地址  3：认证错  4：版本太高   5~ ：其他错误
-                                } */
+                                }
                                 if ($body['Version'] != 0x20) { //验证版本
                                     $status       = 4;
                                     $new_bodyData = pack("C", 4); //status | 1 | Unsigned Integer |状态 0：正确 1：消息结构错  2：非法源地址  3：认证错  4：版本太高   5~ ：其他错误
                                 }
-                                //加密验证
-                                $Timestamp = date('mdHis');
                                 if ($body['AuthenticatorSource'] != md5($Source_Addr . pack("a9", "") . $Shared_secret . $Timestamp, true)) {
                                     $status       = 3;
                                     $new_bodyData = pack("C", 3); //status | 1 | Unsigned Integer |状态 0：正确 1：消息结构错  2：非法源地址  3：认证错  4：版本太高   5~ ：其他错误
@@ -248,7 +247,7 @@ class ServerSocketShuHe extends Pzlife {
                            // $redis->rpush($redisMessageCodeSend,$uid.":".$sendData['mobile'].":".$sendData['message'].":".$num1.$num2.":".$addr); //三体营销通道
                            $sendData['send_msgid'][] = $num1 . $num2;
                            $sendData['uid']          = $uid;
-                           $sendData['Submit_time']  = date('YMDHM', time());
+                           $sendData['Submit_time']  = date('mdHis');
                            // $redis->rpush($redisMessageCodeSend.":1",json_encode($sendData)); //三体营销通道
                            $has_message = $redis->hget($redisMessageCodeSend . ":1", $head['Sequence_Id']);
                            if ($has_message) {
