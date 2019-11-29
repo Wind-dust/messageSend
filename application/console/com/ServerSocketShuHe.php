@@ -426,16 +426,7 @@ class ServerSocketShuHe extends Pzlife {
                                     }
                                 }
                                 // die;
-                                $i++;
-                                $Sequence_Id++;
-                                if ($i > 65536) {
-                                    $time = 1;
-                                    $i    = 1;
-                                } else {
-                                    $time = 0;
-                                }
-                                usleep(1100); //等待时间，进行下一次操作
-                                //sleep($time);
+                               
                             
                         }
                     }
@@ -452,6 +443,16 @@ class ServerSocketShuHe extends Pzlife {
                     }
                 }
             }
+            $i++;
+            $Sequence_Id++;
+            if ($i > 65536) {
+                $time = 1;
+                $i    = 1;
+            } else {
+                $time = 0;
+            }
+            usleep(1100); //等待时间，进行下一次操作
+            //sleep($time);
         } while (true);
         // socket_close($socket);
     }
