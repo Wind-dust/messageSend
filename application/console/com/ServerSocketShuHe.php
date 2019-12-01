@@ -200,6 +200,8 @@ class ServerSocketShuHe extends Pzlife {
                                     if ($encode !='UTF-8') {
                                         $message = mb_convert_encoding($message, 'UTF-8', $encode);
                                     }
+                               }elseif ($body['Msg_Fmt'] == 8){
+                                    $message = mb_convert_encoding($message,'UTF-8','UCS2');
                                }
 
                                $sendData = [

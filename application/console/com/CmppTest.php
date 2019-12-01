@@ -302,7 +302,7 @@ class CmppTest extends Pzlife {
 
                         // $code = mb_convert_encoding($code, 'UTF-8', 'ASCII');
                         // print_r($code);die;
-                        if (strlen($code) > $max_len) {
+                        if (strlen($code) > 140) {
                             $pos          = 0;
                             $num_messages = ceil(strlen($code) / $max_len);
                             // echo $num_messages;die;
