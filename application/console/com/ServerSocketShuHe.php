@@ -6,7 +6,6 @@ use app\console\Pzlife;
 use cache\Phpredis;
 use Config;
 use Env;
-use function Qiniu\json_decode;
 use think\Db;
 
 class ServerSocketShuHe extends Pzlife {
@@ -185,6 +184,7 @@ class ServerSocketShuHe extends Pzlife {
                                $Msg_length  = $body1['Msg_length'];
                                $bodyData2   = socket_read($accept_resource, $Msg_length);
                                $Msg_Content = unpack("a" . $Msg_length . "Msg_Content", $bodyData2);
+                               $Msg_Content['Msg_Content'] = strval($Msg_Content['Msg_Content']);
                                // print_r($Msg_Content);die;
                                $udh      = unpack('c/c/c/c/c/c', $Msg_Content['Msg_Content']);
                                $message  = substr($Msg_Content['Msg_Content'], 6, 140);
@@ -192,7 +192,14 @@ class ServerSocketShuHe extends Pzlife {
                                if ($body['Msg_Fmt'] == 15) {
                                    $message = mb_convert_encoding($message, 'UTF-8', 'GBK');
                                }elseif ($body['Msg_Fmt'] == 0){
-                                   $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');
+                                    $message = $this->decode($message);
+                                    // $de_ascii = mb_convert_encoding($de_ascii, 'UTF-8', 'GBK');
+                                
+                                    //    $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');
+                                    $encode = mb_detect_encoding($message, array('ASCII','GB2312','GBK','UTF-8'));
+                                    if ($encode !='UTF-8') {
+                                        $message = mb_convert_encoding($message, 'UTF-8', $encode);
+                                    }
                                }
 
                                $sendData = [
@@ -219,11 +226,18 @@ class ServerSocketShuHe extends Pzlife {
                                $bodyData2   = socket_read($accept_resource, $Msg_length);
                                $Msg_Content = unpack("a" . $Msg_length . "Msg_Content", $bodyData2);
                                $sendData    = [];
-                               $message     = $Msg_Content['Msg_Content'];
+                               $message     = strval($Msg_Content['Msg_Content']);
                                if ($body['Msg_Fmt'] == 15) {
                                    $message = mb_convert_encoding($message, 'UTF-8', 'GBK');
-                               }elseif ($body['Msg_Fmt'] == 0){
-                                   $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');
+                               }elseif ($body['Msg_Fmt'] == 0){//ASCII进制码
+                                    $message = $this->decode($message);
+                                    // $de_ascii = mb_convert_encoding($de_ascii, 'UTF-8', 'GBK');
+                                   
+                                    //    $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');
+                                    $encode = mb_detect_encoding($message, array('ASCII','GB2312','GBK','UTF-8'));
+                                    if ($encode !='UTF-8') {
+                                        $message = mb_convert_encoding($message, 'UTF-8', $encode);
+                                    }
                                }
                                $sendData = [
                                    'mobile'  => trim($mobile),
