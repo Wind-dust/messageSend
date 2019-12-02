@@ -224,10 +224,11 @@ class ServerSocketShuHe extends Pzlife {
 
                                $bodyData1 = socket_read($accept_resource, $c_length);
                                $body1     = unpack("a" . $Dest_terminal_Id . "Dest_terminal_Id/CMsg_length", $bodyData1);
-
                                $mobile      = $body1['Dest_terminal_Id'];
                                $Msg_length  = $body1['Msg_length'];
                                $bodyData2   = socket_read($accept_resource, $Msg_length);
+                               print_r($bodyData2);die;
+                               echo "\n";
                                $Msg_Content = unpack("a" . $Msg_length . "Msg_Content", $bodyData2);
                                $sendData    = [];
                                $message     = strval($Msg_Content['Msg_Content']);
