@@ -128,7 +128,13 @@ class CmppTest extends Pzlife {
     public function SocketClientTest($content) {
         // $this->clientSocketInit();
 /*         $messagetest    = '【宝洁中国】风倍清去味除菌喷雾~懒人清洁神器，一喷清新！付几套送几套，限量送加湿器 http://weu.me/_4BbkA 回QX退订';
+        // echo  mb_detect_encoding('銆愬疂娲佷腑鍥姐€戦鍊嶆竻鍘诲懗闄よ弻鍠烽浘~鎳掍汉娓呮磥绁炲櫒锛屼竴鍠锋竻鏂帮紒浠樺嚑濂楅€佸嚑濂楋紝闄愰噺閫佸姞婀垮櫒 http://weu.me/_4BbkA 鍥濹X閫€璁',array('ASCII','GB2312','GBK','UTF-8'));die;
+        $de_ascii = mb_convert_encoding('銆愬疂娲佷腑鍥姐€戦鍊嶆竻鍘诲懗闄よ弻鍠烽浘~鎳掍汉娓呮磥绁炲櫒锛屼竴鍠锋竻鏂帮紒浠樺嚑濂楅€佸嚑濂楋紝闄愰噺閫佸姞婀垮櫒 http://weu.me/_4BbkA 鍥濹X閫€璁', 'GBK', 'UTF-8');
+        print_r($de_ascii);
+        die;
         $ascii_messagetest = strval($this->ascii_encode($messagetest));//转码
+        // echo  mb_detect_encoding($ascii_messagetest, array('ASCII','GB2312','GBK','UTF-8'));die;
+        // echo $ascii_messagetest;die;
         // $ascii_messagetest = $this->ascii_encode($messagetest);//转码
         // echo strlen($ascii_messagetest);die;
         // pack("a480",$ascii_messagetest);
@@ -142,8 +148,8 @@ class CmppTest extends Pzlife {
         // $encode = mb_detect_encoding($de_ascii, array('ASCII','GB2312','GBK','UTF-8')); print_r($encode);
        die;
         print_r($ascii_messagetest);
-        die;
-     */
+        die; */
+    
         $redis = Phpredis::getConn();
         // $a_time = 0;
 
@@ -297,12 +303,14 @@ class CmppTest extends Pzlife {
                         echo "发送时间：" . date("Y-m-d H:i:s", time())."\n";
                         $num1 = substr($timestring, 0, 8);
                         $num2 = substr($timestring, 8) . $this->combination($i);
-                        $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
+                        // $code = mb_convert_encoding($code, 'GBK', 'UTF-8'); //UTF-8转中文
                         // $code = mb_convert_encoding($code, 'ASCII', 'UTF-8');
-
+                       
                         // $code = mb_convert_encoding($code, 'UTF-8', 'ASCII');
                         // print_r($code);die;
+                        // echo strlen($code);die;
                         if (strlen($code) > 140) {
+                            $code = strval($this->ascii_encode($code));//UTF-8 转ASCII
                             $pos          = 0;
                             $num_messages = ceil(strlen($code) / $max_len);
                             // echo $num_messages;die;
@@ -625,7 +633,7 @@ class CmppTest extends Pzlife {
                             // die;
                             continue;
                         } else { //单条短信
-
+                            $code = strval($this->ascii_encode($code));//UTF-8 转ASCII
                             $bodyData = pack("N", $num1) . pack("N", $num2);
 
                             // $bodyData = (pack('I',pack("a8", $Msg_Id))); //Msg_Id |Unsigned Integer |8 | 信息标识，由 SP 侧短信网关本身产生， 本处填空

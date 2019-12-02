@@ -179,20 +179,32 @@ class ServerSocket extends Pzlife {
                                $Dest_terminal_Id = 21 * $body['DestUsr_tl']; // Dest_terminal_Id接收短信的 MSISDN 号码
                                $c_length         = $Dest_terminal_Id + 1;
                                $bodyData1        = socket_read($accept_resource, $c_length);
+                            //    print_r($bodyData1);die;
                                $body1            = unpack("a" . $Dest_terminal_Id . "Dest_terminal_Id/CMsg_length", $bodyData1);
 
                                $mobile      = $body1['Dest_terminal_Id'];
                                $Msg_length  = $body1['Msg_length'];
                                $bodyData2   = socket_read($accept_resource, $Msg_length);
                                $Msg_Content = unpack("a" . $Msg_length . "Msg_Content", $bodyData2);
-                               // print_r($Msg_Content);die;
+                               $Msg_Content['Msg_Content'] = strval($Msg_Content['Msg_Content']);
+                               print_r($Msg_Content);
+                            //    die;
                                $udh      = unpack('c/c/c/c/c/c', $Msg_Content['Msg_Content']);
                                $message  = substr($Msg_Content['Msg_Content'], 6, 140);
                                $sendData = [];
                                if ($body['Msg_Fmt'] == 15) {
                                    $message = mb_convert_encoding($message, 'UTF-8', 'GBK');
                                }elseif ($body['Msg_Fmt'] == 0){
-                                   $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');
+                                    $message = $this->decode($message);
+                                    // $de_ascii = mb_convert_encoding($de_ascii, 'UTF-8', 'GBK');
+                                
+                                    //    $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');
+                                    $encode = mb_detect_encoding($message, array('ASCII','GB2312','GBK','UTF-8'));
+                                    if ($encode !='UTF-8') {
+                                        $message = mb_convert_encoding($message, 'UTF-8', $encode);
+                                    }
+                               }elseif ($body['Msg_Fmt'] == 8){
+                                    $message = mb_convert_encoding($message,'UTF-8','UCS2');
                                }
 
                                $sendData = [
@@ -217,13 +229,23 @@ class ServerSocket extends Pzlife {
                                $mobile      = $body1['Dest_terminal_Id'];
                                $Msg_length  = $body1['Msg_length'];
                                $bodyData2   = socket_read($accept_resource, $Msg_length);
+                            //    print_r($bodyData2);
                                $Msg_Content = unpack("a" . $Msg_length . "Msg_Content", $bodyData2);
                                $sendData    = [];
-                               $message     = $Msg_Content['Msg_Content'];
+                               $message     = strval($Msg_Content['Msg_Content']);
                                if ($body['Msg_Fmt'] == 15) {
                                    $message = mb_convert_encoding($message, 'UTF-8', 'GBK');
-                               }elseif ($body['Msg_Fmt'] == 0){
-                                   $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');
+                               }elseif ($body['Msg_Fmt'] == 0){//ASCII进制码
+                                    $message = $this->decode($message);
+                                    // $de_ascii = mb_convert_encoding($de_ascii, 'UTF-8', 'GBK');
+                                   
+                                    //    $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');
+                                    $encode = mb_detect_encoding($message, array('ASCII','GB2312','GBK','UTF-8'));
+                                    if ($encode !='UTF-8') {
+                                        $message = mb_convert_encoding($message, 'UTF-8', $encode);
+                                    }
+                               }elseif ($body['Msg_Fmt'] == 8) {//USC2
+                                    $message = mb_convert_encoding($message, 'UTF-8', 'USC2');
                                }
                                $sendData = [
                                    'mobile'  => trim($mobile),
@@ -278,7 +300,7 @@ class ServerSocket extends Pzlife {
                                }
                                // $redis->hset($redisMessageCodeSend.":1",$head['Sequence_Id'],json_encode($sendData)); //三体营销通道
                            }
-                           print_r($sendData);
+                        //    print_r($sendData);
                            $Total_Length = strlen($new_bodyData) + 12;
                            $new_headData = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
                            // socket_write($socket, $headData . $bodyData, $Total_Length);

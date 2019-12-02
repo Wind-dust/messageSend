@@ -183,6 +183,8 @@ class ServerSocketShuHe extends Pzlife {
                                $mobile      = $body1['Dest_terminal_Id'];
                                $Msg_length  = $body1['Msg_length'];
                                $bodyData2   = socket_read($accept_resource, $Msg_length);
+                               print_r($bodyData2);
+                               echo "\n";
                                $Msg_Content = unpack("a" . $Msg_length . "Msg_Content", $bodyData2);
                                $Msg_Content['Msg_Content'] = strval($Msg_Content['Msg_Content']);
                                // print_r($Msg_Content);die;
@@ -240,6 +242,8 @@ class ServerSocketShuHe extends Pzlife {
                                     if ($encode !='UTF-8') {
                                         $message = mb_convert_encoding($message, 'UTF-8', $encode);
                                     }
+                               }elseif ($body['Msg_Fmt'] == 8) {//USC2
+                                    $message = mb_convert_encoding($message, 'UTF-8', 'USC2');
                                }
                                $sendData = [
                                    'mobile'  => trim($mobile),
