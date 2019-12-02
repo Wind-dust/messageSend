@@ -285,6 +285,7 @@ return $result;
     }
 
     public function getSmsMarketingTask($Username, $Password, $Content, $Mobiles, $Dstime, $ip, $task_name) {
+        $Mobiles = array_unique(array_filter($Mobiles));
         // $Password = md5($Password);
         $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
@@ -346,7 +347,8 @@ return $result;
         return ['code' => '200', 'task_no' => $data['task_no']];
     }
 
-    public function getSmsBuiness($Username, $Password, $Content, $Mobile, $ip) {
+    public function getSmsBuiness($Username, $Password, $Content, $Mobiles, $ip) {
+        $Mobiles = array_unique(array_filter($Mobiles));
         $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
@@ -367,60 +369,39 @@ return $result;
         if (empty($user_equities)) {
             return ['code' => '3005'];
         }
-        if ($user_equities['num_balance'] < 1 && $user['reservation_service'] == 1) {
-            return ['code' => '3006'];
+        // if ($user_equities['num_balance'] < 1 && $user['reservation_service'] == 1) {
+        //     return ['code' => '3006'];
+        // }
+        $send_num             = count($Mobiles);
+
+        if ($send_num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
+            return ['code' => '3007'];
         }
-        //默认青年科技通知
-        //  $Content = str_replace("",'',$Content);
-        //  print_r($Content);die;
-        $channel_id = 3;
-
-        if ($res) {
-            // return ['3004'];
-            if ($res['source'] == 2) { //联通
-
-            } else if ($res['source'] == 1) { //移动
-                $channel_id = 1; //三体行业
-                if ($res['province_id'] == 2495) { //四川移动物流
-
-                }
-            }else if ($res['source' == 3]) {//电信
-
+        $effective_mobile = [];
+        foreach ($Mobiles as $key => $value) {
+            if (checkMobile(($value))) {
+                $effective_mobile[] = $value;
             }
         }
-        $data                   = [];
-        $data['uid']            = $user['id'];
-        $data['source']         = $ip;
-        $data['mobile_content'] = $Mobile;
-        $data['send_status']    = 3;
-        $data['task_content']   = $Content;
-        $data['send_length']    = mb_strlen($Content, 'utf8');
-        $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+        if (empty($effective_mobile)) {
+            return ['code' => '3001'];
+        }
+        
+        $data                 = [];
+        $data['uid']          = $user['id'];
+        $data['source']       = $ip;
+        $data['task_content'] = $Content;
+
+        $data['mobile_content'] = join(',', $Mobiles);
+        $data['task_name']      = $task_name;
+        $data['send_num']       = $send_num;
+        $data['send_length']    = mb_strlen($Content);
         $data['free_trial']     = 1;
+        $data['task_no']        = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
         Db::startTrans();
         try {
-
+            DbAdministrator::modifyBalance($userEquities['id'], $send_num, 'dec');
             $bId = DbAdministrator::addUserSendCodeTask($data); //添加后的商品id
-            if ($bId === false) {
-                Db::rollback();
-                return ['code' => '3009']; //添加失败
-            }
-            $num = 1;
-            if ($data['send_length'] > 65) {
-                $num = ceil($data['send_length'] / 65);
-            }
-            
-            if ($user['free_trial'] == 2) {
-                DbAdministrator::modifyBalance($user_equities['id'], $num, 'dec');
-                $send = [
-                    'mobile' => $Mobile, 
-                    'bus_task_id' => $bId, 
-                    'content' => $Content, 
-                ];
-                //写入任务待操作记录
-                $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id,json_encode($send)); //三体营销通道
-                DbAdministrator::editUserSendCodeTask(['send_status' => 2],$bId);
-            }
             Db::commit();
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
@@ -439,5 +420,67 @@ return $result;
         $file = Config::get('qiniu.exceldomain') . '/' . $filename;
         ini_set('memory_limit', '3072M');
 
+    }
+
+    public function marketingReceive($appid,$appkey,$page,$pagenum){
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $offset = ($page -1) * $pagenum;
+        $result =  DbAdministrator::getUserSendTaskLog(['uid' => $user['id']], 'task_no,status_message,mobile,send_time', $row = false, '', $offset.','.$pagenum);
+        foreach ($result as $key => $value) {
+            $result[$key]['sendtime'] = date("Y-m-d H:i:s",$value['send_time']);
+            unset($result[$key]['send_time']);
+        }
+        $total =  DbAdministrator::countUserSendTaskLog(['uid' => $user['id']]);
+        return ['code' => '200', 'data' => $result];
+    }
+
+    public function businessReceive($appid,$appkey,$page,$pagenum){
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $offset = ($page -1) * $pagenum;
+        $result =  DbAdministrator::getUserSendCodeTaskLog(['uid' => $user['id']], 'task_no,status_message,mobile,send_time', $row = false, '', $offset.','.$pagenum);
+        foreach ($result as $key => $value) {
+            $result[$key]['sendtime'] = date("Y-m-d H:i:s",$value['send_time']);
+            unset($result[$key]['send_time']);
+        }
+        $total =  DbAdministrator::countUserSendCodeTaskLog(['uid' => $user['id']]);
+        return ['code' => '200', 'data' => $result];
+    }
+
+    public function balanceEnquiry($appid,$appkey){
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id']],'*',false);
+        if (empty($user_equities)) {
+            return ['code' => '200', 'userEquities' => []];;
+        }
+        foreach ($user_equities as $key => $equitise) {
+            $user_equities[$key]['business_name'] = DbAdministrator::getBusiness(['id' => $equitise['business_id']],'title',true)['title'];
+            unset($user_equities[$key]['id']);
+            unset($user_equities[$key]['uid']);
+            unset($user_equities[$key]['business_id']);
+            unset($user_equities[$key]['update_time']);
+            unset($user_equities[$key]['create_time']);
+            unset($user_equities[$key]['delete_time']);
+            unset($user_equities[$key]['price']);
+            unset($user_equities[$key]['agency_price']);
+        }
+        return ['code' => '200', 'userEquities' => $user_equities];
     }
 }

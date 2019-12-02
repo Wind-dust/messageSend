@@ -15,6 +15,7 @@ use app\common\model\UserChannel;
 use app\common\model\UserSendTask;
 use app\common\model\UserSendCodeTask;
 use app\common\model\UserSendTaskLog;
+use app\common\model\UserSendCodeTaskLog;
 use think\Db;
 
 class DbAdministrator {
@@ -273,5 +274,25 @@ class DbAdministrator {
 
     public function countUserSendTaskLog($where){
         return UserSendTaskLog::where($where)->count();
+    }
+
+    public function getUserSendCodeTaskLog($where, $field, $row = false, $orderBy = '', $limit = '') {
+        $obj = UserSendCodeTaskLog::field($field)->where($where);
+        return $this->getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function addUserSendCodeTaskLog($data) {
+        $UserSendCodeTaskLog = new UserSendCodeTaskLog;
+        $UserSendCodeTaskLog->save($data);
+        return $UserSendTaskLog->id;
+    }
+
+    public function editUserSendCodeTaskLogg($data, $id) {
+        $UserSendCodeTaskLog = new UserSendCodeTaskLog;
+        return $UserSendCodeTaskLog->save($data, ['id' => $id]);
+    }
+
+    public function countUserSendCodeTaskLog($where){
+        return UserSendCodeTaskLog::where($where)->count();
     }
 }

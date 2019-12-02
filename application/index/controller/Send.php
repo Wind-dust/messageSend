@@ -231,7 +231,7 @@ class Send extends MyController {
         $Content = trim($this->request->post('content'));//短信内容
         $Mobile = trim($this->request->post('mobile'));//接收手机号码
         $ip = trim($this->request->ip());
-        // $Mobiles = explode(',',$Mobile);
+        $Mobiles = explode(',',$Mobile);
         
         // print_r($Content);die;
         // echo phpinfo();die;
@@ -241,9 +241,9 @@ class Send extends MyController {
         if (empty($appkey)) {
             return ['code' => '3000'];
         }
-        if (empty($Mobile) || checkMobile($Mobile) === false) {
-            return ['code'=>'3001'];
-        }
+        // if (empty($Mobile) || checkMobile($Mobile) === false) {
+        //     return ['code'=>'3001'];
+        // }
         if (empty($Content) || strlen($Content) > 500) {
             return ['code'=>'3002'];
         }
@@ -251,7 +251,7 @@ class Send extends MyController {
         if ( mb_strpos($Content,'】') - mb_strpos($Content,'【') < 2 || mb_strpos($Content,'】') - mb_strpos($Content,'【') > 8) {
             return ['code'=>'3003'];
         }
-        $result = $this->app->send->getSmsBuiness($appid,$appkey,$Content,$Mobile,$ip);
+        $result = $this->app->send->getSmsBuiness($appid,$appkey,$Content,$Mobiles,$ip);
         return $result;
     }
 
@@ -329,6 +329,8 @@ class Send extends MyController {
      * @apiName          marketingReceive
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {Number} page 页码 默认1
+     * @apiParam (入参) {Number} pagenum 每页数量 默认10,最大不超过100
      * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 
      * @apiSampleRequest /index/send/marketingReceive
      * @author rzc
@@ -336,13 +338,20 @@ class Send extends MyController {
     public function marketingReceive(){
         $appid = trim($this->request->post('appid'));//登录名
         $appkey = trim($this->request->post('appkey'));//登陆密码
+        $page = trim($this->request->post('page'));//登陆密码
+        $pageNum = trim($this->request->post('pagenum'));//登陆密码
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
         if (empty($appid)) {
             return ['code' => '3000'];
         }
         if (empty($appkey)) {
             return ['code' => '3000'];
         }
-        $result = $this->app->send->marketingReceive($appid,$appkey);
+        if ($pageNum > 100) {
+            return ['code' => '3001'];
+        }
+        $result = $this->app->send->marketingReceive($appid,$appkey,$page,$pageNum);
         return $result;
     }
 
@@ -353,6 +362,8 @@ class Send extends MyController {
      * @apiName          businessReceive
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {Number} page 页码 默认1
+     * @apiParam (入参) {Number} pagenum 每页数量 默认10,最大不超过100
      * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 
      * @apiSampleRequest /index/send/businessReceive
      * @author rzc
@@ -360,13 +371,20 @@ class Send extends MyController {
     public function businessReceive(){
         $appid = trim($this->request->post('appid'));//登录名
         $appkey = trim($this->request->post('appkey'));//登陆密码
+        $page = trim($this->request->post('page'));//登陆密码
+        $pageNum = trim($this->request->post('pagenum'));//登陆密码
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
         if (empty($appid)) {
             return ['code' => '3000'];
         }
         if (empty($appkey)) {
             return ['code' => '3000'];
         }
-        $result = $this->app->send->businessReceive($appid,$appkey);
+        if ($pageNum > 100) {
+            return ['code' => '3001'];
+        }
+        $result = $this->app->send->businessReceive($appid,$appkey,$page,$pageNum);
         return $result;
     }
 }
