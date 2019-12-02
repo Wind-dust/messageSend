@@ -425,9 +425,9 @@ class ServerSocketShuHe extends Pzlife {
     }
 
     public function content($content) { //客户绑定ip 数荷
-        if ($content == 1) { //本机测试
+        // if ($content == 1) { //本机测试
            
-        }
+        // }
         return [
             // 'host'          => "47.103.200.251", //服务商ip
             // 'host'          => "127.0.0.1", //服务商ip
