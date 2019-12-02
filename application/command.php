@@ -29,6 +29,7 @@ return [
     'cmppcreatecodetask' => $commandPath . 'CmppCreateCodeTask',
     'clientSocketwangdai' => $commandPath . 'ClientSocketWangDai',
     'httpchannelsix' => $commandPath . 'HttpChannelSix',
+    'httpchannelkemeng' => $commandPath . 'HttpChannelKeMeng',
     'cmppmijiadianxinmarketing' => $commandPath . 'CmppMiJiaDianXinMarketing',
     'cmppmijialiantongmarketing' => $commandPath . 'CmppMiJiaLianTongMarketing',
     'cmpplanjingmarketing' => $commandPath . 'CmppLanJingMarketing',

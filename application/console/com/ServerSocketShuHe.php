@@ -240,6 +240,7 @@ class ServerSocketShuHe extends Pzlife {
                                    
                                     //    $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');
                                     $encode = mb_detect_encoding($message, array('ASCII','GB2312','GBK','UTF-8'));
+                                     // print_r($encode);die;
                                     if ($encode !='UTF-8') {
                                         $message = mb_convert_encoding($message, 'UTF-8', $encode);
                                     }

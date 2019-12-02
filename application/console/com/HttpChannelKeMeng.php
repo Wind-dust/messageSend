@@ -10,15 +10,19 @@ use Exception;
 use think\Db;
 
 //http 通道,通道编号6
-class HttpChannelSix extends Pzlife {
+class HttpChannelKeMeng extends Pzlife {
 
-    public function content($content = 6) {
+    //
+    public function content($content = 10) {
         return [
-            'username'    => 'shyxyx',
+            'username'    => '上海钰晰图书',
+            'appid'    => '158',
             'password'    => 'D3888377BA4805E84DDEF434FA733211',
             'tockenid'    => 'jdt91x14',
-            'send_api'    => 'http://www.dxsms365.vip/api/sms_send',
-            'receive_api' => 'http://www.dxsms365.vip/api/sms_receive',
+            'send_api'    => 'http://39.98.65.224:8088/v2sms.aspx?action=send',//下发地址
+            'call_api'    => 'http://39.98.65.224:8088/v2callApi.aspx?action=query',//上行地址
+            'overage_api' => 'http://39.98.65.224:8088/v2sms.aspx?action=overage',//余额地址
+            'receive_api' => 'http://39.98.65.224:8088/v2statusApi.aspx?action=query',//回执，报告
         ];
     }
 
@@ -43,7 +47,7 @@ class HttpChannelSix extends Pzlife {
         //     'content' =>'【中山口腔】5周年庆，11月23-30日，黄石三店同庆，全线诊疗项目 8 折让利回馈、消费就送青花瓷礼盒！39.9元购洁牙卡送食用油。详情询:0714-6268188 回T退订', 
         // ]));
         
-        $content              = 6;
+        $content              = 10;
         $redisMessageCodeSend = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
         $user_info            = $this->content();
         $send_task            = [];

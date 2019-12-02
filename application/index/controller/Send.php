@@ -235,6 +235,12 @@ class Send extends MyController {
         
         // print_r($Content);die;
         // echo phpinfo();die;
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
         if (empty($Mobile) || checkMobile($Mobile) === false) {
             return ['code'=>'3001'];
         }
@@ -265,6 +271,102 @@ class Send extends MyController {
            return ['code' => '3001'];
         }
         $result = $this->app->send->readFileContent($filename);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 上行查询
+     * @apiDescription   upGoing
+     * @apiGroup         index_send
+     * @apiName          upGoing
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 
+     * @apiSampleRequest /index/send/upGoing
+     * @author rzc
+     */
+    public function upGoing(){
+        $appid = trim($this->request->post('appid'));//登录名
+        $appkey = trim($this->request->post('appkey'));//登陆密码
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        $result = $this->app->send->upGoing($appid,$appkey);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 余额查询
+     * @apiDescription   balanceEnquiry
+     * @apiGroup         index_send
+     * @apiName          balanceEnquiry
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 
+     * @apiSampleRequest /index/send/balanceEnquiry
+     * @author rzc
+     */
+    public function balanceEnquiry(){
+        $appid = trim($this->request->post('appid'));//登录名
+        $appkey = trim($this->request->post('appkey'));//登陆密码
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        $result = $this->app->send->balanceEnquiry($appid,$appkey);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 营销短信日志查询
+     * @apiDescription   marketingReceive
+     * @apiGroup         index_send
+     * @apiName          marketingReceive
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 
+     * @apiSampleRequest /index/send/marketingReceive
+     * @author rzc
+     */
+    public function marketingReceive(){
+        $appid = trim($this->request->post('appid'));//登录名
+        $appkey = trim($this->request->post('appkey'));//登陆密码
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        $result = $this->app->send->marketingReceive($appid,$appkey);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 行业短信日志查询
+     * @apiDescription   businessReceive
+     * @apiGroup         index_send
+     * @apiName          businessReceive
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 
+     * @apiSampleRequest /index/send/businessReceive
+     * @author rzc
+     */
+    public function businessReceive(){
+        $appid = trim($this->request->post('appid'));//登录名
+        $appkey = trim($this->request->post('appkey'));//登陆密码
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        $result = $this->app->send->businessReceive($appid,$appkey);
         return $result;
     }
 }

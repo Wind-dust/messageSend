@@ -396,6 +396,7 @@ return $result;
         $data['task_content']   = $Content;
         $data['send_length']    = mb_strlen($Content, 'utf8');
         $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+        $data['free_trial']     = 1;
         Db::startTrans();
         try {
 
@@ -416,6 +417,7 @@ return $result;
                     'bus_task_id' => $bId, 
                     'content' => $Content, 
                 ];
+                //写入任务待操作记录
                 $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id,json_encode($send)); //三体营销通道
                 DbAdministrator::editUserSendCodeTask(['send_status' => 2],$bId);
             }
