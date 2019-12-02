@@ -499,7 +499,7 @@ class CmppCreateCodeTask extends Pzlife {
         // $num = count($mobile);
         // print_r($num);die;
         
-        $redisMessageCodeSend = 'index:meassage:code:new:deliver:'; //验证码发送任务rediskey
+/*         $redisMessageCodeSend = 'index:meassage:code:new:deliver:'; //验证码发送任务rediskey
         for ($i = 0; $i < 10; $i++) {
             $new_redisMessageCodeSend = $redisMessageCodeSend . $i;
             
@@ -561,37 +561,42 @@ class CmppCreateCodeTask extends Pzlife {
                 Db::rollback();
             }
             
-        }
+        } */
         // echo time()-1574472176;die;
-        $error = Db::query("SELECT * FROM `yx_user_send_task_log` WHERE `create_time` > `send_time`");
+       /*  $error = Db::query("SELECT * FROM `yx_user_send_task_log` WHERE `create_time` > `send_time`");
         foreach ($error as $key => $value) {
             Db::table('yx_user_send_task_log')->where('id',$value['id'])->update(['send_time' => $value['create_time']+500]);
-        }
-        die;
-        for ($i=5001; $i < 231222; $i++) { 
+        } */
+     /*    for ($i=5001; $i < 231222; $i++) { 
             // $newtime = time()-284402;
             $send_log = Db::table('yx_user_send_task_log')->where('id', $i)->find();
             if ( $send_log['send_time'] <= $send_log['create_time']){
             Db::table('yx_user_send_task_log')->where('id',$i)->update(['send_time' => $send_log['create_time']+500]);
             }
         }
-        die;
+        die; */
         $send_status = [
-            1 => 20000,
-            2 => 40000,
-            3 => 50000,
-            4 => 200000,
+            1 => 4669,
+            2 => 45720,
+            // 3 => 50000,
+            // 4 => 200000,
         ];
+        // $send_status_count = [
+        //     1 => 'MBBLACK',
+        //     2 => 'REJECTD',
+        //     3 => 'DB:0141',
+        //     4 => 'DELIVRD'
+        // ];
         $send_status_count = [
-            1 => 'MBBLACK',
-            2 => 'REJECTD',
-            3 => 'DB:0141',
-            4 => 'DELIVRD'
+            1 => 'DELIVRD',
+            2 => 'MBBLACK',
+            // 3 => 'DB:0141',
+            // 4 => 'DELIVRD'
         ];
         asort($send_status);
         $max     = max($send_status);
         // print_r($send_status);die;
-        for ($n = 375790; $n < 393578; $n++) { 
+        for ($n = 394579; $n < 440299; $n++) { 
 
             $num     = mt_rand(1, $max);
             $sendNum = 0;
@@ -605,10 +610,10 @@ class CmppCreateCodeTask extends Pzlife {
             // $send_log = Db::query("SELECT * FROM yx_user_send_task_log WHERE `uid` = 10 AND id = ".$n);
             $send_log = Db::table('yx_user_send_task_log')->where('id', $n)->find();
                 if (!empty($send_log)) {
-                    if (in_array($send_log['mobile'],[15374535120,13597642198,15172090302,15072872678,15671228688,13597642198])) {
+                    if (in_array($send_log['mobile'],[15374535120,13597642198,15172090302,15072872678,15671228688,13597642198,15827294990])) {
                         $send_data['Stat'] = 'DELIVRD';
                     }
-                    $send_time = time()-284002;
+                    $send_time = $send_log['create_time'] + 80;
                     $send_data['Stat'] = $send_status_count[$sendNum];
                     Db::table('yx_user_send_task_log')->where('id',$n)->update(['status_message' => $send_data['Stat'],'send_time' => $send_time]);
                 }
