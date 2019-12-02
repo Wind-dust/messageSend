@@ -194,13 +194,15 @@ class ServerSocket extends Pzlife {
                                $message  = substr($Msg_Content['Msg_Content'], 6, 140);
                                $sendData = [];
                                if ($body['Msg_Fmt'] == 15) {
-                                   $message = mb_convert_encoding($message, 'UTF-8', 'GBK');
+                                //    $message = mb_convert_encoding($message, 'UTF-8', 'GBK');
+                                $message = iconv('GBK','UTF-8',$message);
                                }elseif ($body['Msg_Fmt'] == 0){
                                     $message = $this->decode($message);
                                     // $de_ascii = mb_convert_encoding($de_ascii, 'UTF-8', 'GBK');
                                 
                                     //    $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');
                                     $encode = mb_detect_encoding($message, array('ASCII','GB2312','GBK','UTF-8'));
+                                    print_r($encode);die;
                                     if ($encode !='UTF-8') {
                                         $message = mb_convert_encoding($message, 'UTF-8', $encode);
                                     }
@@ -242,6 +244,7 @@ class ServerSocket extends Pzlife {
                                    
                                     //    $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');
                                     $encode = mb_detect_encoding($message, array('ASCII','GB2312','GBK','UTF-8'));
+                                    print_r($encode);die;
                                     if ($encode !='UTF-8') {
                                         $message = mb_convert_encoding($message, 'UTF-8', $encode);
                                     }
