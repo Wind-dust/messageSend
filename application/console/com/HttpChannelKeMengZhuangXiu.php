@@ -40,11 +40,11 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
         $redisMessageCodeSend = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
         $redisMessageCodeDeliver    = 'index:meassage:code:deliver:' . $content; //行业通知MsgId
         $user_info            = $this->content();
-        $send                 = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mar_task_id' => 15715, 
-            'mobile' => '15201926171', 
-            'content' =>'【鼎业装饰】鼎礼相祝！跨年巨惠！定单送欧派智能晾衣架一套。选欧派产品可秒杀欧派智能马桶999元一个。终极预存大礼，来店给你个超大的惊喜！！！大到超乎您想象！一年只有这一次！电话3236788', 
-        ]));
+        // $send                 = $redis->rPush($redisMessageCodeSend, json_encode([
+        //     'mar_task_id' => 15715, 
+        //     'mobile' => '15201926171', 
+        //     'content' =>'【鼎业装饰】鼎礼相祝！跨年巨惠！定单送欧派智能晾衣架一套。选欧派产品可秒杀欧派智能马桶999元一个。终极预存大礼，来店给你个超大的惊喜！！！大到超乎您想象！一年只有这一次！电话3236788', 
+        // ]));
         /*    $send                 = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile' => '15821193682', 
             'mar_task_id' => 15715, 
