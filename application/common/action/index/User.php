@@ -571,6 +571,7 @@ class User extends CommonIndex {
             return ['code' => '200'];
         } catch (\Exception $e) {
             Db::rollback();
+            exception($e);
             return ['code' => '3009']; //修改失败
         }
     }
