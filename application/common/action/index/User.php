@@ -566,7 +566,7 @@ class User extends CommonIndex {
         }
         Db::startTrans();
         try {
-            DbUser::addUserEquities($data);
+            DbAdministrator::addUserEquities($data);
             Db::commit();
             return ['code' => '200'];
         } catch (\Exception $e) {
