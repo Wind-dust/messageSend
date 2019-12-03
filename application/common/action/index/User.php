@@ -554,7 +554,7 @@ class User extends CommonIndex {
         $data = [
             'business_id' => $business_id,
             'num_balance' => $business['donate_num'],
-            'uid'         => $uid,
+            'uid'         => $son_user['id'],
         ];
         if ($agency_price){
             if ($agency_price < $business['price']){
