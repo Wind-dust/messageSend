@@ -359,7 +359,7 @@ return $result;
         if ($Password != $user['appkey']) {
             return ['code' => '3000'];
         }
-        $prefix = substr($Mobile, 0, 7);
+        $prefix = substr($Mobiles, 0, 7);
         $res    = DbProvinces::getNumberSource(['mobile' => $prefix], 'source,province_id,province', true);
 
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
@@ -374,7 +374,7 @@ return $result;
         // }
         $send_num             = count($Mobiles);
 
-        if ($send_num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
+        if ($send_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3007'];
         }
         $effective_mobile = [];
@@ -393,14 +393,14 @@ return $result;
         $data['task_content'] = $Content;
 
         $data['mobile_content'] = join(',', $Mobiles);
-        $data['task_name']      = $task_name;
+        $data['task_name']      = $Content;
         $data['send_num']       = $send_num;
         $data['send_length']    = mb_strlen($Content);
         $data['free_trial']     = 1;
         $data['task_no']        = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
         Db::startTrans();
         try {
-            DbAdministrator::modifyBalance($userEquities['id'], $send_num, 'dec');
+            DbAdministrator::modifyBalance($user_equities['id'], $send_num, 'dec');
             $bId = DbAdministrator::addUserSendCodeTask($data); //添加后的商品id
             Db::commit();
             return ['code' => '200', 'task_no' => $data['task_no']];

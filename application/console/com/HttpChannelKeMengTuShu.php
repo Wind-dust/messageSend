@@ -9,16 +9,16 @@ use Env;
 use Exception;
 use think\Db;
 
-//http 通道,通道编号6
-class HttpChannelKeMeng extends Pzlife {
+//http 通道,通道编号11
+class HttpChannelKeMengTuShu extends Pzlife {
 
     //
     public function content($content = 10) {
         return [
             'username'    => '上海钰晰图书',
             'appid'    => '158',
-            'password'    => 'D3888377BA4805E84DDEF434FA733211',
-            'tockenid'    => 'jdt91x14',
+            'password'    => 'sh@123456',
+            'tockenid'    => '',
             'send_api'    => 'http://39.98.65.224:8088/v2sms.aspx?action=send',//下发地址
             'call_api'    => 'http://39.98.65.224:8088/v2callApi.aspx?action=query',//上行地址
             'overage_api' => 'http://39.98.65.224:8088/v2sms.aspx?action=overage',//余额地址
@@ -31,25 +31,27 @@ class HttpChannelKeMeng extends Pzlife {
         // $a_time = 0;
 
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        // $send                 = $redis->rPush($redisMessageCodeSend, json_encode([
-        //     'mobile' => '15201926171', 
-        //     'mar_task_id' => 15715, 
-        //     'content' =>'【中山口腔】5周年庆，11月23-30日，黄石三店同庆，全线诊疗项目 8 折让利回馈、消费就送青花瓷礼盒！39.9元购洁牙卡送食用油。详情询:0714-6268188 回T退订', 
-        // ]));
-        // $send                 = $redis->rPush($redisMessageCodeSend, json_encode([
-        //     'mobile' => '15201926175', 
-        //     'mar_task_id' => 15715, 
-        //     'content' =>'【中山口腔】5周年庆，11月23-30日，黄石三店同庆，全线诊疗项目 8 折让利回馈、消费就送青花瓷礼盒！39.9元购洁牙卡送食用油。详情询:0714-6268188 回T退订', 
-        // ]));
-        // $send                 = $redis->rPush($redisMessageCodeSend, json_encode([
-        //     'mobile' => '15201926175', 
-        //     'mar_task_id' => 15714, 
-        //     'content' =>'【中山口腔】5周年庆，11月23-30日，黄石三店同庆，全线诊疗项目 8 折让利回馈、消费就送青花瓷礼盒！39.9元购洁牙卡送食用油。详情询:0714-6268188 回T退订', 
-        // ]));
+       
+     
         
-        $content              = 10;
+        $content              = 11;
         $redisMessageCodeSend = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
         $user_info            = $this->content();
+        $send                 = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mar_task_id' => 15715, 
+            'mobile' => '15201926171', 
+            'content' =>'【已阅行知】新品大促！童书《DK幼儿艺术启蒙烧脑创意》原价68元，加官微shulixingzhi，直降25元！活动还有最后一天！！！退订回T', 
+        ]));
+           $send                 = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile' => '15821193682', 
+            'mar_task_id' => 15715, 
+            'content' =>'【已阅行知】新品大促！童书《DK幼儿艺术启蒙烧脑创意》原价68元，加官微shulixingzhi，直降25元！活动还有最后一天！！！退订回T', 
+        ]));
+        $send                 = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile' => '15827039444', 
+            'mar_task_id' => 15714, 
+            'content' =>'【已阅行知】新品大促！童书《DK幼儿艺术启蒙烧脑创意》原价68元，加官微shulixingzhi，直降25元！活动还有最后一天！！！退订回T', 
+        ]));
         $send_task            = [];
         $send_num             = [];
         $send_content         = [];
@@ -71,20 +73,21 @@ class HttpChannelKeMeng extends Pzlife {
                     if (count($new_num) >= 50000) { //超出5000条做一次提交
                         $real_send = [];
                         $real_send = [
-                            'username' => $user_info['username'],
-                            'password' => $user_info['password'],
-                            'tockenid' => $user_info['tockenid'],
+                            'userid' => $user_info['appid'],
+                            'timestamp' => date('YmdHis',time()),
+                            'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time()))),
                             'mobile'   => join(',', $new_num),
-                            'message'  => $send_content[$send],
+                            'content'  => $send_content[$send],
                         ];
     
                         $res    = sendRequest($user_info['send_api'], 'post', $real_send);
-                        $result = explode(',', $res);
-                        if ($result[0] == 'success') { //成功
-                            $receive_id[$send][] = $result[1];
-                        } elseif ($result[0] == 'error') { //失败
-                            echo "error" . $result[1] . "\n";die;
+                        $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+                        if ($result['returnstatus'] == 'success') { //成功
+                            $receive_id[$result['taskID']] = $send;
+                        } elseif ($result['returnstatus'] == 'Faild') { //失败
+                            echo "error:" . $result['message'] . "\n";die;
                         }
+                        print_r($result);
                         unset($send_num[$send]);
                         sleep(1);
                     }
@@ -101,32 +104,38 @@ class HttpChannelKeMeng extends Pzlife {
                 }
                 $real_send = [];
                 $real_send = [
-                    'username' => $user_info['username'],
-                    'password' => $user_info['password'],
-                    'tockenid' => $user_info['tockenid'],
+                    'userid' => $user_info['appid'],
+                    'timestamp' => date('YmdHis',time()),
+                    // 'timestamp' => time(),
+                    'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time()))),
+                    // 'sign' => $user_info['appid'].$user_info['password'].date('YmdHis',time()),
+                    // 'sign' => $user_info['username'].$user_info['password'].time(),
                     'mobile'   => join(',', $new_num),
-                    'message'  => $send_content[$send],
+                    'content'  => $send_content[$send],
                 ];
-    
+                print_r($real_send);
                 $res    = sendRequest($user_info['send_api'], 'post', $real_send);
-                $result = explode(',', $res);
-                if ($result[0] == 'success') { //成功
-                    $receive_id[$result[1]] = $send;
-                } elseif ($result[0] == 'error') { //失败
-                    echo "error:" . $result[1] . "\n";die;
+                $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+                // print_r($res);die;
+                // $result = explode(',', $res);
+                if ($result['returnstatus'] == 'success') { //成功
+                    $receive_id[$result['taskID']] = $send;
+                } elseif ($result['returnstatus'] == 'Faild') { //失败
+                    echo "error:" . $result['message'] . "\n";die;
                 }
                 unset($send_num[$send]);
                 sleep(1);
             }
         }
-        $receive_id = [
-            '1016497' => '15715'
-        ];
+        // $receive_id = [
+        //     '1016497' => '15715'
+        // ];
         do {
-            $receive      = trim(sendRequest($user_info['receive_api'], 'post', ['username' => $user_info['username'], 'password' => $user_info['password']]));
-            
+            $receive      = sendRequest($user_info['receive_api'], 'post', ['userid' => $user_info['appid'], 'timestamp' => date('YmdHis',time()),'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time())))]);
+            $receive_data = json_decode(json_encode(simplexml_load_string($receive, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+            print_r($receive_data);
             // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
-            $receive_data = explode(';', $receive);
+            // $receive_data = explode(';', $receive);
             foreach ($receive_data as $key => $value) {
                 $receive_info = [];
                 $receive_info = explode(',', $value);
