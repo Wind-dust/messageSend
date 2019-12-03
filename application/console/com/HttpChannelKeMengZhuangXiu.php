@@ -140,6 +140,10 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
             // die;
             do {
                 $receive      = sendRequest($user_info['receive_api'], 'post', ['userid' => $user_info['appid'], 'timestamp' => date('YmdHis',time()),'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time())))]);
+                if (empty($receive)) {
+                    sleep(60);
+                    continue;
+                }
                 $receive_data = json_decode(json_encode(simplexml_load_string($receive, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
                 // print_r($receive_data);
                 // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
