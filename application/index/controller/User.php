@@ -257,7 +257,7 @@ class User extends MyController {
      * @apiGroup         index_user
      * @apiName          seetingUserEquities
      * @apiParam (入参) {String} con_id
-     * @apiParam (入参) {Int} mobile 账户手机号
+     * @apiParam (入参) {Int} nick_name 账户名
      * @apiParam (入参) {Int} business_id 服务id
      * @apiParam (入参) {Int} [agency_price] 代理价格，默认统一代理商服务价格
      * @apiSuccess (返回) {String} code 200:成功 / 3001:手机号格式错误 / 3002:agency_price格式错误 / 3003:母账户无该项服务业务 / 3004:代理价格不能低于服务商价格 / 3005:该服务已添加 / 3006:子账户服务无法设置 / 3007:business_id格式错误或者不存在 / 3008:该账户非此账户的子账户
@@ -266,17 +266,17 @@ class User extends MyController {
      */
     public function seetingUserEquities() {
         $conId        = trim($this->request->post('con_id'));
-        $mobile       = trim($this->request->post('mobile'));
+        $nick_name       = trim($this->request->post('nick_name'));
         $business_id  = trim($this->request->post('business_id'));
         $agency_price = trim($this->request->post('agency_price'));
         if (!empty($agency_price) && !is_numeric($agency_price)) {
             return ['code' => '3002'];
         }
-        if (checkMobile($mobile) === false) {
+        if (empty($nick_name) ) {
             return ['code' => '3001']; //手机号格式错误
         }
         $agency_price = floatval($agency_price);
-        $result = $this->app->user->seetingUserEquities($conId, $mobile, $business_id, $agency_price);
+        $result = $this->app->user->seetingUserEquities($conId, $nick_name, $business_id, $agency_price);
         // $this->apiLog($apiName, [$cmsConId, $uid, $business_id, $agency_price], $result['code'], $cmsConId);
         return $result;
     }

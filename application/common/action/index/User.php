@@ -527,7 +527,7 @@ class User extends CommonIndex {
         }
     }
 
-    public function seetingUserEquities($conId, $mobile, $business_id, $agency_price){
+    public function seetingUserEquities($conId, $nick_name, $business_id, $agency_price){
         $business = DbAdministrator::getBusiness(['id' => $business_id],'*',true);
         if (empty($business)) {
             return ['code' => '3007'];
@@ -543,7 +543,7 @@ class User extends CommonIndex {
         if ($agency_price < $user_equities['agency_price']){
             return ['code' => '3004'];
         }
-        $son_user = DbUser::getUserOne(['mobile' => $mobile], 'id,pid');
+        $son_user = DbUser::getUserOne(['nick_name' => $nick_name], 'id,pid');
         if (empty($son_user) || $uid != $son_user['pid']) {
             return ['code' => '3008'];
         }
