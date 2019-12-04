@@ -150,7 +150,7 @@ class HttpChannelKeMengTuShu extends Pzlife {
                 // $receive_data = explode(';', $receive);
                 if (isset($receive_data['statusbox'])) {
                     $real_receive_data = $receive_data['statusbox'];
-                    foreach ($receive_data as $key => $value) {
+                    foreach ($real_receive_data as $key => $value) {
                         // $receive_info = [];
                         // $receive_info = explode(',', $value);
                         // $task_id      = $receive_id[$value['taskid']];
