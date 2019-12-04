@@ -33,8 +33,29 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
         // $a_time = 0;
 
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-       
-     
+        
+/*         $XML = '<?xml version="1.0" encoding="utf-8" ?> 
+        <returnsms>
+        <statusbox>
+        <mobile>15023239810</mobile>-------------对应的手机号码
+        <taskid>1212</taskid>-------------同一批任务ID
+        <status>10</status>---------状态报告----10：发送成功，20：发送失败
+        <receivetime>2011-12-02 22:12:11</receivetime>-------------接收时间
+        <errorcode>DELIVRD</errorcode>-上级网关返回值，不同网关返回值不同，仅作为参考
+        <extno>01</extno>--子号，即自定义扩展号
+        </statusbox>
+        <statusbox>
+        <mobile>15023239811</mobile>
+        <taskid>1212</taskid>
+        <status>20</status>
+        <receivetime>2011-12-02 22:12:11</receivetime>
+        <errorcode>2</errorcode>
+        <extno></extno>
+        </statusbox>
+        </returnsms>
+        ';
+        $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', LIBXML_NOCDATA)), true); */
+        // print_r($XML);die;
         
         $content              = 11;
         $redisMessageCodeSend = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
@@ -143,9 +164,9 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
                     sleep(1);
                 }
             }
-            // $receive_id = [
-            //     '866213' => '15715'
-            // ];
+            $receive_id = [
+                '866214' => '15745'
+            ];
             // print_r($receive_id);
             // die;
             do {
@@ -162,7 +183,7 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
                 $send_status = 2;
                 if (isset($receive_data['statusbox'])) {
                     $real_receive_data = $receive_data['statusbox'];
-                    foreach ($receive_data as $key => $value) {
+                    foreach ($real_receive_data as $key => $value) {
                         // $receive_info = [];
                         // $receive_info = explode(',', $value);
                         // $task_id      = $receive_id[$value['taskid']];
