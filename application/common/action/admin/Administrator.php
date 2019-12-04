@@ -439,7 +439,7 @@ class Administrator extends CommonIndex {
                 DbAdministrator::editUserSendTask(['free_trial' => $free_trial, 'channel_id' => $channel_id], $value['id']);
             }
             foreach ($real_usertask as $real => $usertask) {
-                $res = $this->redis->rpush("index:meassage:marketing:sendtask",$usertask['id']); //三体营销通道
+                $res = $this->redis->rpush("index:meassage:marketing:sendtask",$usertask['id']); 
             }
            /*  if ($free_trial == 2) {
                 foreach ($real_usertask as $real => $usertask) {

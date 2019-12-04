@@ -91,6 +91,9 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
             $send_num             = [];
             $send_content         = [];
             $receive_id           = [];
+            if (date('H') >= 18 || date('H') < 8) {
+                exit("8点前,18点后通道关闭");
+            }
             do {
                 $send                 = $redis->lPop($redisMessageCodeSend);
                 $send_data = json_decode($send, true);
@@ -164,9 +167,9 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
                     sleep(1);
                 }
             }
-            $receive_id = [
-                '866214' => '15745'
-            ];
+            // $receive_id = [
+            //     '866214' => '15745'
+            // ];
             // print_r($receive_id);
             // die;
             do {

@@ -60,6 +60,9 @@ class HttpChannelKeMengTuShu extends Pzlife {
             $send_num             = [];
             $send_content         = [];
             $receive_id           = [];
+            if (date('H') >= 18 || date('H') < 8) {
+                exit("8点前,18点后通道关闭");
+            }
             do {
                 $send                 = $redis->lPop($redisMessageCodeSend);
                 $send_data = json_decode($send, true);
