@@ -406,6 +406,7 @@ class CmppCreateCodeTask extends Pzlife {
                 Db::table('yx_user_send_task')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3]);
                 Db::commit();
             } catch (\Exception $e) {
+                $this->redis->rPush('index:meassage:marketing:sendtask',$send);
                 exception($e);
                 Db::rollback();
             }
