@@ -475,7 +475,6 @@ class User extends MyController {
      * @apiParam (入参) {String} page 
      * @apiParam (入参) {String} con_id
      * @apiParam (入参) {String} pageNum 
-     * @apiParam (入参) {String} id 任务id
      * @apiSuccess (返回) {String} code 200:成功  3001:logo为空或者未上传成功/ 3002:businesslicense为空或者未上传成功 / 3003:用户不存在 / 3004:登录失败
      * @apiSuccess (返回) {Array} data 用户信息
      * @apiSampleRequest /index/user/getUserSonAccount
@@ -483,6 +482,14 @@ class User extends MyController {
      * @author rzc
      */
     public function getUserSonAccount(){
-        
+        $ConId = trim($this->request->post('con_id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        $result = $this->app->user->getUserSonAccount($page, $pageNum, $ConId);
+        return $result;
     }
 }

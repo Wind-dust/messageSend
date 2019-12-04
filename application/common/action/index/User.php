@@ -655,4 +655,15 @@ class User extends CommonIndex {
         $total = DbAdministrator::countUserSendTaskLog(['task_no' => $task['task_no']]);
         return ['code' => '200','task' => $task, 'total' => $total, 'task_log' => $task_log];
     }
+
+    public function getUserSonAccount($page, $pageNum, $ConId){
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $offset = $pageNum * ($page - 1);
+        $result = DbUser::getUserInfo(['pid' => $uid], '*', false, 'id', $offset.','.$pageNum, 'desc');
+        $totle = DbUser::getUserInfoCount(['pid' => $uid]);
+        return ['code' => '200', 'totle' => $totle, 'result' => $result];
+    }
 }
