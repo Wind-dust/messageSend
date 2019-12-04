@@ -466,4 +466,23 @@ class User extends MyController {
         $result = $this->app->user->getUserSubmitTaskInfo($page, $pageNum, $ConId, $id);
         return $result;
     }
+
+    /**
+     * @api              {post} / 获取子账户列表
+     * @apiDescription   getUserSonAccount
+     * @apiGroup         index_user
+     * @apiName          getUserSonAccount
+     * @apiParam (入参) {String} page 
+     * @apiParam (入参) {String} con_id
+     * @apiParam (入参) {String} pageNum 
+     * @apiParam (入参) {String} id 任务id
+     * @apiSuccess (返回) {String} code 200:成功  3001:logo为空或者未上传成功/ 3002:businesslicense为空或者未上传成功 / 3003:用户不存在 / 3004:登录失败
+     * @apiSuccess (返回) {Array} data 用户信息
+     * @apiSampleRequest /index/user/getUserSonAccount
+     * @return array
+     * @author rzc
+     */
+    public function getUserSonAccount(){
+        
+    }
 }
