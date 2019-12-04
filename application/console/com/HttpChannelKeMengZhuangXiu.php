@@ -40,7 +40,7 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
         $redisMessageCodeSend = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
         $redisMessageCodeDeliver    = 'index:meassage:code:deliver:' . $content; //行业通知MsgId
         $user_info            = $this->content();
-        $send                 = $redis->rPush($redisMessageCodeSend, json_encode([
+     /*    $send                 = $redis->rPush($redisMessageCodeSend, json_encode([
             'mar_task_id' => 15745, 
             'mobile' => '13476024461', 
             'content' =>'【鼎业装饰】鼎礼相祝！跨年巨惠！定单送欧派智能晾衣架一套。选欧派产品可秒杀欧派智能马桶999元一个。终极预存大礼，来店给你个超大的惊喜！！！大到超乎您想象！一年只有这一次！电话3236788回T退订', 
@@ -64,7 +64,7 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
             'mobile' => '13886258181', 
             'mar_task_id' => 15745, 
             'content' =>'【鼎业装饰】鼎礼相祝！跨年巨惠！定单送欧派智能晾衣架一套。选欧派产品可秒杀欧派智能马桶999元一个。终极预存大礼，来店给你个超大的惊喜！！！大到超乎您想象！一年只有这一次！电话3236788回T退订', 
-        ]));
+        ])); */
         while (true) {
             $send_task            = [];
             $send_num             = [];
@@ -158,6 +158,8 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
                 // print_r($receive_data);
                 // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
                 // $receive_data = explode(';', $receive);
+                
+                $send_status = 2;
                 if (isset($receive_data['statusbox'])) {
                     $real_receive_data = $receive_data['statusbox'];
                     foreach ($receive_data as $key => $value) {
