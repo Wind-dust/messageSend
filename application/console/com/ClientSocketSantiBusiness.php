@@ -132,13 +132,13 @@ class ClientSocketSantiBusiness extends Pzlife {
         //     print_r($send);
         // } while ($send);
         // $send = $redis ->lPop($redisMessageCodeSend);
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15201926171',
-            'mar_task_id' => 15745,
-            'uid'         => 38,
-            'content'     => '【宝洁中国】风倍清去味除菌喷雾~懒人清洁神器，一喷清新！付几套送几套，限量送加湿器 http://weu.me/_4BbkA 回QX退订',
-            'Submit_time' => date('mdHis', time()),
-        ]));
+        // $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        //     'mobile'      => '15201926171',
+        //     'mar_task_id' => 15745,
+        //     'uid'         => 38,
+        //     'content'     => '【宝洁中国】风倍清去味除菌喷雾~懒人清洁神器，一喷清新！付几套送几套，限量送加湿器 http://weu.me/_4BbkA 回QX退订',
+        //     'Submit_time' => date('mdHis', time()),
+        // ]));
         // $send = $redis->lPop($redisMessageCodeSend);
         // $send_data = json_decode($send, true);
         // $code = $send_data['content']; //带签名

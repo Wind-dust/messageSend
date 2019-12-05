@@ -317,7 +317,7 @@ return $result;
         if (empty($effective_mobile)) {
             return ['code' => '3010','msg' => '有效手机号为空'];
         }
-        $Content = $this->dbc2Sbc($Content);
+        // $Content = $this->dbc2Sbc($Content);
         $data                 = [];
         $data['uid']          = $user['id'];
         $data['source']       = $ip;
