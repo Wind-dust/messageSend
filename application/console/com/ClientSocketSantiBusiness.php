@@ -139,6 +139,11 @@ class ClientSocketSantiBusiness extends Pzlife {
             'content'     => '【宝洁中国】风倍清去味除菌喷雾~懒人清洁神器，一喷清新！付几套送几套，限量送加湿器 http://weu.me/_4BbkA 回QX退订',
             'Submit_time' => date('mdHis', time()),
         ]));
+        // $send = $redis->lPop($redisMessageCodeSend);
+        // $send_data = json_decode($send, true);
+        // $code = $send_data['content']; //带签名
+        // $code = strval($this->ascii_encode($code));//UTF-8 转ASCII
+        // print_r($code);die;
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $content  = 3;
         $contdata = $this->content($content);
@@ -207,7 +212,7 @@ class ClientSocketSantiBusiness extends Pzlife {
                         $uer_num = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
 
                         $timestring = time();
-                        echo "发送时间：" . date("Y-m-d H:i:s", time()) . "\n";
+                        
                         $num1 = substr($timestring, 0, 8);
                         $num2 = substr($timestring, 8) . $this->combination($i);
                         // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
@@ -283,7 +288,7 @@ class ClientSocketSantiBusiness extends Pzlife {
 
                                 $Total_Length = strlen($bodyData) + 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $senddata[0] . ":" . $senddata[1] . ":" . $senddata[2]);
+                                $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
                                 // socket_write($socket, $headData . $bodyData, $Total_Length);
                                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) { //写入失败，还原发送信息并关闭端口
                                     echo 'fail to write' . socket_strerror(socket_last_error());
@@ -563,7 +568,7 @@ class ClientSocketSantiBusiness extends Pzlife {
                         // echo strlen($code);die;
                         // echo $Command_Id;die;
                         // print_r(strlen($bodyData));die;
-                        $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $senddata[0] . ":" . $senddata[1] . ":" . $senddata[2]);
+                        $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
                     } else {
                         $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                         $Command_Id  = 0x00000008; //保持连接
