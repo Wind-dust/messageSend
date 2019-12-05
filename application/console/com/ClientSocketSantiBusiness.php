@@ -191,15 +191,18 @@ class ClientSocketSantiBusiness extends Pzlife {
 
                     if ($send) { //正式使用从缓存中读取数据
                         $senddata = [];
-                        $senddata = explode(":", $send);
-
+                        $senddata = [];
+                        $senddata = [];
+                        // $senddata = explode(":",$send);
+                        $send_data = json_decode($send, true);
                         // $mobile = $senddata['mobile_content'];
-                        $mobile   = $senddata[0];
+                        // $mobile = $senddata[0];
+                        $mobile   = $send_data['mobile'];
                         $txt_head = 6;
                         $txt_len  = 140;
                         $max_len  = $txt_len - $txt_head;
                         // $mobile   = 15201926171;
-                        $code = $senddata[2]; //带签名
+                        $code = $send_data['content']; //带签名
 
                         $uer_num = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
 
