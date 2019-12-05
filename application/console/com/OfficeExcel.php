@@ -10,6 +10,8 @@ use PHPExcel;
 use PHPExcel_Cell;
 use PHPExcel_IOFactory;
 use PHPExcel_Writer_Excel2007;
+use PHPExcel_Style_Alignment;
+use PHPExcel_Style_Fill;
 use think\Db;
 
 class OfficeExcel extends Pzlife {
@@ -105,7 +107,7 @@ class OfficeExcel extends Pzlife {
         $objReader = PHPExcel_IOFactory::createReader('Excel2007');
         // print_r(realpath("../"). "\yt_area_mobile.csv");die;
 
-        $objPHPExcel = $objReader->load(realpath("./") . "\白卡.xlsx");
+        $objPHPExcel = $objReader->load(realpath("./") . "\金卡.xlsx");
         // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
         //选择标签页
         $sheet      = $objPHPExcel->getSheet(0); //取得sheet(0)表
@@ -117,6 +119,7 @@ class OfficeExcel extends Pzlife {
             $res     = Db::query("SELECT `source_name`,`province`,`city` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
             $newres  = array_shift($res);
             $value = [];
+            $value['mobile'] = trim($cellVal);
             if ($newres) {
                 $value['source_name'] = $newres['source_name'];
                 $value['province'] = $newres['province'];
@@ -126,7 +129,6 @@ class OfficeExcel extends Pzlife {
                 $value['province'] = '';
                 $value['city'] = '';
             }
-            $value['mobile'] = trim($cellVal);
             $data[] = $value;
         }
 
@@ -148,8 +150,52 @@ class OfficeExcel extends Pzlife {
 
         //设置当前活动sheet的名称
         $objActSheet->setTitle("金卡1");
+        $CellList = array(
+            array('mobile', '手机号'),
+            array('source_name', '运营商'),
+            array('province', '省份'),
+            array('city', '城市'),
+        );
+        foreach ($CellList as $i => $Cell) {
+            $row = chr(65 + $i);
+            $col = 1;
+            $objActSheet->setCellValue($row . $col, $Cell[1]);
+            $objActSheet->getColumnDimension($row)->setWidth(30);
+    
+            $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+            $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+            $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+            $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+            $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+            $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        }
+        $outputFileName = "金卡1.xlsx";
+        $i = 0;
+        foreach ($data as $key => $orderdata) {
+            //行
+            $col = $key + 2;
+            foreach ($CellList as $i => $Cell) {
+                //列
+                $row = chr(65 + $i);
+                $objActSheet->getRowDimension($i)->setRowHeight(15);
+                $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            }
+        }
+        // header("Content-Type: application/force-download");
+        // header("Content-Type: application/octet-stream");
+        // header("Content-Type: application/download");
+        // header('Content-Disposition:inline;filename="' . $outputFileName . '"');
+        // header("Content-Transfer-Encoding: binary");
+        // header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+        // header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+        // header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        // header("Pragma: no-cache");
+        // $objWriter->save('php://output');
+        $objWriter->save('金卡1.xlsx');
+        exit();
 
-        print_r($data);die;
     }
 
     function getMobileOwner($mobile) {

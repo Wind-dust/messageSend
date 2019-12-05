@@ -121,7 +121,7 @@ class ClientSocketSantiBusiness extends Pzlife {
         $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
         $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
         $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
-        $redisMessageCodeDeliver    = 'index:meassage:code:deliver:' . $content; //行业通知MsgId
+        $redisMessageCodeDeliver    = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
         // $redisMessageCodeSend       = 'index:meassage:marketing:send:' . $content; //营销发送任务rediskey
         // $redisMessageCodeSequenceId = 'index:meassage:marketing:sequence:id:' . $content; //营销行业通知SequenceId
         // $redisMessageCodeMsgId      = 'index:meassage:marketing:msg:id:' . $content; //营销行业通知SequenceId
@@ -132,7 +132,13 @@ class ClientSocketSantiBusiness extends Pzlife {
         //     print_r($send);
         // } while ($send);
         // $send = $redis ->lPop($redisMessageCodeSend);
-
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15201926171',
+            'mar_task_id' => 15745,
+            'uid'         => 38,
+            'content'     => '【宝洁中国】风倍清去味除菌喷雾~懒人清洁神器，一喷清新！付几套送几套，限量送加湿器 http://weu.me/_4BbkA 回QX退订',
+            'Submit_time' => date('mdHis', time()),
+        ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $content  = 3;
         $contdata = $this->content($content);
@@ -201,7 +207,8 @@ class ClientSocketSantiBusiness extends Pzlife {
                         echo "发送时间：" . date("Y-m-d H:i:s", time()) . "\n";
                         $num1 = substr($timestring, 0, 8);
                         $num2 = substr($timestring, 8) . $this->combination($i);
-                        $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
+                        // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
+                        $code = strval($this->ascii_encode($code));//UTF-8 转ASCII
                         if (strlen($code) > 140) {
                             $pos          = 0;
                             $num_messages = ceil(strlen($code) / $max_len);
@@ -245,7 +252,8 @@ class ClientSocketSantiBusiness extends Pzlife {
                                 /* 字符串长度（包括中文）超出70字 为长短信 超过70字的，拆成多条发送，一般使用6位协议头，每条短信除去6字节协议头，剩余134字节存放剩余内容 */
                                 /* 一般在发长短信的时候，tp_udhi设置为1，然后短信内容需要拆分成多条，每条内容之前，加上协议头 */
                                 $bodyData = $bodyData . pack("C", 1); //TP_udhi |1 |Unsigned |Integer |GSM协议类型。详细是解释请参考 GSM03.40 中的 9.2.3.23,仅使用 1 位，右 对齐
-                                $bodyData = $bodyData . pack("C", 15); //Msg_Fmt |1 |Unsigned |Integer |信息格式   0：ASCII 串   3：短信写卡操作   4：二进制信息   8：UCS2 编码 15：含 GBK 汉字(GBK编码内容与Msg_Fmt一致)
+                                // $bodyData = $bodyData . pack("C", 15); //Msg_Fmt |1 |Unsigned |Integer |信息格式   0：ASCII 串   3：短信写卡操作   4：二进制信息   8：UCS2 编码 15：含 GBK 汉字(GBK编码内容与Msg_Fmt一致)
+                                $bodyData = $bodyData . pack("C", 0); //Msg_Fmt |1 |Unsigned |Integer |信息格式   0：ASCII 串   3：短信写卡操作   4：二进制信息   8：UCS2 编码 15：含 GBK 汉字(GBK编码内容与Msg_Fmt一致)
 
                                 $bodyData = $bodyData . pack("a6", $Source_Addr); //Msg_src |6 |Octet String |信息内容来源(账号)
                                 $bodyData = $bodyData . pack("a2", 02);
@@ -425,8 +433,11 @@ class ClientSocketSantiBusiness extends Pzlife {
 
                                                 $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                                                 if ($mesage) {
-                                                    $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
-                                                    $redis->rpush($redisMessageCodeDeliver, $mesage . ":" . $Msg_Content['Stat']);
+                                                    $mesage = json_decode($mesage,true);
+                                                    $mesage['Stat'] = $Msg_Content['Stat'];
+                                                    $mesage['Done_time'] = $Msg_Content['Done_time'];
+                                                    $redis->hdel($redisMessageCodeMsgId,$Msg_Content['Msg_Id1'].$Msg_Content['Msg_Id2']);
+                                                    $redis->rpush($redisMessageCodeDeliver,json_encode($mesage));
                                                 }
                                                 print_r($Msg_Content);
                                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
@@ -519,7 +530,8 @@ class ClientSocketSantiBusiness extends Pzlife {
                             /* 字符串长度（包括中文）超出70字 为长短信 超过70字的，拆成多条发送，一般使用6位协议头，每条短信除去6字节协议头，剩余134字节存放剩余内容 */
                             /* 一般在发长短信的时候，tp_udhi设置为1，然后短信内容需要拆分成多条，每条内容之前，加上协议头 */
                             $bodyData = $bodyData . pack("C", 0); //TP_udhi |1 |Unsigned |Integer |GSM协议类型。详细是解释请参考 GSM03.40 中的 9.2.3.23,仅使用 1 位，右 对齐
-                            $bodyData = $bodyData . pack("C", 15); //Msg_Fmt |1 |Unsigned |Integer |信息格式   0：ASCII 串   3：短信写卡操作   4：二进制信息   8：UCS2 编码 15：含 GBK 汉字(GBK编码内容与Msg_Fmt一致)
+                            // $bodyData = $bodyData . pack("C", 15); //Msg_Fmt |1 |Unsigned |Integer |信息格式   0：ASCII 串   3：短信写卡操作   4：二进制信息   8：UCS2 编码 15：含 GBK 汉字(GBK编码内容与Msg_Fmt一致)
+                            $bodyData = $bodyData . pack("C", 0); //Msg_Fmt |1 |Unsigned |Integer |信息格式   0：ASCII 串   3：短信写卡操作   4：二进制信息   8：UCS2 编码 15：含 GBK 汉字(GBK编码内容与Msg_Fmt一致)
 
                             $bodyData = $bodyData . pack("a6", $Source_Addr); //Msg_src |6 |Octet String |信息内容来源(账号)
                             $bodyData = $bodyData . pack("a2", 02);
@@ -708,8 +720,12 @@ class ClientSocketSantiBusiness extends Pzlife {
 
                                 $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                                 if ($mesage) {
-                                    $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
-                                    $redis->rpush($redisMessageCodeDeliver, $mesage . ":" . $Msg_Content['Stat']);
+                                    // print_r($mesage);die;
+                                    $mesage = json_decode($mesage,true);
+                                    $mesage['Stat'] = $Msg_Content['Stat'];
+                                    $mesage['Done_time'] = $Msg_Content['Done_time'];
+                                    $redis->hdel($redisMessageCodeMsgId,$Msg_Content['Msg_Id1'].$Msg_Content['Msg_Id2']);
+                                    $redis->rpush($redisMessageCodeDeliver,json_encode($mesage));
                                 }
                                 print_r($Msg_Content);
                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
@@ -820,6 +836,44 @@ class ClientSocketSantiBusiness extends Pzlife {
         die;
         $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/", "³f󿾧©¬DELIVRD1911071650191107165515201926171AG");
 
+    }
+
+    /**
+     * ascii 转换
+     * @param $c
+     * @param string $prefix
+     * @return string
+     */
+    function ascii_encode($c, $prefix="&#") {
+        $len = strlen($c);
+        $a = 0;
+        $scill = '';
+        while ($a < $len) {
+            $ud = 0;
+            if (ord($c{$a}) >= 0 && ord($c{$a}) <= 127) {
+                $ud = ord($c{$a});
+                $a += 1;
+            } else if (ord($c{$a}) >= 192 && ord($c{$a}) <= 223) {
+                $ud = (ord($c{$a}) - 192) * 64 + (ord($c{$a + 1}) - 128);
+                $a += 2;
+            } else if (ord($c{$a}) >= 224 && ord($c{$a}) <= 239) {
+                $ud = (ord($c{$a}) - 224) * 4096 + (ord($c{$a + 1}) - 128) * 64 + (ord($c{$a + 2}) - 128);
+                $a += 3;
+            } else if (ord($c{$a}) >= 240 && ord($c{$a}) <= 247) {
+                $ud = (ord($c{$a}) - 240) * 262144 + (ord($c{$a + 1}) - 128) * 4096 + (ord($c{$a + 2}) - 128) * 64 + (ord($c{$a + 3}) - 128);
+                $a += 4;
+            } else if (ord($c{$a}) >= 248 && ord($c{$a}) <= 251) {
+                $ud = (ord($c{$a}) - 248) * 16777216 + (ord($c{$a + 1}) - 128) * 262144 + (ord($c{$a + 2}) - 128) * 4096 + (ord($c{$a + 3}) - 128) * 64 + (ord($c{$a + 4}) - 128);
+                $a += 5;
+            } else if (ord($c{$a}) >= 252 && ord($c{$a}) <= 253) {
+                $ud = (ord($c{$a}) - 252) * 1073741824 + (ord($c{$a + 1}) - 128) * 16777216 + (ord($c{$a + 2}) - 128) * 262144 + (ord($c{$a + 3}) - 128) * 4096 + (ord($c{$a + 4}) - 128) * 64 + (ord($c{$a + 5}) - 128);
+                $a += 6;
+            } else if (ord($c{$a}) >= 254 && ord($c{$a}) <= 255) { //error
+                $ud = false;
+            }
+            $scill .= $prefix.$ud.";";
+        }
+        return $scill;
     }
 
     /**
