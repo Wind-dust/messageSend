@@ -422,7 +422,8 @@ class CmppCreateCodeTask extends Pzlife {
     public function getChannelSendLog($content){
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $redisMessageCodeSend = 'index:meassage:code:new:deliver:'.$content; //验证码发送任务rediskey
+        // $redisMessageCodeSend = 'index:meassage:code:new:deliver:'.$content; //验证码发送任务rediskey
+        $redisMessageCodeSend = 'index:meassage:code:deliver:'.$content; //验证码发送任务rediskey
         // $redis->rpush($redisMessageCodeSend,json_encode([
         //     'task_no' => 'mar19120515365354528991',
         //     'uid' => '39',
