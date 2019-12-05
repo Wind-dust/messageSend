@@ -290,7 +290,7 @@ class ClientSocketSantiBusiness extends Pzlife {
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                 $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
                                 // socket_write($socket, $headData . $bodyData, $Total_Length);
-                                echo "发送时间：" . date("Y-m-d H:i:s", time())."\n";
+                                // echo "发送时间：" . date("Y-m-d H:i:s", time())."\n";
                                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) { //写入失败，还原发送信息并关闭端口
                                     echo 'fail to write' . socket_strerror(socket_last_error());
                                 } else {
@@ -580,7 +580,7 @@ class ClientSocketSantiBusiness extends Pzlife {
                 }
                 $Total_Length = strlen($bodyData) + 12;
                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                echo "发送时间：" . date("Y-m-d H:i:s", time())."\n";
+                // echo "发送时间：" . date("Y-m-d H:i:s", time())."\n";
                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) { //写入失败，还原发送信息并关闭端口
                     echo 'fail to write' . socket_strerror(socket_last_error());
                 } else {
