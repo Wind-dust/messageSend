@@ -203,6 +203,7 @@ class Send extends CommonIndex {
         if (empty($effective_mobile)) {
             return 2;
         }
+        $Content = $this->dbc2Sbc($Content);
         $send_num          = count($Mobiles);
         $data              = [];
         $data['uid']       = $user['id'];
@@ -315,6 +316,7 @@ return $result;
         if (empty($effective_mobile)) {
             return 2;
         }
+        $Content = $this->dbc2Sbc($Content);
         $data                 = [];
         $data['uid']          = $user['id'];
         $data['source']       = $ip;
@@ -386,7 +388,7 @@ return $result;
         if (empty($effective_mobile)) {
             return ['code' => '3001'];
         }
-        
+        $Content = $this->dbc2Sbc($Content);
         $data                 = [];
         $data['uid']          = $user['id'];
         $data['source']       = $ip;
@@ -482,5 +484,23 @@ return $result;
             unset($user_equities[$key]['agency_price']);
         }
         return ['code' => '200', 'userEquities' => $user_equities];
+    }
+
+    /**
+    * 全角转半角
+    * @param string $str
+    * @return string
+    **/
+    function sbc2Dbc($str){
+        return preg_replace('/[\x{3000}\x{ff01}-\x{ff5f}]/ue', '($unicode=char2Unicode(\'\0\')) == 0x3000 ? " " : (($code=$unicode-0xfee0) > 256 ? unicode2Char($code) : chr($code))', $str);
+    }
+
+    /**
+    * 半角转全角
+    * @param string $str
+    * @return string
+    **/
+    function dbc2Sbc($str){
+        return preg_replace('/[\x{0020}\x{0020}-\x{7e}]/ue','($unicode=char2Unicode(\'\0\')) == 0x0020 ? unicode2Char（0x3000） : (($code=$unicode+0xfee0) > 256 ? unicode2Char($code) : chr($code))', $str);
     }
 }

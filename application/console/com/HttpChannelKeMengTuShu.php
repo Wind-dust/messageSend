@@ -165,6 +165,8 @@ class HttpChannelKeMengTuShu extends Pzlife {
                         $send_task_log = [];
                         if ($value['errorcode'] == '10') {
                             $send_status = 3;
+                        }else{
+                            $send_status = 4;
                         }
                         $send_task_log = [
                             'task_no'        => $task['task_no'],
