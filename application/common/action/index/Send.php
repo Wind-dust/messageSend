@@ -309,12 +309,13 @@ return $result;
         }
         $effective_mobile = [];
         foreach ($Mobiles as $key => $value) {
-            if (checkMobile(($value))) {
+            if (checkMobile($value) == true) {
                 $effective_mobile[] = $value;
             }
         }
+        // print_r($effective_mobile);die;
         if (empty($effective_mobile)) {
-            return 2;
+            return ['code' => '3010','msg' => '有效手机号为空'];
         }
         $Content = $this->dbc2Sbc($Content);
         $data                 = [];
