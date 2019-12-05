@@ -389,7 +389,7 @@ return $result;
         if (empty($effective_mobile)) {
             return ['code' => '3001'];
         }
-        $Content = $this->dbc2Sbc($Content);
+        // $Content = $this->dbc2Sbc($Content);
         $data                 = [];
         $data['uid']          = $user['id'];
         $data['source']       = $ip;
