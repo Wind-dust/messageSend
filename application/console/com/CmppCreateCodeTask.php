@@ -443,7 +443,7 @@ class CmppCreateCodeTask extends Pzlife {
             if ($has_log) {
                 Db::startTrans();
                 try {
-                    Db::table('yx_user_send_task_log')->where('id', $has_log[0]['id'])->update(['send_time' => $send_log['send_time'], 'status_message' => $send_log['status_message'], 'real_message' => $send_log['status_message']]);
+                    Db::table('yx_user_send_task_log')->where('id', $has_log[0]['id'])->update(['send_time' => $send_log['send_time'], 'status_message' => $send_log['status_message'], 'real_message' => $send_log['status_message'],'send_status'=> $send_log['send_status']]);
                     Db::commit();
                 } catch (\Exception $e) {
                     $redis->rPush('index:meassage:marketing:sendtask',$send_log);

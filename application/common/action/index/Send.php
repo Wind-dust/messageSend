@@ -3,11 +3,13 @@
 namespace app\common\action\index;
 
 use app\common\action\index\Owncmpp;
+use app\common\db\user\DbMobile as UserDbMobile;
 use app\facade\DbAdmin;
 use app\facade\DbAdministrator;
 use app\facade\DbImage;
 use app\facade\DbProvinces;
 use app\facade\DbUser;
+use app\facade\DbMobile;
 use Config;
 use Env;
 use think\Db;
@@ -485,6 +487,38 @@ return $result;
             unset($user_equities[$key]['agency_price']);
         }
         return ['code' => '200', 'userEquities' => $user_equities];
+    }
+
+    public function  getMobilesDetail($phone_data){
+        $submit_num = count($phone_data);
+        $mobile_num = 0;//移动
+        $unicom_num = 0;//联通
+        $telecom_num = 0;//电信
+        $virtual_num = 0;//虚拟
+        $unknown_num = 0;//未知
+        $error_phone = [];
+        foreach ($phone_data as $key => $value) {
+            if (checkMobile($value)) {//手机号码符合规则
+                $mobile_Source = DbMobile::getNumberSource(['mobile' => substr($value,0,7)],'source',true);
+                if (isset($mobile_Source['source'])) {
+                    if ($mobile_Source['source'] == 1){//移动
+                        $mobile_num++;
+                    }elseif ($mobile_Source['source'] == 2) {//联通
+                        $unicom_num++;
+                    }elseif ($mobile_Source['source'] == 3) {//联通
+                        $telecom_num++;
+                    }elseif ($mobile_Source['source'] == 4) {//联通
+                        $virtual_num++;
+                    }
+                }else{
+                    $unknown_num++;
+                }
+                $real_mobile[] = $value;
+            }
+        }
+        $phone = join(',',$real_mobile);
+        $real_num = count($real_mobile);
+        return ['code' => '200','submit_num' => $submit_num, 'real_num' => $real_num, 'mobile_num' => $mobile_num,'unicom_num' => $unicom_num, 'telecom_num' => $telecom_num, 'virtual_num' => $virtual_num, 'unknown_num' => $unknown_num, 'phone' => $phone];
     }
 
     /**

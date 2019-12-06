@@ -592,7 +592,7 @@ INSERT INTO `messagesend`.`yx_user_send_task`(`id`, `task_no`, `uid`, `task_name
 
 
 
-
+DROP TABLE IF EXISTS `yx_user_send_code_task`;
 CREATE TABLE `yx_user_send_code_task` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `task_no` char(23) NOT NULL DEFAULT '' COMMENT '任务编号',
@@ -615,3 +615,14 @@ CREATE TABLE `yx_user_send_code_task` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `uid` (`uid`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='行业任务表';
+
+DROP TABLE IF EXISTS `yx_sensitive_word`;
+CREATE TABLE `yx_sensitive_word` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `word` varchar(255) DEFAULT '' COMMENT '敏感词',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `word` (`word`) USING BTREE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='敏感词库';

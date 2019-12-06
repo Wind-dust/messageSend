@@ -215,7 +215,7 @@ class ClientSocketSantiBusiness extends Pzlife {
                         
                         $num1 = substr($timestring, 0, 8);
                         $num2 = substr($timestring, 8) . $this->combination($i);
-                        // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
+                        // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');//UTF-8转GBK
                         $code = strval($this->ascii_encode($code));//UTF-8 转ASCII
                         if (strlen($code) > 140) {
                             $pos          = 0;

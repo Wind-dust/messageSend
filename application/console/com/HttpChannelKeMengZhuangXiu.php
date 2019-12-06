@@ -172,7 +172,6 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
             // ];
             // print_r($receive_id);
             // die;
-            do {
                 $receive      = sendRequest($user_info['receive_api'], 'post', ['userid' => $user_info['appid'], 'timestamp' => date('YmdHis',time()),'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time())))]);
                 if (empty($receive)) {
                     sleep(60);
@@ -190,41 +189,44 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
                         // $receive_info = [];
                         // $receive_info = explode(',', $value);
                         // $task_id      = $receive_id[$value['taskid']];
-                        $task_id      = $redis->hget('index:meassage:code:back_taskno:'.$content,$value['taskid']);
-                        $task         = $this->getSendTask($task_id);
-                        if ($task == false) {
-                            echo "error task_id" . "\n";
+                        if (isset($value['taskid'])) {
+                            $task_id      = $redis->hget('index:meassage:code:back_taskno:'.$content,$value['taskid']);
+                            $task         = $this->getSendTask($task_id);
+                            if ($task == false) {
+                                echo "error task_id" . "\n";
+                            }
+                            $send_task_log = [];
+                            if ($value['errorcode'] == '10') {
+                                $send_status = 3;
+                            }else{
+                                $send_status = 4;
+                            }
+                            $send_task_log = [
+                                'task_no'        => $task['task_no'],
+                                'uid'            => $task['uid'],
+                                'mobile'         => $value['mobile'],
+                                'status_message' => $value['errorcode'],
+                                'send_status'    => $send_status,
+                                'send_time'      => strtotime($value['receivetime']),
+                            ];
+                            print_r($send_task_log);
+                            $redis->rpush($redisMessageCodeDeliver,json_encode($send_task_log));
+                            // Db::startTrans();
+                            // try {
+                            //     Db::table('yx_user_send_task_log')->insert($send_task_log);
+                            //     Db::commit();
+                            // } catch (\Exception $e) {
+                            //     Db::rollback();
+                            //     return ['code' => '3009']; //修改失败
+                            // }
+                            unset($send_status);
                         }
-                        $send_task_log = [];
-                        if ($value['errorcode'] == '10') {
-                            $send_status = 3;
-                        }else{
-                            $send_status = 4;
-                        }
-                        $send_task_log = [
-                            'task_no'        => $task['task_no'],
-                            'uid'            => $task['uid'],
-                            'mobile'         => $value['mobile'],
-                            'status_message' => $value['errorcode'],
-                            'send_status'    => $send_status,
-                            'send_time'      => strtotime($value['receivetime']),
-                        ];
-                        print_r($send_task_log);
-                        $redis->rpush($redisMessageCodeDeliver,json_encode($send_task_log));
-                        // Db::startTrans();
-                        // try {
-                        //     Db::table('yx_user_send_task_log')->insert($send_task_log);
-                        //     Db::commit();
-                        // } catch (\Exception $e) {
-                        //     Db::rollback();
-                        //     return ['code' => '3009']; //修改失败
-                        // }
-                        unset($send_status);
+                       
                     }
                 }
                 // print_r($receive_data);die;
                 sleep(60);
-            } while ($receive);
+           
             unset($send_num);
             unset($send_content);
             unset($receive_id);

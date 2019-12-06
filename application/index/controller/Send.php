@@ -29,6 +29,26 @@ class Send extends MyController {
         // }
         // echo phpinfo();die;
         $code   = trim($this->request->post('code'));//验证码
+        $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
+        $length = mb_strlen($code);
+        $strdata = [];
+        $ascii_code = '';
+        $code_data = [];
+        $de_code = '';
+        for ($i=0; $i < $length; $i++) { 
+            $str = mb_substr($code,$i,1);
+            $ascii_code.=ord($str);
+            $val['str'] = $str;
+            $val['ASCII'] = ord($str);
+            $val['deascii'] = chr(ord($str));
+            $de_code .=  chr(ord($str));
+            $code_data[] = $val;
+            // $strdata[] = mb_substr($code,$i,1);
+        }
+        $encode = mb_detect_encoding($de_code, array("ASCII",'UTF-8','GB2312','GBK','BIG5'));
+        
+        $de_code = mb_convert_encoding($de_code, 'UTF-8', 'CP936');
+        print_r($de_code);die;
         $result = $this->app->send->cmppSendTest($phone, $code);
         // $this->apiLog($apiName, [$Banner_id, $source], $result['code'], '');
         return $result;

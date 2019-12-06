@@ -102,6 +102,7 @@ class OfficeExcel extends Pzlife {
 //完成，可以存入数据库了
     }
 
+    //XLSX表格手机号处理运营商及归属地方法
     public function OfficeExcelReadXlsx() {
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $objReader = PHPExcel_IOFactory::createReader('Excel2007');
@@ -196,6 +197,39 @@ class OfficeExcel extends Pzlife {
         $objWriter->save('金卡1.xlsx');
         exit();
 
+    }
+
+    public function OfficeExcelWriteDatabase($name) {
+        ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
+        $file = explode('.',$name);
+        $type = $file[1];
+        if ($type == 'CSV') {//CSV文件
+            $types = 'CSV';
+        }elseif ($type == 'xlsx') {
+            $types = 'Excel2007';
+        }elseif ($type == 'xls') {
+            $types = 'Excel5';
+        }
+        $objReader = PHPExcel_IOFactory::createReader($types);
+        // print_r(realpath("../"). "\yt_area_mobile.csv");die;
+
+        $objPHPExcel = $objReader->load(realpath("./") . "/".$name."");
+        // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
+        //选择标签页
+        $sheet      = $objPHPExcel->getSheet(0); //取得sheet(0)表
+        $highestRow = $sheet->getHighestRow(); // 取得总行数
+        $data       = array();
+        for ($i = 1; $i < $highestRow; $i++) {
+            $cellVal = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
+            $inser_value = [];
+            $inser_value = [
+                'word' => trim($cellVal),
+                'create_time' => time(),
+            ];
+            $data[] = $inser_value;
+        }
+        print_r($data);
+        // DB::table('yx_sensitive_word')->insertAll($data);
     }
 
     function getMobileOwner($mobile) {
@@ -483,7 +517,7 @@ class OfficeExcel extends Pzlife {
                 'name'   => "虚拟运营商",
             ],
         ];
-        Db::table('yx_number_segment')->insertAll($data);
+        // Db::table('yx_number_segment')->insertAll($data);
     }
 
 }
