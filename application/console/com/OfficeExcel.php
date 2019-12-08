@@ -12,6 +12,7 @@ use PHPExcel_IOFactory;
 use PHPExcel_Writer_Excel2007;
 use PHPExcel_Style_Alignment;
 use PHPExcel_Style_Fill;
+use Exception;
 use think\Db;
 
 class OfficeExcel extends Pzlife {
@@ -199,17 +200,241 @@ class OfficeExcel extends Pzlife {
 
     }
 
-    public function OfficeExcelWriteDatabase($name) {
-        ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-        $file = explode('.',$name);
+    public function OfficeExcelWriteDatabase($name1) {
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $file = explode('.',$name1);
+        $data1       = array();
         $type = $file[1];
-        if ($type == 'CSV') {//CSV文件
+        if ($type == 'txt'){
+            $path = realpath("./") . "/".$name1;
+            $file = fopen($path, "r");
+            $data=array();
+            $i=0;
+            // $phone = '';
+            // $j     = '';
+            while(! feof($file))
+            {
+                $data1[]= trim(fgets($file));
+                // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+                // // print_r($phone);die;
+                // $j = ',';
+                $i++;
+            }
+            fclose($file);
+           
+        }elseif ($type == 'CSV') {//CSV文件
             $types = 'CSV';
+            $data1 = $this->officeReader($types,$name1);
         }elseif ($type == 'xlsx') {
             $types = 'Excel2007';
+            $data1 = $this->officeReader($types,$name1);
         }elseif ($type == 'xls') {
             $types = 'Excel5';
+            $data1 = $this->officeReader($types,$name1);
         }
+        $data1 = array_unique(array_filter($data1));
+        // $name2 = 'new.txt';
+        // $name2 = '10-1.txt';
+        // $name2 = '111142028.txt';
+        if (!empty($name2)) {
+            $file = explode('.',$name2);
+            $data2       = array();
+            $type = $file[1];
+            if ($type == 'txt'){
+                $path = realpath("./") . "/".$name2;
+                $file = fopen($path, "r");
+                $data=array();
+                $i=0;
+                // $phone = '';
+                // $j     = '';
+                while(! feof($file))
+                {
+                    $data2[]= trim(fgets($file));
+                    // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+                    // // print_r($phone);die;
+                    // $j = ',';
+                    $i++;
+                }
+                fclose($file);
+            
+            }elseif ($type == 'CSV') {//CSV文件
+                $types = 'CSV';
+                $data2 = $this->officeReader($types,$name2,'A');
+            }elseif ($type == 'xlsx') {
+                $types = 'Excel2007';
+                $data2 = $this->officeReader($types,$name2,'A');
+            }elseif ($type == 'xls') {
+                $types = 'Excel5';
+                $data2 = $this->officeReader($types,$name2,'A');
+            }
+            $data2 = array_unique(array_filter($data2));
+        }
+        // print_r(count($data1));
+        // print_r(count($data2));
+        $putdata = [];
+        
+        $date = date('Y-m-d H:i:s', time());
+        $time1 = strtotime('2019/11/29 11:10:48'); 
+        $i = 0;
+        // $CellList = array(
+        //     array('title', '标题'),
+        //     array('model', '模板账户'),
+        //     array('mobile', '手机号码'),
+        //     array('content', '发送内容'),
+        //     array('status', '状态'),
+        //     array('send_time', '发送时间'),
+        //     array('status_info', '状态描述'),
+        // );
+        
+        $j = 1;
+        $n = 0;
+        foreach ($data1 as $key => $value) {
+            $new_value = [];
+            $new_value = [
+                'title' => '丝家臻探李佳琦邀您探寻丝芙兰',
+                'model' => '1551',
+                'mobile' => $value,
+                'content' =>'【丝芙兰】亲爱的会员，“丝家臻探”李佳琦邀您一起追踪肌密、解密小众调香，探寻丝芙兰独家臻品宝藏！即刻前往门店，丝家美妆单品，等你抱回家！更多详情请戳 https://dwz.cn/OLCHBCE1 回T退订。',
+                'status' =>'发送成功',
+                'send_time' =>date("Y/m/d H:i:s",$time1+ceil($n/1000)),
+                'status_info' => '1000:彩信下载成功'
+            ];
+            $putdata[] = $new_value;
+           $i++;
+           if (count($putdata) >= 50000) {
+                $objExcel = new PHPExcel();
+                // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+                // $sheets=$objWriter->getActiveSheet()->setTitle('白卡1.');//设置表格名称
+                $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+                $objWriter->setOffice2003Compatibility(true);
+        
+                //设置文件属性
+                $objProps = $objExcel->getProperties();
+                $objProps->setTitle("金卡1");
+                $objProps->setSubject("金卡1:" . date('Y-m-d H:i:s', time()));
+        
+                $objExcel->setActiveSheetIndex(0);
+                $objActSheet = $objExcel->getActiveSheet();
+        
+                //设置当前活动sheet的名称
+                $objActSheet->setTitle("金卡1");
+                $CellList = array(
+                    array('title', '标题'),
+                    array('model', '模板账户'),
+                    array('mobile', '手机号码'),
+                    array('content', '发送内容'),
+                    array('status', '状态'),
+                    array('send_time', '发送时间'),
+                    array('status_info', '状态描述'),
+                );
+                foreach ($CellList as $i => $Cell) {
+                    $row = chr(65 + $i);
+                    $col = 1;
+                    $objActSheet->setCellValue($row . $col, $Cell[1]);
+                    $objActSheet->getColumnDimension($row)->setWidth(30);
+            
+                    $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+                    $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+                    $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+                    // $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+                    // $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+                    $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                    // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                }
+                $outputFileName = "金卡1.xlsx";
+                $i = 0;
+                foreach ($putdata as $key => $orderdata) {
+                    //行
+                    $col = $key + 2;
+                    foreach ($CellList as $i => $Cell) {
+                        //列
+                        $row = chr(65 + $i);
+                        $objActSheet->getRowDimension($i)->setRowHeight(15);
+                        $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                        $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                    }
+                }
+                $objWriter->save($j.'.xlsx');
+                // exit();
+                $j++;
+                unset($putdata);
+           }
+           $n++;
+        }
+        unset($data1);
+        unset($new_value);
+        if ($putdata) {
+            
+            // $j++;
+            $objExcel = new PHPExcel();
+                // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+                // $sheets=$objWriter->getActiveSheet()->setTitle('白卡1.');//设置表格名称
+                $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+                $objWriter->setOffice2003Compatibility(true);
+        
+                //设置文件属性
+                $objProps = $objExcel->getProperties();
+                $objProps->setTitle("金卡1");
+                $objProps->setSubject("金卡1:" . date('Y-m-d H:i:s', time()));
+        
+                $objExcel->setActiveSheetIndex(0);
+                $objActSheet = $objExcel->getActiveSheet();
+        
+                //设置当前活动sheet的名称
+                $objActSheet->setTitle("金卡1");
+                $CellList = array(
+                    array('title', '标题'),
+                    array('model', '模板账户'),
+                    array('mobile', '手机号码'),
+                    array('content', '发送内容'),
+                    array('status', '状态'),
+                    array('send_time', '发送时间'),
+                    array('status_info', '状态描述'),
+                );
+                foreach ($CellList as $i => $Cell) {
+                    $row = chr(65 + $i);
+                    $col = 1;
+                    $objActSheet->setCellValue($row . $col, $Cell[1]);
+                    $objActSheet->getColumnDimension($row)->setWidth(30);
+            
+                    $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+                    $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+                    $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+                    // $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+                    // $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+                    $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                    // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                }
+                $outputFileName = "金卡1.xlsx";
+                $i = 0;
+                foreach ($putdata as $key => $orderdata) {
+                    //行
+                    $col = $key + 2;
+                    foreach ($CellList as $i => $Cell) {
+                        //列
+                        $row = chr(65 + $i);
+                        $objActSheet->getRowDimension($i)->setRowHeight(15);
+                        $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                        $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                    }
+                }
+                $objWriter->save($j.'.xlsx');
+                // exit();
+                unset($putdata);
+           
+        }
+        // die;
+        // print_r(array_diff($data1,$data2));
+        // print_r(array_diff($data2,$data1));
+        // array_intersect($data1,$data2);
+        // print_r(array_intersect($data1,$data2));
+        // DB::table('yx_sensitive_word')->insertAll($data);
+        // $no = array_diff($data1,$data2);
+
+
+    }
+
+    function officeReader($types,$name,$cell = 'A'){//第一行数据
         $objReader = PHPExcel_IOFactory::createReader($types);
         // print_r(realpath("../"). "\yt_area_mobile.csv");die;
 
@@ -218,9 +443,8 @@ class OfficeExcel extends Pzlife {
         //选择标签页
         $sheet      = $objPHPExcel->getSheet(0); //取得sheet(0)表
         $highestRow = $sheet->getHighestRow(); // 取得总行数
-        $data       = array();
         for ($i = 1; $i < $highestRow; $i++) {
-            $cellVal = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
+            $cellVal = $objPHPExcel->getActiveSheet()->getCell($cell . $i)->getValue();
             $inser_value = [];
             $inser_value = [
                 'word' => trim($cellVal),
@@ -228,8 +452,134 @@ class OfficeExcel extends Pzlife {
             ];
             $data[] = $inser_value;
         }
-        print_r($data);
-        // DB::table('yx_sensitive_word')->insertAll($data);
+        return $data;
+    }
+
+    public function saveReadExcel(){
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $path = realpath("./") . "/1.txt";
+        $file = fopen($path, "r");
+        $data1=array();
+        $i=0;
+        // $phone = '';
+        // $j     = '';
+        while(! feof($file))
+        {
+            $data1[]= trim(fgets($file));
+            // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+            // // print_r($phone);die;
+            // $j = ',';
+            $i++;
+        }
+        fclose($file);
+        $path = realpath("./") . "/2.txt";
+        $file = fopen($path, "r");
+        $data2=array();
+        $i=0;
+        // $phone = '';
+        // $j     = '';
+        while(! feof($file))
+        {
+            $data2[]= trim(fgets($file));
+            // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+            // // print_r($phone);die;
+            // $j = ',';
+            $i++;
+        }
+        fclose($file);
+        $data1 = array_unique(array_filter($data1));
+        $data2 = array_unique(array_filter($data2));
+        $new1 = [];
+        $new2 = [];
+        $objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        // print_r(realpath("../"). "\yt_area_mobile.csv");die;
+
+        $objPHPExcel = $objReader->load(realpath("./") . "/1207.xlsx");
+        // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
+        //选择标签页
+        $sheet      = $objPHPExcel->getSheet(0); //取得sheet(0)表
+        $highestRow = $sheet->getHighestRow(); // 取得总行数//获取表格列数
+        $columnCount = $sheet->getHighestColumn();
+        for ($row = 1; $row <= $highestRow; $row++){
+            //列数循环 , 列数是以A列开始
+                for ($column = 'A'; $column <= $columnCount; $column++) {
+                    $dataArr[] = $objPHPExcel->getActiveSheet()->getCell($column.$row)->getValue();
+                    
+                }
+                if (in_array($dataArr[0],$data1)) {
+                    $new1[] = $dataArr;
+                }elseif (in_array($dataArr[0],$data2)) {
+                    $new2[] = $dataArr;
+                }
+               unset($dataArr);
+            }
+            // print_r($new1);
+            // print_r($new2);
+            $objExcel = new PHPExcel();
+            // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+            // $sheets=$objWriter->getActiveSheet()->setTitle('白卡1.');//设置表格名称
+            $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+            $objWriter->setOffice2003Compatibility(true);
+    
+            //设置文件属性
+            $objProps = $objExcel->getProperties();
+            $objProps->setTitle("金卡1");
+            $objProps->setSubject("金卡1:" . date('Y-m-d H:i:s', time()));
+    
+            $objExcel->setActiveSheetIndex(0);
+            $objActSheet = $objExcel->getActiveSheet();
+    
+            //设置当前活动sheet的名称
+            $objActSheet->setTitle("金卡1");
+            $CellList = array(
+                array('0', '手机号码'),
+                array('1', '标题'),
+                array('2', '发送时间'),
+                array('3', '回执时间'),
+                array('4', '状态代码'),
+                array('5', '状态报告'),
+            );
+            foreach ($CellList as $i => $Cell) {
+                $row = chr(65 + $i);
+                $col = 1;
+                $objActSheet->setCellValue($row . $col, $Cell[1]);
+                $objActSheet->getColumnDimension($row)->setWidth(30);
+        
+                $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+                $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+                $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+                // $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+                // $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+                $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            }
+            $outputFileName = "金卡1.xlsx";
+            $i = 0;
+            foreach ($new1 as $key => $orderdata) {
+                //行
+                $col = $key + 2;
+                foreach ($CellList as $i => $Cell) {
+                    //列
+                    $row = chr(65 + $i);
+                    $objActSheet->getRowDimension($i)->setRowHeight(15);
+                    $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                    $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                }
+            }
+            $objWriter->save('new1.xlsx');
+            foreach ($new2 as $key => $orderdata) {
+                //行
+                $col = $key + 2;
+                foreach ($CellList as $i => $Cell) {
+                    //列
+                    $row = chr(65 + $i);
+                    $objActSheet->getRowDimension($i)->setRowHeight(15);
+                    $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                    $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                }
+            }
+            $objWriter->save('new2.xlsx');
+            // exit();
     }
 
     function getMobileOwner($mobile) {
