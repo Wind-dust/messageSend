@@ -28,6 +28,11 @@ class Upload extends MyController {
      * @apiSuccess (data) {Number} telecom_num 电信手机号数量
      * @apiSuccess (data) {Number} virtual_num 虚拟运营商手机号数量
      * @apiSuccess (data) {Number} unknown_num 未知归属运营商手机号数量
+     * @apiSuccess (data) {Number} mobile_phone 移动手机号码包
+     * @apiSuccess (data) {Number} unicom_phone 联通手机号码包
+     * @apiSuccess (data) {Number} telecom_phone 电信手机号码包
+     * @apiSuccess (data) {Number} virtual_phone 虚拟运营商手机号码包
+     * @apiSuccess (data) {Number} error_phone 错号包
      * @apiSuccess (data) {String} phone 真实手机号结果
      * @apiSampleRequest /index/upload/uploadUserExcel
      * @author zyr

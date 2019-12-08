@@ -497,28 +497,38 @@ return $result;
         $virtual_num = 0;//虚拟
         $unknown_num = 0;//未知
         $error_phone = [];
+        $mobile_phone = [];
+        $unicom_phone = [];
+        $telecom_phone = [];
+        $virtual_phone = [];
         foreach ($phone_data as $key => $value) {
             if (checkMobile($value)) {//手机号码符合规则
                 $mobile_Source = DbMobile::getNumberSource(['mobile' => substr($value,0,7)],'source',true);
                 if (isset($mobile_Source['source'])) {
                     if ($mobile_Source['source'] == 1){//移动
                         $mobile_num++;
+                        $mobile_phone[] = $value;
                     }elseif ($mobile_Source['source'] == 2) {//联通
                         $unicom_num++;
+                        $unicom_phone[] = $value;
                     }elseif ($mobile_Source['source'] == 3) {//联通
                         $telecom_num++;
+                        $telecom_phone[] = $value;
                     }elseif ($mobile_Source['source'] == 4) {//联通
                         $virtual_num++;
+                        $virtual_phone[] = $value;
                     }
                 }else{
                     $unknown_num++;
                 }
                 $real_mobile[] = $value;
+            }else{
+                $error_phone[] = $value;
             }
         }
         $phone = join(',',$real_mobile);
         $real_num = count($real_mobile);
-        return ['code' => '200','submit_num' => $submit_num, 'real_num' => $real_num, 'mobile_num' => $mobile_num,'unicom_num' => $unicom_num, 'telecom_num' => $telecom_num, 'virtual_num' => $virtual_num, 'unknown_num' => $unknown_num, 'phone' => $phone];
+        return ['code' => '200','submit_num' => $submit_num, 'real_num' => $real_num, 'mobile_num' => $mobile_num,'unicom_num' => $unicom_num, 'telecom_num' => $telecom_num, 'virtual_num' => $virtual_num, 'unknown_num' => $unknown_num,'mobile_phone' => $mobile_phone, 'unicom_phone' => $unicom_phone, 'unicom_phone' => $unicom_phone, 'virtual_phone' => $virtual_phone, 'phone' => $phone, 'error_phone' => $error_phone];
     }
 
     /**
