@@ -6,6 +6,7 @@ use Config;
 use upload\Fileupload;
 use upload\Imageupload;
 use app\facade\DbImage;
+use app\facade\DbUser;
 
 class Upload extends CommonIndex {
     private $upload;
@@ -25,8 +26,15 @@ class Upload extends CommonIndex {
      * @param $fileInfo
      * @return array
      */
-    public function uploadFile($fileInfo) {
+    public function uploadFile($appid,$appkey,$fileInfo) {
         /* 文件名重命名 */
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
         $filename    = date('Ymd') . '/' . $this->upload->getNewName($fileInfo['name']);
         $uploadimage = $this->upload->uploadFile($fileInfo['tmp_name'], $filename);
         if ($uploadimage) {//上传成功
@@ -108,5 +116,19 @@ class Upload extends CommonIndex {
             }
         }
         return ['code' => '3002'];//上传失败
+    }
+
+    /**
+     * 批量删除图片
+     * @param $filenameArr
+     */
+    private function delImg($filenameArr) {
+        if (!is_array($filenameArr)) {
+            $this->upload->deleteImage($filenameArr);//删除上传的图片
+        } else {
+            foreach ($filenameArr as $v) {
+                $this->upload->deleteImage($v);//删除上传的图片
+            }
+        }
     }
 }

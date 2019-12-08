@@ -6,7 +6,8 @@ use app\index\MyController;
 use PHPExcel_Cell;
 use PHPExcel_IOFactory;
 
-class Upload extends MyController {
+class Upload extends MyController
+{
 
     protected $beforeActionList = [
         // 'isLogin',//所有方法的前置操作
@@ -19,6 +20,8 @@ class Upload extends MyController {
      * @apiDescription   uploadUserExcel
      * @apiGroup         index_upload
      * @apiName          uploadUserExcel
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
      * @apiParam (入参) {file} filename 表格名称 支持文件格式 txt,xlsx,csv,xls
      * @apiSuccess (返回) {String} code 200:成功  / 3001:上传文件不能为空 / 3002:上传失败 / 3003:上传号码为空
      * @apiSuccess (data) {Number} submit_num 上传数量
@@ -37,7 +40,8 @@ class Upload extends MyController {
      * @apiSampleRequest /index/upload/uploadUserExcel
      * @author rzc
      */
-    public function uploadUserExcel() {
+    public function uploadUserExcel()
+    {
         // $apiName  = classBasename($this) . '/' . __function__;
         // $conId    = trim($this->request->post('con_id'));
         // echo phpinfo();die;
@@ -49,7 +53,7 @@ class Upload extends MyController {
         //表格拓展类型  xlsx:vnd.openxmlformats-officedocument.spreadsheetml.sheet,xls:vnd.ms-excel,csv:csv
         $fileInfo = $filename->getInfo();
         $fileType = explode('/', $fileInfo['type']);
-        if ($fileType[0] == 'text'){
+        if ($fileType[0] == 'text') {
             $info = $filename->move('../uploads/text');
             $type = $info->getExtension();
             $path      = $info->getpathName();
@@ -57,14 +61,13 @@ class Upload extends MyController {
                 return ['code' => '3002'];
             }
             $file = fopen($path, "r");
-            $data=array();
-            $i=0;
+            $data = array();
+            $i = 0;
             $phone = '';
             $j     = '';
-            while(! feof($file))
-            {
+            while (!feof($file)) {
                 // $phone_data[]= trim(fgets($file));
-                $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+                $phone .= $j . trim(fgets($file)); //fgets()函数从文件指针中读取一行
                 // print_r($phone);die;
                 $j = ',';
                 $i++;
@@ -74,7 +77,7 @@ class Upload extends MyController {
             return $phone;
         }
         if (!in_array($fileType[1], ['vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'vnd.ms-excel', 'csv'])) {
-            return ['code'=>'3001']; //上传的不是表格
+            return ['code' => '3001']; //上传的不是表格
         }
         $info = $filename->move('../uploads/excel');
         $phone_data = [];
@@ -120,41 +123,38 @@ class Upload extends MyController {
                     $phone .= $j . trim($cellVal);
                     $j = ',';
                 }
-               
             } else if ($type == 'xlsx') {
                 $type = 'Excel2007';
                 $objReader = PHPExcel_IOFactory::createReader($type);
                 $path      = $info->getpathName();
-                $objPHPExcel = $objReader->load($path,$encode='utf-8');//加载文件
-                $sheet = $objPHPExcel->getSheet(0);//取得sheet(0)表
+                $objPHPExcel = $objReader->load($path, $encode = 'utf-8'); //加载文件
+                $sheet = $objPHPExcel->getSheet(0); //取得sheet(0)表
                 $highestRow = $sheet->getHighestRow(); // 取得总行数
                 $phone = '';
                 $j     = '';
-                for ($i=0; $i < $highestRow; $i++) { 
-                    $cellVal = $objPHPExcel->getActiveSheet()->getCell("A".$i)->getValue();
+                for ($i = 0; $i < $highestRow; $i++) {
+                    $cellVal = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
                     // $phone_data[]= trim($cellVal);
                     $phone .= $j . trim($cellVal);
                     $j = ',';
                 }
-              
             } elseif ($type == 'xls') {
                 $type = 'Excel5';
                 $objReader = PHPExcel_IOFactory::createReader($type);
                 $path      = $info->getpathName();
-                $objPHPExcel = $objReader->load($path,$encode='utf-8');//加载文件
-                $sheet = $objPHPExcel->getSheet(0);//取得sheet(0)表
+                $objPHPExcel = $objReader->load($path, $encode = 'utf-8'); //加载文件
+                $sheet = $objPHPExcel->getSheet(0); //取得sheet(0)表
                 $highestRow = $sheet->getHighestRow(); // 取得总行数
                 $phone = '';
                 $j     = '';
-                
-                for ($i=0; $i < $highestRow; $i++) { 
-                    $cellVal = $objPHPExcel->getActiveSheet()->getCell("A".$i)->getValue();
+
+                for ($i = 0; $i < $highestRow; $i++) {
+                    $cellVal = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
                     // $phone_data[]= trim($cellVal);
                     // $j = ',';
                     $phone .= $j . trim($cellVal);
                     $j = ',';
                 }
-                
             }
             if (empty($phone_data)) {
                 return ['code' => '3003'];
@@ -164,7 +164,6 @@ class Upload extends MyController {
         } else {
             return ['code' => '3002'];
         }
-
     }
 
     /**
@@ -172,17 +171,27 @@ class Upload extends MyController {
      * @apiDescription   uploadFile
      * @apiGroup         index_upload
      * @apiName          uploadFilee
-     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
      * @apiParam (入参) {file} image 图片
-     * @apiSuccess (返回) {String} code 200:成功  / 3001:上传的不是图片 / 3002:上传图片不能超过2M / 3003:上传失败 / 3004:上传文件不能为空
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:appid或者appkey错误/ 3001:上传的不是图片 / 3002:上传图片不能超过2M / 3003:上传失败 / 3004:上传文件不能为空
      * @apiSuccess (data) {Array} data 结果
      * @apiSampleRequest /index/upload/uploadfile
      * @author zyr
      */
-    public function uploadFile() {
+    public function uploadFile()
+    {
         $apiName = classBasename($this) . '/' . __function__;
-        $conId   = trim($this->request->post('con_id'));
+        // $conId   = trim($this->request->post('con_id'));
+        $appid = trim($this->request->post('appid'));//登录名
+        $appkey = trim($this->request->post('appkey'));//登陆密码
         $image   = $this->request->file('image');
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
         if (empty($image)) {
             return ['code' => '3004'];
         }
@@ -194,8 +203,8 @@ class Upload extends MyController {
         if ($fileInfo['size'] > 1024 * 1024 * 2) {
             return ['3002']; //上传图片不能超过2M
         }
-        $result = $this->app->upload->uploadFile($fileInfo);
-        $this->apiLog($apiName, [$conId, $image], $result['code'], $conId);
+        $result = $this->app->upload->uploadFile($appid,$appkey,$fileInfo);
+        // $this->apiLog($apiName, [$conId, $image], $result['code'], $conId);
         return $result;
     }
 }
