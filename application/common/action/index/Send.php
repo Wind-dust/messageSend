@@ -489,7 +489,14 @@ return $result;
         return ['code' => '200', 'userEquities' => $user_equities];
     }
 
-    public function  getMobilesDetail($phone_data){
+    public function  getMobilesDetail($appid,$appkey,$phone_data){
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
         $submit_num = count($phone_data);
         $mobile_num = 0;//移动
         $unicom_num = 0;//联通

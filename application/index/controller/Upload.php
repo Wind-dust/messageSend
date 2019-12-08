@@ -35,7 +35,7 @@ class Upload extends MyController {
      * @apiSuccess (data) {Number} error_phone 错号包
      * @apiSuccess (data) {String} phone 真实手机号结果
      * @apiSampleRequest /index/upload/uploadUserExcel
-     * @author zyr
+     * @author rzc
      */
     public function uploadUserExcel() {
         // $apiName  = classBasename($this) . '/' . __function__;
@@ -59,19 +59,19 @@ class Upload extends MyController {
             $file = fopen($path, "r");
             $data=array();
             $i=0;
-            // $phone = '';
-            // $j     = '';
+            $phone = '';
+            $j     = '';
             while(! feof($file))
             {
-                $phone_data[]= trim(fgets($file));
-                // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
-                // // print_r($phone);die;
-                // $j = ',';
+                // $phone_data[]= trim(fgets($file));
+                $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+                // print_r($phone);die;
+                $j = ',';
                 $i++;
             }
             fclose($file);
-            $result = $this->app->send->getMobilesDetail($phone_data);
-            return $result;
+            // $result = $this->app->send->getMobilesDetail($phone_data);
+            return $phone;
         }
         if (!in_array($fileType[1], ['vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'vnd.ms-excel', 'csv'])) {
             return ['code'=>'3001']; //上传的不是表格
@@ -105,17 +105,20 @@ class Upload extends MyController {
                 //     $filed[]  = $cellVal;
                 // } 
                 //开始取出数据并存入数组
-               
+                $phone = '';
+                $j     = '';
                 for ($i = 0; $i <= $highestRowNum; $i++) {
                     $row      = array();
                     $cellName = PHPExcel_Cell::stringFromColumnIndex(0) . $i;
                     $cellVal  = $sheet->getCell($cellName)->getValue();
-                    $phone_data[]= trim($cellVal);
+                    // $phone_data[]= trim($cellVal);
                     // for ($j = 0; $j < $highestColumnNum; $j++) {
 
                     //     $row[$filed[$j]] = trim($cellVal);
                     // }
                     // $data[] = $row;
+                    $phone .= $j . trim($cellVal);
+                    $j = ',';
                 }
                
             } else if ($type == 'xlsx') {
@@ -125,10 +128,13 @@ class Upload extends MyController {
                 $objPHPExcel = $objReader->load($path,$encode='utf-8');//加载文件
                 $sheet = $objPHPExcel->getSheet(0);//取得sheet(0)表
                 $highestRow = $sheet->getHighestRow(); // 取得总行数
-               
+                $phone = '';
+                $j     = '';
                 for ($i=0; $i < $highestRow; $i++) { 
                     $cellVal = $objPHPExcel->getActiveSheet()->getCell("A".$i)->getValue();
-                    $phone_data[]= trim($cellVal);
+                    // $phone_data[]= trim($cellVal);
+                    $phone .= $j . trim($cellVal);
+                    $j = ',';
                 }
               
             } elseif ($type == 'xls') {
@@ -138,21 +144,23 @@ class Upload extends MyController {
                 $objPHPExcel = $objReader->load($path,$encode='utf-8');//加载文件
                 $sheet = $objPHPExcel->getSheet(0);//取得sheet(0)表
                 $highestRow = $sheet->getHighestRow(); // 取得总行数
-                // $phone = '';
-                // $j     = '';
+                $phone = '';
+                $j     = '';
                 
                 for ($i=0; $i < $highestRow; $i++) { 
                     $cellVal = $objPHPExcel->getActiveSheet()->getCell("A".$i)->getValue();
-                    $phone_data[]= trim($cellVal);
+                    // $phone_data[]= trim($cellVal);
                     // $j = ',';
+                    $phone .= $j . trim($cellVal);
+                    $j = ',';
                 }
                 
             }
             if (empty($phone_data)) {
                 return ['code' => '3003'];
             }
-            $result = $this->app->send->getMobilesDetail($phone_data);
-            return $result;
+            // $result = $this->app->send->getMobilesDetail($phone_data);
+            return $phone;
         } else {
             return ['code' => '3002'];
         }

@@ -407,4 +407,48 @@ class Send extends MyController {
         $result = $this->app->send->businessReceive($appid,$appkey,$page,$pageNum);
         return $result;
     }
+
+    /**
+     * @api              {post} / 号码区分
+     * @apiDescription   getMobilesDetail
+     * @apiGroup         index_send
+     * @apiName          getMobilesDetail
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {file} phone 表格名称 支持文件格式 txt,xlsx,csv,xls
+     * @apiSuccess (返回) {String} code 200:成功  / 3001:电话号码为空 
+     * @apiSuccess (data) {Number} submit_num 上传数量
+     * @apiSuccess (data) {Number} real_num 真实有效数量
+     * @apiSuccess (data) {Number} mobile_num 移动手机号数量
+     * @apiSuccess (data) {Number} unicom_num 联通手机号数量
+     * @apiSuccess (data) {Number} telecom_num 电信手机号数量
+     * @apiSuccess (data) {Number} virtual_num 虚拟运营商手机号数量
+     * @apiSuccess (data) {Number} unknown_num 未知归属运营商手机号数量
+     * @apiSuccess (data) {Number} mobile_phone 移动手机号码包
+     * @apiSuccess (data) {Number} unicom_phone 联通手机号码包
+     * @apiSuccess (data) {Number} telecom_phone 电信手机号码包
+     * @apiSuccess (data) {Number} virtual_phone 虚拟运营商手机号码包
+     * @apiSuccess (data) {Number} error_phone 错号包
+     * @apiSuccess (data) {String} realphone 真实手机号结果
+     * @apiSampleRequest /index/send/getMobilesDetail
+     * @author rzc
+     */
+    public function getMobilesDetail(){
+        $appid = trim($this->request->post('appid'));//登录名
+        $appkey = trim($this->request->post('appkey'));//登陆密码
+        $phone = trim($this->request->post('phone'));//登陆密码
+        $phone_data = explode(',',$phone);
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        if (empty($phone_data)){
+            return ['code' => '3001'];
+        }
+        
+        $result = $this->app->send->getMobilesDetail($appid,$appkey,$phone_data);
+        return $result;
+    }
 }
