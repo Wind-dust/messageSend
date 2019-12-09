@@ -94,6 +94,10 @@ class DbImage {
         return LogImage::field('id')->where(['image_path' => $name, 'status' => $status])->findOrEmpty()->toArray();
     }
 
+    public function getLogImageAll($name) {
+        return LogImage::field('id')->where(['image_path' => $name])->findOrEmpty()->toArray();
+    }
+
     /**
      * 查找该图片是否有未完成的
      * @param $name

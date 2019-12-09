@@ -627,8 +627,8 @@ CREATE TABLE `yx_sensitive_word` (
   KEY `word` (`word`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='敏感词库';
 
-DROP TABLE IF EXISTS `yx_multimedia_message`;
-CREATE TABLE `yx_multimedia_message` (
+DROP TABLE IF EXISTS `yx_user_multimedia_message`;
+CREATE TABLE `yx_user_multimedia_message` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `task_no` char(23) NOT NULL DEFAULT '' COMMENT '任务编号',
   `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
@@ -637,7 +637,6 @@ CREATE TABLE `yx_multimedia_message` (
   `source` varchar(50) NOT NULL DEFAULT '' COMMENT '请求源（ip）',
   `real_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '实际数量',
   `send_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发送数量',
-  `send_length` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '短信长度',
   `free_trial` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '1:需要审核;2:审核通过;3:审核不通过',
   `channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '通道ID',
   `send_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '1：待发送,2:发送中;3:成功;4:失败',
@@ -653,8 +652,8 @@ CREATE TABLE `yx_multimedia_message` (
   KEY `send_status` (`send_status`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='彩信主表';
 
-DROP TABLE IF EXISTS `yx_multimedia_message_frame`;
-CREATE TABLE `yx_multimedia_message_frame` (
+DROP TABLE IF EXISTS `yx_user_multimedia_message_frame`;
+CREATE TABLE `yx_user_multimedia_message_frame` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `multimedia_message_id` char(23) NOT NULL DEFAULT '' COMMENT '彩信id',
   `content` varchar(255) NOT NULL DEFAULT '' COMMENT '文字内容',
@@ -665,3 +664,25 @@ CREATE TABLE `yx_multimedia_message_frame` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `multimedia_message_id` (`multimedia_message_id`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='彩信副表（帧）';
+
+DROP TABLE IF EXISTS `yx_user_multimedia_message_log`;
+CREATE TABLE `yx_user_multimedia_message_log` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `task_no` char(23) NOT NULL DEFAULT '' COMMENT '任务编号',
+  `task_id` char(23) NOT NULL DEFAULT '' COMMENT '任务id',
+  `task_content` text COMMENT '发送内容',
+  `mobile` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '接收手机',
+  `source` varchar(50) NOT NULL DEFAULT '' COMMENT '请求源（ip）',
+  `channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '通道id',
+  `send_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '短信发送状态1：待发送,2:已发送;3:成功;4:失败',
+  `source_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '网关状态1：待发送,2:已发送;3:成功;4:失败',
+  `user_query_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '用户查询状态1:未获取;2:已获取',
+  `status_message` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '状态',
+  `real_message` varchar(20) NOT NULL DEFAULT '' COMMENT '真实返回状态',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `task_no` (`task_no`,`task_id`) USING BTREE,
+  KEY `mobile` (`mobile`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='行业发送记录表';

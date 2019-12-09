@@ -357,6 +357,7 @@ class CmppCreateCodeTask extends Pzlife {
             $real_num += $real_length * $sendTask['send_num'];
             $channel_id = 0;
             $channel_id = $sendTask['channel_id'];
+            $push_messages = [];
             // print_r($sendTask);die;
             Db::startTrans();
             try {
@@ -390,6 +391,7 @@ class CmppCreateCodeTask extends Pzlife {
                             'mobile'      => $mobilesend[$i],
                             'mar_task_id' => $sendTask['id'],
                             'content'     => $sendTask['task_content'],
+                            'channel_id'  => $channel_id,
                         ];
                         $has = Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $mobilesend[$i] . "' ");
                         // echo $i."\n";
@@ -399,12 +401,17 @@ class CmppCreateCodeTask extends Pzlife {
                         }
 
                         Db::table('yx_user_send_task_log')->insert($send_log);
-                        $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
-
+                        // $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
+                        $push_messages[] = $sendmessage;
                     }
                 }
                 Db::table('yx_user_send_task')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3]);
                 Db::commit();
+                foreach ($push_messages as $key => $value) {
+                     $send_channelid = $value['channel_id'];
+                     unset($value['channel_id']);
+                     $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                }
             } catch (\Exception $e) {
                 $this->redis->rPush('index:meassage:marketing:sendtask',$send);
                 exception($e);
