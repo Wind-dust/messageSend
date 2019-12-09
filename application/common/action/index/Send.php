@@ -571,6 +571,7 @@ return $result;
         $multimedia_message_frame = [];
         $content_length           = 0;
         $max_length               = 102400; //最大字节长度
+
         foreach ($content_data as $key => $value) {
             $frame = [];
             if (!isset($value['content'])) {
@@ -579,7 +580,7 @@ return $result;
                 $frame['content'] = $value['content'];
                 // $content_length+= strlen($value['content']);
             }
-            $content_length += strlen($frame['content']);
+            $content_length += (strlen($frame['content'])/8);
             if (!isset($value['image_path'])) {
                 $frame['image_path'] = '';
             } else {
