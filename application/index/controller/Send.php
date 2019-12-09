@@ -476,7 +476,7 @@ class Send extends MyController {
      * @apiParam (content_data) {String} image_path 单个帧图片路径,必须已上传的文件
      * @apiParam (content_data) {String} num 顺序 按自然数排列 从小到大 必传
      * @apiParam (content_data) {String} name 对应帧数 如第一帧
-     * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:单批次手机号码为空 / 3003:send_time发送时间格式错误 / 3004:预约发送时间小于当前时间 / 3005:短信内容为空或者短信内容大于100KB / 3006:余额不足 / 3007:title 短信标题不能为空 / 3008:无效的图片 / 3009:彩信文件长度超过100KB / 3010 图片未上传过
+     * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:单批次手机号码为空 / 3003:send_time发送时间格式错误 / 3004:预约发送时间小于当前时间 / 3005:该账户没有此项服务 / 3006:余额不足 / 3007:title 短信标题不能为空 / 3008:无效的图片 / 3009:彩信文件长度超过100KB或内容为空 / 3010 图片未上传过
      * @apiSampleRequest /index/send/getSmsMultimediaMessageTask
      * @author rzc
      */
@@ -490,6 +490,7 @@ class Send extends MyController {
         $ip             = trim($this->request->ip());
         $mobile_content = explode(',', $mobile_content); //短信数组
         // $content_data   = json_decode($content_data, true);
+        // print_r($content_data);die;
         if (empty($appid)) {
             return ['code' => '3000'];
         }
@@ -500,7 +501,7 @@ class Send extends MyController {
             return ['code' => '3002'];
         }
         if (empty($content_data)) {
-            return ['code' => '3005'];
+            return ['code' => '3009'];
         }
         if (strtotime($send_time) == false && !empty($send_time)) {
             return ['code' => '3003'];
