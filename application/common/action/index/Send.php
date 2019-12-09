@@ -641,6 +641,7 @@ return $result;
             if ($bId) {
                 foreach ($multimedia_message_frame as $key => $frame) {
                     $frame['multimedia_message_id'] = $bId;
+                    $frame['image_path'] =filtraImage(Config::get('qiniu.domain'), $value['image_path']);
                     DbSendMessage::addUserMultimediaMessageFrame($frame); //添加后的商品id
                 }
             }

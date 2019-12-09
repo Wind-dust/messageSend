@@ -31,4 +31,13 @@ class UserMultimediaMessageLog extends Model {
 //        return $this->level[$value];
 //    }
 
+public function getImagePathAttr($value) {
+    if (empty($value)) {
+        return '';
+    }
+    if (stripos($value, 'http') === false) {
+        return Config::get('qiniu.domain') . '/' . $value;
+    }
+    return $value;
+}
 }
