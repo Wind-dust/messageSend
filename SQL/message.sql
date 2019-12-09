@@ -656,6 +656,8 @@ DROP TABLE IF EXISTS `yx_user_multimedia_message_frame`;
 CREATE TABLE `yx_user_multimedia_message_frame` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `multimedia_message_id` char(23) NOT NULL DEFAULT '' COMMENT '彩信id',
+  `num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '排序',
+  `name` varchar(255) NOT NULL DEFAULT '' COMMENT '名称如：第X帧',
   `content` varchar(255) NOT NULL DEFAULT '' COMMENT '文字内容',
   `image_path` char(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '图片路径',
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
@@ -669,6 +671,7 @@ DROP TABLE IF EXISTS `yx_user_multimedia_message_log`;
 CREATE TABLE `yx_user_multimedia_message_log` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `task_no` char(23) NOT NULL DEFAULT '' COMMENT '任务编号',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
   `task_id` char(23) NOT NULL DEFAULT '' COMMENT '任务id',
   `task_content` text COMMENT '发送内容',
   `mobile` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '接收手机',

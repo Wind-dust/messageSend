@@ -517,19 +517,19 @@ class CmppCreateCodeTask extends Pzlife {
                             'content'     => $sendTask['task_content'],
                             'channel_id'  => $channel_id,
                         ];
-                        $has = Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $mobilesend[$i] . "' ");
+                        $has = Db::query("SELECT id FROM yx_user_multimedia_message_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $mobilesend[$i] . "' ");
                         // echo $i."\n";
                         if ($has) {
                             continue;
                             // Db::table('yx_user_send_task_log')->where('id', $has[0]['id'])->update(['create_time' => time()]);
                         }
 
-                        Db::table('yx_user_send_task_log')->insert($send_log);
+                        Db::table('yx_user_multimedia_message_log')->insert($send_log);
                         // $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
                         $push_messages[] = $sendmessage;
                     }
                 }
-                Db::table('yx_user_send_task')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3]);
+                Db::table('yx_user_multimedia_message')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3]);
                 Db::commit();
                 foreach ($push_messages as $key => $value) {
                      $send_channelid = $value['channel_id'];

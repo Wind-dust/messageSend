@@ -601,6 +601,8 @@ return $result;
                 $content_length += $head['Content-Length'];
                 $frame['image_path'] = $value['image_path'];
             }
+            $frame['num'] = $value['num'];
+            $frame['name'] = $value['name'];
             $multimedia_message_frame[] = $frame;
         }
         if ($content_length > $max_length) {
