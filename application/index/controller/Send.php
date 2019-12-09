@@ -482,12 +482,12 @@ class Send extends MyController {
         $appid          = trim($this->request->post('appid')); //登录名
         $appkey         = trim($this->request->post('appkey')); //登陆密码
         $title          = trim($this->request->post('title')); //短信标题
-        $content_data   = trim($this->request->post('content_data')); //短信内容
+        $content_data   = $this->request->post('content_data'); //短信内容
         $send_time      = trim($this->request->post('send_time')); //预约发送时间
         $mobile_content = trim($this->request->post('mobile_content')); //接收手机号码
         $ip             = trim($this->request->ip());
         $mobile_content = explode(',', $mobile_content); //短信数组
-        $content_data   = json_decode($content_data, true);
+        // $content_data   = json_decode($content_data, true);
         if (empty($appid)) {
             return ['code' => '3000'];
         }
