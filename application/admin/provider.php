@@ -16,5 +16,6 @@ return [
     'adminLog'      => app\common\action\admin\AdminLog::class,
     'user'          => app\common\action\admin\User::class,
     'provinces'     => app\common\action\admin\Provinces::class,
-    'upload'            => app\common\action\admin\Upload::class,
+    'upload'        => app\common\action\admin\Upload::class,
+    'message'       => app\common\action\admin\Message::class,
 ];

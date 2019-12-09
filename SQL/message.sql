@@ -685,4 +685,4 @@ CREATE TABLE `yx_user_multimedia_message_log` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `task_no` (`task_no`,`task_id`) USING BTREE,
   KEY `mobile` (`mobile`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='行业发送记录表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='彩信发送记录表';
