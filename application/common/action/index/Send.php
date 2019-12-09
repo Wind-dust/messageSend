@@ -648,7 +648,7 @@ return $result;
             return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no']];
         } catch (\Exception $e) {
             Db::rollback();
-            return ['code' => '3009'];
+            return ['code' => '3011'];
         }
 
     }
