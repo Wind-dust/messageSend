@@ -641,7 +641,7 @@ return $result;
             if ($bId) {
                 foreach ($multimedia_message_frame as $key => $frame) {
                     $frame['multimedia_message_id'] = $bId;
-                    DbSendMessage::addUserMultimediaMessageFrame($SmsMultimediaMessageTask); //添加后的商品id
+                    DbSendMessage::addUserMultimediaMessageFrame($frame); //添加后的商品id
                 }
             }
             Db::commit();
