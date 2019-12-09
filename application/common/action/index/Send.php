@@ -594,10 +594,10 @@ return $result;
                 if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['image/gif', 'image/jpeg'])) {
                     return ['code' => '3008'];
                 }
-                $filename = filtraImage(Config::get('qiniu.exceldomain'), $value['image_path']);
+                $filename = filtraImage(Config::get('qiniu.domain'), $value['image_path']);
                 $logfile  = DbImage::getLogImageAll($filename); //判断时候有未完成的图片
                 if (empty($logfile)) { //图片不存在
-                    return ['code' => '3002']; //图片没有上传过
+                    return ['code' => '3010']; //图片没有上传过
                 }
                 $content_length += $head['Content-Length'];
                 $frame['image_path'] = $value['image_path'];
