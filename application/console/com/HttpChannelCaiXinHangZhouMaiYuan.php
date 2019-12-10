@@ -10,20 +10,17 @@ use Exception;
 use think\Db;
 
 //http 通道,通道编号10
-class HttpChannelCaiXinHuaxingtongxun extends Pzlife {
+class HttpChannelCaiXinHangZhouMaiYuan extends Pzlife {
 
-    //
-    public function content($content = 11) {
+    //杭州迈远
+    public function content($content = 13) {
         return [
-            // 'username'    => '上海钰晰图书',
-            'account'     => 'sfl',
-            'appid'       => '694',
-            'password'    => '123456',
-            'tockenid'    => '',
-            'send_api'    => 'http://101.132.108.240:9001/sendmms.aspx', //下发地址
+            'accesskey' => 'Ef57znngu5K4KFHa',
+            'secret' => '1DM8onrpjbJoYVotl3tOr6tjdnVDwoMs',
+            'send_api'    => 'http://api.1cloudsp.com/mms/api/send', //下发地址
             'call_api'    => '', //上行地址
-            'overage_api' => 'http://101.132.108.240:9001/sendmms.aspx', //余额地址
-            'receive_api' => 'http://101.132.108.240:9001/mmsStatusApi.aspx', //回执，报告
+            'overage_api' => '', //余额地址
+            'receive_api' => 'http://api.1cloudsp.com/report/status', //回执，报告
         ];
 
         //'account'    => 'yuxi',
@@ -61,7 +58,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
         // $image = imagecreatefromjpeg('http://imagesdev.shyuxi.com/20191209/6b97bc91cda37dfbde62dba15b447ca85dee1b09a5251.jpg');
         // print_r(base64_encode(file_get_contents('http://imagesdev.shyuxi.com/20191209/6b97bc91cda37dfbde62dba15b447ca85dee1b09a5251.jpg')));die;
 
-        $content                 = 12;
+        $content                 = 13;
         $redisMessageCodeSend    = 'index:meassage:multimediamessage:sendtask:' . $content; //彩信发送任务rediskey
         $redisMessageCodeDeliver = 'index:meassage:multimediamessage:deliver:' . $content; //彩信MsgId
         $user_info               = $this->content();
@@ -130,70 +127,23 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                         if (count($new_num) >= 2000) { //超出2000条做一次提交
                             $real_send = [];
                             $real_send = [
-                                'action'    => 'send',
-                                'userid'    => $user_info['appid'],
-                                'account'   => $user_info['account'],
-                                'password'  => $user_info['password'],
+                                'accesskey'    => $user_info['accesskey'],
+                                'secret'   => $user_info['secret'],
                                 // 'timestamp' => date('YmdHis',time()),
                                 // 'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time()))),
                                 'mobile'    => join(',', $new_num),
                                 'starttime' => '',
                                 'title'     => $send_title[$send_taskid],
-                                'content'   => $send_content[$send_taskid],
+                                // 'content'   => $send_content[$send_taskid], 
+                                'content'   => urlencode($send_content[$send_taskid]),
                             ];
 
                             $res    = sendRequest($user_info['send_api'], 'post', $real_send);
-                            switch ($res) {
-                                case '0':
-                                    exit('接口参数有误');
-                                    break;
-            
-                                case '1':
-                                    exit('用户名或密码不能为空');
-                                    break;
-            
-                                case '2':
-                                    exit('用户名或密码错误');
-                                    break;
-            
-                                case '3':
-                                    exit('号码为空');
-                                    break;
-            
-                                case '4':
-                                    exit('内容为空');
-                                    break;
-            
-                                case '5':
-                                    exit('单次提交号码不能超过2000个');
-                                    break;
-            
-                                case '6':
-                                    exit('余额不足');
-                                    break;
-            
-                                case '7':
-                                    exit('提交任务失败');
-                                    break;
-            
-                                case '8':
-                                    exit('其他错误');
-                                    break;
-            
-                                case '9':
-                                    exit('彩信文件大于100K');
-                                    break;
-            
-                                case '10':
-                                    exit('该用户不支持彩信');
-                                    break;
-            
-                                default:
-                                    $result = explode(':', $res);
-                                    $receive_id[$result[1]] = $send_taskid;
-                                    $redis->hset('index:meassage:code:back_taskno:' . $content, $result[1], $send_taskid);
-                                    break;
-                                }
+                            $result = json_decode($res, true);
+                            if ($result['code'] == 0) {
+                                $receive_id[$result['batchId']] = $send_taskid;
+                                $redis->hset('index:meassage:code:back_taskno:' . $content, $result['batchId'], $send_taskid);
+                            }
                            /*  $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
                             if ($result['returnstatus'] == 'Success') { //成功
                                 $receive_id[$result['taskID']] = $send_taskid;
@@ -219,72 +169,25 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                     }
                     $real_send = [];
                     $real_send = [
-                        'action'    => 'send',
-                        'userid'    => $user_info['appid'],
-                        'account'   => $user_info['account'],
-                        'password'  => $user_info['password'],
+                        'accesskey'    => $user_info['accesskey'],
+                        'secret'   => $user_info['secret'],
                         // 'timestamp' => date('YmdHis',time()),
                         // 'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time()))),
                         'mobile'    => join(',', $new_num),
                         'starttime' => '',
                         'title'     => $send_title[$send_taskid],
-                        'content'   => $send_content[$send_taskid],
+                        // 'content'   => $send_content[$send_taskid],
+                        'content'   => urlencode($send_content[$send_taskid]),
                     ];
-                    // print_r($real_send);
                     $res = sendRequest($user_info['send_api'], 'post', $real_send);
-                    // $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-                    // print_r($res);
-                    switch ($res) {
-                    case '0':
-                        exit('接口参数有误');
-                        break;
-
-                    case '1':
-                        exit('用户名或密码不能为空');
-                        break;
-
-                    case '2':
-                        exit('用户名或密码错误');
-                        break;
-
-                    case '3':
-                        exit('号码为空');
-                        break;
-
-                    case '4':
-                        exit('内容为空');
-                        break;
-
-                    case '5':
-                        exit('单次提交号码不能超过2000个');
-                        break;
-
-                    case '6':
-                        exit('余额不足');
-                        break;
-
-                    case '7':
-                        exit('提交任务失败');
-                        break;
-
-                    case '8':
-                        exit('其他错误');
-                        break;
-
-                    case '9':
-                        exit('彩信文件大于100K');
-                        break;
-
-                    case '10':
-                        exit('该用户不支持彩信');
-                        break;
-
-                    default:
-                        $result = explode(':', $res);
-                        $receive_id[$result[1]] = $send_taskid;
-                        $redis->hset('index:meassage:code:back_taskno:' . $content, $result[1], $send_taskid);
-                        break;
+                    $result = json_decode($res, true);
+                    // print_r($result);
+                    if ($result['code'] == 0) {
+                        $receive_id[$result['batchId']] = $send_taskid;
+                        $redis->hset('index:meassage:code:back_taskno:' . $content, $result['batchId'], $send_taskid);
                     }
+                    // print_r($res);
+       
                     // $result = explode(',', $res);
                     // if ($result['returnstatus'] == 'Success') { //成功
                     //     $receive_id[$result['taskID']] = $send_taskid;
@@ -302,25 +205,25 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
             // print_r($receive_id);
             // die;
             //该通道方不支持彩信状态查询
-           /*  $receive = sendRequest($user_info['receive_api'], 'post', ['userid' => $user_info['appid'], 'account' => $user_info['account'], 'password' => $user_info['password'], 'action' => 'query']);
+            $receive = sendRequest($user_info['receive_api'], 'post', ['accesskey' => $user_info['accesskey'], 'secret' => $user_info['secret']]);
             if (empty($receive)) {
                 sleep(60);
                 continue;
             }
-            $receive_data = json_decode(json_encode(simplexml_load_string($receive, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+            $receive_data = json_decode($receive, true);
             // print_r($receive_data);
             // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
             // $receive_data = explode(';', $receive);
 
             $send_status = 2;
-            if (isset($receive_data['statusbox'])) {
-                $real_receive_data = $receive_data['statusbox'];
+            if ($receive_data['code'] == 0) {
+                $real_receive_data = $receive_data['data'];
                 foreach ($real_receive_data as $key => $value) {
                     // $receive_info = [];
                     // $receive_info = explode(',', $value);
                     // $task_id      = $receive_id[$value['taskid']];
                     if (isset($value['taskid'])) {
-                        $task_id = $redis->hget('index:meassage:code:back_taskno:' . $content, $value['taskid']);
+                        $task_id = $redis->hget('index:meassage:code:back_taskno:' . $content, $value['batchId']);
                         $task    = $this->getSendTask($task_id);
                         if ($task == false) {
                             echo "error task_id" . "\n";
@@ -353,7 +256,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                     }
 
                 }
-            } */
+            }
             // print_r($receive_data);die;
             sleep(60);
 
