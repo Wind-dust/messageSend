@@ -470,7 +470,7 @@ class CmppCreateCodeTask extends Pzlife {
                 exit('taskId_is_null');
             }
             $mobilesend  = [];
-            print_r($sendTask);die;
+            // print_r($sendTask);die;
             $mobilesend  = explode(',', $sendTask['mobile_content']);
             $send_length = mb_strlen($sendTask['task_content'], 'utf8');
             $real_length = 1;
@@ -539,7 +539,7 @@ class CmppCreateCodeTask extends Pzlife {
                      $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $send_channelid, json_encode($value)); //三体营销通道
                 }
             } catch (\Exception $e) {
-                $this->redis->rPush('index:meassage:marketing:sendtask',$send);
+                $this->redis->rPush('index:meassage:multimediamessage:sendtask',$send);
                 exception($e);
                 Db::rollback();
             }

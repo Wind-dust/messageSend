@@ -156,7 +156,7 @@ class Upload extends MyController
                     $j = ',';
                 }
             }
-            if (empty($phone_data)) {
+            if (empty($phone)) {
                 return ['code' => '3003'];
             }
             // $result = $this->app->send->getMobilesDetail($phone_data);
