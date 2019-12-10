@@ -563,13 +563,13 @@ class Send extends MyController {
 
     /**
      * @api              {post} / 短信状态查询接口（彩信业务）（对外客户）
-     * @apiDescription   getSmsMultimediaMessageTask
+     * @apiDescription   getSmsMultimediaMessageTaskStatus
      * @apiGroup         index_send
-     * @apiName          getSmsMultimediaMessageTask
+     * @apiName          getSmsMultimediaMessageTaskStatus
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
      * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误
-     * @apiSampleRequest /index/send/getSmsMultimediaMessageTask
+     * @apiSampleRequest /index/send/getSmsMultimediaMessageTaskStatus
      * @author rzc
      */
     public function getSmsMultimediaMessageTaskStatus(){
