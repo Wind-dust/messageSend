@@ -230,13 +230,13 @@ class CmppCreateCodeTask extends Pzlife {
             return [];
         }
         $sendTask = $sendTask[0];
-        $content_data = Db::query("select 'id' from yx_user_multimedia_message_frame where delete_time=0 and `multimedia_message_id` = '" . $sendTask['id']);
+        $content_data = Db::query("select `id`,`content`,`num`,`image_path` from yx_user_multimedia_message_frame where delete_time=0 and `multimedia_message_id` = " . $sendTask['id']."  ORDER BY `num` ASC ");
         $sendTask['content'] = $content_data;
         return $sendTask;
     }
 
     private function getMultimediaSendTaskLog($task_no, $mobile) {
-        $getSendTaskSql = "select 'id' from yx_user_multimedia_message_log where delete_time=0 and `task_no` = '" . $task_no . "' and `mobile` = '" . $mobile . "'";
+        $getSendTaskSql = "select `id` from yx_user_multimedia_message_log where delete_time=0 and `task_no` = '" . $task_no . "' and `mobile` = '" . $mobile . "'";
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
         if (!$sendTask) {
@@ -455,7 +455,7 @@ class CmppCreateCodeTask extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15745);
+        $send = $this->redis->rPush('index:meassage:multimediamessage:sendtask',1);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask', 15743);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15740);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15741);
@@ -470,7 +470,7 @@ class CmppCreateCodeTask extends Pzlife {
                 exit('taskId_is_null');
             }
             $mobilesend  = [];
-            // print_r($sendTask);die;
+            print_r($sendTask);die;
             $mobilesend  = explode(',', $sendTask['mobile_content']);
             $send_length = mb_strlen($sendTask['task_content'], 'utf8');
             $real_length = 1;
@@ -507,6 +507,8 @@ class CmppCreateCodeTask extends Pzlife {
                         $send_log = [
                             'task_no'     => $sendTask['task_no'],
                             'uid'         => $sendTask['uid'],
+                            'source'         => $sendTask['source'],
+                            'task_content'         => $sendTask['source'],
                             'mobile'      => $mobilesend[$i],
                             'send_status' => 2,
                             'create_time' => time(),

@@ -658,13 +658,14 @@ CREATE TABLE `yx_user_multimedia_message_frame` (
   `multimedia_message_id` char(23) NOT NULL DEFAULT '' COMMENT '彩信id',
   `num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '排序',
   `name` varchar(255) NOT NULL DEFAULT '' COMMENT '名称如：第X帧',
-  `content` varchar(255) NOT NULL DEFAULT '' COMMENT '文字内容',
+  `content` text COMMENT '文字内容',
   `image_path` char(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '图片路径',
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
   `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE,
-  KEY `multimedia_message_id` (`multimedia_message_id`) USING BTREE
+  KEY `multimedia_message_id` (`multimedia_message_id`) USING BTREE,
+  UNIQUE INDEX `multimedia_message_id_num`(`num`,`multimedia_message_id`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='彩信副表（帧）';
 
 DROP TABLE IF EXISTS `yx_user_multimedia_message_log`;

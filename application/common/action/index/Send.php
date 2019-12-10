@@ -595,6 +595,7 @@ return $result;
                     return ['code' => '3008'];
                 }
                 $filename = filtraImage(Config::get('qiniu.domain'), $value['image_path']);
+                // print_r($value['image_path']);die;
                 $logfile  = DbImage::getLogImageAll($filename); //判断时候有未完成的图片
                 if (empty($logfile)) { //图片不存在
                     return ['code' => '3010']; //图片没有上传过
@@ -641,7 +642,7 @@ return $result;
             if ($bId) {
                 foreach ($multimedia_message_frame as $key => $frame) {
                     $frame['multimedia_message_id'] = $bId;
-                    $frame['image_path'] =filtraImage(Config::get('qiniu.domain'), $value['image_path']);
+                    $frame['image_path'] =filtraImage(Config::get('qiniu.domain'), $frame['image_path']);
                     DbSendMessage::addUserMultimediaMessageFrame($frame); //添加后的商品id
                 }
             }
@@ -649,6 +650,7 @@ return $result;
             return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no']];
         } catch (\Exception $e) {
             Db::rollback();
+            // exception($e);
             return ['code' => '3011'];
         }
 
