@@ -160,7 +160,7 @@ class Upload extends MyController
                 return ['code' => '3003'];
             }
             // $result = $this->app->send->getMobilesDetail($phone_data);
-            return $phone;
+            return [ 'code' => 200,'phone' =>$phone];
         } else {
             return ['code' => '3002'];
         }
