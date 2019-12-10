@@ -74,13 +74,13 @@ class Upload extends MyController
             }
             fclose($file);
             // $result = $this->app->send->getMobilesDetail($phone_data);
-            return $phone;
+            return [ 'code' => 200,'phone' =>$phone];
         }
         if (!in_array($fileType[1], ['vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'vnd.ms-excel', 'csv'])) {
             return ['code' => '3001']; //上传的不是表格
         }
         $info = $filename->move('../uploads/excel');
-        $phone_data = [];
+        // $phone_data = [];
         // print_r($info);die;
         if ($info) {
             $type = $info->getExtension();

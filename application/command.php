@@ -33,6 +33,7 @@ return [
     'httpchannelkemengzhuangxiu' => $commandPath . 'HttpChannelKeMengZhuangXiu',
     'cmppmijiadianxinmarketing' => $commandPath . 'CmppMiJiaDianXinMarketing',
     'cmppmijialiantongmarketing' => $commandPath . 'CmppMiJiaLianTongMarketing',
+    'httpchannelcaixinhuaxingtongxun' => $commandPath . 'HttpChannelCaiXinHuaxingtongxun',
     'cmpplanjingmarketing' => $commandPath . 'CmppLanJingMarketing',
     'serversocketshuhe' => $commandPath .  'ServerSocketShuHe',
 ];

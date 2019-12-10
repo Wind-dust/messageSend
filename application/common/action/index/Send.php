@@ -591,6 +591,11 @@ return $result;
                     ],
                 ]);
                 $head = get_headers($value['image_path'], 1);
+                if ($head['Content-Type'] == 'image/jpeg') {
+                    $frame['image_type'] = 'jpg';
+                }elseif ($head['Content-Type'] == 'image/gif ') {
+                    $frame['image_type'] = 'gif';
+                }
                 if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['image/gif', 'image/jpeg'])) {
                     return ['code' => '3008'];
                 }

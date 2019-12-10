@@ -230,8 +230,8 @@ class CmppCreateCodeTask extends Pzlife {
             return [];
         }
         $sendTask = $sendTask[0];
-        $content_data = Db::query("select `id`,`content`,`num`,`image_path` from yx_user_multimedia_message_frame where delete_time=0 and `multimedia_message_id` = " . $sendTask['id']."  ORDER BY `num` ASC ");
-        $sendTask['content'] = $content_data;
+        $content_data = Db::query("select `id`,`content`,`num`,`image_path`,`image_type` from yx_user_multimedia_message_frame where delete_time=0 and `multimedia_message_id` = " . $sendTask['id']."  ORDER BY `num` ASC ");
+        $sendTask['task_content'] = $content_data;
         return $sendTask;
     }
 
@@ -454,7 +454,7 @@ class CmppCreateCodeTask extends Pzlife {
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
-        $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
+        $redisMessageMarketingSend = 'index:meassage:multimediamessage:sendtask';
         $send = $this->redis->rPush('index:meassage:multimediamessage:sendtask',1);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask', 15743);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15740);
@@ -472,7 +472,7 @@ class CmppCreateCodeTask extends Pzlife {
             $mobilesend  = [];
             // print_r($sendTask);die;
             $mobilesend  = explode(',', $sendTask['mobile_content']);
-            $send_length = mb_strlen($sendTask['task_content'], 'utf8');
+            // $send_length = mb_strlen($sendTask['task_content'], 'utf8');
             $real_length = 1;
             // if ($send_length > 70) {
             //     $real_length = ceil($send_length / 67);
@@ -482,6 +482,10 @@ class CmppCreateCodeTask extends Pzlife {
             $channel_id = 0;
             $channel_id = $sendTask['channel_id'];
             $push_messages = [];
+            $send_content = '';
+            // if (!empty($sendTask['content'])) {
+
+            // }
             // print_r($sendTask);die;
             Db::startTrans();
             try {
@@ -515,6 +519,7 @@ class CmppCreateCodeTask extends Pzlife {
                         ];
                         $sendmessage = [
                             'mobile'      => $mobilesend[$i],
+                            'title'       => $sendTask['title'],
                             'mar_task_id' => $sendTask['id'],
                             'content'     => $sendTask['task_content'],
                             'channel_id'  => $channel_id,
