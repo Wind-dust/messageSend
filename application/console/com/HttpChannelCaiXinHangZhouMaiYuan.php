@@ -255,7 +255,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                             'send_status'    => $send_status,
                             'send_time'      => strtotime($value['deliverTime']),
                         ];
-                        print_r($send_task_log);
+                        // print_r($send_task_log);
                         $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
                         // Db::startTrans();
                         // try {
@@ -277,7 +277,6 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
             unset($send_content);
             unset($receive_id);
             echo "success";
-            sleep(60);
         }
 
     }
