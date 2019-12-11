@@ -48,7 +48,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         $redisMessageCodeDeliver    = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
 
         // $send = $redis->rPush($redisMessageCodeSend, json_encode([
-        //     'mobile'      => '15821193682',
+        //     'mobile'      => '15201926171',
         //     'mar_task_id' => '',
         //     'content'     => '【冰雪传奇】尊敬的测评师：您账户已激活Vip5成功，赠GM号至尊礼包。领：http://uee.me/cF4vv。退订回T',
         // ]));
@@ -191,7 +191,8 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                 // $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
                                 // socket_write($socket, $headData . $bodyData, $Total_Length);
                                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) { //写入失败，还原发送信息并关闭端口
-                                    echo 'fail to write' . socket_strerror(socket_last_error());
+                                    // echo 'fail to write' . socket_strerror(socket_last_error());
+                                    continue;
                                 } else {
                                     // echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
 
@@ -455,7 +456,8 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
 
                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) { //写入失败，还原发送信息并关闭端口
-                    echo 'fail to write' . socket_strerror(socket_last_error());
+                    // echo 'fail to write' . socket_strerror(socket_last_error());
+                    continue;
                 } else {
                     // echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
                     // if ($i == 2) {
@@ -605,6 +607,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                         }
                         //捕获异常
                          catch (Exception $e) {
+                             continue;
                             //关闭工作流并修改通道状态
                             // socket_close($socket);
                             // exception($e);
