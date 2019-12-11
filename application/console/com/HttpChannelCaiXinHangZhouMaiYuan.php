@@ -18,7 +18,7 @@ class HttpChannelCaiXinHangZhouMaiYuan extends Pzlife {
             'accesskey' => 'Ef57znngu5K4KFHa',
             'secret' => '1DM8onrpjbJoYVotl3tOr6tjdnVDwoMs',
             'send_api'    => 'http://api.1cloudsp.com/mms/api/send', //下发地址
-            'call_api'    => '', //上行地址
+            'call_api'    => 'http://api.1cloudsp.com/report/up', //上行地址
             'overage_api' => '', //余额地址
             'receive_api' => 'http://api.1cloudsp.com/report/status', //回执，报告
         ];
@@ -211,10 +211,23 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                 continue;
             }
             $receive_data = json_decode($receive, true);
-            print_r($receive_data);
+            // print_r($receive_data);
             // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
             // $receive_data = explode(';', $receive);
-
+          /*   $receive_data = [
+                'code' => 0,
+                'msg'  => '',
+                'data' => [
+                    [
+                        'smUuid' => '26175_12_0_15172413692_0_tejrsVO_1',
+                        'deliverTime' => '2019-12-10 17:27:16',
+                        'mobile' => '15172413692',
+                        'smUuid' => '26175_12_0_15172413692_0_tejrsVO_1',
+                        'deliverResult' => 'REJECT',
+                        'batchId' => 'o0ULmxE'
+                    ],
+                ],
+            ]; */
             $send_status = 2;
             if ($receive_data['code'] == 0) {
                 $real_receive_data = $receive_data['data'];
@@ -222,14 +235,14 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                     // $receive_info = [];
                     // $receive_info = explode(',', $value);
                     // $task_id      = $receive_id[$value['taskid']];
-                    if (isset($value['taskid'])) {
+                    if (isset($value['batchId'])) {
                         $task_id = $redis->hget('index:meassage:code:back_taskno:' . $content, $value['batchId']);
                         $task    = $this->getSendTask($task_id);
                         if ($task == false) {
                             echo "error task_id" . "\n";
                         }
                         $send_task_log = [];
-                        if ($value['errorcode'] == '10') {
+                        if ($value['deliverResult'] == 'DELIVRD') {
                             $send_status = 3;
                         } else {
                             $send_status = 4;
@@ -238,9 +251,9 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                             'task_no'        => $task['task_no'],
                             'uid'            => $task['uid'],
                             'mobile'         => $value['mobile'],
-                            'status_message' => $value['errorcode'],
+                            'status_message' => $value['deliverResult'],
                             'send_status'    => $send_status,
-                            'send_time'      => strtotime($value['receivetime']),
+                            'send_time'      => strtotime($value['deliverTime']),
                         ];
                         print_r($send_task_log);
                         $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
@@ -270,7 +283,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
     }
 
     public function getSendTask($id) {
-        $task = Db::query("SELECT `task_no`,`uid` FROM yx_user_send_task WHERE `id` =" . $id);
+        $task = Db::query("SELECT `task_no`,`uid` FROM yx_user_multimedia_message WHERE `id` =" . $id);
         if ($task) {
             return $task[0];
         }
