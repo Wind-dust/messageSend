@@ -606,8 +606,8 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                         //捕获异常
                          catch (Exception $e) {
                             //关闭工作流并修改通道状态
-                            socket_close($socket);
-                            exception($e);
+                            // socket_close($socket);
+                            // exception($e);
                         }
                     }
 
