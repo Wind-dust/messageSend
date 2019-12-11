@@ -72,11 +72,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
             socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
-            $starttime= time();
             do {
-                if ($starttime+1 < time()) {
-                    die;
-                }
                 try
                 {
                     date_default_timezone_set('PRC');
