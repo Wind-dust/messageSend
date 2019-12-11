@@ -14,16 +14,16 @@ class Message extends AdminController {
 
     /**
      * @api              {post} / 获取彩信任务
-     * @apiDescription   getUserSendTask
+     * @apiDescription   getMultimediaMessageTask
      * @apiGroup         admin_Message
-     * @apiName          getUserSendTask
+     * @apiName          getMultimediaMessageTask
      * @apiParam (入参) {String} cms_con_id
      * @apiParam (入参) {String} id 任务id
      * @apiParam (入参) {String} page 页码 默认1
      * @apiParam (入参) {String} pageNum 条数 默认10
      * @apiParam (入参) {String} [title] 任务名称
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 
-     * @apiSampleRequest /admin/message/getUserSendTask
+     * @apiSampleRequest /admin/message/getMultimediaMessageTask
      * @return array
      * @author rzc
      */
