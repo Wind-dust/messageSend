@@ -4,6 +4,7 @@ namespace app\common\model;
 
 use think\Model;
 use think\model\concern\SoftDelete;
+use Config;
 
 class UserMultimediaMessageLog extends Model {
     use SoftDelete;
