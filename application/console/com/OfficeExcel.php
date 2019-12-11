@@ -136,7 +136,7 @@ class OfficeExcel extends Pzlife {
 
         $objExcel = new PHPExcel();
         // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
-        // $sheets=$objWriter->getActiveSheet()->setTitle('白卡1.');//设置表格名称
+        // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
         $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
         $objWriter->setOffice2003Compatibility(true);
 
@@ -304,7 +304,7 @@ class OfficeExcel extends Pzlife {
            if (count($putdata) >= 50000) {
                 $objExcel = new PHPExcel();
                 // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
-                // $sheets=$objWriter->getActiveSheet()->setTitle('白卡1.');//设置表格名称
+                // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
                 $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
                 $objWriter->setOffice2003Compatibility(true);
         
@@ -368,7 +368,7 @@ class OfficeExcel extends Pzlife {
             // $j++;
             $objExcel = new PHPExcel();
                 // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
-                // $sheets=$objWriter->getActiveSheet()->setTitle('白卡1.');//设置表格名称
+                // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
                 $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
                 $objWriter->setOffice2003Compatibility(true);
         
@@ -517,7 +517,7 @@ class OfficeExcel extends Pzlife {
             // print_r($new2);
             $objExcel = new PHPExcel();
             // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
-            // $sheets=$objWriter->getActiveSheet()->setTitle('白卡1.');//设置表格名称
+            // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
             $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
             $objWriter->setOffice2003Compatibility(true);
     
