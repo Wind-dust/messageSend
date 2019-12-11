@@ -344,7 +344,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                     // if ($i > 1) {
                                     //     die;
                                     // }
-                                    usleep(10);
+                                    // usleep(10);
     
                                     $i++;
                                 }
@@ -359,7 +359,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                 }
                                 if ($time > 1) {
                                     // ceil(10000/$security_master);
-                                    usleep(10); //等待时间，进行下一次操作
+                                    // usleep(10); //等待时间，进行下一次操作
                                 }
                                 continue;
                             } else { //单条短信
@@ -612,7 +612,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                     // }else{
                     //     usleep(3000); //等待时间，进行下一次操作
                     // }
-                    usleep(10); //等待时间，进行下一次操作
+                    // usleep(10); //等待时间，进行下一次操作
         
                 }
                 //捕获异常
