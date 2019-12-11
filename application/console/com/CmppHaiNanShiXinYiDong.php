@@ -69,7 +69,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         if (socket_connect($socket, $host, $port) == false) {
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
-            // socket_set_nonblock($socket); //设置非阻塞模式
+            socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
             do {
