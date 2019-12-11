@@ -616,15 +616,16 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                 }
                 //捕获异常
                  catch (Exception $e) {
-                    $i++;
-                    $Sequence_Id++;
-                    if ($Sequence_Id > 65536) {
-                        $Sequence_Id = 1;
-                    }
+                    // $i++;
+                    // $Sequence_Id++;
+                    // if ($Sequence_Id > 65536) {
+                    //     $Sequence_Id = 1;
+                    // }
+                    
+                     exception($e);
                      continue;
                     //关闭工作流并修改通道状态
                     // socket_close($socket);
-                    // exception($e);
                 }
             } while (true);
 
