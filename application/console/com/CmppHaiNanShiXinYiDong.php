@@ -624,6 +624,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                     // }
                     //重新建立连接
                     socket_close($socket);
+                    $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                     socket_connect($socket, $host, $port);
                     //  exception($e);
                     //  continue;
