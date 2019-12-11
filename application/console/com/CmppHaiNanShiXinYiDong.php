@@ -192,8 +192,8 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                     // $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
                                     // socket_write($socket, $headData . $bodyData, $Total_Length);
                                     if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) { //写入失败，还原发送信息并关闭端口
-                                        // echo 'fail to write' . socket_strerror(socket_last_error());
-                                        continue;
+                                        echo 'fail to write' . socket_strerror(socket_last_error());die;
+                                        // continue;
                                     } else {
                                         // echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
     
@@ -622,8 +622,8 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                     //     $Sequence_Id = 1;
                     // }
                     
-                     exception($e);
-                     continue;
+                    //  exception($e);
+                    //  continue;
                     //关闭工作流并修改通道状态
                     // socket_close($socket);
                 }
