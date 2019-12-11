@@ -622,7 +622,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                     //     $Sequence_Id = 1;
                     // }
                     
-                    //  exception($e);
+                     exception($e);
                     //  continue;
                     //关闭工作流并修改通道状态
                     // socket_close($socket);
