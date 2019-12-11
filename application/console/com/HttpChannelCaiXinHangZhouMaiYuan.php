@@ -211,7 +211,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                 continue;
             }
             $receive_data = json_decode($receive, true);
-            // print_r($receive_data);
+            print_r($receive_data);
             // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
             // $receive_data = explode(';', $receive);
 

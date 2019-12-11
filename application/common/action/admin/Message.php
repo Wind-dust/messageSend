@@ -18,16 +18,21 @@ class Message extends CommonIndex {
         $where = [];
         if (!empty($id)) {
             $result = DbSendMessage::getUserMultimediaMessage(['id' => $id], '*', true);
+            $result['content'] = DbSendMessage::getUserMultimediaMessageFrame(['multimedia_message_id' => $id],'*',false,['num' => 'asc']);
         } else {
             if (empty($title)) {
                 array_push($where,['title', 'like', '%'.$title.'%']);
             }
             $result = DbSendMessage::getUserMultimediaMessage($where, '*', false, '', $offset . ',' . $pageNum);
+            foreach ($result as $key => $value) {
+                $result[$key]['content'] = DbSendMessage::getUserMultimediaMessageFrame(['multimedia_message_id' => $value['id']],'*',false,['num' => 'asc']);
+            }
         }
         $total = DbSendMessage::countUserMultimediaMessage($where);
         if ($id) {
             $total = 1;
         }
+        
         return ['code' => '200', 'data' => $result];
     }
 
