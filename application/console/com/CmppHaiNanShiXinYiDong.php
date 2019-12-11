@@ -445,7 +445,8 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                     }
                     $Total_Length = strlen($bodyData) + 12;
                     $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-    
+                    print_r(socket_write($socket, $headData . $bodyData, $Total_Length));
+                    echo "\n";
                     if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) { //写入失败，还原发送信息并关闭端口
                         // echo 'fail to write' . socket_strerror(socket_last_error());
                         continue;
