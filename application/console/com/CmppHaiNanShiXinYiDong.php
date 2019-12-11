@@ -75,7 +75,12 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
             socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
+            $start_time = time();
             do {
+                if ($start_time < time()){
+                    die;
+
+                }
                 try
                 {
     
