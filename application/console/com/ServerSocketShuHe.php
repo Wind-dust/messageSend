@@ -91,14 +91,6 @@ class ServerSocketShuHe extends Pzlife {
                                     $status       = 4;
                                     $new_bodyData = pack("C", 4); //status | 1 | Unsigned Integer |状态 0：正确 1：消息结构错  2：非法源地址  3：认证错  4：版本太高   5~ ：其他错误
                                 }
-                                /* if ($body['AuthenticatorSource'] != md5($Source_Addr . '000000000' . $Shared_secret . $Timestamp, true)) {
-                                    $status       = 3;
-                                    $new_bodyData = pack("C", 3); //status | 1 | Unsigned Integer |状态 0：正确 1：消息结构错  2：非法源地址  3：认证错  4：版本太高   5~ ：其他错误
-                                } */
-                                // echo $status;
-                                // print_r($head);
-                                // print_r($body);
-                                // die;
                             } catch (Exception $e) {
                                 $status       = 1;
                                 $new_bodyData = pack("C", 1); //status | 1 | Unsigned Integer |状态 0：正确 1：消息结构错  2：非法源地址  3：认证错  4：版本太高   5~ ：其他错误
@@ -114,12 +106,7 @@ class ServerSocketShuHe extends Pzlife {
                             // echo $new_bodyData;die;
                             $Total_Length = strlen($new_bodyData) + 12;
                             $new_headData = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
-                            // socket_write($socket, $headData . $bodyData, $Total_Length);
 
-                            // print_r($back_Command_Id);
-                            // 向socket_accept的套接流写入信息，也就是回馈信息给socket_bind()所绑定的主机客户端
-                            // echo $new_headData . $new_bodyData."\n";
-                            // echo $back_Command_Id."\n";
                             socket_write($accept_resource, $new_headData . $new_bodyData, $Total_Length);
                             // socket_write的作用是向socket_create的套接流写入信息，或者向socket_accept的套接流写入信息
                             if ($status != 0) {
@@ -183,7 +170,7 @@ class ServerSocketShuHe extends Pzlife {
                                $mobile      = $body1['Dest_terminal_Id'];
                                $Msg_length  = $body1['Msg_length'];
                                $bodyData2   = socket_read($accept_resource, $Msg_length);
-                               print_r($bodyData2);die;
+                            //    print_r($bodyData2);die;
                                echo "\n";
                                $Msg_Content = unpack("a" . $Msg_length . "Msg_Content", $bodyData2);
                                $Msg_Content['Msg_Content'] = strval($Msg_Content['Msg_Content']);
@@ -227,7 +214,7 @@ class ServerSocketShuHe extends Pzlife {
                                $mobile      = $body1['Dest_terminal_Id'];
                                $Msg_length  = $body1['Msg_length'];
                                $bodyData2   = socket_read($accept_resource, $Msg_length);
-                               print_r($bodyData2);die;
+                            //    print_r($bodyData2);die;
                                echo "\n";
                                $Msg_Content = unpack("a" . $Msg_length . "Msg_Content", $bodyData2);
                                $sendData    = [];
