@@ -623,6 +623,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                     //     $Sequence_Id = 1;
                     // }
                     //重新建立连接
+                    socket_close($socket);
                     socket_connect($socket, $host, $port);
                     //  exception($e);
                     //  continue;
