@@ -46,29 +46,12 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
         // $redisMessageCodeDeliver    = 'index:meassage:code:deliver:' . $content; //行业通知MsgId
         $redisMessageCodeDeliver    = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
-        // $redisMessageCodeSend       = 'index:meassage:marketing:send:' . $content; //营销发送任务rediskey
-        // $redisMessageCodeSequenceId = 'index:meassage:marketing:sequence:id:' . $content; //营销行业通知SequenceId
-        // $redisMessageCodeMsgId      = 'index:meassage:marketing:msg:id:' . $content; //营销行业通知SequenceId
-        // $redisMessageCodeDeliver    = 'index:meassage:marketing:deliver:' . $content; //营销行业通知MsgId
-        // echo $redisMessageCodeSend;die;
-        // do {
-        //     $send = $redis ->lPop($redisMessageCodeSend);
-        //     print_r($send);
-        // } while ($send);
-        // // $send = $redis ->lPop($redisMessageCodeSend);
-        
-        // print_r($send);die;
-        // $code   = '短信发送测试';
-        // print_r($redisMessageCodeSend);die;
-        // echo $redisMessageCodeSend;die;
-        // $send = $redis->lPop("index:meassage:code:send:1");
-        // $send = $redis->rPush($redisMessageCodeSend,"15555555555:12:【品质生活】祝您生活愉快");
 
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15821193682',
-            'mar_task_id' => '',
-            'content'     => '【冰雪传奇】尊敬的测评师：您账户已激活Vip5成功，赠GM号至尊礼包。领：http://uee.me/cF4vv。退订回T',
-        ]));
+        // $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        //     'mobile'      => '15821193682',
+        //     'mar_task_id' => '',
+        //     'content'     => '【冰雪传奇】尊敬的测评师：您账户已激活Vip5成功，赠GM号至尊礼包。领：http://uee.me/cF4vv。退订回T',
+        // ]));
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -339,7 +322,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                                     $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                                      
                                                 }
-                                                print_r($Msg_Content);
+                                                print_r($mesage);
                                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
                                                 // echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
                                                 $callback_Command_Id = 0x80000005;
