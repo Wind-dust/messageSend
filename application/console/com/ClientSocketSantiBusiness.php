@@ -215,8 +215,8 @@ class ClientSocketSantiBusiness extends Pzlife {
                         
                         $num1 = substr($timestring, 0, 8);
                         $num2 = substr($timestring, 8) . $this->combination($i);
-                        // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');//UTF-8转GBK
-                        $code = strval($this->ascii_encode($code));//UTF-8 转ASCII
+                        $code = mb_convert_encoding($code, 'GBK', 'UTF-8');//UTF-8转GBK
+                        // $code = strval($this->ascii_encode($code));//UTF-8 转ASCII
                         if (strlen($code) > 140) {
                             $pos          = 0;
                             $num_messages = ceil(strlen($code) / $max_len);
@@ -260,8 +260,8 @@ class ClientSocketSantiBusiness extends Pzlife {
                                 /* 字符串长度（包括中文）超出70字 为长短信 超过70字的，拆成多条发送，一般使用6位协议头，每条短信除去6字节协议头，剩余134字节存放剩余内容 */
                                 /* 一般在发长短信的时候，tp_udhi设置为1，然后短信内容需要拆分成多条，每条内容之前，加上协议头 */
                                 $bodyData = $bodyData . pack("C", 1); //TP_udhi |1 |Unsigned |Integer |GSM协议类型。详细是解释请参考 GSM03.40 中的 9.2.3.23,仅使用 1 位，右 对齐
-                                // $bodyData = $bodyData . pack("C", 15); //Msg_Fmt |1 |Unsigned |Integer |信息格式   0：ASCII 串   3：短信写卡操作   4：二进制信息   8：UCS2 编码 15：含 GBK 汉字(GBK编码内容与Msg_Fmt一致)
-                                $bodyData = $bodyData . pack("C", 0); //Msg_Fmt |1 |Unsigned |Integer |信息格式   0：ASCII 串   3：短信写卡操作   4：二进制信息   8：UCS2 编码 15：含 GBK 汉字(GBK编码内容与Msg_Fmt一致)
+                                $bodyData = $bodyData . pack("C", 15); //Msg_Fmt |1 |Unsigned |Integer |信息格式   0：ASCII 串   3：短信写卡操作   4：二进制信息   8：UCS2 编码 15：含 GBK 汉字(GBK编码内容与Msg_Fmt一致)
+                                // $bodyData = $bodyData . pack("C", 0); //Msg_Fmt |1 |Unsigned |Integer |信息格式   0：ASCII 串   3：短信写卡操作   4：二进制信息   8：UCS2 编码 15：含 GBK 汉字(GBK编码内容与Msg_Fmt一致)
 
                                 $bodyData = $bodyData . pack("a6", $Source_Addr); //Msg_src |6 |Octet String |信息内容来源(账号)
                                 $bodyData = $bodyData . pack("a2", 02);

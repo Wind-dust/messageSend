@@ -9,7 +9,7 @@ use Env;
 use Exception;
 use think\Db;
 
-class CmppSantiMarketing2 extends Pzlife {
+class CmppHaiNanShiXinYiDong extends Pzlife {
 
     // protected $redis;
 
@@ -17,112 +17,21 @@ class CmppSantiMarketing2 extends Pzlife {
         $this->redis = Phpredis::getConn();
         //        $this->connect = Db::connect(Config::get('database.db_config'));
     }
-
+    //海南始新移动游戏通道
     public function content($content) {
         return [
-            'host'          => "116.62.88.162", //服务商ip
-            'port'          => "8592", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "101162", //企业id  企业代码
-            'Shared_secret' => 'uc338qd7', //网关登录密码
-            'Service_Id'    => "101162", //业务代码
-            'template_id'   => "218503", //模板id
-            'Dest_Id'       => "106928080158", //短信接入码 短信端口号 服务代码
+            'host'          => "123.56.225.148", //服务商ip
+            'port'          => "7890", //短连接端口号   17890长连接端口号
+            'Source_Addr'   => "001938", //企业id  企业代码
+            'Shared_secret' => '509464', //网关登录密码
+            'Service_Id'    => "001938", //业务代码
+            'template_id'   => "", //模板id
+            'Dest_Id'       => "", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
-            'master_num'    => 300,
+            'master_num'    => 3000,
         ];
-       /*  if ($content == 1) { //三体行业
-            return [
-                'host'          => "116.62.88.162", //服务商ip
-                'port'          => "8592", //短连接端口号   17890长连接端口号
-                'Source_Addr'   => "101161", //企业id  企业代码
-                'Shared_secret' => '5hsey6u9', //网关登录密码
-                'template_id'   => "217062", //模板id
-                'Service_Id'    => "101161", //业务代码
-                'Dest_Id'       => "106928080159", //短信接入码 短信端口号
-                'Sequence_Id'   => 1,
-                'SP_ID'         => "",
-                'master_num'    => 300,
-            ];
-        } else if ($content == 2) { // 三体营销
-            return [
-                'host'          => "116.62.88.162", //服务商ip
-                'port'          => "8592", //短连接端口号   17890长连接端口号
-                'Source_Addr'   => "101162", //企业id  企业代码
-                'Shared_secret' => 'uc338qd7', //网关登录密码
-                'Service_Id'    => "101162", //业务代码
-                'template_id'   => "217800", //模板id
-                'Dest_Id'       => "106928080158", //短信接入码 短信端口号 服务代码
-                'Sequence_Id'   => 1,
-                'SP_ID'         => "",
-                'master_num'    => 300,
-            ];
-        } else if ($content == 3) { //青年科技移动营销
-            return [
-                'host'          => "47.96.157.156", //服务商ip
-                'port'          => "7890", //短连接端口号   17890长连接端口号
-                'Source_Addr'   => "997476", //企业id  企业代码
-                'Shared_secret' => '47TtFd', //网关登录密码
-                'Service_Id'    => "997476", //业务代码
-                'template_id'   => "", //模板id
-                'Dest_Id'       => "1069030", //短信接入码 短信端口号 服务代码
-                'Sequence_Id'   => 1,
-                'SP_ID'         => "",
-                'master_num'    => 300,
-            ];
-        } else if ($content == 4) { //青年科技移动联通营销
-            return [
-                'host'          => "47.96.157.156", //服务商ip
-                'port'          => "7890", //短连接端口号   17890长连接端口号
-                'Source_Addr'   => "997475", //企业id  企业代码
-                'Shared_secret' => 'SiC67Z', //网关登录密码
-                'Service_Id'    => "997475", //业务代码
-                'template_id'   => "", //模板id
-                'Dest_Id'       => "1069029", //短信接入码 短信端口号 服务代码
-                'Sequence_Id'   => 1,
-                'SP_ID'         => "",
-                'master_num'    => 200,
-            ];
-        } else if ($content == 5) { //青年科技三网行业
-            return [
-                'host'          => "47.96.157.156", //服务商ip
-                'port'          => "7890", //短连接端口号   17890长连接端口号
-                'Source_Addr'   => "997474", //企业id  企业代码
-                'Shared_secret' => 'Yhdbbn', //网关登录密码
-                'Service_Id'    => "997474", //业务代码
-                'template_id'   => "", //模板id
-                'Dest_Id'       => "1069024", //短信接入码 短信端口号 服务代码
-                'Sequence_Id'   => 1,
-                'SP_ID'         => "",
-                'master_num'    => 500,
-            ];
-        } else if ($content == 6) { //物流通知账号
-            return [
-                'host'          => "47.102.193.199", //服务商ip
-                'port'          => "7890", //短连接端口号   17890长连接端口号
-                'Source_Addr'   => "901042", //企业id  企业代码
-                'Shared_secret' => 'NX2MYz', //网关登录密码
-                'Service_Id'    => "901042", //业务代码
-                'template_id'   => "", //模板id
-                'Dest_Id'       => "1069080", //短信接入码 短信端口号 服务代码
-                'Sequence_Id'   => 1,
-                'SP_ID'         => "",
-                'master_num'    => 300,
-            ];
-        } */
-   /*      if ($content == 1) { //测试
-            return [
-                'host'          => "127.0.0.1", //服务商ip
-                'port'          => "8888", //短连接端口号   17890长连接端口号
-                'Source_Addr'   => "101161", //企业id  企业代码
-                'Shared_secret' => '5hsey6u9', //网关登录密码
-                'Service_Id'    => "217062",
-                'Dest_Id'       => "106928080159", //短信接入码 短信端口号
-                'Sequence_Id'   => 1,
-                'SP_ID'         => "",
-                'master_num'    => 300,
-            ];
-        }  */
+     
     }
 
     public function SantiMarketing($content) {
@@ -131,7 +40,7 @@ class CmppSantiMarketing2 extends Pzlife {
         // $a_time = 0;
         date_default_timezone_set('PRC');
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $content = 2;
+        $content = 14;
         $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
         $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
         $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
@@ -155,11 +64,11 @@ class CmppSantiMarketing2 extends Pzlife {
         // $send = $redis->lPop("index:meassage:code:send:1");
         // $send = $redis->rPush($redisMessageCodeSend,"15555555555:12:【品质生活】祝您生活愉快");
 
-        // $send = $redis->rPush($redisMessageCodeSend, json_encode([
-        //     'mobile'      => '15827039444',
-        //     'mar_task_id' => 15715,
-        //     'content'     => '【中山口腔】5周年庆，11月23-30日，黄石三店同庆，全线诊疗项目 8 折让利回馈、消费就送青花瓷礼盒！39.9元购洁牙卡送食用油。详情询:0714-6268188 回T退订',
-        // ]));
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15201926171',
+            'mar_task_id' => '',
+            'content'     => '【冰雪传奇】尊敬的测评师：您账户已激活Vip5成功，赠GM号至尊礼包。领：http://uee.me/cF4vv。退订回T',
+        ]));
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -201,7 +110,7 @@ class CmppSantiMarketing2 extends Pzlife {
                     /* redis 读取需要发送的数据 */
                     $send = $redis->lPop($redisMessageCodeSend);
                         if ($send) { //正式使用从缓存中读取数据
-                        $senddata = [];
+                        $send_data = [];
                         // $senddata = explode(":",$send);
                         $send_data = json_decode($send, true);
                         // $mobile = $senddata['mobile_content'];
@@ -357,27 +266,7 @@ class CmppSantiMarketing2 extends Pzlife {
                                                     $sequence['Msg_Id'] = $msgid;
                                                     // $msgid = 155153131;
                                                     // print_r($send_log);die;
-                                          /*           Db::startTrans();
-                                                    try {
-                                                        if (empty($send_log)) {
-                                                            Db::table('yx_user_send_task_log')->insert([
-                                                                'task_no'     => $sendTask['task_no'],
-                                                                'mobile'      => $sequence['mobile'],
-                                                                'msgid'       => $msgid,
-                                                                'send_status' => 2,
-                                                                'create_time' => time(),
-                                                            ]);
-                
-                                                        } else {
-                                                            Db::table('yx_user_send_task_log')->where('id', $send_log['id'])->update(['msgid' => $msgid]);
-                                                        }
-                                                        Db::commit();
-                                                        // $sequence = $redis->hdel($redisMessageCodeSequenceId,2);
-                                                    } catch (\Exception $e) {
-                                                        exception($e);
-                                                        Db::rollback();
-                
-                                                    } */
+                                          
                                                     $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                                     $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
                                                 }
@@ -448,28 +337,7 @@ class CmppSantiMarketing2 extends Pzlife {
                                                     $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                                     $mesage['Done_time'] = $Msg_Content['Done_time'];
                                                     $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
-                                      /*               $sendlog = $this->getSendTaskLogByMsgid($Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
-                                                    Db::startTrans();
-                                                    try {
-                                                        if (empty($send_log)) {
-                                                            Db::table('yx_user_send_task_log')->insert([
-                                                                'task_no'     => $mesage['task_no'],
-                                                                'mobile'      => $mesage['mobile'],
-                                                                'msgid'       => $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'],
-                                                                'send_status' => 2,
-                                                                'status_message' => $Msg_Content['Stat'],
-                                                                'create_time' => time(),
-                                                                'send_time' => $Msg_Content['Done_time'],
-                                                            ]);
-
-                                                        } else {
-                                                            Db::table('yx_user_send_task_log')->where('id', $sendlog['id'])->update(['status_message' => $Msg_Content['Stat'],'send_time' => $Msg_Content['Done_time']]);
-                                                        }
-                                                        Db::commit();
-                                                    } catch (\Exception $e) {
-                                                        Db::rollback();
-                                                        return ['code' => '3009']; //修改失败
-                                                    } */
+                                     
                                                 }
                                                 print_r($Msg_Content);
                                                 // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
@@ -501,7 +369,7 @@ class CmppSantiMarketing2 extends Pzlife {
                                 // if ($i > 1) {
                                 //     die;
                                 // }
-                                usleep(3000);
+                                usleep(10);
                                
                                 $i++;
                             }
@@ -515,7 +383,8 @@ class CmppSantiMarketing2 extends Pzlife {
                                 $i    = 0;
                             }
                             if ($time > 1) {
-                                sleep($time); //等待时间，进行下一次操作
+                                // ceil(10000/$security_master);
+                                usleep(10); //等待时间，进行下一次操作
                             }
                             continue;
                         } else { //单条短信
@@ -581,19 +450,7 @@ class CmppSantiMarketing2 extends Pzlife {
                             $Command_Id = 0x00000004; // 短信发送
                             // $Sequence_Id = $i;
                             $time = 0;
-                            // Db::startTrans();
-                            // try {
-                            //     Db::table('yx_user_send_code_task')->update(['send_status' => 2])->where('id',$send['id']);
-                            //     // 提交事务
-                            //     Db::commit();
-                            // } catch (\Exception $e) {
-                            //     // 回滚事务
-                            //     // exception($e);
-                            //     // die;
-                            //     Db::rollback();
-
-                            // }
-
+                           
                         }
                         if ($i > $security_master) {
                             $time = 1;
@@ -638,32 +495,32 @@ class CmppSantiMarketing2 extends Pzlife {
                                 // print_r($body) ;
                                 switch ($body['Status']) {
                                 case 0:
-                                    echo "通道连接通过" . "\n";
+                                    // echo "通道连接通过" . "\n";
                                     break;
                                 case 1:
-                                    echo "消息结构错" . "\n";
+                                    // echo "消息结构错" . "\n";
                                     $error_msg = "消息结构错";
                                     break;
                                 case 2:
-                                    echo "非法源地址" . "\n";
+                                    // echo "非法源地址" . "\n";
                                     $error_msg = "非法源地址";
                                     break;
                                 case 3:
-                                    echo "认证错误" . "\n";
+                                    // echo "认证错误" . "\n";
                                     $error_msg = "认证错误";
                                     break;
                                 case 4:
-                                    echo "版本错误" . "\n";
+                                    // echo "版本错误" . "\n";
                                     $error_msg = "版本错误";
                                     break;
                                 default:
-                                    echo "其他错误" . "\n";
+                                    // echo "其他错误" . "\n";
                                     $error_msg = "其他错误";
                                     break;
                                 }
                                 //通道断口处理
                                 if ($body['Status'] != 0) {
-                                   
+                                    echo $error_msg . "\n";
                                     // die;
                                 }
                             } else if ($head['Command_Id'] == 0x80000004) {
@@ -679,62 +536,50 @@ class CmppSantiMarketing2 extends Pzlife {
                                 }
                                 switch ($body['Result']) {
                                 case 0:
-                                    echo "发送成功" . "\n";
+                                    // echo "发送成功" . "\n";
                                     break;
                                 case 1:
-                                    echo "消息结构错" . "\n";
+                                    // echo "消息结构错" . "\n";
                                     $error_msg = "消息结构错";
                                     break;
                                 case 2:
-                                    echo "命令字错" . "\n";
+                                    // echo "命令字错" . "\n";
                                     $error_msg = "命令字错";
                                     break;
                                 case 3:
-                                    echo "消息序号重复" . "\n";
+                                    // echo "消息序号重复" . "\n";
                                     $error_msg = "消息序号重复";
                                     break;
                                 case 4:
-                                    echo "消息长度错" . "\n";
+                                    // echo "消息长度错" . "\n";
                                     $error_msg = "消息长度错";
                                     break;
                                 case 5:
-                                    echo "资费代码错" . "\n";
+                                    // echo "资费代码错" . "\n";
                                     $error_msg = "资费代码错";
                                     break;
                                 case 6:
-                                    echo "超过最大信息长" . "\n";
+                                    // echo "超过最大信息长" . "\n";
                                     $error_msg = "超过最大信息长";
                                     break;
                                 case 7:
-                                    echo "业务代码错" . "\n";
+                                    // echo "业务代码错" . "\n";
                                     $error_msg = "业务代码错";
                                     break;
                                 case 8:
-                                    echo "流量控制错" . "\n";
+                                    // echo "流量控制错" . "\n";
                                     $error_msg = "业务代码错";
                                     break;
                                 default:
-                                    echo "其他错误" . "\n";
+                                    // echo "其他错误" . "\n";
                                     $error_msg = "其他错误";
                                     break;
                                 }
                                 if ($body['Result'] != 0) { //消息发送失败
                                     echo "发送失败" . "\n";
-                                    $error_msg = "其他错误";
-                                } else {
-                                    // Db::startTrans();
-                                    // try {
-                                    //     Db::table('yx_user_send_code_task')->update(['send_status' => 2])->where('id',$send['id']);
-                                    //     // 提交事务
-                                    //     Db::commit();
-                                    // } catch (\Exception $e) {
-                                    //     // 回滚事务
-                                    //     // exception($e);
-                                    //     // die;
-                                    //     Db::rollback();
-
-                                    // }
-                                }
+                                    // $error_msg = "其他错误";
+                                    echo $error_msg."\n";
+                                } 
                             } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                                 $Result = 0;
                                 // print_r($head['Total_Length']);
@@ -767,6 +612,7 @@ class CmppSantiMarketing2 extends Pzlife {
                                 // socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                             } else if ($head['Command_Id'] == 0x00000008) {
                                 echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                                
                             } else if ($head['Command_Id'] == 0x80000008) {
                                 echo "激活测试应答" . "\n"; //激活测试,无消息体结构
                             } else {
@@ -793,11 +639,12 @@ class CmppSantiMarketing2 extends Pzlife {
                     $Sequence_Id = 1;
                 }
                 // sleep($time); //等待时间，进行下一次操作
-                if ($time > 1) {
-                    sleep($time); //等待时间，进行下一次操作
-                }else{
-                    usleep(3000); //等待时间，进行下一次操作
-                }
+                // if ($time > 1) {
+                //     sleep($time); //等待时间，进行下一次操作
+                // }else{
+                //     usleep(3000); //等待时间，进行下一次操作
+                // }
+                usleep(10); //等待时间，进行下一次操作
             } while (true);
 
         }
