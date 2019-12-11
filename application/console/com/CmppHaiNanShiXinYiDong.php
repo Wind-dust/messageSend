@@ -34,7 +34,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
      
     }
 
-    public function SantiMarketing($content) {
+    public function Send($content) {
         // $this->clientSocketInit();
         $redis = Phpredis::getConn();
         // $a_time = 0;
@@ -65,7 +65,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         // $send = $redis->rPush($redisMessageCodeSend,"15555555555:12:【品质生活】祝您生活愉快");
 
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15201926171',
+            'mobile'      => '15821193682',
             'mar_task_id' => '',
             'content'     => '【冰雪传奇】尊敬的测评师：您账户已激活Vip5成功，赠GM号至尊礼包。领：http://uee.me/cF4vv。退订回T',
         ]));
