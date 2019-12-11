@@ -79,7 +79,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                 try
                 {
     
-                    echo $i . "\n";
+                    echo $Sequence_Id . "\n";
                     $time                = 0;
                     $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
                     $Timestamp           = date('mdHis');
