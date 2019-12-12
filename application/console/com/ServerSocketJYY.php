@@ -346,7 +346,7 @@ class ServerSocketJYY extends Pzlife {
                                     $deliver_num1       = substr($deliver_timestring, 0, 8);
                                     $deliver_num2       = substr($deliver_timestring, 8) . $this->combination($i);
                                     $deliver_bodyData   = pack("N", $deliver_num1) . pack("N", $deliver_num2);
-                                    $deliver_bodyData .= pack('a21', $deliver['Src_Id']);
+                                    $deliver_bodyData .= pack('a21', '');
                                     $deliver_bodyData .= pack('a10', $Service_Id);
                                     $deliver_bodyData .= pack('C', 0);
                                     $deliver_bodyData .= pack('C', 0);
