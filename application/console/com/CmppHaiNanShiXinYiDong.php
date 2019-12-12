@@ -311,6 +311,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                         } else {//没有号码发送时 发送连接请求
                             $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                             $Command_Id  = 0x00000008; //保持连接
+                            sleep(15);
                         }
                     }
                     $Total_Length = strlen($bodyData) + 12;
