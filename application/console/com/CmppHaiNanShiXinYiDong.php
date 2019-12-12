@@ -46,11 +46,11 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         // $redisMessageCodeDeliver    = 'index:meassage:code:deliver:' . $content; //行业通知MsgId
         $redisMessageCodeDeliver = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
 
-        // $send = $redis->rPush($redisMessageCodeSend, json_encode([
-        //     'mobile'      => '15201926171',
-        //     'mar_task_id' => '',
-        //     'content'     => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
-        // ]));
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15201926171',
+            'mar_task_id' => '',
+            'content'     => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
+        ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $contdata = $this->content($content);
 
@@ -311,6 +311,8 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                             $Total_Length = strlen($bodyData) + 12;
                             $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                             socket_write($socket, $headData . $bodyData, $Total_Length);
+                            
+                             $send_status = 2;
                         } else {//没有号码发送时 发送连接请求
                             // $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                             $Command_Id  = 0x00000008; //保持连接
@@ -321,7 +323,6 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                         }
                     }
                     
-                    $send_status = 2;
                     $headData = socket_read($socket, 12);
                     if ($headData != false) {
                         $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
@@ -449,6 +450,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                 }
                 //捕获异常
                  catch (Exception $e) {
+                     exception($e);
                      if ($send_status == 1) {
                         $redis->push($redisMessageCodeSend,$redisMessageCodeSend);
                         $redis->hset($redisMessageCodeSequenceId,$Sequence_Id);
