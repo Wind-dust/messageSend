@@ -192,7 +192,7 @@ class ServerSocketJYY extends Pzlife {
                                         $message = mb_convert_encoding($message, 'UTF-8', $encode);
                                     }
                                }elseif ($body['Msg_Fmt'] == 8){
-                                    $message = mb_convert_encoding($message,'UTF-8','UCS2');
+                                    $message = mb_convert_encoding($message,'UTF-8','UCS-2');
                                }
 
                                $sendData = [
