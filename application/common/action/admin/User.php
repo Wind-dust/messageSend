@@ -43,6 +43,7 @@ class User extends CommonIndex {
     }
 
     public function seetingUser($uid, $user_status, $reservation_service, $free_trial) {
+        $data = [];
         if ($user_status) {
             $data['user_status'] = $user_status;
         }
@@ -52,10 +53,12 @@ class User extends CommonIndex {
         if ($reservation_service) {
             $data['free_trial'] = $free_trial;
         }
-        printf($data);die;
+        
         Db::startTrans();
         try {
-            DbUser::updateUser($data, $uid);
+            if (!empty($data)) {
+                DbUser::updateUser($data, $uid);
+            }
             Db::commit();
             return ['code' => '200'];
         } catch (\Exception $e) {
