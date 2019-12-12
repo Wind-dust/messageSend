@@ -242,6 +242,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                                 // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
                                                 $mesage                = json_decode($mesage, true);
                                                 $mesage['Stat']        = $Msg_Content['Stat'];
+                                                $mesage['Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
                                                 $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
                                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));

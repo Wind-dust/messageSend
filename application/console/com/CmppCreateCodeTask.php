@@ -99,8 +99,8 @@ class CmppCreateCodeTask extends Pzlife {
                                     'mar_task_id' => $task_id,
                                     'content'     => $send['message'],
                                     'uid'         => $send['uid'],
-                                    'send_msgid'  => $send['send_msgid'],
-                                    'Submit_time' => $send['Submit_time'],
+                                    'msgid'  => $send['send_msgid'],
+                                    'send_time' => $send['Submit_time'],
                                 ];
                                 $has = Db::query("SELECT id FROM yx_user_send_code_task_log WHERE `task_no` = '" . $send_code_task['task_no'] . "' AND `mobile` = '" . $send['mobile'] . "' ");
                                 // echo $i."\n";
@@ -293,6 +293,7 @@ class CmppCreateCodeTask extends Pzlife {
         }
         exit("success");
     }
+    
 
     //免审任务客户
     public function MisumiTaskSend() {
@@ -586,6 +587,44 @@ class CmppCreateCodeTask extends Pzlife {
                 Db::startTrans();
                 try {
                     Db::table('yx_user_send_task_log')->where('id', $has_log[0]['id'])->update(['send_time' => $send_log['send_time'], 'status_message' => $send_log['status_message'], 'real_message' => $send_log['status_message'],'send_status'=> $send_log['send_status']]);
+                    Db::commit();
+                } catch (\Exception $e) {
+                    $redis->rPush('index:meassage:marketing:sendtask',$send_log);
+                    exception($e);
+                    Db::rollback();
+                }
+            }else{
+                $redis->rpush($redisMessageCodeSend,json_encode($send_log));
+            }
+
+        }
+    }
+
+    public function getCmppChannelSendLog($content){
+        $redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        // $redisMessageCodeSend = 'index:meassage:code:new:deliver:'.$content; //验证码发送任务rediskey
+        $redisMessageCodeSend = 'index:meassage:code:new:deliver:'.$content; //验证码发送任务rediskey
+        // $redis->rpush($redisMessageCodeSend,json_encode([
+        //     'task_no' => 'mar19120515365354528991',
+        //     'uid' => '39',
+        //     'mobile' => '13597523000',
+        //     'status_message' => 'UNDELIV',
+        //     'send_status' => '4',
+        //     'send_time' => '1575533160',
+        // ]));
+        while (true) {
+            $send_log = $redis->lpop($redisMessageCodeSend);
+            if (empty($send_log)) {
+                exit("send_log is null");
+            }
+            $send_log = json_decode($send_log,true);
+            $has_log = Db::query("SELECT `id`,`msgid` FROM yx_user_send_code_task_log WHERE `mobile` = ".$send_log['mobile']." AND `task_no` = '".$send_log['task_no']."'" );
+            // print_r($has_log);die;
+            if ($has_log) {
+                Db::startTrans();
+                try {
+                    Db::table('yx_user_send_code_task_log')->where('id', $has_log[0]['id'])->update(['send_time' => $send_log['send_time'], 'status_message' => $send_log['status_message'], 'real_message' => $send_log['status_message'],'send_status'=> $send_log['send_status']]);
                     Db::commit();
                 } catch (\Exception $e) {
                     $redis->rPush('index:meassage:marketing:sendtask',$send_log);
