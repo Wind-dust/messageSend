@@ -63,7 +63,7 @@ class CmppCreateCodeTask extends Pzlife {
                         $send_code_task['free_trial'] = 1;
                     }
                     //营销任务
-                    $task_id = Db::table('yx_user_send_task')->insertGetId($send_code_task);
+                    $task_id = Db::table('yx_user_send_code_task')->insertGetId($send_code_task);
                     //扣除余额
                     $new_num_balance = $userEquities['num_balance'] - 1;
                     Db::table('yx_user_equities')->where('id', $userEquities['id'])->update(['num_balance' => $new_num_balance]);
@@ -76,13 +76,16 @@ class CmppCreateCodeTask extends Pzlife {
 
                             $newres = array_shift($res);
                             if ($newres) {
-                                if ($newres['source'] == 2) { //米加联通营销
-                                    $channel_id = 8;
-                                } else if ($newres['source'] == 1) { //蓝鲸
-                                    $channel_id = 9;
+                                // if ($newres['source'] == 2) { //米加联通营销
+                                //     $channel_id = 8;
+                                // } else if ($newres['source'] == 1) { //蓝鲸
+                                //     $channel_id = 9;
 
-                                } else if ($newres['source' == 3]) { //米加电信营销
-                                    $channel_id = 7;
+                                // } else if ($newres['source' == 3]) { //米加电信营销
+                                //     $channel_id = 7;
+                                // }
+                                if ($send['uid'] == 45) {
+                                    $channel_id = 14;
                                 }
                                 $send_log = [
                                     'task_no'     => $send_code_task['task_no'],
@@ -99,7 +102,7 @@ class CmppCreateCodeTask extends Pzlife {
                                     'send_msgid'  => $send['send_msgid'],
                                     'Submit_time' => $send['Submit_time'],
                                 ];
-                                $has = Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $send_code_task['task_no'] . "' AND `mobile` = '" . $send['mobile'] . "' ");
+                                $has = Db::query("SELECT id FROM yx_user_send_code_task_log WHERE `task_no` = '" . $send_code_task['task_no'] . "' AND `mobile` = '" . $send['mobile'] . "' ");
                                 // echo $i."\n";
                                 if (!$has) {
 
