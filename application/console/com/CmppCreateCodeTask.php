@@ -618,46 +618,46 @@ class CmppCreateCodeTask extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // $redisMessageCodeSend = 'index:meassage:code:new:deliver:'.$content; //验证码发送任务rediskey
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:' . $content; //验证码发送任务rediskey
-        $redis->rpush($redisMessageCodeSend,json_encode([
-            'mar_task_id' => '1',
-            'uid' => '45',
-            'Msg_Id' => '12648757921059827739',
-            'content' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
-            'mobile' => '18339998120',
-            'Stat' => 'MK:1008',
-            'Done_time' => '1912121543',
-            'Done_time' => '1912121543',
-        ]));
-        $redis->rpush($redisMessageCodeSend,json_encode([
-            'mar_task_id' => '2',
-            'uid' => '45',
-            'Msg_Id' => '12648757921059827739',
-            'content' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
-            'mobile' => '18339998120',
-            'Stat' => 'MK:1008',
-            'Done_time' => '1912121543',
-            'Done_time' => '1912121543',
-        ]));
-        $redis->rpush($redisMessageCodeSend,json_encode([
-            'mar_task_id' => '1',
-            'uid' => '45',
-            'Msg_Id' => '12648757921059827739',
-            'content' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
-            'mobile' => '18339998120',
-            'Stat' => 'MK:1008',
-            'Done_time' => '1912121543',
-            'Done_time' => '1912121543',
-        ]));
-        $redis->rpush($redisMessageCodeSend,json_encode([
-            'mar_task_id' => '4',
-            'uid' => '45',
-            'Msg_Id' => '12648757921059827739',
-            'content' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
-            'mobile' => '18339998120',
-            'Stat' => 'MK:1008',
-            'Done_time' => '1912121543',
-            'Done_time' => '1912121543',
-        ]));
+        // $redis->rpush($redisMessageCodeSend,json_encode([
+        //     'mar_task_id' => '1',
+        //     'uid' => '45',
+        //     'Msg_Id' => '12648757921059827739',
+        //     'content' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
+        //     'mobile' => '18339998120',
+        //     'Stat' => 'MK:1008',
+        //     'Done_time' => '1912121543',
+        //     'Done_time' => '1912121543',
+        // ]));
+        // $redis->rpush($redisMessageCodeSend,json_encode([
+        //     'mar_task_id' => '2',
+        //     'uid' => '45',
+        //     'Msg_Id' => '12648757921059827739',
+        //     'content' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
+        //     'mobile' => '18339998120',
+        //     'Stat' => 'MK:1008',
+        //     'Done_time' => '1912121543',
+        //     'Done_time' => '1912121543',
+        // ]));
+        // $redis->rpush($redisMessageCodeSend,json_encode([
+        //     'mar_task_id' => '1',
+        //     'uid' => '45',
+        //     'Msg_Id' => '12648757921059827739',
+        //     'content' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
+        //     'mobile' => '18339998120',
+        //     'Stat' => 'MK:1008',
+        //     'Done_time' => '1912121543',
+        //     'Done_time' => '1912121543',
+        // ]));
+        // $redis->rpush($redisMessageCodeSend,json_encode([
+        //     'mar_task_id' => '4',
+        //     'uid' => '45',
+        //     'Msg_Id' => '12648757921059827739',
+        //     'content' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
+        //     'mobile' => '18339998120',
+        //     'Stat' => 'MK:1008',
+        //     'Done_time' => '1912121543',
+        //     'Done_time' => '1912121543',
+        // ]));
         while (true) {
             $send_log = $redis->lpop($redisMessageCodeSend);
             if (empty($send_log)) {
