@@ -425,7 +425,7 @@ class ServerSocketJYY extends Pzlife {
             // 'host'          => "47.103.200.251", //服务商ip
             // 'host'          => "127.0.0.1", //服务商ip
             'host'          => "0.0.0.0", //服务商ip
-            'port'          => "7890", //短连接端口号   17890长连接端口号
+            'port'          => "7891", //短连接端口号   17890长连接端口号
             'Source_Addr'   => "101102", //企业id  企业代码
             'Shared_secret' => 'Jyy123456', //网关登录密码
             'Service_Id'    => "",
