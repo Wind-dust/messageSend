@@ -628,6 +628,36 @@ class CmppCreateCodeTask extends Pzlife {
             'Done_time' => '1912121543',
             'Done_time' => '1912121543',
         ]));
+        $redis->rpush($redisMessageCodeSend,json_encode([
+            'mar_task_id' => '2',
+            'uid' => '45',
+            'Msg_Id' => '12648757921059827739',
+            'content' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
+            'mobile' => '18339998120',
+            'Stat' => 'MK:1008',
+            'Done_time' => '1912121543',
+            'Done_time' => '1912121543',
+        ]));
+        $redis->rpush($redisMessageCodeSend,json_encode([
+            'mar_task_id' => '1',
+            'uid' => '45',
+            'Msg_Id' => '12648757921059827739',
+            'content' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
+            'mobile' => '18339998120',
+            'Stat' => 'MK:1008',
+            'Done_time' => '1912121543',
+            'Done_time' => '1912121543',
+        ]));
+        $redis->rpush($redisMessageCodeSend,json_encode([
+            'mar_task_id' => '4',
+            'uid' => '45',
+            'Msg_Id' => '12648757921059827739',
+            'content' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
+            'mobile' => '18339998120',
+            'Stat' => 'MK:1008',
+            'Done_time' => '1912121543',
+            'Done_time' => '1912121543',
+        ]));
         while (true) {
             $send_log = $redis->lpop($redisMessageCodeSend);
             if (empty($send_log)) {
@@ -636,9 +666,9 @@ class CmppCreateCodeTask extends Pzlife {
             }
             $send_log = json_decode($send_log, true);
             $task =  Db::query("SELECT `task_no` FROM yx_user_send_code_task WHERE `id` = '" . $send_log['mar_task_id']."'");
-            // if (empty($task)) {
-            //     continue;
-            // }
+            if (empty($task)) {
+                continue;
+            }
             $has_log  = Db::query("SELECT `id`,`uid`,`msgid`,`create_time` FROM yx_user_send_code_task_log WHERE `mobile` = " . $send_log['mobile'] . " AND `task_no` = '" . $task[0]['task_no'] . "'");
             // print_r("SELECT `id`,`uid`,`msgid`,`create_time` FROM yx_user_send_code_task_log WHERE `mobile` = " . $send_log['mobile'] . " AND `task_no` = '" . $task[0]['task_no'] . "'");die;
             if ($has_log) {
