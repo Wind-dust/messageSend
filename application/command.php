@@ -38,4 +38,5 @@ return [
     'cmppmijialiantongmarketing'       => $commandPath . 'CmppMiJiaLianTongMarketing',
     'cmpplanjingmarketing'             => $commandPath . 'CmppLanJingMarketing',
     'serversocketshuhe'                => $commandPath . 'ServerSocketShuHe',
+    'ServerSocketjyy'                => $commandPath . 'ServerSocketJYY',
 ];
