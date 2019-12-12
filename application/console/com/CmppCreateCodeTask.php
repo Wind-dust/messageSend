@@ -14,16 +14,16 @@ class CmppCreateCodeTask extends Pzlife {
         $redis                    = Phpredis::getConn();
         $redisMessageCodeSend     = 'index:meassage:code:send'; //
         $redisMessageCodeSendReal = 'index:meassage:code:send:realtask'; //验证码发送真实任务rediskey CMPP接口 营销
-        $redis->rpush($redisMessageCodeSendReal,json_encode([
-            'mobile' => 18339998120,
-            'message' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
-            'Src_Id' => '',
-            'send_msgid' => [
-                1576127228031159,
-            ],
-            'uid' => 45,
-            'Submit_time' => 1212130708,
-        ]));
+        // $redis->rpush($redisMessageCodeSendReal,json_encode([
+        //     'mobile' => 15201926171,
+        //     'message' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
+        //     'Src_Id' => '',
+        //     'send_msgid' => [
+        //         1576127228031159,
+        //     ],
+        //     'uid' => 45,
+        //     'Submit_time' => 1212130708,
+        // ]));
         while (true) {
             $SendText = $redis->lPop($redisMessageCodeSendReal);
             if (empty($SendText)) {
