@@ -159,6 +159,8 @@ class ServerSocketJYY extends Pzlife {
                                    continue;
                                }
                            } */
+                           
+                           print_r($body);
                            if ($body['Pk_total'] > 1) { //长短信
 
                                //DestUsr_tl接收用户数量
@@ -205,7 +207,6 @@ class ServerSocketJYY extends Pzlife {
                                }
                                // die;
                            } else {
-                               // print_r($body);die;
                                $Dest_terminal_Id = 21 * $body['DestUsr_tl']; //接收用户数量
                                $c_length         = $Dest_terminal_Id + 1;
 
