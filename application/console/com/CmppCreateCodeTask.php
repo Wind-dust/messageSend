@@ -14,20 +14,29 @@ class CmppCreateCodeTask extends Pzlife {
         $redis                    = Phpredis::getConn();
         $redisMessageCodeSend     = 'index:meassage:code:send:task'; //
         $redisMessageCodeSendReal = 'index:meassage:code:send:realtask'; //验证码发送真实任务rediskey CMPP接口 营销
+        $redis->rpush($redisMessageCodeSendReal,json_encode([
+            'mobile' => 18339998120,
+            'message' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
+            'Src_Id' => '',
+            'send_msgid' => [
+                1576127228031159,
+            ],
+            'uid' => 45,
+            'Submit_time' => 1212130708,
+        ]));
         while (true) {
             $SendText = $redis->lPop($redisMessageCodeSendReal);
             if (empty($SendText)) {
-                break;
+                exit('send_task is_null');
             }
             // $send = explode(':', $SendText);
             $send = json_decode($SendText, true);
             // $user = $this->getUserInfo($send[0]);
-            // print_r($send);die;
             $user = $this->getUserInfo($send['uid']);
             if (empty($user) || $user['user_status'] == 1) {
                 break;
             }
-            $userEquities = $this->getUserEquities($send['uid'], 5);
+            $userEquities = $this->getUserEquities($send['uid'], 9);
             if (empty($userEquities)) {
                 break;
             }
@@ -45,16 +54,17 @@ class CmppCreateCodeTask extends Pzlife {
 
             $send_code_task['send_msg_id']    = join(',', $send['send_msgid']);
             $send_code_task['uid']            = $send['uid'];
-            $send_code_task['task_content']   = $send['message'];
+            $send_code_task['task_content']   = trim($send['message']);
             $send_code_task['submit_time']    = $send['Submit_time'];
             $send_code_task['create_time']    = time();
             $send_code_task['mobile_content'] = $send['mobile'];
             $send_code_task['send_num']       = 1;
-            $send_code_task['send_length']    = mb_strlen($send['message']);
+            $send_code_task['send_length']    = mb_strlen(trim($send['message']));
             // $sendData['uid']          = 1;
             // $sendData['Submit_time']  = date('YMDHM', time());
             //免审用户
             // print_r($send_code_task);die;
+                        // print_r($user);die;
             if ($user['free_trial'] == 2) {
                 Db::startTrans();
                 try {
@@ -67,7 +77,7 @@ class CmppCreateCodeTask extends Pzlife {
                     //扣除余额
                     $new_num_balance = $userEquities['num_balance'] - 1;
                     Db::table('yx_user_equities')->where('id', $userEquities['id'])->update(['num_balance' => $new_num_balance]);
-                    if ($send['uid'] == '45') { //单独客户单条任务直接处理有余额直接推送发送通道，没有则只提交任务，通过审核后才能发送
+                    if ($send['uid'] == 45) { //单独客户单条任务直接处理有余额直接推送发送通道，没有则只提交任务，通过审核后才能发送
 
                         if (checkMobile($send['mobile'])) {
                             $prefix = substr(trim($send['mobile']), 0, 7);
@@ -91,6 +101,7 @@ class CmppCreateCodeTask extends Pzlife {
                                     'task_no'     => $send_code_task['task_no'],
                                     'uid'         => $send['uid'],
                                     'mobile'      => $send['mobile'],
+                                    'task_content'      => $send['message'],
                                     'send_status' => 2,
                                     'create_time' => time(),
                                 ];
@@ -105,18 +116,19 @@ class CmppCreateCodeTask extends Pzlife {
                                 $has = Db::query("SELECT id FROM yx_user_send_code_task_log WHERE `task_no` = '" . $send_code_task['task_no'] . "' AND `mobile` = '" . $send['mobile'] . "' ");
                                 // echo $i."\n";
                                 if (!$has) {
-
-                                    Db::table('yx_user_send_task_log')->insert($send_log);
+                                    Db::table('yx_user_send_code_task')->where('id',$task_id)->update(['channel_id' => $channel_id]);
+                                    Db::table('yx_user_send_code_task_log')->insert($send_log);
+                                    // print_r( Db::table('yx_user_send_task_log')->insert($send_log));
                                     $res = $redis->rpush($redisMessageCodeSend . ":" . $channel_id, json_encode($sendmessage)); //
                                 }
 
+                                Db::commit();
                             }
                         }
                     } else {
                         $redis->rPush('index:meassage:marketing:sendtask', $task_id);
 
                     }
-                    Db::commit();
 
                 } catch (\Exception $e) {
                     $redis->rPush($redisMessageCodeSendReal, $SendText);
@@ -127,12 +139,13 @@ class CmppCreateCodeTask extends Pzlife {
                 Db::startTrans();
                 try {
                     $send_code_task['free_trial'] = 1;
-                    $task_id                      = Db::table('yx_user_send_task')->insertGetId($send_code_task);
+                    $task_id                      = Db::table('yx_user_send_code_task')->insertGetId($send_code_task);
                     //扣除余额
                     $new_num_balance = $userEquities['num_balance'] - 1;
                     Db::table('yx_user_equities')->where('id', $userEquities['id'])->update(['num_balance' => $new_num_balance]);
                     Db::commit();
                 } catch (\Exception $e) {
+                    exception($e);
                     Db::rollback();
                 }
             }
@@ -153,6 +166,7 @@ class CmppCreateCodeTask extends Pzlife {
     private function getUserEquities($uid, $business_id) {
 
         $userEquities = Db::query("SELECT `id`,`num_balance` FROM yx_user_equities WHERE  `delete_time` = 0 AND `uid` = " . $uid . " AND `business_id` = " . $business_id);
+        // print_r("SELECT `id`,`num_balance` FROM yx_user_equities WHERE  `delete_time` = 0 AND `uid` = " . $uid . " AND `business_id` = " . $business_id);
         if (!$userEquities) {
             return [];
         }
