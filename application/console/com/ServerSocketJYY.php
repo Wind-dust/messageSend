@@ -354,35 +354,36 @@ class ServerSocketJYY extends Pzlife {
                                     $deliver_bodyData .= pack('a21', $deliver['mobile']);
                                     $deliver_bodyData .= pack('C', 1);
                                     if (isset($deliver['send_msgid'])) {
-                                        foreach ($deliver['send_msgid'] as $key => $value) {
+                                        $send1 = substr($deliver['send_msgid'],0,8);
+                                        $send2 = substr($deliver['send_msgid'],8,8);
+                                        $deliver_Msg_Content = '';
+                                        $deliver_Msg_Content = pack("N", $send1).pack("N", $send2);
+                                        $deliver_Msg_Content .= pack("a7", $deliver['Stat']);
+                                        $deliver_Msg_Content .= pack("a10", $deliver['Submit_time']);
+                                        $deliver_Msg_Content .= pack("a10", $deliver['Done_time']);
+                                        $deliver_Msg_Content .= pack("a21", $deliver['mobile']);
+                                        $deliver_Msg_Content .= pack("N", '');
+                                        $deliver_Msg_Content_len = strlen($deliver_Msg_Content);
+                                        $deliver_bodyData .= pack("C", $deliver_Msg_Content_len);
+                                        $deliver_bodyData .= pack("a" . $deliver_Msg_Content_len, $deliver_Msg_Content);
+                                        $deliver_bodyData .= pack("a8", '');
+                                        $Total_Length = 0;
+                                        $new_headData = '';
+                                        $Total_Length = strlen($deliver_bodyData) + 12;
+
+                                        $new_headData = pack("NNN", $Total_Length, 0x00000005, $Sequence_Id);
+                                        // socket_write($socket, $headData . $bodyData, $Total_Length);
+
+                                        // print_r($back_Command_Id);
+                                        // 向socket_accept的套接流写入信息，也就是回馈信息给socket_bind()所绑定的主机客户端
+                                        // echo $new_headData . $new_bodyData."\n";
+                                        // echo $back_Command_Id."\n";
+                                        socket_write($accept_resource, $new_headData . $deliver_bodyData, $Total_Length);
+                                        // foreach ($deliver['send_msgid'] as $key => $value) {
                                             // print_r(substr($value,8,8));
-                                            $send1 = substr($value,0,8);
-                                            $send2 = substr($value,8,8);
-                                            $deliver_Msg_Content = '';
-                                            $deliver_Msg_Content = pack("N", $send1).pack("N", $send2);
-                                            $deliver_Msg_Content .= pack("a7", $deliver['Stat']);
-                                            $deliver_Msg_Content .= pack("a10", $deliver['Submit_time']);
-                                            $deliver_Msg_Content .= pack("a10", $deliver['Done_time']);
-                                            $deliver_Msg_Content .= pack("a21", $deliver['mobile']);
-                                            $deliver_Msg_Content .= pack("N", '');
-                                            $deliver_Msg_Content_len = strlen($deliver_Msg_Content);
-                                            $deliver_bodyData .= pack("C", $deliver_Msg_Content_len);
-                                            $deliver_bodyData .= pack("a" . $deliver_Msg_Content_len, $deliver_Msg_Content);
-                                            $deliver_bodyData .= pack("a8", '');
-                                            $Total_Length = 0;
-                                            $new_headData = '';
-                                            $Total_Length = strlen($deliver_bodyData) + 12;
-
-                                            $new_headData = pack("NNN", $Total_Length, 0x00000005, $Sequence_Id);
-                                            // socket_write($socket, $headData . $bodyData, $Total_Length);
-
-                                            // print_r($back_Command_Id);
-                                            // 向socket_accept的套接流写入信息，也就是回馈信息给socket_bind()所绑定的主机客户端
-                                            // echo $new_headData . $new_bodyData."\n";
-                                            // echo $back_Command_Id."\n";
-                                            socket_write($accept_resource, $new_headData . $deliver_bodyData, $Total_Length);
+                                           
                                             // unset($deliver_Msg_Content);
-                                        }
+                                        // }
                                     }
                                 }
                                 // die;

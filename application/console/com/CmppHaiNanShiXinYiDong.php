@@ -244,7 +244,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                                 // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
                                                 $mesage                = json_decode($mesage, true);
                                                 $mesage['Stat']        = $Msg_Content['Stat'];
-                                                $mesage['Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
+                                                // $mesage['Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
                                                 $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
                                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
@@ -411,13 +411,13 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                             $contentlen = $head['Total_Length'] - 65 - 12;
                             $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
                             $Msg_Content = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/", $body['Msg_Content']);
-                            print_r($Msg_Content);
+                            
                             $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                             if ($mesage) {
                                 $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                                 // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
                                 $mesage                = json_decode($mesage, true);
-                                $mesage['GetWay_Msg_Id']        = strval($Msg_Content['Msg_Id1']) . strval($Msg_Content['Msg_Id2']);
+                                // $mesage['Msg_Id']        = strval($Msg_Content['Msg_Id1']) . strval($Msg_Content['Msg_Id2']);
                                 $mesage['Stat']        = $Msg_Content['Stat'];
                                 $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
@@ -452,7 +452,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                 }
                 //捕获异常
                  catch (Exception $e) {
-                     exception($e);
+                    //  exception($e);
                      if ($send_status == 1) {
                         $redis->push($redisMessageCodeSend,$redisMessageCodeSend);
                         $redis->hset($redisMessageCodeSequenceId,$Sequence_Id);

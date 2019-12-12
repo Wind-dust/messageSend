@@ -99,6 +99,7 @@ class CmppCreateCodeTask extends Pzlife {
                                 }
                                 $send_log = [
                                     'task_no'     => $send_code_task['task_no'],
+                                    'msgid'       => join(',', $send['send_msgid']),
                                     'uid'         => $send['uid'],
                                     'mobile'      => $send['mobile'],
                                     'task_content'      => $send['message'],
@@ -617,39 +618,52 @@ class CmppCreateCodeTask extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // $redisMessageCodeSend = 'index:meassage:code:new:deliver:'.$content; //验证码发送任务rediskey
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:' . $content; //验证码发送任务rediskey
-        // $redis->rpush($redisMessageCodeSend,json_encode([
-        //     'task_no' => 'mar19120515365354528991',
-        //     'uid' => '39',
-        //     'mobile' => '13597523000',
-        //     'status_message' => 'UNDELIV',
-        //     'send_status' => '4',
-        //     'send_time' => '1575533160',
-        // ]));
+        $redis->rpush($redisMessageCodeSend,json_encode([
+            'mar_task_id' => '22',
+            'uid' => '45',
+            'Msg_Id' => '12648757921059827739',
+            'content' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
+            'mobile' => '18339998120',
+            'Stat' => 'MK:1008',
+            'Done_time' => '1912121543',
+            'Done_time' => '1912121543',
+        ]));
         while (true) {
             $send_log = $redis->lpop($redisMessageCodeSend);
             if (empty($send_log)) {
+                $redis->rpush($redisMessageCodeSend, json_encode($send_log));
                 exit("send_log is null");
             }
             $send_log = json_decode($send_log, true);
-            $has_log  = Db::query("SELECT `id`,`uid`,`msgid`,`create_time` FROM yx_user_send_code_task_log WHERE `mobile` = " . $send_log['mobile'] . " AND `task_no` = '" . $send_log['task_no'] . "'");
-            // print_r($has_log);die;
+            $task =  Db::query("SELECT `task_no` FROM yx_user_send_code_task WHERE `id` = '" . $send_log['mar_task_id']."'");
+            // if (empty($task)) {
+            //     continue;
+            // }
+            $has_log  = Db::query("SELECT `id`,`uid`,`msgid`,`create_time` FROM yx_user_send_code_task_log WHERE `mobile` = " . $send_log['mobile'] . " AND `task_no` = '" . $task[0]['task_no'] . "'");
+            // print_r("SELECT `id`,`uid`,`msgid`,`create_time` FROM yx_user_send_code_task_log WHERE `mobile` = " . $send_log['mobile'] . " AND `task_no` = '" . $task[0]['task_no'] . "'");die;
             if ($has_log) {
+                if ($send_log['Stat'] !=  'DELIVRD') {
+                    $send_status = 4;
+                }else {
+                    $send_status = 3;
+                }
                 Db::startTrans();
                 try {
-                    Db::table('yx_user_send_code_task_log')->where('id', $has_log[0]['id'])->update(['send_time' => $send_log['Done_time'], 'status_message' => $send_log['Stat'], 'real_message' => $send_log['status_message'], 'send_status' => $send_log['send_status']]);
+                    Db::table('yx_user_send_code_task_log')->where('id', $has_log[0]['id'])->update(['send_time' => $send_log['Done_time'], 'status_message' => $send_log['Stat'], 'real_message' => $send_log['Stat'], 'send_status' => $send_status]);
                     Db::commit();
                 } catch (\Exception $e) {
                     $redis->rPush('index:meassage:marketing:sendtask', $send_log);
                     exception($e);
                     Db::rollback();
                 }
-                $send_msgid = explode(',', $has_log['msgid']);
+                $send_msgid = explode(',', $has_log[0]['msgid']);
                 foreach ($send_msgid as $key => $value) {
-                    $redis->rPush('index:meassage:code:cmppdeliver:' . $has_log['uid'], json_encode([
+                    $redis->rPush('index:meassage:code:cmppdeliver:' . $has_log[0]['uid'], json_encode([
                         'Stat'        => $send_log['Stat'],
                         'send_msgid'  => $value,
                         'Done_time'   => $send_log['Done_time'],
-                        'Submit_time' => $has_log['create_time'],
+                        'content'     => $send_log['content'],
+                        'Submit_time' => $has_log[0]['create_time'],
                         'mobile'      => $send_log['mobile'],
                     ]));
                     // if ($value == $send_log['Msg_Id']){
