@@ -222,7 +222,7 @@ class ServerSocketJYY extends Pzlife {
                                if ($body['Msg_Fmt'] == 15) {
                                    $message = mb_convert_encoding($message, 'UTF-8', 'GBK');
                                }elseif ($body['Msg_Fmt'] == 0){//ASCII进制码
-                                    $message = $this->decode($message);
+                                    // $message = $this->decode($message);
                                     // $de_ascii = mb_convert_encoding($de_ascii, 'UTF-8', 'GBK');
                                    
                                     //    $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');

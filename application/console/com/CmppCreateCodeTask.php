@@ -619,7 +619,7 @@ class CmppCreateCodeTask extends Pzlife {
                 exit("send_log is null");
             }
             $send_log = json_decode($send_log,true);
-            $has_log = Db::query("SELECT `id`,`msgid` FROM yx_user_send_code_task_log WHERE `mobile` = ".$send_log['mobile']." AND `task_no` = '".$send_log['task_no']."'" );
+            $has_log = Db::query("SELECT `id`,`uid`,`msgid` FROM yx_user_send_code_task_log WHERE `mobile` = ".$send_log['mobile']." AND `task_no` = '".$send_log['task_no']."'" );
             // print_r($has_log);die;
             if ($has_log) {
                 Db::startTrans();
@@ -630,6 +630,14 @@ class CmppCreateCodeTask extends Pzlife {
                     $redis->rPush('index:meassage:marketing:sendtask',$send_log);
                     exception($e);
                     Db::rollback();
+                }
+                $send_msgid = explode(',',$has_log['msgid']);
+                foreach ($send_msgid as $key => $value) {
+                    if ($value == $send_log['Msg_Id']){
+                        $redis->rPush('index:meassage:code:cmppdeliver:'.$has_log['uid'],json_encode([
+                            'Stat' => 'Stat',
+                        ]));
+                    }
                 }
             }else{
                 $redis->rpush($redisMessageCodeSend,json_encode($send_log));
