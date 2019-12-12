@@ -12,7 +12,7 @@ class CmppCreateCodeTask extends Pzlife {
 
     public function CreateCodeTask() { //CMPP创建单条任务营销
         $redis                    = Phpredis::getConn();
-        $redisMessageCodeSend     = 'index:meassage:code:send:task'; //
+        $redisMessageCodeSend     = 'index:meassage:code:send'; //
         $redisMessageCodeSendReal = 'index:meassage:code:send:realtask'; //验证码发送真实任务rediskey CMPP接口 营销
         $redis->rpush($redisMessageCodeSendReal,json_encode([
             'mobile' => 18339998120,

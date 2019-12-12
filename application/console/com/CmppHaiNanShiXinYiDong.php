@@ -47,9 +47,9 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         $redisMessageCodeDeliver = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
 
         // $send = $redis->rPush($redisMessageCodeSend, json_encode([
-        //     'mobile'      => '15201926171',
+        //     'mobile'      => '18339998120',
         //     'mar_task_id' => '',
-        //     'content'     => '【冰雪传奇】尊敬的测评师：您账户已激活Vip5成功，赠GM号至尊礼包。领：http://uee.me/cF4vv。退订回T',
+        //     'content'     => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
         // ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $contdata = $this->content($content);
