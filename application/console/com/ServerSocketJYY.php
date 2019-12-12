@@ -429,7 +429,7 @@ class ServerSocketJYY extends Pzlife {
             'Source_Addr'   => "101102", //企业id  企业代码
             'Shared_secret' => 'Jyy123456', //网关登录密码
             'Service_Id'    => "",
-            'Dest_Id'       => "", //短信接入码 短信端口号
+            'Dest_Id'       => "10692054963", //短信接入码 短信端口号
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
             'bin_ip'        => ["221.228.217.57"], //客户端绑定IP

@@ -67,7 +67,7 @@ class CmppCreateCodeTask extends Pzlife {
                     //扣除余额
                     $new_num_balance = $userEquities['num_balance'] - 1;
                     Db::table('yx_user_equities')->where('id', $userEquities['id'])->update(['num_balance' => $new_num_balance]);
-                    if ($send['uid'] == '1') { //单独客户单条任务直接处理有余额直接推送发送通道，没有则只提交任务，通过审核后才能发送
+                    if ($send['uid'] == '45') { //单独客户单条任务直接处理有余额直接推送发送通道，没有则只提交任务，通过审核后才能发送
 
                         if (checkMobile($send['mobile'])) {
                             $prefix = substr(trim($send['mobile']), 0, 7);
