@@ -416,7 +416,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                             if ($mesage) {
                                 $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                                 // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
-                                $mesage['GetWay_Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
+                                $mesage['GetWay_Msg_Id']        = strval($Msg_Content['Msg_Id1']) . strval($Msg_Content['Msg_Id2']);
                                 $mesage                = json_decode($mesage, true);
                                 $mesage['Stat']        = $Msg_Content['Stat'];
                                 $mesage['Submit_time'] = $Msg_Content['Submit_time'];
