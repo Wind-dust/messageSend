@@ -619,7 +619,7 @@ class CmppCreateCodeTask extends Pzlife {
         // $redisMessageCodeSend = 'index:meassage:code:new:deliver:'.$content; //验证码发送任务rediskey
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:' . $content; //验证码发送任务rediskey
         $redis->rpush($redisMessageCodeSend,json_encode([
-            'mar_task_id' => '22',
+            'mar_task_id' => '1',
             'uid' => '45',
             'Msg_Id' => '12648757921059827739',
             'content' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
@@ -660,7 +660,7 @@ class CmppCreateCodeTask extends Pzlife {
                 foreach ($send_msgid as $key => $value) {
                     $redis->rPush('index:meassage:code:cmppdeliver:' . $has_log[0]['uid'], json_encode([
                         'Stat'        => $send_log['Stat'],
-                        'send_msgid'  => $value,
+                        'send_msgid'  => [$value],
                         'Done_time'   => $send_log['Done_time'],
                         'content'     => $send_log['content'],
                         'Submit_time' => $has_log[0]['create_time'],
