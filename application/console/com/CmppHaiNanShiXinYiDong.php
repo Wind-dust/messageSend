@@ -308,15 +308,18 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                 $i    = 0;
                             }
                             $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
+                            $Total_Length = strlen($bodyData) + 12;
+                            $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                            socket_write($socket, $headData . $bodyData, $Total_Length);
                         } else {//没有号码发送时 发送连接请求
                             // $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                             $Command_Id  = 0x00000008; //保持连接
+                            $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                            socket_write($socket, $headData , $Total_Length);
                             sleep(15);
                         }
                     }
-                    $Total_Length = strlen($bodyData) + 12;
-                    $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                    socket_write($socket, $headData . $bodyData, $Total_Length);
+                    
                     $send_status = 2;
                     $headData = socket_read($socket, 12);
                     if ($headData != false) {
