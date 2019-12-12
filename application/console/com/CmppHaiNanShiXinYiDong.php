@@ -84,7 +84,9 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                     if ($i == 1) {
                         $bodyData   = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                         $Command_Id = 0x00000001;
-
+                        $Total_Length = strlen($bodyData) + 12;
+                        $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                        socket_write($socket, $headData . $bodyData, $Total_Length);
                     } else {
                         //当有号码发送需求时 进行提交
                         /* redis 读取需要发送的数据 */
