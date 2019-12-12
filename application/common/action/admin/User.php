@@ -52,9 +52,7 @@ class User extends CommonIndex {
         if ($reservation_service) {
             $data['free_trial'] = $free_trial;
         }
-        printf($user_status);
-        printf($reservation_service);
-        printf($free_trial);die;
+        printf($data);die;
         Db::startTrans();
         try {
             DbUser::updateUser($data, $uid);
