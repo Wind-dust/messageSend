@@ -106,7 +106,7 @@ class OfficeExcel extends Pzlife {
     //XLSX表格手机号处理运营商及归属地方法
     public function OfficeExcelReadXlsx() {
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-        $objReader = PHPExcel_IOFactory::createReader('Excel2007');
+/*         $objReader = PHPExcel_IOFactory::createReader('Excel2007');
         // print_r(realpath("../"). "\yt_area_mobile.csv");die;
 
         $objPHPExcel = $objReader->load(realpath("./") . "\金卡.xlsx");
@@ -132,7 +132,41 @@ class OfficeExcel extends Pzlife {
                 $value['city'] = '';
             }
             $data[] = $value;
-        }
+        } */
+        $path = realpath("./") . "/191111.txt";
+            $file = fopen($path, "r");
+            $data=array();
+            $i=0;
+            // $phone = '';
+            // $j     = '';
+            while(! feof($file))
+            {
+                $cellVal= trim(fgets($file));
+                // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+                // // print_r($phone);die;
+                // $j = ',';
+                if (!empty($cellVal)) {
+                    $prefix  = substr(trim($cellVal), 0, 7);
+                    $res     = Db::query("SELECT `source_name`,`province`,`city` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                    $newres  = array_shift($res);
+                    $value = [];
+                    $value['mobile'] = trim($cellVal);
+                    if ($newres) {
+                        $value['source_name'] = $newres['source_name'];
+                        $value['province'] = $newres['province'];
+                        $value['city'] = $newres['city'];
+                    }else{
+                        $value['source_name'] = '未知';
+                        $value['province'] = '';
+                        $value['city'] = '';
+                    }
+                    $data[] = $value;
+                    $i++;
+                    // print_r($data);die;
+                }
+                
+            }
+            fclose($file);
 
         $objExcel = new PHPExcel();
         // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
