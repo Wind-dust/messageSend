@@ -308,7 +308,7 @@ class OfficeExcel extends Pzlife {
         $putdata = [];
         
         $date = date('Y-m-d H:i:s', time());
-        $time1 = strtotime('2019/11/29 11:10:48'); 
+        $time1 = strtotime('2019/12/14 10:26:08'); 
         $i = 0;
         // $CellList = array(
         //     array('title', '标题'),
@@ -320,18 +320,63 @@ class OfficeExcel extends Pzlife {
         //     array('status_info', '状态描述'),
         // );
         
+        $send_status = [
+            1 => ceil(0.01*count($data1)),//空号0.01比例
+            2 => ceil(0.1*count($data1)),//失败0.1比例
+            3 => count($data1),//总号码
+            // 3 => 50000,
+            // 4 => 200000,
+        ];
+        // $send_status_count = [
+        //     1 => 'MBBLACK',
+        //     2 => 'REJECTD',
+        //     3 => 'DB:0141',
+        //     4 => 'DELIVRD'
+        // ];
+        $send_status_count = [
+            1 => 'MK:0001',//失败
+            2 => 'DB:0141',//空号
+            3 => 'DELIVRD',
+            // 3 => 'DB:0141',
+            // 4 => 'DELIVRD'
+        ];
+        $send_info_count = [
+            1 => '空号',//失败
+            2 => '失败',//空号
+            3 => '下发成功',
+            // 3 => 'DB:0141',
+            // 4 => 'DELIVRD'
+        ];
+        asort($send_status);
+        $max = max($send_status);
         $j = 1;
         $n = 0;
+        // echo  count($data1);die;
         foreach ($data1 as $key => $value) {
             $new_value = [];
+            if (strpos($value,'111111') || strpos($value,'222222') || strpos($value,'333333') || strpos($value,'444444') || strpos($value,'555555') || strpos($value, '666666') || strpos($value,'777777') || strpos($value,'888888') || strpos($value,'999999')) {
+                $status = '空号';
+                $status_info = 'MK:0001';
+            }else{
+                $num     = mt_rand(1, $max);
+                $sendNum = 0;
+                foreach ($send_status as $sk => $sl) {
+                    if ($num <= $sl) {
+                        $sendNum = $sk;
+                        break;
+                    }
+                }
+                $status = $send_status_count[$sendNum];
+                $status_info = $send_info_count[$sendNum];
+            }
             $new_value = [
-                'title' => '丝家臻探李佳琦邀您探寻丝芙兰',
+                'title' => '丝芙兰邀您参与迷你圣诞彩妆秀',
                 'model' => '1551',
                 'mobile' => $value,
-                'content' =>'【丝芙兰】亲爱的会员，“丝家臻探”李佳琦邀您一起追踪肌密、解密小众调香，探寻丝芙兰独家臻品宝藏！即刻前往门店，丝家美妆单品，等你抱回家！更多详情请戳 https://dwz.cn/OLCHBCE1 回T退订。',
-                'status' =>'发送成功',
+                'content' =>'【丝芙兰】圣诞氛围日渐浓烈，妆容跟不上节奏怎么行？！丝芙兰邀您参与迷你圣诞彩妆秀，不仅能Get最IN圣诞妆容，还有机会赢得丝芙兰独家限量圣诞好礼，价值129元-229元正装产品，限量60份，赠完即止，实际获赠礼品以活动当天门店为准。活动时间：2019年12月14日至15日，14:00-14:30；19:00-19:30。即刻前往指定门店 https://dwz.cn/xe7VYg01  焕亮璀璨圣诞。回T退订。',
+                'status' =>$status,
                 'send_time' =>date("Y/m/d H:i:s",$time1+ceil($n/1000)),
-                'status_info' => '1000:彩信下载成功'
+                'status_info' => $status_info
             ];
             $putdata[] = $new_value;
            $i++;
@@ -351,7 +396,7 @@ class OfficeExcel extends Pzlife {
                 $objActSheet = $objExcel->getActiveSheet();
         
                 //设置当前活动sheet的名称
-                $objActSheet->setTitle("金卡1");
+                $objActSheet->setTitle("sheet1");
                 $CellList = array(
                     array('title', '标题'),
                     array('model', '模板账户'),
