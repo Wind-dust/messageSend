@@ -354,7 +354,7 @@ class OfficeExcel extends Pzlife {
         // echo  count($data1);die;
         foreach ($data1 as $key => $value) {
             $new_value = [];
-            if (strpos($value,'111111') || strpos($value,'222222') || strpos($value,'333333') || strpos($value,'444444') || strpos($value,'555555') || strpos($value, '666666') || strpos($value,'777777') || strpos($value,'888888') || strpos($value,'999999')) {
+            if (strpos($value,'00000') || strpos($value,'111111') || strpos($value,'222222') || strpos($value,'333333') || strpos($value,'444444') || strpos($value,'555555') || strpos($value, '666666') || strpos($value,'777777') || strpos($value,'888888') || strpos($value,'999999')) {
                 $status = '空号';
                 $status_info = 'MK:0001';
             }else{

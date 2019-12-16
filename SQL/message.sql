@@ -589,8 +589,29 @@ INSERT INTO `messagesend`.`yx_user_send_task`(`id`, `task_no`, `uid`, `task_name
 INSERT INTO `messagesend`.`yx_user_send_task`(`id`, `task_no`, `uid`, `task_name`, `task_content`, `mobile_content`, `source`, `send_num`, `free_trial`, `send_status`, `update_time`, `create_time`, `delete_time`) VALUES (22, 'mar19111300485096510647', 4, '8126客户专属定制电脑包大派送！10月25-31日,代理品牌商品或智选MRO品（对象商品详见官网首页搜索栏下黑色导航栏）买满2次，金额不限即可参与活动,成功参与即获1个！转发无效。详询021-63917080转8667,回T退订【米思米】', '8126客户专属定制电脑包大派送！10月25-31日,代理品牌商品或智选MRO品（对象商品详见官网首页搜索栏下黑色导航栏）买满2次，金额不限即可参与活动,成功参与即获1个！转发无效。详询021-63917080转8667,回T退订【米思米】', '15605272801', '52.80.226.19', 1, 1, 1, 0, 0, 0);
 INSERT INTO `messagesend`.`yx_user_send_task`(`id`, `task_no`, `uid`, `task_name`, `task_content`, `mobile_content`, `source`, `send_num`, `free_trial`, `send_status`, `update_time`, `create_time`, `delete_time`) VALUES (23, 'mar19111300485030720522', 4, '8198客户专属定制电脑包大派送！10月25-31日,代理品牌商品或智选MRO品（对象商品详见官网首页搜索栏下黑色导航栏）买满2次，金额不限即可参与活动,成功参与即获1个！转发无效。详询021-63917080转8667,回T退订【米思米】', '8198客户专属定制电脑包大派送！10月25-31日,代理品牌商品或智选MRO品（对象商品详见官网首页搜索栏下黑色导航栏）买满2次，金额不限即可参与活动,成功参与即获1个！转发无效。详询021-63917080转8667,回T退订【米思米】', '13918735681', '52.80.226.19', 1, 1, 1, 0, 0, 0);
 
-
-
+DROP TABLE IF EXISTS `yx_user_send_game_task`;
+CREATE TABLE `yx_user_send_game_task` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `task_no` char(23) NOT NULL DEFAULT '' COMMENT '任务编号',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `task_name` varchar(255) NOT NULL DEFAULT '' COMMENT '任务名称',
+  `task_content` text COMMENT '发送内容',
+  `mobile_content` mediumtext CHARACTER SET utf32 COMMENT '发送号码集合',
+  `send_msg_id` varchar(255) DEFAULT '' COMMENT '请求回复msgid',
+  `source` varchar(50) NOT NULL DEFAULT '' COMMENT '请求源（ip）',
+  `real_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '实际数量',
+  `send_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发送数量',
+  `send_length` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '短信长度',
+  `free_trial` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '1:需要审核;2:审核通过;3:审核不通过',
+  `channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '通道ID',
+  `send_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '1：待发送,2:发送中;3:成功;4:失败',
+  `submit_time` varchar(50) DEFAULT '' COMMENT 'CMPP接口提交时间',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `uid` (`uid`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='行业任务表';
 
 DROP TABLE IF EXISTS `yx_user_send_code_task`;
 CREATE TABLE `yx_user_send_code_task` (
