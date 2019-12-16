@@ -523,26 +523,9 @@ class Administrator extends AdminController {
         return $result;
     }
 
-    /**
-     * @api              {post} / 获取行业任务
-     * @apiDescription   getUserSendCodeTask
-     * @apiGroup         admin_Administrator
-     * @apiName          getUserSendCodeTask
-     * @apiParam (入参) {String} cms_con_id
-     * @apiParam (入参) {String} id 任务id
-     * @apiParam (入参) {String} page 页码 默认1
-     * @apiParam (入参) {String} pageNum 条数 默认10
-     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 
-     * @apiSampleRequest /admin/administrator/getUserSendCodeTask
-     * @return array
-     * @author rzc
-     */
-    public function getUserSendCodeTask(){
-        
-    }
 
     /**
-     * @api              {post} / 分配任务通道
+     * @api              {post} / 分配营销任务通道
      * @apiDescription   distributionChannel
      * @apiGroup         admin_Administrator
      * @apiName          distributionChannel
@@ -580,6 +563,117 @@ class Administrator extends AdminController {
             return ['code' => '3003'];
         }
         $result =  $this->app->administrator->distributionChannel($effective_id, intval($channel_id), intval($business_id));
+        return $result;
+    }
+
+    
+    /**
+     * @api              {post} / 获取行业任务
+     * @apiDescription   getUserSendCodeTask
+     * @apiGroup         admin_Administrator
+     * @apiName          getUserSendCodeTask
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 任务id
+     * @apiParam (入参) {String} page 页码 默认1
+     * @apiParam (入参) {String} pageNum 条数 默认10
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 
+     * @apiSampleRequest /admin/administrator/getUserSendCodeTask
+     * @return array
+     * @author rzc
+     */
+    public function getUserSendCodeTask(){
+        $id       = trim($this->request->post('id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        $result = $this->app->administrator->getUserSendCodeTask($page, $pageNum, $id);
+        return $result;
+    }
+
+       /**
+     * @api              {post} / 行业任务审核
+     * @apiDescription   auditUserSendCodeTask
+     * @apiGroup         admin_Administrator
+     * @apiName          auditUserSendCodeTask
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
+     * @apiParam (入参) {String} free_trial 审核状态 2:审核通过;3:审核不通过
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:有效任务ID为空或者不能超过100个 
+     * @apiSampleRequest /admin/administrator/auditUserSendCodeTask
+     * @return array
+     * @author rzc
+     */
+    public function auditUserSendCodeTask(){
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id = trim($this->request->post('id'));
+        $free_trial = trim($this->request->post('free_trial'));
+        $ids = explode(',',$id);
+        $effective_id = [];
+        foreach ($ids as $key => $value) {
+            if (empty($value) || intval($value) < 1 || !is_numeric($value)) {
+                continue;
+            }
+            $effective_id[] = $value;
+        }
+        if (count($effective_id) > 100 || count($effective_id) < 1) {
+            return ['code' => '3001'];
+        }
+        
+        if (!in_array($free_trial,[2,3])) {
+            return ['code' => '3003'];
+        }
+        $result =  $this->app->administrator->auditUserSendCodeTask($effective_id, $free_trial);
+        return $result;
+    }
+
+
+      /**
+     * @api              {post} / 分配行业任务通道
+     * @apiDescription   distributionCodeTaskChannel
+     * @apiGroup         admin_Administrator
+     * @apiName          distributionCodeTaskChannel
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
+     * @apiParam (入参) {String} business_id 业务服务id
+     * @apiParam (入参) {String} channel_id 通道ID
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:channel_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /admin/administrator/distributionCodeTaskChannel
+     * @return array
+     * @author rzc
+     */
+    public function distributionCodeTaskChannel(){
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id = trim($this->request->post('id'));
+        $channel_id = trim($this->request->post('channel_id'));
+        $business_id = trim($this->request->post('business_id'));
+       
+        $ids = explode(',',$id);
+        $effective_id = [];
+        foreach ($ids as $key => $value) {
+            if (empty($value) || intval($value) < 1 || !is_numeric($value)) {
+                continue;
+            }
+            $effective_id[] = $value;
+        }
+        if (empty($channel_id) || intval($channel_id) < 1 || !is_numeric($channel_id)) {
+            return ['code' => '3002'];
+        }
+        if (empty($business_id) || intval($business_id) < 1 || !is_numeric($business_id)) {
+            return ['code' => '3003'];
+        }
+        $result =  $this->app->administrator->distributionCodeTaskChannel($effective_id, intval($channel_id), intval($business_id));
         return $result;
     }
 }
