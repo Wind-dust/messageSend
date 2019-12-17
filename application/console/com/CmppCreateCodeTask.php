@@ -811,12 +811,12 @@ class CmppCreateCodeTask extends Pzlife {
         // $redisMessageCodeSend = 'index:meassage:code:new:deliver:'.$content; //验证码发送任务rediskey
         $redisMessageCodeSend = 'index:meassage:code:deliver:' . $content; //验证码发送任务rediskey
         // $redis->rpush($redisMessageCodeSend,json_encode([
-        //     'task_no' => 'mar19120515365354528991',
+        //     'task_no' => 'mar19121715380521728861',
         //     'uid' => '39',
-        //     'mobile' => '13597523000',
-        //     'status_message' => 'UNDELIV',
+        //     'mobile' => '13972267571',
+        //     'status_message' => 'DELIVRD',
         //     'send_status' => '4',
-        //     'send_time' => '1575533160',
+        //     'send_time' => '1576574460',
         // ]));
         while (true) {
             $send_log = $redis->lpop($redisMessageCodeSend);
