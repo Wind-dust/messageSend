@@ -406,7 +406,7 @@ return $result;
         Db::startTrans();
         try {
             DbAdministrator::modifyBalance($user_equities['id'], $send_num, 'dec');
-            $bId = DbAdministrator::addUserSendCodeTask($data); //添加后的商品id
+            $bId = DbAdministrator::addUserSendCodeTask($data); //
             Db::commit();
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
@@ -427,6 +427,7 @@ return $result;
 
     }
 
+    //回执接口
     public function marketingReceive($appid, $appkey, $page, $pagenum) {
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {

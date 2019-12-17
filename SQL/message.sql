@@ -611,7 +611,7 @@ CREATE TABLE `yx_user_send_game_task` (
   `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `uid` (`uid`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='行业任务表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='游戏任务表';
 
 DROP TABLE IF EXISTS `yx_user_send_code_task`;
 CREATE TABLE `yx_user_send_code_task` (
@@ -712,3 +712,29 @@ CREATE TABLE `yx_user_multimedia_message_log` (
   KEY `task_no` (`task_no`,`task_id`) USING BTREE,
   KEY `mobile` (`mobile`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='彩信发送记录表';
+
+ALTER TABLE `messagesend`.`yx_user_send_task` 
+ADD COLUMN `log_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '日志地址' AFTER `source`;
+
+
+ALTER TABLE `messagesend`.`yx_user_multimedia_message` 
+ADD COLUMN `log_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '日志地址' AFTER `source`;
+
+ALTER TABLE `messagesend`.`yx_user_send_game_task` 
+ADD COLUMN `log_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '日志地址' AFTER `source`;
+
+ALTER TABLE `messagesend`.`yx_user_send_code_task` 
+ADD COLUMN `log_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '日志地址' AFTER `source`;
+
+DROP TABLE IF EXISTS `yx_user_cmpp`;
+CREATE TABLE `yx_user_cmpp`  (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `source_addr` char(6) NOT NULL DEFAULT '' COMMENT '企业代码，Cmpp 接口文档中的Msg_src',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `task_no` (`task_no`,`task_id`) USING BTREE,
+  KEY `mobile` (`mobile`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='用户CMPP账户信息';

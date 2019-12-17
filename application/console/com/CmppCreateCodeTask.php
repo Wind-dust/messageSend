@@ -14,16 +14,17 @@ class CmppCreateCodeTask extends Pzlife {
         $redis                    = Phpredis::getConn();
         $redisMessageCodeSend     = 'index:meassage:code:send'; //
         $redisMessageCodeSendReal = 'index:meassage:code:send:realtask'; //验证码发送真实任务rediskey CMPP接口 营销
-        // $redis->rpush($redisMessageCodeSendReal,json_encode([
-        //     'mobile' => 15201926171,
-        //     'message' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
-        //     'Src_Id' => '',
-        //     'send_msgid' => [
-        //         1576127228031159,
-        //     ],
-        //     'uid' => 45,
-        //     'Submit_time' => 1212130708,
-        // ]));
+        $redis->rpush($redisMessageCodeSendReal,json_encode([
+            'mobile' => 15201926171,
+            'message' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
+            'Src_Id' => '',//扩展码
+            'Source_Addr' =>'101102',
+            'send_msgid' => [
+                1576127228031159,
+            ],
+            // 'uid' => 45,
+            'Submit_time' => 1212130708,
+        ]));
         while (true) {
             $SendText = $redis->lPop($redisMessageCodeSendReal);
             if (empty($SendText)) {
@@ -36,7 +37,7 @@ class CmppCreateCodeTask extends Pzlife {
             if (empty($user) || $user['user_status'] == 1) {
                 break;
             }
-            $userEquities = $this->getUserEquities($send['uid'], 9);
+            $userEquities = $this->getUserEquities($send['uid'], 9);//游戏业务
             if (empty($userEquities)) {
                 break;
             }
@@ -222,6 +223,16 @@ class CmppCreateCodeTask extends Pzlife {
 
     private function getSendTask($id) {
         $getSendTaskSql = sprintf("select * from yx_user_send_task where delete_time=0 and id = %d", $id);
+        $sendTask = Db::query($getSendTaskSql);
+        // print_r($sendTask);die;
+        if (!$sendTask) {
+            return [];
+        }
+        return $sendTask[0];
+    }
+
+    private function getSendCodeTask($id) {
+        $getSendTaskSql = sprintf("select * from yx_user_send_code_task where delete_time=0 and id = %d", $id);
         $sendTask = Db::query($getSendTaskSql);
         // print_r($sendTask);die;
         if (!$sendTask) {
@@ -461,7 +472,7 @@ class CmppCreateCodeTask extends Pzlife {
             
             Db::startTrans();
             try {
-            Db::table('yx_user_send_task')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3]);
+            Db::table('yx_user_send_task')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3, 'log_path' => realpath("").'/tasklog/marketing/'.$sendTask['task_no'].".txt"]);
             Db::commit();
                 foreach ($push_messages as $key => $value) {
                     // $send_channelid = $value['channel_id'];
@@ -663,7 +674,7 @@ class CmppCreateCodeTask extends Pzlife {
            
             Db::startTrans();
             try {
-                Db::table('yx_user_multimedia_message')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3]);
+                Db::table('yx_user_multimedia_message')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3, 'log_path' => realpath("").'/tasklog/marketing/'.$sendTask['task_no'].".txt"]);
                 Db::commit();
                 foreach ($push_messages as $key => $value) {
                     $send_channelid = $value['channel_id'];
@@ -697,9 +708,10 @@ class CmppCreateCodeTask extends Pzlife {
                 $send        = $this->redis->lpop('index:meassage:business:sendtask');
                 // $send = 15745;
     
-                $sendTask = $this->getMultimediaSendTask($send);
+                $sendTask = $this->getSendCodeTask($send);
                 if (empty($sendTask)) {
-                    exit('taskId_is_null');
+                    // exit('taskId_is_null');
+                    continue;
                 }
                 $mobilesend = [];
                 // print_r($sendTask);die;
@@ -733,6 +745,7 @@ class CmppCreateCodeTask extends Pzlife {
                         $prefix = substr(trim($mobilesend[$i]), 0, 7);
                         $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                         $newres = array_shift($res);
+                        //通道组分配
                         // if ($newres) {
                         //     if ($newres['source'] == 2) { //米加联通营销
                         //         $channel_id = 8;
@@ -771,7 +784,7 @@ class CmppCreateCodeTask extends Pzlife {
                
                 Db::startTrans();
                 try {
-                    Db::table('yx_user_send_code_task')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3]);
+                    Db::table('yx_user_send_code_task')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3, 'log_path' => realpath("").'/tasklog/marketing/'.$sendTask['task_no'].".txt"]);
                     Db::commit();
                     foreach ($push_messages as $key => $value) {
                         $send_channelid = $value['channel_id'];
@@ -1070,6 +1083,41 @@ Db::rollback();
             // die;
         }
 
+    }
+
+    public function logReader(){
+        $id = 15751;
+        // while (true) {
+           
+        // }
+        print_r(date('Y-m-d H:i:s',time()));
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $task = Db::query("SELECT `log_path` from yx_user_send_task where delete_time=0 and id =".$id);
+        // print_r("SELECT `log_path` from yx_user_send_task where delete_time=0 and id =".$id);die;
+        if (empty($task)) {
+            // continue;
+        }
+        $log_path = $task[0]['log_path'];
+        $file = fopen($log_path, "r");
+        $data=array();
+        $i=0;
+        // $phone = '';
+        // $j     = '';
+        while(! feof($file))
+        {
+            $cellVal= trim(fgets($file));
+            $log = json_decode($cellVal);
+            // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+            // // print_r($phone);die;
+            // $j = ',';
+            
+                // print_r($data);die;
+            $data[] = $log;
+            
+        }
+        fclose($file);
+        print_r(date('Y-m-d H:i:s',time()));
+        echo count($data);
     }
 
 }

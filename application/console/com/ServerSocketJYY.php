@@ -199,6 +199,8 @@ class ServerSocketJYY extends Pzlife {
                                    'mobile'  => trim($mobile),
                                    'message' => $message,
                                    'Src_Id' => $body['Src_Id'],//拓展码
+                                   'Service_Id' => $body['Service_Id'],//业务服务ID（企业代码）
+                                   'Source_Addr' => $body['Source_Addr'],//业务服务ID（企业代码）
                                ];
                                // print_r($sendData);
                                $residue = $head['Total_Length'] - 12 - 117 - $c_length - $Msg_length;
