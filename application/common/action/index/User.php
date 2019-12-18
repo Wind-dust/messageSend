@@ -659,12 +659,14 @@ class User extends CommonIndex {
             // $phone = '';
             // $j     = '';
             while(! feof($file))
-            {
+            {   
                 $cellVal= trim(fgets($file));
                 $log = json_decode($cellVal,true);
+                $log['create_time'] = date('Y-m-d H:i:s',ceil(strtotime($task['update_time']) + $i/1000));
                 if (isset($log['mobile'])) {
                     $data[] = $log;
                 }
+                $i++;
             }
             fclose($file);
             $total = count($data);

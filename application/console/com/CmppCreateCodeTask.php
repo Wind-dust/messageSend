@@ -804,7 +804,7 @@ class CmppCreateCodeTask extends Pzlife {
                 // exit("SUCCESS");
             }
         }
-
+       
     public function getChannelSendLog($content) {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
