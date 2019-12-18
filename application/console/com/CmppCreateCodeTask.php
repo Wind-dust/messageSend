@@ -394,7 +394,7 @@ class CmppCreateCodeTask extends Pzlife {
         while (true) {
             $real_length = 1;
             $send        = $this->redis->lpop('index:meassage:marketing:sendtask');
-            // $send = 15751;
+            // $send = 15753;
 
             $sendTask = $this->getSendTask($send);
             // print_r($sendTask);die;
@@ -445,7 +445,7 @@ class CmppCreateCodeTask extends Pzlife {
                         'content'     => $sendTask['task_content'],
                         'mobile'      => $mobilesend[$i],
                         'send_status' => 2,
-                        'create_time' => time()-198757,
+                        'create_time' => time(),
                     ];
                     $sendmessage = [
                         'mobile'      => $mobilesend[$i],
@@ -818,29 +818,158 @@ class CmppCreateCodeTask extends Pzlife {
         //     'send_status' => '4',
         //     'send_time' => '1576574460',
         // ]));
+        $task_status = [];
+        $task_mobile = [];
+        $i = 0;
+        // $send = json_encode([
+        //     'task_no' => 'mar19121715380521728861',
+        //     'uid' => '39',
+        //     'mobile' => '15897679999',
+        //     'status_message' => 'DELIVRD',
+        //     'send_status' => '4',
+        //     'send_time' => '1576574460',
+        // ]);
+        // print_r($send_log);die;
         while (true) {
-            $send_log = $redis->lpop($redisMessageCodeSend);
-            if (empty($send_log)) {
-                exit("send_log is null");
-            }
-            $send_log = json_decode($send_log, true);
-            $has_log  = Db::query("SELECT `id` FROM yx_user_send_task_log WHERE `mobile` = " . $send_log['mobile'] . " AND `task_no` = '" . $send_log['task_no'] . "'");
-            // print_r($has_log);die;
-            if ($has_log) {
-                Db::startTrans();
-                try {
-                    Db::table('yx_user_send_task_log')->where('id', $has_log[0]['id'])->update(['send_time' => $send_log['send_time'], 'status_message' => $send_log['status_message'], 'real_message' => $send_log['status_message'], 'send_status' => $send_log['send_status']]);
-                    Db::commit();
-                } catch (\Exception $e) {
-                    $redis->rPush('index:meassage:marketing:sendtask', $send_log);
-                    exception($e);
-                    Db::rollback();
+            $send = $redis->lpop($redisMessageCodeSend);
+           
+            if (!empty($send)) {
+                // exit("send_log is null");
+                
+                $send_log = json_decode($send, true);
+                // print_r($send_log);
+                $task_status[$send_log['task_no']][$send_log['mobile']] = $send_log;
+                $task_mobile[$send_log['task_no']][]= $send_log['mobile'];
+                $i ++;
+                if ($i >= 50000) {
+                    foreach ($task_status as $key => $value) {
+                                            // print_r($task_mobile[$key]);die;
+                    $task = Db::query("SELECT `log_path`,`update_time` from yx_user_send_task where delete_time=0 and task_no ='".$key."'");
+                    // print_r("SELECT `log_path` from yx_user_send_task where delete_time=0 and id =".$id);die;
+                    if (empty($task)) {
+                        // continue;
+                    }
+                    $log_path = '';
+                    $log_path = $task[0]['log_path'];
+                    $file = fopen($log_path, "r");
+                    $data=array();
+                    $i=0;
+                    // $phone = '';
+                    // $j     = '';
+                    while(! feof($file))
+                    {
+                        $cellVal= trim(fgets($file));
+                        $log = json_decode($cellVal,true);
+                        // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+                        // // print_r($phone);die;
+                        // $j = ',';
+                        
+                            // print_r($data);die;
+                        if (isset($log['mobile'])) {
+                            if (in_array($log['mobile'],$task_mobile[$key])) {
+                                $log['status_message'] = $value[$log['mobile']]['status_message'];
+                                $log['send_status'] = $value[$log['mobile']]['send_status'];
+                                $log['send_time'] = $value[$log['mobile']]['send_time'];
+                                
+                                //  print_r($log);die;
+                            }
+                            $log['create_time'] = $task[0]['update_time'];
+                        }
+                        $data[] = $log;
+                        
+                    }
+                    fclose($file);
+                    $myfile = fopen($log_path, "w");
+                    for ($i = 0; $i <count($data); $i++){
+                        $txt = json_encode($data[$i])."\n";
+                        fwrite($myfile,$txt);
+                    }
+                    fclose($myfile);
+                    }
+                    $i = 0;
+                    
+                    unset($task_status);
+                    unset($task_mobile);
                 }
-            } else {
-                $redis->rpush($redisMessageCodeSend, json_encode($send_log));
+                
+            }else{
+                if (empty($task_status)) {
+                    exit("send_log is null");
+                }
+               
+                foreach ($task_status as $key => $value) {    //key为任务编号
+                    // print_r($task_mobile[$key]);die;
+                    $task = Db::query("SELECT `log_path`,`update_time` from yx_user_send_task where delete_time=0 and task_no ='".$key."'");
+                    // print_r("SELECT `log_path` from yx_user_send_task where delete_time=0 and id =".$id);die;
+                    if (empty($task)) {
+                        // continue;
+                    }
+                    $log_path = '';
+                    $log_path = $task[0]['log_path'];
+                    $file = fopen($log_path, "r");
+                    $data=array();
+                    $i=0;
+                    // $phone = '';
+                    // $j     = '';
+                    while(! feof($file))
+                    {
+                        $cellVal= trim(fgets($file));
+                        $log = json_decode($cellVal,true);
+                        // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+                        // // print_r($phone);die;
+                        // $j = ',';
+                       
+                        if (isset($log['mobile'])) {
+                            if (in_array($log['mobile'],$task_mobile[$key])) {
+                                $log['status_message'] = $value[$log['mobile']]['status_message'];
+                                $log['send_status'] = $value[$log['mobile']]['send_status'];
+                                $log['send_time'] = $value[$log['mobile']]['send_time'];
+                                //  print_r($log);die;
+                            }
+                            $log['create_time'] = $task[0]['update_time'];
+                        }
+                            // print_r($data);die;
+                        $data[] = $log;
+                        
+                    }
+                    
+                    // print_r($data);die;
+                    fclose($file);
+                    $myfile = fopen($log_path, "w");
+                    for ($i = 0; $i <count($data); $i++){
+                        $txt = json_encode($data[$i])."\n";
+                        fwrite($myfile,$txt);
+                    }
+                    fclose($myfile);
+                    
+                    // print_r($data);die;
+                }
+                $i = 0;
+                
+                unset($task_status);
+                unset($task_mobile);
             }
+            unset($send);
+            // die;
+            // $send_log = json_decode($send_log, true);
+            // $has_log  = Db::query("SELECT `id` FROM yx_user_send_task_log WHERE `mobile` = " . $send_log['mobile'] . " AND `task_no` = '" . $send_log['task_no'] . "'");
+            // print_r($has_log);die;
+            // if ($has_log) {
+            //     Db::startTrans();
+            //     try {
+            //         Db::table('yx_user_send_task_log')->where('id', $has_log[0]['id'])->update(['send_time' => $send_log['send_time'], 'status_message' => $send_log['status_message'], 'real_message' => $send_log['status_message'], 'send_status' => $send_log['send_status']]);
+            //         Db::commit();
+            //     } catch (\Exception $e) {
+            //         $redis->rPush('index:meassage:marketing:sendtask', $send_log);
+            //         exception($e);
+            //         Db::rollback();
+            //     }
+            // } else {
+            //     $redis->rpush($redisMessageCodeSend, json_encode($send_log));
+            // }
 
         }
+        
     }
 
     public function getCmppChannelSendLog($content) {

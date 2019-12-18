@@ -651,9 +651,29 @@ class User extends CommonIndex {
         if (empty($task)) {
             return ['code' => '3001', 'msg' => '该任务不存在'];
         }
-        $task_log = DbAdministrator::getUserSendTaskLog(['task_no' => $task['task_no']],'*',false,'',$offset . ',' . $pageNum);
-        $total = DbAdministrator::countUserSendTaskLog(['task_no' => $task['task_no']]);
-        return ['code' => '200','task' => $task, 'total' => $total, 'task_log' => $task_log];
+        if (!empty($task['log_path'])) {
+            $task_log = [];
+            $file = fopen($task['log_path'], "r");
+            $data=array();
+            $i=0;
+            // $phone = '';
+            // $j     = '';
+            while(! feof($file))
+            {
+                $cellVal= trim(fgets($file));
+                $log = json_decode($cellVal,true);
+                if (isset($log['mobile'])) {
+                    $data[] = $log;
+                }
+            }
+            fclose($file);
+            $total = count($data);
+            $task_log = array_slice($data,$offset,$pageNum);
+        }else{
+            $task_log = DbAdministrator::getUserSendTaskLog(['task_no' => $task['task_no']],'*',false,'',$offset . ',' . $pageNum);
+            $total = DbAdministrator::countUserSendTaskLog(['task_no' => $task['task_no']]);
+        }
+        return ['code' => '200', 'total' => $total, 'task_log' => $task_log];
     }
 
     public function getUserSonAccount($page, $pageNum, $ConId){
