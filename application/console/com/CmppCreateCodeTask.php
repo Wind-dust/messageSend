@@ -1031,7 +1031,7 @@ class CmppCreateCodeTask extends Pzlife {
                 $send_log = json_decode($send_log, true);
 
                 //获取通道属性
-                $sql = "SELECT `task_no` FROM ";
+                $sql = "SELECT `task_no`,`uid` FROM ";
                 if ($channel['business_id'] == 5) { //营销
                     $sql .= " yx_user_send_task ";
                 } elseif ($channel['business_id'] == 6) { // 行业
