@@ -364,8 +364,8 @@ return $result;
         if ($Password != $user['appkey']) {
             return ['code' => '3000'];
         }
-        $prefix = substr($Mobiles, 0, 7);
-        $res    = DbProvinces::getNumberSource(['mobile' => $prefix], 'source,province_id,province', true);
+        // $prefix = substr($Mobiles, 0, 7);
+        // $res    = DbProvinces::getNumberSource(['mobile' => $prefix], 'source,province_id,province', true);
 
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
 
