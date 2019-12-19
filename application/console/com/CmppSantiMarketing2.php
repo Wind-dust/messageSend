@@ -566,11 +566,12 @@ class CmppSantiMarketing2 extends Pzlife {
                 }
                 //捕获异常
                  catch (Exception $e) {
-                    //  exception($e);
+                     
                      if ($send_status == 1) {
                         $redis->push($redisMessageCodeSend,$redisMessageCodeSend);
                         $redis->hset($redisMessageCodeSequenceId,$Sequence_Id);
                      }
+                     exception($e);
                     socket_close($socket);
                     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                     socket_connect($socket, $host, $port);
