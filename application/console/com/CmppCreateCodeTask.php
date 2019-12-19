@@ -1009,7 +1009,7 @@ class CmppCreateCodeTask extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:' . $channel_id; //验证码发送任务rediskey
         $channel              = $this->getChannelinfo($channel_id);
-        $redis->rpush($redisMessageCodeSend, json_encode([
+/*         $redis->rpush($redisMessageCodeSend, json_encode([
             'mobile' => '15201926171',
             'title' => '【鼎业装饰】鼎礼相祝！跨年巨惠！定单送欧派智能晾衣架一套。选欧派产品可秒杀欧派智能马桶999元一个。终极预存大礼，全包预存免基础装修！！！大到超乎您想象！一年只有这一次！电话3236788回T退订',
             'mar_task_id' => '15753',
@@ -1019,7 +1019,7 @@ class CmppCreateCodeTask extends Pzlife {
             'Submit_time' => '1912191500',
             'Done_time' => '1912191501',
         ]));
-
+ */
         if ($channel['channel_type'] == 2) { //cmpp的
             while (true) {
                 $send_log = $redis->lpop($redisMessageCodeSend);
