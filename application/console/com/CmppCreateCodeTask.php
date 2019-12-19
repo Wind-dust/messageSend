@@ -737,7 +737,7 @@ class CmppCreateCodeTask extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:business:sendtask';
-        // $send                      = $this->redis->rPush('index:meassage:business:sendtask', 1);
+        $send                      = $this->redis->rPush('index:meassage:business:sendtask', 5);
         // echo time() -1574906657;die;
         while (true) {
             $real_length = 1;
