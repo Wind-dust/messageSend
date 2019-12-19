@@ -396,11 +396,18 @@ class CmppCreateCodeTask extends Pzlife {
             $real_length = 1;
             $send        = $this->redis->lpop('index:meassage:marketing:sendtask');
             // $send = 15753;
-
+            if (empty($send)) {
+                exit('taskId_is_null');
+            }
+            $real_send = json_decode($send,true);
+            if ($real_send['send_time'] > time()) {
+                $this->redis->rPush('index:meassage:marketing:sendtask',json_encode($real_send));
+                continue;
+            }
             $sendTask = $this->getSendTask($send);
             // print_r($sendTask);die;
             if (empty($sendTask)) {
-                exit('taskId_is_null');
+                exit('task_is_null');
             }
             $mobilesend = [];
             // print_r($sendTask);die;

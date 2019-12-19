@@ -377,7 +377,7 @@ class Administrator extends CommonIndex {
         if (empty($channel)) {
             return ['code' => '3002'];
         }
-        $usertask = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,task_content,free_trial,send_num,channel_id', false);
+        $usertask = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,task_content,free_trial,send_num,channel_id,appointment_time', false);
         if (empty($usertask)) {
             return ['code' => '3001'];
         }
@@ -439,7 +439,8 @@ class Administrator extends CommonIndex {
                 DbAdministrator::editUserSendTask(['free_trial' => $free_trial, 'channel_id' => $channel_id], $value['id']);
             }
             foreach ($real_usertask as $real => $usertask) {
-                $res = $this->redis->rpush("index:meassage:marketing:sendtask",$usertask['id']); 
+                // $res = $this->redis->rpush("index:meassage:marketing:sendtask",$usertask['id']); 
+                $res = $this->redis->rpush("index:meassage:marketing:sendtask",json_encode(['id' => $usertask['id'],'send_time' => $usertask['appointment_time']])); 
             }
            /*  if ($free_trial == 2) {
                 foreach ($real_usertask as $real => $usertask) {

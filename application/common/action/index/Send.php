@@ -331,6 +331,9 @@ return $result;
         $data['send_length']    = mb_strlen($Content);
         $data['free_trial']     = 1;
         $data['task_no']        = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+        if (!empty($Dstime)) {
+            $data['appointment_time'] = strtotime($Dstime);
+        }
 
         Db::startTrans();
         try {
