@@ -155,12 +155,12 @@ class CmppSantiMarketing2 extends Pzlife {
         // $send = $redis->lPop("index:meassage:code:send:1");
         // $send = $redis->rPush($redisMessageCodeSend,"15555555555:12:【品质生活】祝您生活愉快");
 
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15201926171',
-            'title'      => '【鼎业装饰】鼎礼相祝！跨年巨惠！定单送欧派智能晾衣架一套。选欧派产品可秒杀欧派智能马桶999元一个。终极预存大礼，全包预存免基础装修！！！大到超乎您想象！一年只有这一次！电话3236788回T退订',
-            'mar_task_id' => 15753,
-            'content'     => '【鼎业装饰】鼎礼相祝！跨年巨惠！定单送欧派智能晾衣架一套。选欧派产品可秒杀欧派智能马桶999元一个。终极预存大礼，全包预存免基础装修！！！大到超乎您想象！一年只有这一次！电话3236788回T退订',
-        ]));
+        // $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        //     'mobile'      => '15201926171',
+        //     'title'      => '【DAPHNE】亲爱的会员：您的30元优惠券已到账，请前往DaphneFashion公众号-会员尊享-会员中心领取！退订回T',
+        //     'mar_task_id' => 15753,
+        //     'content'     => '【DAPHNE】亲爱的会员：您的30元优惠券已到账，请前往DaphneFashion公众号-会员尊享-会员中心领取！退订回T',
+        // ]));
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
