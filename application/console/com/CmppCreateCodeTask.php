@@ -1026,8 +1026,8 @@ class CmppCreateCodeTask extends Pzlife {
                 if (empty($send_log)) {
                     continue;
                 }
-                $redis->rpush($redisMessageCodeSend, $send_log);
-                print_r($send_log);die;
+                // $redis->rpush($redisMessageCodeSend, $send_log);
+                // print_r($send_log);die;
                 $send_log = json_decode($send_log, true);
 
                 //获取通道属性
@@ -1042,10 +1042,10 @@ class CmppCreateCodeTask extends Pzlife {
                 $sql .= "WHERE `id` = " . $send_log['mar_task_id'];
                 $task = Db::query($sql);
                 if (empty($task)) {
-                    $redis->rpush($redisMessageCodeSend, json_decode($send_log));
+                    $redis->rpush($redisMessageCodeSend, json_encode($send_log));
                     // continue;
                 }
-                $redis->rpush($redisMessageCodeSend, json_decode($send_log));
+                $redis->rpush($redisMessageCodeSend, json_encode($send_log));
                 $request_url = "https://shyuxi.com?";
                 $request_url .= 'task_no=' . $task[0]['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['Submit_time'];
                 print_r($request_url);
