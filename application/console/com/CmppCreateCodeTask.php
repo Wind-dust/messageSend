@@ -1026,6 +1026,7 @@ class CmppCreateCodeTask extends Pzlife {
                 if (empty($send_log)) {
                     continue;
                 }
+                print_r($send_log);die;
                 $send_log = json_decode($send_log, true);
 
                 //获取通道属性
