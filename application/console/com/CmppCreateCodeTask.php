@@ -1023,7 +1023,9 @@ class CmppCreateCodeTask extends Pzlife {
         if ($channel['channel_type'] == 2) { //cmpp的
             while (true) {
                 $send_log = $redis->lpop($redisMessageCodeSend);
-
+                if (empty($send_log)) {
+                    continue;
+                }
                 $send_log = json_decode($send_log, true);
 
                 //获取通道属性
