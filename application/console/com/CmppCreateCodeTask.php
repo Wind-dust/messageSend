@@ -1048,7 +1048,7 @@ class CmppCreateCodeTask extends Pzlife {
                 // $redis->rpush($redisMessageCodeSend, json_encode($send_log));
                 $request_url = "https://shyuxi.com?";
                 $request_url .= 'task_no=' . $task[0]['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['Submit_time'];
-                // print_r($request_url);die;
+                print_r($request_url);
                 if ($task[0]['uid'] == 47) { //推送给美丽田园
                     // https://zhidao.baidu.com/question/412076997.html
                     $request_url = "https://shyuxi.com?";
