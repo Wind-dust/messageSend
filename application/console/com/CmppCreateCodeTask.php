@@ -1056,7 +1056,7 @@ class CmppCreateCodeTask extends Pzlife {
                     sendRequest($request_url);
                 }
 
-                $redis->rpush('index:meassage:code:cms:deliver:', json_decode($send_log));
+                $redis->rpush('index:meassage:code:cms:deliver:', json_encode($send_log));
             }
 
         }
