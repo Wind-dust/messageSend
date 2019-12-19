@@ -384,7 +384,7 @@ class CmppCreateCodeTask extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15753);
+        $send = $this->redis->rPush('index:meassage:marketing:sendtask',15753);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask', 15752);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15740);
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15741);
@@ -465,6 +465,20 @@ class CmppCreateCodeTask extends Pzlife {
                     $txt = json_encode($send_log)."\n";
                     fwrite($myfile,$txt);
                     $push_messages[] = $sendmessage;
+                }else{
+                    $send_log = [
+                        'task_no'     => $sendTask['task_no'],
+                        'uid'         => $sendTask['uid'],
+                        'title'       => $sendTask['task_name'],
+                        'content'     => $sendTask['task_content'],
+                        'mobile'      => $mobilesend[$i],
+                        'send_status' => 4,
+                        'create_time' => time(),
+                        'status_message' => 'DB:0101',//无效号码
+                        'real_message' => 'DB:0101',
+                    ];
+                    $txt = json_encode($send_log)."\n";
+                    fwrite($myfile,$txt);
                 }
 
             }
@@ -669,6 +683,20 @@ class CmppCreateCodeTask extends Pzlife {
                     fwrite($myfile,$txt);
                     // $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
                     $push_messages[] = $sendmessage;
+                }else{
+                    $send_log = [
+                        'task_no'     => $sendTask['task_no'],
+                        'uid'         => $sendTask['uid'],
+                        'title'       => $sendTask['task_name'],
+                        'content'     => $sendTask['task_content'],
+                        'mobile'      => $mobilesend[$i],
+                        'send_status' => 4,
+                        'create_time' => time(),
+                        'status_message' => 'DB:0101',//无效号码
+                        'real_message' => 'DB:0101',
+                    ];
+                    $txt = json_encode($send_log)."\n";
+                    fwrite($myfile,$txt);
                 }
             }
            
@@ -779,6 +807,20 @@ class CmppCreateCodeTask extends Pzlife {
                         fwrite($myfile,$txt);
                         // $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
                         $push_messages[] = $sendmessage;
+                    }else{
+                        $send_log = [
+                            'task_no'     => $sendTask['task_no'],
+                            'uid'         => $sendTask['uid'],
+                            'title'       => $sendTask['task_name'],
+                            'content'     => $sendTask['task_content'],
+                            'mobile'      => $mobilesend[$i],
+                            'send_status' => 4,
+                            'create_time' => time(),
+                            'status_message' => 'DB:0101',//无效号码
+                            'real_message' => 'DB:0101',
+                        ];
+                        $txt = json_encode($send_log)."\n";
+                        fwrite($myfile,$txt);
                     }
                 }
                

@@ -5,7 +5,7 @@
  * 过滤图片路径的http域名
  * @param $image
  * @return mixed
- * @author zyr
+ * @author rzc
  */
 function filtraImage($domain, $image) {
     return str_replace($domain . '/', '', $image);
@@ -15,9 +15,12 @@ function filtraImage($domain, $image) {
  * 验证手机号
  * @param $mobile
  * @return bool
- * @author zyr
+ * @author rzc
  */
 function checkMobile($mobile) {
+    if (strpos($mobile,'00000') || strpos($mobile,'111111') || strpos($mobile,'222222') || strpos($mobile,'333333') || strpos($mobile,'444444') || strpos($mobile,'555555') || strpos($mobile, '666666') || strpos($mobile,'777777') || strpos($mobile,'888888') || strpos($mobile,'999999')) {
+        return false;
+    }
     if (!empty($mobile) && preg_match('/^1[3-9]{1}\d{9}$/', $mobile)) {
         return true;
     }
