@@ -715,7 +715,7 @@ class CmppCreateCodeTask extends Pzlife {
                 foreach ($push_messages as $key => $value) {
                     $send_channelid = $value['channel_id'];
                     unset($value['channel_id']);
-                    $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                    $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
                 }
             } catch (\Exception $e) {
                 $this->redis->rPush('index:meassage:multimediamessage:sendtask', $send);
@@ -840,7 +840,7 @@ class CmppCreateCodeTask extends Pzlife {
                 foreach ($push_messages as $key => $value) {
                     $send_channelid = $value['channel_id'];
                     unset($value['channel_id']);
-                    $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                    $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
                 }
             } catch (\Exception $e) {
                 $this->redis->rPush('index:meassage:business:sendtask', $send);
