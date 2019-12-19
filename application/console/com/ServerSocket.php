@@ -52,7 +52,7 @@ class ServerSocket extends Pzlife {
         $i = 1;
         // $Sequence_Id = 1;
         $time = 0;
-        
+        // $status = 10;
         $accept_resource = socket_accept($socket);
         socket_set_nonblock($accept_resource); //设置非阻塞模式
         do {
@@ -115,12 +115,7 @@ class ServerSocket extends Pzlife {
                             // echo $new_bodyData;die;
                             $Total_Length = strlen($new_bodyData) + 12;
                             $new_headData = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
-                            // socket_write($socket, $headData . $bodyData, $Total_Length);
 
-                            // print_r($back_Command_Id);
-                            // 向socket_accept的套接流写入信息，也就是回馈信息给socket_bind()所绑定的主机客户端
-                            // echo $new_headData . $new_bodyData."\n";
-                            // echo $back_Command_Id."\n";
                             socket_write($accept_resource, $new_headData . $new_bodyData, $Total_Length);
                             // socket_write的作用是向socket_create的套接流写入信息，或者向socket_accept的套接流写入信息
                             if ($status != 0) {
@@ -173,47 +168,49 @@ class ServerSocket extends Pzlife {
                                    continue;
                                }
                            } */
+                           
+                        //    print_r($body);
                            if ($body['Pk_total'] > 1) { //长短信
 
                                //DestUsr_tl接收用户数量
                                $Dest_terminal_Id = 21 * $body['DestUsr_tl']; // Dest_terminal_Id接收短信的 MSISDN 号码
                                $c_length         = $Dest_terminal_Id + 1;
                                $bodyData1        = socket_read($accept_resource, $c_length);
-                            //    print_r($bodyData1);die;
                                $body1            = unpack("a" . $Dest_terminal_Id . "Dest_terminal_Id/CMsg_length", $bodyData1);
 
                                $mobile      = $body1['Dest_terminal_Id'];
                                $Msg_length  = $body1['Msg_length'];
                                $bodyData2   = socket_read($accept_resource, $Msg_length);
-                               print_r($bodyData2);
+                            //    print_r($bodyData2);die;
                                echo "\n";
                                $Msg_Content = unpack("a" . $Msg_length . "Msg_Content", $bodyData2);
                                $Msg_Content['Msg_Content'] = strval($Msg_Content['Msg_Content']);
-                            //    die;
-                               $udh      = unpack('c/c/c/c/c/c', $Msg_Content['Msg_Content']);
-                               $message  = substr($Msg_Content['Msg_Content'], 6, 140);
+                               // print_r($Msg_Content);die;
+                               $udh      = unpack('c/c/c/c/c/c',substr($Msg_Content['Msg_Content'],0, 6));
+                               $message  = substr($Msg_Content['Msg_Content'], 6,140);
                                $sendData = [];
                                if ($body['Msg_Fmt'] == 15) {
-                                //    $message = mb_convert_encoding($message, 'UTF-8', 'GBK');
-                                $message = iconv('GBK','UTF-8',$message);
+                                    $message = mb_convert_encoding($message, 'UTF-8', 'GBK');
+                                //   iconv("UTF-8","gbk//IGNORE",$message);
                                }elseif ($body['Msg_Fmt'] == 0){
                                     $message = $this->decode($message);
                                     // $de_ascii = mb_convert_encoding($de_ascii, 'UTF-8', 'GBK');
                                 
                                     //    $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');
                                     $encode = mb_detect_encoding($message, array('ASCII','GB2312','GBK','UTF-8'));
-                                    print_r($encode);die;
                                     if ($encode !='UTF-8') {
                                         $message = mb_convert_encoding($message, 'UTF-8', $encode);
                                     }
                                }elseif ($body['Msg_Fmt'] == 8){
-                                    $message = mb_convert_encoding($message,'UTF-8','UCS2');
+                                    $message = mb_convert_encoding($message,'UTF-8','UCS-2');
                                }
 
                                $sendData = [
                                    'mobile'  => trim($mobile),
                                    'message' => $message,
                                    'Src_Id' => $body['Src_Id'],//拓展码
+                                   'Service_Id' => trim($body['Service_Id']),//业务服务ID（企业代码）
+                                   'Source_Addr' => trim($body['Msg_src']),//业务服务ID（企业代码）
                                ];
                                // print_r($sendData);
                                $residue = $head['Total_Length'] - 12 - 117 - $c_length - $Msg_length;
@@ -222,39 +219,40 @@ class ServerSocket extends Pzlife {
                                }
                                // die;
                            } else {
-                               // print_r($body);die;
                                $Dest_terminal_Id = 21 * $body['DestUsr_tl']; //接收用户数量
                                $c_length         = $Dest_terminal_Id + 1;
 
                                $bodyData1 = socket_read($accept_resource, $c_length);
                                $body1     = unpack("a" . $Dest_terminal_Id . "Dest_terminal_Id/CMsg_length", $bodyData1);
-
                                $mobile      = $body1['Dest_terminal_Id'];
                                $Msg_length  = $body1['Msg_length'];
                                $bodyData2   = socket_read($accept_resource, $Msg_length);
-                            //    print_r($bodyData2);
+                            //    print_r($bodyData2);die;
+                               echo "\n";
                                $Msg_Content = unpack("a" . $Msg_length . "Msg_Content", $bodyData2);
                                $sendData    = [];
                                $message     = strval($Msg_Content['Msg_Content']);
                                if ($body['Msg_Fmt'] == 15) {
                                    $message = mb_convert_encoding($message, 'UTF-8', 'GBK');
+                                    // iconv("UTF-8","gbk//IGNORE",$message);
                                }elseif ($body['Msg_Fmt'] == 0){//ASCII进制码
-                                    $message = $this->decode($message);
+                                    // $message = $this->decode($message);
                                     // $de_ascii = mb_convert_encoding($de_ascii, 'UTF-8', 'GBK');
                                    
                                     //    $message = mb_convert_encoding($message, 'UTF-8', 'ASCII');
                                     $encode = mb_detect_encoding($message, array('ASCII','GB2312','GBK','UTF-8'));
-                                    // print_r($encode);die;
+                                     // print_r($encode);die;
                                     if ($encode !='UTF-8') {
                                         $message = mb_convert_encoding($message, 'UTF-8', $encode);
                                     }
                                }elseif ($body['Msg_Fmt'] == 8) {//USC2
-                                    $message = mb_convert_encoding($message, 'UTF-8', 'USC2');
+                                    $message = mb_convert_encoding($message, 'UTF-8', 'USC-2');
                                }
                                $sendData = [
                                    'mobile'  => trim($mobile),
                                    'message' => $message,
-                                   'Src_Id' => $body['Src_Id'],//拓展码
+                                   'Src_Id' => trim($body['Src_Id']),//拓展码
+                                   'Source_Addr' => trim($body['Msg_src']),//业务服务ID（企业代码）
                                ];
                                // print_r($sendData);
                                $residue = $head['Total_Length'] - 12 - 117 - $c_length - $Msg_length;
@@ -277,7 +275,7 @@ class ServerSocket extends Pzlife {
                            // $redis->rpush($redisMessageCodeSend,$uid.":".$sendData['mobile'].":".$sendData['message'].":".$num1.$num2.":".$addr); //三体营销通道
                            $sendData['send_msgid'][] = $num1 . $num2;
                            $sendData['uid']          = $uid;
-                           $sendData['Submit_time']  = date('mdHis');
+                           $sendData['Submit_time']  = time();
                            // $redis->rpush($redisMessageCodeSend.":1",json_encode($sendData)); //三体营销通道
                            $has_message = $redis->hget($redisMessageCodeSend . ":1", $head['Sequence_Id']);
                            if ($has_message) {
@@ -304,7 +302,7 @@ class ServerSocket extends Pzlife {
                                }
                                // $redis->hset($redisMessageCodeSend.":1",$head['Sequence_Id'],json_encode($sendData)); //三体营销通道
                            }
-                        //    print_r($sendData);
+                           print_r($sendData);
                            $Total_Length = strlen($new_bodyData) + 12;
                            $new_headData = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
                            // socket_write($socket, $headData . $bodyData, $Total_Length);
@@ -408,7 +406,7 @@ class ServerSocket extends Pzlife {
                     }
                     //捕获异常
                     catch (Exception $e) {
-                        exception($e);
+                        // exception($e);
                         $new_bodyData = pack("C", 1); //status | 1 | Unsigned Integer |状态 0：正确 1：消息结构错  2：非法源地址  3：认证错  4：版本太高   5~ ：其他错误
                         $Total_Length = strlen($new_bodyData) + 12;
                         $new_headData = pack("NNN", $Total_Length, 0x00000002, 1);

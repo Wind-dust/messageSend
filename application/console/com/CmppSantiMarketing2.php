@@ -155,11 +155,12 @@ class CmppSantiMarketing2 extends Pzlife {
         // $send = $redis->lPop("index:meassage:code:send:1");
         // $send = $redis->rPush($redisMessageCodeSend,"15555555555:12:【品质生活】祝您生活愉快");
 
-        // $send = $redis->rPush($redisMessageCodeSend, json_encode([
-        //     'mobile'      => '15827039444',
-        //     'mar_task_id' => 15715,
-        //     'content'     => '【中山口腔】5周年庆，11月23-30日，黄石三店同庆，全线诊疗项目 8 折让利回馈、消费就送青花瓷礼盒！39.9元购洁牙卡送食用油。详情询:0714-6268188 回T退订',
-        // ]));
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15201926171',
+            'title'      => '【鼎业装饰】鼎礼相祝！跨年巨惠！定单送欧派智能晾衣架一套。选欧派产品可秒杀欧派智能马桶999元一个。终极预存大礼，全包预存免基础装修！！！大到超乎您想象！一年只有这一次！电话3236788回T退订',
+            'mar_task_id' => 15753,
+            'content'     => '【鼎业装饰】鼎礼相祝！跨年巨惠！定单送欧派智能晾衣架一套。选欧派产品可秒杀欧派智能马桶999元一个。终极预存大礼，全包预存免基础装修！！！大到超乎您想象！一年只有这一次！电话3236788回T退订',
+        ]));
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
