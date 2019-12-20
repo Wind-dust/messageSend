@@ -273,6 +273,7 @@ class Send extends MyController {
         // if (empty($Mobile) || checkMobile($Mobile) === false) {
         //     return ['code'=>'3001'];
         // }
+        print_r(strlen($Content) );die;
         if (empty($Content) || strlen($Content) > 500) {
             return ['code' => '3002'];
         }
