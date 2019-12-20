@@ -298,9 +298,9 @@ return $result;
             return ['code' => '3000'];
         }
         $userEquities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 5], 'id,agency_price,num_balance', true);
-        // if (empty($userEquities)) {
-        //     return ['code' => '3005'];
-        // }
+        if (empty($userEquities)) {
+            return ['code' => '3005'];
+        }
         if ($user['user_status'] != 2) {
             return ['code' => '3006'];
         }
