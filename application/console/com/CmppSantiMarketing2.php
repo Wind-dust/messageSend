@@ -571,7 +571,7 @@ class CmppSantiMarketing2 extends Pzlife {
                         $redis->push($redisMessageCodeSend,$redisMessageCodeSend);
                         $redis->hset($redisMessageCodeSequenceId,$Sequence_Id);
                      }
-                    //  exception($e);
+                     exception($e);
                     socket_close($socket);
                     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                     socket_connect($socket, $host, $port);
