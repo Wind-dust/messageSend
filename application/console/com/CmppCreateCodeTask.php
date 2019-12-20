@@ -385,10 +385,7 @@ class CmppCreateCodeTask extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15758);
-        // $send = $this->redis->rPush('index:meassage:marketing:sendtask', 15752);
-        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15740);
-        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15741);
+        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => ,'send_time' => 0]));
         // echo time() -1576290017;die;
         echo date('Y-m-d H:i:s');
         echo "\n";
@@ -1051,7 +1048,7 @@ class CmppCreateCodeTask extends Pzlife {
                 // $request_url .= 'task_no=' . $task[0]['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['Submit_time'];
                 if ($task[0]['uid'] == 47) { //推送给美丽田园
                     // https://zhidao.baidu.com/question/412076997.html
-                    $request_url = "http://116.228.60.189:15902/rtreceive?";
+                    $request_url = "http://116.228.60.189:25902/rtreceive?";
                     $request_url .= 'task_no=' . $task[0]['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['Submit_time'];
                     sendRequest($request_url);
                     print_r($request_url);
