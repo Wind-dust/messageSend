@@ -227,9 +227,9 @@ class Send extends MyController {
         if (strtotime($Dstime) < time() && !empty($Dstime)) {
             return ['code' => '3004'];
         }
-        if (empty($Content) || strlen($Content) > 600) {
-            return ['code' => '3005'];
-        }
+        // if (empty($Content) || strlen($Content) > 600) {
+        //     return ['code' => '3005'];
+        // }
         // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
         if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 8) {
             return ['code' => '3006'];
