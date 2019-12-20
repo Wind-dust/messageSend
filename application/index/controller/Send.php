@@ -208,8 +208,6 @@ class Send extends MyController {
         $Dstime    = trim($this->request->post('dstime')); //手机号
         $ip        = trim($this->request->ip());
         $Mobiles   = explode(',', $Mobile);
-        
-        print_r(strlen($Content) );die;
         if (empty($appid)) {
             return ['code' => '3000'];
         }
@@ -229,7 +227,7 @@ class Send extends MyController {
         if (strtotime($Dstime) < time() && !empty($Dstime)) {
             return ['code' => '3004'];
         }
-        if (empty($Content) || strlen($Content) > 500) {
+        if (empty($Content) || strlen($Content) > 600) {
             return ['code' => '3005'];
         }
         // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
