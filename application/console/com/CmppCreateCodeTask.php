@@ -1054,9 +1054,9 @@ class CmppCreateCodeTask extends Pzlife {
                     $request_url = "http://116.228.60.189:15902/rtreceive?";
                     $request_url .= 'task_no=' . $task[0]['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['Submit_time'];
                     sendRequest($request_url);
+                    print_r($request_url);
                 }
 
-                print_r($request_url);
                 $redis->rpush('index:meassage:code:cms:deliver:', json_encode($send_log));
             }
 
