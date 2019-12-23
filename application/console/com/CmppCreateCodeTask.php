@@ -1228,16 +1228,16 @@ class CmppCreateCodeTask extends Pzlife {
             'Done_time' => '1912231821',
             'Done_time' => '1912231821',
         ]));
-        // $redis->rpush($redisMessageCodeSend,json_encode([
-        //     'mar_task_id' => '2',
-        //     'uid' => '45',
-        //     'Msg_Id' => '12648757921059827739',
-        //     'content' => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
-        //     'mobile' => '18339998120',
-        //     'Stat' => 'MK:1008',
-        //     'Done_time' => '1912121543',
-        //     'Done_time' => '1912121543',
-        // ]));
+        $redis->rpush($redisMessageCodeSend,json_encode([
+            'mar_task_id' => '2',
+            'uid' => '45',
+            'Msg_Id' => '1577096780057526',
+            'content' => '【超变大陆】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/5CWSJ 回T退订',
+            'mobile' => '13812895012',
+            'Stat' => 'LIMIT',
+            'Done_time' => '1912231828',
+            'Done_time' => '1912231828',
+        ]));
         // $redis->rpush($redisMessageCodeSend,json_encode([
         //     'mar_task_id' => '1',
         //     'uid' => '45',
@@ -1267,7 +1267,7 @@ class CmppCreateCodeTask extends Pzlife {
             }
             $redis->rpush('index:meassage:game:cms:deliver:', json_encode($send_log));//游戏通道实际码
             $send_log = json_decode($send_log, true);
-            $task     = Db::query("SELECT `task_no` FROM yx_user_send_game_task WHERE `id` = '" . $send_log['mar_task_id'] . "'");
+            $task     = Db::query("SELECT `task_no,send_msg_id` FROM yx_user_send_game_task WHERE `id` = '" . $send_log['mar_task_id'] . "'");
             if (empty($task)) {
                 continue;
             }
@@ -1276,7 +1276,6 @@ class CmppCreateCodeTask extends Pzlife {
             } else {
                 $send_status = 3;
             }
-           
             $send_msgid = explode(',', $task[0]['send_msg_id']);
             foreach ($send_msgid as $key => $value) {
                 $redis->rPush('index:meassage:game:cmppdeliver:' . $task[0]['uid'], json_encode([
