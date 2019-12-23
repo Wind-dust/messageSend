@@ -269,7 +269,7 @@ class OfficeExcel extends Pzlife {
         $data1 = array_unique(array_filter($data1));
         // $name2 = 'new.txt';
         // $name2 = '10-1.txt';
-        // $name2 = '111142028.txt';
+        $name2 = '1220(1).txt';
         if (!empty($name2)) {
             $file = explode('.',$name2);
             $data2       = array();
@@ -308,7 +308,7 @@ class OfficeExcel extends Pzlife {
         $putdata = [];
         
         $date = date('Y-m-d H:i:s', time());
-        $time1 = strtotime('2019/12/14 10:26:08'); 
+        $time1 = strtotime('2019/12/14 17:24:08'); 
         $i = 0;
         // $CellList = array(
         //     array('title', '标题'),
@@ -334,14 +334,14 @@ class OfficeExcel extends Pzlife {
         //     4 => 'DELIVRD'
         // ];
         $send_status_count = [
-            1 => 'MK:0001',//失败
-            2 => 'DB:0141',//空号
+            1 => 'UNKNOWN',//空号
+            2 => 'UNDELIV',//失败
             3 => 'DELIVRD',
             // 3 => 'DB:0141',
             // 4 => 'DELIVRD'
         ];
         $send_info_count = [
-            1 => '空号',//失败
+            1 => '未知',//失败
             2 => '失败',//空号
             3 => '下发成功',
             // 3 => 'DB:0141',
@@ -352,6 +352,7 @@ class OfficeExcel extends Pzlife {
         $j = 1;
         $n = 0;
         // echo  count($data1);die;
+        $data1 = array_diff($data1,$data2);
         foreach ($data1 as $key => $value) {
             $new_value = [];
             if (strpos($value,'00000') || strpos($value,'111111') || strpos($value,'222222') || strpos($value,'333333') || strpos($value,'444444') || strpos($value,'555555') || strpos($value, '666666') || strpos($value,'777777') || strpos($value,'888888') || strpos($value,'999999')) {
@@ -370,10 +371,13 @@ class OfficeExcel extends Pzlife {
                 $status_info = $send_info_count[$sendNum];
             }
             $new_value = [
-                'title' => '丝芙兰邀您参与迷你圣诞彩妆秀',
+                'title' => '迪奥新品尝鲜，蕴活肌肤年轻力',
                 'model' => '1551',
                 'mobile' => $value,
-                'content' =>'【丝芙兰】圣诞氛围日渐浓烈，妆容跟不上节奏怎么行？！丝芙兰邀您参与迷你圣诞彩妆秀，不仅能Get最IN圣诞妆容，还有机会赢得丝芙兰独家限量圣诞好礼，价值129元-229元正装产品，限量60份，赠完即止，实际获赠礼品以活动当天门店为准。活动时间：2019年12月14日至15日，14:00-14:30；19:00-19:30。即刻前往指定门店 https://dwz.cn/xe7VYg01  焕亮璀璨圣诞。回T退订。',
+                'content' =>'【丝芙兰】迪奥新品尝鲜，蕴活肌肤年轻力
+                DIOR迪奥即将重磅推出护肤新品，DIOR迪奥肌活蕴能系列，一抹唤醒肌肤年轻力，焕现肌肤健康光采。自启肌能，执掌年轻。
+                丝芙兰现为您开启新品抢先体验机会，点击 https://dwz.cn/8D4a5EvQ 前往购物车，仅需支付邮费，即可申领迪奥肌活蕴能精华7日体验装*。令肌肤更加紧致，弹润，平滑，细嫩，充盈， 透亮。
+                *全国限量28,000份。每人限领一份，先到先得，转发无效。回T退订',
                 'status' =>$status,
                 'send_time' =>date("Y/m/d H:i:s",$time1+ceil($n/1000)),
                 'status_info' => $status_info
@@ -389,8 +393,8 @@ class OfficeExcel extends Pzlife {
         
                 //设置文件属性
                 $objProps = $objExcel->getProperties();
-                $objProps->setTitle("金卡1");
-                $objProps->setSubject("金卡1:" . date('Y-m-d H:i:s', time()));
+                $objProps->setTitle($j);
+                $objProps->setSubject($j.":" . date('Y-m-d H:i:s', time()));
         
                 $objExcel->setActiveSheetIndex(0);
                 $objActSheet = $objExcel->getActiveSheet();
@@ -453,14 +457,14 @@ class OfficeExcel extends Pzlife {
         
                 //设置文件属性
                 $objProps = $objExcel->getProperties();
-                $objProps->setTitle("金卡1");
-                $objProps->setSubject("金卡1:" . date('Y-m-d H:i:s', time()));
+                $objProps->setTitle($j);
+                $objProps->setSubject($j.":" . date('Y-m-d H:i:s', time()));
         
                 $objExcel->setActiveSheetIndex(0);
                 $objActSheet = $objExcel->getActiveSheet();
         
                 //设置当前活动sheet的名称
-                $objActSheet->setTitle("金卡1");
+                $objActSheet->setTitle("sheet1");
                 $CellList = array(
                     array('title', '标题'),
                     array('model', '模板账户'),
@@ -484,7 +488,7 @@ class OfficeExcel extends Pzlife {
                     $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
                     // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
                 }
-                $outputFileName = "金卡1.xlsx";
+                $outputFileName = $j.".xlsx";
                 $i = 0;
                 foreach ($putdata as $key => $orderdata) {
                     //行
