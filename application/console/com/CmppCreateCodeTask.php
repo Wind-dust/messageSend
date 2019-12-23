@@ -1228,16 +1228,16 @@ class CmppCreateCodeTask extends Pzlife {
             'Done_time' => '1912231821',
             'Done_time' => '1912231821',
         ]));
-        $redis->rpush($redisMessageCodeSend,json_encode([
-            'mar_task_id' => '2',
-            'uid' => '45',
-            'Msg_Id' => '1577096780057526',
-            'content' => '【超变大陆】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/5CWSJ 回T退订',
-            'mobile' => '13812895012',
-            'Stat' => 'LIMIT',
-            'Done_time' => '1912231828',
-            'Done_time' => '1912231828',
-        ]));
+        // $redis->rpush($redisMessageCodeSend,json_encode([
+        //     'mar_task_id' => '2',
+        //     'uid' => '45',
+        //     'Msg_Id' => '1577096780057526',
+        //     'content' => '【超变大陆】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/5CWSJ 回T退订',
+        //     'mobile' => '13812895012',
+        //     'Stat' => 'LIMIT',
+        //     'Done_time' => '1912231828',
+        //     'Done_time' => '1912231828',
+        // ]));
         // $redis->rpush($redisMessageCodeSend,json_encode([
         //     'mar_task_id' => '1',
         //     'uid' => '45',
@@ -1267,7 +1267,7 @@ class CmppCreateCodeTask extends Pzlife {
             }
             $redis->rpush('index:meassage:game:cms:deliver:', json_encode($send_log));//游戏通道实际码
             $send_log = json_decode($send_log, true);
-            $task     = Db::query("SELECT `task_no,send_msg_id` FROM yx_user_send_game_task WHERE `id` = '" . $send_log['mar_task_id'] . "'");
+            $task     = Db::query("SELECT `task_no`,`send_msg_id` FROM yx_user_send_game_task WHERE `id` = '" . $send_log['mar_task_id'] . "'");
             if (empty($task)) {
                 continue;
             }
