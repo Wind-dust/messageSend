@@ -1277,7 +1277,7 @@ class CmppCreateCodeTask extends Pzlife {
                 $send_status = 3;
             }
            
-            $send_msgid = explode(',', $task[0]['Msg_Id']);
+            $send_msgid = explode(',', $task[0]['send_msg_id']);
             foreach ($send_msgid as $key => $value) {
                 $redis->rPush('index:meassage:game:cmppdeliver:' . $task[0]['uid'], json_encode([
                     'Stat'        => $send_log['Stat'],
