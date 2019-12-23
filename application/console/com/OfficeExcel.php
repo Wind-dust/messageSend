@@ -283,6 +283,7 @@ class OfficeExcel extends Pzlife {
                 // $j     = '';
                 while(! feof($file))
                 {
+                    //随机抽取
                     $data2[]= trim(fgets($file));
                     // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
                     // // print_r($phone);die;
@@ -306,7 +307,21 @@ class OfficeExcel extends Pzlife {
         // print_r(count($data1));
         // print_r(count($data2));
         $putdata = [];
+/*         $path = realpath("./") . "/1220(1).txt";
         
+        foreach ($data1 as $key => $value) {
+            $num     = mt_rand(1, count($data1));
+            if ($num <= 2500) {
+                $putdata[] = $value;
+            }
+        }
+        $myfile = fopen($path, "w");
+        for ($i = 0; $i < count($putdata); $i++) {
+            $txt = $putdata[$i] . "\n";
+            fwrite($myfile, $txt);
+        }
+        fclose($myfile);
+        die; */
         $date = date('Y-m-d H:i:s', time());
         $time1 = strtotime('2019/12/14 10:26:08'); 
         $i = 0;

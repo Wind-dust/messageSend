@@ -375,7 +375,7 @@ return $result;
         // print_r($res);die;
         $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 6], 'id,num_balance', true);
         if (empty($user_equities)) {
-            return ['code' => '3005'];
+            return ['code' => '3006'];
         }
         // if ($user_equities['num_balance'] < 1 && $user['reservation_service'] == 1) {
         //     return ['code' => '3006'];
