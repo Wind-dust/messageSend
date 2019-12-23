@@ -15,9 +15,9 @@ class ServerSocketJYY extends Pzlife {
     public function Service($content) {
         $contdata                 = $this->content($content);
         $redis                    = Phpredis::getConn();
-        $content                  = 9; //绑定通道
-        $redisMessageCodeSend     = 'index:meassage:code:send:task'; //验证码发送任务rediskey
-        $redisMessageCodeSendReal = 'index:meassage:code:send:realtask'; //验证码发送任务rediskey
+        // $content                  = 9; //绑定通道
+        $redisMessageCodeSend     = 'index:meassage:game:send:task'; //游戏发送任务rediskey
+        $redisMessageCodeSendReal = 'index:meassage:game:send:realtask'; //游戏真实发送任务rediskey
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
 
         $host          = $contdata['host']; //服务商ip
@@ -200,7 +200,7 @@ class ServerSocketJYY extends Pzlife {
                                    'message' => $message,
                                    'Src_Id' => $body['Src_Id'],//拓展码
                                    'Service_Id' => $body['Service_Id'],//业务服务ID（企业代码）
-                                   'Source_Addr' => $body['Source_Addr'],//业务服务ID（企业代码）
+                                   'Source_Addr' => $body['Msg_src'],//业务服务ID（企业代码）
                                ];
                                // print_r($sendData);
                                $residue = $head['Total_Length'] - 12 - 117 - $c_length - $Msg_length;
@@ -241,6 +241,8 @@ class ServerSocketJYY extends Pzlife {
                                    'mobile'  => trim($mobile),
                                    'message' => $message,
                                    'Src_Id' => $body['Src_Id'],//拓展码
+                                   'Service_Id' => $body['Service_Id'],//业务服务ID（企业代码）
+                                   'Source_Addr' => $body['Msg_src'],//业务服务ID（企业代码）
                                ];
                                // print_r($sendData);
                                $residue = $head['Total_Length'] - 12 - 117 - $c_length - $Msg_length;
@@ -341,7 +343,7 @@ class ServerSocketJYY extends Pzlife {
                                 //     ],
                                 // ];
                                 // $redis->rPush('index:meassage:code:cmppdeliver:'.$uid,json_encode($deliver));
-                                $deliver = $redis->lpop('index:meassage:code:cmppdeliver:'.$uid);//取出用户发送任务
+                                $deliver = $redis->lpop('index:meassage:game:cmppdeliver:45');//取出用户发送任务
                                 if (!empty($deliver)) {
                                     $deliver            = json_decode($deliver, true);
                                     $deliver_timestring = time();
@@ -435,7 +437,7 @@ class ServerSocketJYY extends Pzlife {
             'Dest_Id'       => "10692054963", //短信接入码 短信端口号
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
-            'bin_ip'        => ["221.228.217.57"], //客户端绑定IP
+            'bin_ip'        => ["221.228.217.57","127.0.0.1"], //客户端绑定IP
             'free_trial'    => 2,
             'master_num'    => 300,
             'uid'           => 45,

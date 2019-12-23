@@ -19,6 +19,24 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
     }
     //海南始新移动游戏通道挂机
     public function content($content) {
+        // print_r($content);die;
+        if ($content == 0) {
+            return [
+                // 'host'          => "47.103.200.251", //服务商ip
+                'host'          => "127.0.0.1", //服务商ip
+                'port'          => "7890", //短连接端口号   17890长连接端口号
+                'Source_Addr'   => "101102", //企业id  企业代码
+                'Shared_secret' => 'Jyy123456', //网关登录密码
+                'Service_Id'    => "",
+                'Dest_Id'       => "10692054963", //短信接入码 短信端口号
+                'Sequence_Id'   => 1,
+                'SP_ID'         => "",
+                'bin_ip'        => ["221.228.217.57"], //客户端绑定IP
+                'free_trial'    => 2,
+                'master_num'    => 300,
+                'uid'           => 45,
+            ];
+        }
         return [
             'host'          => "123.56.225.148", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
@@ -40,11 +58,11 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         date_default_timezone_set('PRC');
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $content                    = 14;
-        $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
-        $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
-        $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
+        $redisMessageCodeSend       = 'index:meassage:game:send:' . $content; //验证码发送任务rediskey
+        $redisMessageCodeSequenceId = 'index:meassage:game:sequence:id:' . $content; //行业通知SequenceId
+        $redisMessageCodeMsgId      = 'index:meassage:game:msg:id:' . $content; //行业通知SequenceId
         // $redisMessageCodeDeliver    = 'index:meassage:code:deliver:' . $content; //行业通知MsgId
-        $redisMessageCodeDeliver = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
+        $redisMessageCodeDeliver = 'index:meassage:game:new:deliver:' . $content; //行业通知MsgId
 
         // $send = $redis->rPush($redisMessageCodeSend, json_encode([
         //     'mobile'      => '15201926171',
@@ -52,8 +70,9 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         //     'content'     => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
         // ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        $content = 0;
         $contdata = $this->content($content);
-
+        // print_r($contdata);die;
         $host                 = $contdata['host']; //服务商ip
         $port                 = $contdata['port']; //短连接端口号   17890长连接端口号
         $Source_Addr          = $contdata['Source_Addr']; //企业id  企业代码
@@ -142,6 +161,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                     $Total_Length = strlen($bodyData) + 12;
                                     $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                     $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
+                                    usleep(300);
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
                                     $send_status = 2;
                                     $headData = socket_read($socket, 12);
@@ -255,7 +275,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                             $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                                             $new_Total_Length = strlen($new_body) + 12;
                                             $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id2']);
-                                            // socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                                            socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                         } else if ($head['Command_Id'] == 0x00000008) {
                                             echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                                         } else if ($head['Command_Id'] == 0x80000008) {
@@ -315,6 +335,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                             socket_write($socket, $headData . $bodyData, $Total_Length);
                             
                              $send_status = 2;
+                             usleep(300);
                         } else {//没有号码发送时 发送连接请求
                             // $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                             $Command_Id  = 0x00000008; //保持连接
@@ -452,11 +473,12 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                 }
                 //捕获异常
                  catch (Exception $e) {
-                    //  exception($e);
+                     
                      if ($send_status == 1) {
                         $redis->push($redisMessageCodeSend,$redisMessageCodeSend);
                         $redis->hset($redisMessageCodeSequenceId,$Sequence_Id);
                      }
+                    //  exception($e);
                     socket_close($socket);
                     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                     socket_connect($socket, $host, $port);

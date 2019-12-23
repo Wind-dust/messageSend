@@ -738,3 +738,6 @@ CREATE TABLE `yx_user_cmpp`  (
   KEY `task_no` (`task_no`,`task_id`) USING BTREE,
   KEY `mobile` (`mobile`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='用户CMPP账户信息';
+
+ALTER TABLE `messagesend`.`yx_users` 
+ADD COLUMN `callback_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '回调' AFTER `free_trial`;
