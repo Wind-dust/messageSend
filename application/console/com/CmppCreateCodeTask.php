@@ -385,6 +385,7 @@ class CmppCreateCodeTask extends Pzlife {
             $channel_id    = 0;
             $channel_id    = $sendTask['channel_id'];
             $push_messages = [];
+            $error_mobile = [];
             // print_r($sendTask);die;
             if (file_exists(realpath("") . '/tasklog/marketing/' . $sendTask['task_no'] . ".txt")) {
                 continue;
@@ -451,6 +452,7 @@ class CmppCreateCodeTask extends Pzlife {
                     ];
                     $txt = json_encode($send_log) . "\n";
                     fwrite($myfile, $txt);
+                    $error_mobile[] = $send_log; 
                 }
 
             }
@@ -465,6 +467,14 @@ class CmppCreateCodeTask extends Pzlife {
                     // $send_channelid =1;
                     unset($value['channel_id']);
                     $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                }
+                foreach ($error_mobile as $key => $value) {
+                    if ($value['uid'] == 47 || $value['uid'] == 51) {
+                        $request_url = "http://116.228.60.189:25902/rtreceive?";
+                        $request_url .= 'task_no=' . $value['task_no'] . "&status_message=" . $value['Stat'] . "&mobile=" . $value['mobile'] . "&send_time=" . $value['create_time'];
+                        sendRequest($request_url);
+                        print_r($request_url);
+                    }
                 }
             } catch (\Exception $e) {
                 $this->redis->rPush('index:meassage:marketing:sendtask', $send);
