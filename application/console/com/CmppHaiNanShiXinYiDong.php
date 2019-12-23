@@ -20,23 +20,23 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
     //海南始新移动游戏通道挂机
     public function content($content) {
         // print_r($content);die;
-        if ($content == 0) {
-            return [
-                // 'host'          => "47.103.200.251", //服务商ip
-                'host'          => "127.0.0.1", //服务商ip
-                'port'          => "7890", //短连接端口号   17890长连接端口号
-                'Source_Addr'   => "101102", //企业id  企业代码
-                'Shared_secret' => 'Jyy123456', //网关登录密码
-                'Service_Id'    => "",
-                'Dest_Id'       => "10692054963", //短信接入码 短信端口号
-                'Sequence_Id'   => 1,
-                'SP_ID'         => "",
-                'bin_ip'        => ["221.228.217.57"], //客户端绑定IP
-                'free_trial'    => 2,
-                'master_num'    => 300,
-                'uid'           => 45,
-            ];
-        }
+        // if ($content == 0) {
+        //     return [
+        //         // 'host'          => "47.103.200.251", //服务商ip
+        //         'host'          => "127.0.0.1", //服务商ip
+        //         'port'          => "7890", //短连接端口号   17890长连接端口号
+        //         'Source_Addr'   => "101102", //企业id  企业代码
+        //         'Shared_secret' => 'Jyy123456', //网关登录密码
+        //         'Service_Id'    => "",
+        //         'Dest_Id'       => "10692054963", //短信接入码 短信端口号
+        //         'Sequence_Id'   => 1,
+        //         'SP_ID'         => "",
+        //         'bin_ip'        => ["221.228.217.57"], //客户端绑定IP
+        //         'free_trial'    => 2,
+        //         'master_num'    => 300,
+        //         'uid'           => 45,
+        //     ];
+        // }
         return [
             'host'          => "123.56.225.148", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
@@ -70,7 +70,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         //     'content'     => '【超变传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/3Ypm7 回T退订',
         // ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $content = 0;
+        // $content = 0;
         $contdata = $this->content($content);
         // print_r($contdata);die;
         $host                 = $contdata['host']; //服务商ip
