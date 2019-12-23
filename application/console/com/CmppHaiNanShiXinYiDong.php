@@ -64,11 +64,11 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         // $redisMessageCodeDeliver    = 'index:meassage:code:deliver:' . $content; //行业通知MsgId
         $redisMessageCodeDeliver = 'index:meassage:game:new:deliver:' . $content; //行业通知MsgId
 
-        // $send = $redis->rPush($redisMessageCodeSend, json_encode([
-        //     'mobile'      => '15201926171',
-        //     'mar_task_id' => '',
-        //     'content'     => '【冰封传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/45RHD 回T退订',
-        // ]));
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15201926171',
+            'mar_task_id' => '',
+            'content'     => '【超变传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/3Ypm7 回T退订',
+        ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $content = 0;
         $contdata = $this->content($content);
