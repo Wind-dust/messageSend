@@ -1140,16 +1140,16 @@ class CmppCreateCodeTask extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:' . $channel_id; //验证码发送任务rediskey
         $channel              = $this->getChannelinfo($channel_id);
-        // $redis->rpush($redisMessageCodeSend, json_encode([
-        //     'mobile' => '13771089392',
-        //     'title' => '尊敬会员：在这属于您的日子里，祝您生日快乐！您可在生日当月前往门店免费专享一份属于你的生日礼物.【美丽田园】',
-        //     'mar_task_id' => '11',
-        //     'content' => '尊敬会员：在这属于您的日子里，祝您生日快乐！您可在生日当月前往门店免费专享一份属于你的生日礼物.【美丽田园】',
-        //     'Msg_Id' => '',
-        //     'Stat' => 'DELIVER',
-        //     'Submit_time' => '191220161136',
-        //     'Done_time' => '1912191501',
-        // ]));
+        $redis->rpush($redisMessageCodeSend, json_encode([
+            'mobile' => '13564869264',
+            'title' => '美丽田园营销短信',
+            'mar_task_id' => '15769',
+            'content' => '【美丽田园】电商圣诞节活动将至，感恩回馈！.【美丽田园】',
+            'Msg_Id' => '',
+            'Stat' => 'DELIVER',
+            'Submit_time' => '191224164036',
+            'Done_time' => '191224164236',
+        ]));
 
         if ($channel['channel_type'] == 2) { //cmpp的
             while (true) {
