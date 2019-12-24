@@ -1172,6 +1172,7 @@ class CmppCreateCodeTask extends Pzlife {
                 }
                 $sql .= "WHERE `id` = " . $send_log['mar_task_id'];
                 $task = Db::query($sql);
+                print_r($task);die;
                 if (empty($task)) {
                     $redis->rpush($redisMessageCodeSend, json_encode($send_log));
                     // continue;
