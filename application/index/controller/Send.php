@@ -234,9 +234,10 @@ class Send extends MyController {
         if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 8) {
             return ['code' => '3006'];
         }
-        if (empty($task_name)) {
-            return ['code' => '3007'];
-        }
+        // print_r($task_name);die;
+        // if (empty($task_name)) {
+        //     return ['code' => '3007'];
+        // }
         $result = $this->app->send->getSmsMarketingTask($appid, $appkey, $Content, $Mobiles, $Dstime, $ip, $task_name);
         return $result;
     }
