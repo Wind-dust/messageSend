@@ -91,10 +91,12 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
             socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
+            
             do {
                 try
                 {
-                    date_default_timezone_set('PRC');
+                            $send_status = 1;
+                            date_default_timezone_set('PRC');
                     echo $Sequence_Id . "\n";
                     $time                = 0;
                     $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
@@ -112,7 +114,6 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                         $send = $redis->lPop($redisMessageCodeSend);
                         if ($send) { //正式使用从缓存中读取数据
                             
-                            $send_status = 1;
                             $send_data = [];
                             $send_data = json_decode($send, true);
                             // $mobile = $senddata['mobile_content'];
@@ -475,9 +476,15 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                  catch (Exception $e) {
                      
                      if ($send_status == 1) {
-                        $redis->rpush($redisMessageCodeSend,$redisMessageCodeSend);
-                        $redis->hset($redisMessageCodeSequenceId,$Sequence_Id);
+                        $redis->rpush($redisMessageCodeSend,$send);
+                        $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$send);
                      }
+                     //写入错误日志
+                     $log_path = realpath("")."/error/14.log";
+                     $myfile = fopen($log_path,'a+');
+                     fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
+                     fwrite($myfile,$e);
+                     fclose($myfile);
                     //  exception($e);
                     socket_close($socket);
                     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);

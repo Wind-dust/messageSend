@@ -17,3 +17,4 @@ composer.lock
 invoice.json
 apidoc.json
 tasklog/
+error/
