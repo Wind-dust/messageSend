@@ -1218,7 +1218,7 @@ class CmppCreateCodeTask extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // $redisMessageCodeSend = 'index:meassage:code:new:deliver:'.$content; //验证码发送任务rediskey
         $redisMessageCodeSend = 'index:meassage:game:new:deliver:' . $content; //验证码发送任务rediskey
-        $redis->rpush($redisMessageCodeSend,json_encode([
+      /*   $redis->rpush($redisMessageCodeSend,json_encode([
             'mar_task_id' => '1',
             'uid' => '45',
             'Msg_Id' => '1577095013046269',
@@ -1227,7 +1227,7 @@ class CmppCreateCodeTask extends Pzlife {
             'Stat' => 'ID:0076',
             'Done_time' => '1912231821',
             'Done_time' => '1912231821',
-        ]));
+        ])); */
         // $redis->rpush($redisMessageCodeSend,json_encode([
         //     'mar_task_id' => '2',
         //     'uid' => '45',
