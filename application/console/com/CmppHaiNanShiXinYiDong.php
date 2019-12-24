@@ -69,6 +69,16 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
             'mar_task_id' => '',
             'content'     => '【雪域传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/64v99 回T退订',
         ]));
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '17721160630',
+            'mar_task_id' => '',
+            'content'     => '【雪域传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/64v99 回T退订',
+        ]));
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15821193682',
+            'mar_task_id' => '',
+            'content'     => '【雪域传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/64v99 回T退订',
+        ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if ($socket == false) {
             $this->error_log("create");die;
