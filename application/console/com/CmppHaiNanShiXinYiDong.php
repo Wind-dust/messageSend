@@ -162,7 +162,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                     $Total_Length = strlen($bodyData) + 12;
                                     $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                     $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
-                                    usleep(300);
+                                    usleep(1200);
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
                                     $send_status = 2;
                                     $headData = socket_read($socket, 12);
@@ -336,7 +336,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                             socket_write($socket, $headData . $bodyData, $Total_Length);
                             
                              $send_status = 2;
-                             usleep(300);
+                             usleep(1200);
                         } else {//没有号码发送时 发送连接请求
                             // $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                             $Command_Id  = 0x00000008; //保持连接
