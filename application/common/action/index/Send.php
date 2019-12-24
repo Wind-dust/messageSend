@@ -9,6 +9,7 @@ use app\facade\DbImage;
 use app\facade\DbMobile;
 use app\facade\DbProvinces;
 use app\facade\DbSendMessage;
+use cache\Phpredis;
 use app\facade\DbUser;
 use Config;
 use Env;
@@ -356,6 +357,8 @@ return $result;
     }
 
     public function getSmsBuiness($Username, $Password, $Content, $Mobiles, $ip) {
+        $this->redis = Phpredis::getConn();
+
         $Mobiles = array_unique(array_filter($Mobiles));
         $user    = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
@@ -405,12 +408,20 @@ return $result;
         $data['send_num']       = $send_num;
         $data['send_length']    = mb_strlen($Content);
         $data['free_trial']     = 1;
-        $data['task_no']        = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+        $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+        if ($user['free_trial'] == 2) {
+            $data['free_trial'] == 2;
+            $data['channel_id'] == 1;
+        }
         Db::startTrans();
         try {
             DbAdministrator::modifyBalance($user_equities['id'], $send_num, 'dec');
             $bId = DbAdministrator::addUserSendCodeTask($data); //
             Db::commit();
+            if ($data['free_trial'] == 2) {
+                $res = $this->redis->rpush("index:meassage:business:sendtask",$bId); 
+
+            }
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
             Db::rollback();
