@@ -106,6 +106,12 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
 
+        $log_path = realpath("")."/error/14.log";
+        $myfile = fopen($log_path,'a+');
+        fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
+        fwrite($myfile," host:".$host." port:".$port."\n");
+        fclose($myfile);
+
         if (socket_connect($socket, $host, $port) == false) {
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
             $this->error_log("connect");die;
