@@ -110,7 +110,7 @@ class Upload extends MyController
                 //开始取出数据并存入数组
                 $phone = '';
                 $j     = '';
-                for ($i = 0; $i <= $highestRowNum; $i++) {
+                for ($i = 1; $i <= $highestRowNum; $i++) {
                     $row      = array();
                     $cellName = PHPExcel_Cell::stringFromColumnIndex(0) . $i;
                     $cellVal  = $sheet->getCell($cellName)->getValue();
@@ -132,7 +132,7 @@ class Upload extends MyController
                 $highestRow = $sheet->getHighestRow(); // 取得总行数
                 $phone = '';
                 $j     = '';
-                for ($i = 0; $i < $highestRow; $i++) {
+                for ($i = 1; $i <= $highestRow; $i++) {
                     $cellVal = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
                     // $phone_data[]= trim($cellVal);
                     $phone .= $j . trim($cellVal);
@@ -148,7 +148,7 @@ class Upload extends MyController
                 $phone = '';
                 $j     = '';
 
-                for ($i = 0; $i < $highestRow; $i++) {
+                for ($i = 1; $i <= $highestRow; $i++) {
                     $cellVal = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
                     // $phone_data[]= trim($cellVal);
                     // $j = ',';
