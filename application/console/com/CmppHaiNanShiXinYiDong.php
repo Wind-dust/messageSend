@@ -70,6 +70,11 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
             'content'     => '【雪域传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/64v99 回T退订',
         ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        if ($socket == false) {
+            $this->error_log("create");die;
+
+        }
+        
         // $content = 0;
         $contdata = $this->content($content);
         // print_r($contdata);die;
@@ -87,6 +92,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
 
         if (socket_connect($socket, $host, $port) == false) {
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
+            $this->error_log("connect");die;
         } else {
             socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
@@ -163,7 +169,11 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                     $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                     $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
                                     usleep(1200);
-                                    socket_write($socket, $headData . $bodyData, $Total_Length);
+                                    
+                                   if( socket_write($socket, $headData . $bodyData, $Total_Length) == false){
+                                    $this->error_log("write");
+                                   }else{
+                                       
                                     $send_status = 2;
                                     $headData = socket_read($socket, 12);
                                     if ($headData != false) {
@@ -288,6 +298,8 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                     }
 
                                     ++$i;
+                                   }
+
                                 }
                                 ++$Sequence_Id;
                                 if ($Sequence_Id > 65536) {
@@ -333,16 +345,23 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                             $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
                             $Total_Length = strlen($bodyData) + 12;
                             $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                            socket_write($socket, $headData . $bodyData, $Total_Length);
+                            if ( socket_write($socket, $headData . $bodyData, $Total_Length)==false
+                            ) {
+                                $this->error_log("write");
+                            }else{
+                                $send_status = 2;
+                                usleep(1200);
+                            }
                             
-                             $send_status = 2;
-                             usleep(1200);
                         } else {//没有号码发送时 发送连接请求
                             // $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
                             $Command_Id  = 0x00000008; //保持连接
                             $Total_Length = 12;
                             $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                            socket_write($socket, $headData , $Total_Length);
+                           if ( socket_write($socket, $headData , $Total_Length) == false){
+                                $this->error_log("心跳 write");
+                           };
+                            
                             sleep(1);
                         }
                     }
@@ -480,15 +499,8 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                         $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$send);
                      }
                      //写入错误日志
-                     $log_path = realpath("")."/error/14.log";
-                     $myfile = fopen($log_path,'a+');
-                     fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
-                     fwrite($myfile,$e);
-                     fwrite($myfile,"\n");
-                     fwrite($myfile,"connect fail massaege:".socket_strerror(socket_last_error())."\n");
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
 
-                     fclose($myfile);
                     //  exception($e);
                     socket_close($socket);
                     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -508,6 +520,14 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
 
         }
 
+    }
+
+    public function error_log($error_type){
+        $log_path = realpath("")."/error/14.log";
+        $myfile = fopen($log_path,'a+');
+        fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
+        fwrite($myfile,$error_type." fail massaege:".socket_strerror(socket_last_error())."\n");
+        fclose($myfile);
     }
 
     //16进制转2进制
