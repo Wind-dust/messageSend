@@ -206,7 +206,7 @@ class Send extends CommonIndex {
         if (empty($effective_mobile)) {
             return 2;
         }
-        $Content           = $this->dbc2Sbc($Content);
+        // $Content           = $this->dbc2Sbc($Content);
         $send_num          = count($Mobiles);
         $data              = [];
         $data['uid']       = $user['id'];

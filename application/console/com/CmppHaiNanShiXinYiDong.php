@@ -484,6 +484,10 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                      $myfile = fopen($log_path,'a+');
                      fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
                      fwrite($myfile,$e);
+                     fwrite($myfile,"\n");
+                     fwrite($myfile,"connect fail massaege:".socket_strerror(socket_last_error())."\n");
+            // echo 'connect fail massege:' . socket_strerror(socket_last_error());
+
                      fclose($myfile);
                     //  exception($e);
                     socket_close($socket);
