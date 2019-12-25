@@ -155,12 +155,13 @@ class CmppSantiMarketing2 extends Pzlife {
         // $send = $redis->lPop("index:meassage:code:send:1");
         // $send = $redis->rPush($redisMessageCodeSend,"15555555555:12:【品质生活】祝您生活愉快");
 
-        // $send = $redis->rPush($redisMessageCodeSend, json_encode([
-        //     'mobile'      => '15201926171',
-        //     'title'      => '【DAPHNE】亲爱的会员：您的30元优惠券已到账，请前往DaphneFashion公众号-会员尊享-会员中心领取！退订回T',
-        //     'mar_task_id' => 15753,
-        //     'content'     => '【DAPHNE】亲爱的会员：您的30元优惠券已到账，请前往DaphneFashion公众号-会员尊享-会员中心领取！退订回T',
-        // ]));
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15201926171',
+            'title'      => '【美丽田园】电商圣诞节活动将至，感恩回馈！',
+            'mar_task_id' => 15769,
+            'content'     => '【美丽田园】电商圣诞节活动将至，感恩回馈！',
+        ]));
+        
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);

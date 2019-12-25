@@ -489,9 +489,11 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                 $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
-
+                                print_r($mesage);
+                            }else{
+                                print_r($body);
+                                print_r($Msg_Content);
                             }
-                            print_r($mesage);
                             $callback_Command_Id = 0x80000005;
 
                             $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
