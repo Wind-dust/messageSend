@@ -65,12 +65,12 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         $redisMessageCodeDeliver = 'index:meassage:game:new:deliver:' . $content; //行业通知MsgId
         $redisMessageUnKownDeliver = 'index:meassage:game:unknow:deliver:' . $content; //行业通知MsgId
 
-      /*   $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '18818788726',
+         $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15201926171',
             'mar_task_id' => '',
-            'content'     => '【雪域传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/64v99 回T退订',
+            'content'     => '【超变传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/3Ypm7 回T退订',
         ]));
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15172413692',
             'mar_task_id' => '',
             'content'     => '【雪域传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/64v99 回T退订',
@@ -546,6 +546,11 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                         $redis->rpush($redisMessageCodeSend,$send);
                         $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$send);
                      }
+                     $log_path = realpath("")."/error/14.log";
+                     $myfile = fopen($log_path,'a+');
+                     fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
+                     fwrite($myfile,$e."\n");
+                     fclose($myfile);
                      //写入错误日志
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
 
