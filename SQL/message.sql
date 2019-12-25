@@ -741,3 +741,7 @@ CREATE TABLE `yx_user_cmpp`  (
 
 ALTER TABLE `messagesend`.`yx_users` 
 ADD COLUMN `callback_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '回调' AFTER `free_trial`;
+
+ALTER TABLE `messagesend`.`yx_user_send_game_task` 
+ADD COLUMN `real_message` varchar(20) NOT NULL DEFAULT '' COMMENT '真实返回状态' AFTER `free_trial`,
+ ADD COLUMN  `status_message` varchar(20) DEFAULT '' COMMENT '状态' AFTER `free_trial`;
