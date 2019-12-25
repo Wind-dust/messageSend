@@ -65,12 +65,12 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         $redisMessageCodeDeliver = 'index:meassage:game:new:deliver:' . $content; //行业通知MsgId
         $redisMessageUnKownDeliver = 'index:meassage:game:unknow:deliver:' . $content; //行业通知MsgId
 
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+      /*   $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '18818788726',
             'mar_task_id' => '',
             'content'     => '【雪域传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/64v99 回T退订',
         ]));
-       /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15172413692',
             'mar_task_id' => '',
             'content'     => '【雪域传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/64v99 回T退订',
