@@ -63,6 +63,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         $redisMessageCodeMsgId      = 'index:meassage:game:msg:id:' . $content; //行业通知SequenceId
         // $redisMessageCodeDeliver    = 'index:meassage:code:deliver:' . $content; //行业通知MsgId
         $redisMessageCodeDeliver = 'index:meassage:game:new:deliver:' . $content; //行业通知MsgId
+        $redisMessageUnKownDeliver = 'index:meassage:game:unknow:deliver:' . $content; //行业通知MsgId
 
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
@@ -80,7 +81,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
             'content'     => '【雪域传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/64v99 回T退订',
         ]));
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15821199999',
+            'mobile'      => '15555555555',
             'mar_task_id' => '',
             'content'     => '【雪域传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/64v99 回T退订',
         ]));
@@ -92,7 +93,6 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         fclose($myfile);
         if ($socket == false) {
             $this->error_log("create");die;
-
         }
         
         // $content = 0;
@@ -127,8 +127,8 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
             do {
                 try
                 {
-                            $send_status = 1;
-                            date_default_timezone_set('PRC');
+                    $send_status = 1;
+                    date_default_timezone_set('PRC');
                     echo $Sequence_Id . "\n";
                     $time                = 0;
                     $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
@@ -306,6 +306,14 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
                                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
 
+                                            }else{//不在记录中的回执存入缓存，
+                                                print_r($body);
+                                                print_r($Msg_Content);
+                                                $mesage['Stat']        = $Msg_Content['Stat'];
+                                                $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+                                                $mesage['Done_time']   = $Msg_Content['Done_time'];
+                                                $mesage['mobile']      = $body['Dest_Id '];//手机号
+                                                $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
                                             }
                                             $callback_Command_Id = 0x80000005;
 
@@ -480,7 +488,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                             $Msg_Content = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/", $body['Msg_Content']);
                             
                             $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
-                            if ($mesage) {
+                            if ($mesage) {//获取是否在记录中
                                 $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                                 // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
                                 $mesage                = json_decode($mesage, true);
@@ -490,9 +498,14 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                                 print_r($mesage);
-                            }else{
+                            }else{//不在记录中的回执存入缓存，
                                 print_r($body);
                                 print_r($Msg_Content);
+                                $mesage['Stat']        = $Msg_Content['Stat'];
+                                $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+                                $mesage['Done_time']   = $Msg_Content['Done_time'];
+                                $mesage['mobile']      = $body['Dest_Id '];//手机号
+                                $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
                             }
                             $callback_Command_Id = 0x80000005;
 
