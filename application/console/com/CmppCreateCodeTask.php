@@ -701,7 +701,7 @@ class CmppCreateCodeTask extends Pzlife {
             //         // $getSendTaskSql = "select source,province_id,province from yx_number_source where `mobile` = '".$prefix."' LIMIT 1";
             //     }
             // }
-            exit("SUCCESS");
+            // exit("SUCCESS");
         }
     }
 
@@ -827,6 +827,7 @@ class CmppCreateCodeTask extends Pzlife {
             //     }
             // }
             // exit("SUCCESS");
+            fclose($myfile);
         }
     }
 
@@ -1009,6 +1010,7 @@ class CmppCreateCodeTask extends Pzlife {
             //     }
             // }
             // exit("SUCCESS");
+            fclose($myfile);
         }
     }
 
@@ -1188,6 +1190,9 @@ class CmppCreateCodeTask extends Pzlife {
                 $send_log = json_decode($send_log, true);
 
                 //获取通道属性
+                if (!isset($send_log['mar_task_id'])) {
+                    continue;
+                }
                 $sql = "SELECT `task_no`,`uid` FROM ";
                 if ($channel['business_id'] == 5) { //营销
                     $sql .= " yx_user_send_task ";
