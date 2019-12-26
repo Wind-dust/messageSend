@@ -45,6 +45,7 @@ class ClientSocketSantiBusiness extends Pzlife {
         $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
         $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
         $redisMessageCodeDeliver    = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
+        $redisMessageUnKownDeliver = 'index:meassage:game:unknow:deliver:' . $content; //行业通知MsgId
         // $redisMessageCodeSend       = 'index:meassage:marketing:send:' . $content; //营销发送任务rediskey
         // $redisMessageCodeSequenceId = 'index:meassage:marketing:sequence:id:' . $content; //营销行业通知SequenceId
         // $redisMessageCodeMsgId      = 'index:meassage:marketing:msg:id:' . $content; //营销行业通知SequenceId
@@ -59,9 +60,32 @@ class ClientSocketSantiBusiness extends Pzlife {
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'uid'         => '1',
-            'content'     => '【宝洁中国】风倍清去味除菌喷雾~懒人清洁神器，一喷清新！付几套送几套，限量送加湿器 http://weu.me/_4BbkA 回QX退订',
+            'content'     => '【钰蜥科技】您本次登录的验证码为026835',
             'Submit_time' => date('mdHis', time()),
         ]));
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15821193682',
+            'mar_task_id' => '',
+            'uid'         => '1',
+            'content'     => '【钰蜥科技】您本次登录的验证码为028635',
+            'Submit_time' => date('mdHis', time()),
+        ]));
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15601607386',
+            'mar_task_id' => '',
+            'uid'         => '1',
+            'content'     => '【钰蜥科技】您本次登录的验证码为062835',
+            'Submit_time' => date('mdHis', time()),
+        ]));
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15172413692',
+            'mar_task_id' => '',
+            'uid'         => '1',
+            'content'     => '【钰蜥科技】您本次登录的验证码为062835',
+            'Submit_time' => date('mdHis', time()),
+        ]));
+
+        
         // $send = $redis->lPop($redisMessageCodeSend);
         // $send_data = json_decode($send, true);
         // $code = $send_data['content']; //带签名
@@ -90,7 +114,7 @@ class ClientSocketSantiBusiness extends Pzlife {
         if (socket_connect($socket, $host, $port) == false) {
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
-            socket_set_nonblock($socket); //设置非阻塞模式
+            // socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
             do {
@@ -272,6 +296,15 @@ class ClientSocketSantiBusiness extends Pzlife {
                                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
 
                                             }
+                                            else{//不在记录中的回执存入缓存，
+                                                print_r($body);
+                                                print_r($Msg_Content);
+                                                $mesage['Stat']        = $Msg_Content['Stat'];
+                                                $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+                                                $mesage['Done_time']   = $Msg_Content['Done_time'];
+                                                // $mesage['mobile']      = $body['Dest_Id '];//手机号
+                                                $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
+                                            }
                                             $callback_Command_Id = 0x80000005;
 
                                             $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
@@ -444,6 +477,16 @@ class ClientSocketSantiBusiness extends Pzlife {
                                 $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
+
+                            }else{//不在记录中的回执存入缓存，
+                                                                
+                                print_r($body);
+                                print_r($Msg_Content);
+                                $mesage['Stat']        = $Msg_Content['Stat'];
+                                $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+                                $mesage['Done_time']   = $Msg_Content['Done_time'];
+                                // $mesage['mobile']      = $body['Dest_Id '];//手机号
+                                $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
 
                             }
                             print_r($mesage);

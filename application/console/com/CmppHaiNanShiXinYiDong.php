@@ -314,7 +314,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                                 $mesage['Stat']        = $Msg_Content['Stat'];
                                                 $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
-                                                $mesage['mobile']      = $body['Dest_Id '];//手机号
+                                                // $mesage['mobile']      = $body['Dest_Id '];//手机号
                                                 $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
                                             }
                                             $callback_Command_Id = 0x80000005;
@@ -500,15 +500,15 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                                 
                             }else{//不在记录中的回执存入缓存，
-                                
+                                                                
+                                print_r($body);
+                                print_r($Msg_Content);
                                 $mesage['Stat']        = $Msg_Content['Stat'];
                                 $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
-                                $mesage['mobile']      = $body['Dest_Id '];//手机号
+                                // $mesage['mobile']      = $body['Dest_Id '];//手机号
                                 $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
-                                
-                                print_r($body);
-                                print_r($Msg_Content);
+
                             }
                             print_r($mesage);
                             $callback_Command_Id = 0x80000005;
