@@ -28,6 +28,10 @@ class Send extends MyController {
         //     return ['code' => 3001];
         // }
         // echo phpinfo();die;
+        $a = 'E.....@.w.F.{8.....v...@.SF~lG.1P....s..............e...T.h...................................15201926171...........<e...T.h.92.....1912251728191225172815201926171......................';
+            $header = substr($a,0,12);
+            $headData = unpack('NNN',$a);
+            print_r($headData);die;
         $code = trim($this->request->post('code')); //验证码
         //图片函数测试
         stream_context_set_default([

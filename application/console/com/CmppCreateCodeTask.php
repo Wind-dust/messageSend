@@ -1296,7 +1296,7 @@ class CmppCreateCodeTask extends Pzlife {
             'Done_time' => '1912231821',
             'my_submit_time' => time(),
         ])); */
-        $untime = 0;
+        // $untime = 0;
         while (true) {
             $send_log = $redis->lpop($redisMessageCodeSend);
             $time_no = time();
@@ -1305,8 +1305,10 @@ class CmppCreateCodeTask extends Pzlife {
                 // $redis->rpush($redisMessageCodeSend, json_encode($send_log));
                 
             //未知
-            sleep(60);
-            continue;
+            if (!isset($untime)){
+                continue;
+            }
+            // continue;
                 $sendunknow = $redis->hgetall('index:meassage:game:msg:id:14');
                 if (!empty($sendunknow)) {
                     sleep($untime);
@@ -1350,7 +1352,12 @@ class CmppCreateCodeTask extends Pzlife {
             
             $redis->rpush('index:meassage:game:cms:deliver:', json_encode($send_log));//游戏通道实际码
             $send_log = json_decode($send_log, true);
+            if (!isset($untime)) {
             $untime = $send_log['receive_time'] - $send_log['my_submit_time'];
+                
+            }else{
+                $untime = $send_log['receive_time'] - $send_log['my_submit_time'] > $untime ? $send_log['receive_time'] - $send_log['my_submit_time'] : $untime;
+            }
             $task     = Db::query("SELECT * FROM yx_user_send_game_task WHERE `id` = '" . $send_log['mar_task_id'] . "'");
             if (empty($task)) {
                 continue;
