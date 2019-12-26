@@ -120,7 +120,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
             $this->error_log("connect");die;
         } else {
-            socket_set_nonblock($socket); //设置非阻塞模式
+            // socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
             
