@@ -945,16 +945,18 @@ class CmppCreateCodeTask extends Pzlife {
                                 $push_messages[] = $sendmessage;//实际发送队列
                             }
                             $send_log['status_message'] = 'DELIVRD';//推送到虚拟不发送队列
-                            $this->redis->rPush('index:meassage:game:waitcmppdeliver', json_encode([
-                                'Stat'        => $send_log['status_message'],
-                                'send_msgid'  => [$sendTask['send_msg_id']],
-                                'Done_time'   => date('ymdHis',time()),
-                                'content'     =>  $sendTask['task_content'],
-                                'Submit_time' => date('ymdHis',time()),
-                                'mobile'      => $send_log['mobile'],
-                                'uid'         =>  $sendTask['uid'],
-                                'mar_task_id' => $sendTask['id'],
-                            ]));
+                            $push_messages[] = $sendmessage;//实际发送队列
+                            
+                            // $this->redis->rPush('index:meassage:game:waitcmppdeliver', json_encode([
+                            //     'Stat'        => $send_log['status_message'],
+                            //     'send_msgid'  => [$sendTask['send_msg_id']],
+                            //     'Done_time'   => date('ymdHis',time()),
+                            //     'content'     =>  $sendTask['task_content'],
+                            //     'Submit_time' => date('ymdHis',time()),
+                            //     'mobile'      => $send_log['mobile'],
+                            //     'uid'         =>  $sendTask['uid'],
+                            //     'mar_task_id' => $sendTask['id'],
+                            // ]));
                             // die;
                         }else{//不扣量
                             $push_messages[] = $sendmessage;//实际发送队列
@@ -1397,7 +1399,7 @@ class CmppCreateCodeTask extends Pzlife {
             //扣量
             $witenosend = $redis->lpop("index:meassage:game:waitcmppdeliver");
             if (!empty($witenosend)) {
-                continue;
+                // continue;
                 sleep($untime);
                 $witenosend_log = json_decode($witenosend, true);
                 $witenosend_task     = Db::query("SELECT * FROM yx_user_send_game_task WHERE `id` = '" . $witenosend_log['mar_task_id'] . "'");
