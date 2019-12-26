@@ -1190,7 +1190,7 @@ class CmppCreateCodeTask extends Pzlife {
                 $send_log = json_decode($send_log, true);
 
                 //获取通道属性
-                if (!isset($send_log['mar_task_id'])) {
+                if (!isset($send_log['mar_task_id']) || empty($send_log['mar_task_id'])) {
                     continue;
                 }
                 $sql = "SELECT `task_no`,`uid` FROM ";
