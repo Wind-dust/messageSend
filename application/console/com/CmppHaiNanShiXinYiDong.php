@@ -546,6 +546,8 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                         $redis->rpush($redisMessageCodeSend,$send);
                         $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$send);
                      }
+                     
+                     exception($e);
                      $log_path = realpath("")."/error/14.log";
                      $myfile = fopen($log_path,'a+');
                      fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
@@ -554,7 +556,6 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                      //写入错误日志
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
 
-                    //  exception($e);
                     socket_close($socket);
                     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                     socket_connect($socket, $host, $port);
