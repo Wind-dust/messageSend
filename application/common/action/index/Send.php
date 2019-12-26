@@ -410,8 +410,8 @@ return $result;
         $data['free_trial']     = 1;
         $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
         if ($user['free_trial'] == 2) {
-            $data['free_trial'] == 2;
-            $data['channel_id'] == 1;
+            $data['free_trial'] = 2;
+            $data['channel_id'] =1;
         }
         Db::startTrans();
         try {
