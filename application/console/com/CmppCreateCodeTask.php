@@ -1166,7 +1166,7 @@ class CmppCreateCodeTask extends Pzlife {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:' . $channel_id; //验证码发送任务rediskey
         $channel              = $this->getChannelinfo($channel_id);
-        $redis->rpush($redisMessageCodeSend, json_encode([
+/*         $redis->rpush($redisMessageCodeSend, json_encode([
             'mobile' => '13564869264',
             'title' => '美丽田园营销短信',
             'mar_task_id' => '15769',
@@ -1175,7 +1175,7 @@ class CmppCreateCodeTask extends Pzlife {
             'Stat' => 'DELIVER',
             'Submit_time' => '191224164036',
             'Done_time' => '191224164236',
-        ]));
+        ])); */
 
         if ($channel['channel_type'] == 2) { //cmpp的
             while (true) {
