@@ -547,7 +547,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                         $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$send);
                      }
                      
-                     exception($e);
+                    //  exception($e);
                      $log_path = realpath("")."/error/14.log";
                      $myfile = fopen($log_path,'a+');
                      fwrite($myfile,date('Y-m-d H:i:s',time())."\n");

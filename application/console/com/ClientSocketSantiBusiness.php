@@ -522,7 +522,12 @@ class ClientSocketSantiBusiness extends Pzlife {
                         $redis->push($redisMessageCodeSend,$redisMessageCodeSend);
                         $redis->hset($redisMessageCodeSequenceId,$Sequence_Id);
                      }
-                     exception($e);
+                    //  exception($e);
+                    $log_path = realpath("")."/error/1.log";
+                    $myfile = fopen($log_path,'a+');
+                    fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
+                    fwrite($myfile,$e."\n");
+                    fclose($myfile);
                     socket_close($socket);
                     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                     socket_connect($socket, $host, $port);
