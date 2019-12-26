@@ -1315,7 +1315,7 @@ class CmppCreateCodeTask extends Pzlife {
                     foreach ($sendunknow as $send => $value) {
                         $value = json_decode($value,true);
                         if (!isset($value['receive_time'])) {
-                            if (time()- $value['my_submit_time'] >= $untime) {
+                            if (time()- $value['my_submit_time'] >= 1800) {
                                 $value_task     = Db::query("SELECT * FROM yx_user_send_game_task WHERE `id` = '" . $value['mar_task_id'] . "'");
                                 if (empty($value_task)) {
                                     continue;
