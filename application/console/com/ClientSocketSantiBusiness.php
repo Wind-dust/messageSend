@@ -56,7 +56,7 @@ class ClientSocketSantiBusiness extends Pzlife {
         //     print_r($send);
         // } while ($send);
         // $send = $redis ->lPop($redisMessageCodeSend);
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+/*         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'uid'         => '1',
@@ -84,7 +84,7 @@ class ClientSocketSantiBusiness extends Pzlife {
             'content'     => '【钰蜥科技】您本次登录的验证码为062835',
             'Submit_time' => date('mdHis', time()),
         ]));
-
+ */
         
         // $send = $redis->lPop($redisMessageCodeSend);
         // $send_data = json_decode($send, true);
@@ -310,7 +310,7 @@ class ClientSocketSantiBusiness extends Pzlife {
                                             $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                                             $new_Total_Length = strlen($new_body) + 12;
                                             $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id2']);
-                                            socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                                            // socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                         } else if ($head['Command_Id'] == 0x00000008) {
                                             echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                                         } else if ($head['Command_Id'] == 0x80000008) {

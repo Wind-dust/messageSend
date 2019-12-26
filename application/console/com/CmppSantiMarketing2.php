@@ -137,6 +137,7 @@ class CmppSantiMarketing2 extends Pzlife {
         $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
         // $redisMessageCodeDeliver    = 'index:meassage:code:deliver:' . $content; //行业通知MsgId
         $redisMessageCodeDeliver    = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
+        $redisMessageUnKownDeliver = 'index:meassage:game:unknow:deliver:' . $content; //行业通知MsgId
         // $redisMessageCodeSend       = 'index:meassage:marketing:send:' . $content; //营销发送任务rediskey
         // $redisMessageCodeSequenceId = 'index:meassage:marketing:sequence:id:' . $content; //营销行业通知SequenceId
         // $redisMessageCodeMsgId      = 'index:meassage:marketing:msg:id:' . $content; //营销行业通知SequenceId
@@ -155,12 +156,12 @@ class CmppSantiMarketing2 extends Pzlife {
         // $send = $redis->lPop("index:meassage:code:send:1");
         // $send = $redis->rPush($redisMessageCodeSend,"15555555555:12:【品质生活】祝您生活愉快");
 
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15201926171',
-            'title'      => '【美丽田园】电商圣诞节活动将至，感恩回馈！',
-            'mar_task_id' => 15769,
-            'content'     => '【美丽田园】电商圣诞节活动将至，感恩回馈！',
-        ]));
+        // $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        //     'mobile'      => '15201926171',
+        //     'title'      => '【美丽田园】电商圣诞节活动将至，感恩回馈！',
+        //     'mar_task_id' => 15769,
+        //     'content'     => '【美丽田园】电商圣诞节活动将至，感恩回馈！',
+        // ]));
         
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
@@ -182,7 +183,7 @@ class CmppSantiMarketing2 extends Pzlife {
         if (socket_connect($socket, $host, $port) == false) {
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
-            socket_set_nonblock($socket); //设置非阻塞模式
+            // socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
             do {
@@ -363,6 +364,14 @@ class CmppSantiMarketing2 extends Pzlife {
                                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
                                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
 
+                                            }else{//不在记录中的回执存入缓存，
+                                                print_r($body);
+                                                print_r($Msg_Content);
+                                                $mesage['Stat']        = $Msg_Content['Stat'];
+                                                $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+                                                $mesage['Done_time']   = $Msg_Content['Done_time'];
+                                                // $mesage['mobile']      = $body['Dest_Id '];//手机号
+                                                $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
                                             }
                                             $callback_Command_Id = 0x80000005;
 
@@ -538,6 +547,14 @@ class CmppSantiMarketing2 extends Pzlife {
                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
 
+                            }else{//不在记录中的回执存入缓存，
+                                print_r($body);
+                                print_r($Msg_Content);
+                                $mesage['Stat']        = $Msg_Content['Stat'];
+                                $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+                                $mesage['Done_time']   = $Msg_Content['Done_time'];
+                                // $mesage['mobile']      = $body['Dest_Id '];//手机号
+                                $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
                             }
                             print_r($mesage);
                             $callback_Command_Id = 0x80000005;
