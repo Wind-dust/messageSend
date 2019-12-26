@@ -65,11 +65,11 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
         $redisMessageCodeDeliver = 'index:meassage:game:new:deliver:' . $content; //行业通知MsgId
         $redisMessageUnKownDeliver = 'index:meassage:game:unknow:deliver:' . $content; //行业通知MsgId
 
-        /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15051585351',
-            'mar_task_id' => '96',
+         $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '13651913994',
+            'mar_task_id' => '',
             'content'     => '【陈情劫】已为您发出6888888钻石和超级VIP，今日限领玄鲲坐骑！戳 https://ltv7.cn/68AK3 回T退订',
-        ])); */
+        ]));
         /*
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15172413692',
