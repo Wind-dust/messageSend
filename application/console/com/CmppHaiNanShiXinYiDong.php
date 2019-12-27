@@ -70,7 +70,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
             'mar_task_id' => '',
             'content'     => '【陈情劫】已为您发出6888888钻石和超级VIP，今日限领玄鲲坐骑！戳 https://ltv7.cn/68AK3 回T退订',
         ]));
-        /*
+        
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15172413692',
             'mar_task_id' => '',
@@ -82,10 +82,10 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
             'content'     => '【雪域传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/64v99 回T退订',
         ]));
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15555555555',
+            'mobile'      => '15201926171',
             'mar_task_id' => '',
             'content'     => '【雪域传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/64v99 回T退订',
-        ])); */
+        ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("")."/error/14.log";
         $myfile = fopen($log_path,'a+');
@@ -206,6 +206,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                     $headData = socket_read($socket, 12);
                                     if ($headData != false) {
                                         $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
+                                        print_r($head);
                                         $bodyData = socket_read($socket, $head['Total_Length'] - 12);
                                         if ($head['Command_Id'] == 0x80000001) {
                                             $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
@@ -404,7 +405,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                     $headData = socket_read($socket, 12);
                     if ($headData != false) {
                         $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
-                        // print_r($head);
+                        print_r($head);
                         $bodyData = socket_read($socket, $head['Total_Length'] - 12);
                         // print_r($bodyData);
                         // echo "\n";
