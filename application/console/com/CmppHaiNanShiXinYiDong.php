@@ -400,7 +400,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                 $this->error_log("心跳 write");
                            };
                             
-                            sleep(1);
+                           usleep(1200);
                         }
                     }
                     
