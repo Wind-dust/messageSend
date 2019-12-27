@@ -1312,9 +1312,9 @@ class CmppCreateCodeTask extends Pzlife {
                 // $redis->rpush($redisMessageCodeSend, json_encode($send_log));
                 
             //未知
-            if (!isset($untime)){
-                continue;
-            }
+            // if (!isset($untime)){
+            //     continue;
+            // }
             // continue;
                 $sendunknow = $redis->hgetall('index:meassage:game:msg:id:14');
                 if (!empty($sendunknow)) {
