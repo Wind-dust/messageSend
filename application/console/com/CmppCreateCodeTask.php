@@ -1318,7 +1318,7 @@ class CmppCreateCodeTask extends Pzlife {
             // continue;
                 $sendunknow = $redis->hgetall('index:meassage:game:msg:id:14');
                 if (!empty($sendunknow)) {
-                    sleep($untime);
+                    // sleep($untime);
                     foreach ($sendunknow as $send => $value) {
                         $value = json_decode($value,true);
                         if (!isset($value['receive_time'])) {
@@ -1400,7 +1400,7 @@ class CmppCreateCodeTask extends Pzlife {
             $witenosend = $redis->lpop("index:meassage:game:waitcmppdeliver");
             if (!empty($witenosend)) {
                 // continue;
-                sleep($untime);
+                // sleep($untime);
                 $witenosend_log = json_decode($witenosend, true);
                 $witenosend_task     = Db::query("SELECT * FROM yx_user_send_game_task WHERE `id` = '" . $witenosend_log['mar_task_id'] . "'");
                 if (empty($witenosend_task)) {
