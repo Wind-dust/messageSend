@@ -317,7 +317,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                                 $mesage['Stat']        = $Msg_Content['Stat'];
                                                 $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
-                                                $mesage['mobile']   = $Msg_Content['Dest_terminal_Id'];
+                                                $mesage['mobile']   = trim($Msg_Content['Dest_terminal_Id']);
                                                 // $mesage['mobile']      = $body['Dest_Id '];//手机号
                                                 $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
                                             }
@@ -512,7 +512,7 @@ class CmppHaiNanShiXinYiDong extends Pzlife {
                                 $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
                                 // $mesage['mobile']      = $body['Dest_Id '];//手机号
-                                    $mesage['mobile']   = $Msg_Content['Dest_terminal_Id'];
+                                    $mesage['mobile']   = trim($Msg_Content['Dest_terminal_Id']);
                                 $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
 
                             }
