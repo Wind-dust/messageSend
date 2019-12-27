@@ -1304,9 +1304,51 @@ class CmppCreateCodeTask extends Pzlife {
             'my_submit_time' => time(),
         ])); */
         // $untime = 0;
+        $i = 0;
+     /*    $redis->rpush('index:meassage:game:unknow:deliver:14',json_encode([
+            'mobile' => '13737139325',
+            'Stat' => 'ID:0076',
+            'Submit_time' => '1912231821',
+            'Done_time' => '1912231821',
+        ])); */
         while (true) {
             $send_log = $redis->lpop($redisMessageCodeSend);
             $time_no = time();
+
+            //状态更新
+            $unknow_status = $redis->lpop('index:meassage:game:unknow:deliver:14');
+            if (!empty($unknow_status)) {
+                $unknow_data = json_decode($unknow_status,true);
+                if (!empty($unknow_data)) {
+                    $gametask = Db::query("SELECT * FROM yx_user_send_game_task WHERE `mobile_content` = '".$unknow_data['mobile']."' AND `status_message` ='' LIMIT 1 ");
+                    if (!empty($gametask)) {
+                        $send_msgid = explode(',', $gametask[0]['send_msg_id']);
+                                foreach ($send_msgid as $key => $msgid) {
+                                    $redis->rPush('index:meassage:game:cmppdeliver:' . $gametask[0]['uid'], json_encode([
+                                        'Stat'        => $unknow_data['Stat'],
+                                        'send_msgid'  => [$msgid],
+                                        'Done_time'   => $unknow_data['Done_time'],
+                                        'Submit_time' => $unknow_data['Submit_time'],
+                                        'mobile'      => $unknow_data['mobile'],
+                                    ]));
+                                    // if ($value == $send_log['Msg_Id']){
+                    
+                                    // }
+                                }
+                                Db::startTrans();
+                                try {
+                                    Db::table('yx_user_send_game_task')->where('id',$gametask['mar_task_id'])->update(['status_message' => $unknow_data['Stat'],'real_message' => $unknow_data['Stat']]);
+                                    Db::commit();
+                                } catch (\Exception $e) {
+                    
+                                    Db::rollback();
+                                }
+                                $i++;
+                                
+                        print_r($gametask);
+                    }
+                }
+            }
             if (empty($send_log)) {
                 // exit("send_log is null");
                 // $redis->rpush($redisMessageCodeSend, json_encode($send_log));
