@@ -66,11 +66,15 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
         $redisMessageUnKownDeliver = 'index:meassage:game:unknow:deliver:' . $content; //行业通知MsgId
 
          $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15201926171',
+            'mobile'      => '13901963667',
             'mar_task_id' => '',
             'content'     => '【美丽田园】尊敬的顾客您好！即日起非会员只需支付212元即可尊享指定护理一折体验，每月前20位体验顾客加赠精美化妆包1个，10/22-12/31日我和万象城有个约会，万象城全体员工恭候您的体验，竭诚为您的皮肤保驾护航！详询：021-54700816 回T退订',
         ]));
-        
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '13564232775',
+            'mar_task_id' => '',
+            'content'     => '【美丽田园】尊敬的顾客您好！即日起非会员只需支付212元即可尊享指定护理一折体验，每月前20位体验顾客加赠精美化妆包1个，10/22-12/31日我和万象城有个约会，万象城全体员工恭候您的体验，竭诚为您的皮肤保驾护航！详询：021-54700816 回T退订',
+        ]));
        /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15172413692',
             'mar_task_id' => '',
