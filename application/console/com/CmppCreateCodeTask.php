@@ -1327,12 +1327,19 @@ class CmppCreateCodeTask extends Pzlife {
                                 if (empty($value_task)) {
                                     continue;
                                 }
+                                $max = mt_rand(9,11);
+                                $num     = mt_rand(0, 100);
+                                if ($num <= $max) {
+                                    $Stat = 'UNKNOWN';
+                                }else{
+                                    $Stat = 'DELIVRD';
+                                }
                                 $send_msgid = explode(',', $value_task[0]['send_msg_id']);
                                 foreach ($send_msgid as $key => $msgid) {
                                     $redis->rPush('index:meassage:game:cmppdeliver:' . $value_task[0]['uid'], json_encode([
-                                        'Stat'        => 'UNKNOWN',
+                                        'Stat'        => $Stat,
                                         'send_msgid'  => [$msgid],
-                                        'Done_time'   => date('ymdHis',time()),
+                                        'Done_time'   => date('ymdHis',$value['my_submit_time']+10),
                                         'Submit_time' => date('ymdHis',$value['my_submit_time']),
                                         'mobile'      => $value['mobile'],
                                     ]));
@@ -1342,7 +1349,7 @@ class CmppCreateCodeTask extends Pzlife {
                                 }
                                 Db::startTrans();
                                 try {
-                                    Db::table('yx_user_send_game_task')->where('id',$value_task['mar_task_id'])->update(['status_message' => 'UNKNOWN','real_message' => 'UNKNOWN']);
+                                    Db::table('yx_user_send_game_task')->where('id',$value_task['mar_task_id'])->update(['status_message' => $Stat,'real_message' => 'UNKNOWN']);
                                     Db::commit();
                                 } catch (\Exception $e) {
                     
