@@ -164,7 +164,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
                             echo "发送时间：" . date("Y-m-d H:i:s", time()) . "\n";
                             $num1 = substr($timestring, 0, 8);
                             $num2 = substr($timestring, 8) . $this->combination($i);
-                            $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
+                            $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
                             if (strlen($code) > 140) {
                                 $pos          = 0;
                                 $num_messages = ceil(strlen($code) / $max_len);
@@ -179,7 +179,8 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
                                     $bodyData.= pack("a21", $mobile);
                                     $bodyData.= pack("C", 0); 
                                     $bodyData.= pack("C", 1);
-                                    $bodyData.= pack("C", 15); 
+                                    // $bodyData.= pack("C", 15); 
+                                    $bodyData.= pack("C", 8); 
                                     $bodyData.= pack("a6", $Source_Addr);
                                     $bodyData.= pack("a2", 02);
                                     $bodyData.= pack("a6", ''); 
@@ -364,7 +365,8 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
                                 $bodyData.= pack("a21", $mobile); 
                                 $bodyData.= pack("C", 0);
                                 $bodyData.= pack("C", 0);
-                                $bodyData.= pack("C", 15);
+                                // $bodyData.= pack("C", 15);
+                                $bodyData.= pack("C", 8);
                                 $bodyData.= pack("a6", $Source_Addr);
                                 $bodyData.= pack("a2", 02);
                                 $bodyData.= pack("a6", '');
