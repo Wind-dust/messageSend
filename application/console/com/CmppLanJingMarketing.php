@@ -65,11 +65,11 @@ class CmppLanJingMarketing extends Pzlife {
         // $send = $redis->lPop("index:meassage:code:send:1");
         // $send = $redis->rPush($redisMessageCodeSend,"15555555555:12:【品质生活】祝您生活愉快");
 
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+    /*     $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'content'     => '【美丽田园】尊敬的顾客您好！即日起非会员只需支付212元即可尊享指定护理一折体验，每月前20位体验顾客加赠精美化妆包1个，10/22-12/31日我和万象城有个约会，万象城全体员工恭候您的体验，竭诚为您的皮肤保驾护航！详询：021-54700816 回T退订',
-        ]));
+        ])); */
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
