@@ -65,7 +65,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
         $redisMessageCodeDeliver = 'index:meassage:game:new:deliver:' . $content; //行业通知MsgId
         $redisMessageUnKownDeliver = 'index:meassage:game:unknow:deliver:' . $content; //行业通知MsgId
 
-         $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15172413692',
             'mar_task_id' => '',
             'content'     => '【美丽田园】尊敬的顾客您好！即日起非会员只需支付212元即可尊享指定护理一折体验，每月前20位体验顾客加赠精美化妆包1个，10/22-12/31日我和万象城有个约会，万象城全体员工恭候您的体验，竭诚为您的皮肤保驾护航！详询：021-54700816 回T退订',
@@ -79,7 +79,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'content'     => '【美丽田园】尊敬的顾客您好！即日起非会员只需支付212元即可尊享指定护理一折体验，每月前20位体验顾客加赠精美化妆包1个，10/22-12/31日我和万象城有个约会，万象城全体员工恭候您的体验，竭诚为您的皮肤保驾护航！详询：021-54700816 回T退订',
-        ]));
+        ])); */
       
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("")."/error/16.log";
@@ -116,7 +116,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
             $this->error_log("connect");die;
         } else {
-            // socket_set_nonblock($socket); //设置非阻塞模式
+            socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
             
