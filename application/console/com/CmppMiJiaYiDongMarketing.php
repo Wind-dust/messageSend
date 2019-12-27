@@ -65,7 +65,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
         $redisMessageCodeDeliver = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
         $redisMessageUnKownDeliver = 'index:meassage:code:unknow:deliver:' . $content; //行业通知MsgId
 
-         $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15172413692',
             'mar_task_id' => '',
             'content'     => '【美丽田园】尊敬的顾客您好！即日起非会员只需支付212元即可尊享指定护理一折体验，每月前20位体验顾客加赠精美化妆包1个，10/22-12/31日我和万象城有个约会，万象城全体员工恭候您的体验，竭诚为您的皮肤保驾护航！详询：021-54700816 回T退订',
@@ -80,7 +80,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
             'mar_task_id' => '',
             'content'     => '【美丽田园】尊敬的顾客您好！即日起非会员只需支付212元即可尊享指定护理一折体验，每月前20位体验顾客加赠精美化妆包1个，10/22-12/31日我和万象城有个约会，万象城全体员工恭候您的体验，竭诚为您的皮肤保驾护航！详询：021-54700816 回T退订',
         ]));
-      
+       */
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("")."/error/16.log";
         $myfile = fopen($log_path,'a+');
@@ -293,7 +293,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
                                             $contentlen = $head['Total_Length'] - 65 - 12;
                                             $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
                                             $stalen = $body['Msg_Length']-20-8-21-4;
-                                            $Msg_Content = unpack("N2Msg_Id/a".$stalen."Stat/a10Submit_time/a10Done_time/", $body['Msg_Content']);
+                                            $Msg_Content = unpack("N2Msg_Id/a".$stalen."Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence ", $body['Msg_Content']);
 
                                             $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                                             if ($mesage) {
@@ -313,7 +313,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
                                                 $mesage['Stat']        = $Msg_Content['Stat'];
                                                 $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
-                                                // $mesage['mobile']      = $body['Dest_Id '];//手机号
+                                                $mesage['mobile']   = $Msg_Content['Dest_terminal_Id'];
                                                 $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
                                             }
                                             $callback_Command_Id = 0x80000005;
@@ -486,7 +486,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
                             $contentlen = $head['Total_Length'] - 65 - 12;
                             $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
                             $stalen = $body['Msg_Length']-20-8-21-4;
-                            $Msg_Content = unpack("N2Msg_Id/a".$stalen."Stat/a10Submit_time/a10Done_time/", $body['Msg_Content']);
+                            $Msg_Content = unpack("N2Msg_Id/a".$stalen."Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence ", $body['Msg_Content']);
                             
                             $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                             if ($mesage) {//获取是否在记录中
@@ -507,6 +507,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
                                 $mesage['Stat']        = $Msg_Content['Stat'];
                                 $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
+                                $mesage['mobile']   = $Msg_Content['Dest_terminal_Id'];
                                 // $mesage['mobile']      = $body['Dest_Id '];//手机号
                                 $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
 
