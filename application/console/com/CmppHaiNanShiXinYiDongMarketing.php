@@ -64,7 +64,7 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife {
         ]));
       
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $log_path = realpath("")."/error/16.log";
+        $log_path = realpath("")."/error/17.log";
         $myfile = fopen($log_path,'a+');
         fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
         fwrite($myfile," Begin"."\n");
@@ -88,7 +88,7 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife {
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
 
-        $log_path = realpath("")."/error/16.log";
+        $log_path = realpath("")."/error/17.log";
         $myfile = fopen($log_path,'a+');
         fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
         fwrite($myfile," host:".$host." port:".$port."\n");
@@ -532,7 +532,7 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife {
                      }
                      
                     //  exception($e);
-                     $log_path = realpath("")."/error/16.log";
+                     $log_path = realpath("")."/error/17.log";
                      $myfile = fopen($log_path,'a+');
                      fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
                      fwrite($myfile,$e."\n");
@@ -561,7 +561,7 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife {
     }
 
     public function error_log($error_type){
-        $log_path = realpath("")."/error/16.log";
+        $log_path = realpath("")."/error/17.log";
         $myfile = fopen($log_path,'a+');
         fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
         fwrite($myfile,$error_type." fail massaege:".socket_strerror(socket_last_error())."\n");
@@ -582,23 +582,6 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife {
         return join('', $arr);
     }
 
-    public function decodeString() {
-        // echo strlen("³½'¹ ");
-        $timestring = time();
-        $num1       = substr($timestring, 0, 8);
-        $num2       = substr($timestring, 8) . $this->combination(rand(1, 240));
-        echo $num1;
-        echo "\n";
-        echo $num2;
-
-        $a = pack("N", $num1) . pack("N", $num2);
-        echo $a . "\n";
-        print_r(unpack("N2Msg_Id", $a));
-
-        die;
-        $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/", "³f󿾧©¬DELIVRD1911071650191107165515201926171AG");
-
-    }
 
     /**
      * 6位数字补齐
