@@ -1350,7 +1350,7 @@ class CmppCreateCodeTask extends Pzlife {
                                 }
                                 $i++;
                                 
-                        print_r($gametask);
+                        // print_r($gametask);
                     }
                 }
             }
