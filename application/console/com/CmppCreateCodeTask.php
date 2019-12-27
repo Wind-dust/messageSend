@@ -1318,9 +1318,12 @@ class CmppCreateCodeTask extends Pzlife {
             //状态更新
             $unknow_status = $redis->lpop('index:meassage:game:unknow:deliver:14');
             print_r($unknow_status);
-            $redis->rpush('index:meassage:game:unknow:deliver:14',$unknow_status); die;
+            // $redis->rpush('index:meassage:game:unknow:deliver:14',$unknow_status); die;
             if (!empty($unknow_status)) {
                 $unknow_data = json_decode($unknow_status,true);
+                if (!isset($unknow_data['mobile'])) {
+                    continue;
+                }
                 if (!empty($unknow_data)) {
                     $gametask = Db::query("SELECT * FROM yx_user_send_game_task WHERE `mobile_content` = '".$unknow_data['mobile']."' AND `status_message` ='' LIMIT 1 ");
                     if (!empty($gametask)) {
