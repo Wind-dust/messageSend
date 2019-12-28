@@ -235,7 +235,7 @@ class Send extends MyController {
         //     return ['code' => '3005'];
         // }
         // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
-        if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 8) {
+        if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 10) {
             return ['code' => '3006'];
         }
         // print_r($task_name);die;
