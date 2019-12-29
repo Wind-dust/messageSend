@@ -259,11 +259,6 @@ class ClientSocketSantiBusiness extends Pzlife {
 
                 }
                 if ($verify_status == 0) {//验证成功并且所有信息已读完可进行发送操作
-                    ++$i;
-                    ++$Sequence_Id;
-                    if ($Sequence_Id > 65536) {
-                        $Sequence_Id = 1;
-                    }
                     while (true) {
                             
                          echo $Sequence_Id . "\n";
@@ -466,7 +461,6 @@ class ClientSocketSantiBusiness extends Pzlife {
                                     if ($i > $security_master) {
                                         $i    = 0;
                                     }
-                                    continue;
                                 } else { //单条短信
     
                                     $bodyData = pack("N", $num1) . pack("N", $num2);
@@ -495,24 +489,31 @@ class ClientSocketSantiBusiness extends Pzlife {
                                     $bodyData.= pack("a8", ''); 
                                     $Command_Id = 0x00000004; // 短信发送
                                     $time = 0;
+                                    if ($i > $security_master) {
+                                        $time = 1;
+                                        $i    = 0;
+                                    }
+                                    $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
+                                    $Total_Length = strlen($bodyData) + 12;
+                                    $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                    socket_write($socket, $headData . $bodyData, $Total_Length);
+                                    
+                                     $send_status = 2;
+                                     usleep(300);
                                 }
-                                if ($i > $security_master) {
-                                    $time = 1;
-                                    $i    = 0;
-                                }
-                                $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
-                                $Total_Length = strlen($bodyData) + 12;
-                                $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                socket_write($socket, $headData . $bodyData, $Total_Length);
-                                
-                                 $send_status = 2;
-                                 usleep(300);
+                               
                             } else {
                                 $Command_Id  = 0x00000008; //保持连接
                                 $Total_Length = 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                 socket_write($socket, $headData , $Total_Length);
                                 sleep(1);
+                            }
+                            
+                            ++$i;
+                            ++$Sequence_Id;
+                            if ($Sequence_Id > 65536) {
+                                $Sequence_Id = 1;
                             }
 
                         }
