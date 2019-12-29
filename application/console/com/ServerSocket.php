@@ -83,6 +83,7 @@ class ServerSocket extends Pzlife {
                             {
                                 // $bodyData = socket_read($accept_resource, $head['Total_Length'] - 12);
                                 $body = unpack("a6Source_Addr/a16AuthenticatorSource/CVersion/NTimestamp", $bodyData);
+                                // print_r($body);
                                 //ip地址绑定
                                 if (!in_array($addr, $bin_ip)) {
                                     $status       = 2;
