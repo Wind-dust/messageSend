@@ -111,6 +111,11 @@ class ClientSocketSantiBusiness extends Pzlife {
         // $send = $this->redis->lPop($redisMessageCodeSend);
         // print_r($send);
         // die;
+        $log_path = realpath("")."/error/1.log";
+        $myfile = fopen($log_path,'a+');
+        fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
+        fwrite($myfile," Begin"."\n");
+        fclose($myfile);
         if (socket_connect($socket, $host, $port) == false) {
             echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
@@ -516,7 +521,7 @@ class ClientSocketSantiBusiness extends Pzlife {
                                      usleep(300);
                                 }
                                
-                            } else {
+                            } else {//心跳
                                 $Command_Id  = 0x00000008; //保持连接
                                 $Total_Length = 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
@@ -538,8 +543,13 @@ class ClientSocketSantiBusiness extends Pzlife {
                                 $redis->hset($redisMessageCodeSequenceId,$Sequence_Id);
                             }
                             socket_close($socket);
-                            
-                             exception($e);
+
+                            $log_path = realpath("")."/error/1.log";
+                            $myfile = fopen($log_path,'a+');
+                            fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
+                            fwrite($myfile,$e."\n");
+                            fclose($myfile);
+                            //  exception($e);
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                             socket_connect($socket, $host, $port);
                             $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
