@@ -234,7 +234,8 @@ class ClientSocketSantiBusiness extends Pzlife {
                         $Result = 0;
                         $contentlen = $head['Total_Length'] - 65 - 12;
                         $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
-                        $Msg_Content = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/", $body['Msg_Content']);
+                        $stalen = $body['Msg_Length']-20-8-21-4;
+                        $Msg_Content = unpack("N2Msg_Id/a".$stalen."Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence ", $body['Msg_Content']);
 
                         $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                         if ($mesage) {
@@ -246,6 +247,18 @@ class ClientSocketSantiBusiness extends Pzlife {
                             $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                             $mesage['Done_time']   = $Msg_Content['Done_time'];
                             $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
+
+                        }else{//不在记录中的回执存入缓存，
+                                                                
+                            print_r($body);
+                            print_r($Msg_Content);
+                            $mesage['Stat']        = $Msg_Content['Stat'];
+                            $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+                            $mesage['Done_time']   = $Msg_Content['Done_time'];
+                            // $mesage['mobile']      = $body['Dest_Id '];//手机号
+                                $mesage['mobile']   = trim($Msg_Content['Dest_terminal_Id']);
+                                $mesage['receive_time'] = time();//回执时间戳
+                            $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
 
                         }
                         $callback_Command_Id = 0x80000005;
@@ -365,7 +378,8 @@ class ClientSocketSantiBusiness extends Pzlife {
                                         $Result = 0;
                                         $contentlen = $head['Total_Length'] - 65 - 12;
                                         $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
-                                        $Msg_Content = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/", $body['Msg_Content']);
+                                        $stalen = $body['Msg_Length']-20-8-21-4;
+                                        $Msg_Content = unpack("N2Msg_Id/a".$stalen."Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence ", $body['Msg_Content']);
             
                                         $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                                         if ($mesage) {
