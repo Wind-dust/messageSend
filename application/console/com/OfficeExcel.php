@@ -323,7 +323,7 @@ class OfficeExcel extends Pzlife {
         fclose($myfile);
         die; */
         $date = date('Y-m-d H:i:s', time());
-        $time1 = strtotime('2019/12/14 17:24:08'); 
+        $time1 = strtotime('2019/12/20 17:10:48'); 
         $i = 0;
         // $CellList = array(
         //     array('title', '标题'),
@@ -439,7 +439,7 @@ class OfficeExcel extends Pzlife {
                     $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
                     // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
                 }
-                $outputFileName = "金卡1.xlsx";
+                $outputFileName = "金卡1.csv";
                 $i = 0;
                 foreach ($putdata as $key => $orderdata) {
                     //行
@@ -452,7 +452,7 @@ class OfficeExcel extends Pzlife {
                         $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                     }
                 }
-                $objWriter->save($j.'.xlsx');
+                $objWriter->save($j.'.csv');
                 // exit();
                 $j++;
                 unset($putdata);
@@ -503,7 +503,7 @@ class OfficeExcel extends Pzlife {
                     $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
                     // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
                 }
-                $outputFileName = $j.".xlsx";
+                $outputFileName = $j.".csv";
                 $i = 0;
                 foreach ($putdata as $key => $orderdata) {
                     //行
@@ -516,7 +516,7 @@ class OfficeExcel extends Pzlife {
                         $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                     }
                 }
-                $objWriter->save($j.'.xlsx');
+                $objWriter->save($j.'.csv');
                 // exit();
                 unset($putdata);
            

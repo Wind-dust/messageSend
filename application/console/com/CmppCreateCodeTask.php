@@ -1314,10 +1314,9 @@ class CmppCreateCodeTask extends Pzlife {
         while (true) {
             $send_log = $redis->lpop($redisMessageCodeSend);
             $time_no = time();
-
             //状态更新
             $unknow_status = $redis->lpop('index:meassage:game:unknow:deliver:14');
-            print_r($unknow_status);
+            // print_r($unknow_status);
             // $redis->rpush('index:meassage:game:unknow:deliver:14',$unknow_status); die;
             if (!empty($unknow_status)) {
                 $unknow_data = json_decode($unknow_status,true);
@@ -1342,7 +1341,7 @@ class CmppCreateCodeTask extends Pzlife {
                                 }
                                 Db::startTrans();
                                 try {
-                                    Db::table('yx_user_send_game_task')->where('id',$gametask['mar_task_id'])->update(['status_message' => $unknow_data['Stat'],'real_message' => $unknow_data['Stat']]);
+                                    Db::table('yx_user_send_game_task')->where('id',$gametask[0]['id'])->update(['status_message' => $unknow_data['Stat'],'real_message' => $unknow_data['Stat']]);
                                     Db::commit();
                                 } catch (\Exception $e) {
                     
@@ -1354,7 +1353,8 @@ class CmppCreateCodeTask extends Pzlife {
                     }
                 }
             }
-            if (empty($send_log)) {
+            
+            if (!empty($send_log)) {
                 // exit("send_log is null");
                 // $redis->rpush($redisMessageCodeSend, json_encode($send_log));
                 
@@ -1362,97 +1362,103 @@ class CmppCreateCodeTask extends Pzlife {
             // if (!isset($untime)){
             //     continue;
             // }
-            // continue;
-                $sendunknow = $redis->hgetall('index:meassage:game:msg:id:14');
-                if (!empty($sendunknow)) {
-                    // sleep($untime);
-                    foreach ($sendunknow as $send => $value) {
-                        $value = json_decode($value,true);
-                        if (!isset($value['receive_time'])) {
-                            if (time()- $value['my_submit_time'] >= 1800) {
-                                $value_task     = Db::query("SELECT * FROM yx_user_send_game_task WHERE `id` = '" . $value['mar_task_id'] . "'");
-                                if (empty($value_task)) {
-                                    continue;
-                                }
-                                $max = mt_rand(9,11);
-                                $num     = mt_rand(0, 100);
-                                if ($num <= $max) {
-                                    $Stat = 'UNKNOWN';
-                                }else{
-                                    $Stat = 'DELIVRD';
-                                }
-                                $send_msgid = explode(',', $value_task[0]['send_msg_id']);
-                                foreach ($send_msgid as $key => $msgid) {
-                                    $redis->rPush('index:meassage:game:cmppdeliver:' . $value_task[0]['uid'], json_encode([
-                                        'Stat'        => $Stat,
-                                        'send_msgid'  => [$msgid],
-                                        'Done_time'   => date('ymdHis',$value['my_submit_time']+10),
-                                        'Submit_time' => date('ymdHis',$value['my_submit_time']),
-                                        'mobile'      => $value['mobile'],
-                                    ]));
-                                    // if ($value == $send_log['Msg_Id']){
+                $redis->rpush('index:meassage:game:cms:deliver:', json_encode($send_log));//游戏通道实际码
+                $send_log = json_decode($send_log, true);
+                if (!isset($untime)) {
+                    $untime = $send_log['receive_time'] - $send_log['my_submit_time'];
                     
-                                    // }
-                                }
-                                Db::startTrans();
-                                try {
-                                    Db::table('yx_user_send_game_task')->where('id',$value_task['mar_task_id'])->update(['status_message' => $Stat,'real_message' => 'UNKNOWN']);
-                                    Db::commit();
-                                } catch (\Exception $e) {
-                    
-                                    Db::rollback();
-                                }
-                                $redis->hdel('index:meassage:game:msg:id:14', $send);
-                                break;
+                }else{
+                    $untime = $send_log['receive_time'] - $send_log['my_submit_time'] > $untime ? $send_log['receive_time'] - $send_log['my_submit_time'] : $untime;
+                }
+                $task     = Db::query("SELECT * FROM yx_user_send_game_task WHERE `id` = '" . $send_log['mar_task_id'] . "'");
+                if (empty($task)) {
+                    continue;
+                }
+                if ($send_log['Stat'] != 'DELIVRD') {
+                    $send_status = 4;
+                } else {
+                    $send_status = 3;
+                }
+                if (empty($task[0]['status_message'])) {
+                    $send_msgid = explode(',', $task[0]['send_msg_id']);
+                    foreach ($send_msgid as $key => $value) {
+                        $redis->rPush('index:meassage:game:cmppdeliver:' . $task[0]['uid'], json_encode([
+                            'Stat'        => $send_log['Stat'],
+                            'send_msgid'  => [$value],
+                            'Done_time'   => $send_log['Done_time'],
+                            'Submit_time' => $task[0]['create_time'],
+                            'mobile'      => $send_log['mobile'],
+                        ]));
+                        // if ($value == $send_log['Msg_Id']){
+    
+                        // }
+                    }
+                }
+               
+                Db::startTrans();
+                try {
+                    Db::table('yx_user_send_game_task')->where('id',$send_log['mar_task_id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $send_log['Stat']]);
+                    Db::commit();
+                } catch (\Exception $e) {
+
+                    Db::rollback();
+                }
+
+
+            }
+            $sendunknow = $redis->hgetall('index:meassage:game:msg:id:14');
+            if (!empty($sendunknow)) {
+                // sleep($untime);
+                foreach ($sendunknow as $send => $value) {
+                    $value = json_decode($value,true);
+                    if (!isset($value['receive_time'])) {
+                        if (time()- $value['my_submit_time'] >= 1800) {
+                            $value_task     = Db::query("SELECT * FROM yx_user_send_game_task WHERE `id` = '" . $value['mar_task_id'] . "'");
+                            if (empty($value_task)) {
+                                continue;
                             }
+                            $max = mt_rand(9,11);
+                            $num     = mt_rand(0, 100);
+                            if ($num <= $max) {
+                                $Stat = 'UNKNOWN';
+                            }else{
+                                $Stat = 'DELIVRD';
+                            }
+                            $send_msgid = explode(',', $value_task[0]['send_msg_id']);
+                            foreach ($send_msgid as $key => $msgid) {
+                                $redis->rPush('index:meassage:game:cmppdeliver:' . $value_task[0]['uid'], json_encode([
+                                    'Stat'        => $Stat,
+                                    'send_msgid'  => [$msgid],
+                                    'Done_time'   => date('ymdHis',$value['my_submit_time']+10),
+                                    'Submit_time' => date('ymdHis',$value['my_submit_time']),
+                                    'mobile'      => $value['mobile'],
+                                ]));
+                                // if ($value == $send_log['Msg_Id']){
+                
+                                // }
+                            }
+                            Db::startTrans();
+                            try {
+                                Db::table('yx_user_send_game_task')->where('id',$value['mar_task_id'])->update(['status_message' => $Stat,'real_message' => 'UNKNOWN']);
+                                Db::commit();
+                            } catch (\Exception $e) {
+                
+                                Db::rollback();
+                            }
+                            $redis->hdel('index:meassage:game:msg:id:14', $send);
+                            break;
                         }
                     }
                 }
-                continue;
             }
             
-            $redis->rpush('index:meassage:game:cms:deliver:', json_encode($send_log));//游戏通道实际码
-            $send_log = json_decode($send_log, true);
-            if (!isset($untime)) {
-                $untime = $send_log['receive_time'] - $send_log['my_submit_time'];
-                
-            }else{
-                $untime = $send_log['receive_time'] - $send_log['my_submit_time'] > $untime ? $send_log['receive_time'] - $send_log['my_submit_time'] : $untime;
-            }
-            $task     = Db::query("SELECT * FROM yx_user_send_game_task WHERE `id` = '" . $send_log['mar_task_id'] . "'");
-            if (empty($task)) {
-                continue;
-            }
-            if ($send_log['Stat'] != 'DELIVRD') {
-                $send_status = 4;
-            } else {
-                $send_status = 3;
-            }
-            $send_msgid = explode(',', $task[0]['send_msg_id']);
-            foreach ($send_msgid as $key => $value) {
-                $redis->rPush('index:meassage:game:cmppdeliver:' . $task[0]['uid'], json_encode([
-                    'Stat'        => $send_log['Stat'],
-                    'send_msgid'  => [$value],
-                    'Done_time'   => $send_log['Done_time'],
-                    'Submit_time' => $task[0]['create_time'],
-                    'mobile'      => $send_log['mobile'],
-                ]));
-                // if ($value == $send_log['Msg_Id']){
 
-                // }
-            }
-            Db::startTrans();
-            try {
-                Db::table('yx_user_send_game_task')->where('id',$send_log['mar_task_id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $send_log['Stat']]);
-                Db::commit();
-            } catch (\Exception $e) {
-
-                Db::rollback();
-            }
+           
 
             //扣量
             $witenosend = $redis->lpop("index:meassage:game:waitcmppdeliver");
             if (!empty($witenosend)) {
+                
                 // continue;
                 // sleep($untime);
                 $witenosend_log = json_decode($witenosend, true);
@@ -1485,7 +1491,60 @@ class CmppCreateCodeTask extends Pzlife {
 
             // print_r("SELECT `id`,`uid`,`msgid`,`create_time` FROM yx_user_send_code_task_log WHERE `mobile` = " . $send_log['mobile'] . " AND `task_no` = '" . $task[0]['task_no'] . "'");die;
             
+            //状态回执慢
+    
+            $day_time = strtotime(date('Y-m-d 0:00:00',time()));
+        // $day_time = strtotime(date('2019-12-27 0:00:00',time()));
+        $low = Db::query("SELECT * FROM yx_user_send_game_task WHERE `status_message` = '' AND `create_time` > ".$day_time. " ORDER BY ID ASC LIMIT 1");
+        if (!empty($low)) {
+            $rece_time = mt_rand(15,18);
+            if (time() - $low[0]['create_time'] > $rece_time){
+                $send_msgid = explode(',', $low[0]['send_msg_id']);
+                
+                $utime = mt_rand(8,12);
+                $bounts = [
+                    0 => 4,
+                    1 => 5,
+                    2 => $utime,
+                    3 => 1000,
+                ];
+                $tatus_array = [
+                    0 => 'FIBLACK',
+                    1 => 'MK:0000',
+                    2 => 'ID:0076',
+                    3 => 'DELIVRD'
+                ];
+                $num = mt_rand(0,max($bounts));
+                foreach ($bounts as $b => $s) {
+                    if ($num <= $s) {
+                        $thisstatus = $tatus_array[$b];
+                        break;
+                    }
+                }
+                foreach ($send_msgid as $key => $value) {
+                    $redis->rPush('index:meassage:game:cmppdeliver:' . $low[0]['uid'], json_encode([
+                        'Stat'        => $thisstatus,
+                        'send_msgid'  => [$value],
+                        'Done_time'   => date('ymdHis',$low[0]['create_time']+$utime),
+                        'Submit_time' => date('ymdHis',$low[0]['create_time']),
+                        'mobile'      => $low[0]['mobile_content'],
+                    ]));
+                    // if ($value == $send_log['Msg_Id']){
+    
+                    // }
+                }
+                Db::startTrans();
+                try {
+                    Db::table('yx_user_send_game_task')->where('id',$low[0]['id'])->update(['status_message' => $thisstatus]);
+                    Db::commit();
+                } catch (\Exception $e) {
+                    exception($e);
+                    Db::rollback();
+                }
+            }
         }
+        }
+        
     }
 
     public function getNumberSource($prefix) {

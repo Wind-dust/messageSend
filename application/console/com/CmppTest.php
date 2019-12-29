@@ -239,280 +239,35 @@ class CmppTest extends Pzlife {
         // print_r($send);
         // die;
         if (socket_connect($socket, $host, $port) == false) {
-            // echo 'connect fail massege:' . socket_strerror(socket_last_error());
+            echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
             socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = 1;
-            do {
-                try
-                {
-                    date_default_timezone_set('PRC');
-                    echo $Sequence_Id . "\n";
-                    $time                = 0;
-                    $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
-                    $Timestamp           = date('mdHis');
-                    $AuthenticatorSource = md5($Source_Addr . pack("a9", "") . $Shared_secret . $Timestamp, true);
-                    if ($i == 1) {
-                        $bodyData   = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
-                        $Command_Id = 0x00000001;
-                        $Total_Length = strlen($bodyData) + 12;
-                        $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                        socket_write($socket, $headData . $bodyData, $Total_Length);
-                    } else {
-                        //当有号码发送需求时 进行提交
-                        /* redis 读取需要发送的数据 */
-                        $send = $redis->lPop($redisMessageCodeSend);
-                        if ($send) { //正式使用从缓存中读取数据
-                            
-                            $send_status = 1;
-                            $send_data = [];
-                            $send_data = json_decode($send, true);
-                            // $mobile = $senddata['mobile_content'];
-                            $mobile   = $send_data['mobile'];
-                            $txt_head = 6;
-                            $txt_len  = 140;
-                            $max_len  = $txt_len - $txt_head;
-                            $code = $send_data['content']; //带签名
-                            $uer_num    = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
-                            $timestring = time();
-                            echo "发送时间：" . date("Y-m-d H:i:s", time()) . "\n";
-                            $num1 = substr($timestring, 0, 8);
-                            $num2 = substr($timestring, 8) . $this->combination($i);
-                            $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
-                            // iconv("UTF-8","gbk",$code);
-                            // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
-                            // print_r($code);die;
-                            if (strlen($code) > 140) {
-                                $pos          = 0;
-                                $num_messages = ceil(strlen($code) / $max_len);
-                                for ($j = 0; $j < $num_messages; $j++) {
-                                    $bodyData = pack("N", $num1) . pack("N", $num2);
-                                    $bodyData.= pack('C', $num_messages);
-                                    $bodyData.= pack('C', $j + 1); 
-                                    $bodyData.= pack('C', 1);
-                                    $bodyData.= pack('C', ''); 
-                                    $bodyData.= pack("a10", $Service_Id);
-                                    $bodyData.= pack('C', ''); 
-                                    $bodyData.= pack("a21", $mobile);
-                                    $bodyData.= pack("C", 0); 
-                                    $bodyData.= pack("C", 1);
-                                    $bodyData.= pack("C", 15); 
-                                    $bodyData.= pack("a6", $Source_Addr);
-                                    $bodyData.= pack("a2", 02);
-                                    $bodyData.= pack("a6", ''); 
-                                    $bodyData.= pack("a17", '');
-                                    $bodyData.= pack("a17", ''); 
-                                    $bodyData.= pack("a21", $Dest_Id);
-                                    $bodyData.= pack("C", $uer_num);
-                                    $p_n      = 21 * $uer_num;
-                                    $bodyData.= pack("a" . $p_n, $mobile);
-                                    $udh     = pack("cccccc", 5, 0, 3, $Sequence_Id, $num_messages, $j + 1);
-                                    $newcode = $udh . substr($code, $j * $max_len, $max_len);
-                                    $len     = strlen($newcode);
-                                    $bodyData.= pack("C", $len);
-                                    $bodyData.= pack("a" . $len, $newcode);
-                                    $bodyData.= pack("a8", '');
-                                    $Command_Id = 0x00000004; // 短信发送
-                                    $Total_Length = strlen($bodyData) + 12;
-                                    $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                    $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
-                                    usleep(300);
-                                    socket_write($socket, $headData . $bodyData, $Total_Length);
-                                    $send_status = 2;
-                                    $headData = socket_read($socket, 12);
-                                    if ($headData != false) {
-                                        $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
-                                        $bodyData = socket_read($socket, $head['Total_Length'] - 12);
-                                        if ($head['Command_Id'] == 0x80000001) {
-                                            $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
-                                            switch ($body['Status']) {
-                                            case 0:
-                                                break;
-                                            case 1:
-                                                $error_msg = "消息结构错";
-                                                break;
-                                            case 2:
-                                                $error_msg = "非法源地址";
-                                                break;
-                                            case 3:
-                                                $error_msg = "认证错误";
-                                                break;
-                                            case 4:
-                                                $error_msg = "版本错误";
-                                                break;
-                                            default:
-                                                $error_msg = "其他错误";
-                                                break;
-                                            }
-                                            //通道断口处理
-                                            if ($body['Status'] != 0) {
-                                                exit($error_msg);
-                                            }
-                                        } else if ($head['Command_Id'] == 0x80000004) {
-                                            $body = unpack("N2Msg_Id/CResult", $bodyData);
-                                            // print_r($body);
-                                            $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
-                                            if ($sequence) {
-                                                $sequence           = json_decode($sequence, true);
-                                                $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
-                                                $sequence['Msg_Id'] = $msgid;
-                                                $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
-                                                $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
-                                            }
-
-                                            switch ($body['Result']) {
-                                            case 0:
-                                                echo "发送成功" . "\n";
-                                                break;
-                                            case 1:
-                                                echo "消息结构错" . "\n";
-                                                $error_msg = "消息结构错";
-                                                break;
-                                            case 2:
-                                                echo "命令字错" . "\n";
-                                                $error_msg = "命令字错";
-                                                break;
-                                            case 3:
-                                                echo "消息序号重复" . "\n";
-                                                $error_msg = "消息序号重复";
-                                                break;
-                                            case 4:
-                                                echo "消息长度错" . "\n";
-                                                $error_msg = "消息长度错";
-                                                break;
-                                            case 5:
-                                                echo "资费代码错" . "\n";
-                                                $error_msg = "资费代码错";
-                                                break;
-                                            case 6:
-                                                echo "超过最大信息长" . "\n";
-                                                $error_msg = "超过最大信息长";
-                                                break;
-                                            case 7:
-                                                echo "业务代码错" . "\n";
-                                                $error_msg = "业务代码错";
-                                                break;
-                                            case 8:
-                                                echo "流量控制错" . "\n";
-                                                $error_msg = "业务代码错";
-                                                break;
-                                            default:
-                                                echo "其他错误" . "\n";
-                                                $error_msg = "其他错误";
-                                                break;
-                                            }
-                                            if ($body['Result'] != 0) { //消息发送失败
-                                                echo "发送失败" . "\n";
-                                                $error_msg = "其他错误";
-                                            } else {
-
-                                            }
-                                        } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
-                                            $Result = 0;
-                                            $contentlen = $head['Total_Length'] - 65 - 12;
-                                            $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
-                                            $Msg_Content = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/", $body['Msg_Content']);
-
-                                            $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
-                                            if ($mesage) {
-                                                $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
-                                                // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
-                                                $mesage                = json_decode($mesage, true);
-                                                $mesage['Stat']        = $Msg_Content['Stat'];
-                                                // $mesage['Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
-                                                $mesage['Submit_time'] = $Msg_Content['Submit_time'];
-                                                $mesage['Done_time']   = $Msg_Content['Done_time'];
-                                                $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
-
-                                            }
-                                            $callback_Command_Id = 0x80000005;
-
-                                            $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
-                                            $new_Total_Length = strlen($new_body) + 12;
-                                            $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id2']);
-                                            // socket_write($socket, $new_headData . $new_body, $new_Total_Length);
-                                        } else if ($head['Command_Id'] == 0x00000008) {
-                                            echo "心跳维持中" . "\n"; //激活测试,无消息体结构
-                                        } else if ($head['Command_Id'] == 0x80000008) {
-                                            echo "激活测试应答" . "\n"; //激活测试,无消息体结构
-                                        } else {
-                                            echo "未声明head['Command_Id']:" . $head['Command_Id'];
-                                        }
-
-                                    }
-
-                                    ++$i;
-                                }
-                                ++$Sequence_Id;
-                                if ($Sequence_Id > 65536) {
-                                    $Sequence_Id = 1;
-                                }
-                                if ($i > $security_master) {
-                                    $i    = 0;
-                                }
-                                continue;
-                            } else { //单条短信
-
-                                $bodyData = pack("N", $num1) . pack("N", $num2);
-                                $bodyData.= pack('C', 1);
-                                $bodyData.= pack('C', 1);
-                                $bodyData.= pack('C', 1);
-                                $bodyData.= pack('C', '');
-                                $bodyData.= pack("a10", $Service_Id);
-                                $bodyData.= pack('C', '');
-                                $bodyData.= pack("a21", $mobile); 
-                                $bodyData.= pack("C", 0);
-                                $bodyData.= pack("C", 0);
-                                $bodyData.= pack("C", 15);
-                                $bodyData.= pack("a6", $Source_Addr);
-                                $bodyData.= pack("a2", 02);
-                                $bodyData.= pack("a6", '');
-                                $bodyData.= pack("a17", '');
-                                $bodyData.= pack("a17", '');
-                                $bodyData.= pack("a21", $Dest_Id);
-                                $bodyData.= pack("C", $uer_num);
-                                $p_n      = 21 * $uer_num;
-                                $bodyData.= pack("a" . $p_n, $mobile);
-                                $len      = strlen($code);
-                                $bodyData.= pack("C", $len); 
-                                $bodyData.= pack("a" . $len, $code);
-                                $bodyData.= pack("a8", ''); 
-                                $Command_Id = 0x00000004; // 短信发送
-                                $time = 0;
-                            }
-                            if ($i > $security_master) {
-                                $time = 1;
-                                $i    = 0;
-                            }
-                            $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
-                            $Total_Length = strlen($bodyData) + 12;
-                            $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                            socket_write($socket, $headData . $bodyData, $Total_Length);
-                            
-                             $send_status = 2;
-                             usleep(300);
-                        } else {//没有号码发送时 发送连接请求
-                            // $bodyData    = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
-                            $Command_Id  = 0x00000008; //保持连接
-                            $Total_Length = 12;
-                            $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                            socket_write($socket, $headData , $Total_Length);
-                            sleep(1);
-                        }
-                    }
-                    
+            //先进行连接验证
+            date_default_timezone_set('PRC');
+            $time                = 0;
+            $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
+            $Timestamp           = date('mdHis');
+            $AuthenticatorSource = md5($Source_Addr . pack("a9", "") . $Shared_secret . $Timestamp, true);
+            $bodyData   = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
+            $Command_Id = 0x00000001;
+            $Total_Length = strlen($bodyData) + 12;
+            $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+            // ;
+            if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
+                echo 'write_verify fail massege:' . socket_strerror(socket_last_error());
+            }else{
+                $verify_status = 5; //默认失败
+                // $headData = socket_read($socket, 12);
+                while (true) {
                     $headData = socket_read($socket, 12);
                     if ($headData != false) {
                         $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
-                        // print_r($head);
                         $bodyData = socket_read($socket, $head['Total_Length'] - 12);
-                        // print_r($bodyData);
-                        // echo "\n";
-
                         if ($head['Command_Id'] == 0x80000001) {
                             $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
-                            // print_r($body) ;
+                            $verify_status = $body['Status'];
                             switch ($body['Status']) {
                             case 0:
                                 break;
@@ -534,74 +289,85 @@ class CmppTest extends Pzlife {
                             }
                             //通道断口处理
                             if ($body['Status'] != 0) {
-                                echo $error_msg . "\n";
-                                // die;
+                                exit($error_msg);
                             }
                         } else if ($head['Command_Id'] == 0x80000004) {
                             $body = unpack("N2Msg_Id/CResult", $bodyData);
-                            print_r($body);
+                            // print_r($body);
                             $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                             if ($sequence) {
                                 $sequence           = json_decode($sequence, true);
-                                $sequence['Msg_Id'] = $body['Msg_Id1'] . $body['Msg_Id2'];
-
+                                $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
+                                $sequence['Msg_Id'] = $msgid;
                                 $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                 $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
                             }
+
                             switch ($body['Result']) {
                             case 0:
+                                echo "发送成功" . "\n";
                                 break;
                             case 1:
+                                echo "消息结构错" . "\n";
                                 $error_msg = "消息结构错";
                                 break;
                             case 2:
+                                echo "命令字错" . "\n";
                                 $error_msg = "命令字错";
                                 break;
                             case 3:
+                                echo "消息序号重复" . "\n";
                                 $error_msg = "消息序号重复";
                                 break;
                             case 4:
+                                echo "消息长度错" . "\n";
                                 $error_msg = "消息长度错";
                                 break;
                             case 5:
+                                echo "资费代码错" . "\n";
                                 $error_msg = "资费代码错";
                                 break;
                             case 6:
+                                echo "超过最大信息长" . "\n";
                                 $error_msg = "超过最大信息长";
                                 break;
                             case 7:
+                                echo "业务代码错" . "\n";
                                 $error_msg = "业务代码错";
                                 break;
                             case 8:
+                                echo "流量控制错" . "\n";
                                 $error_msg = "业务代码错";
                                 break;
                             default:
+                                echo "其他错误" . "\n";
                                 $error_msg = "其他错误";
                                 break;
                             }
                             if ($body['Result'] != 0) { //消息发送失败
                                 echo "发送失败" . "\n";
-                                echo $error_msg . "\n";
+                                $error_msg = "其他错误";
+                            } else {
+
                             }
                         } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                             $Result = 0;
                             $contentlen = $head['Total_Length'] - 65 - 12;
                             $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
                             $Msg_Content = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/", $body['Msg_Content']);
-                            
+
                             $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                             if ($mesage) {
                                 $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                                 // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
                                 $mesage                = json_decode($mesage, true);
-                                // $mesage['Msg_Id']        = strval($Msg_Content['Msg_Id1']) . strval($Msg_Content['Msg_Id2']);
                                 $mesage['Stat']        = $Msg_Content['Stat'];
+                                // $mesage['Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
                                 $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
 
                             }
-                            print_r($mesage);
                             $callback_Command_Id = 0x80000005;
 
                             $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
@@ -610,83 +376,303 @@ class CmppTest extends Pzlife {
                             // socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                         } else if ($head['Command_Id'] == 0x00000008) {
                             echo "心跳维持中" . "\n"; //激活测试,无消息体结构
-
                         } else if ($head['Command_Id'] == 0x80000008) {
                             echo "激活测试应答" . "\n"; //激活测试,无消息体结构
                         } else {
                             echo "未声明head['Command_Id']:" . $head['Command_Id'];
-                            // break;
                         }
 
+                    }else{
+                         break;
                     }
-
+                }
+                if ($verify_status == 0) {//验证成功并且所有信息已读完可进行发送操作
                     ++$i;
                     ++$Sequence_Id;
                     if ($Sequence_Id > 65536) {
                         $Sequence_Id = 1;
                     }
+                    while (true) {
+                            
+                         echo $Sequence_Id . "\n";
+                        try
+                        {
+
+                            //先接收
+                            while (true) {
+                                $headData = socket_read($socket, 12);
+                                if ($headData != false) {
+                                    $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
+                                    $bodyData = socket_read($socket, $head['Total_Length'] - 12);
+                                    if ($head['Command_Id'] == 0x80000001) {
+                                        $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
+                                        $verify_status = $body['Status'];
+                                        switch ($body['Status']) {
+                                        case 0:
+                                            break;
+                                        case 1:
+                                            $error_msg = "消息结构错";
+                                            break;
+                                        case 2:
+                                            $error_msg = "非法源地址";
+                                            break;
+                                        case 3:
+                                            $error_msg = "认证错误";
+                                            break;
+                                        case 4:
+                                            $error_msg = "版本错误";
+                                            break;
+                                        default:
+                                            $error_msg = "其他错误";
+                                            break;
+                                        }
+                                        //通道断口处理
+                                        if ($body['Status'] != 0) {
+                                            exit($error_msg);
+                                        }
+                                    } else if ($head['Command_Id'] == 0x80000004) {
+                                        $body = unpack("N2Msg_Id/CResult", $bodyData);
+                                        // print_r($body);
+                                        $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
+                                        if ($sequence) {
+                                            $sequence           = json_decode($sequence, true);
+                                            $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
+                                            $sequence['Msg_Id'] = $msgid;
+                                            $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
+                                            $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
+                                        }
+            
+                                        switch ($body['Result']) {
+                                        case 0:
+                                            echo "发送成功" . "\n";
+                                            break;
+                                        case 1:
+                                            echo "消息结构错" . "\n";
+                                            $error_msg = "消息结构错";
+                                            break;
+                                        case 2:
+                                            echo "命令字错" . "\n";
+                                            $error_msg = "命令字错";
+                                            break;
+                                        case 3:
+                                            echo "消息序号重复" . "\n";
+                                            $error_msg = "消息序号重复";
+                                            break;
+                                        case 4:
+                                            echo "消息长度错" . "\n";
+                                            $error_msg = "消息长度错";
+                                            break;
+                                        case 5:
+                                            echo "资费代码错" . "\n";
+                                            $error_msg = "资费代码错";
+                                            break;
+                                        case 6:
+                                            echo "超过最大信息长" . "\n";
+                                            $error_msg = "超过最大信息长";
+                                            break;
+                                        case 7:
+                                            echo "业务代码错" . "\n";
+                                            $error_msg = "业务代码错";
+                                            break;
+                                        case 8:
+                                            echo "流量控制错" . "\n";
+                                            $error_msg = "业务代码错";
+                                            break;
+                                        default:
+                                            echo "其他错误" . "\n";
+                                            $error_msg = "其他错误";
+                                            break;
+                                        }
+                                        if ($body['Result'] != 0) { //消息发送失败
+                                            echo "发送失败" . "\n";
+                                            $error_msg = "其他错误";
+                                        } else {
+            
+                                        }
+                                    } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
+                                        $Result = 0;
+                                        $contentlen = $head['Total_Length'] - 65 - 12;
+                                        $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
+                                        $Msg_Content = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/", $body['Msg_Content']);
+            
+                                        $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
+                                        if ($mesage) {
+                                            $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
+                                            // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
+                                            $mesage                = json_decode($mesage, true);
+                                            $mesage['Stat']        = $Msg_Content['Stat'];
+                                            // $mesage['Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
+                                            $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+                                            $mesage['Done_time']   = $Msg_Content['Done_time'];
+                                            $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
+            
+                                        }
+                                        $callback_Command_Id = 0x80000005;
+            
+                                        $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
+                                        $new_Total_Length = strlen($new_body) + 12;
+                                        $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id2']);
+                                        // socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                                    } else if ($head['Command_Id'] == 0x00000008) {
+                                        echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                                    } else if ($head['Command_Id'] == 0x80000008) {
+                                        echo "激活测试应答" . "\n"; //激活测试,无消息体结构
+                                    } else {
+                                        echo "未声明head['Command_Id']:" . $head['Command_Id'];
+                                    }
+            
+                                }else{
+                                     break;
+                                }
+                            }
+                            //在发送
+                            
+                            $send = $redis->lPop($redisMessageCodeSend);
+                            if (!empty($send)) { //正式使用从缓存中读取数据并且有待发送数据
+                                
+                                $send_status = 1;
+                                $send_data = [];
+                                $send_data = json_decode($send, true);
+                                // $mobile = $senddata['mobile_content'];
+                                $mobile   = $send_data['mobile'];
+                                $txt_head = 6;
+                                $txt_len  = 140;
+                                $max_len  = $txt_len - $txt_head;
+                                $code = $send_data['content']; //带签名
+                                $uer_num    = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
+                                $timestring = time();
+                                echo "发送时间：" . date("Y-m-d H:i:s", time()) . "\n";
+                                $num1 = substr($timestring, 0, 8);
+                                $num2 = substr($timestring, 8) . $this->combination($i);
+                                $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
+                                // iconv("UTF-8","gbk",$code);
+                                // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
+                                // print_r($code);die;
+                                if (strlen($code) > 140) {
+                                    $pos          = 0;
+                                    $num_messages = ceil(strlen($code) / $max_len);
+                                    for ($j = 0; $j < $num_messages; $j++) {
+                                        $bodyData = pack("N", $num1) . pack("N", $num2);
+                                        $bodyData.= pack('C', $num_messages);
+                                        $bodyData.= pack('C', $j + 1); 
+                                        $bodyData.= pack('C', 1);
+                                        $bodyData.= pack('C', ''); 
+                                        $bodyData.= pack("a10", $Service_Id);
+                                        $bodyData.= pack('C', ''); 
+                                        $bodyData.= pack("a21", $mobile);
+                                        $bodyData.= pack("C", 0); 
+                                        $bodyData.= pack("C", 1);
+                                        $bodyData.= pack("C", 15); 
+                                        $bodyData.= pack("a6", $Source_Addr);
+                                        $bodyData.= pack("a2", 02);
+                                        $bodyData.= pack("a6", ''); 
+                                        $bodyData.= pack("a17", '');
+                                        $bodyData.= pack("a17", ''); 
+                                        $bodyData.= pack("a21", $Dest_Id);
+                                        $bodyData.= pack("C", $uer_num);
+                                        $p_n      = 21 * $uer_num;
+                                        $bodyData.= pack("a" . $p_n, $mobile);
+                                        $udh     = pack("cccccc", 5, 0, 3, $Sequence_Id, $num_messages, $j + 1);
+                                        $newcode = $udh . substr($code, $j * $max_len, $max_len);
+                                        $len     = strlen($newcode);
+                                        $bodyData.= pack("C", $len);
+                                        $bodyData.= pack("a" . $len, $newcode);
+                                        $bodyData.= pack("a8", '');
+                                        $Command_Id = 0x00000004; // 短信发送
+                                        $Total_Length = strlen($bodyData) + 12;
+                                        $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                        $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
+                                        usleep(300);
+                                        socket_write($socket, $headData . $bodyData, $Total_Length);
+                                        $send_status = 2;
+                                        ++$i;
+                                    }
+                                    ++$Sequence_Id;
+                                    if ($Sequence_Id > 65536) {
+                                        $Sequence_Id = 1;
+                                    }
+                                    if ($i > $security_master) {
+                                        $i    = 0;
+                                    }
+                                    continue;
+                                } else { //单条短信
+    
+                                    $bodyData = pack("N", $num1) . pack("N", $num2);
+                                    $bodyData.= pack('C', 1);
+                                    $bodyData.= pack('C', 1);
+                                    $bodyData.= pack('C', 1);
+                                    $bodyData.= pack('C', '');
+                                    $bodyData.= pack("a10", $Service_Id);
+                                    $bodyData.= pack('C', '');
+                                    $bodyData.= pack("a21", $mobile); 
+                                    $bodyData.= pack("C", 0);
+                                    $bodyData.= pack("C", 0);
+                                    $bodyData.= pack("C", 15);
+                                    $bodyData.= pack("a6", $Source_Addr);
+                                    $bodyData.= pack("a2", 02);
+                                    $bodyData.= pack("a6", '');
+                                    $bodyData.= pack("a17", '');
+                                    $bodyData.= pack("a17", '');
+                                    $bodyData.= pack("a21", $Dest_Id);
+                                    $bodyData.= pack("C", $uer_num);
+                                    $p_n      = 21 * $uer_num;
+                                    $bodyData.= pack("a" . $p_n, $mobile);
+                                    $len      = strlen($code);
+                                    $bodyData.= pack("C", $len); 
+                                    $bodyData.= pack("a" . $len, $code);
+                                    $bodyData.= pack("a8", ''); 
+                                    $Command_Id = 0x00000004; // 短信发送
+                                    $time = 0;
+                                }
+                                if ($i > $security_master) {
+                                    $time = 1;
+                                    $i    = 0;
+                                }
+                                $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
+                                $Total_Length = strlen($bodyData) + 12;
+                                $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                socket_write($socket, $headData . $bodyData, $Total_Length);
+                                
+                                 $send_status = 2;
+                                 usleep(300);
+                            } else {
+                                $Command_Id  = 0x00000008; //保持连接
+                                $Total_Length = 12;
+                                $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                socket_write($socket, $headData , $Total_Length);
+                                sleep(1);
+                            }
+
+                        }
+                        //捕获异常
+                        catch (Exception $e) {
+                            if ($send_status == 1) {
+                                $redis->push($redisMessageCodeSend,$redisMessageCodeSend);
+                                $redis->hset($redisMessageCodeSequenceId,$Sequence_Id);
+                            }
+                            socket_close($socket);
+                            
+                             exception($e);
+                            $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+                            socket_connect($socket, $host, $port);
+                            $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
+                            $Timestamp           = date('mdHis');
+                            $AuthenticatorSource = md5($Source_Addr . pack("a9", "") . $Shared_secret . $Timestamp, true);
+                            $bodyData   = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
+                            $Command_Id = 0x00000001;
+                            $Total_Length = strlen($bodyData) + 12;
+                            $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                            socket_write($socket, $headData . $bodyData, $Total_Length);
+                            ++$i;
+                            ++$Sequence_Id;
+                        }
+                    }
 
                 }
-                //捕获异常
-                 catch (Exception $e) {
-                    //  exception($e);
-                     if ($send_status == 1) {
-                        $redis->push($redisMessageCodeSend,$redisMessageCodeSend);
-                        $redis->hset($redisMessageCodeSequenceId,$Sequence_Id);
-                     }
-                    socket_close($socket);
-                    $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-                    socket_connect($socket, $host, $port);
-                    $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
-                    $Timestamp           = date('mdHis');
-                    $AuthenticatorSource = md5($Source_Addr . pack("a9", "") . $Shared_secret . $Timestamp, true);
-                    $bodyData   = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
-                    $Command_Id = 0x00000001;
-                    $Total_Length = strlen($bodyData) + 12;
-                    $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                    socket_write($socket, $headData . $bodyData, $Total_Length);
-                    ++$i;
-                    ++$Sequence_Id;
-                }
-            } while (true);
-
-        }
-    }
-
-    public function cmppDeliver($Total_Length, $Sequence_Id) { //Msg_Id直接用N解析不行
-        $contentlen = $Total_Length - 109;
-        $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a32Src_terminal_Id/CSrc_terminal_type/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a20LinkID", $this->bodyData);
-        var_dump($body);
-        if ($body['Msg_Length'] > 0) {
-            $data = $body['Msg_Content'];
-            //$Msg_Id = $body['Msg_Id'];
-            $Msg_Id   = ($body['Msg_Id1'] & 0x0fffffff);
-            $Msg_Idfu = $body['Msg_Id2'];
-            $msgidz   = unpack("N", substr($this->bodyData, 0, 8));
-            $msgidzz  = '0000' . $msgidz[1];
-            //操作数据库(原方法)
-            /* mysql_connect('localhost', '', '');
-            mysql_select_db('');
-            mysql_query('set names utf8');
-            $data    = trim($data);
-            $sql1    = "select id from socket_yd where msgid='" . $Msg_Id . "'";
-            $chongfu = mysql_query($sql1);
-            $arrs    = array();
-            while ($arr = mysql_fetch_assoc($chongfu)) {
-            $arrs[] = $arr;
             }
-            if ($arrs == array() || $arrs[0] == null) {
-            $sql = "insert into socket_yd set msgid='" . $Msg_Id . "', content='" . addslashes($data) . "', add_time='" . date('Y-m-d H:i:s') . "'";
-            mysql_query($sql);
-            } */
-            // mysql_close();
-            //echo $Msg_Id."\n";
-            echo $data . "\n";
-            echo $msgidzz . "\n";
-            echo $Sequence_Id . "\n";
-            $this->cmppDeliverResp($msgidzz, $Msg_Idfu, $Sequence_Id);
         }
     }
+
 
     //16进制转2进制
     function StrToBin($str) {

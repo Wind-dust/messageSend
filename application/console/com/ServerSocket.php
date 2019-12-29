@@ -246,7 +246,7 @@ class ServerSocket extends Pzlife {
                                         $message = mb_convert_encoding($message, 'UTF-8', $encode);
                                     }
                                }elseif ($body['Msg_Fmt'] == 8) {//USC2
-                                    $message = mb_convert_encoding($message, 'UTF-8', 'USC-2');
+                                    $message = mb_convert_encoding($message, 'UTF-8', 'UCS-2');
                                }
                                $sendData = [
                                    'mobile'  => trim($mobile),
@@ -406,7 +406,7 @@ class ServerSocket extends Pzlife {
                     }
                     //捕获异常
                     catch (Exception $e) {
-                        // exception($e);
+                        exception($e);
                         $new_bodyData = pack("C", 1); //status | 1 | Unsigned Integer |状态 0：正确 1：消息结构错  2：非法源地址  3：认证错  4：版本太高   5~ ：其他错误
                         $Total_Length = strlen($new_bodyData) + 12;
                         $new_headData = pack("NNN", $Total_Length, 0x00000002, 1);
