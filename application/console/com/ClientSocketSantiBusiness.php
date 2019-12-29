@@ -373,6 +373,18 @@ class ClientSocketSantiBusiness extends Pzlife {
                                             $mesage['Done_time']   = $Msg_Content['Done_time'];
                                             $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
             
+                                        }else{//不在记录中的回执存入缓存，
+                                                                
+                                            print_r($body);
+                                            print_r($Msg_Content);
+                                            $mesage['Stat']        = $Msg_Content['Stat'];
+                                            $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+                                            $mesage['Done_time']   = $Msg_Content['Done_time'];
+                                            // $mesage['mobile']      = $body['Dest_Id '];//手机号
+                                                $mesage['mobile']   = trim($Msg_Content['Dest_terminal_Id']);
+                                                $mesage['receive_time'] = time();//回执时间戳
+                                            $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
+            
                                         }
                                         $callback_Command_Id = 0x80000005;
             
@@ -448,7 +460,8 @@ class ClientSocketSantiBusiness extends Pzlife {
                                         $Command_Id = 0x00000004; // 短信发送
                                         $Total_Length = strlen($bodyData) + 12;
                                         $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                        $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
+                                        $send_data['my_submit_time'] = time();//发送时间戳
+                                        $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, json_encode($send_data));
                                         usleep(300);
                                         socket_write($socket, $headData . $bodyData, $Total_Length);
                                         $send_status = 2;
@@ -493,7 +506,8 @@ class ClientSocketSantiBusiness extends Pzlife {
                                         $time = 1;
                                         $i    = 0;
                                     }
-                                    $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
+                                    $send_data['my_submit_time'] = time();//发送时间戳
+                                    $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, json_encode($send_data));
                                     $Total_Length = strlen($bodyData) + 12;
                                     $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
