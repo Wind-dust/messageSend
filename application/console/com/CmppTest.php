@@ -548,7 +548,6 @@ class CmppTest extends Pzlife {
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
                                 // print_r($code);die;
                                 if (strlen($code) > 140) {
-                                    $pos          = 0;
                                     $num_messages = ceil(strlen($code) / $max_len);
                                     for ($j = 0; $j < $num_messages; $j++) {
                                         $bodyData = pack("N", $num1) . pack("N", $num2);
@@ -586,14 +585,7 @@ class CmppTest extends Pzlife {
                                         $send_status = 2;
                                         ++$i;
                                     }
-                                    ++$Sequence_Id;
-                                    if ($Sequence_Id > 65536) {
-                                        $Sequence_Id = 1;
-                                    }
-                                    if ($i > $security_master) {
-                                        $i    = 0;
-                                    }
-                                    continue;
+                                   
                                 } else { //单条短信
     
                                     $bodyData = pack("N", $num1) . pack("N", $num2);
@@ -622,18 +614,19 @@ class CmppTest extends Pzlife {
                                     $bodyData.= pack("a8", ''); 
                                     $Command_Id = 0x00000004; // 短信发送
                                     $time = 0;
+                                    if ($i > $security_master) {
+                                        $time = 1;
+                                        $i    = 0;
+                                    }
+                                    $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
+                                    $Total_Length = strlen($bodyData) + 12;
+                                    $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                    socket_write($socket, $headData . $bodyData, $Total_Length);
+                                    
+                                     $send_status = 2;
+                                     usleep(300);
                                 }
-                                if ($i > $security_master) {
-                                    $time = 1;
-                                    $i    = 0;
-                                }
-                                $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $send);
-                                $Total_Length = strlen($bodyData) + 12;
-                                $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                socket_write($socket, $headData . $bodyData, $Total_Length);
                                 
-                                 $send_status = 2;
-                                 usleep(300);
                             } else {
                                 $Command_Id  = 0x00000008; //保持连接
                                 $Total_Length = 12;
