@@ -131,6 +131,7 @@ class ClientSocketSantiBusiness extends Pzlife {
             if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
                 echo 'write_verify fail massege:' . socket_strerror(socket_last_error());
             }else{
+                sleep(1);
                 $verify_status = 5; //默认失败
                 // $headData = socket_read($socket, 12);
                 echo $Sequence_Id. "\n";
