@@ -410,7 +410,7 @@ class User extends CommonIndex {
             'user_type' => $user_type,
             'email'     => $email,
             'appid'     => uniqid(''),
-            'appkey'     => md5('123456'),
+            'appkey'     => md5(uniqid('')),
             'user_status'     => 2,
         ];
 
