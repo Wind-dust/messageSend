@@ -379,11 +379,9 @@ class CmppJuMengYiDongMarketing extends Pzlife {
                                         $stalen = $body['Msg_Length']-20-8-21-4;
                                         $Msg_Content = unpack("N2Msg_Id/a".$stalen."Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence ", $body['Msg_Content']);
             
-                                        $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
-                                        
-                                                                
-                                        print_r($body);
-                                        print_r($Msg_Content);
+                                        $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);                   
+                                        // print_r($body);
+                                        // print_r($Msg_Content);
                                         if ($mesage) {
                                             $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                                             // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
