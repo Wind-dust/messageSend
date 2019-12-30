@@ -8,13 +8,15 @@ use Config;
 use Env;
 use think\Db;
 
-class CmppCreateCodeTask extends Pzlife {
+class CmppCreateCodeTask extends Pzlife
+{
 
-    public function CreateGameCodeTask() { //CMPP创建单条任务营销
+    public function CreateGameCodeTask()
+    { //CMPP创建单条任务营销
         $redis                    = Phpredis::getConn();
         $redisMessageCodeSend     = 'index:meassage:game:sendtask'; //游戏日志待发送通道
         $redisMessageCodeSendReal = 'index:meassage:game:send:realtask'; //验证码发送真实任务rediskey CMPP接口 营销
-/*         $redis->rpush($redisMessageCodeSendReal,json_encode([
+        /*         $redis->rpush($redisMessageCodeSendReal,json_encode([
             'mobile' => 15201926171,
             'message' => '【超变传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/3Ypm7 回T退订',
             'Src_Id' => '',//扩展码
@@ -113,7 +115,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    private function getUserInfo($uid) {
+    private function getUserInfo($uid)
+    {
         $getUserSql = sprintf("select id,user_status,reservation_service,free_trial from yx_users where delete_time=0 and id = %d", $uid);
         // print_r($getUserSql);die;
         $userInfo = Db::query($getUserSql);
@@ -123,7 +126,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $userInfo[0];
     }
 
-    private function getUserEquities($uid, $business_id) {
+    private function getUserEquities($uid, $business_id)
+    {
 
         $userEquities = Db::query("SELECT `id`,`num_balance` FROM yx_user_equities WHERE  `delete_time` = 0 AND `uid` = " . $uid . " AND `business_id` = " . $business_id);
         // print_r("SELECT `id`,`num_balance` FROM yx_user_equities WHERE  `delete_time` = 0 AND `uid` = " . $uid . " AND `business_id` = " . $business_id);
@@ -133,7 +137,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $userEquities[0];
     }
 
-    public function getMessageLog() {
+    public function getMessageLog()
+    {
         $redis                = Phpredis::getConn();
         $redisMessageCodeSend = 'index:meassage:code:deliver:'; //验证码发送任务rediskey
         for ($i = 0; $i < 5; $i++) {
@@ -170,7 +175,6 @@ class CmppCreateCodeTask extends Pzlife {
                     $task_id = Db::table('yx_user_send_task_log')->insertGetId($sendlog);
 
                     Db::commit();
-
                 } catch (\Exception $e) {
                     Db::rollback();
                 }
@@ -179,7 +183,8 @@ class CmppCreateCodeTask extends Pzlife {
         echo "sucess";
     }
 
-    private function getSendTask($id) {
+    private function getSendTask($id)
+    {
         $getSendTaskSql = sprintf("select * from yx_user_send_task where delete_time=0 and id = %d", $id);
         $sendTask       = Db::query($getSendTaskSql);
         // print_r($sendTask);die;
@@ -189,7 +194,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $sendTask[0];
     }
 
-    private function getSendCodeTask($id) {
+    private function getSendCodeTask($id)
+    {
         $getSendTaskSql = sprintf("select * from yx_user_send_code_task where delete_time=0 and id = %d", $id);
         $sendTask       = Db::query($getSendTaskSql);
         // print_r($sendTask);die;
@@ -199,7 +205,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $sendTask[0];
     }
 
-    private function getSendGameTask($id) {
+    private function getSendGameTask($id)
+    {
         $getSendTaskSql = sprintf("select * from yx_user_send_game_task where delete_time=0 and id = %d", $id);
         $sendTask       = Db::query($getSendTaskSql);
         // print_r($sendTask);die;
@@ -209,7 +216,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $sendTask[0];
     }
 
-    private function getSendTaskLog($task_no, $mobile) {
+    private function getSendTaskLog($task_no, $mobile)
+    {
         $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `task_no` = '" . $task_no . "' and `mobile` = '" . $mobile . "'";
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
@@ -219,7 +227,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $sendTask[0];
     }
 
-    private function getMultimediaSendTask($id) {
+    private function getMultimediaSendTask($id)
+    {
         $getSendTaskSql = sprintf("select * from yx_user_multimedia_message where delete_time=0 and id = %d", $id);
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
@@ -232,7 +241,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $sendTask;
     }
 
-    private function getMultimediaSendTaskLog($task_no, $mobile) {
+    private function getMultimediaSendTaskLog($task_no, $mobile)
+    {
         $getSendTaskSql = "select `id` from yx_user_multimedia_message_log where delete_time=0 and `task_no` = '" . $task_no . "' and `mobile` = '" . $mobile . "'";
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
@@ -242,7 +252,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $sendTask[0];
     }
 
-    public function getNewMessageLog() {
+    public function getNewMessageLog()
+    {
         $redis                      = Phpredis::getConn();
         $redisMessageCodeSend       = 'index:meassage:code:new:deliver:'; //验证码发送任务rediskey
         $content                    = 2;
@@ -265,7 +276,6 @@ class CmppCreateCodeTask extends Pzlife {
                     'send_status' => 2,
                     'create_time' => time(),
                 ]);
-
             } else {
                 Db::table('yx_user_send_task_log')->where('id', $send_log['id'])->update(['msgid' => $msgid]);
             }
@@ -274,7 +284,6 @@ class CmppCreateCodeTask extends Pzlife {
         } catch (\Exception $e) {
             exception($e);
             Db::rollback();
-
         }
 
         for ($i = 0; $i < 5; $i++) {
@@ -282,19 +291,20 @@ class CmppCreateCodeTask extends Pzlife {
             $send                     = $redis->lPop($new_redisMessageCodeSend);
             while ($send) {
                 $newsend = json_decode($send);
-
             }
         }
         exit("success");
     }
 
     //免审任务客户
-    public function MisumiTaskSend() {
+    public function MisumiTaskSend()
+    {
         $this->redis = Phpredis::getConn();
         // $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
         $send                      = $this->redis->lpop($redisMessageMarketingSend);
-        print_r($send);die;
+        print_r($send);
+        die;
         do {
             $sendtask = Db::query("SELECT * FROM yx_user_send_task WHERE  `uid` IN (4,6) AND `free_trial` = 1 AND `id` > 3291 LIMIT 1");
             // print_r($sendtask);die;
@@ -339,7 +349,6 @@ class CmppCreateCodeTask extends Pzlife {
                 } catch (\Exception $e) {
                     exception($e);
                     Db::rollback();
-
                 }
             }
         } while ($theSend);
@@ -347,7 +356,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //书写营销任务日志并写入通道
-    public function createMessageSendTaskLog() {
+    public function createMessageSendTaskLog()
+    {
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
@@ -363,9 +373,9 @@ class CmppCreateCodeTask extends Pzlife {
             if (empty($send)) {
                 exit('taskId_is_null');
             }
-            $real_send = json_decode($send,true);
+            $real_send = json_decode($send, true);
             if ($real_send['send_time'] > time()) {
-                $this->redis->rPush('index:meassage:marketing:sendtask',json_encode($real_send));
+                $this->redis->rPush('index:meassage:marketing:sendtask', json_encode($real_send));
                 continue;
             }
             $sendTask = $this->getSendTask($real_send['id']);
@@ -452,9 +462,8 @@ class CmppCreateCodeTask extends Pzlife {
                     ];
                     $txt = json_encode($send_log) . "\n";
                     fwrite($myfile, $txt);
-                    $error_mobile[] = $send_log; 
+                    $error_mobile[] = $send_log;
                 }
-
             }
             fclose($myfile);
 
@@ -481,14 +490,14 @@ class CmppCreateCodeTask extends Pzlife {
                 exception($e);
                 Db::rollback();
             }
-
         }
         print_r(date('Y-m-d H:i:s', time()));
         echo "\n";
         exit("SUCCESS");
     }
     //  大批量扣量任务扣量
-    public function createNoSendMessageSendTaskLog() {
+    public function createNoSendMessageSendTaskLog()
+    {
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
@@ -588,7 +597,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //书写彩信任务日志并写入通道
-    public function createMultimediaMessageSendTaskLog() {
+    public function createMultimediaMessageSendTaskLog()
+    {
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
@@ -706,7 +716,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //书写行业通知任务日志并写入通道
-    public function createBusinessMessageSendTaskLog() {
+    public function createBusinessMessageSendTaskLog()
+    {
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
@@ -832,7 +843,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //书写游戏任务日志并写入通道
-    public function createGameMessageSendTaskLog() {
+    public function createGameMessageSendTaskLog()
+    {
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
@@ -896,7 +908,7 @@ class CmppCreateCodeTask extends Pzlife {
 
                     // }
                     // print_r($newres);
-                    if (strpos($mobilesend[$i],'00000') || strpos($mobilesend[$i],'111111') || strpos($mobilesend[$i],'222222') || strpos($mobilesend[$i],'333333') || strpos($mobilesend[$i],'444444') || strpos($mobilesend[$i],'555555') || strpos($mobilesend[$i], '666666') || strpos($mobilesend[$i],'777777') || strpos($mobilesend[$i],'888888') || strpos($mobilesend[$i],'999999')) {
+                    if (strpos($mobilesend[$i], '00000') || strpos($mobilesend[$i], '111111') || strpos($mobilesend[$i], '222222') || strpos($mobilesend[$i], '333333') || strpos($mobilesend[$i], '444444') || strpos($mobilesend[$i], '555555') || strpos($mobilesend[$i], '666666') || strpos($mobilesend[$i], '777777') || strpos($mobilesend[$i], '888888') || strpos($mobilesend[$i], '999999')) {
                         $send_log = [
                             'task_no'        => $sendTask['task_no'],
                             'uid'            => $sendTask['uid'],
@@ -911,15 +923,14 @@ class CmppCreateCodeTask extends Pzlife {
                         $this->redis->rPush('index:meassage:game:waitcmppdeliver', json_encode([
                             'Stat'        => $send_log['status_message'],
                             'send_msgid'  => [$sendTask['send_msg_id']],
-                            'Done_time'   => date('ymdHis',time()),
+                            'Done_time'   => date('ymdHis', time()),
                             'content'     =>  $sendTask['task_content'],
-                            'Submit_time' => date('ymdHis',time()),
+                            'Submit_time' => date('ymdHis', time()),
                             'mobile'      => $send_log['mobile'],
                             'uid'         =>  $sendTask['uid'],
                             'mar_task_id' => $sendTask['id'],
                         ]));
-
-                    }else{
+                    } else {
 
                         $send_log = [
                             'task_no'      => $sendTask['task_no'],
@@ -938,19 +949,19 @@ class CmppCreateCodeTask extends Pzlife {
                             'content'     => $sendTask['task_content'],
                             'channel_id'  => $channel_id,
                         ];
-                        $max = mt_rand(9,11);
+                        $max = mt_rand(9, 11);
                         $num     = mt_rand(0, 100);
-                        if ($num <= $max) {//扣量
-                            if (in_array($mobilesend[$i],[18339998120,13812895012])) {
-                                $push_messages[] = $sendmessage;//实际发送队列
+                        if ($num <= $max) { //扣量
+                            if (in_array($mobilesend[$i], [18339998120, 13812895012])) {
+                                $push_messages[] = $sendmessage; //实际发送队列
                             }
-                            $send_log['status_message'] = 'DELIVRD';//推送到虚拟不发送队列
-                            $push_messages[] = $sendmessage;//实际发送队列
-                            
+                            $send_log['status_message'] = 'DELIVRD'; //推送到虚拟不发送队列
+                            $push_messages[] = $sendmessage; //实际发送队列
+
                             // $this->redis->rPush('index:meassage:game:waitcmppdeliver', json_encode([
                             //     'Stat'        => $send_log['status_message'],
                             //     'send_msgid'  => [$sendTask['send_msg_id']],
-                            //     'Done_time'   => date('ymdHis',time()),
+                            //     'Done_time'   => date('ymdHis',time() + $max),
                             //     'content'     =>  $sendTask['task_content'],
                             //     'Submit_time' => date('ymdHis',time()),
                             //     'mobile'      => $send_log['mobile'],
@@ -958,11 +969,11 @@ class CmppCreateCodeTask extends Pzlife {
                             //     'mar_task_id' => $sendTask['id'],
                             // ]));
                             // die;
-                        }else{//不扣量
-                            $push_messages[] = $sendmessage;//实际发送队列
+                        } else { //不扣量
+                            $push_messages[] = $sendmessage; //实际发送队列
                         }
                     }
-                   
+
                     $txt = json_encode($send_log) . "\n";
                     fwrite($myfile, $txt);
                 } else {
@@ -982,9 +993,9 @@ class CmppCreateCodeTask extends Pzlife {
                     $this->redis->rPush('index:meassage:game:waitcmppdeliver:' . $sendTask['uid'], json_encode([
                         'Stat'        => $send_log['status_message'],
                         'send_msgid'  => [$sendTask['send_msg_id']],
-                        'Done_time'   => date('ymdHis',time()),
+                        'Done_time'   => date('ymdHis', time()),
                         'content'     =>  $sendTask['task_content'],
-                        'Submit_time' => date('ymdHis',time()),
+                        'Submit_time' => date('ymdHis', time()),
                         'mobile'      => $send_log['mobile'],
                         'uid'         =>  $sendTask['uid'],
                         'mar_task_id' => $sendTask['id'],
@@ -1017,7 +1028,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //http通道日志
-    public function getChannelSendLog($content) {
+    public function getChannelSendLog($content)
+    {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // $redisMessageCodeSend = 'index:meassage:code:new:deliver:'.$content; //验证码发送任务rediskey
@@ -1081,7 +1093,6 @@ class CmppCreateCodeTask extends Pzlife {
                                     $log['create_time'] = $task[0]['update_time'];
                                 }
                                 $data[] = $log;
-
                             }
                             fclose($file);
                             $myfile = fopen($log_path, "w");
@@ -1096,7 +1107,6 @@ class CmppCreateCodeTask extends Pzlife {
                         unset($task_status);
                         unset($task_mobile);
                     }
-
                 } else {
                     if (empty($task_status)) {
                         unset($callback);
@@ -1135,7 +1145,6 @@ class CmppCreateCodeTask extends Pzlife {
                             }
                             // print_r($data);die;
                             $data[] = $log;
-
                         }
 
                         // print_r($data);die;
@@ -1155,17 +1164,16 @@ class CmppCreateCodeTask extends Pzlife {
                     unset($task_mobile);
                 }
                 unset($send);
-
             }
         } catch (\Exception $e) {
             foreach ($callback as $key => $value) {
                 $send = $redis->rPush($redisMessageCodeSend, $value);
             }
         }
-
     }
 
-    public function unknowLog($channel_id){
+    public function unknowLog($channel_id)
+    {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redisMessageCodeSend = 'index:meassage:code:unknow:deliver:' . $channel_id; //验证码发送任务rediskey
@@ -1176,14 +1184,14 @@ class CmppCreateCodeTask extends Pzlife {
         // // $mesage['mobile']      = $body['Dest_Id '];//手机号
         //     $mesage['mobile']   = trim($Msg_Content['Dest_terminal_Id']);
         //     $mesage['receive_time'] = time();//回执时间戳
-        $redis->rpush($redisMessageCodeSend,json_encode([
+        $redis->rpush($redisMessageCodeSend, json_encode([
             'Stat' => 'DELIVRD',
             'mobile' => '13761273981',
             'Submit_time' => '1912301028',
             'Done_time' => '1912301058',
             'receive_time' => '1577672536',
         ]));
-        if ($channel['channel_type'] == 2) { 
+        if ($channel['channel_type'] == 2) {
             while (true) {
                 Db::startTrans();
                 try {
@@ -1192,7 +1200,7 @@ class CmppCreateCodeTask extends Pzlife {
                         continue;
                     }
                     $send_log = json_decode($send_log, true);
-                    $time = strtotime(date("Y-m-d 0:00:00",time()));
+                    $time = strtotime(date("Y-m-d 0:00:00", time()));
                     $sql = "SELECT `id`,`task_no`,`uid` FROM ";
                     if ($channel['business_id'] == 5) { //营销
                         $sql .= " yx_user_send_task ";
@@ -1201,7 +1209,7 @@ class CmppCreateCodeTask extends Pzlife {
                     } elseif ($channel['business_id'] == 9) { //游戏
                         $sql .= " yx_user_send_game_task ";
                     }
-                    $sql .= "WHERE `mobile_content` = " . $send_log['mobile'] ." AND `real_message` = '' AND `status_message` = '' ". " AND `create_time` > ".$time ;
+                    $sql .= "WHERE `mobile_content` = " . $send_log['mobile'] . " AND `real_message` = '' AND `status_message` = '' " . " AND `create_time` > " . $time;
                     // print_r($sql);die;
                     $task = Db::query($sql);
                     if (empty($task)) {
@@ -1216,30 +1224,30 @@ class CmppCreateCodeTask extends Pzlife {
                         print_r($request_url);
                     }
                     if ($channel['business_id'] == 5) { //营销
-                        Db::table('yx_user_send_task')->where('id',$task[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $send_log['Stat']]);
+                        Db::table('yx_user_send_task')->where('id', $task[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $send_log['Stat']]);
                     } elseif ($channel['business_id'] == 6) { // 行业
-                        Db::table('yx_user_send_code_task')->where('id',$task[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $send_log['Stat']]);
+                        Db::table('yx_user_send_code_task')->where('id', $task[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $send_log['Stat']]);
                     } elseif ($channel['business_id'] == 9) { //游戏
-                        Db::table('yx_user_send_game_task')->where('id',$task[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $send_log['Stat']]);
+                        Db::table('yx_user_send_game_task')->where('id', $task[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $send_log['Stat']]);
                     }
-                   
+
                     Db::commit();
                 } catch (\Exception $e) {
-                    $redis->rpush($redisMessageCodeSend,$send_log);
+                    $redis->rpush($redisMessageCodeSend, $send_log);
                     exception($e);
                     Db::rollback();
                 }
-                
             }
         }
     }
 
-    public function updateLog($channel_id) {
+    public function updateLog($channel_id)
+    {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:' . $channel_id; //验证码发送任务rediskey
         $channel              = $this->getChannelinfo($channel_id);
-/*         $redis->rpush($redisMessageCodeSend, json_encode([
+        /*         $redis->rpush($redisMessageCodeSend, json_encode([
             'mobile' => '13564869264',
             'title' => '美丽田园营销短信',
             'mar_task_id' => '15769',
@@ -1292,7 +1300,6 @@ class CmppCreateCodeTask extends Pzlife {
 
                 $redis->rpush('index:meassage:code:cms:deliver:', json_encode($send_log));
             }
-
         }
         // try {
         //     //code...
@@ -1305,7 +1312,8 @@ class CmppCreateCodeTask extends Pzlife {
 
     }
 
-    private function getChannelinfo($channel_id) {
+    private function getChannelinfo($channel_id)
+    {
         $channel = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `id` = " . $channel_id);
         if (empty($channel)) {
             return false;
@@ -1316,12 +1324,13 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //游戏日志通道
-    public function getCmppChannelSendLog($content) {
+    public function getCmppChannelSendLog($content)
+    {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // $redisMessageCodeSend = 'index:meassage:code:new:deliver:'.$content; //验证码发送任务rediskey
         $redisMessageCodeSend = 'index:meassage:game:new:deliver:' . $content; //验证码发送任务rediskey
-/*         $redis->rpush($redisMessageCodeSend,json_encode([
+        /*         $redis->rpush($redisMessageCodeSend,json_encode([
             'mar_task_id' => '1',
             'uid' => '45',
             'Msg_Id' => '1577095013046269',
@@ -1362,7 +1371,7 @@ class CmppCreateCodeTask extends Pzlife {
         //     'Done_time' => '1912121543',
         //     'Done_time' => '1912121543',
         // ]));
-/*         $redis->hset('index:meassage:game:msg:id:14',1,json_encode([
+        /*         $redis->hset('index:meassage:game:msg:id:14',1,json_encode([
             'mar_task_id' => '1',
             'uid' => '45',
             'Msg_Id' => '1577095013046269',
@@ -1374,7 +1383,7 @@ class CmppCreateCodeTask extends Pzlife {
         ])); */
         // $untime = 0;
         $i = 0;
-     /*    $redis->rpush('index:meassage:game:unknow:deliver:14',json_encode([
+        /*    $redis->rpush('index:meassage:game:unknow:deliver:14',json_encode([
             'mobile' => '13737139325',
             'Stat' => 'ID:0076',
             'Submit_time' => '1912231821',
@@ -1388,55 +1397,54 @@ class CmppCreateCodeTask extends Pzlife {
             // print_r($unknow_status);
             // $redis->rpush('index:meassage:game:unknow:deliver:14',$unknow_status); die;
             if (!empty($unknow_status)) {
-                $unknow_data = json_decode($unknow_status,true);
+                $unknow_data = json_decode($unknow_status, true);
                 if (!isset($unknow_data['mobile'])) {
                     continue;
                 }
                 if (!empty($unknow_data)) {
-                    $gametask = Db::query("SELECT * FROM yx_user_send_game_task WHERE `mobile_content` = '".$unknow_data['mobile']."' AND `status_message` ='' LIMIT 1 ");
+                    $gametask = Db::query("SELECT * FROM yx_user_send_game_task WHERE `mobile_content` = '" . $unknow_data['mobile'] . "' AND `status_message` ='' LIMIT 1 ");
                     if (!empty($gametask)) {
                         $send_msgid = explode(',', $gametask[0]['send_msg_id']);
-                                foreach ($send_msgid as $key => $msgid) {
-                                    $redis->rPush('index:meassage:game:cmppdeliver:' . $gametask[0]['uid'], json_encode([
-                                        'Stat'        => $unknow_data['Stat'],
-                                        'send_msgid'  => [$msgid],
-                                        'Done_time'   => $unknow_data['Done_time'],
-                                        'Submit_time' => $unknow_data['Submit_time'],
-                                        'mobile'      => $unknow_data['mobile'],
-                                    ]));
-                                    // if ($value == $send_log['Msg_Id']){
-                    
-                                    // }
-                                }
-                                Db::startTrans();
-                                try {
-                                    Db::table('yx_user_send_game_task')->where('id',$gametask[0]['id'])->update(['status_message' => $unknow_data['Stat'],'real_message' => $unknow_data['Stat']]);
-                                    Db::commit();
-                                } catch (\Exception $e) {
-                    
-                                    Db::rollback();
-                                }
-                                $i++;
-                                
+                        foreach ($send_msgid as $key => $msgid) {
+                            $redis->rPush('index:meassage:game:cmppdeliver:' . $gametask[0]['uid'], json_encode([
+                                'Stat'        => $unknow_data['Stat'],
+                                'send_msgid'  => [$msgid],
+                                'Done_time'   => $unknow_data['Done_time'],
+                                'Submit_time' => $unknow_data['Submit_time'],
+                                'mobile'      => $unknow_data['mobile'],
+                            ]));
+                            // if ($value == $send_log['Msg_Id']){
+
+                            // }
+                        }
+                        Db::startTrans();
+                        try {
+                            Db::table('yx_user_send_game_task')->where('id', $gametask[0]['id'])->update(['status_message' => $unknow_data['Stat'], 'real_message' => $unknow_data['Stat']]);
+                            Db::commit();
+                        } catch (\Exception $e) {
+
+                            Db::rollback();
+                        }
+                        $i++;
+
                         // print_r($gametask);
                     }
                 }
             }
-            
+
             if (!empty($send_log)) {
                 // exit("send_log is null");
                 // $redis->rpush($redisMessageCodeSend, json_encode($send_log));
-                
-            //未知
-            // if (!isset($untime)){
-            //     continue;
-            // }
-                $redis->rpush('index:meassage:game:cms:deliver:', json_encode($send_log));//游戏通道实际码
+
+                //未知
+                // if (!isset($untime)){
+                //     continue;
+                // }
+                $redis->rpush('index:meassage:game:cms:deliver:', json_encode($send_log)); //游戏通道实际码
                 $send_log = json_decode($send_log, true);
                 if (!isset($untime)) {
                     $untime = $send_log['receive_time'] - $send_log['my_submit_time'];
-                    
-                }else{
+                } else {
                     $untime = $send_log['receive_time'] - $send_log['my_submit_time'] > $untime ? $send_log['receive_time'] - $send_log['my_submit_time'] : $untime;
                 }
                 $task     = Db::query("SELECT * FROM yx_user_send_game_task WHERE `id` = '" . $send_log['mar_task_id'] . "'");
@@ -1459,38 +1467,36 @@ class CmppCreateCodeTask extends Pzlife {
                             'mobile'      => $send_log['mobile'],
                         ]));
                         // if ($value == $send_log['Msg_Id']){
-    
+
                         // }
                     }
                 }
-               
+
                 Db::startTrans();
                 try {
-                    Db::table('yx_user_send_game_task')->where('id',$send_log['mar_task_id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $send_log['Stat']]);
+                    Db::table('yx_user_send_game_task')->where('id', $send_log['mar_task_id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $send_log['Stat']]);
                     Db::commit();
                 } catch (\Exception $e) {
 
                     Db::rollback();
                 }
-
-
             }
             $sendunknow = $redis->hgetall('index:meassage:game:msg:id:14');
             if (!empty($sendunknow)) {
                 // sleep($untime);
                 foreach ($sendunknow as $send => $value) {
-                    $value = json_decode($value,true);
+                    $value = json_decode($value, true);
                     if (!isset($value['receive_time'])) {
-                        if (time()- $value['my_submit_time'] >= 1800) {
+                        if (time() - $value['my_submit_time'] >= 1800) {
                             $value_task     = Db::query("SELECT * FROM yx_user_send_game_task WHERE `id` = '" . $value['mar_task_id'] . "'");
                             if (empty($value_task)) {
                                 continue;
                             }
-                            $max = mt_rand(9,11);
+                            $max = mt_rand(9, 11);
                             $num     = mt_rand(0, 100);
                             if ($num <= $max) {
                                 $Stat = 'UNKNOWN';
-                            }else{
+                            } else {
                                 $Stat = 'DELIVRD';
                             }
                             $send_msgid = explode(',', $value_task[0]['send_msg_id']);
@@ -1498,20 +1504,20 @@ class CmppCreateCodeTask extends Pzlife {
                                 $redis->rPush('index:meassage:game:cmppdeliver:' . $value_task[0]['uid'], json_encode([
                                     'Stat'        => $Stat,
                                     'send_msgid'  => [$msgid],
-                                    'Done_time'   => date('ymdHis',$value['my_submit_time']+10),
-                                    'Submit_time' => date('ymdHis',$value['my_submit_time']),
+                                    'Done_time'   => date('ymdHis', $value['my_submit_time'] + 10),
+                                    'Submit_time' => date('ymdHis', $value['my_submit_time']),
                                     'mobile'      => $value['mobile'],
                                 ]));
                                 // if ($value == $send_log['Msg_Id']){
-                
+
                                 // }
                             }
                             Db::startTrans();
                             try {
-                                Db::table('yx_user_send_game_task')->where('id',$value['mar_task_id'])->update(['status_message' => $Stat,'real_message' => 'UNKNOWN']);
+                                Db::table('yx_user_send_game_task')->where('id', $value['mar_task_id'])->update(['status_message' => $Stat, 'real_message' => 'UNKNOWN']);
                                 Db::commit();
                             } catch (\Exception $e) {
-                
+
                                 Db::rollback();
                             }
                             $redis->hdel('index:meassage:game:msg:id:14', $send);
@@ -1520,14 +1526,14 @@ class CmppCreateCodeTask extends Pzlife {
                     }
                 }
             }
-            
 
-           
+
+
 
             //扣量
             $witenosend = $redis->lpop("index:meassage:game:waitcmppdeliver");
             if (!empty($witenosend)) {
-                
+
                 // continue;
                 // sleep($untime);
                 $witenosend_log = json_decode($witenosend, true);
@@ -1541,82 +1547,82 @@ class CmppCreateCodeTask extends Pzlife {
                         'Stat'        => $witenosend_log['Stat'],
                         'send_msgid'  => [$value],
                         'Done_time'   => $send_log['Done_time'],
-                        'Submit_time' => date('ymdHis',time()),
+                        'Submit_time' => date('ymdHis', time()),
                         'mobile'      => $witenosend_log['mobile'],
                     ]));
                     // if ($value == $send_log['Msg_Id']){
-    
+
                     // }
                 }
                 Db::startTrans();
                 try {
-                    Db::table('yx_user_send_game_task')->where('id',$witenosend_log['mar_task_id'])->update(['status_message' => $witenosend_log['Stat']]);
+                    Db::table('yx_user_send_game_task')->where('id', $witenosend_log['mar_task_id'])->update(['status_message' => $witenosend_log['Stat']]);
                     Db::commit();
                 } catch (\Exception $e) {
-    
+
                     Db::rollback();
                 }
             }
 
             // print_r("SELECT `id`,`uid`,`msgid`,`create_time` FROM yx_user_send_code_task_log WHERE `mobile` = " . $send_log['mobile'] . " AND `task_no` = '" . $task[0]['task_no'] . "'");die;
-            
+
             //状态回执慢
-    
-            $day_time = strtotime(date('Y-m-d 0:00:00',time()));
-        // $day_time = strtotime(date('2019-12-27 0:00:00',time()));
-        $low = Db::query("SELECT * FROM yx_user_send_game_task WHERE `status_message` = '' AND `create_time` > ".$day_time. " ORDER BY ID ASC LIMIT 1");
-        if (!empty($low)) {
-            $rece_time = mt_rand(15,18);
-            if (time() - $low[0]['create_time'] > $rece_time){
-                $send_msgid = explode(',', $low[0]['send_msg_id']);
-                
-                $utime = mt_rand(8,12);
-                $bounts = [
-                    0 => 4,
-                    1 => 5,
-                    2 => $utime,
-                    3 => 1000,
-                ];
-                $tatus_array = [
-                    0 => 'FIBLACK',
-                    1 => 'MK:0000',
-                    2 => 'ID:0076',
-                    3 => 'DELIVRD'
-                ];
-                $num = mt_rand(0,max($bounts));
-                foreach ($bounts as $b => $s) {
-                    if ($num <= $s) {
-                        $thisstatus = $tatus_array[$b];
-                        break;
+
+       /*      $day_time = strtotime(date('Y-m-d 0:00:00', time()));
+            // $day_time = strtotime(date('2019-12-27 0:00:00',time()));
+            $low = Db::query("SELECT * FROM yx_user_send_game_task WHERE `status_message` = '' AND `create_time` > " . $day_time . " ORDER BY ID ASC LIMIT 1");
+            if (!empty($low)) {
+                $rece_time = mt_rand(15, 18);
+                if (time() - $low[0]['create_time'] > $rece_time) {
+                    $send_msgid = explode(',', $low[0]['send_msg_id']);
+
+                    $utime = mt_rand(8, 12);
+                    $bounts = [
+                        0 => 4,
+                        1 => 5,
+                        2 => $utime,
+                        3 => 1000,
+                    ];
+                    $tatus_array = [
+                        0 => 'FIBLACK',
+                        1 => 'MK:0000',
+                        2 => 'ID:0076',
+                        3 => 'DELIVRD'
+                    ];
+                    $num = mt_rand(0, max($bounts));
+                    foreach ($bounts as $b => $s) {
+                        if ($num <= $s) {
+                            $thisstatus = $tatus_array[$b];
+                            break;
+                        }
+                    }
+                    foreach ($send_msgid as $key => $value) {
+                        $redis->rPush('index:meassage:game:cmppdeliver:' . $low[0]['uid'], json_encode([
+                            'Stat'        => $thisstatus,
+                            'send_msgid'  => [$value],
+                            'Done_time'   => date('ymdHis', $low[0]['create_time'] + $utime),
+                            'Submit_time' => date('ymdHis', $low[0]['create_time']),
+                            'mobile'      => $low[0]['mobile_content'],
+                        ]));
+                        // if ($value == $send_log['Msg_Id']){
+
+                        // }
+                    }
+                    Db::startTrans();
+                    try {
+                        Db::table('yx_user_send_game_task')->where('id', $low[0]['id'])->update(['status_message' => $thisstatus]);
+                        Db::commit();
+                    } catch (\Exception $e) {
+                        exception($e);
+                        Db::rollback();
                     }
                 }
-                foreach ($send_msgid as $key => $value) {
-                    $redis->rPush('index:meassage:game:cmppdeliver:' . $low[0]['uid'], json_encode([
-                        'Stat'        => $thisstatus,
-                        'send_msgid'  => [$value],
-                        'Done_time'   => date('ymdHis',$low[0]['create_time']+$utime),
-                        'Submit_time' => date('ymdHis',$low[0]['create_time']),
-                        'mobile'      => $low[0]['mobile_content'],
-                    ]));
-                    // if ($value == $send_log['Msg_Id']){
-    
-                    // }
-                }
-                Db::startTrans();
-                try {
-                    Db::table('yx_user_send_game_task')->where('id',$low[0]['id'])->update(['status_message' => $thisstatus]);
-                    Db::commit();
-                } catch (\Exception $e) {
-                    exception($e);
-                    Db::rollback();
-                }
-            }
+            } */
         }
-        }
-        
     }
 
-    public function getNumberSource($prefix) {
+    public function getNumberSource($prefix)
+    {
         $getSendTaskSql = "select source,province_id,province from yx_number_source where delete_time=0 and `mobile` = '" . $prefix . "'";
 
         // echo "\n";
@@ -1630,7 +1636,8 @@ class CmppCreateCodeTask extends Pzlife {
         // print_r($sendTask);
     }
 
-    public function getSendLog() {
+    public function getSendLog()
+    {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // echo time()-1574480118;die;
@@ -1640,7 +1647,7 @@ class CmppCreateCodeTask extends Pzlife {
         // $num = count($mobile);
         // print_r($num);die;
 
-/*         $redisMessageCodeSend = 'index:meassage:code:new:deliver:'; //验证码发送任务rediskey
+        /*         $redisMessageCodeSend = 'index:meassage:code:new:deliver:'; //验证码发送任务rediskey
 for ($i = 0; $i < 10; $i++) {
 $new_redisMessageCodeSend = $redisMessageCodeSend . $i;
 
@@ -1761,10 +1768,10 @@ Db::rollback();
             // $n++;
             // die;
         }
-
     }
 
-    public function logReader() {
+    public function logReader()
+    {
         $id = 15753;
         // while (true) {
 
@@ -1791,11 +1798,9 @@ Db::rollback();
 
             // print_r($data);die;
             $data[] = $log;
-
         }
         fclose($file);
         print_r(date('Y-m-d H:i:s', time()));
         echo count($data);
     }
-
 }
