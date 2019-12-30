@@ -637,7 +637,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife {
                             fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
                             fwrite($myfile,$e."\n");
                             fclose($myfile);
-                            //  exception($e);
+                             exception($e);
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                             socket_connect($socket, $host, $port);
                             $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
