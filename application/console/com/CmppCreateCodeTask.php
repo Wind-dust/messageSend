@@ -401,7 +401,7 @@ class CmppCreateCodeTask extends Pzlife
             $channel_id    = $sendTask['channel_id'];
             $push_messages = [];
             $error_mobile = [];
-            print_r($sendTask);die;
+            // print_r($sendTask);die;
             if (file_exists(realpath("") . '/tasklog/marketing/' . $sendTask['task_no'] . ".txt")) {
                 continue;
             }
