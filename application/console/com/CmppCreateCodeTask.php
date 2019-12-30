@@ -1224,7 +1224,7 @@ class CmppCreateCodeTask extends Pzlife
                     }
                     if ($task[0]['uid'] == 47 || $task[0]['uid'] == 51 || $task[0]['uid'] == 52) { //推送给美丽田园
                         // https://zhidao.baidu.com/question/412076997.html
-                        $request_url = "http://116.228.60.189:25902/rtreceive?";
+                        $request_url = "http://116.228.60.189:15901/rtreceive?";
                         $request_url .= 'task_no=' . $task[0]['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['Submit_time'];
                         sendRequest($request_url);
                         print_r($request_url);
@@ -1298,7 +1298,7 @@ class CmppCreateCodeTask extends Pzlife
                 // $request_url .= 'task_no=' . $task[0]['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['Submit_time'];
                 if ($task[0]['uid'] == 47 || $task[0]['uid'] == 51 || $task[0]['uid'] == 52) { //推送给美丽田园
                     // https://zhidao.baidu.com/question/412076997.html
-                    $request_url = "http://116.228.60.189:25902/rtreceive?";
+                    $request_url = "http://116.228.60.189:15901/rtreceive?";
                     $request_url .= 'task_no=' . $task[0]['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['Submit_time'];
                     sendRequest($request_url);
                     print_r($request_url);
