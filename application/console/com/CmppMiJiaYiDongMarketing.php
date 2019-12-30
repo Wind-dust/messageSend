@@ -554,7 +554,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
                             }
                             socket_close($socket);
 
-                            $log_path = realpath("")."/error/1.log";
+                            $log_path = realpath("")."/error/16.log";
                             $myfile = fopen($log_path,'a+');
                             fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
                             fwrite($myfile,$e."\n");
