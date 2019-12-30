@@ -252,6 +252,7 @@ class CmppJuMengYiDongMarketing extends Pzlife {
                             $mesage['Stat']        = $Msg_Content['Stat'];
                             $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                             $mesage['Done_time']   = $Msg_Content['Done_time'];
+                            $mesage['Msg_Id']   = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
                             // $mesage['mobile']      = $body['Dest_Id '];//手机号
                                 $mesage['mobile']   = trim($Msg_Content['Dest_terminal_Id']);
                                 $mesage['receive_time'] = time();//回执时间戳
@@ -399,6 +400,7 @@ class CmppJuMengYiDongMarketing extends Pzlife {
                                             // $mesage['mobile']      = $body['Dest_Id '];//手机号
                                                 $mesage['mobile']   = trim($Msg_Content['Dest_terminal_Id']);
                                                 $mesage['receive_time'] = time();//回执时间戳
+                                                $mesage['Msg_Id']   = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
                                             $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
             
                                         }
