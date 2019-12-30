@@ -362,7 +362,7 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15822,'send_time' => 0]));
+        $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15834,'send_time' => 0]));
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15823,'send_time' => 0]));
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15824,'send_time' => 0]));
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15825,'send_time' => 0]));
@@ -401,13 +401,14 @@ class CmppCreateCodeTask extends Pzlife
             $channel_id    = $sendTask['channel_id'];
             $push_messages = [];
             $error_mobile = [];
-            // print_r($sendTask);die;
+            print_r($sendTask);die;
             if (file_exists(realpath("") . '/tasklog/marketing/' . $sendTask['task_no'] . ".txt")) {
                 continue;
             }
             $myfile = fopen(realpath("") . '/tasklog/marketing/' . $sendTask['task_no'] . ".txt", "w");
             // $myfile = fopen("testfile.txt", "w");
             // die;
+            
             for ($i = 0; $i < count($mobilesend); $i++) {
                 $send_log = [];
                 if (checkMobile(trim($mobilesend[$i])) == true) {
@@ -420,7 +421,7 @@ class CmppCreateCodeTask extends Pzlife
                         } else if ($newres['source'] == 1 && in_array($sendTask['uid'],[47,49,51,52])) { //聚梦移动
                             $channel_id = 18;
 
-                        } else if ($newres['source' == 3] && in_array($sendTask['uid'],[47,49,51,52])) { //聚梦电信营销
+                        } else if ($newres['source']== 3 && in_array($sendTask['uid'],[47,49,51,52])) { //聚梦电信营销
                             $channel_id = 19;
                         }
 
