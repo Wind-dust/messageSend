@@ -173,7 +173,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife {
         $security_master      = $master_num * $security_coefficient;
 
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '18017369942',
+            'mobile'      => '17317961110',
             'mar_task_id' => 15834,
             'content'     => '【美丽田园】尊敬的会员，美丽田园三八纤俏女神季火爆开启。
             即日起至4月20日
@@ -637,7 +637,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife {
                             fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
                             fwrite($myfile,$e."\n");
                             fclose($myfile);
-                             exception($e);
+                            //  exception($e);
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                             socket_connect($socket, $host, $port);
                             $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
