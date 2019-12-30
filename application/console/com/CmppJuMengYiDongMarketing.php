@@ -404,6 +404,7 @@ class CmppJuMengYiDongMarketing extends Pzlife {
                                             $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
             
                                         }
+                                        print_r($mesage);
                                         $callback_Command_Id = 0x80000005;
             
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
@@ -494,6 +495,7 @@ class CmppJuMengYiDongMarketing extends Pzlife {
                                     if ($i > $security_master) {
                                         $i    = 0;
                                     }
+                                    continue;
                                 } else { //单条短信
     
                                     $bodyData = pack("N", $num1) . pack("N", $num2);
