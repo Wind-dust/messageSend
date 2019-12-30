@@ -17,7 +17,7 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife {
         $this->redis = Phpredis::getConn();
         //        $this->connect = Db::connect(Config::get('database.db_config'));
     }
-    //海南始新移动游戏通道挂机
+    //海南始新移动营销
     public function content($content) {
         return [
             'host'          => "123.56.225.148", //服务商ip

@@ -9,7 +9,7 @@ use Env;
 use Exception;
 use think\Db;
 
-class CmppMiJiaYiDongMarketing extends Pzlife {
+class CmppJuMengYiDongMarketing extends Pzlife {
 
     // protected $redis;
 
@@ -17,7 +17,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
         $this->redis = Phpredis::getConn();
         //        $this->connect = Db::connect(Config::get('database.db_config'));
     }
-    //米加移动营销
+    //聚梦移动营销
     public function content($content) {
         // print_r($content);die;
         // if ($content == 0) {
@@ -38,11 +38,11 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
         //     ];
         // }
         return [
-            'host'          => "139.196.145.242", //服务商ip
+            'host'          => "47.106.127.182", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "100029", //企业id  企业代码
+            'Source_Addr'   => "610666", //企业id  企业代码
             'Shared_secret' => '123456', //网关登录密码
-            'Service_Id'    => "100029", //业务代码
+            'Service_Id'    => "610666", //业务代码
             'template_id'   => "", //模板id
             'Dest_Id'       => "", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
@@ -57,7 +57,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
         $redis = Phpredis::getConn();
         date_default_timezone_set('PRC');
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $content                    = 16;
+        $content                    = 18;
         $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
         $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
         $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
@@ -78,11 +78,11 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
-            'content'     => '【美丽田园】尊敬的顾客您好！即日起非会员只需支付212元即可尊享指定护理一折体验，每月前20位体验顾客加赠精美化妆包1个，10/22-12/31日我和万象城有个约会，万象城全体员工恭候您的体验，竭诚为您的皮肤保驾护航！详询：021-54700816 回T退订',
+            'content'     => '【美丽田园】尊敬的顾客您好！10/22-12/31日我和万象城有个约会，万象城全体员工恭候您的体验，竭诚为您的皮肤保驾护航！详询：021-54700816 回T退订',
         ]));
       
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $log_path = realpath("")."/error/16.log";
+        $log_path = realpath("")."/error/18.log";
         $myfile = fopen($log_path,'a+');
         fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
         fwrite($myfile," Begin"."\n");
@@ -106,7 +106,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
 
-        $log_path = realpath("")."/error/16.log";
+        $log_path = realpath("")."/error/18.log";
         $myfile = fopen($log_path,'a+');
         fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
         fwrite($myfile," host:".$host." port:".$port."\n");
@@ -234,6 +234,10 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
                         $Msg_Content = unpack("N2Msg_Id/a".$stalen."Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence ", $body['Msg_Content']);
 
                         $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
+                        
+                                                                
+                        print_r($body);
+                        print_r($Msg_Content);
                         if ($mesage) {
                             $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                             // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
@@ -245,9 +249,6 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
                             $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
 
                         }else{//不在记录中的回执存入缓存，
-                                                                
-                            print_r($body);
-                            print_r($Msg_Content);
                             $mesage['Stat']        = $Msg_Content['Stat'];
                             $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                             $mesage['Done_time']   = $Msg_Content['Done_time'];
@@ -257,6 +258,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
                             $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
 
                         }
+                        print_r($mesage);
                         $callback_Command_Id = 0x80000005;
 
                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
@@ -313,7 +315,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
                                         }
                                     } else if ($head['Command_Id'] == 0x80000004) {
                                         $body = unpack("N2Msg_Id/CResult", $bodyData);
-                                        // print_r($body);
+                                        print_r($body);
                                         $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                         if ($sequence) {
                                             $sequence           = json_decode($sequence, true);
@@ -378,6 +380,10 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
                                         $Msg_Content = unpack("N2Msg_Id/a".$stalen."Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence ", $body['Msg_Content']);
             
                                         $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
+                                        
+                                                                
+                                        print_r($body);
+                                        print_r($Msg_Content);
                                         if ($mesage) {
                                             $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                                             // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
@@ -389,9 +395,6 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
                                             $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
             
                                         }else{//不在记录中的回执存入缓存，
-                                                                
-                                            print_r($body);
-                                            print_r($Msg_Content);
                                             $mesage['Stat']        = $Msg_Content['Stat'];
                                             $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                             $mesage['Done_time']   = $Msg_Content['Done_time'];
