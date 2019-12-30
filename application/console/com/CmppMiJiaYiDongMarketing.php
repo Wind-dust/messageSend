@@ -390,8 +390,8 @@ class CmppMiJiaYiDongMarketing extends Pzlife {
             
                                         }else{//不在记录中的回执存入缓存，
                                                                 
-                                            print_r($body);
-                                            print_r($Msg_Content);
+                                            // print_r($body);
+                                            // print_r($Msg_Content);
                                             $mesage['Stat']        = $Msg_Content['Stat'];
                                             $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                             $mesage['Done_time']   = $Msg_Content['Done_time'];

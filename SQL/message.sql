@@ -726,6 +726,11 @@ ADD COLUMN `log_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general
 ALTER TABLE `messagesend`.`yx_user_send_code_task` 
 ADD COLUMN `log_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '日志地址' AFTER `source`;
 
+ALTER TABLE `messagesend`.`yx_user_send_code_task` 
+ADD COLUMN `status_message` varchar(20) NOT NULL DEFAULT '' COMMENT '状态信息' AFTER `source`,
+ADD COLUMN `real_message` varchar(20) NOT NULL DEFAULT '' COMMENT '状态信息' AFTER `source`;
+
+
 DROP TABLE IF EXISTS `yx_user_cmpp`;
 CREATE TABLE `yx_user_cmpp`  (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

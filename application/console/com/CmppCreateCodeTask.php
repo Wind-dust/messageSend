@@ -1165,6 +1165,75 @@ class CmppCreateCodeTask extends Pzlife {
 
     }
 
+    public function unknowLog($channel_id){
+        $redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $redisMessageCodeSend = 'index:meassage:code:unknow:deliver:' . $channel_id; //验证码发送任务rediskey
+        $channel              = $this->getChannelinfo($channel_id);
+        // $mesage['Stat']        = $Msg_Content['Stat'];
+        // $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+        // $mesage['Done_time']   = $Msg_Content['Done_time'];
+        // // $mesage['mobile']      = $body['Dest_Id '];//手机号
+        //     $mesage['mobile']   = trim($Msg_Content['Dest_terminal_Id']);
+        //     $mesage['receive_time'] = time();//回执时间戳
+        $redis->rpush($redisMessageCodeSend,json_encode([
+            'Stat' => 'DELIVRD',
+            'mobile' => '13761273981',
+            'Submit_time' => '1912301028',
+            'Done_time' => '1912301058',
+            'receive_time' => '1577672536',
+        ]));
+        if ($channel['channel_type'] == 2) { 
+            while (true) {
+                Db::startTrans();
+                try {
+                    $send_log = $redis->lpop($redisMessageCodeSend);
+                    if (empty($send_log)) {
+                        continue;
+                    }
+                    $send_log = json_decode($send_log, true);
+                    $time = strtotime(date("Y-m-d 0:00:00",time()));
+                    $sql = "SELECT `id`,`task_no`,`uid` FROM ";
+                    if ($channel['business_id'] == 5) { //营销
+                        $sql .= " yx_user_send_task ";
+                    } elseif ($channel['business_id'] == 6) { // 行业
+                        $sql .= " yx_user_send_code_task ";
+                    } elseif ($channel['business_id'] == 9) { //游戏
+                        $sql .= " yx_user_send_game_task ";
+                    }
+                    $sql .= "WHERE `mobile_content` = " . $send_log['mobile'] ." AND `real_message` = '' AND `status_message` = '' ". " AND `create_time` > ".$time ;
+                    // print_r($sql);die;
+                    $task = Db::query($sql);
+                    if (empty($task)) {
+                        $redis->rpush($redisMessageCodeSend, json_encode($send_log));
+                        continue;
+                    }
+                    if ($task[0]['uid'] == 47 || $task[0]['uid'] == 51 || $task[0]['uid'] == 52) { //推送给美丽田园
+                        // https://zhidao.baidu.com/question/412076997.html
+                        $request_url = "http://116.228.60.189:25902/rtreceive?";
+                        $request_url .= 'task_no=' . $task[0]['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['Submit_time'];
+                        sendRequest($request_url);
+                        print_r($request_url);
+                    }
+                    if ($channel['business_id'] == 5) { //营销
+                        Db::table('yx_user_send_task')->where('id',$task[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $send_log['Stat']]);
+                    } elseif ($channel['business_id'] == 6) { // 行业
+                        Db::table('yx_user_send_code_task')->where('id',$task[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $send_log['Stat']]);
+                    } elseif ($channel['business_id'] == 9) { //游戏
+                        Db::table('yx_user_send_game_task')->where('id',$task[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $send_log['Stat']]);
+                    }
+                   
+                    Db::commit();
+                } catch (\Exception $e) {
+                    $redis->rpush($redisMessageCodeSend,$send_log);
+                    exception($e);
+                    Db::rollback();
+                }
+                
+            }
+        }
+    }
+
     public function updateLog($channel_id) {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
