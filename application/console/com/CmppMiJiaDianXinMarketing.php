@@ -137,6 +137,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife {
         $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
         $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
         $redisMessageCodeDeliver    = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
+        $redisMessageUnKownDeliver = 'index:meassage:code:unknow:deliver:' . $content; //行业通知MsgId
         // $redisMessageCodeSend       = 'index:meassage:marketing:send:' . $content; //营销发送任务rediskey
         // $redisMessageCodeSequenceId = 'index:meassage:marketing:sequence:id:' . $content; //营销行业通知SequenceId
         // $redisMessageCodeMsgId      = 'index:meassage:marketing:msg:id:' . $content; //营销行业通知SequenceId
@@ -172,16 +173,16 @@ class CmppMiJiaDianXinMarketing extends Pzlife {
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
 
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '17317961110',
-            'mar_task_id' => 15834,
-            'content'     => '【美丽田园】尊敬的会员，美丽田园三八纤俏女神季火爆开启。
-            即日起至4月20日
-          ★全线护理3.8折，特惠指定护理3.2折
-          ★新品乙酰透明质酸水光原液配方升级全新上市，打造水润肌
-          ★医美项目体验价低至1580元；更有“幸福眼”“天使肌”“魔鬼身”特价疗程，由眼及面奢享“美”一天。
-          具体活动详询门店或垂询4008206142 回T退订',
-        ]));
+        // $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        //     'mobile'      => '17317961110',
+        //     'mar_task_id' => 15834,
+        //     'content'     => '【美丽田园】尊敬的会员，美丽田园三八纤俏女神季火爆开启。
+        //     即日起至4月20日
+        //   ★全线护理3.8折，特惠指定护理3.2折
+        //   ★新品乙酰透明质酸水光原液配方升级全新上市，打造水润肌
+        //   ★医美项目体验价低至1580元；更有“幸福眼”“天使肌”“魔鬼身”特价疗程，由眼及面奢享“美”一天。
+        //   具体活动详询门店或垂询4008206142 回T退订',
+        // ]));
         if (socket_connect($socket, $host, $port) == false) {
             echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
