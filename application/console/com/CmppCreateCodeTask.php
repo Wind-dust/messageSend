@@ -1449,9 +1449,13 @@ class CmppCreateCodeTask extends Pzlife
                 $redis->rpush('index:meassage:game:cms:deliver:', json_encode($send_log)); //游戏通道实际码
                 $send_log = json_decode($send_log, true);
                 if (!isset($untime)) {
-                    $untime = $send_log['receive_time'] - $send_log['my_submit_time'];
+                    if (isset($send_log['receive_time']) && isset($send_log['my_submit_time'])) {
+                        $untime = $send_log['receive_time'] - $send_log['my_submit_time'];
+                    }
                 } else {
-                    $untime = $send_log['receive_time'] - $send_log['my_submit_time'] > $untime ? $send_log['receive_time'] - $send_log['my_submit_time'] : $untime;
+                    if (isset($send_log['receive_time']) && isset($send_log['my_submit_time'])) {
+                        $untime = $send_log['receive_time'] - $send_log['my_submit_time'] > $untime ? $send_log['receive_time'] - $send_log['my_submit_time'] : $untime;
+                    }
                 }
                 $task     = Db::query("SELECT * FROM yx_user_send_game_task WHERE `id` = '" . $send_log['mar_task_id'] . "'");
                 if (empty($task)) {
