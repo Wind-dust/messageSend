@@ -1264,6 +1264,8 @@ class CmppCreateCodeTask extends Pzlife
             'Done_time' => '191224164236',
         ])); */
 
+        // $request_url = 'http://116.228.60.189:15901/rtreceive?task_no=bus19123111560308152071&status_message=E:CHAN&mobile=18643198590&send_time=1912311333';
+        // sendRequest($request_url);
         if ($channel['channel_type'] == 2) { //cmpp的
             while (true) {
                 $send_log = $redis->lpop($redisMessageCodeSend);
@@ -1299,7 +1301,7 @@ class CmppCreateCodeTask extends Pzlife
                 if ($task[0]['uid'] == 47 || $task[0]['uid'] == 49 || $task[0]['uid'] == 51 || $task[0]['uid'] == 52 || $task[0]['uid'] == 53 || $task[0]['uid'] == 54 || $task[0]['uid'] == 55) { //推送给美丽田园
                     // https://zhidao.baidu.com/question/412076997.html
                     $request_url = "http://116.228.60.189:15901/rtreceive?";
-                    $request_url .= 'task_no=' . $task[0]['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['Submit_time'];
+                    $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . trim($send_log['Stat']) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
                     
                     print_r($request_url);
                     sendRequest($request_url);
