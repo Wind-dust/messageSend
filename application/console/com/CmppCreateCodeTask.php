@@ -1253,10 +1253,10 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:' . $channel_id; //验证码发送任务rediskey
         $channel              = $this->getChannelinfo($channel_id);
-        /*         $redis->rpush($redisMessageCodeSend, json_encode([
+/*                 $redis->rpush($redisMessageCodeSend, json_encode([
             'mobile' => '13564869264',
             'title' => '美丽田园营销短信',
-            'mar_task_id' => '15769',
+            'mar_task_id' => '1599',
             'content' => '【美丽田园】电商圣诞节活动将至，感恩回馈！.【美丽田园】',
             'Msg_Id' => '',
             'Stat' => 'DELIVER',
@@ -1290,7 +1290,7 @@ class CmppCreateCodeTask extends Pzlife
                 }
                 $sql .= "WHERE `id` = " . $send_log['mar_task_id'];
                 $task = Db::query($sql);
-                // print_r($task);die;
+                // print_r($sql);die;
                 if (empty($task)) {
                     $redis->rpush($redisMessageCodeSend, json_encode($send_log));
                     // continue;
@@ -1300,15 +1300,22 @@ class CmppCreateCodeTask extends Pzlife
                 // $request_url .= 'task_no=' . $task[0]['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['Submit_time'];
                 if ($task[0]['uid'] == 47 || $task[0]['uid'] == 49 || $task[0]['uid'] == 51 || $task[0]['uid'] == 52 || $task[0]['uid'] == 53 || $task[0]['uid'] == 54 || $task[0]['uid'] == 55) { //推送给美丽田园
                     // https://zhidao.baidu.com/question/412076997.html
-                    $request_url = "http://116.228.60.189:15901/rtreceive?";
-                    $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . trim($send_log['Stat']) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
+                    if(strpos($send_log['content'],'问卷')!==false){
+                        $request_url = "http://116.228.60.189:15901/rtreceive?";
+                        $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
+                    }else{
+                        $request_url = "http://116.228.60.189:15901/rtreceive?";
+                        $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . trim($send_log['Stat']) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
+                    }
+                   
                     
                     print_r($request_url);
                     sendRequest($request_url);
                     
                     usleep(20000);
                 }
-                $redis->rpush('index:meassage:code:cms:deliver:', json_encode($send_log));
+                $send_log['Stat'] = 'DELIVRD';
+                $redis->rpush('index:meassage:code:cms:deliver:'.$channel_id, json_encode($send_log));
             }
         }
         // try {
@@ -1320,6 +1327,97 @@ class CmppCreateCodeTask extends Pzlife
 
         // }
 
+    }
+
+    public function supplyMessageAgain () {//行业重推
+        $redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+          
+        // $redis->rpush('index:meassage:code:cms:deliver:', json_encode(Array
+        // (
+        //     'mobile' => '13564869264',
+        //     'title' => '美丽田园营销短信',
+        //     'mar_task_id' => '1599',
+        //     'content' => '感谢您对于美丽田园的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价http://crmapp.beautyfarm.com.cn/questionNaire1/api/qnnaire/refct?id=534478，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142，回T退订【美丽田园】',
+        //     'Msg_Id' => '',
+        //     'Stat' => 'DELIVER',
+        //     'Submit_time' => '191224164036',
+        //     'Done_time' => '191224164236',
+        // )));
+        while (true) {
+            $send_log = $redis->lpop('index:meassage:code:cms:deliver:');
+            if (empty($send_log)) {
+                exit('Success');
+            }
+            // $redis->rpush('index:meassage:code:cms:deliver:', $send_log);
+            $send_log = json_decode($send_log, true);
+            $sql = "SELECT `task_no`,`uid` FROM ";
+            if (trim($send_log['mar_task_id']) > 15763) {//营销
+                //推回营销
+                // $sql .= "WHERE `id` = " . $send_log['mar_task_id'];
+                // $sql .= " yx_user_send_task ";
+                // $task = Db::query($sql);
+                $redis->rpush('index:meassage:Marketing:cms:deliver:', $send_log);
+            }else{//行业
+              
+                $redis->rpush('index:meassage:Buiness:cms:deliver:', json_encode($send_log));
+                $sql .= " yx_user_send_code_task ";
+                $sql .= "WHERE `id` = " . $send_log['mar_task_id'];
+                $task = Db::query($sql);
+                if(strpos($send_log['content'],'问卷')!==false){
+                    Db::startTrans();
+                    try {
+                        Db::table('yx_user_send_code_task')->where('id', $send_log['mar_task_id'])->update(['status_message' => 'DELIVRD', 'real_message' => $send_log['Stat']]);
+                        Db::commit();
+                    } catch (\Exception $e) {
+                        exception($e);
+                        Db::rollback();
+                    }
+                    $send_log['Stat'] = 'DELIVRD';
+                }else{
+                    if (trim($send_log['Stat'] )== 'E:CHAN'){//补发
+                        $sendmessage = [
+                            'mobile'      => $send_log['mobile'],
+                            'title'       => $task[0]['task_name'],
+                            'mar_task_id' => $send_log['mar_task_id'],
+                            'content'     => $send_log['content'],
+                        ];
+                        
+                        $redis->rpush('index:meassage:game:send:1', json_encode($sendmessage)); //三体营销通道
+                    }
+                    Db::startTrans();
+                    try {
+                        Db::table('yx_user_send_code_task')->where('id', $task[0]['id'])->update(['status_message' => $send_log['Stat'], 'real_message' => $send_log['Stat']]);
+                        Db::commit();
+                    } catch (\Exception $e) {
+
+                        Db::rollback();
+                    }
+
+                }
+
+                
+
+            }
+            if ($task[0]['uid'] == 47 || $task[0]['uid'] == 49 || $task[0]['uid'] == 51 || $task[0]['uid'] == 52 || $task[0]['uid'] == 53 || $task[0]['uid'] == 54 || $task[0]['uid'] == 55) { //推送给美丽田园
+                // https://zhidao.baidu.com/question/412076997.html
+                if(strpos($send_log['content'],'问卷')!==false){
+                    $request_url = "http://116.228.60.189:15901/rtreceive?";
+                    $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
+                }else{
+                    $request_url = "http://116.228.60.189:15901/rtreceive?";
+                    $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . trim($send_log['Stat']) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
+                }
+               
+                
+                print_r($request_url);
+                // sendRequest($request_url);
+                
+                usleep(20000);
+            }
+
+        }
+        
     }
 
     private function getChannelinfo($channel_id)
