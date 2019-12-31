@@ -679,6 +679,54 @@ class User extends CommonIndex {
         return ['code' => '200', 'total' => $total, 'task_log' => $task_log];
     }
 
+    public function getUserBusinessSubmitTask($page, $pageNum, $conId){
+        $uid = $this->getUidByConId($conId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $offset = ($page - 1) * $pageNum;
+        $result = DbAdministrator::getUserSendCodeTask(['uid' => $uid], '*', false, '', $offset . ',' . $pageNum);
+        $total = DbAdministrator::countUserSendCodeTask(['uid' => $uid]);
+        return ['code' => '200', 'total' => $total, 'data' => $result];
+    }
+
+    public function getUserBusinessSubmitTaskInfo($page, $pageNum, $ConId, $id){
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $offset = ($page - 1) * $pageNum;
+        $task = DbAdministrator::getUserSendCodeTask(['id' => $id,'uid' => $uid], '*', true);
+        if (empty($task)) {
+            return ['code' => '3001', 'msg' => '该任务不存在'];
+        }
+        if (!empty($task['log_path'])) {
+            $task_log = [];
+            $file = fopen($task['log_path'], "r");
+            $data=array();
+            $i=0;
+            // $phone = '';
+            // $j     = '';
+            while(! feof($file))
+            {   
+                $cellVal= trim(fgets($file));
+                $log = json_decode($cellVal,true);
+                $log['create_time'] = date('Y-m-d H:i:s',ceil(strtotime($task['update_time']) + $i/1000));
+                if (isset($log['mobile'])) {
+                    $data[] = $log;
+                }
+                $i++;
+            }
+            fclose($file);
+            $total = count($data);
+            $task_log = array_slice($data,$offset,$pageNum);
+        }else{
+            $task_log = DbAdministrator::getUserSendCodeTaskLog(['task_no' => $task['task_no']],'*',false,'',$offset . ',' . $pageNum);
+            $total = DbAdministrator::countUserSendCodeTaskLog(['task_no' => $task['task_no']]);
+        }
+        return ['code' => '200', 'total' => $total, 'task_log' => $task_log];
+    }
+
     public function getUserSonAccount($page, $pageNum, $ConId){
         $uid = $this->getUidByConId($ConId);
         if (empty($uid)) { //用户不存在
