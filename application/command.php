@@ -25,7 +25,7 @@ return [
     'clientsocketjiujiaXintong'        => $commandPath . 'ClientSocketJiuJiaXinTong',
     'cmppsantimarketing'               => $commandPath . 'CmppSantiMarketing',
     'cmppsantimarketing2'              => $commandPath . 'CmppSantiMarketing2',
-    'cmpphainanshixinyidong'           => $commandPath . 'CmppHaiNanShiXinYiDong',//游戏挂机
+    'cmpphainanshixinyidong'           => $commandPath . 'CmppHaiNanShiXinYiDong', //游戏挂机
     'cmpphainanshiXinyidongmarketing'  => $commandPath . 'CmppHaiNanShiXinYiDongMarketing',
     'cmpptestlocal'                    => $commandPath . 'CmppTestLocal',
     'cmppcreatecodetask'               => $commandPath . 'CmppCreateCodeTask',
@@ -38,6 +38,8 @@ return [
     'cmppmijiadianxinmarketing'        => $commandPath . 'CmppMiJiaDianXinMarketing',
     'cmppmijialiantongmarketing'       => $commandPath . 'CmppMiJiaLianTongMarketing',
     'cmppmijiayidongmarketing'         => $commandPath . 'CmppMiJiaYiDongMarketing',
+    'cmppmijialiandianbusiness'        => $commandPath . 'CmppMiJiaLianDianBusiness',
+    'cmppmijiayidongbusiness'          => $commandPath . 'CmppMiJiaYiDongBusiness',
     'cmppjumengyidongmarketing'        => $commandPath . 'CmppJuMengYiDongMarketing',
     'cmppjumengliandianmarketing'      => $commandPath . 'CmppJuMengLianDianMarketing',
     'cmpplanjingmarketing'             => $commandPath . 'CmppLanJingMarketing',
