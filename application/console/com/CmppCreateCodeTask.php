@@ -1359,7 +1359,7 @@ class CmppCreateCodeTask extends Pzlife
                 $redis->rpush('index:meassage:Marketing:cms:deliver:', $send_log);
             }else{//行业
               
-                $sql = "SELECT `task_no`,`uid` FROM ";
+                $sql = "SELECT `task_no`,`uid`,`task_name` FROM ";
                 $redis->rpush('index:meassage:Buiness:cms:deliver:', json_encode($send_log));
                 $sql .= " yx_user_send_code_task ";
                 $sql .= "WHERE `id` = " . $send_log['mar_task_id'];
