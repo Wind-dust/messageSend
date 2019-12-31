@@ -296,6 +296,7 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife {
                                                 $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                                 $mesage['Done_time']   = $Msg_Content['Done_time'];
                                                 $mesage['mobile']   = $Msg_Content['Dest_terminal_Id'];
+                                                $mesage['receive_time'] = time();//回执时间戳
                                                 $redis->rPush($redisMessageUnKownDeliver,json_encode($mesage));
                                             }
                                             $callback_Command_Id = 0x80000005;

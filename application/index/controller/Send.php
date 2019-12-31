@@ -28,10 +28,8 @@ class Send extends MyController {
         //     return ['code' => 3001];
         // }
         // echo phpinfo();die;
-        $a = 'E.....@.w.F.{8.....v...@.SF~lG.1P....s..............e...T.h...................................15201926171...........<e...T.h.92.....1912251728191225172815201926171......................';
-            $header = substr($a,0,12);
-            $headData = unpack('NNN',$a);
-            print_r($headData);die;
+        $a = '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】';
+         
         $code = trim($this->request->post('code')); //验证码
         //图片函数测试
         stream_context_set_default([

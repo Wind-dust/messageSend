@@ -218,6 +218,7 @@ class CmppMiJiaYiDongBusiness extends Pzlife {
                             // $mesage['Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
                             $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                             $mesage['Done_time']   = $Msg_Content['Done_time'];
+                            $mesage['receive_time'] = time();//回执时间戳
                             $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
 
                         }else{//不在记录中的回执存入缓存，
