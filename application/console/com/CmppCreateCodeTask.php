@@ -1351,7 +1351,6 @@ class CmppCreateCodeTask extends Pzlife
             }
             // $redis->rpush('index:meassage:code:cms:deliver:', $send_log);
             $send_log = json_decode($send_log, true);
-            $sql = "SELECT `task_no`,`uid` FROM ";
             if (trim($send_log['mar_task_id']) > 15763) {//营销
                 //推回营销
                 // $sql .= "WHERE `id` = " . $send_log['mar_task_id'];
@@ -1360,6 +1359,7 @@ class CmppCreateCodeTask extends Pzlife
                 $redis->rpush('index:meassage:Marketing:cms:deliver:', $send_log);
             }else{//行业
               
+                $sql = "SELECT `task_no`,`uid` FROM ";
                 $redis->rpush('index:meassage:Buiness:cms:deliver:', json_encode($send_log));
                 $sql .= " yx_user_send_code_task ";
                 $sql .= "WHERE `id` = " . $send_log['mar_task_id'];
@@ -1395,26 +1395,26 @@ class CmppCreateCodeTask extends Pzlife
                     }
 
                 }
-
-                
-
-            }
-            if ($task[0]['uid'] == 47 || $task[0]['uid'] == 49 || $task[0]['uid'] == 51 || $task[0]['uid'] == 52 || $task[0]['uid'] == 53 || $task[0]['uid'] == 54 || $task[0]['uid'] == 55) { //推送给美丽田园
-                // https://zhidao.baidu.com/question/412076997.html
-                if(strpos($send_log['content'],'问卷')!==false){
-                    $request_url = "http://116.228.60.189:15901/rtreceive?";
-                    $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
-                }else{
-                    $request_url = "http://116.228.60.189:15901/rtreceive?";
-                    $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . trim($send_log['Stat']) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
+                if ($task[0]['uid'] == 47 || $task[0]['uid'] == 49 || $task[0]['uid'] == 51 || $task[0]['uid'] == 52 || $task[0]['uid'] == 53 || $task[0]['uid'] == 54 || $task[0]['uid'] == 55) { //推送给美丽田园
+                    // https://zhidao.baidu.com/question/412076997.html
+                    if(strpos($send_log['content'],'问卷')!==false){
+                        $request_url = "http://116.228.60.189:15901/rtreceive?";
+                        $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
+                    }else{
+                        $request_url = "http://116.228.60.189:15901/rtreceive?";
+                        $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . trim($send_log['Stat']) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
+                    }
+                   
+                    
+                    print_r($request_url);
+                    // sendRequest($request_url);
+                    
+                    usleep(20000);
                 }
-               
                 
-                print_r($request_url);
-                // sendRequest($request_url);
-                
-                usleep(20000);
+
             }
+           
 
         }
         
