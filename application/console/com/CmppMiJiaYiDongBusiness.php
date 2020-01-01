@@ -261,6 +261,8 @@ class CmppMiJiaYiDongBusiness extends Pzlife {
                                 if ($headData != false) {
                                     $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                                     $bodyData = socket_read($socket, $head['Total_Length'] - 12);
+                                    echo "获取到bodyData的长度".strlen($bodyData)."\n";
+                                    echo "请求头解析的内容长度".$head['Total_Length']."\n";
                                     // do {
                                     //     $bodyData.=socket_read($socket,$head['Total_Length'] - 12 -strlen($bodyData));
                                     // } while (strlen($bodyData) ==  $head['Total_Length']-12);
