@@ -289,6 +289,7 @@ class ClientSocketSantiBusiness extends Pzlife {
                                 $headData = socket_read($socket, 12);
                                 if ($headData != false) {
                                     $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
+                                    usleep(1000);
                                     $bodyData = socket_read($socket, $head['Total_Length'] - 12);
                                     if ($head['Command_Id'] == 0x80000001) {
                                         $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
@@ -483,10 +484,11 @@ class ClientSocketSantiBusiness extends Pzlife {
                                         $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                         $send_data['my_submit_time'] = time();//发送时间戳
                                         $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, json_encode($send_data));
-                                        usleep(300);
                                         socket_write($socket, $headData . $bodyData, $Total_Length);
                                         $send_status = 2;
                                         ++$i;
+                                        usleep(3000);
+
                                     }
                                     ++$Sequence_Id;
                                     if ($Sequence_Id > 65536) {
@@ -534,7 +536,7 @@ class ClientSocketSantiBusiness extends Pzlife {
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
                                     
                                      $send_status = 2;
-                                     usleep(300);
+                                     usleep(3000);
                                 }
                                
                             } else {//心跳
