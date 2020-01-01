@@ -405,7 +405,7 @@ class ClientSocketSantiBusiness extends Pzlife {
                                             $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
             
                                         }else{//不在记录中的回执存入缓存，
-                                            $mesage['Stat']        = isset($Msg_Content['Stat']) ? $$Msg_Content['Stat'] : 'UNKNOWN';
+                                            $mesage['Stat']        = isset($Msg_Content['Stat']) ? $Msg_Content['Stat'] : 'UNKNOWN';
                                             $mesage['Submit_time'] = trim(isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis',$mesage['my_submit_time']));
                                             $mesage['Done_time']   = trim(isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis',time()));
                                             // $mesage['mobile']      = $body['Dest_Id '];//手机号
