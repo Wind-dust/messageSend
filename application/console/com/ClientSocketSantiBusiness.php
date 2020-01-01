@@ -406,7 +406,7 @@ class ClientSocketSantiBusiness extends Pzlife {
             
                                         }else{//不在记录中的回执存入缓存，
                                             $mesage['Stat']        = isset($Msg_Content['Stat']) ? $Msg_Content['Stat'] : 'UNKNOWN';
-                                            $mesage['Submit_time'] = trim(isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis',$mesage['my_submit_time']));
+                                            $mesage['Submit_time'] = trim(isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis',time()));
                                             $mesage['Done_time']   = trim(isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis',time()));
                                             // $mesage['mobile']      = $body['Dest_Id '];//手机号
                                                 $mesage['mobile']   = isset($Msg_Content['Dest_terminal_Id']) ? $Msg_Content['Dest_terminal_Id']: '';
