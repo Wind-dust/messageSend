@@ -261,9 +261,9 @@ class CmppMiJiaYiDongBusiness extends Pzlife {
                                 if ($headData != false) {
                                     $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                                     $bodyData = socket_read($socket, $head['Total_Length'] - 12);
-                                    do {
-                                        $bodyData.=socket_read($socket,$head['Total_Length'] - 12 -strlen($bodyData));
-                                    } while (strlen($bodyData) ==  $head['Total_Length']-12);
+                                    // do {
+                                    //     $bodyData.=socket_read($socket,$head['Total_Length'] - 12 -strlen($bodyData));
+                                    // } while (strlen($bodyData) ==  $head['Total_Length']-12);
                                     if ($head['Command_Id'] == 0x80000001) {
                                         $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
                                         $verify_status = $body['Status'];
