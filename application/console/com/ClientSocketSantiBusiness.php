@@ -286,10 +286,10 @@ class ClientSocketSantiBusiness extends Pzlife {
 
                             //先接收
                             while (true) {
-                                usleep(2000);
 
                                 $headData = socket_read($socket, 12);
                                 if ($headData != false) {
+                                    usleep(2000);
                                     $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                                     $bodyData = socket_read($socket, $head['Total_Length'] - 12);
                                     if ($head['Command_Id'] == 0x80000001) {
