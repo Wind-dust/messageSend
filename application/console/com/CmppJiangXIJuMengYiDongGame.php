@@ -68,23 +68,23 @@ class CmppJiangXIJuMengYiDongGame extends Pzlife {
          $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '13651913994',
             'mar_task_id' => '',
-            'content'     => '【冰封传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/4ZaDH 回T退订',
+            'content'     => '【猛虎高爆】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/5VacM 回T退订',
         ]));
         
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15172413692',
             'mar_task_id' => '',
-            'content'     => '【冰封传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/4ZaDH 回T退订',
+            'content'     => '【猛虎高爆】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/5VacM 回T退订',
         ]));
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15821193682',
             'mar_task_id' => '',
-            'content'     => '【冰封传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/4ZaDH 回T退订',
+            'content'     => '【猛虎高爆】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/5VacM 回T退订',
         ]));
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
-            'content'     => '【冰封传奇】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/4ZaDH 回T退订',
+            'content'     => '【猛虎高爆】已为您发出6888888钻石和VIP15，今日限领至尊屠龙！戳 https://ltv7.cn/5VacM 回T退订',
         ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("")."/error/23.log";
