@@ -826,7 +826,7 @@ class CmppCreateCodeTask extends Pzlife
 
             Db::startTrans();
             try {
-                Db::table('yx_user_send_code_task')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3, 'log_path' => realpath("") . '/tasklog/marketing/' . $sendTask['task_no'] . ".txt"]);
+                Db::table('yx_user_send_code_task')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3, 'log_path' => realpath("") . '/tasklog/business/' . $sendTask['task_no'] . ".txt"]);
                 Db::commit();
                 foreach ($push_messages as $key => $value) {
                     $send_channelid = $value['channel_id'];
