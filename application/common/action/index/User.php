@@ -702,7 +702,12 @@ class User extends CommonIndex {
         }
         if (!empty($task['log_path'])) {
             $task_log = [];
-            $file = fopen($task['log_path'], "r");
+            if (file_exists(realpath("") . '/tasklog/business/' . $task['task_no'] . ".txt")) {
+                $file = fopen($task['log_path'], "r");
+            }else{
+                $file = fopen(realpath("") . '/tasklog/business/' . $task['task_no'] . ".txt", "r");
+            }
+            
             $data=array();
             $i=0;
             // $phone = '';
