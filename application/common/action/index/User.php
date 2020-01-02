@@ -685,7 +685,6 @@ class User extends CommonIndex {
             return ['code' => '3003'];
         }
         $offset = ($page - 1) * $pageNum;
-        print_r($uid);die;
         $result = DbAdministrator::getUserSendCodeTask(['uid' => $uid], '*', false, '', $offset . ',' . $pageNum);
         $total = DbAdministrator::countUserSendCodeTask(['uid' => $uid]);
         return ['code' => '200', 'total' => $total, 'data' => $result];
