@@ -25,8 +25,8 @@ return [
     'clientsocketjiujiaXintong'        => $commandPath . 'ClientSocketJiuJiaXinTong',
     'cmppsantimarketing'               => $commandPath . 'CmppSantiMarketing',
     'cmppsantimarketing2'              => $commandPath . 'CmppSantiMarketing2',
-    'cmpphainanshixinyidong'           => $commandPath . 'CmppHaiNanShiXinYiDong', //游戏挂机
-    'cmppjiangxijumengyidonggame'      => $commandPath . 'CmppJiangXIJuMengYiDongGame', //游戏挂机
+    'cmpphainanshixinyidong'           => $commandPath . 'CmppHaiNanShiXinYiDong', //海南始新游戏挂机
+    'cmppjiangxijumengyidonggame'      => $commandPath . 'CmppJiangXIJuMengYiDongGame', //江西聚梦游戏挂机
     'cmpphainanshiXinyidongmarketing'  => $commandPath . 'CmppHaiNanShiXinYiDongMarketing',
     'cmpptestlocal'                    => $commandPath . 'CmppTestLocal',
     'cmppcreatecodetask'               => $commandPath . 'CmppCreateCodeTask',

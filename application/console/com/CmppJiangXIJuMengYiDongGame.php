@@ -57,7 +57,7 @@ class CmppJiangXIJuMengYiDongGame extends Pzlife {
         $redis = Phpredis::getConn();
         date_default_timezone_set('PRC');
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $content                    = 14;
+        $content                    = 23;
         $redisMessageCodeSend       = 'index:meassage:game:send:' . $content; //验证码发送任务rediskey
         $redisMessageCodeSequenceId = 'index:meassage:game:sequence:id:' . $content; //行业通知SequenceId
         $redisMessageCodeMsgId      = 'index:meassage:game:msg:id:' . $content; //行业通知SequenceId
@@ -87,7 +87,7 @@ class CmppJiangXIJuMengYiDongGame extends Pzlife {
             'content'     => '【超变传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/3Ypm7 回T退订',
         ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $log_path = realpath("")."/error/14.log";
+        $log_path = realpath("")."/error/23.log";
         $myfile = fopen($log_path,'a+');
         fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
         fwrite($myfile," Begin"."\n");
@@ -111,7 +111,7 @@ class CmppJiangXIJuMengYiDongGame extends Pzlife {
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
 
-        $log_path = realpath("")."/error/14.log";
+        $log_path = realpath("")."/error/23.log";
         $myfile = fopen($log_path,'a+');
         fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
         fwrite($myfile," host:".$host." port:".$port."\n");
@@ -573,7 +573,7 @@ class CmppJiangXIJuMengYiDongGame extends Pzlife {
                             }
                             socket_close($socket);
 
-                            $log_path = realpath("")."/error/14.log";
+                            $log_path = realpath("")."/error/23.log";
                             $myfile = fopen($log_path,'a+');
                             fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
                             fwrite($myfile,$e."\n");
@@ -601,7 +601,7 @@ class CmppJiangXIJuMengYiDongGame extends Pzlife {
     }
 
     public function error_log($error_type){
-        $log_path = realpath("")."/error/14.log";
+        $log_path = realpath("")."/error/23.log";
         $myfile = fopen($log_path,'a+');
         fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
         fwrite($myfile,$error_type." fail massaege:".socket_strerror(socket_last_error())."\n");
