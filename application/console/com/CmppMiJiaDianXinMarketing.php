@@ -92,6 +92,12 @@ class CmppMiJiaDianXinMarketing extends Pzlife {
         //   ★医美项目体验价低至1580元；更有“幸福眼”“天使肌”“魔鬼身”特价疗程，由眼及面奢享“美”一天。
         //   具体活动详询门店或垂询4008206142 回T退订',
         // ]));
+        $log_path = realpath("")."/error/".$content.".log";
+        $myfile = fopen($log_path,'a+');
+        fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
+        fwrite($myfile," host:".$host." port:".$port."\n");
+        fclose($myfile);
+
         if (socket_connect($socket, $host, $port) == false) {
             echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
@@ -545,7 +551,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife {
                             }
                             socket_close($socket);
 
-                            $log_path = realpath("")."/error/17.log";
+                            $log_path = realpath("")."/error/".$content.".log";
                             $myfile = fopen($log_path,'a+');
                             fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
                             fwrite($myfile,$e."\n");
@@ -572,40 +578,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife {
         }
     }
 
-    public function cmppDeliver($Total_Length, $Sequence_Id) { //Msg_Id直接用N解析不行
-        $contentlen = $Total_Length - 109;
-        $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a32Src_terminal_Id/CSrc_terminal_type/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a20LinkID", $this->bodyData);
-        var_dump($body);
-        if ($body['Msg_Length'] > 0) {
-            $data = $body['Msg_Content'];
-            //$Msg_Id = $body['Msg_Id'];
-            $Msg_Id   = ($body['Msg_Id1'] & 0x0fffffff);
-            $Msg_Idfu = $body['Msg_Id2'];
-            $msgidz   = unpack("N", substr($this->bodyData, 0, 8));
-            $msgidzz  = '0000' . $msgidz[1];
-            //操作数据库(原方法)
-            /* mysql_connect('localhost', '', '');
-            mysql_select_db('');
-            mysql_query('set names utf8');
-            $data    = trim($data);
-            $sql1    = "select id from socket_yd where msgid='" . $Msg_Id . "'";
-            $chongfu = mysql_query($sql1);
-            $arrs    = array();
-            while ($arr = mysql_fetch_assoc($chongfu)) {
-            $arrs[] = $arr;
-            }
-            if ($arrs == array() || $arrs[0] == null) {
-            $sql = "insert into socket_yd set msgid='" . $Msg_Id . "', content='" . addslashes($data) . "', add_time='" . date('Y-m-d H:i:s') . "'";
-            mysql_query($sql);
-            } */
-            // mysql_close();
-            //echo $Msg_Id."\n";
-            echo $data . "\n";
-            echo $msgidzz . "\n";
-            echo $Sequence_Id . "\n";
-            $this->cmppDeliverResp($msgidzz, $Msg_Idfu, $Sequence_Id);
-        }
-    }
+
 
     //16进制转2进制
     function StrToBin($str) {

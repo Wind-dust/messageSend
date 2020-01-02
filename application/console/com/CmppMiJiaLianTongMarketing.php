@@ -32,98 +32,6 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
             'SP_ID'         => "",
             'master_num'    => 200,
         ];
-        /*  if ($content == 1) { //三体行业
-        return [
-        'host'          => "116.62.88.162", //服务商ip
-        'port'          => "8592", //短连接端口号   17890长连接端口号
-        'Source_Addr'   => "101161", //企业id  企业代码
-        'Shared_secret' => '5hsey6u9', //网关登录密码
-        'template_id'   => "217062", //模板id
-        'Service_Id'    => "101161", //业务代码
-        'Dest_Id'       => "106928080159", //短信接入码 短信端口号
-        'Sequence_Id'   => 1,
-        'SP_ID'         => "",
-        'master_num'    => 300,
-        ];
-        } else if ($content == 2) { // 三体营销
-        return [
-        'host'          => "116.62.88.162", //服务商ip
-        'port'          => "8592", //短连接端口号   17890长连接端口号
-        'Source_Addr'   => "101162", //企业id  企业代码
-        'Shared_secret' => 'uc338qd7', //网关登录密码
-        'Service_Id'    => "101162", //业务代码
-        'template_id'   => "217800", //模板id
-        'Dest_Id'       => "106928080158", //短信接入码 短信端口号 服务代码
-        'Sequence_Id'   => 1,
-        'SP_ID'         => "",
-        'master_num'    => 300,
-        ];
-        } else if ($content == 3) { //青年科技移动营销
-        return [
-        'host'          => "47.96.157.156", //服务商ip
-        'port'          => "7890", //短连接端口号   17890长连接端口号
-        'Source_Addr'   => "997476", //企业id  企业代码
-        'Shared_secret' => '47TtFd', //网关登录密码
-        'Service_Id'    => "997476", //业务代码
-        'template_id'   => "", //模板id
-        'Dest_Id'       => "1069030", //短信接入码 短信端口号 服务代码
-        'Sequence_Id'   => 1,
-        'SP_ID'         => "",
-        'master_num'    => 300,
-        ];
-        } else if ($content == 4) { //青年科技移动联通营销
-        return [
-        'host'          => "47.96.157.156", //服务商ip
-        'port'          => "7890", //短连接端口号   17890长连接端口号
-        'Source_Addr'   => "997475", //企业id  企业代码
-        'Shared_secret' => 'SiC67Z', //网关登录密码
-        'Service_Id'    => "997475", //业务代码
-        'template_id'   => "", //模板id
-        'Dest_Id'       => "1069029", //短信接入码 短信端口号 服务代码
-        'Sequence_Id'   => 1,
-        'SP_ID'         => "",
-        'master_num'    => 200,
-        ];
-        } else if ($content == 5) { //青年科技三网行业
-        return [
-        'host'          => "47.96.157.156", //服务商ip
-        'port'          => "7890", //短连接端口号   17890长连接端口号
-        'Source_Addr'   => "997474", //企业id  企业代码
-        'Shared_secret' => 'Yhdbbn', //网关登录密码
-        'Service_Id'    => "997474", //业务代码
-        'template_id'   => "", //模板id
-        'Dest_Id'       => "1069024", //短信接入码 短信端口号 服务代码
-        'Sequence_Id'   => 1,
-        'SP_ID'         => "",
-        'master_num'    => 500,
-        ];
-        } else if ($content == 6) { //物流通知账号
-        return [
-        'host'          => "47.102.193.199", //服务商ip
-        'port'          => "7890", //短连接端口号   17890长连接端口号
-        'Source_Addr'   => "901042", //企业id  企业代码
-        'Shared_secret' => 'NX2MYz', //网关登录密码
-        'Service_Id'    => "901042", //业务代码
-        'template_id'   => "", //模板id
-        'Dest_Id'       => "1069080", //短信接入码 短信端口号 服务代码
-        'Sequence_Id'   => 1,
-        'SP_ID'         => "",
-        'master_num'    => 300,
-        ];
-        } */
-        /*      if ($content == 1) { //测试
-    return [
-    'host'          => "127.0.0.1", //服务商ip
-    'port'          => "8888", //短连接端口号   17890长连接端口号
-    'Source_Addr'   => "101161", //企业id  企业代码
-    'Shared_secret' => '5hsey6u9', //网关登录密码
-    'Service_Id'    => "217062",
-    'Dest_Id'       => "106928080159", //短信接入码 短信端口号
-    'Sequence_Id'   => 1,
-    'SP_ID'         => "",
-    'master_num'    => 300,
-    ];
-    }  */
     }
 
     public function Send($content) {
@@ -178,6 +86,12 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
             'mar_task_id' => 15715,
             'content'     => '【中山口腔】5周年庆，11月23-30日，黄石三店同庆，全线诊疗项目 8 折让利回馈、消费就送青花瓷礼盒！39.9元购洁牙卡送食用油。详情询:0714-6268188 回T退订',
         ])); */
+        $log_path = realpath("")."/error/".$content.".log";
+        $myfile = fopen($log_path,'a+');
+        fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
+        fwrite($myfile," host:".$host." port:".$port."\n");
+        fclose($myfile);
+
         if (socket_connect($socket, $host, $port) == false) {
             echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
@@ -631,7 +545,7 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
                             }
                             socket_close($socket);
 
-                            $log_path = realpath("")."/error/8.log";
+                            $log_path = realpath("")."/error/".$content.".log";
                             $myfile = fopen($log_path,'a+');
                             fwrite($myfile,date('Y-m-d H:i:s',time())."\n");
                             fwrite($myfile,$e."\n");
@@ -688,40 +602,7 @@ class CmppMiJiaLianTongMarketing extends Pzlife {
         return $sendTask[0];
     }
 
-    public function cmppDeliver($Total_Length, $Sequence_Id) { //Msg_Id直接用N解析不行
-        $contentlen = $Total_Length - 109;
-        $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a32Src_terminal_Id/CSrc_terminal_type/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a20LinkID", $this->bodyData);
-        var_dump($body);
-        if ($body['Msg_Length'] > 0) {
-            $data = $body['Msg_Content'];
-            //$Msg_Id = $body['Msg_Id'];
-            $Msg_Id   = ($body['Msg_Id1'] & 0x0fffffff);
-            $Msg_Idfu = $body['Msg_Id2'];
-            $msgidz   = unpack("N", substr($this->bodyData, 0, 8));
-            $msgidzz  = '0000' . $msgidz[1];
-            //操作数据库(原方法)
-            /* mysql_connect('localhost', '', '');
-            mysql_select_db('');
-            mysql_query('set names utf8');
-            $data    = trim($data);
-            $sql1    = "select id from socket_yd where msgid='" . $Msg_Id . "'";
-            $chongfu = mysql_query($sql1);
-            $arrs    = array();
-            while ($arr = mysql_fetch_assoc($chongfu)) {
-            $arrs[] = $arr;
-            }
-            if ($arrs == array() || $arrs[0] == null) {
-            $sql = "insert into socket_yd set msgid='" . $Msg_Id . "', content='" . addslashes($data) . "', add_time='" . date('Y-m-d H:i:s') . "'";
-            mysql_query($sql);
-            } */
-            // mysql_close();
-            //echo $Msg_Id."\n";
-            echo $data . "\n";
-            echo $msgidzz . "\n";
-            echo $Sequence_Id . "\n";
-            $this->cmppDeliverResp($msgidzz, $Msg_Idfu, $Sequence_Id);
-        }
-    }
+
 
     //16进制转2进制
     function StrToBin($str) {
