@@ -26,6 +26,7 @@ return [
     'cmppsantimarketing'               => $commandPath . 'CmppSantiMarketing',
     'cmppsantimarketing2'              => $commandPath . 'CmppSantiMarketing2',
     'cmpphainanshixinyidong'           => $commandPath . 'CmppHaiNanShiXinYiDong', //游戏挂机
+    'cmppjiangxijumengyidonggame'      => $commandPath . 'CmppJiangXIJuMengYiDongGame', //游戏挂机
     'cmpphainanshiXinyidongmarketing'  => $commandPath . 'CmppHaiNanShiXinYiDongMarketing',
     'cmpptestlocal'                    => $commandPath . 'CmppTestLocal',
     'cmppcreatecodetask'               => $commandPath . 'CmppCreateCodeTask',
