@@ -494,7 +494,7 @@ class CmppJiangXIJuMengYiDongGame extends Pzlife {
                                         $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                         $send_data['my_submit_time'] = time();//发送时间戳
                                         $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, json_encode($send_data));
-                                        usleep(300);
+                                        usleep(3000);
                                         socket_write($socket, $headData . $bodyData, $Total_Length);
                                         $send_status = 2;
                                         ++$i;
@@ -547,7 +547,7 @@ class CmppJiangXIJuMengYiDongGame extends Pzlife {
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
                                     
                                      $send_status = 2;
-                                     usleep(300);
+                                     usleep(3000);
                                 }
                                
                             } else {//心跳
