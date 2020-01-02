@@ -416,12 +416,19 @@ class CmppCreateCodeTask extends Pzlife
                     $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                     $newres = array_shift($res);
                     if ($newres) {
-                        if ($newres['source'] == 2 && in_array($sendTask['uid'],[47,49,51,52])) { //聚梦联通营销
-                            $channel_id = 19;
-                        } else if ($newres['source'] == 1 && in_array($sendTask['uid'],[47,49,51,52])) { //聚梦移动
-                            $channel_id = 18;
+                        // if ($newres['source'] == 2 && in_array($sendTask['uid'],[47,49,51,52])) { //聚梦联通营销
+                        //     $channel_id = 19;
+                        // } else if ($newres['source'] == 1 && in_array($sendTask['uid'],[47,49,51,52])) { //聚梦移动
+                        //     $channel_id = 18;
 
-                        } else if ($newres['source']== 3 && in_array($sendTask['uid'],[47,49,51,52])) { //聚梦电信营销
+                        // } else if ($newres['source']== 3 && in_array($sendTask['uid'],[47,49,51,52])) { //聚梦电信营销
+                        //     $channel_id = 7;
+                        // }
+                        if ($newres['source'] == 1) {
+                            $channel_id = 17;
+                        }elseif ($channel_id == 17 && $newres['source'] == 2) {
+                            $channel_id = 8;
+                        }elseif ($channel_id == 17 && $newres['source'] == 3) {
                             $channel_id = 7;
                         }
 
