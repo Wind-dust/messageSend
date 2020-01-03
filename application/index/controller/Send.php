@@ -587,4 +587,20 @@ class Send extends MyController {
         $result = $this->app->send->getSmsMultimediaMessageTaskStatus($appid, $appkey);
         return $result;
     }
+
+    /**
+     * @api              {post} / 批量自定义短信提交接口（行业）
+     * @apiDescription   submitBatchCustomBusiness
+     * @apiGroup         index_send
+     * @apiName          submitBatchCustomBusiness
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {String} connect 组合包内容 
+     * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误
+     * @apiSampleRequest /index/send/submitBatchCustomBusiness
+     * @author rzc
+     */
+    public function submitBatchCustomBusiness(){
+        
+    }
 }

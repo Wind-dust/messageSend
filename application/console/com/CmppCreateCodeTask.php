@@ -1427,6 +1427,10 @@ class CmppCreateCodeTask extends Pzlife
         
     }
 
+    public function updateCmppChannelLog(){
+        
+    }
+
     private function getChannelinfo($channel_id)
     {
         $channel = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `id` = " . $channel_id);

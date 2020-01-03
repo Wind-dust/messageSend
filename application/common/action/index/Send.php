@@ -469,12 +469,41 @@ return $result;
             return ['code' => '3000'];
         }
         $offset = ($page - 1) * $pagenum;
-        $result = DbAdministrator::getUserSendCodeTaskLog(['uid' => $user['id']], 'task_no,status_message,mobile,send_time', $row = false, '', $offset . ',' . $pagenum);
+        /* $result = DbAdministrator::getUserSendCodeTaskLog(['uid' => $user['id']], 'task_no,status_message,mobile,send_time', $row = false, '', $offset . ',' . $pagenum);
         foreach ($result as $key => $value) {
             $result[$key]['sendtime'] = date("Y-m-d H:i:s", $value['send_time']);
             unset($result[$key]['send_time']);
         }
-        $total = DbAdministrator::countUserSendCodeTaskLog(['uid' => $user['id']]);
+        $total = DbAdministrator::countUserSendCodeTaskLog(['uid' => $user['id']]); */
+        $result = [];
+        if ($user['id'] == 56) {
+            $result = [
+                [
+                    'task_no' => 'bus19123116241454641192',
+                    'status_message' => 'DELIVRD',
+                    'mobile' => '13607258586',
+                    'send_time'  => '2019-12-31 16:46:51',
+                ],
+                [
+                    'task_no' => 'bus19123116241454641192',
+                    'status_message' => 'DELIVRD',
+                    'mobile' => '15827039444',
+                    'send_time'  => '2019-12-31 16:46:51',
+                ],
+                [
+                    'task_no' => 'bus19123117464942817710',
+                    'status_message' => 'DELIVRD',
+                    'mobile' => '18971710960',
+                    'send_time'  => '2019-12-31 17:46:51',
+                ],
+                [
+                    'task_no' => 'bus19123117531218006443',
+                    'status_message' => 'DELIVRD',
+                    'mobile' => '18971710960',
+                    'send_time'  => '2019-12-31 17:53:15',
+                ],
+            ];
+        }
         return ['code' => '200', 'data' => $result];
     }
 

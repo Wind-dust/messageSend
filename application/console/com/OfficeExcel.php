@@ -553,6 +553,25 @@ class OfficeExcel extends Pzlife {
         return $data;
     }
 
+    public function insertSensitiveWord(){
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $path = realpath("./") . "/minganci.txt";
+        $file = fopen($path, "r");
+        $data=array();
+        $i=0;
+        // $phone = '';
+        // $j     = '';
+        while(! feof($file))
+        {
+            $data[]['word']= trim(fgets($file));
+            $i++;
+        }
+        fclose($file);
+        $data = array_filter($data);
+        // print_r($data);die; 
+        Db::table('yx_sensitive_word')->insertAll($data);
+    }
+
     public function saveReadExcel(){
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
         $path = realpath("./") . "/1.txt";
