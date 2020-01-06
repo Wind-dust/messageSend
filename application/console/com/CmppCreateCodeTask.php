@@ -10,7 +10,7 @@ use think\Db;
 
 class CmppCreateCodeTask extends Pzlife
 {
-
+    //游戏任务创建function
     public function CreateGameCodeTask()
     { //CMPP创建单条任务营销
         $redis                    = Phpredis::getConn();
@@ -362,7 +362,7 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15834,'send_time' => 0]));
+        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15850,'send_time' => 0]));
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15823,'send_time' => 0]));
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15824,'send_time' => 0]));
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15825,'send_time' => 0]));
@@ -908,19 +908,19 @@ class CmppCreateCodeTask extends Pzlife
                     $prefix = substr(trim($mobilesend[$i]), 0, 7);
                     $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                     $newres = array_shift($res);
-                    //通道组分配
-                    // if ($newres) {
-                    //     if ($newres['source'] == 2) { //米加联通营销
-                    //         $channel_id = 8;
-                    //     } else if ($newres['source'] == 1) { //蓝鲸
-                    //         $channel_id = 2;
+                    //游戏通道分流
+                    if ($newres) {
+                        if ($newres['source'] == 2) { //米加联通营销
+                            $channel_id = 28;
+                        } else if ($newres['source'] == 1) { //蓝鲸
+                            $channel_id = 14;
 
-                    //     } else if ($newres['source' == 3]) { //米加电信营销
-                    //         $channel_id = 7;
-                    //     }
+                        } else if ($newres['source' == 3]) { //米加电信营销
+                            $channel_id = 29;
+                        }
 
-                    // }
-                    // print_r($newres);
+                    }
+                    print_r($newres);
                     if (strpos($mobilesend[$i], '00000') || strpos($mobilesend[$i], '111111') || strpos($mobilesend[$i], '222222') || strpos($mobilesend[$i], '333333') || strpos($mobilesend[$i], '444444') || strpos($mobilesend[$i], '555555') || strpos($mobilesend[$i], '666666') || strpos($mobilesend[$i], '777777') || strpos($mobilesend[$i], '888888') || strpos($mobilesend[$i], '999999')) {
                         $send_log = [
                             'task_no'        => $sendTask['task_no'],
@@ -1310,6 +1310,7 @@ class CmppCreateCodeTask extends Pzlife
                     if(strpos($send_log['content'],'问卷')!==false){
                         $request_url = "http://116.228.60.189:15901/rtreceive?";
                         $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
+
                     }else{
                         $request_url = "http://116.228.60.189:15901/rtreceive?";
                         $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . trim($send_log['Stat']) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
@@ -1320,9 +1321,15 @@ class CmppCreateCodeTask extends Pzlife
                     sendRequest($request_url);
                     
                     usleep(20000);
+                }else{
+                    $redis->rpush('index:meassage:code:user:receive:'.$task[0]['uid'], json_encode([
+                        'task_no' =>  trim($task[0]['task_no']),
+                        'status_message' =>   trim($send_log['Stat']),
+                        'mobile' =>   trim($send_log['mobile']),
+                        'send_time' =>   date('Y-m-d H:i:s',trim($send_log['receive_time'])),
+                    ]));//写入用户带处理日志
                 }
-                $send_log['Stat'] = 'DELIVRD';
-                $redis->rpush('index:meassage:code:cms:deliver:'.$channel_id, json_encode($send_log));
+                $redis->rpush('index:meassage:code:cms:deliver:'.$channel_id, json_encode($send_log));//写入通道处理日志                
             }
         }
         // try {
@@ -1335,6 +1342,192 @@ class CmppCreateCodeTask extends Pzlife
         // }
 
     }
+
+    //处理通道消息队列中的回执日志
+    public function updateCmppChannelLog($channel_id){
+        
+        $redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $redisMessageCodeSend = 'index:meassage:code:cms:deliver:' . $channel_id; //验证码发送任务rediskey
+        $channel              = $this->getChannelinfo($channel_id);
+        $task_status = [];
+        $task_mobile = [];
+        $i           = 0;
+        $callback    = [];
+        // $redis->rpush($redisMessageCodeSend, json_encode([
+        //     'mobile' => '13907989407',
+        //     'title' => '达芙妮',
+        //     'mar_task_id' => '15850',
+        //     'content' => '【DAPHNE】亲爱的会员：您的30元优惠券已到账，请前往DaphneFashion公众号-会员尊享-会员中心领取！退订回T',
+        //     'Msg_Id' => '',
+        //     'Stat' => 'DELIVER',
+        //     'Submit_time' => '1578239314',
+        //     'Done_time' => '1578239314',
+        //     'Done_time' => '1578239314',
+        // ]));
+        if ($channel['channel_type'] == 2) {
+            try {
+                while (true) {
+                    $send_log       = $redis->lpop($redisMessageCodeSend);
+                    $send_log = json_decode($send_log, true);
+                    
+                    if (!empty($send_log)) {
+                        $callback[] = $send_log;
+                        // exit("send_log is null");
+    
+                        
+                        if (!isset($send_log['mar_task_id']) || empty($send_log['mar_task_id'])) {
+                            continue;
+                        }
+                        // print_r($send_log);die;
+                        $task_status[$send_log['mar_task_id']][$send_log['mobile']] = $send_log;
+                        $task_mobile[$send_log['mar_task_id']][]                    = $send_log['mobile'];
+                        $i++;
+                        if ($i >= 50000) {
+                            foreach ($task_status as $key => $value) {
+                                // print_r($task_mobile[$key]);die;
+                                $sql = "SELECT `task_no`,`uid`,`log_path` FROM ";
+                                if ($channel['business_id'] == 5) { //营销
+                                    $sql .= " yx_user_send_task ";
+                                } elseif ($channel['business_id'] == 6) { // 行业
+                                    $sql .= " yx_user_send_code_task ";
+                                } elseif ($channel['business_id'] == 9) { //游戏
+                                    $sql .= " yx_user_send_game_task ";
+                                }
+                                $sql .= "WHERE `id` = " . $key;
+                                $task = Db::query($sql);
+                                // print_r("SELECT `log_path` from yx_user_send_task where delete_time=0 and id =".$id);die;
+                                // print_r($sql);die;
+                                if (empty($task)) {
+                                    // $redis->rpush($redisMessageCodeSend, json_encode($send_log));
+                                    continue;
+                                }
+                                $log_path = '';
+                                $log_path = $task[0]['log_path'];
+                                $file     = fopen($log_path, "r");
+                                $data     = array();
+                                $i        = 0;
+                                // $phone = '';
+                                // $j     = '';
+                                while (!feof($file)) {
+                                    $cellVal = trim(fgets($file));
+                                    $log     = json_decode($cellVal, true);
+                                    // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+                                    // // print_r($phone);die;
+                                    // $j = ',';
+    
+                                    // print_r($data);die;
+                                    if (isset($log['mobile'])) {
+                                        if (in_array($log['mobile'], $task_mobile[$key])) {
+                                            $log['status_message'] = $value[$log['mobile']]['Stat'];
+                                            if ($value[$log['mobile']]['Stat'] != 'DELIVRD') {
+                                                $log['send_status']    = 3;
+                                            }else{
+                                                $log['send_status']    = 4;
+                                            }
+                                            
+                                            $log['send_time']      = date('Y-m-d H:i:s',trim($value[$log['mobile']]['Submit_time']));
+                                        
+    
+                                            //  print_r($log);die;
+                                        }
+                                        if (is_numeric($log['create_time'])) {
+                                            $log['create_time']    = date('Y-m-d H:i:s',$log['create_time']);
+                                        }
+                                    }
+                                    $data[] = $log;
+                                }
+                                fclose($file);
+                                $myfile = fopen($log_path, "w");
+                                for ($i = 0; $i < count($data); $i++) {
+                                    $txt = json_encode($data[$i]) . "\n";
+                                    fwrite($myfile, $txt);
+                                }
+                                fclose($myfile);
+                            }
+                            $i = 0;
+    
+                            unset($task_status);
+                            unset($task_mobile);
+                        }
+                    } else {
+                        if (empty($task_status)) {
+                            unset($callback);
+                            exit("send_log is null");
+                        }
+                        //    print_r($task_status);die;
+                        foreach ($task_status as $key => $value) { //key为任务编号
+                            // print_r($task_mobile[$key]);die;
+                            $task = Db::query("SELECT `log_path`,`update_time` from yx_user_send_task where delete_time=0 and id ='" . $key . "'");
+                            // print_r("SELECT `log_path` from yx_user_send_task where delete_time=0 and id =".$id);die;
+                            if (empty($task)) {
+                                // continue;
+                            }
+                            $log_path = '';
+                            $log_path = $task[0]['log_path'];
+                            $file     = fopen($log_path, "r");
+                            $data     = array();
+                            $i        = 0;
+                            // $phone = '';
+                            // $j     = '';
+                            while (!feof($file)) {
+                                $cellVal = trim(fgets($file));
+                                $log     = json_decode($cellVal, true);
+                                // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+                                // // print_r($phone);die;
+                                // $j = ',';
+    
+                                if (isset($log['mobile'])) {
+                                    if (in_array($log['mobile'], $task_mobile[$key])) {
+                                        $log['status_message'] = $value[$log['mobile']]['Stat'];
+                                        if ($value[$log['mobile']]['Stat'] != 'DELIVRD') {
+                                            $log['send_status']    = 3;
+                                        }else{
+                                            $log['send_status']    = 4;
+                                        }
+                                        
+                                        //  print_r($log);die;
+                                        $log['send_time']      = date('Y-m-d H:i:s',trim($value[$log['mobile']]['Submit_time']));
+                                        if (is_numeric($log['create_time'])) {
+                                            $log['create_time']    = date('Y-m-d H:i:s',$log['create_time']);
+                                        }
+                                        // $log['create_time']    = date('Y-m-d H:i:s',$log['create_time']);
+                                    }
+                                }
+                                // print_r($data);die;
+                                $data[] = $log;
+                            }
+    
+                            // print_r($data);die;
+                            fclose($file);
+                            $myfile = fopen($log_path, "w");
+                            for ($i = 0; $i < count($data); $i++) {
+                                $txt = json_encode($data[$i]) . "\n";
+                                fwrite($myfile, $txt);
+                            }
+                            fclose($myfile);
+    
+                            // print_r($data);die;
+                        }
+                        $i = 0;
+    
+                        unset($task_status);
+                        unset($task_mobile);
+                    }
+                    unset($send);
+                }
+            } catch (\Exception $e) {
+                foreach ($callback as $key => $value) {
+                    $redis->rPush($redisMessageCodeSend, json_encode($value));
+                }
+                
+                exception($e);
+            }
+
+        }
+
+    }
+
 
     public function supplyMessageAgain () {//行业重推
         $redis = Phpredis::getConn();
@@ -1427,9 +1620,6 @@ class CmppCreateCodeTask extends Pzlife
         
     }
 
-    public function updateCmppChannelLog(){
-        
-    }
 
     private function getChannelinfo($channel_id)
     {
@@ -1512,7 +1702,7 @@ class CmppCreateCodeTask extends Pzlife
             $send_log = $redis->lpop($redisMessageCodeSend);
             $time_no = time();
             //状态更新
-            $unknow_status = $redis->lpop('index:meassage:game:unknow:deliver:14');
+            $unknow_status = $redis->lpop('index:meassage:game:unknow:deliver:'.$content);
             // print_r($unknow_status);
             // $redis->rpush('index:meassage:game:unknow:deliver:14',$unknow_status); die;
             if (!empty($unknow_status)) {
@@ -1604,7 +1794,7 @@ class CmppCreateCodeTask extends Pzlife
                     Db::rollback();
                 }
             }
-            $sendunknow = $redis->hgetall('index:meassage:game:msg:id:14');
+            $sendunknow = $redis->hgetall('index:meassage:game:msg:id:'.$content);
             if (!empty($sendunknow)) {
                 // sleep($untime);
                 foreach ($sendunknow as $send => $value) {

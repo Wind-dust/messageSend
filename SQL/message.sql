@@ -736,6 +736,7 @@ CREATE TABLE `yx_user_cmpp`  (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
   `source_addr` char(6) NOT NULL DEFAULT '' COMMENT '企业代码，Cmpp 接口文档中的Msg_src',
+  `Shared_secret` char(6) NOT NULL DEFAULT '' COMMENT '认证密码',
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
   `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
@@ -750,3 +751,16 @@ ADD COLUMN `callback_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_gen
 ALTER TABLE `messagesend`.`yx_user_send_game_task` 
 ADD COLUMN `real_message` varchar(20) NOT NULL DEFAULT '' COMMENT '真实返回状态' AFTER `free_trial`,
  ADD COLUMN  `status_message` varchar(20) DEFAULT '' COMMENT '状态' AFTER `free_trial`;
+
+ DROP TABLE IF EXISTS `yx_user_cmpp`;
+CREATE TABLE `yx_user_cmpp`  (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `source_addr` char(6) NOT NULL DEFAULT '' COMMENT '企业代码，Cmpp 接口文档中的Msg_src',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `task_no` (`task_no`,`task_id`) USING BTREE,
+  KEY `mobile` (`mobile`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='用户CMPP账户信息';

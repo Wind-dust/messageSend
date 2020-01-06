@@ -289,7 +289,7 @@ class DbAdministrator {
     public function addUserSendCodeTaskLog($data) {
         $UserSendCodeTaskLog = new UserSendCodeTaskLog;
         $UserSendCodeTaskLog->save($data);
-        return $UserSendTaskLog->id;
+        return $UserSendCodeTaskLog->id;
     }
 
     public function editUserSendCodeTaskLogg($data, $id) {

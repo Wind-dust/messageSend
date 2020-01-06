@@ -4,6 +4,12 @@ namespace app\common\action\admin;
 
 use app\facade\DbAdministrator;
 use app\facade\DbSendMessage;
+use PHPExcel;
+use PHPExcel_Cell;
+use PHPExcel_IOFactory;
+use PHPExcel_Writer_Excel2007;
+use PHPExcel_Style_Alignment;
+use PHPExcel_Style_Fill;
 use think\Db;
 
 class Message extends CommonIndex {
@@ -146,5 +152,115 @@ class Message extends CommonIndex {
             Db::rollback();
             return ['code' => '3009']; //修改失败
         }
+    }
+
+    public function exportReceiptReport($id, $business_id){
+        if ($business_id == 5) { //营销
+            $result = DbAdministrator::getUserSendTask(['id' => $id], 'log_path,update_time,task_no', true);
+        } elseif ($business_id == 6) { // 行业
+            $result = DbAdministrator::getUserSendCodeTask(['id' => $id], 'log_path,update_time,task_no', true);
+        } elseif ($business_id == 9) { //游戏
+            // $result = DbAdministrator::getUserSendTask(['id' => $id], 'log_path', true);
+        }
+        if (!empty($result['log_path'])) {
+            $task_log = [];
+            if (file_exists($result['log_path'])) {
+                $file = fopen($result['log_path'], "r");
+            }else{
+                if ($business_id == 6) {
+                    $file = fopen(str_replace('marketing','business',$result['log_path']), "r");
+                }
+            }
+            
+            $data=array();
+            $i=0;
+            // $phone = '';
+            // $j     = '';
+            while(! feof($file))
+            {   
+                $cellVal= trim(fgets($file));
+                $log = json_decode($cellVal,true);
+                if (isset($log['mobile'])) {
+                    if (!isset($log['status_message'])) {
+                        $log['status_message'] = '';
+                    }
+                    if (!isset($log['send_time'])) {
+                        $log['send_time'] = '';
+                    }
+                    $data[] = $log;
+                }
+                $i++;
+            }
+            fclose($file);
+        }else{
+            $data = DbAdministrator::getUserSendCodeTaskLog(['task_no' => $result['task_no']],'*',false);
+        }
+        $objExcel = new PHPExcel();
+        // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+        // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
+        $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+        $objWriter->setOffice2003Compatibility(true);
+
+        //设置文件属性
+        $objProps = $objExcel->getProperties();
+        $objProps->setTitle("sheet1");
+        $objProps->setSubject($result['task_no'].":" . date('Y-m-d H:i:s', time()));
+
+        $objExcel->setActiveSheetIndex(0);
+        $objActSheet = $objExcel->getActiveSheet();
+
+        $date = date('Y-m-d H:i:s', time());
+
+        //设置当前活动sheet的名称
+        $objActSheet->setTitle("金卡1");
+        $CellList = array(
+            array('task_no', '任务编号'),
+            array('uid', '用户id'),
+            array('title', '标题'),
+            array('content', '内容'),
+            array('mobile', '手机号'),
+            array('send_status', '发送状态'),
+            array('create_time', '创建时间'),
+            array('status_message', '回执码'),
+            array('send_time', '发送时间'),
+        );
+        foreach ($CellList as $i => $Cell) {
+            $row = chr(65 + $i);
+            $col = 1;
+            $objActSheet->setCellValue($row . $col, $Cell[1]);
+            $objActSheet->getColumnDimension($row)->setWidth(30);
+    
+            $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+            $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+            $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+            $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+            $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+            $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        }
+        $outputFileName = "金卡1.xlsx";
+        $i = 0;
+        foreach ($data as $key => $orderdata) {
+            //行
+            $col = $key + 2;
+            foreach ($CellList as $i => $Cell) {
+                //列
+                $row = chr(65 + $i);
+                $objActSheet->getRowDimension($i)->setRowHeight(15);
+                $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            }
+        }
+        header("Content-Type: application/force-download");
+        header("Content-Type: application/octet-stream");
+        header("Content-Type: application/download");
+        header('Content-Disposition:inline;filename="' . $outputFileName . '"');
+        header("Content-Transfer-Encoding: binary");
+        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+        header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header("Pragma: no-cache");
+        $objWriter->save('php://output');
+        exit;
     }
 }

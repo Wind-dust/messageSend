@@ -569,7 +569,73 @@ class OfficeExcel extends Pzlife {
         fclose($file);
         $data = array_filter($data);
         // print_r($data);die; 
-        Db::table('yx_sensitive_word')->insertAll($data);
+        // Db::table('yx_sensitive_word')->insertAll($data);
+        //上传至远端接口
+        foreach ($data as $key => $value) {
+            // print_r($value);die;
+            $result = $this->uploadingFarend($value['word']);
+        }
+
+    }
+
+    function uploadingFarend($value){
+        $client_id = '10000001';
+        $secret = 'VPNDYgDb7mTv2KuDTwWkAwRnDQtWj97E';
+        $nonce = $this->getRandomString(8);
+        $time = time();
+        
+        $sign = md5('{"client_id":'.$client_id.',"nonce":"'.$nonce.'","secret":"VPNDYgDb7mTv2KuDTwWkAwRnDQtWj97E","timestamp":'.$time.'}');
+        $jy_token = base64_encode('{"client_id":'.$client_id.',"nonce":"'.$nonce.'","sign":"'.$sign.'","timestamp":'.$time.'}');
+        $request_url = 'https://api-sit.itingluo.com/apiv1/openapi/search/insertdict/info?word_type=word&value='.$value;
+        $header  = array(
+            'client_id:'.$client_id,
+            'secret:'.$secret,
+            'nonce:'.$nonce,
+            'timestamp:'.$time,
+            'jy-token:'.$jy_token,
+            'Content-Type:'.'application/x-www-form-urlencoded; charset=UTF-8'
+        );
+        return $this->http_request($request_url,'',$header);
+    
+    }
+
+    function getRandomString($len, $chars=null)  
+    {  
+        if (is_null($chars)) {  
+            $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";  
+        }  
+        mt_srand(10000000*(double)microtime());  
+        for ($i = 0, $str = '', $lc = strlen($chars)-1; $i < $len; $i++) {  
+            $str .= $chars[mt_rand(0, $lc)];  
+        }  
+        return $str;  
+    }  
+
+    /**
+     * @param $url
+     * @param null $data
+     * @return bool|string
+     */
+    public function http_request($url, $data = null, $header = null){
+    
+        $curl = curl_init();
+        if(!empty($header)){
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+            curl_setopt($curl, CURLOPT_HEADER, 0);//返回response头部信息
+        }
+    
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        if (!empty($data)) {
+            curl_setopt($curl, CURLOPT_HTTPGET, 1);
+            curl_setopt($curl, CURLOPT_POSTFIELDS,http_build_query($data));
+        }
+    
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+        $output = curl_exec($curl);
+        curl_close($curl);
+        return $output;
     }
 
     public function saveReadExcel(){

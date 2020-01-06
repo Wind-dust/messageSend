@@ -468,7 +468,7 @@ return $result;
         if ($appkey != $user['appkey']) {
             return ['code' => '3000'];
         }
-        $offset = ($page - 1) * $pagenum;
+        // $offset = ($page - 1) * $pagenum;
         /* $result = DbAdministrator::getUserSendCodeTaskLog(['uid' => $user['id']], 'task_no,status_message,mobile,send_time', $row = false, '', $offset . ',' . $pagenum);
         foreach ($result as $key => $value) {
             $result[$key]['sendtime'] = date("Y-m-d H:i:s", $value['send_time']);
@@ -476,7 +476,17 @@ return $result;
         }
         $total = DbAdministrator::countUserSendCodeTaskLog(['uid' => $user['id']]); */
         $result = [];
-        if ($user['id'] == 56) {
+        $this->redis = Phpredis::getConn();
+        $i = 0;
+        while ($i <= 100) {
+            $userstat = $this->redis->lpop('index:meassage:code:user:receive:'.$user['id']);
+            $userstat = json_decode($userstat,true);
+            if (empty($userstat)) {
+            break;
+            }
+            $result[] = $userstat;
+        }
+        /* if ($user['id'] == 56) {
             $result = [
                 [
                     'task_no' => 'bus19123116241454641192',
@@ -515,7 +525,7 @@ return $result;
                     'send_time'  => '2020-01-03 14:55:04',
                 ],
             ];
-        }
+        } */
         return ['code' => '200', 'data' => $result];
     }
 
