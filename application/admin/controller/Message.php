@@ -154,5 +154,4 @@ class Message extends AdminController {
         $result =  $this->app->message->exportReceiptReport( intval($id), intval($business_id));
         return $result;
     }
- 
 }

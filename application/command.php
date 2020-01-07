@@ -49,4 +49,6 @@ return [
     'cmpplanjingbusiness'             => $commandPath . 'CmppLanJingBusiness',
     'serversocketshuhe'                => $commandPath . 'ServerSocketShuHe',
     'ServerSocketjyy'                  => $commandPath . 'ServerSocketJYY',
+    'ServerSocketjyylt'                  => $commandPath . 'ServerSocketJYYLT',
+    'ServerSocketjyydx'                  => $commandPath . 'ServerSocketJYYDX',
 ];

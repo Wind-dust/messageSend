@@ -443,7 +443,8 @@ CREATE TABLE `yx_user_model` (
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY (`template_id`) USING BTREE
+  UNIQUE KEY (`template_id`) USING BTREE,
+  KEY `user_template`(`uid`,`template_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户自定义模板' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `yx_blacklist`;
@@ -752,7 +753,7 @@ ALTER TABLE `messagesend`.`yx_user_send_game_task`
 ADD COLUMN `real_message` varchar(20) NOT NULL DEFAULT '' COMMENT '真实返回状态' AFTER `free_trial`,
  ADD COLUMN  `status_message` varchar(20) DEFAULT '' COMMENT '状态' AFTER `free_trial`;
 
- DROP TABLE IF EXISTS `yx_user_cmpp`;
+DROP TABLE IF EXISTS `yx_user_cmpp`;
 CREATE TABLE `yx_user_cmpp`  (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
