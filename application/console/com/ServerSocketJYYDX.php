@@ -238,9 +238,9 @@ class ServerSocketJYYDX extends Pzlife
                                 $sendData = [
                                     'mobile'  => trim($mobile),
                                     'message' => $message,
-                                    'Src_Id' => $body['Src_Id'], //拓展码
-                                    'Service_Id' => $body['Service_Id'], //业务服务ID（企业代码）
-                                    'Source_Addr' => $body['Msg_src'], //业务服务ID（企业代码）
+                                    'Src_Id' => trim($body['Src_Id']), //拓展码
+                                    'Service_Id' => trim($body['Service_Id']), //业务服务ID（企业代码）
+                                    'Source_Addr' => trim($body['Msg_src']), //业务服务ID（企业代码）
                                 ];
                                 // print_r($sendData);
                                 $residue = $head['Total_Length'] - 12 - 117 - $c_length - $Msg_length;
