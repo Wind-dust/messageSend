@@ -50,11 +50,11 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
         $redisMessageCodeDeliver = 'index:meassage:game:new:deliver:' . $content; //行业通知MsgId
         $redisMessageUnKownDeliver = 'index:meassage:game:unknow:deliver:' . $content; //行业通知MsgId
 
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '18011512156',
             'mar_task_id' => '',
             'content'     => '【超变传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/3Ypm7 回T退订 ',
-        ]));
+        ])); */
 
         /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15316188669',
