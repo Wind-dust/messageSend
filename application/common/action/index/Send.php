@@ -856,6 +856,9 @@ return $result;
         }
         if (!empty($template_id)) {
             $template =  DbSendMessage::getUserModel(['template_id' => $template_id], '*', true);
+            if ($template['status'] != 3) {
+                return ['code' => '3004'];
+            }
         }
         $connect_data = explode(';', $connect);
         $send_data = [];

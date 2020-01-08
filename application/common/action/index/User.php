@@ -7,17 +7,20 @@ use app\facade\DbAdmin;
 use app\facade\DbAdministrator;
 use app\facade\DbImage;
 use app\facade\DbProvinces;
+use app\facade\DbSendMessage;
 use app\facade\DbUser;
 use Config;
 use Env;
 use think\Db;
 
-class User extends CommonIndex {
+class User extends CommonIndex
+{
     private $cipherUserKey = 'userpass'; //用户密码加密key
     // private $userRedisKey = 'index:user:'; //用户密码加密key
     private $note;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->note = new Note();
     }
@@ -30,7 +33,8 @@ class User extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function login($nick_name, $password) {
+    public function login($nick_name, $password)
+    {
         $user = DbUser::getUserOne(['nick_name' => $nick_name], 'id,passwd');
         if (empty($user)) {
             return ['code' => '3002'];
@@ -60,7 +64,7 @@ class User extends CommonIndex {
                 // $this->redis->zRem($this->redisConIdTime, $userCon['con_id']);
                 $this->redis->zRem($this->redisConIdTime, $userCon['con_id']);
             }
-            
+
             $this->redis->zAdd($this->redisConIdTime, time(), $conId);
             $conUid = $this->redis->hSet($this->redisConIdUid, $conId, $uid);
             if ($conUid === false) {
@@ -73,7 +77,6 @@ class User extends CommonIndex {
             exception($e);
             Db::rollback();
             return ['code' => '3004'];
-
         }
     }
 
@@ -86,7 +89,8 @@ class User extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function resetPassword($mobile, $vercode, $password) {
+    public function resetPassword($mobile, $vercode, $password)
+    {
         $stype = 2;
         $uid   = $this->checkAccount($mobile);
         if (empty($uid)) {
@@ -111,7 +115,8 @@ class User extends CommonIndex {
      * @return bool
      * @author zyr
      */
-    private function checkAccount($mobile) {
+    private function checkAccount($mobile)
+    {
         $user = DbUser::getUserOne(['mobile' => $mobile], 'id');
         if (!empty($user)) {
             return $user['id'];
@@ -126,7 +131,8 @@ class User extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function sendVercode($mobile, $stype) {
+    public function sendVercode($mobile, $stype)
+    {
         $redisKey   = $this->redisKey . 'vercode:' . $mobile . ':' . $stype;
         $timeoutKey = $this->redisKey . 'vercode:timeout:' . $mobile . ':' . $stype;
         $code       = $this->createVercode($redisKey, $timeoutKey);
@@ -156,7 +162,8 @@ class User extends CommonIndex {
      * @return bool
      * @author zyr
      */
-    private function checkVercode($stype, $mobile, $vercode) {
+    private function checkVercode($stype, $mobile, $vercode)
+    {
         $redisKey  = $this->redisKey . 'vercode:' . $mobile . ':' . $stype;
         $redisCode = $this->redis->get($redisKey); //服务器保存的验证码
         if ($redisCode == $vercode) {
@@ -172,7 +179,8 @@ class User extends CommonIndex {
      * @return string
      * @author zyr
      */
-    private function createVercode($redisKey, $timeoutKey) {
+    private function createVercode($redisKey, $timeoutKey)
+    {
         if (!$this->redis->setNx($timeoutKey, 1)) {
             return '0'; //一分钟内不能重复发送
         }
@@ -191,7 +199,8 @@ class User extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function getUser($conId) {
+    public function getUser($conId)
+    {
         $uid = $this->getUidByConId($conId);
         if (empty($uid)) {
             return ['code' => '3003'];
@@ -222,7 +231,8 @@ class User extends CommonIndex {
      * @param $user
      * @author zyr
      */
-    private function saveUser($id, $user) {
+    private function saveUser($id, $user)
+    {
         $saveTime = 300; //保存5分钟
         $this->redis->hMSet($this->redisKey . 'userinfo:' . $id, $user);
         $this->redis->expireAt($this->redisKey . 'userinfo:' . $id, bcadd(time(), $saveTime, 0)); //设置过期
@@ -235,7 +245,8 @@ class User extends CommonIndex {
      * @return string
      * @author zyr
      */
-    private function getPassword($str, $key) {
+    private function getPassword($str, $key)
+    {
         $algo   = Config::get('conf.cipher_algo');
         $md5    = hash_hmac('md5', $str, $key);
         $key2   = strrev($key);
@@ -247,7 +258,8 @@ class User extends CommonIndex {
      * 创建唯一conId
      * @author zyr
      */
-    private function createConId() {
+    private function createConId()
+    {
         $conId = uniqid(date('ymdHis'));
         $conId = hash_hmac('ripemd128', $conId, '');
         return $conId;
@@ -259,7 +271,8 @@ class User extends CommonIndex {
      * @return string
      * @author rzc
      */
-    public function getQrcode($conId, $page, $scene, $stype) {
+    public function getQrcode($conId, $page, $scene, $stype)
+    {
         $uid    = $this->getUidByConId($conId);
         $Upload = new Upload;
         if (empty($uid)) {
@@ -311,13 +324,13 @@ class User extends CommonIndex {
             }
             // echo $result;die;
         } else {
-            $result = json_decode($result,true);
-            return ['code' => $result['errcode'],'errmsg' => $result['errmsg']];
-
+            $result = json_decode($result, true);
+            return ['code' => $result['errcode'], 'errmsg' => $result['errmsg']];
         }
     }
 
-    function sendRequest2($requestUrl, $data = []) {
+    function sendRequest2($requestUrl, $data = [])
+    {
         $curl = curl_init();
         $data = json_encode($data);
         curl_setopt($curl, CURLOPT_URL, $requestUrl);
@@ -333,7 +346,8 @@ class User extends CommonIndex {
         return $res;
     }
 
-    public function createQrcode($scene, $page) {
+    public function createQrcode($scene, $page)
+    {
         $access_token = $this->getWeiXinAccessToken();
         if (!$access_token) {
             return ['code' => '3005'];
@@ -353,17 +367,18 @@ class User extends CommonIndex {
      * @author rzc
      */
 
-    public function wxaccredit($redirect_uri) {
+    public function wxaccredit($redirect_uri)
+    {
         $appid = Env::get('weixin.weixin_appid');
         // $appid         = 'wx1771b2e93c87e22c';
         $secret = Env::get('weixin.weixin_secret');
         // $secret        = '1566dc764f46b71b33085ba098f58317';
         $requestUrl = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' . $appid . '&redirect_uri=' . $redirect_uri . '&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect';
         return ['code' => 200, 'requestUrl' => $requestUrl];
-
     }
 
-    private function getaccessToken($code) {
+    private function getaccessToken($code)
+    {
         $appid = Env::get('weixin.weixin_appid');
         // $appid         = 'wx1771b2e93c87e22c';
         $secret = Env::get('weixin.weixin_secret');
@@ -377,7 +392,8 @@ class User extends CommonIndex {
         return $result;
     }
 
-    private function getunionid($openid, $access_token) {
+    private function getunionid($openid, $access_token)
+    {
         $appid = Env::get('weixin.weixin_appid');
         // $appid         = 'wx1771b2e93c87e22c';
         $secret = Env::get('weixin.weixin_secret');
@@ -391,7 +407,8 @@ class User extends CommonIndex {
         return $result;
     }
 
-    public function userRegistered($nick_name, $user_type, $passwd, $mobile, $email, $vercode){
+    public function userRegistered($nick_name, $user_type, $passwd, $mobile, $email, $vercode)
+    {
 
         $stype = 1;
         // if ($this->checkVercode($stype, $mobile, $vercode) === false) {
@@ -436,21 +453,22 @@ class User extends CommonIndex {
         }
     }
 
-    public function quickLogin($mobile, $vercode){
+    public function quickLogin($mobile, $vercode)
+    {
         $stype = 3;
         if ($this->checkVercode($stype, $mobile, $vercode) === false) {
             return ['code' => '3006']; //验证码错误
         }
         $uid        = $this->checkAccount($mobile); //通过手机号获取uid
         if (empty($uid)) {
-            return ['code' => '3005'];//该手机号未注册
+            return ['code' => '3005']; //该手机号未注册
         }
         $userCon = [];
         $userCon = DbUser::getUserCon(['uid' => $uid], 'id,con_id', true);
         Db::startTrans();
         try {
             $conId = $this->createConId();
-            
+
             if (!empty($userCon)) {
                 DbUser::updateUserCon(['con_id' => $conId], $userCon['id']);
             } else {
@@ -469,7 +487,7 @@ class User extends CommonIndex {
             }
             $this->redis->del($this->redisKey . 'vercode:' . $mobile . ':' . $stype);
             DbUser::updateUser(['last_time' => time()], $uid);
-            
+
             Db::commit();
             return ['code' => '200', 'con_id' => $conId];
         } catch (\Exception $e) {
@@ -479,7 +497,8 @@ class User extends CommonIndex {
         }
     }
 
-    public function apportionSonUser($conId, $nick_name, $user_type, $passwd, $mobile, $email){
+    public function apportionSonUser($conId, $nick_name, $user_type, $passwd, $mobile, $email)
+    {
         $uid = $this->getUidByConId($conId);
         if (empty($uid)) { //用户不存在
             return ['code' => '3003'];
@@ -497,7 +516,7 @@ class User extends CommonIndex {
             'email'     => $email,
             'appid'     => uniqid(''),
             'appkey'     => md5('123456'),
-            'user_status'     =>2,
+            'user_status'     => 2,
         ];
 
         Db::startTrans();
@@ -511,7 +530,8 @@ class User extends CommonIndex {
         }
     }
 
-    public function recordUserQualification($conId,$data){
+    public function recordUserQualification($conId, $data)
+    {
         $uid = $this->getUidByConId($conId);
         if (empty($uid)) { //用户不存在
             return ['code' => '3003'];
@@ -528,8 +548,9 @@ class User extends CommonIndex {
         }
     }
 
-    public function seetingUserEquities($conId, $nick_name, $business_id, $agency_price){
-        $business = DbAdministrator::getBusiness(['id' => $business_id],'*',true);
+    public function seetingUserEquities($conId, $nick_name, $business_id, $agency_price)
+    {
+        $business = DbAdministrator::getBusiness(['id' => $business_id], '*', true);
         if (empty($business)) {
             return ['code' => '3007'];
         }
@@ -537,18 +558,18 @@ class User extends CommonIndex {
         if (empty($uid)) { //用户不存在
             return ['code' => '3003'];
         }
-        $user_equities = DbAdministrator::getUserEquities(['business_id' => $business_id,'uid' => $uid],'*',true);
+        $user_equities = DbAdministrator::getUserEquities(['business_id' => $business_id, 'uid' => $uid], '*', true);
         if (empty($user_equities)) {
             return ['code' => '3003'];
         }
-        if ($agency_price < $user_equities['agency_price']){
+        if ($agency_price < $user_equities['agency_price']) {
             return ['code' => '3004'];
         }
         $son_user = DbUser::getUserOne(['nick_name' => $nick_name], 'id,pid');
         if (empty($son_user) || $uid != $son_user['pid']) {
             return ['code' => '3008'];
         }
-        if (DbAdministrator::getUserEquities(['uid' => $son_user['id'], 'business_id' => $business_id],'id',true)) {
+        if (DbAdministrator::getUserEquities(['uid' => $son_user['id'], 'business_id' => $business_id], 'id', true)) {
             return ['code' => '3005'];
         }
         $data = [];
@@ -557,12 +578,12 @@ class User extends CommonIndex {
             'num_balance' => $business['donate_num'],
             'uid'         => $son_user['id'],
         ];
-        if ($agency_price){
-            if ($agency_price < $business['price']){
+        if ($agency_price) {
+            if ($agency_price < $business['price']) {
                 return ['code' => '3004'];
             }
             $data['agency_price'] = $agency_price;
-        }else {
+        } else {
             $data['agency_price'] = $business['price'];
         }
         Db::startTrans();
@@ -577,17 +598,18 @@ class User extends CommonIndex {
         }
     }
 
-    public function getUserEquitises($conId){
+    public function getUserEquitises($conId)
+    {
         $uid = $this->getUidByConId($conId);
         if (empty($uid)) { //用户不存在
             return ['code' => '3003'];
         }
-        $user_equities = DbAdministrator::getUserEquities(['uid' => $uid],'*',false);
+        $user_equities = DbAdministrator::getUserEquities(['uid' => $uid], '*', false);
         if (empty($user_equities)) {
             return ['code' => '200', 'userEquities' => []];;
         }
         foreach ($user_equities as $key => $equitise) {
-            $user_equities[$key]['business_name'] = DbAdministrator::getBusiness(['id' => $equitise['business_id']],'title',true)['title'];
+            $user_equities[$key]['business_name'] = DbAdministrator::getBusiness(['id' => $equitise['business_id']], 'title', true)['title'];
             unset($user_equities[$key]['id']);
             unset($user_equities[$key]['uid']);
             // unset($user_equities[$key]['business_id']);
@@ -598,40 +620,42 @@ class User extends CommonIndex {
         return ['code' => '200', 'userEquities' => $user_equities];
     }
 
-    public function completeInformation($conId,$businesslicense,$logo){
+    public function completeInformation($conId, $businesslicense, $logo)
+    {
         $uid = $this->getUidByConId($conId);
         if (empty($uid)) { //用户不存在
             return ['code' => '3003'];
         }
         $user = DbUser::getUser(['id' => $uid]);
         $image    = filtraImage(Config::get('qiniu.domain'), $logo);
-        $logImage = DbImage::getLogImage($image, 2);//判断时候有未完成的图片
-        if (empty($logImage)) {//图片不存在
-            return ['code' => '3010'];//图片没有上传过
+        $logImage = DbImage::getLogImage($image, 2); //判断时候有未完成的图片
+        if (empty($logImage)) { //图片不存在
+            return ['code' => '3010']; //图片没有上传过
         }
         $bimage    = filtraImage(Config::get('qiniu.domain'), $businesslicense);
-        $blogImage = DbImage::getLogImage($bimage, 2);//判断时候有未完成的图片
-        if (empty($blogImage)) {//图片不存在
-            return ['code' => '3010'];//图片没有上传过
+        $blogImage = DbImage::getLogImage($bimage, 2); //判断时候有未完成的图片
+        if (empty($blogImage)) { //图片不存在
+            return ['code' => '3010']; //图片没有上传过
         }
         if ($user['logo'] && $logo) {
-            return ['code' => '3004','msg' => '已上传logo'];
-        }   
+            return ['code' => '3004', 'msg' => '已上传logo'];
+        }
         if ($user['businesslicense'] && $businesslicense) {
-            return ['code' => '3004','msg' => '已上传营业执照'];
-        }  
+            return ['code' => '3004', 'msg' => '已上传营业执照'];
+        }
         Db::startTrans();
         try {
-            DbUser::updateUser(['logo' => $image, 'businesslicense' => $bimage],$uid);
+            DbUser::updateUser(['logo' => $image, 'businesslicense' => $bimage], $uid);
             Db::commit();
             return ['code' => '200'];
         } catch (\Exception $e) {
             Db::rollback();
             return ['code' => '3009']; //修改失败
-        } 
+        }
     }
 
-    public function getUserSubmitTask($page, $pageNum, $conId){
+    public function getUserSubmitTask($page, $pageNum, $conId)
+    {
         $uid = $this->getUidByConId($conId);
         if (empty($uid)) { //用户不存在
             return ['code' => '3003'];
@@ -642,28 +666,28 @@ class User extends CommonIndex {
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
 
-    public function getUserSubmitTaskInfo($page, $pageNum, $ConId, $id){
+    public function getUserSubmitTaskInfo($page, $pageNum, $ConId, $id)
+    {
         $uid = $this->getUidByConId($ConId);
         if (empty($uid)) { //用户不存在
             return ['code' => '3003'];
         }
         $offset = ($page - 1) * $pageNum;
-        $task = DbAdministrator::getUserSendTask(['id' => $id,'uid' => $uid], '*', true);
+        $task = DbAdministrator::getUserSendTask(['id' => $id, 'uid' => $uid], '*', true);
         if (empty($task)) {
             return ['code' => '3001', 'msg' => '该任务不存在'];
         }
         if (!empty($task['log_path'])) {
             $task_log = [];
             $file = fopen($task['log_path'], "r");
-            $data=array();
-            $i=0;
+            $data = array();
+            $i = 0;
             // $phone = '';
             // $j     = '';
-            while(! feof($file))
-            {   
-                $cellVal= trim(fgets($file));
-                $log = json_decode($cellVal,true);
-                $log['create_time'] = date('Y-m-d H:i:s',ceil(strtotime($task['update_time']) + $i/1000));
+            while (!feof($file)) {
+                $cellVal = trim(fgets($file));
+                $log = json_decode($cellVal, true);
+                $log['create_time'] = date('Y-m-d H:i:s', ceil(strtotime($task['update_time']) + $i / 1000));
                 if (isset($log['mobile'])) {
                     $data[] = $log;
                 }
@@ -671,15 +695,16 @@ class User extends CommonIndex {
             }
             fclose($file);
             $total = count($data);
-            $task_log = array_slice($data,$offset,$pageNum);
-        }else{
-            $task_log = DbAdministrator::getUserSendTaskLog(['task_no' => $task['task_no']],'*',false,'',$offset . ',' . $pageNum);
+            $task_log = array_slice($data, $offset, $pageNum);
+        } else {
+            $task_log = DbAdministrator::getUserSendTaskLog(['task_no' => $task['task_no']], '*', false, '', $offset . ',' . $pageNum);
             $total = DbAdministrator::countUserSendTaskLog(['task_no' => $task['task_no']]);
         }
         return ['code' => '200', 'total' => $total, 'task_log' => $task_log];
     }
 
-    public function getUserBusinessSubmitTask($page, $pageNum, $conId){
+    public function getUserBusinessSubmitTask($page, $pageNum, $conId)
+    {
         $uid = $this->getUidByConId($conId);
         if (empty($uid)) { //用户不存在
             return ['code' => '3003'];
@@ -690,13 +715,14 @@ class User extends CommonIndex {
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
 
-    public function getUserBusinessSubmitTaskInfo($page, $pageNum, $ConId, $id){
+    public function getUserBusinessSubmitTaskInfo($page, $pageNum, $ConId, $id)
+    {
         $uid = $this->getUidByConId($ConId);
         if (empty($uid)) { //用户不存在
             return ['code' => '3003'];
         }
         $offset = ($page - 1) * $pageNum;
-        $task = DbAdministrator::getUserSendCodeTask(['id' => $id,'uid' => $uid], '*', true);
+        $task = DbAdministrator::getUserSendCodeTask(['id' => $id, 'uid' => $uid], '*', true);
         if (empty($task)) {
             return ['code' => '3001', 'msg' => '该任务不存在'];
         }
@@ -704,19 +730,18 @@ class User extends CommonIndex {
             $task_log = [];
             if (file_exists($task['log_path'])) {
                 $file = fopen($task['log_path'], "r");
-            }else{
-                $file = fopen(str_replace('marketing','business',$task['log_path']), "r");
+            } else {
+                $file = fopen(str_replace('marketing', 'business', $task['log_path']), "r");
             }
-            
-            $data=array();
-            $i=0;
+
+            $data = array();
+            $i = 0;
             // $phone = '';
             // $j     = '';
-            while(! feof($file))
-            {   
-                $cellVal= trim(fgets($file));
-                $log = json_decode($cellVal,true);
-                $log['create_time'] = date('Y-m-d H:i:s',ceil(strtotime($task['update_time']) + $i/1000));
+            while (!feof($file)) {
+                $cellVal = trim(fgets($file));
+                $log = json_decode($cellVal, true);
+                $log['create_time'] = date('Y-m-d H:i:s', ceil(strtotime($task['update_time']) + $i / 1000));
                 if (isset($log['mobile'])) {
                     $data[] = $log;
                 }
@@ -724,22 +749,35 @@ class User extends CommonIndex {
             }
             fclose($file);
             $total = count($data);
-            $task_log = array_slice($data,$offset,$pageNum);
-        }else{
-            $task_log = DbAdministrator::getUserSendCodeTaskLog(['task_no' => $task['task_no']],'*',false,'',$offset . ',' . $pageNum);
+            $task_log = array_slice($data, $offset, $pageNum);
+        } else {
+            $task_log = DbAdministrator::getUserSendCodeTaskLog(['task_no' => $task['task_no']], '*', false, '', $offset . ',' . $pageNum);
             $total = DbAdministrator::countUserSendCodeTaskLog(['task_no' => $task['task_no']]);
         }
         return ['code' => '200', 'total' => $total, 'task_log' => $task_log];
     }
 
-    public function getUserSonAccount($page, $pageNum, $ConId){
+    public function getUserSonAccount($page, $pageNum, $ConId)
+    {
         $uid = $this->getUidByConId($ConId);
         if (empty($uid)) { //用户不存在
             return ['code' => '3003'];
         }
         $offset = $pageNum * ($page - 1);
-        $result = DbUser::getUserInfo(['pid' => $uid], '*', false, 'id', $offset.','.$pageNum, 'desc');
+        $result = DbUser::getUserInfo(['pid' => $uid], '*', false, 'id', $offset . ',' . $pageNum, 'desc');
         $totle = DbUser::getUserInfoCount(['pid' => $uid]);
+        return ['code' => '200', 'totle' => $totle, 'result' => $result];
+    }
+
+    public function getUserModel($page, $pageNum, $ConId)
+    {
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $offset = $pageNum * ($page - 1);
+        $result =  DbSendMessage::getUserModel(['uid' => $uid], '*', false, '', $offset . ',' . $pageNum);
+        $totle = DbSendMessage::countUserModel(['uid' => $uid]);
         return ['code' => '200', 'totle' => $totle, 'result' => $result];
     }
 }

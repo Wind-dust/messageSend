@@ -12,37 +12,40 @@ use PHPExcel_Style_Alignment;
 use PHPExcel_Style_Fill;
 use think\Db;
 
-class Message extends CommonIndex {
-     /**
+class Message extends CommonIndex
+{
+    /**
      * @param $page
      * @param $pageNum
      * @return array
      * @author rzc
      */
-    public function  getMultimediaMessageTask($page, $pageNum, $id = 0, $title = ''){
+    public function  getMultimediaMessageTask($page, $pageNum, $id = 0, $title = '')
+    {
         $offset = ($page - 1) * $pageNum;
         $where = [];
         if (!empty($id)) {
             $result = DbSendMessage::getUserMultimediaMessage(['id' => $id], '*', true);
-            $result['content'] = DbSendMessage::getUserMultimediaMessageFrame(['multimedia_message_id' => $id],'*',false,['num' => 'asc']);
+            $result['content'] = DbSendMessage::getUserMultimediaMessageFrame(['multimedia_message_id' => $id], '*', false, ['num' => 'asc']);
         } else {
             if (empty($title)) {
-                array_push($where,['title', 'like', '%'.$title.'%']);
+                array_push($where, ['title', 'like', '%' . $title . '%']);
             }
             $result = DbSendMessage::getUserMultimediaMessage($where, '*', false, '', $offset . ',' . $pageNum);
             foreach ($result as $key => $value) {
-                $result[$key]['content'] = DbSendMessage::getUserMultimediaMessageFrame(['multimedia_message_id' => $value['id']],'*',false,['num' => 'asc']);
+                $result[$key]['content'] = DbSendMessage::getUserMultimediaMessageFrame(['multimedia_message_id' => $value['id']], '*', false, ['num' => 'asc']);
             }
         }
         $total = DbSendMessage::countUserMultimediaMessage($where);
         if ($id) {
             $total = 1;
         }
-        
+
         return ['code' => '200', 'data' => $result];
     }
 
-    public function auditMultimediaMessageTask($effective_id = [], $free_trial) {
+    public function auditMultimediaMessageTask($effective_id = [], $free_trial)
+    {
         // print_r($effective_id);die;
         $userchannel = DbSendMessage::getUserMultimediaMessage([['id', 'in', join(',', $effective_id)]], 'id,mobile_content,free_trial', false);
 
@@ -65,14 +68,14 @@ class Message extends CommonIndex {
             }
             Db::commit();
             return ['code' => '200'];
-
         } catch (\Exception $e) {
             Db::rollback();
             return ['code' => '3009']; //修改失败
         }
     }
 
-    public function distributionChannel($effective_id = [], $channel_id, $business_id) {
+    public function distributionChannel($effective_id = [], $channel_id, $business_id)
+    {
         $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id, 'business_id' => $business_id], 'id,title,channel_price', true);
         if (empty($channel)) {
             return ['code' => '3002'];
@@ -88,7 +91,7 @@ class Message extends CommonIndex {
         foreach ($usertask as $key => $value) {
             if (empty($uids)) {
                 $uids[] = $value['uid'];
-            }elseif (!in_array($value['uid'], $uids)) {
+            } elseif (!in_array($value['uid'], $uids)) {
                 $uids[] = $value['uid'];
             }
             // print_r($value);
@@ -100,9 +103,9 @@ class Message extends CommonIndex {
                 // if ($send_length > 70) {
                 //     $real_length = ceil($send_length / 67);
                 // }
-                $num += ($real_length* $value['send_num']);
+                $num += ($real_length * $value['send_num']);
                 // foreach ($mobilesend as $key => $kvalue) {
-                    
+
                 // }
             }
         }
@@ -112,7 +115,7 @@ class Message extends CommonIndex {
             return ['code' => '3008', 'msg' => '一批只能同时分配一个用户的营销任务'];
         }
         if (empty($real_usertask)) {
-            return ['code' => '3010','msg' => '待分配的批量任务未空（提交了一批未审核的批量任务）'];
+            return ['code' => '3010', 'msg' => '待分配的批量任务未空（提交了一批未审核的批量任务）'];
         }
         $userEquities = DbAdministrator::getUserEquities(['uid' => $uids[0], 'business_id' => $business_id], 'id,agency_price,num_balance', true);
         if (empty($userEquities)) {
@@ -140,13 +143,12 @@ class Message extends CommonIndex {
             }
             if ($free_trial == 2) {
                 foreach ($real_usertask as $real => $usertask) {
-                    $res = $this->redis->rpush("index:meassage:multimediamessage:sendtask",$usertask['id']); 
+                    $res = $this->redis->rpush("index:meassage:multimediamessage:sendtask", $usertask['id']);
                 }
             }
-  
+
             Db::commit();
             return ['code' => '200'];
-
         } catch (\Exception $e) {
             exception($e);
             Db::rollback();
@@ -154,7 +156,8 @@ class Message extends CommonIndex {
         }
     }
 
-    public function exportReceiptReport($id, $business_id){
+    public function exportReceiptReport($id, $business_id)
+    {
         if ($business_id == 5) { //营销
             $result = DbAdministrator::getUserSendTask(['id' => $id], 'log_path,update_time,task_no', true);
         } elseif ($business_id == 6) { // 行业
@@ -166,20 +169,19 @@ class Message extends CommonIndex {
             $task_log = [];
             if (file_exists($result['log_path'])) {
                 $file = fopen($result['log_path'], "r");
-            }else{
+            } else {
                 if ($business_id == 6) {
-                    $file = fopen(str_replace('marketing','business',$result['log_path']), "r");
+                    $file = fopen(str_replace('marketing', 'business', $result['log_path']), "r");
                 }
             }
-            
-            $data=array();
-            $i=0;
+
+            $data = array();
+            $i = 0;
             // $phone = '';
             // $j     = '';
-            while(! feof($file))
-            {   
-                $cellVal= trim(fgets($file));
-                $log = json_decode($cellVal,true);
+            while (!feof($file)) {
+                $cellVal = trim(fgets($file));
+                $log = json_decode($cellVal, true);
                 if (isset($log['mobile'])) {
                     if (!isset($log['status_message'])) {
                         $log['status_message'] = '';
@@ -192,8 +194,8 @@ class Message extends CommonIndex {
                 $i++;
             }
             fclose($file);
-        }else{
-            $data = DbAdministrator::getUserSendCodeTaskLog(['task_no' => $result['task_no']],'*',false);
+        } else {
+            $data = DbAdministrator::getUserSendCodeTaskLog(['task_no' => $result['task_no']], '*', false);
         }
         $objExcel = new PHPExcel();
         // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
@@ -204,7 +206,7 @@ class Message extends CommonIndex {
         //设置文件属性
         $objProps = $objExcel->getProperties();
         $objProps->setTitle("sheet1");
-        $objProps->setSubject($result['task_no'].":" . date('Y-m-d H:i:s', time()));
+        $objProps->setSubject($result['task_no'] . ":" . date('Y-m-d H:i:s', time()));
 
         $objExcel->setActiveSheetIndex(0);
         $objActSheet = $objExcel->getActiveSheet();
@@ -229,7 +231,7 @@ class Message extends CommonIndex {
             $col = 1;
             $objActSheet->setCellValue($row . $col, $Cell[1]);
             $objActSheet->getColumnDimension($row)->setWidth(30);
-    
+
             $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
             $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
             $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
@@ -262,5 +264,33 @@ class Message extends CommonIndex {
         header("Pragma: no-cache");
         $objWriter->save('php://output');
         exit;
+    }
+
+    public function getUserModel($page, $pageNum)
+    {
+        $offset = $pageNum * ($page - 1);
+        $result =  DbSendMessage::getUserModel([], '*', false, '', $offset . ',' . $pageNum);
+        $totle = DbSendMessage::countUserModel([]);
+        return ['code' => '200', 'totle' => $totle, 'result' => $result];
+    }
+
+    public function auditUserModel($id, $status)
+    {
+        $result =  DbSendMessage::getUserModel(['id' => $id], '*', true);
+        if (empty($result)) {
+            return ['code' => '3001'];
+        }
+        if ($result['status'] != 1) {
+            return ['code' => '3003'];
+        }
+        Db::startTrans();
+        try {
+            DbSendMessage::editUserModel(['status' => $status], $id);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
     }
 }

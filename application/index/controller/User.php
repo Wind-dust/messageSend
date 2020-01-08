@@ -1,8 +1,11 @@
 <?php
+
 namespace app\index\controller;
+
 use app\index\MyController;
 
-class User extends MyController {
+class User extends MyController
+{
     protected $beforeActionList = [
         //        'isLogin',//所有方法的前置操作
         'isLogin' => ['except' => 'login,quickLogin,userRegistered,resetPassword,sendVercode,wxaccredit,wxregister'], //除去getFirstCate其他方法都进行second前置操作
@@ -24,7 +27,8 @@ class User extends MyController {
      * @apiSampleRequest /index/user/userRegistered
      * @author rzc
      */
-    public function userRegistered() {
+    public function userRegistered()
+    {
         $apiName   = classBasename($this) . '/' . __function__;
         $nick_name = trim($this->request->post('nick_name'));
         $user_type = trim($this->request->post('user_type'));
@@ -67,7 +71,8 @@ class User extends MyController {
      * @return array
      * @author rzc
      */
-    public function resetPassword() {
+    public function resetPassword()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $mobile   = trim($this->request->post('mobile'));
         $vercode  = trim($this->request->post('vercode'));
@@ -99,7 +104,8 @@ class User extends MyController {
      * @return array
      * @author zyr
      */
-    public function sendVercode() {
+    public function sendVercode()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $stypeArr = [1, 2, 3, 4, 5];
         $mobile   = trim($this->request->post('mobile'));
@@ -134,7 +140,8 @@ class User extends MyController {
      * @return array
      * @author rzc
      */
-    public function getUser() {
+    public function getUser()
+    {
         $apiName = classBasename($this) . '/' . __function__;
         $conId   = trim($this->request->post('con_id'));
         if (empty($conId)) {
@@ -161,7 +168,8 @@ class User extends MyController {
      * @return array
      * @author rzc
      */
-    public function quickLogin() {
+    public function quickLogin()
+    {
         $apiName = classBasename($this) . '/' . __function__;
         $mobile  = trim($this->request->post('mobile'));
         $vercode = trim($this->request->post('vercode'));
@@ -174,7 +182,7 @@ class User extends MyController {
 
         $result = $this->app->user->quickLogin($mobile, $vercode);
         $this->apiLog($apiName, [$mobile, $vercode], $result['code'], '');
-//        $dd       = [$result, ['mobile' => $mobile, 'vercode' => $vercode, 'buid' => $buid]];
+        //        $dd       = [$result, ['mobile' => $mobile, 'vercode' => $vercode, 'buid' => $buid]];
         //        Db::table('pz_log_error')->insert(['title' => '/index/user/getintegraldetail', 'data' => json_encode($dd)]);
         return $result;
     }
@@ -192,7 +200,8 @@ class User extends MyController {
      * @return array
      * @author rzc
      */
-    public function login() {
+    public function login()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $nick_name   = trim($this->request->post('nick_name'));
         $password = trim($this->request->post('password'));
@@ -226,7 +235,8 @@ class User extends MyController {
      * @author rzc
      */
 
-    public function apportionSonUser() {
+    public function apportionSonUser()
+    {
         $apiName   = classBasename($this) . '/' . __function__;
         $conId     = trim($this->request->post('con_id'));
         $nick_name = trim($this->request->post('nick_name'));
@@ -264,7 +274,8 @@ class User extends MyController {
      * @apiSampleRequest /index/user/seetingUserEquities
      * @author rzc
      */
-    public function seetingUserEquities() {
+    public function seetingUserEquities()
+    {
         $conId        = trim($this->request->post('con_id'));
         $nick_name       = trim($this->request->post('nick_name'));
         $business_id  = trim($this->request->post('business_id'));
@@ -272,7 +283,7 @@ class User extends MyController {
         if (!empty($agency_price) && !is_numeric($agency_price)) {
             return ['code' => '3002'];
         }
-        if (empty($nick_name) ) {
+        if (empty($nick_name)) {
             return ['code' => '3001']; //手机号格式错误
         }
         $agency_price = floatval($agency_price);
@@ -313,7 +324,8 @@ class User extends MyController {
      * @return array
      * @author rzc
      */
-    public function recordUserQualification() {
+    public function recordUserQualification()
+    {
         $apiName                                  = classBasename($this) . '/' . __function__;
         $conId                                    = trim($this->request->post('con_id'));
         $company_name                             = trim($this->request->post('company_name'));
@@ -377,7 +389,8 @@ class User extends MyController {
      * @return array
      * @author rzc
      */
-    public function getUserEquitises(){
+    public function getUserEquitises()
+    {
         $conId        = trim($this->request->post('con_id'));
         $result = $this->app->user->getUserEquitises($conId);
         // $this->apiLog($apiName, [$conId, $nick_name, $user_type, $passwd, $mobile, $email], $result['code'], $conId);
@@ -398,7 +411,8 @@ class User extends MyController {
      * @return array
      * @author rzc
      */
-    public function completeInformation(){
+    public function completeInformation()
+    {
         $conId        = trim($this->request->post('con_id'));
         $businesslicense        = trim($this->request->post('businesslicense'));
         $logo        = trim($this->request->post('logo'));
@@ -408,7 +422,7 @@ class User extends MyController {
         if (empty($businesslicense)) {
             return ['code' => '3002'];
         }
-        $result = $this->app->user->completeInformation($conId,$businesslicense,$logo);
+        $result = $this->app->user->completeInformation($conId, $businesslicense, $logo);
         // $this->apiLog($apiName, [$conId, $nick_name, $user_type, $passwd, $mobile, $email], $result['code'], $conId);
         return $result;
     }
@@ -427,7 +441,8 @@ class User extends MyController {
      * @return array
      * @author rzc
      */
-    public function getUserSubmitTask(){
+    public function getUserSubmitTask()
+    {
         $ConId = trim($this->request->post('con_id'));
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
@@ -454,7 +469,8 @@ class User extends MyController {
      * @return array
      * @author rzc
      */
-    public function getUserSubmitTaskInfo(){
+    public function getUserSubmitTaskInfo()
+    {
         $ConId = trim($this->request->post('con_id'));
         $id = trim($this->request->post('id'));
         $page     = trim($this->request->post('page'));
@@ -481,7 +497,8 @@ class User extends MyController {
      * @return array
      * @author rzc
      */
-    public function getUserBusinessSubmitTask(){
+    public function getUserBusinessSubmitTask()
+    {
         $ConId = trim($this->request->post('con_id'));
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
@@ -493,7 +510,7 @@ class User extends MyController {
         return $result;
     }
 
-     /**
+    /**
      * @api              {post} / 查询用户提交任务详情(行业)
      * @apiDescription   getUserBusinessSubmitTaskInfo
      * @apiGroup         index_user
@@ -508,7 +525,8 @@ class User extends MyController {
      * @return array
      * @author rzc
      */
-    public function getUserBusinessSubmitTaskInfo(){
+    public function getUserBusinessSubmitTaskInfo()
+    {
         $ConId = trim($this->request->post('con_id'));
         $id = trim($this->request->post('id'));
         $page     = trim($this->request->post('page'));
@@ -535,7 +553,8 @@ class User extends MyController {
      * @return array
      * @author rzc
      */
-    public function getUserSonAccount(){
+    public function getUserSonAccount()
+    {
         $ConId = trim($this->request->post('con_id'));
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
@@ -544,6 +563,33 @@ class User extends MyController {
         intval($page);
         intval($pageNum);
         $result = $this->app->user->getUserSonAccount($page, $pageNum, $ConId);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 获取已报备的模板
+     * @apiDescription   getUserModel
+     * @apiGroup         index_user
+     * @apiName          getUserModel
+     * @apiParam (入参) {String} con_id
+     * @apiParam (入参) {String} page 
+     * @apiParam (入参) {String} pageNum 
+     * @apiSuccess (返回) {String} code 200:成功  3001:logo为空或者未上传成功/ 3002:businesslicense为空或者未上传成功 / 3003:用户不存在 / 3004:登录失败
+     * @apiSuccess (返回) {Array} data 用户信息
+     * @apiSampleRequest /index/user/getUserModel
+     * @return array
+     * @author rzc
+     */
+    public function getUserModel()
+    {
+        $ConId = trim($this->request->post('con_id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        $result = $this->app->user->getUserModel($page, $pageNum, $ConId);
         return $result;
     }
 }
