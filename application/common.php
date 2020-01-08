@@ -7,7 +7,8 @@
  * @return mixed
  * @author rzc
  */
-function filtraImage($domain, $image) {
+function filtraImage($domain, $image)
+{
     return str_replace($domain . '/', '', $image);
 }
 
@@ -17,8 +18,9 @@ function filtraImage($domain, $image) {
  * @return bool
  * @author rzc
  */
-function checkMobile($mobile) {
-    if (strpos($mobile,'00000') || strpos($mobile,'111111') || strpos($mobile,'222222') || strpos($mobile,'333333') || strpos($mobile,'444444') || strpos($mobile,'555555') || strpos($mobile, '666666') || strpos($mobile,'777777') || strpos($mobile,'888888') || strpos($mobile,'999999')) {
+function checkMobile($mobile)
+{
+    if (strpos($mobile, '00000') || strpos($mobile, '111111') || strpos($mobile, '222222') || strpos($mobile, '333333') || strpos($mobile, '444444') || strpos($mobile, '666666') || strpos($mobile, '777777') || strpos($mobile, '888888') || strpos($mobile, '999999')) {
         return false;
     }
     if (!empty($mobile) && preg_match('/^1[3-9]{1}\d{9}$/', $mobile)) {
@@ -27,7 +29,8 @@ function checkMobile($mobile) {
     return false;
 }
 
-function checkEmail($email) {
+function checkEmail($email)
+{
     if (!empty($email) && preg_match('/^\w+@[a-z0-9]+\.[a-z]{2,4}$/', $email)) {
         return true;
     }
@@ -40,7 +43,8 @@ function checkEmail($email) {
  * @return bool
  * @author zyr
  */
-function checkVercode($code) {
+function checkVercode($code)
+{
     if (!empty($code) && preg_match('/^\d{6}$/', $code)) {
         return true;
     }
@@ -53,7 +57,8 @@ function checkVercode($code) {
  * @return bool
  * @author zyr
  */
-function checkPassword($password) {
+function checkPassword($password)
+{
     // /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[\s\S]{8,16}$/  至少8-16个字符，至少1个大写字母，1个小写字母和1个数字，其他可以是任意字符：
     if (!empty($password) && preg_match('/^(?=.*[a-zA-Z])(?=.*\d)[\s\S]{6,16}$/', $password)) { //6-16个字符，至少1个字母和1个数字，其他可以是任意字符
         return true;
@@ -67,7 +72,8 @@ function checkPassword($password) {
  * @return bool
  * @author zyr
  */
-function checkCmsPassword($password) {
+function checkCmsPassword($password)
+{
     if (!empty($password) && preg_match('/^(?=.*)[\s\S]{6,16}$/', $password)) { //6-16个字符,可以是任意字符
         return true;
     }
@@ -80,7 +86,8 @@ function checkCmsPassword($password) {
  * @return string
  * @author zyr
  */
-function getVercodeContent($code, $type = 0) {
+function getVercodeContent($code, $type = 0)
+{
     if ($type == 5) {
         return '您参与报名活动的验证码是:' . $code . '，在10分钟内有效。如非本人操作请忽略本短信。';
     }
@@ -93,7 +100,8 @@ function getVercodeContent($code, $type = 0) {
  * @return string
  * @author zyr
  */
-function randCaptcha($num) {
+function randCaptcha($num)
+{
     $key     = '';
     $pattern = '1234567890';
     for ($i = 0; $i < $num; $i++) {
@@ -107,7 +115,8 @@ function randCaptcha($num) {
  * @return int|string
  * @author zyr
  */
-function enUid($uid) {
+function enUid($uid)
+{
     $str    = 'AcEgIkMoQs';
     $newuid = strrev($uid);
     $newStr = '';
@@ -117,7 +126,7 @@ function enUid($uid) {
     $tit    = getOneNum($newuid);
     $result = $str[getOneNum($tit)] . $newStr;
     return $result;
-//    $cryptMethod = Env::get('cipher.userAesMethod', 'AES-256-CBC');
+    //    $cryptMethod = Env::get('cipher.userAesMethod', 'AES-256-CBC');
     //    $cryptKey    = Env::get('cipher.userAesKey', 'pzlife');
     //    $cryptIv     = Env::get('cipher.userAesIv', '1111111100000000');
     //    if (strlen($uid) > 15) {
@@ -133,7 +142,8 @@ function enUid($uid) {
  * @return int|string
  * @author zyr
  */
-function deUid($enUid) {
+function deUid($enUid)
+{
     if (empty($enUid)) {
         return '';
     }
@@ -154,7 +164,7 @@ function deUid($enUid) {
         return '';
     }
     return strrev($id);
-//    $cryptMethod = Env::get('cipher.userAesMethod', 'AES-256-CBC');
+    //    $cryptMethod = Env::get('cipher.userAesMethod', 'AES-256-CBC');
     //    $cryptKey    = Env::get('cipher.userAesKey', 'pzlife');
     //    $cryptIv     = Env::get('cipher.userAesIv', '1111111100000000');
     //    $decrypt     = openssl_decrypt(base64_decode($enUid), $cryptMethod, $cryptKey, 0, $cryptIv);
@@ -170,7 +180,8 @@ function deUid($enUid) {
  * @return int|string
  * @author zyr
  */
-function enAdminId($adminId) {
+function enAdminId($adminId)
+{
     $cryptMethod = Env::get('cipher.userAesMethod', 'AES-128-CBC');
     $cryptKey    = Env::get('cipher.userAesKey', 'pzlife');
     $cryptIv     = Env::get('cipher.userAesIv', '1111111100000000');
@@ -187,7 +198,8 @@ function enAdminId($adminId) {
  * @return int|string
  * @author zyr
  */
-function deAdminId($enAdminId) {
+function deAdminId($enAdminId)
+{
     $cryptMethod = Env::get('cipher.userAesMethod', 'AES-128-CBC');
     $cryptKey    = Env::get('cipher.userAesKey', 'pzlife');
     $cryptIv     = Env::get('cipher.userAesIv', '1111111100000000');
@@ -199,7 +211,8 @@ function deAdminId($enAdminId) {
     }
 }
 
-function getOneNum($num) {
+function getOneNum($num)
+{
     if ($num < 10) {
         return $num;
     }
@@ -218,7 +231,8 @@ function getOneNum($num) {
  * @return array|mixed
  * @author zyr
  */
-function sendRequest($requestUrl, $method = 'get', $data = []) {
+function sendRequest($requestUrl, $method = 'get', $data = [])
+{
     $methonArr = ['get', 'post'];
     if (!in_array(strtolower($method), $methonArr)) {
         return [];
@@ -253,7 +267,8 @@ function sendRequest($requestUrl, $method = 'get', $data = []) {
  * @return bool|string
  * @author zyr
  */
-function controllerBaseName($file) {
+function controllerBaseName($file)
+{
     $path  = dirname(dirname($file));
     $index = intval(strrpos($path, '/'));
     return substr($path, bcadd($index, 1, 0));
@@ -265,7 +280,8 @@ function controllerBaseName($file) {
  * @return string
  * @author zyr
  */
-function classBasename($class) {
+function classBasename($class)
+{
     $class = is_object($class) ? get_class($class) : $class;
     return basename(str_replace('\\', '/', $class));
 }
@@ -276,7 +292,8 @@ function classBasename($class) {
  * @return string
  * @author zyr
  */
-function createOrderNo($prefix = 'odr') {
+function createOrderNo($prefix = 'odr')
+{
     $orderNo = $prefix . date('ymdHis') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
     return $orderNo;
 }
@@ -289,10 +306,11 @@ function createOrderNo($prefix = 'odr') {
  * @return decimal
  * @author zyr
  */
-function getDistrProfits($retailPrice, $costPrice, $marginPrice) {
-    $otherPrice   = bcmul($retailPrice, 0.006, 4);//售价的0.6%
-    $profits      = bcsub(bcsub(bcsub($retailPrice, $costPrice, 4), $marginPrice, 4), $otherPrice, 4);//利润(售价-进价-其他成本-售价*0.006)
-    $distrProfits = bcmul($profits, 0.9, 2);//可分配利润
+function getDistrProfits($retailPrice, $costPrice, $marginPrice)
+{
+    $otherPrice   = bcmul($retailPrice, 0.006, 4); //售价的0.6%
+    $profits      = bcsub(bcsub(bcsub($retailPrice, $costPrice, 4), $marginPrice, 4), $otherPrice, 4); //利润(售价-进价-其他成本-售价*0.006)
+    $distrProfits = bcmul($profits, 0.9, 2); //可分配利润
     $distrProfits = $distrProfits < 0 ? 0 : $distrProfits;
     return $distrProfits;
 }
@@ -305,7 +323,8 @@ function getDistrProfits($retailPrice, $costPrice, $marginPrice) {
  * @return array|bool|int
  * @author zyr
  */
-function getOpenid($code, $encrypteddata = '', $iv = '') {
+function getOpenid($code, $encrypteddata = '', $iv = '')
+{
     $appid         = Env::get('weixin.weixin_miniprogram_appid');
     $secret        = Env::get('weixin.weixin_miniprogram_appsecret');
     $get_token_url = 'https://api.weixin.qq.com/sns/jscode2session?appid=' . $appid . '&secret=' . $secret . '&js_code=' . $code . '&grant_type=authorization_code';
@@ -349,7 +368,8 @@ function getOpenid($code, $encrypteddata = '', $iv = '') {
  * -40010: base64解密失败
  * -40011: 生成xml失败
  */
-function decryptData($encryptedData, $iv, $sessionKey) {
+function decryptData($encryptedData, $iv, $sessionKey)
+{
     $appid = Env::get('weixin.weixin_miniprogram_appid');
     if (strlen($sessionKey) != 24) {
         return -41001;
@@ -378,7 +398,8 @@ function decryptData($encryptedData, $iv, $sessionKey) {
  * @return array
  * @author rzc
  */
-function getExpressList() {
+function getExpressList()
+{
     $ExpressList = [
         'shunfeng'       => '顺丰速运',
         'zhongtong'      => '中通快递',
@@ -407,7 +428,8 @@ function getExpressList() {
  * @return array
  * @author rzc
  */
-function checkBankCard($cardNum) {
+function checkBankCard($cardNum)
+{
     $arr_no = str_split($cardNum);
     $last_n = $arr_no[count($arr_no) - 1];
     krsort($arr_no);
@@ -446,7 +468,8 @@ function checkBankCard($cardNum) {
  * @return array
  * @author rzc
  */
-function getBancardKey($cardNo) {
+function getBancardKey($cardNo)
+{
     $url = 'https://ccdcapi.alipay.com/validateAndCacheCardInfo.json?_input_charset=utf-8&cardNo=';
     $url .= $cardNo;
     $url .= "&cardBinCheck=true";
@@ -464,7 +487,8 @@ function getBancardKey($cardNo) {
  * @return array
  * @author rzc
  */
-function checkIdcard($idcard) {
+function checkIdcard($idcard)
+{
     $idcard    = strtoupper($idcard);
     $regx      = "/(^\d{15}$)|(^\d{17}([0-9]|X)$)/";
     $arr_split = array();
@@ -502,7 +526,8 @@ function checkIdcard($idcard) {
             $sign    = 0;
 
             for ($i = 0; $i < 17; $i++) {
-                $b = (int) $idcard{$i};
+                $b = (int) $idcard{
+                    $i};
                 $w = $arr_int[$i];
                 $sign += $b * $w;
             }
@@ -526,8 +551,9 @@ function checkIdcard($idcard) {
  * @return string
  * @author zyr
  */
-function getPassword($str, $key, $algo = 'sha256') {
-//    $algo   = Config::get('conf.cipher_algo');
+function getPassword($str, $key, $algo = 'sha256')
+{
+    //    $algo   = Config::get('conf.cipher_algo');
     $md5    = hash_hmac('md5', $str, $key);
     $key2   = strrev($key);
     $result = hash_hmac($algo, $md5, $key2);
@@ -543,7 +569,8 @@ function getPassword($str, $key, $algo = 'sha256') {
  * @return mixed
  * @author zyr
  */
-function getResult($obj, $row = false, $orderBy = '', $limit = '') {
+function getResult($obj, $row = false, $orderBy = '', $limit = '')
+{
     if (!empty($orderBy)) {
         $obj = $obj->order($orderBy);
     }
@@ -558,3 +585,21 @@ function getResult($obj, $row = false, $orderBy = '', $limit = '') {
     return $obj->toArray();
 }
 
+/**
+ * 生成字母加数字随机组合
+ * @param $len
+ * @param string $chars
+ * @return mixed
+ * @author rzc
+ */
+function getRandomString($len, $chars = null)
+{
+    if (is_null($chars)) {
+        $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    }
+    mt_srand(10000000 * (float) microtime());
+    for ($i = 0, $str = '', $lc = strlen($chars) - 1; $i < $len; $i++) {
+        $str .= $chars[mt_rand(0, $lc)];
+    }
+    return $str;
+}
