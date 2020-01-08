@@ -74,7 +74,7 @@ class Upload extends MyController
             }
             fclose($file);
             // $result = $this->app->send->getMobilesDetail($phone_data);
-            return [ 'code' => 200,'phone' =>$phone];
+            return ['code' => 200, 'phone' => $phone];
         }
         if (!in_array($fileType[1], ['vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'vnd.ms-excel', 'csv'])) {
             return ['code' => '3001']; //上传的不是表格
@@ -160,7 +160,7 @@ class Upload extends MyController
                 return ['code' => '3003'];
             }
             // $result = $this->app->send->getMobilesDetail($phone_data);
-            return [ 'code' => 200,'phone' =>$phone];
+            return ['code' => 200, 'phone' => $phone];
         } else {
             return ['code' => '3002'];
         }
@@ -183,8 +183,8 @@ class Upload extends MyController
     {
         $apiName = classBasename($this) . '/' . __function__;
         // $conId   = trim($this->request->post('con_id'));
-        $appid = trim($this->request->post('appid'));//登录名
-        $appkey = trim($this->request->post('appkey'));//登陆密码
+        $appid = trim($this->request->post('appid')); //登录名
+        $appkey = trim($this->request->post('appkey')); //登陆密码
         $image   = $this->request->file('image');
         if (empty($appid)) {
             return ['code' => '3000'];
@@ -203,7 +203,49 @@ class Upload extends MyController
         if ($fileInfo['size'] > 1024 * 1024 * 2) {
             return ['3002']; //上传图片不能超过2M
         }
-        $result = $this->app->upload->uploadFile($appid,$appkey,$fileInfo);
+        $result = $this->app->upload->uploadFile($appid, $appkey, $fileInfo);
+        // $this->apiLog($apiName, [$conId, $image], $result['code'], $conId);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 上传视频
+     * @apiDescription   uploadVideo
+     * @apiGroup         index_upload
+     * @apiName          uploadVedio
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {file} video 视频文件
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:appid或者appkey错误/ 3001:上传的不是视频文件 / 3002:上传文件不能超过2M / 3003:上传失败 / 3004:上传文件不能为空
+     * @apiSuccess (data) {Array} data 结果
+     * @apiSampleRequest /index/upload/uploadVideo
+     * @author rzc
+     */
+    public function uploadVideo()
+    {
+        $apiName = classBasename($this) . '/' . __function__;
+        // $conId   = trim($this->request->post('con_id'));
+        $appid = trim($this->request->post('appid')); //登录名
+        $appkey = trim($this->request->post('appkey')); //登陆密码
+        $video   = $this->request->file('video');
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        if (empty($video)) {
+            return ['code' => '3004'];
+        }
+        $fileInfo = $video->getInfo();
+        $fileType = explode('/', $fileInfo['type']);;
+        if ($fileType[0] != 'video') {
+            return ['3001']; //上传的不是视频文件
+        }
+        if ($fileInfo['size'] > 1024 * 1024 * 2) {
+            return ['3002']; //上传图片不能超过2M
+        }
+        $result = $this->app->upload->uploadVideo($appid, $appkey, $fileInfo);
         // $this->apiLog($apiName, [$conId, $image], $result['code'], $conId);
         return $result;
     }

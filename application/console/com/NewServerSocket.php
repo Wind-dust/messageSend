@@ -6,20 +6,17 @@ use app\console\Pzlife;
 use cache\Phpredis;
 use Config;
 use Env;
+use function Qiniu\json_decode;
 use think\Db;
 
-class ServerSocket extends Pzlife
+class NewServerSocket extends Pzlife
 {
 
     // private $bodyData;
 
     public function Service($content)
     {
-        $contdata                 = $this->content($content);
-        $redis                    = Phpredis::getConn();
-        $content                  = 9; //绑定通道
-        $redisMessageCodeSend     = 'index:meassage:code:send:task'; //验证码发送任务rediskey
-        $redisMessageCodeSendReal = 'index:meassage:code:send:realtask'; //验证码发送任务rediskey
+        $contdata = $this->content($content);
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
 
         $host          = $contdata['host']; //服务商ip
@@ -31,17 +28,11 @@ class ServerSocket extends Pzlife
         $Sequence_Id   = $contdata['Sequence_Id'];
         $SP_ID         = $contdata['SP_ID'];
         $bin_ip        = $contdata['bin_ip']; //客户端绑定IP
-        $free_trial    = $contdata['free_trial']; //是否需要审核 1:需要审核;2:无需审核
-        $master_num    = $contdata['master_num']; //通道最大提交量
-        $uid           = $contdata['uid']; //通道最大提交量
-        // $security_coefficient = 0.8; //通道饱和系数
-        $security_master = $master_num;
-        $socket          = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        //打印创建连接
-        // print_r($socket);die;
-        date_default_timezone_set('PRC');
+
+        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        socket_set_option($socket, SOL_SOCKET, SO_REUSEADDR, 1); #可以重复使用端口号
         /*绑定接收的套接流主机和端口,与客户端相对应*/
-        if (socket_bind($socket, $host, $port) == false) {
+        if (socket_bind($socket, '127.0.0.1', 8888) == false) {
             echo 'server bind fail:' . socket_strerror(socket_last_error());
             /*这里的127.0.0.1是在本地主机测试，你如果有多台电脑，可以写IP地址*/
         }
@@ -49,18 +40,53 @@ class ServerSocket extends Pzlife
         if (socket_listen($socket, 4) == false) {
             echo 'server listen fail:' . socket_strerror(socket_last_error());
         }
-        /*接收客户端传过来的信息*/
-        $i = 1;
-        // $Sequence_Id = 1;
-        $time = 0;
-        // $status = 10;
-        $clients = array($socket);
+        while (true) {
+            print("******等待新客户端的到来*******\r\n");
+            $clien = socket_accept($socket) or die("error:" . socket_strerror(socket_last_error()));
+            $pid = pcntl_fork();
+            #posix_setsid();
+            if ($pid == -1) {
+                die('fork failed');
+            } else if ($pid == 0) {
+                $this->hanld_seesion($clien);
+            } else {
+                #pcntl_wait($status);
+            }
+        }
+    }
 
-        $accept_resource = socket_accept($socket);
-        socket_set_nonblock($accept_resource); //设置非阻塞模式
-        do {
-            /*socket_accept的作用就是接受socket_bind()所绑定的主机发过来的套接流*/
-            //加密验证
+    function hanld_seesion($accept_resource)
+    {
+        socket_getpeername($accept_resource, $ip, $port);
+        $id = posix_getpid();
+        // print("进程ID:$id == 客户端:".$ip.":".$port."已连接\r\n");
+        $redis                    = Phpredis::getConn();
+        // $content                  = 9; //绑定通道
+        $redisMessageCodeSend     = 'index:meassage:game:send:task'; //游戏发送任务rediskey
+        $redisMessageCodeSendReal = 'index:meassage:game:send:realtask'; //游戏真实发送任务rediskey
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+
+        /*  $contdata                 = $this->content($content);
+        $host          = $contdata['host']; //服务商ip
+        $port          = $contdata['port']; //短连接端口号   17890长连接端口号
+        $Source_Addr   = $contdata['Source_Addr']; //企业id  企业代码
+        $Shared_secret = $contdata['Shared_secret']; //网关登录密码
+        $Service_Id    = $contdata['Service_Id'];
+        $Dest_Id       = $contdata['Dest_Id']; //短信接入码 短信端口号
+        $Sequence_Id   = $contdata['Sequence_Id'];
+        $SP_ID         = $contdata['SP_ID'];
+        $bin_ip        = $contdata['bin_ip']; //客户端绑定IP
+        $free_trial    = $contdata['free_trial']; //是否需要审核 1:需要审核;2:无需审核
+        $master_num    = $contdata['master_num']; //通道最大提交量
+        $uid           = $contdata['uid']; //通道最大提交量 */
+        while (true) {
+            /*  $data = socket_read($clien,1024);
+            if(mb_strlen($data) == 0){
+                // print("进程ID:$id == 客户端:".$ip.":".$port."断开连接\r\n");
+                socket_close($clien);
+                exit();
+            } */
+            // print($ip.":".$port.">>:".$data."\r\n");
             $Timestamp = date('mdHis');
             if ($accept_resource !== false) {
                 $headData = socket_read($accept_resource, 12);
@@ -84,7 +110,6 @@ class ServerSocket extends Pzlife
                             try {
                                 // $bodyData = socket_read($accept_resource, $head['Total_Length'] - 12);
                                 $body = unpack("a6Source_Addr/a16AuthenticatorSource/CVersion/NTimestamp", $bodyData);
-                                // print_r($body);
                                 //ip地址绑定
                                 if (!in_array($addr, $bin_ip)) {
                                     $status       = 2;
@@ -94,14 +119,6 @@ class ServerSocket extends Pzlife
                                     $status       = 4;
                                     $new_bodyData = pack("C", 4); //status | 1 | Unsigned Integer |状态 0：正确 1：消息结构错  2：非法源地址  3：认证错  4：版本太高   5~ ：其他错误
                                 }
-                                /* if ($body['AuthenticatorSource'] != md5($Source_Addr . '000000000' . $Shared_secret . $Timestamp, true)) {
-                                    $status       = 3;
-                                    $new_bodyData = pack("C", 3); //status | 1 | Unsigned Integer |状态 0：正确 1：消息结构错  2：非法源地址  3：认证错  4：版本太高   5~ ：其他错误
-                                } */
-                                // echo $status;
-                                // print_r($head);
-                                // print_r($body);
-                                // die;
                             } catch (Exception $e) {
                                 $status       = 1;
                                 $new_bodyData = pack("C", 1); //status | 1 | Unsigned Integer |状态 0：正确 1：消息结构错  2：非法源地址  3：认证错  4：版本太高   5~ ：其他错误
@@ -121,7 +138,7 @@ class ServerSocket extends Pzlife
                             socket_write($accept_resource, $new_headData . $new_bodyData, $Total_Length);
                             // socket_write的作用是向socket_create的套接流写入信息，或者向socket_accept的套接流写入信息
                             if ($status != 0) {
-                                socket_close($socket);
+                                socket_close($accept_resource);
                             }
                         } else if ($head['Command_Id'] == 0x00000004) {
                             // $contentlen = $head['Total_Length'] - 12 - 116;
@@ -169,7 +186,7 @@ class ServerSocket extends Pzlife
                                }
                            } */
 
-                            //    print_r($body);
+                            print_r($body);
                             if ($body['Pk_total'] > 1) { //长短信
 
                                 //DestUsr_tl接收用户数量
@@ -186,12 +203,11 @@ class ServerSocket extends Pzlife
                                 $Msg_Content = unpack("a" . $Msg_length . "Msg_Content", $bodyData2);
                                 $Msg_Content['Msg_Content'] = strval($Msg_Content['Msg_Content']);
                                 // print_r($Msg_Content);die;
-                                $udh      = unpack('c/c/c/c/c/c', substr($Msg_Content['Msg_Content'], 0, 6));
+                                $udh      = unpack('c/c/c/c/c/c', $Msg_Content['Msg_Content']);
                                 $message  = substr($Msg_Content['Msg_Content'], 6, 140);
                                 $sendData = [];
                                 if ($body['Msg_Fmt'] == 15) {
                                     $message = mb_convert_encoding($message, 'UTF-8', 'GBK');
-                                    //   iconv("UTF-8","gbk//IGNORE",$message);
                                 } elseif ($body['Msg_Fmt'] == 0) {
                                     $message = $this->decode($message);
                                     // $de_ascii = mb_convert_encoding($de_ascii, 'UTF-8', 'GBK');
@@ -209,8 +225,8 @@ class ServerSocket extends Pzlife
                                     'mobile'  => trim($mobile),
                                     'message' => $message,
                                     'Src_Id' => $body['Src_Id'], //拓展码
-                                    'Service_Id' => trim($body['Service_Id']), //业务服务ID（企业代码）
-                                    'Source_Addr' => trim($body['Msg_src']), //业务服务ID（企业代码）
+                                    'Service_Id' => $body['Service_Id'], //业务服务ID（企业代码）
+                                    'Source_Addr' => $body['Msg_src'], //业务服务ID（企业代码）
                                 ];
                                 // print_r($sendData);
                                 $residue = $head['Total_Length'] - 12 - 117 - $c_length - $Msg_length;
@@ -234,7 +250,6 @@ class ServerSocket extends Pzlife
                                 $message     = strval($Msg_Content['Msg_Content']);
                                 if ($body['Msg_Fmt'] == 15) {
                                     $message = mb_convert_encoding($message, 'UTF-8', 'GBK');
-                                    // iconv("UTF-8","gbk//IGNORE",$message);
                                 } elseif ($body['Msg_Fmt'] == 0) { //ASCII进制码
                                     // $message = $this->decode($message);
                                     // $de_ascii = mb_convert_encoding($de_ascii, 'UTF-8', 'GBK');
@@ -251,8 +266,9 @@ class ServerSocket extends Pzlife
                                 $sendData = [
                                     'mobile'  => trim($mobile),
                                     'message' => $message,
-                                    'Src_Id' => trim($body['Src_Id']), //拓展码
-                                    'Source_Addr' => trim($body['Msg_src']), //业务服务ID（企业代码）
+                                    'Src_Id' => $body['Src_Id'], //拓展码
+                                    'Service_Id' => $body['Service_Id'], //业务服务ID（企业代码）
+                                    'Source_Addr' => $body['Msg_src'], //业务服务ID（企业代码）
                                 ];
                                 // print_r($sendData);
                                 $residue = $head['Total_Length'] - 12 - 117 - $c_length - $Msg_length;
@@ -274,7 +290,7 @@ class ServerSocket extends Pzlife
                             // $redis->rpush($redisMessageCodeSend,$uid.":".$sendData['mobile'].":".$sendData['message'].":".$num1.$num2.":".$addr); //三体营销通道
                             $sendData['send_msgid'][] = $num1 . $num2;
                             $sendData['uid']          = $uid;
-                            $sendData['Submit_time']  = time();
+                            $sendData['Submit_time']  = date('mdHis');
                             // $redis->rpush($redisMessageCodeSend.":1",json_encode($sendData)); //三体营销通道
                             $has_message = $redis->hget($redisMessageCodeSend . ":1", $head['Sequence_Id']);
                             if ($has_message) {
@@ -349,14 +365,14 @@ class ServerSocket extends Pzlife
                             //     ],
                             // ];
                             // $redis->rPush('index:meassage:code:cmppdeliver:'.$uid,json_encode($deliver));
-                            $deliver = $redis->lpop('index:meassage:code:cmppdeliver:' . $uid); //取出用户发送任务
+                            $deliver = $redis->lpop('index:meassage:game:cmppdeliver:45'); //取出用户发送任务
                             if (!empty($deliver)) {
                                 $deliver            = json_decode($deliver, true);
                                 $deliver_timestring = time();
                                 $deliver_num1       = substr($deliver_timestring, 0, 8);
                                 $deliver_num2       = substr($deliver_timestring, 8) . $this->combination($i);
                                 $deliver_bodyData   = pack("N", $deliver_num1) . pack("N", $deliver_num2);
-                                $deliver_bodyData .= pack('a21', $deliver['Src_Id']);
+                                $deliver_bodyData .= pack('a21', '');
                                 $deliver_bodyData .= pack('a10', $Service_Id);
                                 $deliver_bodyData .= pack('C', 0);
                                 $deliver_bodyData .= pack('C', 0);
@@ -402,7 +418,7 @@ class ServerSocket extends Pzlife
                     }
                     //捕获异常
                     catch (Exception $e) {
-                        exception($e);
+                        // exception($e);
                         $new_bodyData = pack("C", 1); //status | 1 | Unsigned Integer |状态 0：正确 1：消息结构错  2：非法源地址  3：认证错  4：版本太高   5~ ：其他错误
                         $Total_Length = strlen($new_bodyData) + 12;
                         $new_headData = pack("NNN", $Total_Length, 0x00000002, 1);
@@ -423,13 +439,11 @@ class ServerSocket extends Pzlife
                 $time = 0;
             }
             usleep(1100); //等待时间，进行下一次操作
-            //sleep($time);
-        } while (true);
-        // socket_close($socket);
+        }
     }
 
     public function content($content)
-    { //客户绑定ip
+    {
         if ($content == 1) { //本机测试
             return [
                 'host'          => "127.0.0.1", //服务商ip
@@ -441,9 +455,6 @@ class ServerSocket extends Pzlife
                 'Sequence_Id'   => 1,
                 'SP_ID'         => "",
                 'bin_ip'        => ["127.0.0.1"], //客户端绑定IP
-                'free_trial'    => 2,
-                'master_num'    => 300,
-                'uid'           => 1,
             ];
         }
     }
@@ -497,30 +508,5 @@ class ServerSocket extends Pzlife
             $bytes[] = bin2hex($tmp);
         }
         return $bytes;
-    }
-    /**
-     * 将ascii码转为字符串
-     * @param type $str 要解码的字符串
-     * @param type $prefix 前缀，默认:&#
-     * @return type
-     */
-    function decode($str, $prefix = "&#")
-    {
-        $str = str_replace($prefix, "", $str);
-        $a   = explode(";", $str);
-        $utf = '';
-        foreach ($a as $dec) {
-            if ($dec < 128) {
-                $utf .= chr($dec);
-            } else if ($dec < 2048) {
-                $utf .= chr(192 + (($dec - ($dec % 64)) / 64));
-                $utf .= chr(128 + ($dec % 64));
-            } else {
-                $utf .= chr(224 + (($dec - ($dec % 4096)) / 4096));
-                $utf .= chr(128 + ((($dec % 4096) - ($dec % 64)) / 64));
-                $utf .= chr(128 + ($dec % 64));
-            }
-        }
-        return $utf;
     }
 }

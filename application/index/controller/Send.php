@@ -1,8 +1,11 @@
 <?php
+
 namespace app\index\controller;
+
 use app\index\MyController;
 
-class Send extends MyController {
+class Send extends MyController
+{
     protected $beforeActionList = [
         //        'isLogin',//所有方法的前置操作
         // 'isLogin' => ['except' => 'cmppSendTest,smsBatch,getBalanceSmsBatch,getReceiveSmsBatch'], //除去getFirstCate其他方法都进行second前置操作
@@ -21,7 +24,8 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/cmppSendTest
      * @author rzc
      */
-    public function cmppSendTest() {
+    public function cmppSendTest()
+    {
         $apiName = classBasename($this) . '/' . __function__;
         $phone   = trim($this->request->post('phone')); //手机号
         // if (!checkMobile($phone)) {
@@ -29,7 +33,7 @@ class Send extends MyController {
         // }
         // echo phpinfo();die;
         $a = '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】';
-         
+
         $code = trim($this->request->post('code')); //验证码
         //图片函数测试
         stream_context_set_default([
@@ -39,7 +43,8 @@ class Send extends MyController {
             ],
         ]);
         $head = get_headers($code, 1);
-        print_r($head);die;
+        print_r($head);
+        die;
         $code       = mb_convert_encoding($code, 'GBK', 'UTF-8');
         $length     = mb_strlen($code);
         $strdata    = [];
@@ -59,7 +64,8 @@ class Send extends MyController {
         $encode = mb_detect_encoding($de_code, array("ASCII", 'UTF-8', 'GB2312', 'GBK', 'BIG5'));
 
         $de_code = mb_convert_encoding($de_code, 'UTF-8', 'CP936');
-        print_r($de_code);die;
+        print_r($de_code);
+        die;
         $result = $this->app->send->cmppSendTest($phone, $code);
         // $this->apiLog($apiName, [$Banner_id, $source], $result['code'], '');
         return $result;
@@ -79,7 +85,8 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/smsBatch
      * @author rzc
      */
-    public function smsBatch() {
+    public function smsBatch()
+    {
         $Username = trim($this->request->post('username')); //登录名
         $Password = trim($this->request->post('password')); //登陆密码
         $Content  = trim($this->request->post('content')); //短信内容
@@ -131,7 +138,8 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/getBalanceSmsBatch
      * @author rzc
      */
-    public function getBalanceSmsBatch() {
+    public function getBalanceSmsBatch()
+    {
         $Username = trim($this->request->post('username')); //登录名
         $Password = trim($this->request->post('password')); //登陆密码
         if (empty($Username)) {
@@ -155,7 +163,8 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/getReceiveSmsBatch
      * @author rzc
      */
-    public function getReceiveSmsBatch() {
+    public function getReceiveSmsBatch()
+    {
         $Username = trim($this->request->post('username')); //登录名
         $Password = trim($this->request->post('password')); //登陆密码
         if (empty($Username)) {
@@ -179,7 +188,8 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/getReceiveSmsBatch
      * @author rzc
      */
-    public function getReplaySmsBatch() {
+    public function getReplaySmsBatch()
+    {
         $Username = trim($this->request->post('username')); //登录名
         $Password = trim($this->request->post('password')); //登陆密码
         $result   = $this->app->send->getReplaySmsBatch($Username, $Password);
@@ -201,7 +211,8 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/getSmsMarketingTask
      * @author rzc
      */
-    public function getSmsMarketingTask() {
+    public function getSmsMarketingTask()
+    {
         $appid     = trim($this->request->post('appid')); //登录名
         $appkey    = trim($this->request->post('appkey')); //登陆密码
         $Content   = trim($this->request->post('content')); //短信内容
@@ -257,7 +268,8 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/getSmsBuiness
      * @author rzc
      */
-    public function getSmsBuiness() {
+    public function getSmsBuiness()
+    {
         $appid   = trim($this->request->post('appid')); //登录名
         $appkey  = trim($this->request->post('appkey')); //登陆密码
         $Content = trim($this->request->post('content')); //短信内容
@@ -297,7 +309,8 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/readFileContent
      * @author rzc
      */
-    public function readFileContent() {
+    public function readFileContent()
+    {
         $filename = trim($this->request->post('filename')); //登录名
         if (empty($filename)) {
             return ['code' => '3001'];
@@ -317,7 +330,8 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/upGoing
      * @author rzc
      */
-    public function upGoing() {
+    public function upGoing()
+    {
         $appid  = trim($this->request->post('appid')); //登录名
         $appkey = trim($this->request->post('appkey')); //登陆密码
         if (empty($appid)) {
@@ -341,7 +355,8 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/balanceEnquiry
      * @author rzc
      */
-    public function balanceEnquiry() {
+    public function balanceEnquiry()
+    {
         $appid  = trim($this->request->post('appid')); //登录名
         $appkey = trim($this->request->post('appkey')); //登陆密码
         if (empty($appid)) {
@@ -367,7 +382,8 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/marketingReceive
      * @author rzc
      */
-    public function marketingReceive() {
+    public function marketingReceive()
+    {
         $appid   = trim($this->request->post('appid')); //登录名
         $appkey  = trim($this->request->post('appkey')); //登陆密码
         $page    = trim($this->request->post('page')); //登陆密码
@@ -400,7 +416,8 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/businessReceive
      * @author rzc
      */
-    public function businessReceive() {
+    public function businessReceive()
+    {
         $appid   = trim($this->request->post('appid')); //登录名
         $appkey  = trim($this->request->post('appkey')); //登陆密码
         $page    = trim($this->request->post('page')); //登陆密码
@@ -445,7 +462,8 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/getMobilesDetail
      * @author rzc
      */
-    public function getMobilesDetail() {
+    public function getMobilesDetail()
+    {
         $appid      = trim($this->request->post('appid')); //登录名
         $appkey     = trim($this->request->post('appkey')); //登陆密码
         $phone      = trim($this->request->post('phone')); //登陆密码
@@ -483,7 +501,8 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/getSmsMultimediaMessageTask
      * @author rzc
      */
-    public function getSmsMultimediaMessageTask() {
+    public function getSmsMultimediaMessageTask()
+    {
         $appid          = trim($this->request->post('appid')); //登录名
         $appkey         = trim($this->request->post('appkey')); //登陆密码
         $title          = trim($this->request->post('title')); //短信标题
@@ -535,7 +554,8 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/getSmsMultimediaMessageTaskLog
      * @author rzc
      */
-    public function getSmsMultimediaMessageTaskLog() {
+    public function getSmsMultimediaMessageTaskLog()
+    {
         $appid   = trim($this->request->post('appid')); //登录名
         $appkey  = trim($this->request->post('appkey')); //登陆密码
         $task_no = trim($this->request->post('task_no')); //短信标题
@@ -575,9 +595,10 @@ class Send extends MyController {
      * @apiSampleRequest /index/send/getSmsMultimediaMessageTaskStatus
      * @author rzc
      */
-    public function getSmsMultimediaMessageTaskStatus(){
-         $appid   = trim($this->request->post('appid')); //登录名
-        $appkey  = trim($this->request->post('appkey')); //登陆密码=
+    public function getSmsMultimediaMessageTaskStatus()
+    {
+        $appid   = trim($this->request->post('appid')); //登录名
+        $appkey  = trim($this->request->post('appkey')); //登陆密码
         if (empty($appid)) {
             return ['code' => '3000'];
         }
@@ -588,6 +609,46 @@ class Send extends MyController {
         return $result;
     }
 
+
+
+    /**
+     * @api              {post} / 文本类模板签名报备接口（不支持彩信和视频短信）
+     * @apiDescription   textTemplateSignatureReport
+     * @apiGroup         index_send
+     * @apiName          textTemplateSignatureReport
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {String} type 业务场景 5营销，6行业，7网贷，9游戏
+     * @apiParam (入参) {String} title 模板标题
+     * @apiParam (入参) {String} connect 模板内容 格式【签名】+内容+{{var1}}+内容+{{var2}}+内容+...
+     * @apiSuccess (返回) {String} code 200:成功 / 3000:appid 或者appkey 为空 / 3001:业务场景错误 / 3002:签名长度小于2个字 / 3003:该用户没有此项服务
+     * @apiSampleRequest /index/send/textTemplateSignatureReport
+     * @return array
+     * @author rzc
+     */
+    public function textTemplateSignatureReport()
+    {
+        $appid   = trim($this->request->post('appid')); //登录名
+        $appkey  = trim($this->request->post('appkey')); //登陆密码
+        $type  = trim($this->request->post('type')); //业务场景
+        $title  = trim($this->request->post('title')); //业务场景
+        $connect  = trim($this->request->post('connect')); //业务场景
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        if (!in_array($type, [5, 6, 7, 9])) {
+            return ['code' => '3001'];
+        }
+        if (mb_strpos($connect, '】') - mb_strpos($connect, '【') < 2) {
+            return ['code' => '3002'];
+        }
+        $result = $this->app->send->textTemplateSignatureReport($appid, $appkey, $type, $title, $connect);
+        return $result;
+    }
+
     /**
      * @api              {post} / 批量自定义短信提交接口（行业）
      * @apiDescription   submitBatchCustomBusiness
@@ -595,12 +656,31 @@ class Send extends MyController {
      * @apiName          submitBatchCustomBusiness
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
-     * @apiParam (入参) {String} connect 组合包内容 组合方式： 
-     * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误
+     * @apiParam (入参) {String} template_id template_id报备的template_id 如果传template_id 则内容替换为模板中内容变量
+     * @apiParam (入参) {String} connect 组合包内容(template组合方式：变量,变量,...:手机号;变量,变量,...:手机号;...  无模板组合方式:内容:手机号;内容:手机号;...)
+     * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:提交内容为空
      * @apiSampleRequest /index/send/submitBatchCustomBusiness
+     * @return array
      * @author rzc
      */
-    public function submitBatchCustomBusiness(){
-        
+
+    public function submitBatchCustomBusiness()
+    {
+        $appid   = trim($this->request->post('appid')); //登录名
+        $appkey  = trim($this->request->post('appkey')); //登陆密码
+        $template_id  = trim($this->request->post('template_id'));
+        $connect  = trim($this->request->post('connect'));
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        if (empty($connect)) {
+            return ['code' => '3001'];
+        }
+        $ip       = trim($this->request->ip());
+        $result = $this->app->send->submitBatchCustomBusiness($appid, $appkey, $template_id, $connect, $ip);
+        return $result;
     }
 }

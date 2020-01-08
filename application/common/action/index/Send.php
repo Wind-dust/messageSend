@@ -15,7 +15,8 @@ use Config;
 use Env;
 use think\Db;
 
-class Send extends CommonIndex {
+class Send extends CommonIndex
+{
 
     /**
      * 账号密码登录
@@ -25,7 +26,8 @@ class Send extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function cmppSendTest($mobile, $code) {
+    public function cmppSendTest($mobile, $code)
+    {
 
         //设置参数，并且转换成16进制数字显示
         $time   = time();
@@ -114,71 +116,71 @@ class Send extends CommonIndex {
         $Sequence_Id = $head['Sequence_Id'];
         $bodyData    = socket_read($socket, $head['Total_Length'] - 12);
         switch ($head['Command_Id'] & 0x0fffffff) {
-        case 0x00000001:
-            $body   = unpack("CStatus/a16AuthenticatorISMG/CVersion", $bodyData);
-            $Msg_Id = rand(1, 100);
-            //$bodyData = pack("a8", $Msg_Id);
-            $bodyData = pack("N", $Msg_Id) . pack("N", "00000000");
-            $bodyData .= pack("C", 1) . pack("C", 1);
-            $bodyData .= pack("C", 0) . pack("C", 0);
-            $bodyData .= pack("a10", $Service_Id);
-            $bodyData .= pack("C", 0) . pack("a32", "") . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("a6", $SP_ID) . pack("a2", "02") . pack("a6", "") . pack("a17", "") . pack("a17", "") . pack("a21", $Dest_Id) . pack("C", 1);
-            $bodyData .= pack("a32", $mobile);
-            $bodyData .= pack("C", 0);
-            $len = strlen($code);
-            $bodyData .= pack("C", $len);
-            $bodyData .= pack("a" . $len, $code);
-            $bodyData .= pack("a20", "00000000000000000000");
-            // send($bodyData, "CMPP_SUBMIT", $Msg_Id);
-            $Command_Id   = 0x00000004;
-            $Total_Length = strlen($bodyData) + 12;
-            if ($Msg_Id != 0) {
-                $Sequence_Id = $Msg_Id;
-            } else {
-                if ($Sequence_Id < 10) {
-                    $Sequence_Id = $Sequence_Id;
+            case 0x00000001:
+                $body   = unpack("CStatus/a16AuthenticatorISMG/CVersion", $bodyData);
+                $Msg_Id = rand(1, 100);
+                //$bodyData = pack("a8", $Msg_Id);
+                $bodyData = pack("N", $Msg_Id) . pack("N", "00000000");
+                $bodyData .= pack("C", 1) . pack("C", 1);
+                $bodyData .= pack("C", 0) . pack("C", 0);
+                $bodyData .= pack("a10", $Service_Id);
+                $bodyData .= pack("C", 0) . pack("a32", "") . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("C", 0) . pack("a6", $SP_ID) . pack("a2", "02") . pack("a6", "") . pack("a17", "") . pack("a17", "") . pack("a21", $Dest_Id) . pack("C", 1);
+                $bodyData .= pack("a32", $mobile);
+                $bodyData .= pack("C", 0);
+                $len = strlen($code);
+                $bodyData .= pack("C", $len);
+                $bodyData .= pack("a" . $len, $code);
+                $bodyData .= pack("a20", "00000000000000000000");
+                // send($bodyData, "CMPP_SUBMIT", $Msg_Id);
+                $Command_Id   = 0x00000004;
+                $Total_Length = strlen($bodyData) + 12;
+                if ($Msg_Id != 0) {
+                    $Sequence_Id = $Msg_Id;
                 } else {
-                    $Sequence_Id = 1;
+                    if ($Sequence_Id < 10) {
+                        $Sequence_Id = $Sequence_Id;
+                    } else {
+                        $Sequence_Id = 1;
+                    }
+                    $Sequence_Id = $Sequence_Id + 1;
                 }
-                $Sequence_Id = $Sequence_Id + 1;
-            }
-            $headData = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-            // print_r(socket_write($socket, $headData . $bodyData, $Total_Length));die;
-            print_r($socket);
-            die;
-            socket_write($socket, $headData . $bodyData, $Total_Length);
-            $headData = socket_read($socket, 12);
-            print_r($headData);
-            die;
-            if (empty($headData)) {
-                // $this->log();
-                $code = 0000;
-            }
-            // echo 1;
-            break;
-        // case 0x00000005:
-        //     $this->CMPP_DELIVER($head['Total_Length'],$Sequence_Id);
-        //     break;
-        // case 0x80000005:
-        //     $this->CMPP_DELIVER($head['Total_Length'],$Sequence_Id);
-        //     break;
-        case 0x00000008:
-            echo 2;
-            $bodyData = pack("C", 1);
-            // $this->send($bodyData, "CMPP_ACTIVE_TEST_RESP", $Sequence_Id);
-            break;
-        case 0x00000004:
-            // $this->cmppSubmitResp();
-            echo 3;
-            break;
-        // case 0x80000004:
-        //     $this->CMPP_SUBMIT_RESP();
-        //     break;
-        default:
-            echo 4;
-            $bodyData = pack("C", 1);
-            // $this->send($bodyData, "CMPP_ACTIVE_TEST_RESP", $Sequence_Id);
-            break;
+                $headData = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                // print_r(socket_write($socket, $headData . $bodyData, $Total_Length));die;
+                print_r($socket);
+                die;
+                socket_write($socket, $headData . $bodyData, $Total_Length);
+                $headData = socket_read($socket, 12);
+                print_r($headData);
+                die;
+                if (empty($headData)) {
+                    // $this->log();
+                    $code = 0000;
+                }
+                // echo 1;
+                break;
+                // case 0x00000005:
+                //     $this->CMPP_DELIVER($head['Total_Length'],$Sequence_Id);
+                //     break;
+                // case 0x80000005:
+                //     $this->CMPP_DELIVER($head['Total_Length'],$Sequence_Id);
+                //     break;
+            case 0x00000008:
+                echo 2;
+                $bodyData = pack("C", 1);
+                // $this->send($bodyData, "CMPP_ACTIVE_TEST_RESP", $Sequence_Id);
+                break;
+            case 0x00000004:
+                // $this->cmppSubmitResp();
+                echo 3;
+                break;
+                // case 0x80000004:
+                //     $this->CMPP_SUBMIT_RESP();
+                //     break;
+            default:
+                echo 4;
+                $bodyData = pack("C", 1);
+                // $this->send($bodyData, "CMPP_ACTIVE_TEST_RESP", $Sequence_Id);
+                break;
         }
         // print_r($head['Command_Id']);
         // print_r($bodyData);
@@ -188,7 +190,8 @@ class Send extends CommonIndex {
         die;
     }
 
-    public function smsBatch($Username, $Password, $Content, $Mobiles, $Dstime, $ip) {
+    public function smsBatch($Username, $Password, $Content, $Mobiles, $Dstime, $ip)
+    {
         // $Password = md5($Password);
         $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
@@ -235,7 +238,7 @@ class Send extends CommonIndex {
         $result = 1;
         $result = $result . ',' . $data['task_no'];
         return $result;
-/*         if ($send_num > 1) { //多条号码认定为营销
+        /*         if ($send_num > 1) { //多条号码认定为营销
 
 } else { //行业
 //将行业短信写入任务并写入缓存
@@ -251,7 +254,8 @@ return $result;
 } */
     }
 
-    public function getBalanceSmsBatch($Username, $Password) {
+    public function getBalanceSmsBatch($Username, $Password)
+    {
         // $Password = md5($Password);
         $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         // print_r($Username);die;
@@ -266,7 +270,8 @@ return $result;
         return $result['num_balance'];
     }
 
-    public function getReceiveSmsBatch($Username, $Password) {
+    public function getReceiveSmsBatch($Username, $Password)
+    {
         // $Password = md5($Password);
         $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service', true);
         if (empty($user)) {
@@ -288,7 +293,8 @@ return $result;
         return 0;
     }
 
-    public function getSmsMarketingTask($Username, $Password, $Content, $Mobiles, $Dstime, $ip, $task_name) {
+    public function getSmsMarketingTask($Username, $Password, $Content, $Mobiles, $Dstime, $ip, $task_name)
+    {
         $Mobiles = array_unique(array_filter($Mobiles));
         // $Password = md5($Password);
         $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
@@ -307,18 +313,24 @@ return $result;
         }
         $send_num = count(array_filter($Mobiles));
 
-        if ($send_num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
-            return ['code' => '3007'];
-        }
         $effective_mobile = [];
         foreach ($Mobiles as $key => $value) {
             if (checkMobile($value) == true) {
                 $effective_mobile[] = $value;
             }
         }
+
         // print_r($effective_mobile);die;
         if (empty($effective_mobile)) {
             return ['code' => '3010', 'msg' => '有效手机号为空'];
+        }
+        if (mb_strlen($Content) > 70) {
+            $real_num = ceil(mb_strlen($Content) / 67) * count($effective_mobile);
+        } else {
+            $real_num = count($effective_mobile);
+        }
+        if ($real_num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
+            return ['code' => '3007'];
         }
         // $Content = $this->dbc2Sbc($Content);
         $data                 = [];
@@ -328,6 +340,7 @@ return $result;
 
         $data['mobile_content'] = join(',', $Mobiles);
         $data['task_name']      = $task_name;
+        $data['real_num']       = $real_num;
         $data['send_num']       = $send_num;
         $data['send_length']    = mb_strlen($Content);
         $data['free_trial']     = 1;
@@ -338,7 +351,7 @@ return $result;
 
         Db::startTrans();
         try {
-            DbAdministrator::modifyBalance($userEquities['id'], $send_num, 'dec');
+            DbAdministrator::modifyBalance($userEquities['id'], $real_num, 'dec');
             $id = DbAdministrator::addUserSendTask($data);
 
             Db::commit();
@@ -356,7 +369,8 @@ return $result;
         return ['code' => '200', 'task_no' => $data['task_no']];
     }
 
-    public function getSmsBuiness($Username, $Password, $Content, $Mobiles, $ip) {
+    public function getSmsBuiness($Username, $Password, $Content, $Mobiles, $ip)
+    {
         $this->redis = Phpredis::getConn();
 
         $Mobiles = array_unique(array_filter($Mobiles));
@@ -385,9 +399,6 @@ return $result;
         // }
         $send_num = count($Mobiles);
 
-        if ($send_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
-            return ['code' => '3007'];
-        }
         $effective_mobile = [];
         foreach ($Mobiles as $key => $value) {
             if (checkMobile(($value))) {
@@ -396,6 +407,14 @@ return $result;
         }
         if (empty($effective_mobile)) {
             return ['code' => '3001'];
+        }
+        if (mb_strlen($Content) > 70) {
+            $real_num = ceil(mb_strlen($Content) / 67) * count($effective_mobile);
+        } else {
+            $real_num = count($effective_mobile);
+        }
+        if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
+            return ['code' => '3007'];
         }
         // $Content = $this->dbc2Sbc($Content);
         $data                 = [];
@@ -406,6 +425,7 @@ return $result;
         $data['mobile_content'] = join(',', $Mobiles);
         $data['task_name']      = $Content;
         $data['send_num']       = $send_num;
+        $data['real_num']       = $real_num;
         $data['send_length']    = mb_strlen($Content);
         $data['free_trial']     = 1;
         $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
@@ -415,22 +435,21 @@ return $result;
         }
         Db::startTrans();
         try {
-            DbAdministrator::modifyBalance($user_equities['id'], $send_num, 'dec');
+            DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
             $bId = DbAdministrator::addUserSendCodeTask($data); //
             Db::commit();
             if ($data['free_trial'] == 2) {
-                $res = $this->redis->rpush("index:meassage:business:sendtask",$bId); 
-
+                $res = $this->redis->rpush("index:meassage:business:sendtask", $bId);
             }
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
             Db::rollback();
             return ['code' => '3009'];
         }
-
     }
 
-    public function readFileContent($filename) {
+    public function readFileContent($filename)
+    {
         $filename = filtraImage(Config::get('qiniu.exceldomain'), $filename);
         $logfile  = DbImage::getLogFile($filename); //判断时候有未完成的图片
         if (empty($logfile)) { //图片不存在
@@ -438,11 +457,11 @@ return $result;
         }
         $file = Config::get('qiniu.exceldomain') . '/' . $filename;
         ini_set('memory_limit', '3072M');
-
     }
 
     //回执接口
-    public function marketingReceive($appid, $appkey, $page, $pagenum) {
+    public function marketingReceive($appid, $appkey, $page, $pagenum)
+    {
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
@@ -460,7 +479,8 @@ return $result;
         return ['code' => '200', 'data' => $result];
     }
 
-    public function businessReceive($appid, $appkey, $page, $pagenum) {
+    public function businessReceive($appid, $appkey, $page, $pagenum)
+    {
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
@@ -479,10 +499,10 @@ return $result;
         $this->redis = Phpredis::getConn();
         $i = 0;
         while ($i <= 100) {
-            $userstat = $this->redis->lpop('index:meassage:code:user:receive:'.$user['id']);
-            $userstat = json_decode($userstat,true);
+            $userstat = $this->redis->lpop('index:meassage:code:user:receive:' . $user['id']);
+            $userstat = json_decode($userstat, true);
             if (empty($userstat)) {
-            break;
+                break;
             }
             $result[] = $userstat;
         }
@@ -529,7 +549,8 @@ return $result;
         return ['code' => '200', 'data' => $result];
     }
 
-    public function balanceEnquiry($appid, $appkey) {
+    public function balanceEnquiry($appid, $appkey)
+    {
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
@@ -555,7 +576,8 @@ return $result;
         return ['code' => '200', 'userEquities' => $user_equities];
     }
 
-    public function getMobilesDetail($appid, $appkey, $phone_data) {
+    public function getMobilesDetail($appid, $appkey, $phone_data)
+    {
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
@@ -621,7 +643,8 @@ return $result;
     // function dbc2Sbc($str){
     //     return preg_replace('/[\x{0020}\x{0020}-\x{7e}]/ue','($unicode=char2Unicode(\'\0\')) == 0x0020 ? unicode2Char（0x3000） : (($code=$unicode+0xfee0) > 256 ? unicode2Char($code) : chr($code))', $str);
     // }
-    public function getSmsMultimediaMessageTask($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title) {
+    public function getSmsMultimediaMessageTask($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title)
+    {
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
@@ -646,7 +669,7 @@ return $result;
                 $frame['content'] = $value['content'];
                 // $content_length+= strlen($value['content']);
             }
-            $content_length += (strlen($frame['content'])/8);
+            $content_length += (strlen($frame['content']) / 8);
             if (!isset($value['image_path'])) {
                 $frame['image_path'] = '';
             } else {
@@ -659,7 +682,7 @@ return $result;
                 $head = get_headers($value['image_path'], 1);
                 if ($head['Content-Type'] == 'image/jpeg') {
                     $frame['image_type'] = 'jpg';
-                }elseif ($head['Content-Type'] == 'image/gif ') {
+                } elseif ($head['Content-Type'] == 'image/gif ') {
                     $frame['image_type'] = 'gif';
                 }
                 if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['image/gif', 'image/jpeg'])) {
@@ -713,7 +736,7 @@ return $result;
             if ($bId) {
                 foreach ($multimedia_message_frame as $key => $frame) {
                     $frame['multimedia_message_id'] = $bId;
-                    $frame['image_path'] =filtraImage(Config::get('qiniu.domain'), $frame['image_path']);
+                    $frame['image_path'] = filtraImage(Config::get('qiniu.domain'), $frame['image_path']);
                     DbSendMessage::addUserMultimediaMessageFrame($frame); //添加后的商品id
                 }
             }
@@ -724,10 +747,10 @@ return $result;
             // exception($e);
             return ['code' => '3011'];
         }
-
     }
 
-    public function getSmsMultimediaMessageTaskLog($appid, $appkey, $page, $pageNum, $task_no, $mobile = '', $status = '') {
+    public function getSmsMultimediaMessageTaskLog($appid, $appkey, $page, $pageNum, $task_no, $mobile = '', $status = '')
+    {
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
@@ -749,7 +772,8 @@ return $result;
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
 
-    public function getSmsMultimediaMessageTaskStatus($appid, $appkey){
+    public function getSmsMultimediaMessageTaskStatus($appid, $appkey)
+    {
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
@@ -757,7 +781,7 @@ return $result;
         if ($appkey != $user['appkey']) {
             return ['code' => '3000'];
         }
-        $result = DbSendMessage::getUserUserMultimediaMessageLog([['uid' ,'=', $user['id']],['user_query_status' ,'=', 1],['status_message' ,'<>','']], 'id,task_no,mobile,status_message,update_time', false, '',200);
+        $result = DbSendMessage::getUserUserMultimediaMessageLog([['uid', '=', $user['id']], ['user_query_status', '=', 1], ['status_message', '<>', '']], 'id,task_no,mobile,status_message,update_time', false, '', 200);
         $update_log = [];
         foreach ($result as $key => $value) {
             $update_value['id'] = $value['id'];
@@ -774,5 +798,217 @@ return $result;
             Db::rollback();
             return ['code' => '3009'];
         }
+    }
+
+    public function textTemplateSignatureReport($appid, $appkey, $type, $title, $content)
+    {
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => $type], 'id', true);
+        if (empty($user_equities)) {
+            return ['code' => '3003'];
+        }
+        $template_id = getRandomString(8);
+        do {
+            $template_id = getRandomString(8);
+            $has = DbSendMessage::getUserModel(['template_id' => $template_id], 'id', true);
+        } while ($has);
+        $variable_len = substr_count($content, "{{var");
+        $user_model = [];
+        $user_model = [
+            'uid' => $user['id'],
+            'template_id' => $template_id,
+            'business_id' => $type,
+            'title' => $title,
+            'content' => $content,
+            'variable_len' => $variable_len,
+            'status' => 1,
+        ];
+        Db::startTrans();
+        try {
+            DbSendMessage::addUserModel($user_model);
+            Db::commit();
+            return ['code' => '200', 'template_id' => $template_id];
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009'];
+        }
+    }
+
+    public function submitBatchCustomBusiness($appid, $appkey, $template_id = '', $connect, $ip)
+    {
+        $this->redis = Phpredis::getConn();
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 6], 'id,num_balance', true);
+        if (empty($user_equities)) {
+            return ['code' => '3003'];
+        }
+        if (!empty($template_id)) {
+            $template =  DbSendMessage::getUserModel(['template_id' => $template_id], '*', true);
+        }
+        $connect_data = explode(';', $connect);
+        $send_data = [];
+        $send_data_mobile = [];
+        foreach ($connect_data as $key => $data) {
+            $send_text = explode(':', $data);
+            if (!empty($template)) {
+                $replace_data = explode(',', $send_text[0]);
+                for ($i = 0; $i < $template['variable_len']; $i++) {
+                    $var_num = $i + 1;
+                    $real_text = str_replace("{{var" . $var_num . "}}", $replace_data[$i], $template['content']); //内容
+                }
+                if (in_array($real_text, $send_data)) {
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                } else {
+                    $send_data[] = $real_text;
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                }
+            } else {
+                $real_text = $send_text[0];
+                if (in_array($real_text, $send_data)) {
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                } else {
+                    $send_data[] = $real_text;
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                }
+            }
+        }
+
+        $free_taskno = [];
+        $trial = []; //需审核
+        //组合任务包
+        $real_num = 0;
+
+
+        foreach ($send_data as $key => $value) {
+            $send_task = [];
+            $task_no = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+            $send_task = [
+                'task_no' => $task_no,
+                'uid'     => $user['id'],
+                'task_content' => $value,
+                'mobile_content' => join(',', $send_data_mobile[$key]),
+                'source'         => $ip,
+                'send_length'       => mb_strlen($value),
+                'send_num'       => count($send_data_mobile[$key]),
+            ];
+            if (mb_strlen($value) > 70) {
+                $real_num += ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
+            } else {
+                $real_num += count($send_data_mobile[$key]);
+            }
+            $send_task['free_trial'] = 1;
+            if ($user['free_trial'] == 2) {
+                //短信内容分词
+                $search_analyze = $this->search_analyze($value);
+                $search_result = json_decode($search_analyze, true);
+                $words = [];
+                if ($search_result['code'] == 20000) {
+                    $words = $search_result['data']['tokens'];
+                }
+                if (!empty($words)) { //敏感词
+                    $analyze_value = DbSendMessage::getSensitiveWord([['word', 'IN', join(',', $words)]], 'id', false);
+                    if (!empty($analyze_value)) {
+                        // array_push($trial, $send_task);
+                        $send_task['free_trial'] = 1;
+                    } else {
+                        // array_push($task_no, $free_taskno);
+                        $send_task['free_trial'] = 2;
+                        $send_task['channel_id'] = 22;
+                        $free_taskno[] = $task_no;
+                        // array_push($free_trial, $send_task);
+                    }
+                } else {
+                    if (!empty($value)) {
+                        $free_taskno[] = $task_no;
+                        $send_task['free_trial'] = 2;
+                        $send_task['channel_id'] = 22;
+                        // array_push($free_trial, $send_task);
+                    }
+                }
+            }
+            array_push($trial, $send_task);
+        }
+        // print_r($trial);
+        // die;
+        if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
+            return ['code' => '3007'];
+        }
+        Db::startTrans();
+        try {
+            $save = DbAdministrator::saveUserSendCodeTask($trial);
+            if ($save) {
+                if (!empty($free_taskno)) {
+
+                    DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
+                    //免审
+                    $free_ids = DbAdministrator::getUserSendCodeTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
+                    foreach ($free_ids as $key => $value) {
+                        $res = $this->redis->rpush("index:meassage:business:sendtask", $value['id']);
+                    }
+                }
+            }
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            exception($e);
+            return ['code' => '3009'];
+        }
+    }
+
+    private function search_analyze($value)
+    {
+        $client_id = '10000001';
+        $secret = 'VPNDYgDb7mTv2KuDTwWkAwRnDQtWj97E';
+        $nonce = getRandomString(8);
+        $time = time();
+
+        $sign = md5('{"client_id":' . $client_id . ',"nonce":"' . $nonce . '","secret":"VPNDYgDb7mTv2KuDTwWkAwRnDQtWj97E","timestamp":' . $time . '}');
+        $jy_token = base64_encode('{"client_id":' . $client_id . ',"nonce":"' . $nonce . '","sign":"' . $sign . '","timestamp":' . $time . '}');
+        $request_url = 'https://api-sit.itingluo.com/apiv1/openapi/search/analyze?text=' . $value;
+        $header  = array(
+            'client_id:' . $client_id,
+            'secret:' . $secret,
+            'nonce:' . $nonce,
+            'timestamp:' . $time,
+            'jy-token:' . $jy_token,
+            'Content-Type:' . 'application/x-www-form-urlencoded; charset=UTF-8'
+        );
+        return $this->http_request($request_url, '', $header);
+    }
+
+    private function http_request($url, $data = null, $header = null)
+    {
+
+        $curl = curl_init();
+        if (!empty($header)) {
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+            curl_setopt($curl, CURLOPT_HEADER, 0); //返回response头部信息
+        }
+
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        if (!empty($data)) {
+            curl_setopt($curl, CURLOPT_HTTPGET, 1);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
+        }
+
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+        $output = curl_exec($curl);
+        curl_close($curl);
+        return $output;
     }
 }

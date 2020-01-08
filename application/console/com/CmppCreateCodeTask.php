@@ -763,11 +763,11 @@ class CmppCreateCodeTask extends Pzlife
             $mobilesend = [];
             // print_r($sendTask);die;
             $mobilesend = explode(',', $sendTask['mobile_content']);
-            // $send_length = mb_strlen($sendTask['task_content'], 'utf8');
+            $send_length = mb_strlen($sendTask['task_content'], 'utf8');
             $real_length = 1;
-            // if ($send_length > 70) {
-            //     $real_length = ceil($send_length / 67);
-            // }
+            if ($send_length > 70) {
+                $real_length = ceil($send_length / 67);
+            }
             $real_num = 0;
             $real_num += $real_length * $sendTask['send_num'];
             $channel_id    = 0;
@@ -892,11 +892,11 @@ class CmppCreateCodeTask extends Pzlife
             $mobilesend = [];
             // print_r($sendTask);die;
             $mobilesend = explode(',', $sendTask['mobile_content']);
-            // $send_length = mb_strlen($sendTask['task_content'], 'utf8');
+            $send_length = mb_strlen($sendTask['task_content'], 'utf8');
             $real_length = 1;
-            // if ($send_length > 70) {
-            //     $real_length = ceil($send_length / 67);
-            // }
+            if ($send_length > 70) {
+                $real_length = ceil($send_length / 67);
+            }
             $real_num = 0;
             $real_num += $real_length * $sendTask['send_num'];
             $channel_id    = 0;

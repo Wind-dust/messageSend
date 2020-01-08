@@ -9,7 +9,7 @@ use Env;
 use Exception;
 use think\Db;
 
-class CmppHaiNanShiXinDianXinGame extends Pzlife
+class CmppYiXinYiDongBusiness extends Pzlife
 {
 
     // protected $redis;
@@ -19,63 +19,84 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
         $this->redis = Phpredis::getConn();
         //        $this->connect = Db::connect(Config::get('database.db_config'));
     }
-    //海南始新移动游戏通道挂机
+    //三体行业
     public function content($content)
     {
         return [
-            'host'          => "123.56.225.148", //服务商ip
-            'port'          => "7890", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "003086", //企业id  企业代码
-            'Shared_secret' => '914644', //网关登录密码
-            'Service_Id'    => "003086", //业务代码
-            'template_id'   => "", //模板id
-            'Dest_Id'       => "", //短信接入码 短信端口号 服务代码
+            'host'          => "116.62.88.162", //服务商ip
+            'port'          => "8592", //短连接端口号   17890长连接端口号
+            'Source_Addr'   => "101161", //企业id  企业代码
+            'Shared_secret' => '5hsey6u9', //网关登录密码
+            'template_id'   => "217062", //模板id
+            'Service_Id'    => "101161", //业务代码
+            'Dest_Id'       => "106928080159", //短信接入码 短信端口号
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
             'master_num'    => 300,
         ];
     }
 
-    public function Send($content)
+    public function SocketClientLong($content)
     {
         // $this->clientSocketInit();
         $redis = Phpredis::getConn();
+        // $a_time = 0;
         date_default_timezone_set('PRC');
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $content                    = 29;
-        $redisMessageCodeSend       = 'index:meassage:game:send:' . $content; //验证码发送任务rediskey
-        $redisMessageCodeSequenceId = 'index:meassage:game:sequence:id:' . $content; //行业通知SequenceId
-        $redisMessageCodeMsgId      = 'index:meassage:game:msg:id:' . $content; //行业通知SequenceId
-        // $redisMessageCodeDeliver    = 'index:meassage:code:deliver:' . $content; //行业通知MsgId
-        $redisMessageCodeDeliver = 'index:meassage:game:new:deliver:' . $content; //行业通知MsgId
-        $redisMessageUnKownDeliver = 'index:meassage:game:unknow:deliver:' . $content; //行业通知MsgId
-
-        /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '17311166660',
+        $content                    = 24;
+        $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
+        $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
+        $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
+        $redisMessageCodeDeliver    = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
+        $redisMessageUnKownDeliver = 'index:meassage:code:unknow:deliver:' . $content; //行业通知MsgId
+        // $redisMessageCodeSend       = 'index:meassage:marketing:send:' . $content; //营销发送任务rediskey
+        // $redisMessageCodeSequenceId = 'index:meassage:marketing:sequence:id:' . $content; //营销行业通知SequenceId
+        // $redisMessageCodeMsgId      = 'index:meassage:marketing:msg:id:' . $content; //营销行业通知SequenceId
+        // $redisMessageCodeDeliver    = 'index:meassage:marketing:deliver:' . $content; //营销行业通知MsgId
+        // echo $redisMessageCodeSend;die;
+        // do {
+        //     $send = $redis ->lPop($redisMessageCodeSend);
+        //     print_r($send);
+        // } while ($send);
+        // $send = $redis ->lPop($redisMessageCodeSend);
+        /*         $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15201926171',
             'mar_task_id' => '',
-            'content'     => '【超变传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/3Ypm7 回T退订 ',
-        ])); */
-
-        /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15316188669',
+            'uid'         => '1',
+            'content'     => '【钰蜥科技】您本次登录的验证码为026835',
+            'Submit_time' => date('mdHis', time()),
+        ]));
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15821193682',
             'mar_task_id' => '',
-            'content'     => '【超变传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/3Ypm7 回T退订',
-        ])); */
+            'uid'         => '1',
+            'content'     => '【钰蜥科技】您本次登录的验证码为028635',
+            'Submit_time' => date('mdHis', time()),
+        ]));
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15601607386',
+            'mar_task_id' => '',
+            'uid'         => '1',
+            'content'     => '【钰蜥科技】您本次登录的验证码为062835',
+            'Submit_time' => date('mdHis', time()),
+        ]));
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15172413692',
+            'mar_task_id' => '',
+            'uid'         => '1',
+            'content'     => '【钰蜥科技】您本次登录的验证码为062835',
+            'Submit_time' => date('mdHis', time()),
+        ]));
+ */
 
+        // $send = $redis->lPop($redisMessageCodeSend);
+        // $send_data = json_decode($send, true);
+        // $code = $send_data['content']; //带签名
+        // $code = strval($this->ascii_encode($code));//UTF-8 转ASCII
+        // print_r($code);die;
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $log_path = realpath("") . "/error/29.log";
-        $myfile = fopen($log_path, 'a+');
-        fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
-        fwrite($myfile, " Begin" . "\n");
-        fclose($myfile);
-        if ($socket == false) {
-            $this->error_log("create");
-            die;
-        }
-
-        // $content = 0;
         $contdata = $this->content($content);
-        // print_r($contdata);die;
+
         $host                 = $contdata['host']; //服务商ip
         $port                 = $contdata['port']; //短连接端口号   17890长连接端口号
         $Source_Addr          = $contdata['Source_Addr']; //企业id  企业代码
@@ -87,13 +108,16 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
         $master_num           = $contdata['master_num']; //通道最大提交量
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
-
-        $log_path = realpath("") . "/error/29.log";
+        // echo $security_master;die;
+        // die;
+        // $send = $this->redis->lPop($redisMessageCodeSend);
+        // print_r($send);
+        // die;
+        $log_path = realpath("") . "/error/24.log";
         $myfile = fopen($log_path, 'a+');
         fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
-        fwrite($myfile, " host:" . $host . " port:" . $port . "\n");
+        fwrite($myfile, " Begin" . "\n");
         fclose($myfile);
-
         if (socket_connect($socket, $host, $port) == false) {
             echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
@@ -215,10 +239,6 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
                         $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence ", $body['Msg_Content']);
 
                         $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
-
-
-                        print_r($body);
-                        print_r($Msg_Content);
                         if ($mesage) {
                             $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                             // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
@@ -230,16 +250,17 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
                             $mesage['receive_time'] = time(); //回执时间戳
                             $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                         } else { //不在记录中的回执存入缓存，
+
+                            print_r($body);
+                            print_r($Msg_Content);
                             $mesage['Stat']        = $Msg_Content['Stat'];
                             $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                             $mesage['Done_time']   = $Msg_Content['Done_time'];
-                            $mesage['Msg_Id']   = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
                             // $mesage['mobile']      = $body['Dest_Id '];//手机号
                             $mesage['mobile']   = trim($Msg_Content['Dest_terminal_Id']);
                             $mesage['receive_time'] = time(); //回执时间戳
                             $redis->rPush($redisMessageUnKownDeliver, json_encode($mesage));
                         }
-                        print_r($mesage);
                         $callback_Command_Id = 0x80000005;
 
                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
@@ -262,10 +283,15 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
 
                             //先接收
                             while (true) {
+
                                 $headData = socket_read($socket, 12);
                                 if ($headData != false) {
+                                    // usleep(2000);
                                     $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                                     $bodyData = socket_read($socket, $head['Total_Length'] - 12);
+                                    do {
+                                        $bodyData .= socket_read($socket, $head['Total_Length'] - 12 - strlen($bodyData));
+                                    } while (strlen($bodyData) <  $head['Total_Length'] - 12);
                                     if ($head['Command_Id'] == 0x80000001) {
                                         $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
                                         $verify_status = $body['Status'];
@@ -294,7 +320,7 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
                                         }
                                     } else if ($head['Command_Id'] == 0x80000004) {
                                         $body = unpack("N2Msg_Id/CResult", $bodyData);
-                                        print_r($body);
+                                        // print_r($body);
                                         $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                         if ($sequence) {
                                             $sequence           = json_decode($sequence, true);
@@ -383,7 +409,6 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
                                             $mesage['Msg_Id']   = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
                                             $redis->rPush($redisMessageUnKownDeliver, json_encode($mesage));
                                         }
-                                        print_r($mesage);
                                         $callback_Command_Id = 0x80000005;
 
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
@@ -420,8 +445,7 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
                                 echo "发送时间：" . date("Y-m-d H:i:s", time()) . "\n";
                                 $num1 = substr($timestring, 0, 8);
                                 $num2 = substr($timestring, 8) . $this->combination($i);
-                                // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
-                                $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
+                                $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
                                 // iconv("UTF-8","gbk",$code);
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
                                 // print_r($code);die;
@@ -439,8 +463,7 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
                                         $bodyData .= pack("a21", $mobile);
                                         $bodyData .= pack("C", 0);
                                         $bodyData .= pack("C", 1);
-                                        // $bodyData.= pack("C", 15); 
-                                        $bodyData .= pack("C", 8);
+                                        $bodyData .= pack("C", 15);
                                         $bodyData .= pack("a6", $Source_Addr);
                                         $bodyData .= pack("a2", 02);
                                         $bodyData .= pack("a6", '');
@@ -461,10 +484,10 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
                                         $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                         $send_data['my_submit_time'] = time(); //发送时间戳
                                         $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, json_encode($send_data));
-                                        usleep(3000);
                                         socket_write($socket, $headData . $bodyData, $Total_Length);
                                         $send_status = 2;
                                         ++$i;
+                                        usleep(3000);
                                     }
                                     ++$Sequence_Id;
                                     if ($Sequence_Id > 65536) {
@@ -473,7 +496,6 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
                                     if ($i > $security_master) {
                                         $i    = 0;
                                     }
-                                    continue;
                                 } else { //单条短信
 
                                     $bodyData = pack("N", $num1) . pack("N", $num2);
@@ -486,8 +508,7 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
                                     $bodyData .= pack("a21", $mobile);
                                     $bodyData .= pack("C", 0);
                                     $bodyData .= pack("C", 0);
-                                    // $bodyData.= pack("C", 15);
-                                    $bodyData .= pack("C", 8);
+                                    $bodyData .= pack("C", 15);
                                     $bodyData .= pack("a6", $Source_Addr);
                                     $bodyData .= pack("a2", 02);
                                     $bodyData .= pack("a6", '');
@@ -538,12 +559,17 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
                             }
                             socket_close($socket);
 
-                            $log_path = realpath("") . "/error/29.log";
+                            $log_path = realpath("") . "/error/24.log";
                             $myfile = fopen($log_path, 'a+');
                             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                             fwrite($myfile, $e . "\n");
+                            // fclose($myfile);
+                            // //  exception($e);
+                            // $log_path = realpath("")."/error/1.log";
+                            // $myfile = fopen($log_path,'a+');
+                            fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
+                            fwrite($myfile, " Begin" . "\n");
                             fclose($myfile);
-                            //  exception($e);
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                             socket_connect($socket, $host, $port);
                             $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
@@ -561,15 +587,6 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
                 }
             }
         }
-    }
-
-    public function error_log($error_type)
-    {
-        $log_path = realpath("") . "/error/29.log";
-        $myfile = fopen($log_path, 'a+');
-        fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
-        fwrite($myfile, $error_type . " fail massaege:" . socket_strerror(socket_last_error()) . "\n");
-        fclose($myfile);
     }
 
     //16进制转2进制
@@ -603,6 +620,80 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
 
         die;
         $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/", "³f󿾧©¬DELIVRD1911071650191107165515201926171AG");
+    }
+
+    /**
+     * ascii 转换
+     * @param $c
+     * @param string $prefix
+     * @return string
+     */
+    function ascii_encode($c, $prefix = "&#")
+    {
+        $len = strlen($c);
+        $a = 0;
+        $scill = '';
+        while ($a < $len) {
+            $ud = 0;
+            if (ord($c{
+            $a}) >= 0 && ord($c{
+            $a}) <= 127) {
+                $ud = ord($c{
+                $a});
+                $a += 1;
+            } else if (ord($c{
+            $a}) >= 192 && ord($c{
+            $a}) <= 223) {
+                $ud = (ord($c{
+                $a}) - 192) * 64 + (ord($c{
+                $a + 1}) - 128);
+                $a += 2;
+            } else if (ord($c{
+            $a}) >= 224 && ord($c{
+            $a}) <= 239) {
+                $ud = (ord($c{
+                $a}) - 224) * 4096 + (ord($c{
+                $a + 1}) - 128) * 64 + (ord($c{
+                $a + 2}) - 128);
+                $a += 3;
+            } else if (ord($c{
+            $a}) >= 240 && ord($c{
+            $a}) <= 247) {
+                $ud = (ord($c{
+                $a}) - 240) * 262144 + (ord($c{
+                $a + 1}) - 128) * 4096 + (ord($c{
+                $a + 2}) - 128) * 64 + (ord($c{
+                $a + 3}) - 128);
+                $a += 4;
+            } else if (ord($c{
+            $a}) >= 248 && ord($c{
+            $a}) <= 251) {
+                $ud = (ord($c{
+                $a}) - 248) * 16777216 + (ord($c{
+                $a + 1}) - 128) * 262144 + (ord($c{
+                $a + 2}) - 128) * 4096 + (ord($c{
+                $a + 3}) - 128) * 64 + (ord($c{
+                $a + 4}) - 128);
+                $a += 5;
+            } else if (ord($c{
+            $a}) >= 252 && ord($c{
+            $a}) <= 253) {
+                $ud = (ord($c{
+                $a}) - 252) * 1073741824 + (ord($c{
+                $a + 1}) - 128) * 16777216 + (ord($c{
+                $a + 2}) - 128) * 262144 + (ord($c{
+                $a + 3}) - 128) * 4096 + (ord($c{
+                $a + 4}) - 128) * 64 + (ord($c{
+                $a + 5}) - 128);
+                $a += 6;
+            } else if (ord($c{
+            $a}) >= 254 && ord($c{
+            $a}) <= 255) { //error
+                $ud = false;
+            }
+            $scill .= $prefix . $ud . ";";
+        }
+        return $scill;
     }
 
     /**
@@ -690,38 +781,5 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
             return $task[0];
         }
         return [];
-    }
-
-    private function getSendTask($id)
-    {
-        $getSendTaskSql = sprintf("select * from yx_user_send_task where delete_time=0 and id = %d", $id);
-        // print_r($getUserSql);die;
-        $sendTask = Db::query($getSendTaskSql);
-        if (!$sendTask) {
-            return [];
-        }
-        return $sendTask[0];
-    }
-
-    private function getSendTaskLog($task_no, $mobile)
-    {
-        $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `task_no` = '" . $task_no . "' and `mobile` = '" . $mobile . "'";
-        // print_r($getUserSql);die;
-        $sendTask = Db::query($getSendTaskSql);
-        if (!$sendTask) {
-            return [];
-        }
-        return $sendTask[0];
-    }
-
-    private function getSendTaskLogByMsgid($msgid)
-    {
-        $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `msgid` = '" . $msgid . "'";
-        // print_r($getUserSql);die;
-        $sendTask = Db::query($getSendTaskSql);
-        if (!$sendTask) {
-            return [];
-        }
-        return $sendTask[0];
     }
 }
