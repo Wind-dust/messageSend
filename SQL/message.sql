@@ -80,6 +80,22 @@ CREATE TABLE `yx_log_image`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '文件上传日志' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Table structure for pz_log_video
+-- ----------------------------
+DROP TABLE IF EXISTS `yx_log_video`;
+CREATE TABLE `yx_log_video`  (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '上传者',
+  `stype` tinyint(3) UNSIGNED NOT NULL DEFAULT 2 COMMENT '1.index 2.admin',
+  `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 2 COMMENT '状态1.完成 2.未完成 3.弃用',
+  `video_path` char(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '视频路径',
+  `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uniq_video_path`(`video_path`, `delete_time`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '文件上传日志' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Table structure for yx_menu
 -- ----------------------------
 DROP TABLE IF EXISTS `yx_menu`;
@@ -420,15 +436,16 @@ DROP TABLE IF EXISTS `yx_model_temeplate`;
 CREATE TABLE `yx_model_temeplate` (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板标题',
-  `template_id` char(23) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板id',
+  `template_id` char(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板id',
   `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
   `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板内容',
+  `variable_len` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '变量长度',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间',
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY (`template_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '平台模板' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '平台文本模板（不支持彩信和视频短信）' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `yx_user_model`;
 CREATE TABLE `yx_user_model` (
@@ -436,8 +453,9 @@ CREATE TABLE `yx_user_model` (
   `uid` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '用户id',
   `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
   `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板标题',
-  `template_id` char(23) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板id',
+  `template_id` char(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板id',
   `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板内容',
+  `variable_len` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '变量长度',
   `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态:1,提交申请;2,可用;3,审核通过;4,审核不通过;5,停用',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间',
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
@@ -445,7 +463,7 @@ CREATE TABLE `yx_user_model` (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY (`template_id`) USING BTREE,
   KEY `user_template`(`uid`,`template_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户自定义模板' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户自定义文本模板（不支持彩信和视频短信)' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `yx_blacklist`;
 CREATE TABLE `yx_blacklist` (
