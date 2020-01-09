@@ -45,12 +45,12 @@ class CmppLanJingMarketing extends Pzlife
         date_default_timezone_set('PRC');
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $content = 9;
-        $redisMessageCodeSend       = 'index:meassage:marketing:send:' . $content; //验证码发送任务rediskey
-        $redisMessageCodeSequenceId = 'index:meassage:marketing:sequence:id:' . $content; //行业通知SequenceId
-        $redisMessageCodeMsgId      = 'index:meassage:marketing:msg:id:' . $content; //行业通知SequenceId
+        $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
+        $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
+        $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
         // $redisMessageCodeDeliver    = 'index:meassage:code:deliver:' . $content; //行业通知MsgId
-        $redisMessageCodeDeliver    = 'index:meassage:marketing:new:deliver:' . $content; //行业通知MsgId
-        $redisMessageUnKownDeliver = 'index:meassage:marketing:unknow:deliver:' . $content; //行业通知MsgId
+        $redisMessageCodeDeliver    = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
+        $redisMessageUnKownDeliver = 'index:meassage:code:unknow:deliver:' . $content; //行业通知MsgId
         // $redisMessageCodeSend       = 'index:meassage:marketing:send:' . $content; //营销发送任务rediskey
         // $redisMessageCodeSequenceId = 'index:meassage:marketing:sequence:id:' . $content; //营销行业通知SequenceId
         // $redisMessageCodeMsgId      = 'index:meassage:marketing:msg:id:' . $content; //营销行业通知SequenceId
