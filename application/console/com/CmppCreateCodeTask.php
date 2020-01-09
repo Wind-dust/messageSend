@@ -2120,4 +2120,57 @@ Db::rollback();
         print_r(date('Y-m-d H:i:s', time()));
         echo count($data);
     }
+
+    //使用数量更正
+    public function businessTaskLogMove()
+    {
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $upnum_data = [];
+        $upnum_uid = [];
+        $up_real_num = [];
+        for ($i = 1; $i < 60291; $i++) {
+            $task = $this->getSendCodeTask($i);
+            if (empty($task) || empty($task['log_path'])) {
+                continue;
+            }
+            $send_length = mb_strlen($task['task_content'], 'utf8');
+            $real_length = 1;
+            if ($send_length > 70) {
+                $real_length = ceil($send_length / 67);
+            }
+            $real_num = 0;
+            $real_num += $real_length * $task['send_num'];
+            if ($real_num != $task['real_num']) {
+                $upnum = $real_num - $task['real_num'];
+                if (!in_array($task['uid'], $upnum_uid)) {
+                    $upnum_uid[] = $task['uid'];
+                    $upnum_data[$task['uid']] = 0;
+                    $upnum_data[$task['uid']] += $upnum;
+                } else {
+                    $upnum_data[$task['uid']] += $upnum;
+                }
+                $up_real_num[$task['id']] = $real_num;
+            }
+            // Db::table('yx_user_send_code_task')->where('id',$task['id'])->
+        }
+        // $up_equities = [];
+
+        Db::startTrans();
+        try {
+            foreach ($up_real_num as $key => $value) {
+                Db::table('yx_user_send_code_task')->where('id', $key)->update(['real_num' => $value]);
+            }
+            foreach ($upnum_data as $key => $value) {
+                $user_equities = Db::query("SELECT id,num_balance FROM `yx_user_equities` WHERE `business_id` = '6' AND `uid` = " . $key);
+                $up_num = $user_equities[0]['num_balance'] - $value;
+                Db::table('yx_user_equities')->where('id', $user_equities[0]['id'])->update(['num_balance' => $up_num]);
+            }
+            Db::commit();
+        } catch (\Exception $e) {
+            exception($e);
+            Db::rollback();
+        }
+
+        echo 'success';
+    }
 }

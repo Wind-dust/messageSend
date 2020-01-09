@@ -1027,4 +1027,144 @@ return $result;
         curl_close($curl);
         return $output;
     }
+
+    public function submitBatchCustomMarketing($appid, $appkey, $template_id = '', $connect, $ip)
+    {
+        $this->redis = Phpredis::getConn();
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 5], 'id,num_balance', true);
+        if (empty($user_equities)) {
+            return ['code' => '3002'];
+        }
+        if (!empty($template_id)) {
+            $template =  DbSendMessage::getUserModel(['template_id' => $template_id], '*', true);
+            if ($template['status'] != 3) {
+                return ['code' => '3003'];
+            }
+        }
+        $connect_data = explode(';', $connect);
+        $send_data = [];
+        $send_data_mobile = [];
+        foreach ($connect_data as $key => $data) {
+            $send_text = explode(':', $data);
+            if (!empty($template)) {
+                $replace_data = explode(',', $send_text[0]);
+                $real_text = $template['content'];
+                //有变量
+                if ($template['variable_len'] > 0) {
+                    if (empty($replace_data)) {
+                        return ['code' => '3005']; //未获取到变量内容
+                    }
+                    for ($i = 0; $i < $template['variable_len']; $i++) {
+                        $var_num = $i + 1;
+                        $real_text = str_replace("{{var" . $var_num . "}}", $replace_data[$i], $template['content']); //内容
+                    }
+                }
+
+                if (in_array($real_text, $send_data)) {
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                } else {
+                    $send_data[] = $real_text;
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                }
+            } else {
+                $real_text = $send_text[0];
+                if (in_array($real_text, $send_data)) {
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                } else {
+                    $send_data[] = $real_text;
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                }
+            }
+        }
+
+        $free_taskno = [];
+        $trial = []; //需审核
+        //组合任务包
+        $real_num = 0;
+
+        $all_task_no = [];
+        foreach ($send_data as $key => $value) {
+            $send_task = [];
+            $task_no = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+            $send_task = [
+                'task_no' => $task_no,
+                'uid'     => $user['id'],
+                'task_content' => $value,
+                'mobile_content' => join(',', $send_data_mobile[$key]),
+                'source'         => $ip,
+                'send_length'       => mb_strlen($value),
+                'send_num'       => count($send_data_mobile[$key]),
+            ];
+            if (mb_strlen($value) > 70) {
+                $real_num += ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
+            } else {
+                $real_num += count($send_data_mobile[$key]);
+            }
+            $send_task['free_trial'] = 1;
+            if ($user['free_trial'] == 2) {
+                //短信内容分词
+                $search_analyze = $this->search_analyze($value);
+                $search_result = json_decode($search_analyze, true);
+                $words = [];
+                if ($search_result['code'] == 20000) {
+                    $words = $search_result['data']['tokens'];
+                }
+                if (!empty($words)) { //敏感词
+                    $analyze_value = DbSendMessage::getSensitiveWord([['word', 'IN', join(',', $words)]], 'id', false);
+                    if (!empty($analyze_value)) {
+                        // array_push($trial, $send_task);
+                        $send_task['free_trial'] = 1;
+                    } else {
+                        // array_push($task_no, $free_taskno);
+                        $send_task['free_trial'] = 2;
+                        $send_task['channel_id'] = 17;
+                        $free_taskno[] = $task_no;
+                        // array_push($free_trial, $send_task);
+                    }
+                } else {
+                    if (!empty($value)) {
+                        $free_taskno[] = $task_no;
+                        $send_task['free_trial'] = 2;
+                        $send_task['channel_id'] = 17;
+                        // array_push($free_trial, $send_task);
+                    }
+                }
+            }
+            array_push($trial, $send_task);
+            $all_task_no[] = $task_no;
+        }
+        // print_r($trial);
+        // die;
+        if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
+            return ['code' => '3004'];
+        }
+        Db::startTrans();
+        try {
+            $save = DbAdministrator::saveUserSendTask($trial);
+            if ($save) {
+                if (!empty($free_taskno)) {
+
+                    DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
+                    //免审
+                    $free_ids = DbAdministrator::getUserSendCodeTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
+                    foreach ($free_ids as $key => $value) {
+                        $res = $this->redis->rpush("index:meassage:marketing:sendtask", $value['id']);
+                    }
+                }
+            }
+            Db::commit();
+            return ['code' => '200', 'task_no' => $all_task_no];
+        } catch (\Exception $e) {
+            Db::rollback();
+            exception($e);
+            return ['code' => '3009'];
+        }
+    }
 }

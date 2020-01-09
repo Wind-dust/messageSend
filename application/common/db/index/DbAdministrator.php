@@ -265,6 +265,12 @@ class DbAdministrator
         return UserSendTask::where($where)->count();
     }
 
+    public function saveUserSendTask($data)
+    {
+        $UserSendTask = new UserSendTask;
+        return $UserSendTask->saveAll($data);
+    }
+
     public function addUserSendTask($data)
     {
         $UserSendTask = new UserSendTask;
