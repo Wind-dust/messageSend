@@ -214,7 +214,7 @@ class Message extends AdminController
         if (!in_array($status, [3, 4, 5])) {
             return ['code' => '3002'];
         }
-        $result =  $this->app->message->auditUserModel(intval($id));
+        $result =  $this->app->message->auditUserModel(intval($id), $status);
         return $result;
     }
 }
