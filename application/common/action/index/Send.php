@@ -871,10 +871,18 @@ return $result;
             $send_text = explode(':', $data);
             if (!empty($template)) {
                 $replace_data = explode(',', $send_text[0]);
-                for ($i = 0; $i < $template['variable_len']; $i++) {
-                    $var_num = $i + 1;
-                    $real_text = str_replace("{{var" . $var_num . "}}", $replace_data[$i], $template['content']); //内容
+                $real_text = $template['content'];
+                //有变量
+                if ($template['variable_len'] > 0) {
+                    if (empty($replace_data)) {
+                        return ['code' => '3005']; //未获取到变量内容
+                    }
+                    for ($i = 0; $i < $template['variable_len']; $i++) {
+                        $var_num = $i + 1;
+                        $real_text = str_replace("{{var" . $var_num . "}}", $replace_data[$i], $template['content']); //内容
+                    }
                 }
+
                 if (in_array($real_text, $send_data)) {
                     $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
                 } else {

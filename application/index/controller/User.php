@@ -574,7 +574,7 @@ class User extends MyController
      * @apiParam (入参) {String} con_id
      * @apiParam (入参) {String} page 
      * @apiParam (入参) {String} pageNum 
-     * @apiSuccess (返回) {String} code 200:成功  3001:logo为空或者未上传成功/ 3002:businesslicense为空或者未上传成功 / 3003:用户不存在 / 3004:登录失败
+     * @apiSuccess (返回) {String} code 200:成功  3001:logo为空或者未上传成功/ 3002:business错误 / 3003:用户不存在 / 3004:登录失败
      * @apiSuccess (返回) {Array} data 用户信息
      * @apiSampleRequest /index/user/getUserModel
      * @return array
@@ -585,11 +585,15 @@ class User extends MyController
         $ConId = trim($this->request->post('con_id'));
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
+        $business_id  = trim($this->request->post('business_id'));
         $page     = is_numeric($page) ? $page : 1;
         $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
         intval($page);
         intval($pageNum);
-        $result = $this->app->user->getUserModel($page, $pageNum, $ConId);
+        if (!in_array($business_id, [5, 6, 7, 9])) {
+            return ['code' => '3002'];
+        }
+        $result = $this->app->user->getUserModel($page, $pageNum, $ConId, $business_id);
         return $result;
     }
 }

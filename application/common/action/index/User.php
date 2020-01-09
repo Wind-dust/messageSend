@@ -769,15 +769,15 @@ class User extends CommonIndex
         return ['code' => '200', 'totle' => $totle, 'result' => $result];
     }
 
-    public function getUserModel($page, $pageNum, $ConId)
+    public function getUserModel($page, $pageNum, $ConId, $business_id)
     {
         $uid = $this->getUidByConId($ConId);
         if (empty($uid)) { //用户不存在
             return ['code' => '3003'];
         }
         $offset = $pageNum * ($page - 1);
-        $result =  DbSendMessage::getUserModel(['uid' => $uid], '*', false, '', $offset . ',' . $pageNum);
-        $totle = DbSendMessage::countUserModel(['uid' => $uid]);
+        $result =  DbSendMessage::getUserModel(['uid' => $uid, 'business_id' => $business_id], '*', false, '', $offset . ',' . $pageNum);
+        $totle = DbSendMessage::countUserModel(['uid' => $uid, 'business_id' => $business_id]);
         return ['code' => '200', 'totle' => $totle, 'result' => $result];
     }
 }
