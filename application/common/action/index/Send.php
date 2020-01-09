@@ -431,7 +431,11 @@ return $result;
         $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
         if ($user['free_trial'] == 2) {
             $data['free_trial'] = 2;
-            $data['channel_id'] = 1;
+            if ($user['id'] == 56) {
+                $data['channel_id'] = 22;
+            } else {
+                $data['channel_id'] = 1; //三体
+            }
         }
         Db::startTrans();
         try {
@@ -852,12 +856,12 @@ return $result;
         }
         $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 6], 'id,num_balance', true);
         if (empty($user_equities)) {
-            return ['code' => '3003'];
+            return ['code' => '3002'];
         }
         if (!empty($template_id)) {
             $template =  DbSendMessage::getUserModel(['template_id' => $template_id], '*', true);
             if ($template['status'] != 3) {
-                return ['code' => '3004'];
+                return ['code' => '3003'];
             }
         }
         $connect_data = explode(';', $connect);
@@ -893,7 +897,7 @@ return $result;
         //组合任务包
         $real_num = 0;
 
-
+        $all_task_no = [];
         foreach ($send_data as $key => $value) {
             $send_task = [];
             $task_no = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
@@ -942,11 +946,12 @@ return $result;
                 }
             }
             array_push($trial, $send_task);
+            $all_task_no[] = $task_no;
         }
         // print_r($trial);
         // die;
         if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
-            return ['code' => '3007'];
+            return ['code' => '3004'];
         }
         Db::startTrans();
         try {
@@ -963,7 +968,7 @@ return $result;
                 }
             }
             Db::commit();
-            return ['code' => '200'];
+            return ['code' => '200', 'task_no' => $all_task_no];
         } catch (\Exception $e) {
             Db::rollback();
             exception($e);
