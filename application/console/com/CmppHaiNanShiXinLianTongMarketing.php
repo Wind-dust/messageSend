@@ -92,9 +92,10 @@ class CmppHaiNanShiXinLianTongMarketing extends Pzlife
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
 
-        $log_path = realpath("") . "/error/17.log";
+        $log_path = realpath("") . "/error/30.log";
         $myfile = fopen($log_path, 'a+');
         fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
+        fwrite($myfile, 'Begin' . "\n");
         fwrite($myfile, " host:" . $host . " port:" . $port . "\n");
         fclose($myfile);
 
