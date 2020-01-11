@@ -801,3 +801,15 @@ CREATE TABLE `yx_user_cmpp`  (
   KEY `task_no` (`task_no`,`task_id`) USING BTREE,
   KEY `mobile` (`mobile`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='用户CMPP账户信息';
+
+ALTER TABLE `messagesend`.`yx_user_send_task_log` 
+ADD COLUMN `free_trial` tinyint(3) unsigned NOT NULL DEFAULT 1 COMMENT '任务审核，1:默认需要审核;2:审核通过;3:审核不通过' AFTER `status_message`,
+ADD COLUMN `task_content` text NOT NULL COMMENT '发送内容' AFTER `task_no`,
+ADD COLUMN `source_status` tinyint(3) unsigned NOT NULL DEFAULT 1 COMMENT '短信发送状态1：待发送,2:已发送;3:成功;4:失败' AFTER `send_status`;
+
+ALTER TABLE `messagesend`.`yx_user_send_task_log` 
+ADD COLUMN `source` varchar(50) NOT NULL DEFAULT '' COMMENT '请求源（ip）' AFTER `send_status`;
+
+ALTER TABLE `messagesend`.`yx_user_send_task_log` 
+ADD COLUMN `send_length` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '内容长度' AFTER `send_status`;
+

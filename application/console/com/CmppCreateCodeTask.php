@@ -2234,26 +2234,65 @@ Db::rollback();
         exit('Success');
     }
 
-    /*    CREATE TABLE `yx_user_send_code_task_log` (
-        `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-        `uid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '用户id',
-        `task_no` char(23) NOT NULL DEFAULT '' COMMENT '任务编号',
-        `task_content` text NOT NULL COMMENT '发送内容',
-        `mobile` char(11) NOT NULL DEFAULT '' COMMENT '接收手机',
-        `source` varchar(50) NOT NULL DEFAULT '' COMMENT '请求源（ip）',
-        `send_length` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '内容长度',
-        `send_status` tinyint(3) unsigned NOT NULL DEFAULT 1 COMMENT '短信发送状态1：待发送,2:已发送;3:成功;4:失败',
-        `source_status` tinyint(3) unsigned NOT NULL DEFAULT 1 COMMENT '网关状态1：待发送,2:已发送;3:成功;4:失败',
-        `msgid` varchar(255) NOT NULL DEFAULT '' COMMENT 'msgid',
-        `real_message` varchar(20) NOT NULL DEFAULT '' COMMENT '真实返回状态',
-        `status_message` varchar(20) DEFAULT '' COMMENT '状态',
-        `free_trial` tinyint(3) unsigned NOT NULL DEFAULT 1 COMMENT '任务审核，1:默认需要审核;2:审核通过;3:审核不通过',
-        `msg_id` varchar(255) NOT NULL DEFAULT '' COMMENT 'msg_id CMPP接口',
-        `update_time` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '更新时间',
-        `create_time` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '创建时间',
-        `delete_time` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '删除时间',
-        `send_time` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '送达时间',
-        PRIMARY KEY (`id`) USING BTREE
-      ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='行业发送记录表';
-      */
+    //日志写入到数据表中行业
+    public function removeMarketingTaskLog()
+    {
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $time = strtotime(date('Y-m-d 0:00:00', time()));
+        $ids = Db::query("SELECT `id` FROM  `yx_user_send_task` WHERE `create_time` < " . $time . " AND  `log_path` <> ''");
+        $all_log = [];
+        $j = 1;
+        // echo count($ids);
+        // die;
+        for ($i = 0; $i < count($ids); $i++) {
+            $sendTask = $this->getSendTask($ids[$i]['id']);
+            $mobilesend = explode(',', $sendTask['mobile_content']);
+            $send_length = mb_strlen($sendTask['task_content'], 'utf8');
+            $real_length = 1;
+            if ($send_length > 70) {
+                $real_length = ceil($send_length / 67);
+            }
+            // print_r($sendTask);
+            // die;
+            foreach ($mobilesend as $key => $value) {
+                $send_log = [];
+                $send_log = [
+                    'uid' => $sendTask['uid'],
+                    'task_no' => $sendTask['task_no'],
+                    'task_content' => $sendTask['task_content'],
+                    'mobile' => $value,
+                    'source' => $sendTask['source'],
+                    'send_length' => $send_length,
+                    'send_status' => 2,
+                    'free_trial' => 2,
+                    'create_time' => $sendTask['create_time'],
+                ];
+                $all_log[] = $send_log;
+                $j++;
+            }
+            if ($j > 5000) {
+                Db::startTrans();
+                try {
+                    Db::table('yx_user_send_task_log')->insertAll($all_log);
+                    Db::commit();
+                } catch (\Exception $e) {
+                    Db::rollback();
+                    exception($e);
+                }
+                $j = 1;
+                unset($all_log);
+            }
+        }
+        if (!empty($all_log)) {
+            Db::startTrans();
+            try {
+                Db::table('yx_user_send_task_log')->insertAll($all_log);
+                Db::commit();
+            } catch (\Exception $e) {
+                Db::rollback();
+                exception($e);
+            }
+        }
+        exit('Success');
+    }
 }
