@@ -2234,7 +2234,7 @@ Db::rollback();
         exit('Success');
     }
 
-    //日志写入到数据表中行业
+    //日志写入到数据表中营销
     public function removeMarketingTaskLog()
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
@@ -2294,5 +2294,59 @@ Db::rollback();
             }
         }
         exit('Success');
+    }
+
+    public function receiptBusinessToBase()
+    {
+        // $redis->rpush('index:meassage:Buiness:cms:deliver:', json_encode($send_log));
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $redis = Phpredis::getConn();
+        // $redis->rpush('index:meassage:Buiness:cms:deliver:', json_encode(array(
+        //     'mobile' => '18918508850',
+        //     'title' => '美丽田园营销短信',
+        //     'mar_task_id' => '1599',
+        //     'content' => '感谢您对于美丽田园的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价http://crmapp.beautyfarm.com.cn/questionNaire1/api/qnnaire/refct?id=534478，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142，回T退订【美丽田园】',
+        //     'Msg_Id' => '',
+        //     'Stat' => 'DELIVER',
+        //     'Submit_time' => '191224164036',
+        //     'Done_time' => '191224164236',
+        // )));
+        while (true) {
+            $sendlog = $redis->lpop('index:meassage:Buiness:cms:deliver:');
+            if (empty($sendlog)) {
+                exit('Send Log IS null');
+            }
+            $send_log = json_decode($sendlog, true);
+
+            if (!isset($send_log['mar_task_id'])) {
+                continue;
+            }
+            $sendTask = $this->getSendCodeTask($send_log['mar_task_id']);
+
+            if (empty($sendTask)) {
+                continue;
+            }
+            $sendtasklog = Db::query("SELECT `id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $send_log['mobile'] . "' ");
+            // print_r($sendtasklog);
+            // die;
+            if (empty($sendtasklog)) {
+                print_r($send_log);
+                die;
+            }
+            if (strpos($send_log['content'], '问卷') !== false) {
+                $status_message = 'DELIVRD';
+            } else {
+                $status_message =  $send_log['Stat'];
+            }
+           
+            Db::startTrans();
+            try {
+                Db::table('yx_user_send_code_task_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $status_message]);
+                Db::commit();
+            } catch (\Exception $e) {
+                Db::rollback();
+                exception($e);
+            }
+        }
     }
 }
