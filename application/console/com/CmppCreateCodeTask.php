@@ -1338,7 +1338,7 @@ class CmppCreateCodeTask extends Pzlife
                         'task_no' =>  trim($task[0]['task_no']),
                         'status_message' =>   trim($send_log['Stat']),
                         'mobile' =>   trim($send_log['mobile']),
-                        'send_time' =>   date('Y-m-d H:i:s', trim($send_log['receive_time'])),
+                        // 'send_time' =>   date('Y-m-d H:i:s', trim($send_log['receive_time'])),
                     ])); //写入用户带处理日志
                 }
                 $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode($send_log)); //写入通道处理日志                

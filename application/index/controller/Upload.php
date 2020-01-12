@@ -167,7 +167,7 @@ class Upload extends MyController
     }
 
     /**
-     * @api              {post} / 上传模板表格文件
+     * @api              {post} / 上传模板表格文件（非变量类型）
      * @apiDescription   uploadModelExcel
      * @apiGroup         index_upload
      * @apiName          uploadModelExcel
@@ -175,19 +175,7 @@ class Upload extends MyController
      * @apiParam (入参) {String} appkey appkey
      * @apiParam (入参) {file} filename 表格名称 支持文件格式xlsx,csv,xls
      * @apiSuccess (返回) {String} code 200:成功  / 3001:上传文件不能为空 / 3002:上传失败 / 3003:上传号码为空
-     * @apiSuccess (data) {Number} submit_num 上传数量
-     * @apiSuccess (data) {Number} real_num 真实有效数量
-     * @apiSuccess (data) {Number} mobile_num 移动手机号数量
-     * @apiSuccess (data) {Number} unicom_num 联通手机号数量
-     * @apiSuccess (data) {Number} telecom_num 电信手机号数量
-     * @apiSuccess (data) {Number} virtual_num 虚拟运营商手机号数量
-     * @apiSuccess (data) {Number} unknown_num 未知归属运营商手机号数量
-     * @apiSuccess (data) {Number} mobile_phone 移动手机号码包
-     * @apiSuccess (data) {Number} unicom_phone 联通手机号码包
-     * @apiSuccess (data) {Number} telecom_phone 电信手机号码包
-     * @apiSuccess (data) {Number} virtual_phone 虚拟运营商手机号码包
-     * @apiSuccess (data) {Number} error_phone 错号包
-     * @apiSuccess (data) {String} phone 真实手机号结果
+     * @apiSuccess (data) {String} send_data 真实手机号结果
      * @apiSampleRequest /index/upload/uploadModelExcel
      * @author rzc
      */
@@ -264,6 +252,23 @@ class Upload extends MyController
         }
         // $result = $this->app->send->getMobilesDetail($phone_data);
         return ['code' => 200, 'send_data' => join(';', $send_data)];
+    }
+
+    /**
+     * @api              {post} / 上传模板表格文件（变量类型）
+     * @apiDescription   uploadVarModelExcel
+     * @apiGroup         index_upload
+     * @apiName          uploadVarModelExcel
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {file} filename 表格名称 支持文件格式xlsx,csv,xls
+     * @apiSuccess (返回) {String} code 200:成功  / 3001:上传文件不能为空 / 3002:上传失败 / 3003:上传号码为空
+     * @apiSuccess (data) {String} send_data 内容结果
+     * @apiSampleRequest /index/upload/uploadVarModelExcel
+     * @author rzc
+     */
+    public function uploadVarModelExcel()
+    {
     }
 
     /**

@@ -906,6 +906,7 @@ return $result;
         $real_num = 0;
 
         $all_task_no = [];
+        $task_no_mobile = [];
         foreach ($send_data as $key => $value) {
             $send_task = [];
             $task_no = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
@@ -955,6 +956,7 @@ return $result;
             }
             array_push($trial, $send_task);
             $all_task_no[] = $task_no;
+            $task_no_mobile[$task_no] = $send_data_mobile[$key];
         }
         // print_r($trial);
         // die;
@@ -976,7 +978,7 @@ return $result;
                 }
             }
             Db::commit();
-            return ['code' => '200', 'task_no' => $all_task_no];
+            return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_no_mobile];
         } catch (\Exception $e) {
             Db::rollback();
             exception($e);
@@ -1090,6 +1092,7 @@ return $result;
         $real_num = 0;
 
         $all_task_no = [];
+        $task_no_mobile = [];
         foreach ($send_data as $key => $value) {
             $send_task = [];
             $task_no = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
@@ -1139,6 +1142,7 @@ return $result;
             }
             array_push($trial, $send_task);
             $all_task_no[] = $task_no;
+            $task_no_mobile[$task_no] = $send_data_mobile[$key];
         }
         // print_r($trial);
         // die;
@@ -1160,7 +1164,7 @@ return $result;
                 }
             }
             Db::commit();
-            return ['code' => '200', 'task_no' => $all_task_no];
+            return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_no_mobile];
         } catch (\Exception $e) {
             Db::rollback();
             exception($e);

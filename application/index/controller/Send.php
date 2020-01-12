@@ -612,7 +612,7 @@ class Send extends MyController
 
 
     /**
-     * @api              {post} / 文本类模板签名报备接口（不支持彩信和视频短信）
+     * @api              {post} / 文本类模板报备接口（不支持彩信和视频短信）
      * @apiDescription   textTemplateSignatureReport
      * @apiGroup         index_send
      * @apiName          textTemplateSignatureReport
@@ -716,6 +716,43 @@ class Send extends MyController
         }
         $ip       = trim($this->request->ip());
         $result = $this->app->send->submitBatchCustomMarketing($appid, $appkey, $template_id, $connect, $ip);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 签名报备接口
+     * @apiDescription   SignatureReport
+     * @apiGroup         index_send
+     * @apiName          SignatureReport
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {String} type 业务场景 5营销，6行业，7网贷，9游戏
+     * @apiParam (入参) {String} title 签名内容
+     * @apiSuccess (返回) {String} code 200:成功 / 3000:appid 或者appkey 为空 / 3001:业务场景错误 / 3002:签名长度小于2个字 / 3003:该用户没有此项服务
+     * @apiSampleRequest /index/send/SignatureReport
+     * @return array
+     * @author rzc
+     */
+
+    public function SignatureReport()
+    {
+        $appid   = trim($this->request->post('appid')); //登录名
+        $appkey  = trim($this->request->post('appkey')); //登陆密码
+        $type  = trim($this->request->post('type')); //业务场景
+        $title  = trim($this->request->post('title')); //业务场景
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        if (!in_array($type, [5, 6, 7, 9])) {
+            return ['code' => '3001'];
+        }
+        if (mb_strpos($title, '】') - mb_strpos($title, '【') < 2) {
+            return ['code' => '3002'];
+        }
+        $result = $this->app->send->SignatureReport($appid, $appkey, $type, $title);
         return $result;
     }
 }
