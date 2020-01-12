@@ -2363,7 +2363,7 @@ Db::rollback();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
         // $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode($send_log)); //写入通道处理日志        
-        $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode(array(
+        /* $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode(array(
             'mobile' => '15045451231',
             'title' => '美丽田园营销短信',
             'mar_task_id' => '15850',
@@ -2372,7 +2372,7 @@ Db::rollback();
             'Stat' => 'DELIVER',
             'Submit_time' => '191224164036',
             'Done_time' => '191224164236',
-        )));
+        ))); */
         $time = strtotime(date('Y-m-d 0:00:00', time()));
         $channel              = $this->getChannelinfo($channel_id);
 
