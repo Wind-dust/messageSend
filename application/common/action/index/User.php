@@ -679,7 +679,7 @@ class User extends CommonIndex
         }
         $task_log = DbAdministrator::getUserSendTaskLog(['task_no' => $task['task_no']], '*', false, '', $offset . ',' . $pageNum);
         $total = DbAdministrator::countUserSendTaskLog(['task_no' => $task['task_no']]);
-        if (!empty($task['log_path']) && !empty($task_log)) {
+        if (!empty($task['log_path']) && empty($task_log)) {
             $task_log = [];
             $file = fopen($task['log_path'], "r");
             $data = array();
@@ -727,8 +727,7 @@ class User extends CommonIndex
         }
         $task_log = DbAdministrator::getUserSendCodeTaskLog(['task_no' => $task['task_no']], '*', false, '', $offset . ',' . $pageNum);
         $total = DbAdministrator::countUserSendCodeTaskLog(['task_no' => $task['task_no']]);
-
-        if (!empty($task['log_path']) && !empty($task_log)) {
+        if (!empty($task['log_path']) && empty($task_log)) {
             $task_log = [];
             if (file_exists($task['log_path'])) {
                 $file = fopen($task['log_path'], "r");
