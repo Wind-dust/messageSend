@@ -897,6 +897,7 @@ return $result;
             }
         }
         $connect_data = explode(';', $connect);
+        $connect_data = array_filter($connect_data);
         $send_data = [];
         $send_data_mobile = [];
         foreach ($connect_data as $key => $data) {
@@ -1095,6 +1096,7 @@ return $result;
             }
         }
         $connect_data = explode(';', $connect);
+        $connect_data = array_filter($connect_data);
         $send_data = [];
         $send_data_mobile = [];
         foreach ($connect_data as $key => $data) {
