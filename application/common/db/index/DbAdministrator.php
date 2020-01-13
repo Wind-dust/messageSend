@@ -140,6 +140,11 @@ class DbAdministrator
         return $AdminRemittance->save($data, ['id' => $id]);
     }
 
+    public function countAdminRemittance($where)
+    {
+        return AdminRemittance::where($where)->count();
+    }
+
     /**
      * 改短信余额
      * @param $uid

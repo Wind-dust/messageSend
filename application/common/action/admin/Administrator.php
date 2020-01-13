@@ -14,12 +14,14 @@ use Exception;
 use think\Db;
 use third\PHPTree;
 
-class Administrator extends CommonIndex {
+class Administrator extends CommonIndex
+{
     private $cmsCipherUserKey = 'adminpass'; //用户密码加密key
 
-    private function redisInit() {
+    private function redisInit()
+    {
         $this->redis = Phpredis::getConn();
-//        $this->connect = Db::connect(Config::get('database.db_config'));
+        //        $this->connect = Db::connect(Config::get('database.db_config'));
     }
 
     /**
@@ -28,7 +30,8 @@ class Administrator extends CommonIndex {
      * @return array
      * @author rzc
      */
-    public function getBusiness($page, $pageNum, $id = 0, $getall) {
+    public function getBusiness($page, $pageNum, $id = 0, $getall)
+    {
         $offset = ($page - 1) * $pageNum;
         if (!empty($id)) {
             $result = DbAdministrator::getBusiness(['id' => $id], '*', true);
@@ -42,7 +45,8 @@ class Administrator extends CommonIndex {
         return ['code' => '200', 'Business' => $result];
     }
 
-    public function addBusiness($title, $price, $donate_num = 0) {
+    public function addBusiness($title, $price, $donate_num = 0)
+    {
         $data = [];
         $data = [
             'title'      => $title,
@@ -66,7 +70,8 @@ class Administrator extends CommonIndex {
         }
     }
 
-    public function updateBusiness($id, $title, $price, $donate_num = 0) {
+    public function updateBusiness($id, $title, $price, $donate_num = 0)
+    {
         $Business = DbAdministrator::getBusiness(['id' => $id], 'id', true);
         if (empty($Business)) {
             return ['code' => '3001'];
@@ -95,7 +100,8 @@ class Administrator extends CommonIndex {
         }
     }
 
-    public function getUserQualificationRecord($page, $pageNum, $id) {
+    public function getUserQualificationRecord($page, $pageNum, $id)
+    {
         $offset = ($page - 1) * $pageNum;
         if (!empty($id)) {
             $result = DbAdministrator::getUserQualificationRecord(['id' => $id], '*', true);
@@ -105,7 +111,8 @@ class Administrator extends CommonIndex {
         return ['code' => '200', 'Business' => $result];
     }
 
-    public function auditUserQualificationRecord($id, $status) {
+    public function auditUserQualificationRecord($id, $status)
+    {
         $record = DbAdministrator::getUserQualificationRecord(['id' => $id], '*', true);
         if (empty($record)) {
             return ['code' => '3001'];
@@ -140,7 +147,8 @@ class Administrator extends CommonIndex {
         }
     }
 
-    public function getUserEquities($mobile, $business_id) {
+    public function getUserEquities($mobile, $business_id)
+    {
         $user = DbUser::getUserInfo(['mobile' => $mobile], 'id', true);
         if (empty($user)) {
             return ['code' => '3002'];
@@ -153,7 +161,8 @@ class Administrator extends CommonIndex {
         return ['code' => '200', 'userequities' => $result];
     }
 
-    public function rechargeApplication($cmsConId, $nick_name, $business_id, $num) {
+    public function rechargeApplication($cmsConId, $nick_name, $business_id, $num)
+    {
         $adminId = $this->getUidByConId($cmsConId);
         // $adminInfo     = DbAdmin::getAdminInfo(['id' => $adminId], 'id,passwd,status', true);
         $user = DbUser::getUserInfo(['nick_name' => $nick_name], 'id,mobile', true);
@@ -185,15 +194,16 @@ class Administrator extends CommonIndex {
             $updateRes = DbAdministrator::addAdminRemittance($data);
             Db::commit();
             return ['code' => '200'];
-
         } catch (\Exception $e) {
             Db::rollback();
             return ['code' => '3009']; //修改失败
         }
     }
 
-    public function getRechargeApplication($page, $pageNum, $id = 0, $getall) {
+    public function getRechargeApplication($page, $pageNum, $id = 0, $getall)
+    {
         $offset = ($page - 1) * $pageNum;
+        $total = 0;
         if (!empty($id)) {
             $result = DbAdministrator::getAdminRemittance(['id' => $id], '*', true);
         } else {
@@ -201,12 +211,14 @@ class Administrator extends CommonIndex {
                 $result = DbAdministrator::getAdminRemittance([], '*', false);
             } else {
                 $result = DbAdministrator::getAdminRemittance([], '*', false, '', $offset . ',' . $pageNum);
+                $total = DbAdministrator::countAdminRemittance([]);
             }
         }
-        return ['code' => '200', 'data' => $result];
+        return ['code' => '200', 'total' => $total, 'data' => $result];
     }
 
-    public function aduitRechargeApplication($status, $message, $id) {
+    public function aduitRechargeApplication($status, $message, $id)
+    {
         $adminRemittance = DbAdministrator::getAdminRemittance(['id' => $id], '*', true);
         if (empty($adminRemittance)) {
             return ['code' => '3001'];
@@ -233,7 +245,6 @@ class Administrator extends CommonIndex {
             }
             Db::commit();
             return ['code' => '200'];
-
         } catch (\Exception $e) {
             exception($e);
             Db::rollback();
@@ -241,12 +252,14 @@ class Administrator extends CommonIndex {
         }
     }
 
-    public function getChannel() {
+    public function getChannel()
+    {
         $result = DbAdministrator::getSmsSendingChannel([], 'id,title', false);
         return ['code' => '200', 'channel_list' => $result];
     }
 
-    public function settingChannel($channel_id, $business_id) {
+    public function settingChannel($channel_id, $business_id)
+    {
         $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id], 'id,title', true);
         if (empty($channel)) {
             return ['code' => '3001'];
@@ -260,14 +273,14 @@ class Administrator extends CommonIndex {
             DbAdministrator::editSmsSendingChannel(['business_id' => $business_id], $channel_id);
             Db::commit();
             return ['code' => '200'];
-
         } catch (\Exception $e) {
             Db::rollback();
             return ['code' => '3009']; //修改失败
         }
     }
 
-    public function distributeUserChannel($channel_id, $user_phone, $priority) {
+    public function distributeUserChannel($channel_id, $user_phone, $priority)
+    {
         $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id], 'id', true);
         if (empty($channel)) {
             return ['code' => '3002'];
@@ -290,14 +303,14 @@ class Administrator extends CommonIndex {
             DbAdministrator::addUserChannel($data);
             Db::commit();
             return ['code' => '200'];
-
         } catch (\Exception $e) {
             Db::rollback();
             return ['code' => '3009']; //修改失败
         }
     }
 
-    public function updateUserChannel($id, $priority) {
+    public function updateUserChannel($id, $priority)
+    {
         $userchannel = DbAdministrator::getUserChannel(['id' => $id], 'id', true);
         if (empty($userchannel)) {
             return ['code' => '3001'];
@@ -307,14 +320,14 @@ class Administrator extends CommonIndex {
             DbAdministrator::editUserChannel(['priority' => $priority], $id);
             Db::commit();
             return ['code' => '200'];
-
         } catch (\Exception $e) {
             Db::rollback();
             return ['code' => '3009']; //修改失败
         }
     }
 
-    public function delUserChannel($id) {
+    public function delUserChannel($id)
+    {
         $userchannel = DbAdministrator::getUserChannel(['id' => $id], 'id', true);
         if (empty($userchannel)) {
             return ['code' => '3001'];
@@ -324,14 +337,14 @@ class Administrator extends CommonIndex {
             DbAdministrator::delUserChannel($id);
             Db::commit();
             return ['code' => '200'];
-
         } catch (\Exception $e) {
             Db::rollback();
             return ['code' => '3009']; //修改失败
         }
     }
 
-    public function getUserSendTask($page, $pageNum, $id) {
+    public function getUserSendTask($page, $pageNum, $id)
+    {
         $offset = ($page - 1) * $pageNum;
         if (!empty($id)) {
             $result = DbAdministrator::getUserSendTask(['id' => $id], '*', true);
@@ -342,7 +355,8 @@ class Administrator extends CommonIndex {
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
 
-    public function auditUserSendTask($effective_id = [], $free_trial) {
+    public function auditUserSendTask($effective_id = [], $free_trial)
+    {
         // print_r($effective_id);die;
         $userchannel = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'id,mobile_content,free_trial', false);
 
@@ -365,14 +379,14 @@ class Administrator extends CommonIndex {
             }
             Db::commit();
             return ['code' => '200'];
-
         } catch (\Exception $e) {
             Db::rollback();
             return ['code' => '3009']; //修改失败
         }
     }
 
-    public function distributionChannel($effective_id = [], $channel_id, $business_id) {
+    public function distributionChannel($effective_id = [], $channel_id, $business_id)
+    {
         $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id, 'business_id' => $business_id], 'id,title,channel_price', true);
         if (empty($channel)) {
             return ['code' => '3002'];
@@ -388,7 +402,7 @@ class Administrator extends CommonIndex {
         foreach ($usertask as $key => $value) {
             if (empty($uids)) {
                 $uids[] = $value['uid'];
-            }elseif (!in_array($value['uid'], $uids)) {
+            } elseif (!in_array($value['uid'], $uids)) {
                 $uids[] = $value['uid'];
             }
             // print_r($value);
@@ -400,9 +414,9 @@ class Administrator extends CommonIndex {
                 if ($send_length > 70) {
                     $real_length = ceil($send_length / 67);
                 }
-                $num += ($real_length* $value['send_num']);
+                $num += ($real_length * $value['send_num']);
                 // foreach ($mobilesend as $key => $kvalue) {
-                    
+
                 // }
             }
         }
@@ -412,7 +426,7 @@ class Administrator extends CommonIndex {
             return ['code' => '3008', 'msg' => '一批只能同时分配一个用户的营销任务'];
         }
         if (empty($real_usertask)) {
-            return ['code' => '3010','msg' => '待分配的批量任务未空（提交了一批未审核的批量任务）'];
+            return ['code' => '3010', 'msg' => '待分配的批量任务未空（提交了一批未审核的批量任务）'];
         }
         $userEquities = DbAdministrator::getUserEquities(['uid' => $uids[0], 'business_id' => $business_id], 'id,agency_price,num_balance', true);
         if (empty($userEquities)) {
@@ -440,9 +454,9 @@ class Administrator extends CommonIndex {
             }
             foreach ($real_usertask as $real => $usertask) {
                 // $res = $this->redis->rpush("index:meassage:marketing:sendtask",$usertask['id']); 
-                $res = $this->redis->rpush("index:meassage:marketing:sendtask",json_encode(['id' => $usertask['id'],'send_time' => $usertask['appointment_time']])); 
+                $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => $usertask['appointment_time']]));
             }
-           /*  if ($free_trial == 2) {
+            /*  if ($free_trial == 2) {
                 foreach ($real_usertask as $real => $usertask) {
                     $mobilesend       = explode(',', $usertask['mobile_content']);
                     $effective_mobile = [];
@@ -498,10 +512,9 @@ class Administrator extends CommonIndex {
                 }
 
             } */
-            
+
             Db::commit();
             return ['code' => '200'];
-
         } catch (\Exception $e) {
             exception($e);
             Db::rollback();
@@ -509,7 +522,8 @@ class Administrator extends CommonIndex {
         }
     }
 
-    public function getUserSendCodeTask($page, $pageNum, $id) {
+    public function getUserSendCodeTask($page, $pageNum, $id)
+    {
         $offset = ($page - 1) * $pageNum;
         if (!empty($id)) {
             $result = DbAdministrator::getUserSendCodeTask(['id' => $id], '*', true);
@@ -520,7 +534,8 @@ class Administrator extends CommonIndex {
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
 
-    public function auditUserSendCodeTask($effective_id = [], $free_trial) {
+    public function auditUserSendCodeTask($effective_id = [], $free_trial)
+    {
         // print_r($effective_id);die;
         $userchannel = DbAdministrator::getUserSendCodeTask([['id', 'in', join(',', $effective_id)]], 'id,mobile_content,free_trial', false);
 
@@ -543,14 +558,14 @@ class Administrator extends CommonIndex {
             }
             Db::commit();
             return ['code' => '200'];
-
         } catch (\Exception $e) {
             Db::rollback();
             return ['code' => '3009']; //修改失败
         }
     }
 
-    public function distributionCodeTaskChannel($effective_id = [], $channel_id, $business_id) {
+    public function distributionCodeTaskChannel($effective_id = [], $channel_id, $business_id)
+    {
         $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id, 'business_id' => $business_id], 'id,title,channel_price', true);
         if (empty($channel)) {
             return ['code' => '3002'];
@@ -566,7 +581,7 @@ class Administrator extends CommonIndex {
         foreach ($usertask as $key => $value) {
             if (empty($uids)) {
                 $uids[] = $value['uid'];
-            }elseif (!in_array($value['uid'], $uids)) {
+            } elseif (!in_array($value['uid'], $uids)) {
                 $uids[] = $value['uid'];
             }
             // print_r($value);
@@ -578,9 +593,9 @@ class Administrator extends CommonIndex {
                 if ($send_length > 70) {
                     $real_length = ceil($send_length / 67);
                 }
-                $num += ($real_length* $value['send_num']);
+                $num += ($real_length * $value['send_num']);
                 // foreach ($mobilesend as $key => $kvalue) {
-                    
+
                 // }
             }
         }
@@ -590,7 +605,7 @@ class Administrator extends CommonIndex {
             return ['code' => '3008', 'msg' => '一批只能同时分配一个用户的营销任务'];
         }
         if (empty($real_usertask)) {
-            return ['code' => '3010','msg' => '待分配的批量任务未空（提交了一批未审核的批量任务）'];
+            return ['code' => '3010', 'msg' => '待分配的批量任务未空（提交了一批未审核的批量任务）'];
         }
         $userEquities = DbAdministrator::getUserEquities(['uid' => $uids[0], 'business_id' => $business_id], 'id,agency_price,num_balance', true);
         if (empty($userEquities)) {
@@ -617,11 +632,10 @@ class Administrator extends CommonIndex {
                 DbAdministrator::editUserSendCodeTask(['free_trial' => $free_trial, 'channel_id' => $channel_id], $value['id']);
             }
             foreach ($real_usertask as $real => $usertask) {
-                $res = $this->redis->rpush("index:meassage:business:sendtask",$usertask['id']); 
+                $res = $this->redis->rpush("index:meassage:business:sendtask", $usertask['id']);
             }
             Db::commit();
             return ['code' => '200'];
-
         } catch (\Exception $e) {
             exception($e);
             Db::rollback();
