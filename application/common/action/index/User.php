@@ -699,6 +699,30 @@ class User extends CommonIndex
             $total = count($data);
             $task_log = array_slice($data, $offset, $pageNum);
         }
+        foreach ($task_log as $key => $value) {
+            //    if ($value['status_message'] == 'DELIVRD') {
+            //         $task_log[$key]['explanation'] = '成功';
+            //    }
+            switch ($value['status_message']) {
+                case 'DELIVRD':
+                    $task_log[$key]['explanation'] = '成功';
+                    break;
+                case 'UNDELIV':
+                    $task_log[$key]['explanation'] = '成功';
+                    break;
+                case 'UNKNOWN':
+                    $task_log[$key]['explanation'] = '未知';
+                    break;
+                case '':
+                    $task_log[$key]['explanation'] = '未知';
+                    break;
+
+                default:
+                    $task_log[$key]['explanation'] = '失败';
+                    break;
+            }
+            unset($task_log[$key]['real_message']);
+        }
         return ['code' => '200', 'total' => $total, 'task_log' => $task_log];
     }
 
@@ -751,6 +775,30 @@ class User extends CommonIndex
             fclose($file);
             $total = count($data);
             $task_log = array_slice($data, $offset, $pageNum);
+        }
+        foreach ($task_log as $key => $value) {
+            //    if ($value['status_message'] == 'DELIVRD') {
+            //         $task_log[$key]['explanation'] = '成功';
+            //    }
+            switch ($value['status_message']) {
+                case 'DELIVRD':
+                    $task_log[$key]['explanation'] = '成功';
+                    break;
+                case 'UNDELIV':
+                    $task_log[$key]['explanation'] = '成功';
+                    break;
+                case 'UNKNOWN':
+                    $task_log[$key]['explanation'] = '未知';
+                    break;
+                case '':
+                    $task_log[$key]['explanation'] = '未知';
+                    break;
+
+                default:
+                    $task_log[$key]['explanation'] = '失败';
+                    break;
+            }
+            unset($task_log[$key]['real_message']);
         }
         return ['code' => '200', 'total' => $total, 'task_log' => $task_log];
     }
