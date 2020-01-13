@@ -205,6 +205,7 @@ class Send extends MyController
      * @apiParam (入参) {String} appkey appkey
      * @apiParam (入参) {String} content 短信内容
      * @apiParam (入参) {String} taskname 任务名称
+     * @apiParam (入参) {String} signature_id 已报备签名ID
      * @apiParam (入参) {String} mobile 接收手机号码
      * @apiParam (入参) {String} dstime 发送时间
      * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:单批次手机号码为空 / 3003:dstime发送时间格式错误 / 3004:预约发送时间小于当前时间 / 3005:短信内容为空或者短信内容超出500字符 / 3006:签名长度为2~8个字 / 3007:task_name 短信标题不能为空
@@ -219,6 +220,7 @@ class Send extends MyController
         $task_name = trim($this->request->post('taskname')); //任务名称
         $Mobile    = trim($this->request->post('mobile')); //接收手机号码
         $Dstime    = trim($this->request->post('dstime')); //手机号
+        $signature_id  = trim($this->request->post('signature_id')); //接收手机号码
         $ip        = trim($this->request->ip());
         $Mobiles   = explode(',', $Mobile);
         if (empty($appid)) {
@@ -251,7 +253,7 @@ class Send extends MyController
         // if (empty($task_name)) {
         //     return ['code' => '3007'];
         // }
-        $result = $this->app->send->getSmsMarketingTask($appid, $appkey, $Content, $Mobiles, $Dstime, $ip, $task_name);
+        $result = $this->app->send->getSmsMarketingTask($appid, $appkey, $Content, $Mobiles, $Dstime, $ip, $task_name, $signature_id);
         return $result;
     }
 
@@ -262,6 +264,7 @@ class Send extends MyController
      * @apiName          getSmsBuiness
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {String} signature_id 已报备签名ID
      * @apiParam (入参) {String} content 短信内容
      * @apiParam (入参) {String} mobile 接收手机号码
      * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:短信内容为空或者短信内容超出500字符 / 3003:签名长度为2~8个字 / 3004:该账户已被停用 / 3005:该账户没有此项服务 / 3006:短信余额不足，请先充值 / 3009 :系统错误
@@ -274,6 +277,7 @@ class Send extends MyController
         $appkey  = trim($this->request->post('appkey')); //登陆密码
         $Content = trim($this->request->post('content')); //短信内容
         $Mobile  = trim($this->request->post('mobile')); //接收手机号码
+        $signature_id  = trim($this->request->post('signature_id')); //接收手机号码
         $ip      = trim($this->request->ip());
         $Mobiles = explode(',', $Mobile);
 
@@ -295,7 +299,7 @@ class Send extends MyController
         if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 8) {
             return ['code' => '3003'];
         }
-        $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip);
+        $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id);
         return $result;
     }
 
@@ -656,6 +660,7 @@ class Send extends MyController
      * @apiName          submitBatchCustomBusiness
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {String} signature_id 已报备签名ID
      * @apiParam (入参) {String} template_id template_id报备的template_id 如果传template_id 则内容替换为模板中内容变量
      * @apiParam (入参) {String} connect 组合包内容(template组合方式：变量,变量,...:手机号;变量,变量,...:手机号;...  无模板组合方式:内容:手机号;内容:手机号;...)
      * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:提交内容为空
@@ -669,6 +674,7 @@ class Send extends MyController
         $appid   = trim($this->request->post('appid')); //登录名
         $appkey  = trim($this->request->post('appkey')); //登陆密码
         $template_id  = trim($this->request->post('template_id'));
+        $signature_id  = trim($this->request->post('signature_id'));
         $connect  = trim($this->request->post('connect'));
         if (empty($appid)) {
             return ['code' => '3000'];
@@ -680,7 +686,7 @@ class Send extends MyController
             return ['code' => '3001'];
         }
         $ip       = trim($this->request->ip());
-        $result = $this->app->send->submitBatchCustomBusiness($appid, $appkey, $template_id, $connect, $ip);
+        $result = $this->app->send->submitBatchCustomBusiness($appid, $appkey, $template_id, $connect, $ip, $signature_id);
         return $result;
     }
 
@@ -691,6 +697,7 @@ class Send extends MyController
      * @apiName          submitBatchCustomBusiness
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {String} signature_id 已报备签名ID
      * @apiParam (入参) {String} template_id template_id报备的template_id 如果传template_id 则内容替换为模板中内容变量
      * @apiParam (入参) {String} connect 组合包内容(template组合方式：变量,变量,...:手机号;变量,变量,...:手机号;...  无模板组合方式:内容:手机号;内容:手机号;...)
      * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:提交内容为空
@@ -704,6 +711,7 @@ class Send extends MyController
         $appid   = trim($this->request->post('appid')); //登录名
         $appkey  = trim($this->request->post('appkey')); //登陆密码
         $template_id  = trim($this->request->post('template_id'));
+        $signature_id  = trim($this->request->post('signature_id'));
         $connect  = trim($this->request->post('connect'));
         if (empty($appid)) {
             return ['code' => '3000'];
@@ -715,7 +723,7 @@ class Send extends MyController
             return ['code' => '3001'];
         }
         $ip       = trim($this->request->ip());
-        $result = $this->app->send->submitBatchCustomMarketing($appid, $appkey, $template_id, $connect, $ip);
+        $result = $this->app->send->submitBatchCustomMarketing($appid, $appkey, $template_id, $connect, $ip,$signature_id);
         return $result;
     }
 

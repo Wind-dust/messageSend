@@ -293,4 +293,37 @@ class Message extends CommonIndex
             return ['code' => '3009']; //修改失败
         }
     }
+
+    public function getUserSignature($page, $pageNum)
+    {
+        $offset = $pageNum * ($page - 1);
+        $result =  DbSendMessage::getUserSignature([], '*', false, '', $offset . ',' . $pageNum);
+        $totle = DbSendMessage::countUserSignature([]);
+        return ['code' => '200', 'total' => $totle, 'result' => $result];
+    }
+
+    public function auditUserSignature($id, $audit_status)
+    {
+        $result =  DbSendMessage::getUserSignature(['id' => $id], '*', true);
+        if (empty($result)) {
+            return ['code' => '3001'];
+        }
+        if ($result['audit_status'] != 1) {
+            return ['code' => '3003'];
+        }
+        Db::startTrans();
+        try {
+            if ($audit_status == 2 ) {
+                $status = 2;
+            }else{
+                $status = 1;
+            }
+            DbSendMessage::editUserSignature(['audit_status' => $audit_status, 'status' => $status], $id);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
+    }
 }

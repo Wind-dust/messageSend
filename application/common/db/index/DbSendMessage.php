@@ -8,6 +8,7 @@ use app\common\model\UserMultimediaMessageLog;
 use app\common\model\ModelTemeplate;
 use app\common\model\UserModel;
 use app\common\model\SensitiveWord;
+use app\common\model\UserSignature;
 use think\Db;
 
 class DbSendMessage extends Db
@@ -154,5 +155,29 @@ class DbSendMessage extends Db
     {
         $obj = SensitiveWord::field($field)->where($where);
         return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function getUserSignature($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = UserSignature::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function addUserSignature($data)
+    {
+        $UserSignature = new UserSignature;
+        $UserSignature->save($data);
+        return $UserSignature->id;
+    }
+
+    public function countUserSignature($where)
+    {
+        return UserSignature::where($where)->count();
+    }
+
+    public function editUserSignature($data, $id)
+    {
+        $UserSignature = new UserSignature;
+        return $UserSignature->save($data, ['id' => $id]);
     }
 }

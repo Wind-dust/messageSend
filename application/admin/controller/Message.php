@@ -217,4 +217,62 @@ class Message extends AdminController
         $result =  $this->app->message->auditUserModel(intval($id), $status);
         return $result;
     }
+
+    /**
+     * @api              {get} / 获取所有用户签名
+     * @apiDescription   getUserSignature
+     * @apiGroup         admin_Message
+     * @apiName          getUserSignature
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
+     * @apiParam (入参) {String} business_id 业务服务id(服务类型)
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /admin/message/getUserSignature
+     * @return array
+     * @author rzc
+     */
+    public function getUserSignature()
+    {
+        $ConId = trim($this->request->post('cms_con_id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        $result = $this->app->message->getUserSignature($page, $pageNum);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 审核用户签名
+     * @apiDescription   auditUserSignature
+     * @apiGroup         admin_Message
+     * @apiName          auditUserSignature
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 模板Id
+     * @apiParam (入参) {String} status 状态:2,审核通过;3,审核不通过
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:审核状态码错误 / 
+     * @apiSampleRequest /admin/message/auditUserSignature
+     * @return array
+     * @author rzc
+     */
+    public function auditUserSignature()
+    {
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id = trim($this->request->post('id'));
+        $status = trim($this->request->post('status'));
+        if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
+            return ['code' => '3001'];
+        }
+        if (!in_array($status, [2, 3])) {
+            return ['code' => '3002'];
+        }
+        $result =  $this->app->message->auditUserSignature(intval($id), $status);
+        return $result;
+    }
 }

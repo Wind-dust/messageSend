@@ -677,7 +677,9 @@ class User extends CommonIndex
         if (empty($task)) {
             return ['code' => '3001', 'msg' => '该任务不存在'];
         }
-        if (!empty($task['log_path'])) {
+        $task_log = DbAdministrator::getUserSendTaskLog(['task_no' => $task['task_no']], '*', false, '', $offset . ',' . $pageNum);
+        $total = DbAdministrator::countUserSendTaskLog(['task_no' => $task['task_no']]);
+        if (!empty($task['log_path']) && !empty($task_log)) {
             $task_log = [];
             $file = fopen($task['log_path'], "r");
             $data = array();
@@ -696,9 +698,6 @@ class User extends CommonIndex
             fclose($file);
             $total = count($data);
             $task_log = array_slice($data, $offset, $pageNum);
-        } else {
-            $task_log = DbAdministrator::getUserSendTaskLog(['task_no' => $task['task_no']], '*', false, '', $offset . ',' . $pageNum);
-            $total = DbAdministrator::countUserSendTaskLog(['task_no' => $task['task_no']]);
         }
         return ['code' => '200', 'total' => $total, 'task_log' => $task_log];
     }
@@ -726,7 +725,10 @@ class User extends CommonIndex
         if (empty($task)) {
             return ['code' => '3001', 'msg' => '该任务不存在'];
         }
-        if (!empty($task['log_path'])) {
+        $task_log = DbAdministrator::getUserSendCodeTaskLog(['task_no' => $task['task_no']], '*', false, '', $offset . ',' . $pageNum);
+        $total = DbAdministrator::countUserSendCodeTaskLog(['task_no' => $task['task_no']]);
+
+        if (!empty($task['log_path']) && !empty($task_log)) {
             $task_log = [];
             if (file_exists($task['log_path'])) {
                 $file = fopen($task['log_path'], "r");
@@ -750,9 +752,6 @@ class User extends CommonIndex
             fclose($file);
             $total = count($data);
             $task_log = array_slice($data, $offset, $pageNum);
-        } else {
-            $task_log = DbAdministrator::getUserSendCodeTaskLog(['task_no' => $task['task_no']], '*', false, '', $offset . ',' . $pageNum);
-            $total = DbAdministrator::countUserSendCodeTaskLog(['task_no' => $task['task_no']]);
         }
         return ['code' => '200', 'total' => $total, 'task_log' => $task_log];
     }
@@ -766,7 +765,7 @@ class User extends CommonIndex
         $offset = $pageNum * ($page - 1);
         $result = DbUser::getUserInfo(['pid' => $uid], '*', false, 'id', $offset . ',' . $pageNum, 'desc');
         $totle = DbUser::getUserInfoCount(['pid' => $uid]);
-        return ['code' => '200', 'totle' => $totle, 'result' => $result];
+        return ['code' => '200', 'total' => $totle, 'result' => $result];
     }
 
     public function getUserModel($page, $pageNum, $ConId, $business_id)
@@ -778,6 +777,18 @@ class User extends CommonIndex
         $offset = $pageNum * ($page - 1);
         $result =  DbSendMessage::getUserModel(['uid' => $uid, 'business_id' => $business_id], '*', false, '', $offset . ',' . $pageNum);
         $totle = DbSendMessage::countUserModel(['uid' => $uid, 'business_id' => $business_id]);
-        return ['code' => '200', 'totle' => $totle, 'result' => $result];
+        return ['code' => '200', 'total' => $totle, 'result' => $result];
+    }
+
+    public function getUserSignature($page, $pageNum, $ConId, $business_id)
+    {
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $offset = $pageNum * ($page - 1);
+        $result =  DbSendMessage::getUserSignature(['uid' => $uid, 'business_id' => $business_id], '*', false, '', $offset . ',' . $pageNum);
+        $totle = DbSendMessage::countUserSignature(['uid' => $uid, 'business_id' => $business_id]);
+        return ['code' => '200', 'total' => $totle, 'result' => $result];
     }
 }

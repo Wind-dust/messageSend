@@ -293,7 +293,7 @@ return $result;
         return 0;
     }
 
-    public function getSmsMarketingTask($Username, $Password, $Content, $Mobiles, $Dstime, $ip, $task_name)
+    public function getSmsMarketingTask($Username, $Password, $Content, $Mobiles, $Dstime, $ip, $task_name, $signature_id)
     {
         $Mobiles = array_unique(array_filter($Mobiles));
         // $Password = md5($Password);
@@ -318,6 +318,17 @@ return $result;
             if (checkMobile($value) == true) {
                 $effective_mobile[] = $value;
             }
+        }
+
+        if (!empty($signature)) {
+            $signature =  DbSendMessage::getUserSignature(['uid' => $user['uid'], 'signature_id' => $signature_id], '*', true);
+            if (empty($signature)) {
+                return ['code' => '3008'];
+            }
+            if ($signature['status'] != 2) {
+                return ['code' => '3010'];
+            }
+            $Content = $signature['title'] . $Content;
         }
 
         // print_r($effective_mobile);die;
@@ -369,7 +380,7 @@ return $result;
         return ['code' => '200', 'task_no' => $data['task_no']];
     }
 
-    public function getSmsBuiness($Username, $Password, $Content, $Mobiles, $ip)
+    public function getSmsBuiness($Username, $Password, $Content, $Mobiles, $ip, $signature_id = '')
     {
         $this->redis = Phpredis::getConn();
 
@@ -397,6 +408,18 @@ return $result;
         // if ($user_equities['num_balance'] < 1 && $user['reservation_service'] == 1) {
         //     return ['code' => '3006'];
         // }
+        if (!empty($signature)) {
+            $signature =  DbSendMessage::getUserSignature(['uid' => $user['uid'], 'signature_id' => $signature_id], '*', true);
+            if (empty($signature)) {
+                return ['code' => '3008'];
+            }
+            if ($signature['status'] != 2) {
+                return ['code' => '3010'];
+            }
+            $Content = $signature['title'] . $Content;
+        }
+
+
         $send_num = count($Mobiles);
 
         $effective_mobile = [];
@@ -844,7 +867,7 @@ return $result;
         }
     }
 
-    public function submitBatchCustomBusiness($appid, $appkey, $template_id = '', $connect, $ip)
+    public function submitBatchCustomBusiness($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '')
     {
         $this->redis = Phpredis::getConn();
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
@@ -864,6 +887,15 @@ return $result;
                 return ['code' => '3003'];
             }
         }
+        if (!empty($signature_id)) {
+            $signature =  DbSendMessage::getUserSignature(['uid' => $user['uid'], 'signature_id' => $signature_id], '*', true);
+            if (empty($signature)) {
+                return ['code' => '3008'];
+            }
+            if ($signature['status'] != 2) {
+                return ['code' => '3010'];
+            }
+        }
         $connect_data = explode(';', $connect);
         $send_data = [];
         $send_data_mobile = [];
@@ -872,6 +904,9 @@ return $result;
             if (!empty($template)) {
                 $replace_data = explode(',', $send_text[0]);
                 $real_text = $template['content'];
+                if (!empty($signature)) {
+                    $real_text = $signature['title'] . $template['content'];
+                }
                 //有变量
                 if ($template['variable_len'] > 0) {
                     if (empty($replace_data)) {
@@ -1030,7 +1065,7 @@ return $result;
         return $output;
     }
 
-    public function submitBatchCustomMarketing($appid, $appkey, $template_id = '', $connect, $ip)
+    public function submitBatchCustomMarketing($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '')
     {
         $this->redis = Phpredis::getConn();
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
@@ -1050,6 +1085,15 @@ return $result;
                 return ['code' => '3003'];
             }
         }
+        if (!empty($signature_id)) {
+            $signature =  DbSendMessage::getUserSignature(['uid' => $user['uid'], 'signature_id' => $signature_id], '*', true);
+            if (empty($signature)) {
+                return ['code' => '3008'];
+            }
+            if ($signature['status'] != 2) {
+                return ['code' => '3010'];
+            }
+        }
         $connect_data = explode(';', $connect);
         $send_data = [];
         $send_data_mobile = [];
@@ -1058,6 +1102,9 @@ return $result;
             if (!empty($template)) {
                 $replace_data = explode(',', $send_text[0]);
                 $real_text = $template['content'];
+                if (!empty($signature)) {
+                    $real_text = $signature['title'] . $template['content'];
+                }
                 //有变量
                 if ($template['variable_len'] > 0) {
                     if (empty($replace_data)) {
@@ -1168,6 +1215,44 @@ return $result;
         } catch (\Exception $e) {
             Db::rollback();
             exception($e);
+            return ['code' => '3009'];
+        }
+    }
+
+    public function  SignatureReport($appid, $appkey, $type, $title)
+    {
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => $type], 'id', true);
+        if (empty($user_equities)) {
+            return ['code' => '3003'];
+        }
+        $signature_id = getRandomString(8);
+        do {
+            $signature_id = getRandomString(8);
+            $has = DbSendMessage::getUserSignature(['signature_id' => $signature_id], 'id', true);
+        } while ($has);
+
+        $user_model = [];
+        $user_model = [
+            'uid' => $user['id'],
+            'signature_id' => $signature_id,
+            'business_id' => $type,
+            'title' => $title,
+            'status' => 1,
+        ];
+        Db::startTrans();
+        try {
+            DbSendMessage::addUserSignature($user_model);
+            Db::commit();
+            return ['code' => '200', 'signature_id' => $signature_id];
+        } catch (\Exception $e) {
+            Db::rollback();
             return ['code' => '3009'];
         }
     }
