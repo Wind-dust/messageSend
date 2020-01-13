@@ -20,7 +20,7 @@ function filtraImage($domain, $image)
  */
 function checkMobile($mobile)
 {
-    if (strpos($mobile, '00000') || strpos($mobile, '111111') || strpos($mobile, '222222') || strpos($mobile, '333333') || strpos($mobile, '444444') || strpos($mobile, '666666') || strpos($mobile, '777777') || strpos($mobile, '888888') || strpos($mobile, '999999')) {
+    if (strpos($mobile, '111111') || strpos($mobile, '222222') || strpos($mobile, '333333') || strpos($mobile, '444444') || strpos($mobile, '666666') || strpos($mobile, '777777') || strpos($mobile, '888888') || strpos($mobile, '999999')) {
         return false;
     }
     if (!empty($mobile) && preg_match('/^1[3-9]{1}\d{9}$/', $mobile)) {
