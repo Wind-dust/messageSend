@@ -246,9 +246,12 @@ class Send extends MyController
         //     return ['code' => '3005'];
         // }
         // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
-        if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 10) {
-            return ['code' => '3006'];
+        if (empty($signature_id)) {
+            if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 10) {
+                return ['code' => '3006'];
+            }
         }
+
         // print_r($task_name);die;
         // if (empty($task_name)) {
         //     return ['code' => '3007'];
@@ -296,8 +299,10 @@ class Send extends MyController
             return ['code' => '3002'];
         }
         // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
-        if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 8) {
-            return ['code' => '3003'];
+        if (empty($signature_id)) {
+            if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 10) {
+                return ['code' => '3006'];
+            }
         }
         $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id);
         return $result;
@@ -723,7 +728,7 @@ class Send extends MyController
             return ['code' => '3001'];
         }
         $ip       = trim($this->request->ip());
-        $result = $this->app->send->submitBatchCustomMarketing($appid, $appkey, $template_id, $connect, $ip,$signature_id);
+        $result = $this->app->send->submitBatchCustomMarketing($appid, $appkey, $template_id, $connect, $ip, $signature_id);
         return $result;
     }
 
