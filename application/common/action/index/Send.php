@@ -1191,10 +1191,15 @@ return $result;
             }
             array_push($trial, $send_task);
             $all_task_no[] = $task_no;
-            $task_no_mobile[$task_no] = $send_data_mobile[$key];
+            $task_no_mobile[$key] = $send_data_mobile[$key];
         }
-        // print_r($trial);
-        // die;
+        $task_as_mobile = [];
+        foreach ($task_no_mobile as $key => $value) {
+            $as_value = [];
+            $as_value['task_no'] = $all_task_no[$key];
+            $as_value['mobiles'] = $value;
+            $task_as_mobile[] = $as_value;
+        }
         if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3004'];
         }
@@ -1213,7 +1218,7 @@ return $result;
                 }
             }
             Db::commit();
-            return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_no_mobile];
+            return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
         } catch (\Exception $e) {
             Db::rollback();
             exception($e);
