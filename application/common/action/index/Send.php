@@ -382,8 +382,6 @@ return $result;
 
     public function getSmsBuiness($Username, $Password, $Content, $Mobiles, $ip, $signature_id = '')
     {
-        echo 1;
-        die;
         $this->redis = Phpredis::getConn();
         // print_r($this->redis);
         // die;
