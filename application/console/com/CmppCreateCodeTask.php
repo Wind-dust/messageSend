@@ -762,7 +762,6 @@ class CmppCreateCodeTask extends Pzlife
         while (true) {
             echo time() . "\n";
             while (true) {
-                $real_length = 1;
                 $send        = $this->redis->lpop('index:meassage:business:sendtask');
                 // $send = 15745;
                 $rollback[] = $send;
@@ -774,6 +773,7 @@ class CmppCreateCodeTask extends Pzlife
                 $mobilesend = [];
                 // print_r($sendTask);die;
                 $mobilesend = explode(',', $sendTask['mobile_content']);
+                $mobilesend = array_filter($mobilesend);
                 /*  $send_length = mb_strlen($sendTask['task_content'], 'utf8');
                 $real_length = 1;
                 if ($send_length > 70) {
@@ -792,10 +792,11 @@ class CmppCreateCodeTask extends Pzlife
                 // }
                 for ($i = 0; $i < count($mobilesend); $i++) {
                     $send_log = [];
+                    $sendmessage = [];
                     if (checkMobile(trim($mobilesend[$i])) == true) {
-                        $prefix = substr(trim($mobilesend[$i]), 0, 7);
-                        $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
-                        $newres = array_shift($res);
+                        // $prefix = substr(trim($mobilesend[$i]), 0, 7);
+                        // $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                        // $newres = array_shift($res);
                         //通道组分配
                         // if ($newres) {
                         //     if ($newres['source'] == 2) { //米加联通营销
@@ -844,7 +845,7 @@ class CmppCreateCodeTask extends Pzlife
                     }
                     $all_log[] = $send_log;
                     $j++;
-                    if ($j >= 500) {
+                    if ($j > 1000) {
                         $j = 1;
                         Db::startTrans();
                         try {
@@ -866,7 +867,7 @@ class CmppCreateCodeTask extends Pzlife
                         }
                         unset($all_log);
                         unset($push_messages);
-                        echo time() . "\n";
+                        // echo time() . "\n";
                     }
                 }
 
@@ -1372,7 +1373,8 @@ class CmppCreateCodeTask extends Pzlife
                         'task_no' =>  trim($task[0]['task_no']),
                         'status_message' =>   trim($send_log['Stat']),
                         'mobile' =>   trim($send_log['mobile']),
-                        'send_time' =>   date('Y-m-d H:i:s', trim($send_log['receive_time'])),
+                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        'send_time' => isset($send_log['receive_time']) ? date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
                     ])); //写入用户带处理日志
                 }
                 $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode($send_log)); //写入通道处理日志                
