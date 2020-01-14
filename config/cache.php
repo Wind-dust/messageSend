@@ -46,6 +46,7 @@ return [
         'port' => '6379',
         'password' => Env::get('redis.password'),
         'timeout' => 3600,
+        'select' => 2,
     ]
 
 ];
