@@ -472,6 +472,7 @@ return $result;
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
             Db::rollback();
+            exception($e);
             return ['code' => '3009'];
         }
     }
