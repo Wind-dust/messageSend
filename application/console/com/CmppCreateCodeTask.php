@@ -1338,7 +1338,8 @@ class CmppCreateCodeTask extends Pzlife
                         'task_no' =>  trim($task[0]['task_no']),
                         'status_message' =>   trim($send_log['Stat']),
                         'mobile' =>   trim($send_log['mobile']),
-                        // 'send_time' =>   date('Y-m-d H:i:s', trim($send_log['receive_time'])),
+                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        'send_time' => isset($send_log['receive_time']) ? date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
                     ])); //写入用户带处理日志
                 }
                 $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode($send_log)); //写入通道处理日志                
@@ -2181,8 +2182,8 @@ Db::rollback();
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $time = strtotime(date('Y-m-d 0:00:00', time()));
-        $start_time = strtotime(date('Y-m-d 0:00:00',strtotime("-1 day")));
-        $ids = Db::query("SELECT `id` FROM  `yx_user_send_code_task` WHERE `create_time` < " . $time . " AND `create_time` >= ".$start_time."  AND  `log_path` <> ''");
+        $start_time = strtotime(date('Y-m-d 0:00:00', strtotime("-1 day")));
+        $ids = Db::query("SELECT `id` FROM  `yx_user_send_code_task` WHERE `create_time` < " . $time . " AND `create_time` >= " . $start_time . "  AND  `log_path` <> ''");
         $all_log = [];
         $j = 1;
         for ($i = 0; $i < count($ids); $i++) {
@@ -2303,7 +2304,7 @@ Db::rollback();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
         // $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode($send_log)); //写入通道处理日志        
-      /*   $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode(array(
+        /*   $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode(array(
             'mobile' => '18918508850',
             'title' => '美丽田园营销短信',
             'mar_task_id' => '1599',
@@ -2345,7 +2346,7 @@ Db::rollback();
             } else {
                 $status_message =  $send_log['Stat'];
             }
-           
+
             Db::startTrans();
             try {
                 Db::table('yx_user_send_code_task_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $status_message]);
@@ -2408,7 +2409,7 @@ Db::rollback();
                     } else {
                         $status_message =  $send_log['Stat'];
                     }
-                   
+
                     Db::startTrans();
                     try {
                         Db::table('yx_user_send_task_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $status_message]);
@@ -2438,7 +2439,7 @@ Db::rollback();
                     } else {
                         $status_message =  $send_log['Stat'];
                     }
-                   
+
                     Db::startTrans();
                     try {
                         Db::table('yx_user_send_code_task_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $status_message]);
@@ -2451,10 +2452,6 @@ Db::rollback();
                     $sql .= " yx_user_send_game_task ";
                 }
             }
-          
-
-           
         }
-
     }
 }
