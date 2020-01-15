@@ -703,25 +703,27 @@ class User extends CommonIndex
             //    if ($value['status_message'] == 'DELIVRD') {
             //         $task_log[$key]['explanation'] = '成功';
             //    }
-            switch ($value['status_message']) {
-                case 'DELIVRD':
-                    $task_log[$key]['explanation'] = '成功';
-                    break;
-                case 'UNDELIV':
-                    $task_log[$key]['explanation'] = '成功';
-                    break;
-                case 'UNKNOWN':
-                    $task_log[$key]['explanation'] = '未知';
-                    break;
-                case '':
-                    $task_log[$key]['explanation'] = '未知';
-                    break;
+            if (isset($value['status_message'])) {
+                switch ($value['status_message']) {
+                    case 'DELIVRD':
+                        $task_log[$key]['explanation'] = '成功';
+                        break;
+                    case 'UNDELIV':
+                        $task_log[$key]['explanation'] = '成功';
+                        break;
+                    case 'UNKNOWN':
+                        $task_log[$key]['explanation'] = '未知';
+                        break;
+                    case '':
+                        $task_log[$key]['explanation'] = '未知';
+                        break;
 
-                default:
-                    $task_log[$key]['explanation'] = '失败';
-                    break;
+                    default:
+                        $task_log[$key]['explanation'] = '失败';
+                        break;
+                }
+                unset($task_log[$key]['real_message']);
             }
-            unset($task_log[$key]['real_message']);
         }
         return ['code' => '200', 'total' => $total, 'task_log' => $task_log];
     }

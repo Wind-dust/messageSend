@@ -383,7 +383,8 @@ return $result;
     public function getSmsBuiness($Username, $Password, $Content, $Mobiles, $ip, $signature_id = '')
     {
         $this->redis = Phpredis::getConn();
-
+        // print_r($this->redis);
+        // die;
         $Mobiles = array_unique(array_filter($Mobiles));
         $user    = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
@@ -471,6 +472,7 @@ return $result;
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
             Db::rollback();
+            exception($e);
             return ['code' => '3009'];
         }
     }

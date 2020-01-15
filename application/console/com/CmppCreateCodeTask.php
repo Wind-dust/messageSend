@@ -2276,7 +2276,8 @@ Db::rollback();
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $time = strtotime(date('Y-m-d 0:00:00', time()));
-        $ids = Db::query("SELECT `id` FROM  `yx_user_send_task` WHERE `create_time` < " . $time . " AND  `log_path` <> ''");
+        $start_time = strtotime(date('Y-m-d 0:00:00', strtotime("-1 day")));
+        $ids = Db::query("SELECT `id` FROM  `yx_user_send_task` WHERE `create_time` < " . $time . " AND  `create_time` >= " . $start_time . "   AND  `log_path` <> ''");
         $all_log = [];
         $j = 1;
         // echo count($ids);

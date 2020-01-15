@@ -471,15 +471,15 @@ CREATE TABLE `yx_user_signature` (
   `uid` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '用户id',
   `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
   `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '短信模板标题',
-  `template_id` char(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '签名id',
+  `signature_id` char(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '签名id',
   `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态:1,停用;2,启用;',
   `audit_status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态:1,待审核;2,审核通过;3,审核不通过',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间',
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY (`template_id`) USING BTREE,
-  KEY `user_template`(`uid`,`template_id`) USING BTREE
+  UNIQUE KEY (`signature_id`) USING BTREE,
+  KEY `user_template`(`uid`,`signature_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户报备签名' ROW_FORMAT = Dynamic;
 
 

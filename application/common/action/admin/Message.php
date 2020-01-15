@@ -4,6 +4,7 @@ namespace app\common\action\admin;
 
 use app\facade\DbAdministrator;
 use app\facade\DbSendMessage;
+use app\facade\DbUser;
 use PHPExcel;
 use PHPExcel_Cell;
 use PHPExcel_IOFactory;
@@ -313,9 +314,9 @@ class Message extends CommonIndex
         }
         Db::startTrans();
         try {
-            if ($audit_status == 2 ) {
+            if ($audit_status == 2) {
                 $status = 2;
-            }else{
+            } else {
                 $status = 1;
             }
             DbSendMessage::editUserSignature(['audit_status' => $audit_status, 'status' => $status], $id);

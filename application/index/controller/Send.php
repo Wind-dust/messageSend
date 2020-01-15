@@ -248,7 +248,7 @@ class Send extends MyController
         // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
         if (empty($signature_id)) {
             if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 10) {
-                return ['code' => '3006'];
+                return ['code' => '3003'];
             }
         }
 
@@ -301,7 +301,7 @@ class Send extends MyController
         // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
         if (empty($signature_id)) {
             if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 10) {
-                return ['code' => '3006'];
+                return ['code' => '3003'];
             }
         }
         $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id);
