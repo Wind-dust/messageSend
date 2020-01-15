@@ -2378,7 +2378,8 @@ Db::rollback();
             // die;
             if (empty($sendtasklog)) {
                 print_r($send_log);
-                die;
+                $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
+                exit;
             }
             if ($sendtasklog[0]['create_time'] > $time) {
                 $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
