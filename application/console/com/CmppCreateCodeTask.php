@@ -2379,7 +2379,7 @@ Db::rollback();
             // print_r($sendtasklog);
             // die;
             if (empty($sendtasklog)) {
-               
+                $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
                 exit;
             }
             // if ($sendtasklog[0]['create_time'] > $time) {
