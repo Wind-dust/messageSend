@@ -4,10 +4,11 @@ namespace app\admin\controller;
 
 use app\admin\AdminController;
 
-class Admin extends AdminController {
+class Admin extends AdminController
+{
     protected $beforeActionList = [
-//        'isLogin', //所有方法的前置操作
-        'isLogin' => ['except' => 'login'], //除去login其他方法都进行isLogin前置操作
+        //        'isLogin', //所有方法的前置操作
+        // 'isLogin' => ['except' => 'login'], //除去login其他方法都进行isLogin前置操作
         //        'three'   => ['only' => 'hello,data'],//只有hello,data方法进行three前置操作
     ];
 
@@ -23,7 +24,8 @@ class Admin extends AdminController {
      * @return array
      * @author zyr
      */
-    public function login() {
+    public function login()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $adminName = trim($this->request->post('admin_name'));
         $passwd    = trim($this->request->post('passwd'));
@@ -49,7 +51,8 @@ class Admin extends AdminController {
      * @return array
      * @author rzc
      */
-    public function getAdminUsers() {
+    public function getAdminUsers()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         $result   = $this->app->admin->getAdminUsers();
@@ -72,7 +75,8 @@ class Admin extends AdminController {
      * @return array
      * @author zyr
      */
-    public function getAdminInfo() {
+    public function getAdminInfo()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         $result   = $this->app->admin->getAdminInfo($cmsConId);
@@ -94,7 +98,8 @@ class Admin extends AdminController {
      * @return array
      * @author zyr
      */
-    public function addAdmin() {
+    public function addAdmin()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -133,7 +138,8 @@ class Admin extends AdminController {
      * @return array
      * @author zyr
      */
-    public function midifyPasswd() {
+    public function midifyPasswd()
+    {
         $apiName    = classBasename($this) . '/' . __function__;
         $cmsConId   = trim($this->request->post('cms_con_id'));
         $passwd     = trim($this->request->post('passwd'));
@@ -152,7 +158,7 @@ class Admin extends AdminController {
         $this->apiLog($apiName, [$cmsConId, $passwd, $newPasswd1], $result['code'], $cmsConId);
         return $result;
     }
-   
+
     /**
      * @api              {post} / cms左侧菜单
      * @apiDescription   cmsMenu
@@ -164,7 +170,8 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/cmsmenu
      * @author zyr
      */
-    public function cmsMenu() {
+    public function cmsMenu()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         $result   = $this->app->admin->cmsMenu($cmsConId);
@@ -184,12 +191,13 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/cmsmenuone
      * @author zyr
      */
-    public function cmsMenuOne() {
+    public function cmsMenuOne()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         $id       = trim($this->request->post('id'));
         if (!is_numeric($id) || $id < 0) {
-            return ['code' => '3001'];//菜单id有误
+            return ['code' => '3001']; //菜单id有误
         }
         $result = $this->app->admin->cmsMenuOne($cmsConId, $id);
         $this->apiLog($apiName, [$cmsConId, $id], $result['code'], $cmsConId);
@@ -208,7 +216,8 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/editmenu
      * @author zyr
      */
-    public function editMenu() {
+    public function editMenu()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id')); //操作管理员
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -217,7 +226,7 @@ class Admin extends AdminController {
         $id   = trim($this->request->post('id'));
         $name = trim($this->request->post('name'));
         if (!is_numeric($id) || $id < 0) {
-            return ['code' => '3001'];//菜单id有误
+            return ['code' => '3001']; //菜单id有误
         }
         $result = $this->app->admin->editMenu($cmsConId, $id, $name);
         $this->apiLog($apiName, [$cmsConId, $id, $name], $result['code'], $cmsConId);
@@ -236,7 +245,8 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/addpermissionsgroup
      * @author zyr
      */
-    public function addPermissionsGroup() {
+    public function addPermissionsGroup()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id')); //操作管理员
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -265,7 +275,8 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/editpermissionsgroup
      * @author zyr
      */
-    public function editPermissionsGroup() {
+    public function editPermissionsGroup()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id')); //操作管理员
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -298,7 +309,8 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/addadminpermissions
      * @author zyr
      */
-    public function addAdminPermissions() {
+    public function addAdminPermissions()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id')); //操作管理员
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -334,12 +346,13 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/addpermissionsapi
      * @author zyr
      */
-    public function addPermissionsApi() {
+    public function addPermissionsApi()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id')); //操作管理员
-//        if ($this->checkPermissions($cmsConId, $apiName) === false) { //该接口只有root可以使用,开发特殊接口
-//            return ['code' => '3100'];
-//        }
+        //        if ($this->checkPermissions($cmsConId, $apiName) === false) { //该接口只有root可以使用,开发特殊接口
+        //            return ['code' => '3100'];
+        //        }
         $menuId   = trim($this->request->post('menu_id'));
         $apiUrl   = trim($this->request->post('api_name'));
         $stype    = trim($this->request->post('stype'));
@@ -347,17 +360,17 @@ class Admin extends AdminController {
         $content  = trim($this->request->post('content'));
         $stypeArr = [1, 2, 3];
         if (!is_numeric($menuId) || $menuId < 1) {
-            return ['code' => '3001'];//菜单id有误
+            return ['code' => '3001']; //菜单id有误
         }
         $menuId = intval($menuId);
         if (empty($apiUrl)) {
-            return ['code' => '3002'];//接口url不能为空
+            return ['code' => '3002']; //接口url不能为空
         }
         if (!in_array($stype, $stypeArr)) {
-            return ['code' => '3003'];//接口权操作类型
+            return ['code' => '3003']; //接口权操作类型
         }
         if (empty($cnName)) {
-            return ['code' => '3004'];//权限名称不能为空
+            return ['code' => '3004']; //权限名称不能为空
         }
         $content = $content ?? '';
         $result  = $this->app->admin->addPermissionsApi($cmsConId, $menuId, $apiUrl, $stype, $cnName, $content);
@@ -378,7 +391,8 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/editpermissionsapi
      * @author zyr
      */
-    public function editPermissionsApi() {
+    public function editPermissionsApi()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id')); //操作管理员
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -388,11 +402,11 @@ class Admin extends AdminController {
         $cnName  = trim($this->request->post('cn_name'));
         $content = trim($this->request->post('content'));
         if (!is_numeric($id) || $id < 1) {
-            return ['code' => '3001'];//接口id有误
+            return ['code' => '3001']; //接口id有误
         }
         $id = intval($id);
         if (empty($cnName)) {
-            return ['code' => '3004'];//权限名称不能为空
+            return ['code' => '3004']; //权限名称不能为空
         }
         $content = $content ?? '';
         $result  = $this->app->admin->editPermissionsApi($cmsConId, $id, $cnName, $content);
@@ -412,7 +426,8 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/addpermissionsgrouppower
      * @author zyr
      */
-    public function addPermissionsGroupPower() {
+    public function addPermissionsGroupPower()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id')); //操作管理员
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -423,7 +438,7 @@ class Admin extends AdminController {
         if (!is_numeric($groupId) || $groupId < 1) {
             return ['code' => '3001'];
         }
-//        $permissions = json_encode($arr);
+        //        $permissions = json_encode($arr);
         if (empty($permissions)) {
             return ['code' => '3004'];
         }
@@ -445,7 +460,8 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/deladminpermissions
      * @author zyr
      */
-    public function delAdminPermissions() {
+    public function delAdminPermissions()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id')); //操作管理员
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -479,7 +495,8 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/getpermissionsgroupadmin
      * @author zyr
      */
-    public function getPermissionsGroupAdmin() {
+    public function getPermissionsGroupAdmin()
+    {
         $apiName = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         $groupId  = trim($this->request->post('group_id'));
@@ -506,7 +523,8 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/getadmingroup
      * @author zyr
      */
-    public function getAdminGroup() {
+    public function getAdminGroup()
+    {
         $apiName = classBasename($this) . '/' . __function__;
         $cmsConId   = trim($this->request->post('cms_con_id'));
         $getAdminId = trim($this->request->post('get_admin_id'));
@@ -533,7 +551,8 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/getgroupinfo
      * @author zyr
      */
-    public function getGroupInfo() {
+    public function getGroupInfo()
+    {
         $apiName = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         $groupId  = trim($this->request->post('group_id'));
@@ -557,7 +576,8 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/getpermissionslist
      * @author zyr
      */
-    public function getPermissionsList() {
+    public function getPermissionsList()
+    {
         $apiName = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         $groupId  = trim($this->request->post('group_id'));
@@ -586,7 +606,8 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/getpermissionsapi
      * @author zyr
      */
-    public function getPermissionsApi() {
+    public function getPermissionsApi()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         $result   = $this->app->admin->getPermissionsApi($cmsConId);
@@ -611,17 +632,17 @@ class Admin extends AdminController {
      * @apiSampleRequest /admin/admin/getpermissionsapione
      * @author zyr
      */
-    public function getPermissionsApiOne() {
+    public function getPermissionsApiOne()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         $id       = trim($this->request->post('id'));
         if (!is_numeric($id) || $id < 0) {
-            return ['code' => '3001'];//接口id有误
+            return ['code' => '3001']; //接口id有误
         }
         $id     = intval($id);
         $result = $this->app->admin->getPermissionsApiOne($cmsConId, $id);
         $this->apiLog($apiName, [$cmsConId, $id], $result['code'], $cmsConId);
         return $result;
     }
-
 }
