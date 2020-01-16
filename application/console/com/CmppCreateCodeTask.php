@@ -2508,9 +2508,7 @@ Db::rollback();
         $redisMessageCodeDeliver    = 'index:meassage:code:new:deliver:1'; //行业通知MsgId
         while (true) {
             $status = $redis->lpop("index:meassage:code:unknow:deliver:24");
-            if (empty($status)) {
-                exit;
-            }
+
             $new_status = json_decode($status, true);
             $mesage = $redis->hget($redisMessageCodeMsgId, $new_status['Msg_Id']);
             if ($mesage) {
