@@ -2371,14 +2371,15 @@ Db::rollback();
             $sendTask = $this->getSendCodeTask($send_log['mar_task_id']);
 
             if (empty($sendTask)) {
+                print_r($send_log);
+                $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
                 continue;
             }
             $sendtasklog = Db::query("SELECT `id`,`create_time` FROM `yx_user_send_code_task_log` WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $send_log['mobile'] . "' ");
             // print_r($sendtasklog);
             // die;
             if (empty($sendtasklog)) {
-                print_r($send_log);
-                $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
+               
                 exit;
             }
             // if ($sendtasklog[0]['create_time'] > $time) {
