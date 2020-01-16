@@ -36,7 +36,7 @@ class CmppYiXinYiDongBusiness extends Pzlife
         ];
     }
 
-    public function SocketClientLong($content)
+    public function Send($content)
     {
         // $this->clientSocketInit();
         $redis = Phpredis::getConn();
