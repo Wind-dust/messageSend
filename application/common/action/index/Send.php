@@ -457,6 +457,8 @@ return $result;
             $data['free_trial'] = 2;
             if ($user['id'] == 56) {
                 $data['channel_id'] = 22;
+            } elseif ($user['id'] == 50) {
+                $data['channel_id'] = 22;
             } else {
                 $data['channel_id'] = 1; //三体
             }
