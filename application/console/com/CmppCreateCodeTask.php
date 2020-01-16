@@ -2376,7 +2376,7 @@ Db::rollback();
                 continue;
             }
             $sendtasklog = Db::query("SELECT `id`,`create_time` FROM `yx_user_send_code_task_log` WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $send_log['mobile'] . "' ");
-            // print_r($sendtasklog);
+            print_r($sendtasklog);
             // die;
             if (empty($sendtasklog)) {
                 $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
