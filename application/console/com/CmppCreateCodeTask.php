@@ -2498,4 +2498,32 @@ Db::rollback();
             }
         }
     }
+
+    //错误日志重推
+    public function errotRpush()
+    {
+        $redis = Phpredis::getConn();
+        $redisMessageCodeMsgId = 'index:meassage:code:msg:id:1';
+
+        $redisMessageCodeDeliver    = 'index:meassage:code:new:deliver:1'; //行业通知MsgId
+        while (true) {
+            $status = $redis->lpop("index:meassage:code:unknow:deliver:24");
+            if (empty($status)) {
+                exit;
+            }
+            $new_status = json_decode($status, true);
+            $mesage = $redis->hget($redisMessageCodeMsgId, $new_status['Msg_Id']);
+            if ($mesage) {
+                $redis->hdel($redisMessageCodeMsgId, $new_status['Msg_Id']);
+                // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
+                $mesage                = json_decode($mesage, true);
+                $mesage['Stat']        = $new_status['Stat'];
+                // $mesage['Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
+                $mesage['Submit_time'] = $new_status['Submit_time'];
+                $mesage['Done_time']   = $new_status['Done_time'];
+                $mesage['receive_time'] = time(); //回执时间戳
+                $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
+            }
+        }
+    }
 }
