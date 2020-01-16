@@ -23,8 +23,8 @@ class CmppYiXinYiDongBusiness extends Pzlife
     public function content($content)
     {
         return [
-            'host'          => "116.62.88.162", //服务商ip
-            'port'          => "8592", //短连接端口号   17890长连接端口号
+            'host'          => "47.95.161.134", //服务商ip
+            'port'          => "9004", //短连接端口号   17890长连接端口号
             'Source_Addr'   => "101161", //企业id  企业代码
             'Shared_secret' => '5hsey6u9', //网关登录密码
             'template_id'   => "217062", //模板id
