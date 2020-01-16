@@ -46,6 +46,7 @@ return [
     'cmppmijiayidongbusiness'          => $commandPath . 'CmppMiJiaYiDongBusiness',
     'cmppjumengyidongmarketing'        => $commandPath . 'CmppJuMengYiDongMarketing',
     'cmppjumengliandianmarketing'      => $commandPath . 'CmppJuMengLianDianMarketing',
+    'cmppyixinyidongbusiness'      => $commandPath . 'CmppYiXinYiDongBusiness', //易信移动营销通道
     'cmpplanjingmarketing'             => $commandPath . 'CmppLanJingMarketing',
     'cmpplanjingbusiness'             => $commandPath . 'CmppLanJingBusiness',
     'serversocketshuhe'                => $commandPath . 'ServerSocketShuHe',
