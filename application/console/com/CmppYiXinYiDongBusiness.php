@@ -51,7 +51,7 @@ class CmppYiXinYiDongBusiness extends Pzlife
         $redisMessageUnKownDeliver = 'index:meassage:code:unknow:deliver:' . $content; //行业通知MsgId
 
         while (true) {
-            $status = $redis->lpop("index:meassage:code:unknow:deliver:24");
+            $status = $redis->lPop("index:meassage:code:unknow:deliver:24");
             $new_status = json_decode($status, true);
             if (empty($new_status)) {
                 exit("null");
