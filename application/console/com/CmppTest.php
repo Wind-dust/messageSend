@@ -23,18 +23,18 @@ class CmppTest extends Pzlife
     public function content($content)
     {
         if ($content == 1) { //测试
-            //移动
-            // return [
-            //     'host'          => "127.0.0.1", //服务商ip
-            //     'port'          => "7890", //短连接端口号   17890长连接端口号
-            //     'Source_Addr'   => "101102", //企业id  企业代码
-            //     'Shared_secret' => 'Jyy123456', //网关登录密码
-            //     'Service_Id'    => "101102",
-            //     'Dest_Id'       => "10692054963", //短信接入码 短信端口号
-            //     'Sequence_Id'   => 1,
-            //     'SP_ID'         => "",
-            //     'master_num'    => 300,
-            // ];
+            // 移动
+            return [
+                'host'          => "127.0.0.1", //服务商ip
+                'port'          => "7890", //短连接端口号   17890长连接端口号
+                'Source_Addr'   => "101102", //企业id  企业代码
+                'Shared_secret' => 'Jyy123456', //网关登录密码
+                'Service_Id'    => "101102",
+                'Dest_Id'       => "10692054963", //短信接入码 短信端口号
+                'Sequence_Id'   => 1,
+                'SP_ID'         => "",
+                'master_num'    => 300,
+            ];
             //联通
             // return [
             //     'host'          => "127.0.0.1", //服务商ip
@@ -48,17 +48,17 @@ class CmppTest extends Pzlife
             //     'master_num'    => 300,
             // ];
             //电信
-            return [
-                'host'          => "127.0.0.1", //服务商ip
-                'port'          => "7892", //短连接端口号   17890长连接端口号
-                'Source_Addr'   => "101104", //企业id  企业代码
-                'Shared_secret' => 'Jyy12dx56', //网关登录密码
-                'Service_Id'    => "101104",
-                'Dest_Id'       => "10692054963", //短信接入码 短信端口号
-                'Sequence_Id'   => 1,
-                'SP_ID'         => "",
-                'master_num'    => 300,
-            ];
+            // return [
+            //     'host'          => "127.0.0.1", //服务商ip
+            //     'port'          => "7892", //短连接端口号   17890长连接端口号
+            //     'Source_Addr'   => "101104", //企业id  企业代码
+            //     'Shared_secret' => 'Jyy12dx56', //网关登录密码
+            //     'Service_Id'    => "101104",
+            //     'Dest_Id'       => "10692054963", //短信接入码 短信端口号
+            //     'Sequence_Id'   => 1,
+            //     'SP_ID'         => "",
+            //     'master_num'    => 300,
+            // ];
         } elseif ($content == 2) { //三体行业
             return [
                 'host'          => "116.62.88.162", //服务商ip
@@ -479,6 +479,7 @@ class CmppTest extends Pzlife
                                             $sequence['Msg_Id'] = $msgid;
                                             $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                             $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
+                                            $redis->expire($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], 259200); //设置有效时间
                                         }
 
                                         switch ($body['Result']) {
@@ -539,36 +540,38 @@ class CmppTest extends Pzlife
                                         // print_r($Msg_Content);
                                         $Registered_Delivery = trim($body['Registered_Delivery']);
                                         if ($Registered_Delivery == 0) { //上行
+                                            if ($mesage) { //
 
+                                            }
                                         } elseif ($Registered_Delivery == 1) { //回执报告
+                                            if ($mesage) {
+                                                // $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
+                                                // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
+                                                $mesage                = json_decode($mesage, true);
+                                                $mesage['Stat']        = $Msg_Content['Stat'];
+                                                // $mesage['Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
+                                                $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+                                                $mesage['Done_time']   = $Msg_Content['Done_time'];
+                                                $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
+                                            } else { //不在记录中的回执存入缓存，
+                                                $mesage['Stat']        = $Msg_Content['Stat'];
+                                                $mesage['Submit_time'] = $Msg_Content['Submit_time'];
+                                                $mesage['Done_time']   = $Msg_Content['Done_time'];
+                                                // $mesage['mobile']      = $body['Dest_Id '];//手机号
+                                                $mesage['mobile']   = trim($Msg_Content['Dest_terminal_Id']);
+                                                $mesage['receive_time'] = time(); //回执时间戳
+                                                $mesage['Msg_Id']   = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
+                                                $redis->rPush($redisMessageUnKownDeliver, json_encode($mesage));
+                                            }
+                                        }
 
-                                        }
-                                        if ($mesage) {
-                                            $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
-                                            // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
-                                            $mesage                = json_decode($mesage, true);
-                                            $mesage['Stat']        = $Msg_Content['Stat'];
-                                            // $mesage['Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
-                                            $mesage['Submit_time'] = $Msg_Content['Submit_time'];
-                                            $mesage['Done_time']   = $Msg_Content['Done_time'];
-                                            $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
-                                        } else { //不在记录中的回执存入缓存，
-                                            $mesage['Stat']        = $Msg_Content['Stat'];
-                                            $mesage['Submit_time'] = $Msg_Content['Submit_time'];
-                                            $mesage['Done_time']   = $Msg_Content['Done_time'];
-                                            // $mesage['mobile']      = $body['Dest_Id '];//手机号
-                                            $mesage['mobile']   = trim($Msg_Content['Dest_terminal_Id']);
-                                            $mesage['receive_time'] = time(); //回执时间戳
-                                            $mesage['Msg_Id']   = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
-                                            $redis->rPush($redisMessageUnKownDeliver, json_encode($mesage));
-                                        }
                                         print_r($mesage);
                                         $callback_Command_Id = 0x80000005;
 
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                                         $new_Total_Length = strlen($new_body) + 12;
                                         $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id2']);
-                                        // socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                                        socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                     } else if ($head['Command_Id'] == 0x00000008) {
                                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                                     } else if ($head['Command_Id'] == 0x80000008) {

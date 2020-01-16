@@ -59,14 +59,14 @@ class CmppYiXinYiDongBusiness extends Pzlife
         //     print_r($send);
         // } while ($send);
         // $send = $redis ->lPop($redisMessageCodeSend);
-        /*         $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'uid'         => '1',
             'content'     => '【钰蜥科技】您本次登录的验证码为026835',
             'Submit_time' => date('mdHis', time()),
         ]));
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /*   $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15821193682',
             'mar_task_id' => '',
             'uid'         => '1',
@@ -387,8 +387,8 @@ class CmppYiXinYiDongBusiness extends Pzlife
                                             $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence", $body['Msg_Content']);
                                         }
                                         $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
-                                        // print_r($body);
-                                        // print_r($Msg_Content);
+                                        print_r($body);
+                                        print_r($Msg_Content);
                                         if ($mesage) {
                                             $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                                             // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
@@ -636,59 +636,59 @@ class CmppYiXinYiDongBusiness extends Pzlife
         while ($a < $len) {
             $ud = 0;
             if (ord($c{
-            $a}) >= 0 && ord($c{
-            $a}) <= 127) {
+                $a}) >= 0 && ord($c{
+                $a}) <= 127) {
                 $ud = ord($c{
-                $a});
+                    $a});
                 $a += 1;
             } else if (ord($c{
-            $a}) >= 192 && ord($c{
-            $a}) <= 223) {
+                $a}) >= 192 && ord($c{
+                $a}) <= 223) {
                 $ud = (ord($c{
-                $a}) - 192) * 64 + (ord($c{
-                $a + 1}) - 128);
+                    $a}) - 192) * 64 + (ord($c{
+                    $a + 1}) - 128);
                 $a += 2;
             } else if (ord($c{
-            $a}) >= 224 && ord($c{
-            $a}) <= 239) {
+                $a}) >= 224 && ord($c{
+                $a}) <= 239) {
                 $ud = (ord($c{
-                $a}) - 224) * 4096 + (ord($c{
-                $a + 1}) - 128) * 64 + (ord($c{
-                $a + 2}) - 128);
+                    $a}) - 224) * 4096 + (ord($c{
+                    $a + 1}) - 128) * 64 + (ord($c{
+                    $a + 2}) - 128);
                 $a += 3;
             } else if (ord($c{
-            $a}) >= 240 && ord($c{
-            $a}) <= 247) {
+                $a}) >= 240 && ord($c{
+                $a}) <= 247) {
                 $ud = (ord($c{
-                $a}) - 240) * 262144 + (ord($c{
-                $a + 1}) - 128) * 4096 + (ord($c{
-                $a + 2}) - 128) * 64 + (ord($c{
-                $a + 3}) - 128);
+                    $a}) - 240) * 262144 + (ord($c{
+                    $a + 1}) - 128) * 4096 + (ord($c{
+                    $a + 2}) - 128) * 64 + (ord($c{
+                    $a + 3}) - 128);
                 $a += 4;
             } else if (ord($c{
-            $a}) >= 248 && ord($c{
-            $a}) <= 251) {
+                $a}) >= 248 && ord($c{
+                $a}) <= 251) {
                 $ud = (ord($c{
-                $a}) - 248) * 16777216 + (ord($c{
-                $a + 1}) - 128) * 262144 + (ord($c{
-                $a + 2}) - 128) * 4096 + (ord($c{
-                $a + 3}) - 128) * 64 + (ord($c{
-                $a + 4}) - 128);
+                    $a}) - 248) * 16777216 + (ord($c{
+                    $a + 1}) - 128) * 262144 + (ord($c{
+                    $a + 2}) - 128) * 4096 + (ord($c{
+                    $a + 3}) - 128) * 64 + (ord($c{
+                    $a + 4}) - 128);
                 $a += 5;
             } else if (ord($c{
-            $a}) >= 252 && ord($c{
-            $a}) <= 253) {
+                $a}) >= 252 && ord($c{
+                $a}) <= 253) {
                 $ud = (ord($c{
-                $a}) - 252) * 1073741824 + (ord($c{
-                $a + 1}) - 128) * 16777216 + (ord($c{
-                $a + 2}) - 128) * 262144 + (ord($c{
-                $a + 3}) - 128) * 4096 + (ord($c{
-                $a + 4}) - 128) * 64 + (ord($c{
-                $a + 5}) - 128);
+                    $a}) - 252) * 1073741824 + (ord($c{
+                    $a + 1}) - 128) * 16777216 + (ord($c{
+                    $a + 2}) - 128) * 262144 + (ord($c{
+                    $a + 3}) - 128) * 4096 + (ord($c{
+                    $a + 4}) - 128) * 64 + (ord($c{
+                    $a + 5}) - 128);
                 $a += 6;
             } else if (ord($c{
-            $a}) >= 254 && ord($c{
-            $a}) <= 255) { //error
+                $a}) >= 254 && ord($c{
+                $a}) <= 255) { //error
                 $ud = false;
             }
             $scill .= $prefix . $ud . ";";
