@@ -2379,7 +2379,12 @@ Db::rollback();
             print_r($sendtasklog);
             // die;
             if (empty($sendtasklog)) {
-                $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
+                // $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
+                if (strpos($send_log['content'], '问卷') !== false) {
+                    $status_message = 'DELIVRD';
+                } else {
+                    $status_message =  $send_log['Stat'];
+                }
                 Db::startTrans();
                 try {
                     Db::table('yx_user_send_code_task_log')->insert([
@@ -2392,7 +2397,8 @@ Db::rollback();
                         'send_status' => 2,
                         'free_trial' => 2,
                         'create_time' => $sendTask['create_time'],
-                        'real_message' => $send_log['Stat']
+                        'real_message' => $send_log['Stat'],
+                        'status_message' => $status_message
                     ]);
                     Db::commit();
                 } catch (\Exception $e) {
