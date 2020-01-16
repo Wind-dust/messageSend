@@ -2380,26 +2380,46 @@ Db::rollback();
             // die;
             if (empty($sendtasklog)) {
                 $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
-                exit;
+                Db::startTrans();
+                try {
+                    Db::table('yx_user_send_code_task_log')->insert([
+                        'uid' => $sendTask['uid'],
+                        'task_no' => $sendTask['task_no'],
+                        'task_content' => $sendTask['task_content'],
+                        'mobile' => $send_log['mobile'],
+                        'source' => $sendTask['source'],
+                        'send_length' => $sendTask['send_length'],
+                        'send_status' => 2,
+                        'free_trial' => 2,
+                        'create_time' => $sendTask['create_time'],
+                        'real_message' => $send_log['Stat']
+                    ]);
+                    Db::commit();
+                } catch (\Exception $e) {
+                    Db::rollback();
+                    exception($e);
+                }
+            }else{
+                if (strpos($send_log['content'], '问卷') !== false) {
+                    $status_message = 'DELIVRD';
+                } else {
+                    $status_message =  $send_log['Stat'];
+                }
+    
+                Db::startTrans();
+                try {
+                    Db::table('yx_user_send_code_task_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $status_message]);
+                    Db::commit();
+                } catch (\Exception $e) {
+                    Db::rollback();
+                    exception($e);
+                }
             }
             // if ($sendtasklog[0]['create_time'] > $time) {
             //     $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
             //     exit('today is success');
             // }
-            if (strpos($send_log['content'], '问卷') !== false) {
-                $status_message = 'DELIVRD';
-            } else {
-                $status_message =  $send_log['Stat'];
-            }
-
-            Db::startTrans();
-            try {
-                Db::table('yx_user_send_code_task_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $status_message]);
-                Db::commit();
-            } catch (\Exception $e) {
-                Db::rollback();
-                exception($e);
-            }
+           
         }
     }
 
