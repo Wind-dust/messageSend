@@ -2517,9 +2517,6 @@ Db::rollback();
         ]));
         while (true) {
             $status = $redis->lpop("index:meassage:code:unknow:deliver:24");
-            if (empty($status)) {
-                exit("null");
-            }
             $new_status = json_decode($status, true);
             $mesage = $redis->hget($redisMessageCodeMsgId, $new_status['Msg_Id']);
             if ($mesage) {
