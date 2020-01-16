@@ -11,12 +11,14 @@ use Env;
 use think\Db;
 use third\PHPTree;
 
-class Admin extends CommonIndex {
+class Admin extends CommonIndex
+{
     private $cmsCipherUserKey = 'adminpass'; //用户密码加密key
 
-    private function redisInit() {
+    private function redisInit()
+    {
         $this->redis = Phpredis::getConn();
-//        $this->connect = Db::connect(Config::get('database.db_config'));
+        //        $this->connect = Db::connect(Config::get('database.db_config'));
     }
 
     /**
@@ -25,7 +27,8 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function login($adminName, $passwd) {
+    public function login($adminName, $passwd)
+    {
         $getPass   = $this->getPassword($passwd, $this->cmsCipherUserKey); //用户填写的密码
         $adminInfo = DbAdmin::getAdminInfo(['admin_name' => $adminName, 'status' => 1], 'id,passwd', true);
         if (empty($adminInfo)) {
@@ -37,9 +40,9 @@ class Admin extends CommonIndex {
         $cmsConId = $this->createCmsConId();
         $this->redis->zAdd($this->redisCmsConIdTime, time(), $cmsConId);
         $conUid = $this->redis->hSet($this->redisCmsConIdUid, $cmsConId, $adminInfo['id']);
-        if ($conUid === false) {
-            return ['code' => '3004']; //登录失败
-        }
+        // if ($conUid === false) {
+        //     return ['code' => '3004']; //登录失败
+        // }
         return ['code' => '200', 'cms_con_id' => $cmsConId];
     }
 
@@ -48,7 +51,8 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function getAdminInfo($cmsConId) {
+    public function getAdminInfo($cmsConId)
+    {
         $adminId                 = $this->getUidByConId($cmsConId);
         $adminInfo               = DbAdmin::getAdminInfo(['id' => $adminId], 'admin_name,stype', true);
         $adminGroup              = DbAdmin::getAdminPermissionsGroup(['admin_id' => $adminId], 'group_id');
@@ -63,7 +67,8 @@ class Admin extends CommonIndex {
      * @return array
      * @author rzc
      */
-    public function getAdminUsers() {
+    public function getAdminUsers()
+    {
         $adminByGroup = DbAdmin::getAdminInfoByGroup([
             ['a.id', '<>', '1'],
         ], 'a.id as admin_id,pg.group_name');
@@ -91,9 +96,10 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function addAdmin($cmsConId, $adminName, $passwd, $stype) {
+    public function addAdmin($cmsConId, $adminName, $passwd, $stype)
+    {
         $adminId = $this->getUidByConId($cmsConId);
-//        $adminInfo = DbAdmin::getAdminInfo(['id' => $adminId], 'stype,status', true);
+        //        $adminInfo = DbAdmin::getAdminInfo(['id' => $adminId], 'stype,status', true);
         //        if ($adminInfo['stype'] != '2') {
         //            return ['code' => '3005']; //没有操作权限
         //        }
@@ -126,7 +132,8 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function midifyPasswd($cmsConId, $passwd, $newPasswd) {
+    public function midifyPasswd($cmsConId, $passwd, $newPasswd)
+    {
         $adminId   = $this->getUidByConId($cmsConId);
         $adminInfo = DbAdmin::getAdminInfo(['id' => $adminId], 'id,passwd,status', true);
         if ($adminInfo['passwd'] !== $this->getPassword($passwd, $this->cmsCipherUserKey)) {
@@ -147,7 +154,8 @@ class Admin extends CommonIndex {
      * 创建唯一conId
      * @author zyr
      */
-    private function createCmsConId() {
+    private function createCmsConId()
+    {
         $cmsConId = uniqid(date('ymdHis'));
         $cmsConId = hash_hmac('ripemd128', $cmsConId, 'admin');
         return $cmsConId;
@@ -159,7 +167,8 @@ class Admin extends CommonIndex {
      * @return string
      * @author zyr
      */
-    private function getPassword($str, $key) {
+    private function getPassword($str, $key)
+    {
         $algo   = Config::get('conf.cipher_algo');
         $md5    = hash_hmac('md5', $str, $key);
         $key2   = strrev($key);
@@ -174,7 +183,8 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function cmsMenu($cmsConId) {
+    public function cmsMenu($cmsConId)
+    {
         $adminId = $this->getUidByConId($cmsConId);
         if ($adminId == 1) {
             $data = DbAdmin::getMenu([]);
@@ -207,8 +217,9 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function cmsMenuOne($cmsConId, $id) {
-//        $adminId = $this->getUidByConId($cmsConId);
+    public function cmsMenuOne($cmsConId, $id)
+    {
+        //        $adminId = $this->getUidByConId($cmsConId);
         $data = DbAdmin::getMenuList([['id', '=', $id]], 'name', true);
         return ["code" => 200, "data" => $data];
     }
@@ -221,7 +232,8 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function editMenu($cmsConId, $id, $name) {
+    public function editMenu($cmsConId, $id, $name)
+    {
         $menu = DbAdmin::getMenuList([['id', '=', $id]], 'id', true);
         if (empty($menu)) {
             return ['code' => '3002'];
@@ -245,8 +257,9 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function addPermissionsGroup($cmsConId, $groupName, $content) {
-//        $adminId = $this->getUidByConId($cmsConId);
+    public function addPermissionsGroup($cmsConId, $groupName, $content)
+    {
+        //        $adminId = $this->getUidByConId($cmsConId);
         $group = DbAdmin::getPermissionsGroup(['group_name' => $groupName], 'id', true);
         if (!empty($group)) {
             return ['code' => '3001'];
@@ -275,7 +288,8 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function editPermissionsGroup($cmsConId, $groupId, $groupName, $content) {
+    public function editPermissionsGroup($cmsConId, $groupId, $groupName, $content)
+    {
         $adminId = $this->getUidByConId($cmsConId);
         $data    = [
             'group_name' => $groupName,
@@ -304,7 +318,8 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function addAdminPermissions($cmsConId, $groupId, $addAdminId) {
+    public function addAdminPermissions($cmsConId, $groupId, $addAdminId)
+    {
         $adminId = $this->getUidByConId($cmsConId);
         $group   = DbAdmin::getPermissionsGroup(['id' => $groupId], 'id', true);
         if (empty($group)) { //权限分组不存在
@@ -344,7 +359,8 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function addPermissionsApi($cmsConId, $menuId, $apiName, $stype, $cnName, $content) {
+    public function addPermissionsApi($cmsConId, $menuId, $apiName, $stype, $cnName, $content)
+    {
         $adminId = $this->getUidByConId($cmsConId);
         if ($adminId != '1') {
             return ['code' => '3008']; //只有root可以添加
@@ -384,7 +400,8 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function editPermissionsApi($cmsConId, $id, $cnName, $content) {
+    public function editPermissionsApi($cmsConId, $id, $cnName, $content)
+    {
         $adminId = $this->getUidByConId($cmsConId);
         $apiRes  = DbAdmin::getPermissionsApi(['id' => $id], 'id', true);
         if (empty($apiRes)) {
@@ -413,7 +430,8 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function addPermissionsGroupPower($cmsConId, $groupId, $permissions) {
+    public function addPermissionsGroupPower($cmsConId, $groupId, $permissions)
+    {
         $adminId = $this->getUidByConId($cmsConId);
         $group   = DbAdmin::getPermissionsGroup(['id' => $groupId], 'id', true);
         if (empty($group)) { //权限分组不存在
@@ -516,7 +534,8 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function delAdminPermissions($cmsConId, $groupId, $delAdminId) {
+    public function delAdminPermissions($cmsConId, $groupId, $delAdminId)
+    {
         $adminId = $this->getUidByConId($cmsConId);
         $group   = DbAdmin::getPermissionsGroup(['id' => $groupId], 'id', true);
         if (empty($group)) { //权限分组不存在
@@ -553,8 +572,9 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function getPermissionsGroupAdmin($cmsConId, $groupId) {
-//        $adminId = $this->getUidByConId($cmsConId);
+    public function getPermissionsGroupAdmin($cmsConId, $groupId)
+    {
+        //        $adminId = $this->getUidByConId($cmsConId);
         $groupAdmin = DbAdmin::getAdminPermissionsGroup([['group_id', '=', $groupId]], 'admin_id');
         if (empty($groupAdmin)) {
             return ['code' => '3000'];
@@ -575,8 +595,9 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function getAdminGroup($cmsConId, $getAdminId) {
-//        $adminId = $this->getUidByConId($cmsConId);
+    public function getAdminGroup($cmsConId, $getAdminId)
+    {
+        //        $adminId = $this->getUidByConId($cmsConId);
         if (empty($getAdminId)) {
             $group = DbAdmin::getPermissionsGroup([], 'id,group_name,content');
         } else {
@@ -592,7 +613,8 @@ class Admin extends CommonIndex {
         return ['code' => '200', 'data' => $group];
     }
 
-    public function getGroupInfo($cmsConId, $groupId) {
+    public function getGroupInfo($cmsConId, $groupId)
+    {
         $group = DbAdmin::getPermissionsGroup(['id' => $groupId], 'id,group_name,content', true);
         return ['code' => '200', 'data' => $group];
     }
@@ -604,8 +626,9 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function getPermissionsList($cmsConId, $groupId) {
-//        $adminId = $this->getUidByConId($cmsConId);
+    public function getPermissionsList($cmsConId, $groupId)
+    {
+        //        $adminId = $this->getUidByConId($cmsConId);
         $data = DbAdmin::getMenuList([], 'id,pid,name');
         $tree = new PHPTree($data);
         $tree->setParam("pk", "id");
@@ -648,7 +671,8 @@ class Admin extends CommonIndex {
      * @return bool
      * @author zyr
      */
-    public function checkPermissions($cmsConId, $apiName) {
+    public function checkPermissions($cmsConId, $apiName)
+    {
         $adminId = $this->getUidByConId($cmsConId);
         if ($adminId == '1') {
             return true;
@@ -680,7 +704,8 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function getPermissionsApi($cmsConId) {
+    public function getPermissionsApi($cmsConId)
+    {
         $data = DbAdmin::getMenuList([], 'id,pid,name');
         $tree = new PHPTree($data);
         $tree->setParam("pk", "id");
@@ -709,7 +734,8 @@ class Admin extends CommonIndex {
      * @return array
      * @author zyr
      */
-    public function getPermissionsApiOne($cmsConId, $id) {
+    public function getPermissionsApiOne($cmsConId, $id)
+    {
         $data = DbAdmin::getPermissionsApi([['id', '=', $id]], 'id,stype,cn_name,content', true);
         return ['code' => '200', 'data' => $data];
     }
