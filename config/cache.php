@@ -46,6 +46,7 @@ return [
         'port' => '6379',
         'password' => 'as6d7g&h',
         'timeout' => 3600,
+        'select' => 2,
     ]
 
 ];
