@@ -2498,4 +2498,37 @@ Db::rollback();
             }
         }
     }
+
+    public function errotRpush()
+    {
+        $redis = Phpredis::getConn();
+        $redisMessageCodeMsgId = 'index:meassage:code:msg:id:1';
+
+        $redisMessageCodeDeliver    = 'index:meassage:code:new:deliver:1'; //行业通知MsgId
+        // {"Stat":"DELIVRD","Submit_time":"2001161532","Done_time":"2001161534","mobile":"13739310156\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000","receive_time":1579160061,"Msg_Id":"406718912655530494"}
+        $redis->rpush("index:meassage:code:unknow:deliver:24", json_encode([
+            'Stat' => 'DELIVRD',
+            'Submit_time' => '2001161532',
+            'Done_time' => '2001161534',
+            'mobile' => '13739310156',
+            'receive_time' => '1579160061',
+            'Msg_Id' => '406718912655530494',
+        ]));
+        while (true) {
+            $status = $redis->lpop("index:meassage:code:unknow:deliver:24");
+            $new_status = json_decode($status, true);
+            $mesage = $redis->hget($redisMessageCodeMsgId, $new_status['Msg_Id']);
+            if ($mesage) {
+                $redis->hdel($redisMessageCodeMsgId, $new_status['Msg_Id']);
+                // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
+                $mesage                = json_decode($mesage, true);
+                $mesage['Stat']        = $new_status['Stat'];
+                // $mesage['Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
+                $mesage['Submit_time'] = $new_status['Submit_time'];
+                $mesage['Done_time']   = $new_status['Done_time'];
+                $mesage['receive_time'] = time(); //回执时间戳
+                $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
+            }
+        }
+    }
 }
