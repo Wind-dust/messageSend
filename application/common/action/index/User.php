@@ -715,7 +715,7 @@ class User extends CommonIndex
                         $task_log[$key]['explanation'] = '未知';
                         break;
                     case '':
-                        $task_log[$key]['explanation'] = '未知';
+                        $task_log[$key]['explanation'] = '成功';
                         break;
 
                     default:
