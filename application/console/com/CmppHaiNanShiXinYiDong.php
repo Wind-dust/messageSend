@@ -68,27 +68,27 @@ class CmppHaiNanShiXinYiDong extends Pzlife
         $redisMessageCodeDeliver = 'index:meassage:game:new:deliver:' . $content; //行业通知MsgId
         $redisMessageUnKownDeliver = 'index:meassage:game:unknow:deliver:' . $content; //行业通知MsgId
 
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '13651913994',
             'mar_task_id' => '',
-            'content'     => '【冰雪传奇】尊敬的3994测评师：感谢接听！您账户已激活Vip5成功，赠GM号至尊礼包。领：https://68p6.cn/0G。退订回T',
+            'content'     => '【冰雪传奇】我是给您致电的推荐师萌萌，您[m4]账户已激活V15，礼包码：cxk8888，领：https://68p6.cn/0G。退订回T',
         ]));
 
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15172413692',
             'mar_task_id' => '',
-            'content'     => '【冰雪传奇】尊敬的3692测评师：感谢接听！您账户已激活Vip5成功，赠GM号至尊礼包。领：https://68p6.cn/0G。退订回T',
+            'content'     => '【冰雪传奇】我是给您致电的推荐师萌萌，您[m4]账户已激活V15，礼包码：cxk8888，领：https://68p6.cn/0G。退订回T',
         ]));
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15821193682',
             'mar_task_id' => '',
-            'content'     => '【冰雪传奇】尊敬的3682测评师：感谢接听！您账户已激活Vip5成功，赠GM号至尊礼包。领：https://68p6.cn/0G。退订回T',
+            'content'     => '【冰雪传奇】我是给您致电的推荐师萌萌，您[m4]账户已激活V15，礼包码：cxk8888，领：https://68p6.cn/0G。退订回T',
         ]));
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
-            'content'     => '【冰雪传奇】尊敬的6171测评师：感谢接听！您账户已激活Vip5成功，赠GM号至尊礼包。领：https://68p6.cn/0G。退订回T',
-        ]));
+            'content'     => '【冰雪传奇】我是给您致电的推荐师萌萌，您[m4]账户已激活V15，礼包码：cxk8888，领：https://68p6.cn/0G。退订回T',
+        ])); */
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/14.log";
         $myfile = fopen($log_path, 'a+');

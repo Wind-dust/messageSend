@@ -2361,7 +2361,8 @@ Db::rollback();
         while (true) {
             $sendlog = $redis->lpop('index:meassage:code:cms:deliver:' . $channel_id);
             if (empty($sendlog)) {
-                exit('Send Log IS null');
+                // exit('Send Log IS null');
+                continue;
             }
             $send_log = json_decode($sendlog, true);
 
@@ -2371,34 +2372,61 @@ Db::rollback();
             $sendTask = $this->getSendCodeTask($send_log['mar_task_id']);
 
             if (empty($sendTask)) {
+                print_r($send_log);
+                $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
                 continue;
             }
             $sendtasklog = Db::query("SELECT `id`,`create_time` FROM `yx_user_send_code_task_log` WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $send_log['mobile'] . "' ");
-            // print_r($sendtasklog);
+            print_r($sendtasklog);
             // die;
             if (empty($sendtasklog)) {
-                print_r($send_log);
-                $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
-                exit;
+                // $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
+                if (strpos($send_log['content'], '问卷') !== false) {
+                    $status_message = 'DELIVRD';
+                } else {
+                    $status_message =  $send_log['Stat'];
+                }
+                Db::startTrans();
+                try {
+                    Db::table('yx_user_send_code_task_log')->insert([
+                        'uid' => $sendTask['uid'],
+                        'task_no' => $sendTask['task_no'],
+                        'task_content' => $sendTask['task_content'],
+                        'mobile' => $send_log['mobile'],
+                        'source' => $sendTask['source'],
+                        'send_length' => $sendTask['send_length'],
+                        'send_status' => 2,
+                        'free_trial' => 2,
+                        'create_time' => $sendTask['create_time'],
+                        'real_message' => $send_log['Stat'],
+                        'status_message' => $status_message
+                    ]);
+                    Db::commit();
+                } catch (\Exception $e) {
+                    Db::rollback();
+                    exception($e);
+                }
+            } else {
+                if (strpos($send_log['content'], '问卷') !== false) {
+                    $status_message = 'DELIVRD';
+                } else {
+                    $status_message =  $send_log['Stat'];
+                }
+
+                Db::startTrans();
+                try {
+                    Db::table('yx_user_send_code_task_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $status_message]);
+                    Db::commit();
+                } catch (\Exception $e) {
+                    Db::rollback();
+                    exception($e);
+                }
             }
             // if ($sendtasklog[0]['create_time'] > $time) {
             //     $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
             //     exit('today is success');
             // }
-            if (strpos($send_log['content'], '问卷') !== false) {
-                $status_message = 'DELIVRD';
-            } else {
-                $status_message =  $send_log['Stat'];
-            }
 
-            Db::startTrans();
-            try {
-                Db::table('yx_user_send_code_task_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $status_message]);
-                Db::commit();
-            } catch (\Exception $e) {
-                Db::rollback();
-                exception($e);
-            }
         }
     }
 
@@ -2499,18 +2527,23 @@ Db::rollback();
         }
     }
 
-    //错误日志重推
     public function errotRpush()
     {
         $redis = Phpredis::getConn();
         $redisMessageCodeMsgId = 'index:meassage:code:msg:id:1';
 
         $redisMessageCodeDeliver    = 'index:meassage:code:new:deliver:1'; //行业通知MsgId
+        // {"Stat":"DELIVRD","Submit_time":"2001161532","Done_time":"2001161534","mobile":"13739310156\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000","receive_time":1579160061,"Msg_Id":"406718912655530494"}
+        $redis->rpush("index:meassage:code:unknow:deliver:24", json_encode([
+            'Stat' => 'DELIVRD',
+            'Submit_time' => '2001161532',
+            'Done_time' => '2001161534',
+            'mobile' => '13739310156',
+            'receive_time' => '1579160061',
+            'Msg_Id' => '406718912655530494',
+        ]));
         while (true) {
             $status = $redis->lpop("index:meassage:code:unknow:deliver:24");
-            if (empty($status)) {
-                exit;
-            }
             $new_status = json_decode($status, true);
             $mesage = $redis->hget($redisMessageCodeMsgId, $new_status['Msg_Id']);
             if ($mesage) {

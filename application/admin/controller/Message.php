@@ -275,4 +275,21 @@ class Message extends AdminController
         $result =  $this->app->message->auditUserSignature(intval($id), $status);
         return $result;
     }
+
+    /**
+     * @api              {post} / 获取拓展码库
+     * @apiDescription   getDevelopCode
+     * @apiGroup         admin_Message
+     * @apiName          getDevelopCode
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 模板Id
+     * @apiParam (入参) {String} status 状态:2,审核通过;3,审核不通过
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:审核状态码错误 / 
+     * @apiSampleRequest /admin/message/getDevelopCode
+     * @return array
+     * @author rzc
+     */
+    public function getDevelopCode()
+    {
+    }
 }

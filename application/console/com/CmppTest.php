@@ -23,7 +23,7 @@ class CmppTest extends Pzlife
     public function content($content)
     {
         if ($content == 1) { //测试
-            // 移动
+            //移动
             return [
                 'host'          => "127.0.0.1", //服务商ip
                 'port'          => "7890", //短连接端口号   17890长连接端口号
