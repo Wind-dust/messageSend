@@ -1053,4 +1053,80 @@ class OfficeExcel extends Pzlife
         ];
         // Db::table('yx_number_segment')->insertAll($data);
     }
+
+    //生产拓展码
+    public function createDevelopCode()
+    {
+        $two_codes = [];
+        $two_keep_back_codes = [11, 22, 33, 44, 55, 66, 77, 88, 99];
+        for ($i = 10; $i < 100; $i++) {
+            if (!in_array($i, $two_keep_back_codes)) {
+                $two_codes[] = $i;
+            }
+        }
+        $two_need_keep = array_rand($two_codes, 21);
+        foreach ($two_codes as $key => $value) {
+            if (in_array($key, $two_need_keep)) {
+                $two_keep_back_codes[] = $value; //保留的2位拓展码
+            }
+        }
+        $remain_two_codes = array_diff($two_codes, $two_keep_back_codes);
+        // print_r($remain_two_codes);
+        $three_codes = [];
+        foreach ($remain_two_codes as $key => $value) {
+            for ($i = 0; $i < 10; $i++) {
+                $three_codes[] = $value . $i;
+            }
+        }
+        // echo count($three_codes);
+        $three_need_keep = array_rand($three_codes, 100);
+        foreach ($three_codes as $key => $value) {
+            if (in_array($key, $three_need_keep)) {
+                $three_keep_back_codes[] = $value; //保留的3位拓展码
+            }
+        }
+
+        // print_r($three_keep_back_codes);
+        $remain_three_codes = array_diff($three_codes, $three_keep_back_codes);
+        $four_codes = [];
+        foreach ($remain_three_codes as $key => $value) {
+            for ($i = 0; $i < 10; $i++) {
+                $four_codes[] = $value . $i;
+            }
+        }
+
+        // echo count($three_codes);
+        $four_need_keep = array_rand($four_codes, 100);
+        foreach ($four_codes as $key => $value) {
+            if (in_array($key, $four_need_keep)) {
+                $four_keep_back_codes[] = $value; //保留的4位拓展码
+            }
+        }
+        // print_r($four_keep_back_codes);
+
+        $remain_four_codes = array_diff($four_codes, $four_keep_back_codes);
+
+        $five_codes = [];
+        foreach ($remain_four_codes as $key => $value) {
+            for ($i = 0; $i < 10; $i++) {
+                $five_codes[] = $value . $i;
+            }
+        }
+        $five_need_keep = array_rand($five_codes, 30);
+        foreach ($five_codes as $key => $value) {
+            if (in_array($key, $five_need_keep)) {
+                $five_keep_back_codes[] = $value; //保留的4位拓展码
+            }
+        }
+
+        $remain_five_codes = array_diff($five_codes, $five_keep_back_codes);
+        $six_codes = [];
+        foreach ($remain_five_codes as $key => $value) {
+            for ($i = 0; $i < 10; $i++) {
+                $six_codes[] = $value . $i;
+            }
+        }
+        // echo count($two_keep_back_codes) + count($three_keep_back_codes) + count($four_keep_back_codes) + count($five_keep_back_codes) + count($six_codes);
+
+    }
 }
