@@ -2534,6 +2534,7 @@ Db::rollback();
 
         $redisMessageCodeDeliver    = 'index:meassage:code:new:deliver:1'; //行业通知MsgId
         // {"Stat":"DELIVRD","Submit_time":"2001161532","Done_time":"2001161534","mobile":"13739310156\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000","receive_time":1579160061,"Msg_Id":"406718912655530494"}
+        exit('退出');
         $redis->rpush("index:meassage:code:unknow:deliver:24", json_encode([
             'Stat' => 'DELIVRD',
             'Submit_time' => '2001161532',
