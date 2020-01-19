@@ -25,11 +25,11 @@ class CmppYiXinYiDongBusiness extends Pzlife
         return [
             'host'          => "47.95.161.134", //服务商ip
             'port'          => "9004", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "101161", //企业id  企业代码
-            'Shared_secret' => '5hsey6u9', //网关登录密码
-            'template_id'   => "217062", //模板id
-            'Service_Id'    => "101161", //业务代码
-            'Dest_Id'       => "106928080159", //短信接入码 短信端口号
+            'Source_Addr'   => "280723", //企业id  企业代码
+            'Shared_secret' => 'ken4057y803j', //网关登录密码
+            'template_id'   => "", //模板id
+            'Service_Id'    => "280723", //业务代码
+            'Dest_Id'       => "1069280723", //短信接入码 短信端口号
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
             'master_num'    => 300,
@@ -59,13 +59,14 @@ class CmppYiXinYiDongBusiness extends Pzlife
         //     print_r($send);
         // } while ($send);
         // $send = $redis ->lPop($redisMessageCodeSend);
-        /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'uid'         => '1',
-            'content'     => '【钰蜥科技】您本次登录的验证码为026835',
+            'content'     => '【钰蜥科技】您本次登录的验证码为026835,回复QX可取消本次登陆',
+            'develop_code' => '8868',
             'Submit_time' => date('mdHis', time()),
-        ])); */
+        ]));
         /*   $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15821193682',
             'mar_task_id' => '',
@@ -449,6 +450,9 @@ class CmppYiXinYiDongBusiness extends Pzlife
                                 // iconv("UTF-8","gbk",$code);
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
                                 // print_r($code);die;
+                                if (isset($send_data['develop_code'])) {
+                                    $Dest_Id = $Dest_Id . $send_data['develop_code'];
+                                }
                                 if (strlen($code) > 140) {
                                     $pos          = 0;
                                     $num_messages = ceil(strlen($code) / $max_len);
