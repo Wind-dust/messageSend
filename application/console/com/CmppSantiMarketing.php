@@ -442,7 +442,11 @@ class CmppSantiMarketing extends Pzlife
                                         $bodyData .= pack("a6", '');
                                         $bodyData .= pack("a17", '');
                                         $bodyData .= pack("a17", '');
-                                        $bodyData .= pack("a21", $Dest_Id);
+                                        if (isset($send_data['develop_code'])) {
+                                            $bodyData .= pack("a21", $Dest_Id . $send_data['develop_code']);
+                                        } else {
+                                            $bodyData .= pack("a21", $Dest_Id);
+                                        }
                                         $bodyData .= pack("C", $uer_num);
                                         $p_n      = 21 * $uer_num;
                                         $bodyData .= pack("a" . $p_n, $mobile);
@@ -487,7 +491,11 @@ class CmppSantiMarketing extends Pzlife
                                     $bodyData .= pack("a6", '');
                                     $bodyData .= pack("a17", '');
                                     $bodyData .= pack("a17", '');
-                                    $bodyData .= pack("a21", $Dest_Id);
+                                    if (isset($send_data['develop_code'])) {
+                                        $bodyData .= pack("a21", $Dest_Id . $send_data['develop_code']);
+                                    } else {
+                                        $bodyData .= pack("a21", $Dest_Id);
+                                    }
                                     $bodyData .= pack("C", $uer_num);
                                     $p_n      = 21 * $uer_num;
                                     $bodyData .= pack("a" . $p_n, $mobile);
@@ -558,41 +566,6 @@ class CmppSantiMarketing extends Pzlife
         }
     }
 
-    public function cmppDeliver($Total_Length, $Sequence_Id)
-    { //Msg_Id直接用N解析不行
-        $contentlen = $Total_Length - 109;
-        $body       = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a32Src_terminal_Id/CSrc_terminal_type/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/a20LinkID", $this->bodyData);
-        var_dump($body);
-        if ($body['Msg_Length'] > 0) {
-            $data = $body['Msg_Content'];
-            //$Msg_Id = $body['Msg_Id'];
-            $Msg_Id   = ($body['Msg_Id1'] & 0x0fffffff);
-            $Msg_Idfu = $body['Msg_Id2'];
-            $msgidz   = unpack("N", substr($this->bodyData, 0, 8));
-            $msgidzz  = '0000' . $msgidz[1];
-            //操作数据库(原方法)
-            /* mysql_connect('localhost', '', '');
-            mysql_select_db('');
-            mysql_query('set names utf8');
-            $data    = trim($data);
-            $sql1    = "select id from socket_yd where msgid='" . $Msg_Id . "'";
-            $chongfu = mysql_query($sql1);
-            $arrs    = array();
-            while ($arr = mysql_fetch_assoc($chongfu)) {
-            $arrs[] = $arr;
-            }
-            if ($arrs == array() || $arrs[0] == null) {
-            $sql = "insert into socket_yd set msgid='" . $Msg_Id . "', content='" . addslashes($data) . "', add_time='" . date('Y-m-d H:i:s') . "'";
-            mysql_query($sql);
-            } */
-            // mysql_close();
-            //echo $Msg_Id."\n";
-            echo $data . "\n";
-            echo $msgidzz . "\n";
-            echo $Sequence_Id . "\n";
-            $this->cmppDeliverResp($msgidzz, $Msg_Idfu, $Sequence_Id);
-        }
-    }
 
     //16进制转2进制
     function StrToBin($str)

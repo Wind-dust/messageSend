@@ -541,7 +541,11 @@ class CmppSantiMarketing2 extends Pzlife
                                         $bodyData .= pack("a6", '');
                                         $bodyData .= pack("a17", '');
                                         $bodyData .= pack("a17", '');
-                                        $bodyData .= pack("a21", $Dest_Id);
+                                        if (isset($send_data['develop_code'])) {
+                                            $bodyData .= pack("a21", $Dest_Id . $send_data['develop_code']);
+                                        } else {
+                                            $bodyData .= pack("a21", $Dest_Id);
+                                        }
                                         $bodyData .= pack("C", $uer_num);
                                         $p_n      = 21 * $uer_num;
                                         $bodyData .= pack("a" . $p_n, $mobile);
@@ -586,7 +590,11 @@ class CmppSantiMarketing2 extends Pzlife
                                     $bodyData .= pack("a6", '');
                                     $bodyData .= pack("a17", '');
                                     $bodyData .= pack("a17", '');
-                                    $bodyData .= pack("a21", $Dest_Id);
+                                    if (isset($send_data['develop_code'])) {
+                                        $bodyData .= pack("a21", $Dest_Id . $send_data['develop_code']);
+                                    } else {
+                                        $bodyData .= pack("a21", $Dest_Id);
+                                    }
                                     $bodyData .= pack("C", $uer_num);
                                     $p_n      = 21 * $uer_num;
                                     $bodyData .= pack("a" . $p_n, $mobile);
