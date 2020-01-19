@@ -451,7 +451,7 @@ class Message extends CommonIndex
             Dbuser::delUserDevelopCode($id);
             if (!Dbuser::getUserDevelopCode(['develop_no' => $has_bind['develop_no']], 'uid,business_id,source,develop_no', false)) {
                 $result = DbSendMessage::getDevelopCode(['develop_no' => $has_bind['develop_no']], 'id,develop_no,is_bind', true);
-                DbSendMessage::updateDevelopCode(['is_bind' => 1, $result['id']]);
+                DbSendMessage::updateDevelopCode(['is_bind' => 1], $result['id']);
             }
             Db::commit();
             return ['code' => '200'];
