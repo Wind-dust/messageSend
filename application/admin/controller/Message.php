@@ -398,8 +398,8 @@ class Message extends AdminController
         $develop_no = trim($this->request->post('develop_no'));
         $nick_name = trim($this->request->post('nick_name'));
 
-        $business_id = trim($this->request->get('business_id'));
-        $source = trim($this->request->get('source'));
+        $business_id = trim($this->request->post('business_id'));
+        $source = trim($this->request->post('source'));
         if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
             return ['code' => '3001'];
         }
