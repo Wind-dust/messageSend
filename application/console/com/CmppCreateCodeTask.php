@@ -751,7 +751,7 @@ class CmppCreateCodeTask extends Pzlife
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:business:sendtask';
         // for ($i = 20000; $i < 30000; $i++) {
-        //     $this->redis->rPush('index:meassage:business:sendtask', $i);
+        // $this->redis->rPush('index:meassage:business:sendtask', 110500);
         // }
 
         $push_messages = []; //推送队列
@@ -778,7 +778,8 @@ class CmppCreateCodeTask extends Pzlife
                     continue;
                 }
                 $mobilesend = [];
-                // print_r($sendTask);die;
+                // print_r($sendTask);
+                // die;
                 $mobilesend = explode(',', $sendTask['mobile_content']);
                 $mobilesend = array_filter($mobilesend);
                 /*  $send_length = mb_strlen($sendTask['task_content'], 'utf8');
@@ -834,7 +835,9 @@ class CmppCreateCodeTask extends Pzlife
                             'content'     => $sendTask['task_content'],
                             'channel_id'  => $channel_id,
                         ];
-
+                        if (!empty($sendTask['develop_no'])) {
+                            $sendmessage['develop_code'] = $sendTask['develop_no'];
+                        }
                         // $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
                         $push_messages[] = $sendmessage;
                     } else {

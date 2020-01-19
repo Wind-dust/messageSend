@@ -206,6 +206,7 @@ class Send extends MyController
      * @apiParam (入参) {String} content 短信内容
      * @apiParam (入参) {String} taskname 任务名称
      * @apiParam (入参) {String} signature_id 已报备签名ID
+     * @apiParam (入参) {String} [develop_no] 拓展号
      * @apiParam (入参) {String} mobile 接收手机号码
      * @apiParam (入参) {String} dstime 发送时间
      * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:单批次手机号码为空 / 3003:dstime发送时间格式错误 / 3004:预约发送时间小于当前时间 / 3005:短信内容为空或者短信内容超出500字符 / 3006:签名长度为2~8个字 / 3007:task_name 短信标题不能为空
@@ -220,6 +221,7 @@ class Send extends MyController
         $task_name = trim($this->request->post('taskname')); //任务名称
         $Mobile    = trim($this->request->post('mobile')); //接收手机号码
         $Dstime    = trim($this->request->post('dstime')); //手机号
+        $develop_no  = trim($this->request->post('develop_no')); //拓展码号
         $signature_id  = trim($this->request->post('signature_id')); //接收手机号码
         $ip        = trim($this->request->ip());
         $Mobiles   = explode(',', $Mobile);
@@ -251,12 +253,14 @@ class Send extends MyController
                 return ['code' => '3003'];
             }
         }
-
+        if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
+            return ['code' => '3011'];
+        }
         // print_r($task_name);die;
         // if (empty($task_name)) {
         //     return ['code' => '3007'];
         // }
-        $result = $this->app->send->getSmsMarketingTask($appid, $appkey, $Content, $Mobiles, $Dstime, $ip, $task_name, $signature_id);
+        $result = $this->app->send->getSmsMarketingTask($appid, $appkey, $Content, $Mobiles, $Dstime, $ip, $task_name, $signature_id, $develop_no);
         return $result;
     }
 
@@ -268,9 +272,10 @@ class Send extends MyController
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
      * @apiParam (入参) {String} signature_id 已报备签名ID
+     * @apiParam (入参) {String} [develop_no] 拓展号
      * @apiParam (入参) {String} content 短信内容
      * @apiParam (入参) {String} mobile 接收手机号码
-     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:短信内容为空或者短信内容超出500字符 / 3003:签名长度为2~8个字 / 3004:该账户已被停用 / 3005:该账户没有此项服务 / 3006:短信余额不足，请先充值 / 3009 :系统错误
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:短信内容为空或者短信内容超出500字符 / 3003:签名长度为2~8个字 / 3004:该账户已被停用 / 3005:该账户没有此项服务 / 3006:短信余额不足，请先充值 / 3009 :系统错误 / 3011:develop_no错误
      * @apiSampleRequest /index/send/getSmsBuiness
      * @author rzc
      */
@@ -280,6 +285,7 @@ class Send extends MyController
         $appkey  = trim($this->request->post('appkey')); //登陆密码
         $Content = trim($this->request->post('content')); //短信内容
         $Mobile  = trim($this->request->post('mobile')); //接收手机号码
+        $develop_no  = trim($this->request->post('develop_no')); //拓展码号
         $signature_id  = trim($this->request->post('signature_id')); //接收手机号码
         $ip      = trim($this->request->ip());
         $Mobiles = explode(',', $Mobile);
@@ -304,7 +310,10 @@ class Send extends MyController
                 return ['code' => '3003'];
             }
         }
-        $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id);
+        if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
+            return ['code' => '3011'];
+        }
+        $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id, $develop_no);
         return $result;
     }
 

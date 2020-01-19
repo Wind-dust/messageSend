@@ -293,7 +293,7 @@ return $result;
         return 0;
     }
 
-    public function getSmsMarketingTask($Username, $Password, $Content, $Mobiles, $Dstime, $ip, $task_name, $signature_id)
+    public function getSmsMarketingTask($Username, $Password, $Content, $Mobiles, $Dstime, $ip, $task_name, $signature_id = '', $develop_no = '')
     {
         $Mobiles = array_unique(array_filter($Mobiles));
         // $Password = md5($Password);
@@ -345,6 +345,13 @@ return $result;
         }
         // $Content = $this->dbc2Sbc($Content);
         $data                 = [];
+        if (!empty($develop_no)) {
+            $has_bind = Dbuser::getUserDevelopCode(['develop_no' => $develop_no, 'business_id' => 6, 'uid' => $user['id']], 'id,uid,business_id,source', true);
+            if (!empty($has_bind)) {
+                return ['code' => '3011'];
+            }
+            $data['develop_no'] = $develop_no;
+        }
         $data['uid']          = $user['id'];
         $data['source']       = $ip;
         $data['task_content'] = $Content;
@@ -380,7 +387,7 @@ return $result;
         return ['code' => '200', 'task_no' => $data['task_no']];
     }
 
-    public function getSmsBuiness($Username, $Password, $Content, $Mobiles, $ip, $signature_id = '')
+    public function getSmsBuiness($Username, $Password, $Content, $Mobiles, $ip, $signature_id = '', $develop_no = '')
     {
         $this->redis = Phpredis::getConn();
         // print_r($this->redis);
@@ -419,8 +426,6 @@ return $result;
             }
             $Content = $signature['title'] . $Content;
         }
-
-
         $send_num = count($Mobiles);
 
         $effective_mobile = [];
@@ -442,6 +447,13 @@ return $result;
         }
         // $Content = $this->dbc2Sbc($Content);
         $data                 = [];
+        if (!empty($develop_no)) {
+            $has_bind = Dbuser::getUserDevelopCode(['develop_no' => $develop_no, 'business_id' => 6, 'uid' => $user['id']], 'id,uid,business_id,source', true);
+            if (!empty($has_bind)) {
+                return ['code' => '3011'];
+            }
+            $data['develop_no'] = $develop_no;
+        }
         $data['uid']          = $user['id'];
         $data['source']       = $ip;
         $data['task_content'] = $Content;
