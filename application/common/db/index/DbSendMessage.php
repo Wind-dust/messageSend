@@ -195,7 +195,8 @@ class DbSendMessage extends Db
 
     public function updateDevelopCode($data, $id)
     {
-        return DevelopCode::save($data, ['id' => $id]);
+        $DevelopCode = new DevelopCode;
+        return $DevelopCode->save($data, ['id' => $id]);
     }
 
     public function getRandomDevelopCode($where, $field, $row = false, $limit = '')
