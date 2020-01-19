@@ -5,27 +5,32 @@ namespace app\common\db\user;
 use app\common\model\LogVercode;
 use app\common\model\UserCon;
 use app\common\model\Users;
+use app\common\model\UserDevelopCode;
 use think\Db;
 
-class DbUser {
+class DbUser
+{
 
     /**
      * 获取一个用户信息
      * @param $where
      * @return array
      */
-    public function getUser($where) {
+    public function getUser($where)
+    {
         $field = ['passwd', 'delete_time'];
         $user  = Users::where($where)->field($field, true)->findOrEmpty()->toArray();
         return $user;
     }
 
-    public function getUserOne($where, $field) {
+    public function getUserOne($where, $field)
+    {
         $user = Users::where($where)->field($field)->findOrEmpty()->toArray();
         return $user;
     }
 
-    public function getUserInfo($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '') {
+    public function getUserInfo($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
         $obj = Users::field($field)->where($where);
         if (!empty($orderBy) && !empty($sc)) {
             $obj = $obj->order($orderBy, $sc);
@@ -41,7 +46,8 @@ class DbUser {
         return $obj->toArray();
     }
 
-    public function getUserInfoCount($where){
+    public function getUserInfoCount($where)
+    {
         return Users::where($where)->count();
     }
 
@@ -53,7 +59,8 @@ class DbUser {
      * @return array
      * @author zyr
      */
-    public function getUserCon($where, $field, $row = false) {
+    public function getUserCon($where, $field, $row = false)
+    {
         $obj = UserCon::where($where)->field($field);
         if ($row === true) {
             return $obj->findOrEmpty()->toArray();
@@ -62,9 +69,10 @@ class DbUser {
     }
 
 
-    public function updateUserCon($data, $id) {
+    public function updateUserCon($data, $id)
+    {
         $UserCon = new UserCon;
-        return $UserCon->save($data,['id' => $id]);
+        return $UserCon->save($data, ['id' => $id]);
     }
 
     /**
@@ -73,7 +81,8 @@ class DbUser {
      * @return mixed
      * @author zyr
      */
-    public function addLogVercode($data) {
+    public function addLogVercode($data)
+    {
         $logVercode = new LogVercode();
         $logVercode->save($data);
         return $logVercode->id;
@@ -86,7 +95,8 @@ class DbUser {
      * @return array
      * @author zyr
      */
-    public function getOneLogVercode($where, $field) {
+    public function getOneLogVercode($where, $field)
+    {
         return LogVercode::where($where)->field($field)->findOrEmpty()->toArray();
     }
 
@@ -98,7 +108,8 @@ class DbUser {
      * @return mixed
      * @author zyr
      */
-    private function getResult($obj, $row = false, $orderBy = '', $limit = '') {
+    private function getResult($obj, $row = false, $orderBy = '', $limit = '')
+    {
         if (!empty($orderBy)) {
             $obj = $obj->order($orderBy);
         }
@@ -113,19 +124,21 @@ class DbUser {
         return $obj->toArray();
     }
 
-     /**
+    /**
      * 添加一天con_id记录
      * @param $data
      * @return mixed
      * @author zyr
      */
-    public function addUserCon($data) {
+    public function addUserCon($data)
+    {
         $userCon = new UserCon();
         $userCon->save($data);
         return $userCon->id;
     }
 
-    public function addUser($data) {
+    public function addUser($data)
+    {
         $user = new Users();
         $user->save($data);
         return $user->id;
@@ -138,8 +151,46 @@ class DbUser {
      * @return bool
      * @author zyr
      */
-    public function updateUser($data, $uid) {
+    public function updateUser($data, $uid)
+    {
         $user = new Users();
         return $user->save($data, ['id' => $uid]);
+    }
+
+    /**
+     * 查找扩展码关联关系
+     * @param $data
+     * @param $uid
+     * @return bool
+     * @author rzc
+     */
+    public function getUserDevelopCode($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = UserDevelopCode::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    /**
+     * 修改扩展码关联关系
+     * @param $data
+     * @param $uid
+     * @return bool
+     * @author rzc
+     */
+    public function updateUserDevelopCode($data, $id)
+    {
+        $UserDevelopCode = new UserDevelopCode();
+        return $UserDevelopCode->save($data, ['id' => $id]);
+    }
+
+    public function addUserDevelopCode($data)
+    {
+        $UserDevelopCode = new UserDevelopCode();
+        return $UserDevelopCode->save($data);
+    }
+
+    public function delUserDevelopCode($id)
+    {
+        return UserDevelopCode::destroy($id);
     }
 }

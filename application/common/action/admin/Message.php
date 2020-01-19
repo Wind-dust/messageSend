@@ -327,4 +327,137 @@ class Message extends CommonIndex
             return ['code' => '3009']; //修改失败
         }
     }
+
+    public function getDevelopCode($page, $pageNum, $no_lenth = 0, $develop_no = '', $is_bind = 0)
+    {
+        $where = [];
+        if (!empty($no_lenth)) {
+            array_push($where, [['no_lenth', '=', $no_lenth]]);
+        }
+        if (!empty($develop_no)) {
+            array_push($where, [['no_lenth', 'like', '%' . $no_lenth . '%']]);
+        }
+        if (!empty($is_bind)) {
+            array_push($where, [['is_bind', '=', $is_bind]]);
+        }
+        $offset = $pageNum * ($page - 1);
+        if ($offset < 0) {
+            return ['code' => '200', 'total' => 0, 'develop' => []];
+        }
+        $result = DbSendMessage::getDevelopCode($where, '*', false, '', $offset . ',' . $pageNum);
+        $total = DbSendMessage::countDevelopCode($where);
+        return ['code' => '200', 'total' => $total, 'develop' => $result];
+    }
+
+    public function getOneRandomDevelopCode($no_lenth)
+    {
+        $result = DbSendMessage::getRandomDevelopCode(['no_lenth' => $no_lenth, 'is_bind' => 1], 'develop_no', true);
+        if (empty($result)) {
+            return ['code' => '3002'];
+        }
+        return ['code' => '200', 'develop_no' => $result['develop_no']];
+    }
+
+    public function verifyDevelopCode($develop_no)
+    {
+        $result = DbSendMessage::getDevelopCode(['develop_no' => $develop_no, 'is_bind' => 1], 'develop_no', true);
+        if (empty($result)) {
+            return ['code' => '200'];
+        }
+        return ['code' => '3002'];
+    }
+
+    public function userBindDevelopCode($develop_no, $nick_name, $business_id, $source)
+    {
+        $user = DbUser::getUserInfo(['nick_name' => $nick_name], 'id,reservation_service,user_status', true);
+        if (empty($user) || $user['user_status'] != 2) {
+            return ['code' => '3003'];
+        }
+        $result = DbSendMessage::getDevelopCode(['develop_no' => $develop_no], 'id,develop_no,is_bind', true);
+        if (empty($result)) {
+            return ['code' => '3004'];
+        }
+        if ($result['is_bind'] == 1) { //未绑定
+            Db::startTrans();
+            try {
+                $data = [];
+                $data = [
+                    'develop_no' => $develop_no,
+                    'uid' => $user['id'],
+                    'business_id' => $business_id,
+                    'source' => $source,
+                ];
+                Dbuser::addUserDevelopCode($data);
+                DbSendMessage::updateDevelopCode(['is_bind' => 2, $result['id']]);
+                Db::commit();
+                return ['code' => '200'];
+            } catch (\Exception $e) {
+                Db::rollback();
+                return ['code' => '3009']; //修改失败
+            }
+        } else { //已绑定
+            $has_bind = Dbuser::getUserDevelopCode(['develop_no' => $develop_no], 'uid,business_id,source', false);
+            if (empty($has_bind)) {
+                return ['code' => '3007'];
+            }
+            foreach ($has_bind as $key => $value) {
+                if ($value['uid'] != $user['id']) {
+                    return ['code' => '3005'];
+                }
+                if ($value['business_id'] == $business_id && $value['source'] == $source) {
+                    return ['code' => '3006'];
+                }
+            }
+            Db::startTrans();
+            try {
+                $data = [];
+                $data = [
+                    'develop_no' => $develop_no,
+                    'uid' => $user['id'],
+                    'business_id' => $business_id,
+                    'source' => $source,
+                ];
+                Dbuser::addUserDevelopCode($data);
+                Db::commit();
+                return ['code' => '200'];
+            } catch (\Exception $e) {
+                Db::rollback();
+                return ['code' => '3009']; //修改失败
+            }
+        }
+    }
+
+    public function getuserBindDevelopCode($develop_no)
+    {
+        $has_bind = Dbuser::getUserDevelopCode(['develop_no' => $develop_no], 'uid,business_id,source', false);
+        if (empty($has_bind)) {
+            return ['code' => '3000'];
+        }
+        foreach ($has_bind as $key => $value) {
+            $has_bind[$key]['nick_name'] = DbUser::getUserInfo(['id' => $value['uid']], 'nick_name', true)['nick_name'];
+        }
+        return ['code' => '200', 'data' => $has_bind];
+    }
+
+    public function deluserBindDevelopCode($id)
+    {
+        $has_bind = Dbuser::getUserDevelopCode(['id' => $id], 'uid,business_id,source,develop_no', false);
+        if (empty($has_bind)) {
+            return ['code' => '3000'];
+        }
+        Db::startTrans();
+        try {
+
+            Dbuser::delUserDevelopCode($id);
+            if (!Dbuser::getUserDevelopCode(['develop_no' => $has_bind['develop_no']], 'uid,business_id,source,develop_no', false)) {
+                $result = DbSendMessage::getDevelopCode(['develop_no' => $has_bind['develop_no']], 'id,develop_no,is_bind', true);
+                DbSendMessage::updateDevelopCode(['is_bind' => 1, $result['id']]);
+            }
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
+    }
 }

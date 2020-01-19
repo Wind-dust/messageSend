@@ -282,14 +282,180 @@ class Message extends AdminController
      * @apiGroup         admin_Message
      * @apiName          getDevelopCode
      * @apiParam (入参) {String} cms_con_id
-     * @apiParam (入参) {String} id 模板Id
-     * @apiParam (入参) {String} status 状态:2,审核通过;3,审核不通过
-     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:审核状态码错误 / 
+     * @apiParam (入参) {String} [no_lenth] 长度
+     * @apiParam (入参) {String} [develop_no] develop_no
+     * @apiParam (入参) {String} page 页码 默认1
+     * @apiParam (入参) {String} pageNum 条数 默认10
+     * @apiParam (入参) {String} is_bind 是否绑定：1.未绑定；2.已绑定
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:no_lenth格式错误或者查取范围错误 / 3002:绑定状态码错误 / 
      * @apiSampleRequest /admin/message/getDevelopCode
      * @return array
      * @author rzc
      */
     public function getDevelopCode()
     {
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $no_lenth = trim($this->request->post('no_lenth'));
+        $develop_no = trim($this->request->post('develop_no'));
+        $is_bind = trim($this->request->post('is_bind'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = trim($this->request->post('page'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        if (!empty($no_lenth) && (intval($no_lenth) < 2 || !is_numeric($no_lenth) || intval($no_lenth) > 6)) {
+            return ['code' => '3001'];
+        }
+        strval($develop_no);
+        if (!empty($is_bind) && !in_array($is_bind, [1, 2])) {
+            return ['code' => '3002'];
+        }
+        $result =  $this->app->message->getDevelopCode($page, $pageNum, $no_lenth, $develop_no, intval($is_bind));
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 随机抽取一个未绑定的拓展码
+     * @apiDescription   getOneRandomDevelopCode
+     * @apiGroup         admin_Message
+     * @apiName          getOneRandomDevelopCode
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} [no_lenth] 长度
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:no_lenth格式错误或者查取范围错误 / 3002:改号段已无空余拓展码 / 
+     * @apiSampleRequest /admin/message/getOneRandomDevelopCode
+     * @return array
+     * @author rzc
+     */
+    public function getOneRandomDevelopCode()
+    {
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $no_lenth = trim($this->request->post('no_lenth'));
+        if (!empty($no_lenth) && (intval($no_lenth) < 2 || !is_numeric($no_lenth) || intval($no_lenth) > 6)) {
+            return ['code' => '3001'];
+        }
+        $result =  $this->app->message->getOneRandomDevelopCode($no_lenth);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 验证拓展码是否被绑定过
+     * @apiDescription   verifyDevelopCode
+     * @apiGroup         admin_Message
+     * @apiName          verifyDevelopCode
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} develop_no 扩展码号
+     * @apiSuccess (返回) {String} code 200:未绑定 / 3001:no_lenth格式错误或者查取范围错误 / 3002:已绑定 / 
+     * @apiSampleRequest /admin/message/verifyDevelopCode
+     * @return array
+     * @author rzc
+     */
+    public function verifyDevelopCode()
+    {
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $develop_no = trim($this->request->post('develop_no'));
+        if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
+            return ['code' => '3001'];
+        }
+        $result =  $this->app->message->verifyDevelopCode($develop_no);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 用户绑定拓展码
+     * @apiDescription   userBindDevelopCode
+     * @apiGroup         admin_Message
+     * @apiName          userBindDevelopCode
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} develop_no 扩展码号
+     * @apiParam (入参) {String} business_id 业务服务id
+     * @apiParam (入参) {String} source 服务范围1移动；2电信；3联通；4三网；5移动电信；6移动联通；7联通电信
+     * @apiParam (入参) {String} nick_name 用户昵称
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:no_lenth格式错误或者查取范围错误 / 3002:source码错误 / 3003:用户不存在或者未启用 / 3004：该扩展码不存在 / 3005:该扩展码已被其他用户绑定 / 3006:已添加过的服务范围拓展码 / 3007 异常的拓展号码
+     * @apiSampleRequest /admin/message/userBindDevelopCode
+     * @return array
+     * @author rzc
+     */
+    public function userBindDevelopCode()
+    {
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $develop_no = trim($this->request->post('develop_no'));
+        $nick_name = trim($this->request->post('nick_name'));
+
+        $business_id = trim($this->request->get('business_id'));
+        $source = trim($this->request->get('source'));
+        if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
+            return ['code' => '3001'];
+        }
+        if (!in_array($source, [1, 2, 3, 4, 5, 6, 7])) {
+            return ['code' => '3002'];
+        }
+        $result =  $this->app->message->userBindDevelopCode($develop_no, $nick_name, $business_id, $source);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 查看扩展码绑定关系
+     * @apiDescription   getuserBindDevelopCode
+     * @apiGroup         admin_Message
+     * @apiName          getuserBindDevelopCode
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} develop_no 扩展码号
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:no_lenth格式错误或者查取范围错误 
+     * @apiSampleRequest /admin/message/getuserBindDevelopCode
+     * @return array
+     * @author rzc
+     */
+    public function getuserBindDevelopCode()
+    {
+        $develop_no = trim($this->request->post('develop_no'));
+        if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
+            return ['code' => '3001'];
+        }
+        $result =  $this->app->message->getuserBindDevelopCode($develop_no);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 解除拓展码绑定关系
+     * @apiDescription   deluserBindDevelopCode
+     * @apiGroup         admin_Message
+     * @apiName          deluserBindDevelopCode
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 绑定关系id
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误或者查取范围错误 
+     * @apiSampleRequest /admin/message/deluserBindDevelopCode
+     * @return array
+     * @author rzc
+     */
+    public function deluserBindDevelopCode()
+    {
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id = trim($this->request->post('id'));
+        if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
+            return ['code' => '3001'];
+        }
+        $result =  $this->app->message->deluserBindDevelopCode($id);
+        return $result;
     }
 }

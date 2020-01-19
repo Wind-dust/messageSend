@@ -9,6 +9,7 @@ use app\common\model\ModelTemeplate;
 use app\common\model\UserModel;
 use app\common\model\SensitiveWord;
 use app\common\model\UserSignature;
+use app\common\model\DevelopCode;
 use think\Db;
 
 class DbSendMessage extends Db
@@ -179,5 +180,35 @@ class DbSendMessage extends Db
     {
         $UserSignature = new UserSignature;
         return $UserSignature->save($data, ['id' => $id]);
+    }
+
+    public function getDevelopCode($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = DevelopCode::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function countDevelopCode($where)
+    {
+        return DevelopCode::where($where)->count();
+    }
+
+    public function updateDevelopCode($data, $id)
+    {
+        return DevelopCode::save($data, ['id' => $id]);
+    }
+
+    public function getRandomDevelopCode($where, $field, $row = false, $limit = '')
+    {
+        $obj = DevelopCode::where($where)->orderRand("(" . $field . ")");
+        if (!empty($limit)) {
+            $obj = $obj->limit($limit);
+        }
+        if ($row === true) {
+            $obj = $obj->findOrEmpty();
+        } else {
+            $obj = $obj->select();
+        }
+        return $obj->toArray();
     }
 }

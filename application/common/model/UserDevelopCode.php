@@ -10,7 +10,7 @@ class UserDevelopCode extends Model
     use SoftDelete;
     protected $pk = 'id';
     // 设置当前模型对应的完整数据表名称
-    protected $table = 'yx_develop_code';
+    protected $table = 'yx_user_developcode_relation';
     // 设置当前模型的数据库连接
     protected $connection = '';
     protected $deleteTime = 'delete_time';

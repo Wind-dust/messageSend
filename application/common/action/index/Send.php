@@ -624,6 +624,7 @@ return $result;
         $unknown_num   = 0; //未知
         $error_phone   = [];
         $mobile_phone  = [];
+        $real_mobile  = [];
         $unicom_phone  = [];
         $telecom_phone = [];
         $virtual_phone = [];
