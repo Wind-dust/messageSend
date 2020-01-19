@@ -351,27 +351,29 @@ class CmppLanJingBusiness extends Pzlife
                                         $contentlen = $head['Total_Length'] - 65 - 12;
                                         $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
                                         $stalen = $body['Msg_Length'] - 20 - 8 - 21 - 4;
-                                        $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence ", $body['Msg_Content']);
-
+                                        if (strlen($body['Msg_Content']) < 60) {
+                                            $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat", $body['Msg_Content']);
+                                        } else {
+                                            $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence", $body['Msg_Content']);
+                                        }
+                                        print_r($Msg_Content);
                                         $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
-                                        // print_r($body);
-                                        // print_r($Msg_Content);
                                         if ($mesage) {
                                             $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                                             // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
                                             $mesage                = json_decode($mesage, true);
                                             $mesage['Stat']        = $Msg_Content['Stat'];
                                             // $mesage['Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
-                                            $mesage['Submit_time'] = $Msg_Content['Submit_time'];
-                                            $mesage['Done_time']   = $Msg_Content['Done_time'];
+                                            $mesage['Submit_time'] = isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis', $mesage['my_submit_time']);
+                                            $mesage['Done_time']   = isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis', time());
                                             $mesage['receive_time'] = time(); //回执时间戳
                                             $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                                         } else { //不在记录中的回执存入缓存，
-                                            $mesage['Stat']        = $Msg_Content['Stat'];
-                                            $mesage['Submit_time'] = $Msg_Content['Submit_time'];
-                                            $mesage['Done_time']   = $Msg_Content['Done_time'];
+                                            $mesage['Stat']        = isset($Msg_Content['Stat']) ? $Msg_Content['Stat'] : 'UNKNOWN';
+                                            $mesage['Submit_time'] = trim(isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis', time()));
+                                            $mesage['Done_time']   = trim(isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis', time()));
                                             // $mesage['mobile']      = $body['Dest_Id '];//手机号
-                                            $mesage['mobile']   = trim($Msg_Content['Dest_terminal_Id']);
+                                            $mesage['mobile']   = isset($Msg_Content['Dest_terminal_Id']) ? $Msg_Content['Dest_terminal_Id'] : '';
                                             $mesage['receive_time'] = time(); //回执时间戳
                                             $mesage['Msg_Id']   = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
                                             $redis->rPush($redisMessageUnKownDeliver, json_encode($mesage));
