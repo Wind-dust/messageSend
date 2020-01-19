@@ -442,7 +442,7 @@ class Message extends CommonIndex
 
     public function deluserBindDevelopCode($id)
     {
-        $has_bind = Dbuser::getUserDevelopCode(['id' => $id], 'uid,business_id,source,develop_no', false);
+        $has_bind = Dbuser::getUserDevelopCode(['id' => $id], 'uid,business_id,source,develop_no', true);
         if (empty($has_bind)) {
             return ['code' => '3000'];
         }
@@ -457,7 +457,7 @@ class Message extends CommonIndex
             Db::commit();
             return ['code' => '200'];
         } catch (\Exception $e) {
-            exception($e);
+            // exception($e);
             Db::rollback();
             return ['code' => '3009']; //修改失败
         }
