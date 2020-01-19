@@ -388,7 +388,7 @@ class Message extends CommonIndex
                     'source' => $source,
                 ];
                 Dbuser::addUserDevelopCode($data);
-                DbSendMessage::updateDevelopCode(['is_bind' => 2, $result['id']]);
+                DbSendMessage::updateDevelopCode(['is_bind' => 2], $result['id']);
                 Db::commit();
                 return ['code' => '200'];
             } catch (\Exception $e) {
