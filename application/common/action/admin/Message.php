@@ -430,7 +430,7 @@ class Message extends CommonIndex
 
     public function getuserBindDevelopCode($develop_no)
     {
-        $has_bind = Dbuser::getUserDevelopCode(['develop_no' => $develop_no], 'uid,business_id,source', false);
+        $has_bind = Dbuser::getUserDevelopCode(['develop_no' => $develop_no], 'id,uid,business_id,source', false);
         if (empty($has_bind)) {
             return ['code' => '3000'];
         }
