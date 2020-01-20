@@ -347,7 +347,7 @@ return $result;
         $data                 = [];
         if (!empty($develop_no)) {
             $has_bind = Dbuser::getUserDevelopCode(['develop_no' => $develop_no, 'business_id' => 5, 'uid' => $user['id']], 'id,uid,business_id,source', true);
-            if (!empty($has_bind)) {
+            if (empty($has_bind)) {
                 return ['code' => '3011'];
             }
             $data['develop_no'] = $develop_no;
@@ -449,7 +449,7 @@ return $result;
         $data                 = [];
         if (!empty($develop_no)) {
             $has_bind = Dbuser::getUserDevelopCode(['develop_no' => $develop_no, 'business_id' => 6, 'uid' => $user['id']], 'id,uid,business_id,source', true);
-            if (!empty($has_bind)) {
+            if (empty($has_bind)) {
                 return ['code' => '3011'];
             }
             $data['develop_no'] = $develop_no;
