@@ -64,15 +64,15 @@ class CmppYiXinYiDongBusiness extends Pzlife
             'mar_task_id' => '',
             'uid'         => '1',
             'content'     => '【钰蜥科技】您本次登录的验证码为026835,回复QX可取消本次登陆',
-            'develop_code' => '323',
+            'develop_code' => '42306',
             'Submit_time' => date('mdHis', time()),
         ]));
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15821193682',
+            'mobile'      => '15172413982',
             'mar_task_id' => '',
             'uid'         => '1',
             'content'     => '【钰蜥科技】您本次登录的验证码为026835,回复QX可取消本次登陆',
-            'develop_code' => '323',
+            'develop_code' => '45306',
             'Submit_time' => date('mdHis', time()),
         ]));
         /*   $send = $redis->rPush($redisMessageCodeSend, json_encode([
