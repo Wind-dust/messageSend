@@ -335,7 +335,7 @@ class Message extends CommonIndex
             array_push($where, [['no_lenth', '=', $no_lenth]]);
         }
         if (!empty($develop_no)) {
-            array_push($where, [['develop_no', 'like', '%' . $no_lenth . '%']]);
+            array_push($where, [['develop_no', 'like', '%' . $develop_no . '%']]);
         }
         if (!empty($is_bind)) {
             array_push($where, [['is_bind', '=', $is_bind]]);
