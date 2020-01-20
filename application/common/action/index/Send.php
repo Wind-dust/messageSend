@@ -346,7 +346,7 @@ return $result;
         // $Content = $this->dbc2Sbc($Content);
         $data                 = [];
         if (!empty($develop_no)) {
-            $has_bind = Dbuser::getUserDevelopCode(['develop_no' => $develop_no, 'business_id' => 6, 'uid' => $user['id']], 'id,uid,business_id,source', true);
+            $has_bind = Dbuser::getUserDevelopCode(['develop_no' => $develop_no, 'business_id' => 5, 'uid' => $user['id']], 'id,uid,business_id,source', true);
             if (!empty($has_bind)) {
                 return ['code' => '3011'];
             }
