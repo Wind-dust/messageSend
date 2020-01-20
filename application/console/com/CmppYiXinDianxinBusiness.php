@@ -9,7 +9,7 @@ use Env;
 use Exception;
 use think\Db;
 
-class CmppYiXinYiDongBusiness extends Pzlife
+class CmppYiXinDianxinBusiness extends Pzlife
 {
 
     // protected $redis;
@@ -19,17 +19,17 @@ class CmppYiXinYiDongBusiness extends Pzlife
         $this->redis = Phpredis::getConn();
         //        $this->connect = Db::connect(Config::get('database.db_config'));
     }
-    //三体行业
+    //易信电信行业
     public function content($content)
     {
         return [
             'host'          => "47.95.161.134", //服务商ip
             'port'          => "9004", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "280742", //企业id  企业代码
-            'Shared_secret' => '1c2j2p4aue9w', //网关登录密码
+            'Source_Addr'   => "280743", //企业id  企业代码
+            'Shared_secret' => 'onh2g3wv9ul8', //网关登录密码
             'template_id'   => "", //模板id
-            'Service_Id'    => "280742", //业务代码
-            'Dest_Id'       => "1069280742", //短信接入码 短信端口号
+            'Service_Id'    => "280743", //业务代码
+            'Dest_Id'       => "1069280743", //短信接入码 短信端口号
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
             'master_num'    => 300,
@@ -43,7 +43,7 @@ class CmppYiXinYiDongBusiness extends Pzlife
         // $a_time = 0;
         date_default_timezone_set('PRC');
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $content                    = 24;
+        $content                    = 26;
         $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
         $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
         $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
@@ -101,7 +101,7 @@ class CmppYiXinYiDongBusiness extends Pzlife
         // $send = $this->redis->lPop($redisMessageCodeSend);
         // print_r($send);
         // die;
-        $log_path = realpath("") . "/error/24.log";
+        $log_path = realpath("") . "/error/" . $content . ".log";
         $myfile = fopen($log_path, 'a+');
         fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
         fwrite($myfile, " Begin" . "\n");
@@ -584,7 +584,7 @@ class CmppYiXinYiDongBusiness extends Pzlife
                             }
                             socket_close($socket);
 
-                            $log_path = realpath("") . "/error/24.log";
+                            $log_path = realpath("") . "/error/" . $content . ".log";
                             $myfile = fopen($log_path, 'a+');
                             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                             fwrite($myfile, $e . "\n");

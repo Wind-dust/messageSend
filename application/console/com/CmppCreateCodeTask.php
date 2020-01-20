@@ -2563,4 +2563,17 @@ Db::rollback();
             }
         }
     }
+
+    public function getUpRiver($content)
+    {
+        $redis = Phpredis::getConn();
+        $redisMessageUpRiver = 'index:message:code:upriver:' . $content;
+        $redis->rpush($redisMessageUpRiver, json_encode([
+            'mobile' => 15201926171,
+            'message_info' => 'QX',
+        ]));
+        while(true){
+            
+        }
+    }
 }
