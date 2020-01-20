@@ -25,11 +25,11 @@ class CmppYiXinYiDongBusiness extends Pzlife
         return [
             'host'          => "47.95.161.134", //服务商ip
             'port'          => "9004", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "280723", //企业id  企业代码
-            'Shared_secret' => 'ken4057y803j', //网关登录密码
+            'Source_Addr'   => "280742", //企业id  企业代码
+            'Shared_secret' => '1c2j2p4aue9w', //网关登录密码
             'template_id'   => "", //模板id
-            'Service_Id'    => "280723", //业务代码
-            'Dest_Id'       => "1069280723", //短信接入码 短信端口号
+            'Service_Id'    => "280742", //业务代码
+            'Dest_Id'       => "1069280742", //短信接入码 短信端口号
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
             'master_num'    => 300,
@@ -59,16 +59,16 @@ class CmppYiXinYiDongBusiness extends Pzlife
         //     print_r($send);
         // } while ($send);
         // $send = $redis ->lPop($redisMessageCodeSend);
-        /*    $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'uid'         => '1',
             'content'     => '【钰蜥科技】您本次登录的验证码为026835,回复QX可取消本次登陆',
             'develop_code' => '323',
             'Submit_time' => date('mdHis', time()),
-        ])); */
+        ]));
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15821993682',
+            'mobile'      => '15821193682',
             'mar_task_id' => '',
             'uid'         => '1',
             'content'     => '【钰蜥科技】您本次登录的验证码为026835,回复QX可取消本次登陆',
