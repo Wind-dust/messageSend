@@ -2566,15 +2566,21 @@ Db::rollback();
         }
     }
 
-    public function getUpRiver($content)
+    public function getUpRiver()
     {
         $redis = Phpredis::getConn();
-        $redisMessageUpRiver = 'index:message:code:upriver:' . $content;
-        $redis->rpush($redisMessageUpRiver, json_encode([
-            'mobile' => 15201926171,
-            'message_info' => 'QX',
-        ]));
-        $channel              = $this->getChannelinfo($content);
+        for ($i = 1; $i < 100; $i++) {
+            $redisMessageUpRiver = 'index:message:code:upriver:' . $i;
+            $redis->rpush($redisMessageUpRiver, json_encode([
+                'mobile' => 15201926171,
+                'message_info' => 'QX',
+            ]));
+            $channel              = $this->getChannelinfo($i);
+            if (empty($channel)) {
+                $i = 1;
+            }
+        }
+
         while (true) {
             $upriver = $redis->lpop($redisMessageUpRiver);
             if (empty($upriver)) {

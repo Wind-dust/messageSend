@@ -840,4 +840,17 @@ class User extends CommonIndex
         $totle = DbSendMessage::countUserSignature(['uid' => $uid, 'business_id' => $business_id]);
         return ['code' => '200', 'total' => $totle, 'result' => $result];
     }
+
+    public function getUserDevelopCode($ConId, $business_id)
+    {
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $has_bind = Dbuser::getUserDevelopCode(['uid' => $uid, 'business_id' => $business_id], 'id,uid,business_id,develop_no,source', false);
+        if (empty($has_bind)) {
+            return ['code' => '3000'];
+        }
+        return ['code' => '200', 'develop_codes' => $has_bind];
+    }
 }

@@ -598,7 +598,7 @@ class User extends MyController
         return $result;
     }
 
-     /**
+    /**
      * @api              {post} / 获取已报备的签名
      * @apiDescription   getUserSignature
      * @apiGroup         index_user
@@ -627,6 +627,30 @@ class User extends MyController
             return ['code' => '3002'];
         }
         $result = $this->app->user->getUserSignature($page, $pageNum, $ConId, $business_id);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 获取已绑定的签名
+     * @apiDescription   getUserDevelopCode
+     * @apiGroup         index_user
+     * @apiName          getUserDevelopCode
+     * @apiParam (入参) {String} con_id
+     * @apiParam (入参) {String} business_id 5,6,7,9 
+     * @apiSuccess (返回) {String} code 200:成功  3001:logo为空或者未上传成功/ 3002:business错误 / 3003:用户不存在 / 3004:登录失败
+     * @apiSuccess (返回) {Array} data 用户信息
+     * @apiSampleRequest /index/user/getUserDevelopCode
+     * @return array
+     * @author rzc
+     */
+    public function getUserDevelopCode()
+    {
+        $ConId = trim($this->request->post('con_id'));
+        $business_id  = trim($this->request->post('business_id'));
+        if (!in_array($business_id, [5, 6, 7, 9])) {
+            return ['code' => '3002'];
+        }
+        $result = $this->app->user->getUserDevelopCode($ConId, $business_id);
         return $result;
     }
 }
