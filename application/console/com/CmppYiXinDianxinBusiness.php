@@ -61,7 +61,7 @@ class CmppYiXinDianxinBusiness extends Pzlife
         // } while ($send);
         // $send = $redis ->lPop($redisMessageCodeSend);
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '17721160630',
+            'mobile'      => '15601607386',
             'mar_task_id' => '',
             'uid'         => '1',
             'content'     => '【钰蜥科技】您本次登录的验证码为026835,回复QX可取消本次登陆',

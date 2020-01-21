@@ -455,6 +455,7 @@ class CmppCreateCodeTask extends Pzlife
                         'title'       => $sendTask['task_name'],
                         'content'     => $sendTask['task_content'],
                         'mobile'      => $mobilesend[$i],
+                        'channel_id'  => $channel_id,
                         'send_status' => 2,
                         'create_time' => time(),
                     ];
@@ -583,6 +584,7 @@ class CmppCreateCodeTask extends Pzlife
                             'uid'         => $sendTask['uid'],
                             'mobile'      => $mobilesend[$i],
                             'send_status' => 2,
+                            'channel_id'  => $channel_id,
                             'create_time' => time() - 5063,
                         ];
                         $sendmessage = [
@@ -825,7 +827,7 @@ class CmppCreateCodeTask extends Pzlife
                             'task_content' => $sendTask['task_content'],
                             'mobile'       => $mobilesend[$i],
                             'send_status'  => 2,
-                            // 'channel_id'  => $channel_id,
+                            'channel_id'  => $channel_id,
                             'create_time'  => time(),
                         ];
                         $sendmessage = [
@@ -2572,8 +2574,14 @@ Db::rollback();
             'mobile' => 15201926171,
             'message_info' => 'QX',
         ]));
-        while(true){
-            
+        $channel              = $this->getChannelinfo($content);
+        while (true) {
+            $upriver = $redis->lpop($redisMessageUpRiver);
+            if (empty($upriver)) {
+                continue;
+            }
+            $upriver_data = json_decode($upriver, true);
+            $mobile = $upriver_data['mobile'];
         }
     }
 }
