@@ -472,7 +472,7 @@ return $result;
             } elseif ($user['id'] == 50) {
                 $data['channel_id'] = 22;
             } else {
-                $data['channel_id'] = 1; //三体
+                $data['channel_id'] = 22; //三体
             }
         }
         Db::startTrans();
