@@ -301,7 +301,7 @@ class Send extends MyController
         // if (empty($Mobile) || checkMobile($Mobile) === false) {
         //     return ['code'=>'3001'];
         // }
-        if (empty($Content) || strlen($Content) > 500) {
+        if (empty($Content) || mb_strlen($Content) > 500) {
             return ['code' => '3002'];
         }
         // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
@@ -688,6 +688,7 @@ class Send extends MyController
         $appid   = trim($this->request->post('appid')); //登录名
         $appkey  = trim($this->request->post('appkey')); //登陆密码
         $template_id  = trim($this->request->post('template_id'));
+        $develop_no  = trim($this->request->post('develop_no')); //拓展码号
         $signature_id  = trim($this->request->post('signature_id'));
         $connect  = trim($this->request->post('connect'));
         if (empty($appid)) {
@@ -698,6 +699,9 @@ class Send extends MyController
         }
         if (empty($connect)) {
             return ['code' => '3001'];
+        }
+        if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
+            return ['code' => '3011'];
         }
         $ip       = trim($this->request->ip());
         $result = $this->app->send->submitBatchCustomBusiness($appid, $appkey, $template_id, $connect, $ip, $signature_id);
