@@ -753,7 +753,7 @@ class CmppCreateCodeTask extends Pzlife
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:business:sendtask';
         // for ($i = 20000; $i < 30000; $i++) {
-        // $this->redis->rPush('index:meassage:business:sendtask', 110500);
+        // $this->redis->rPush('index:meassage:business:sendtask', 144870);
         // }
 
         $push_messages = []; //推送队列
