@@ -361,7 +361,7 @@ class Message extends CommonIndex
     public function verifyDevelopCode($develop_no)
     {
         $result = DbSendMessage::getDevelopCode(['develop_no' => $develop_no, 'is_bind' => 1], 'develop_no', true);
-        if (empty($result)) {
+        if (!empty($result)) {
             return ['code' => '200'];
         }
         return ['code' => '3002'];
