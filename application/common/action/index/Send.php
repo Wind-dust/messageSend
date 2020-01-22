@@ -426,7 +426,6 @@ return $result;
             }
             $Content = $signature['title'] . $Content;
         }
-        $send_num = count($Mobiles);
 
         $effective_mobile = [];
         foreach ($Mobiles as $key => $value) {
@@ -434,6 +433,7 @@ return $result;
                 $effective_mobile[] = $value;
             }
         }
+        $send_num = count($effective_mobile);
         if (empty($effective_mobile)) {
             return ['code' => '3001'];
         }
@@ -458,7 +458,7 @@ return $result;
         $data['source']       = $ip;
         $data['task_content'] = $Content;
 
-        $data['mobile_content'] = join(',', $Mobiles);
+        $data['mobile_content'] = join(',', $effective_mobile);
         $data['task_name']      = $Content;
         $data['send_num']       = $send_num;
         $data['real_num']       = $real_num;

@@ -759,6 +759,7 @@ class CmppCreateCodeTask extends Pzlife
         $push_messages = []; //推送队列
         $rollback = [];
         $all_log = [];
+        $true_log = [];
         $j = 1;
         // echo time() -1574906657;die;
         while (true) {
@@ -832,7 +833,7 @@ class CmppCreateCodeTask extends Pzlife
                         ];
                         $sendmessage = [
                             'mobile'      => $mobilesend[$i],
-                            // 'title'       => $sendTask['task_name'],
+                            'title'       => $sendTask['task_name'],
                             'mar_task_id' => $sendTask['id'],
                             'content'     => $sendTask['task_content'],
                             'channel_id'  => $channel_id,
@@ -842,25 +843,29 @@ class CmppCreateCodeTask extends Pzlife
                         }
                         // $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
                         $push_messages[] = $sendmessage;
+                        $true_log[] = $send_log;
                     } else {
                         $send_log = [
                             'task_no'        => $sendTask['task_no'],
                             'uid'            => $sendTask['uid'],
-                            'title'          => $sendTask['task_name'],
-                            'content'        => $sendTask['task_content'],
+                            // 'title'          => $sendTask['task_name'],
+                            'task_content'        => $sendTask['task_content'],
+                            'source'       => $sendTask['source'],
                             'mobile'         => $mobilesend[$i],
                             'send_status'    => 4,
                             'create_time'    => time(),
                             'status_message' => 'DB:0101', //无效号码
                             'real_message'   => 'DB:0101',
                         ];
+                        $all_log[] = $send_log;
                     }
-                    $all_log[] = $send_log;
+
                     $j++;
                     if ($j > 500) {
                         $j = 1;
                         Db::startTrans();
                         try {
+                            Db::table('yx_user_send_code_task_log')->insertAll($true_log);
                             Db::table('yx_user_send_code_task_log')->insertAll($all_log);
 
                             foreach ($push_messages as $key => $value) {
@@ -892,9 +897,10 @@ class CmppCreateCodeTask extends Pzlife
                 // exit("SUCCESS");
             }
 
-            if (!empty($all_log)) {
+            if (!empty($true_log)) {
                 Db::startTrans();
                 try {
+                    Db::table('yx_user_send_code_task_log')->insertAll($true_log);
                     Db::table('yx_user_send_code_task_log')->insertAll($all_log);
                     Db::commit();
                     foreach ($push_messages as $key => $value) {
@@ -911,6 +917,7 @@ class CmppCreateCodeTask extends Pzlife
                     exception($e);
                 }
                 unset($all_log);
+                unset($true_log);
                 unset($push_messages);
                 unset($rollback);
             }
