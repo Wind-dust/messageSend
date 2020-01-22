@@ -880,6 +880,7 @@ class CmppCreateCodeTask extends Pzlife
                         unset($all_log);
                         unset($push_messages);
                         // echo time() . "\n";
+                        unset($rollback);
                     }
                 }
 
@@ -911,6 +912,7 @@ class CmppCreateCodeTask extends Pzlife
                 }
                 unset($all_log);
                 unset($push_messages);
+                unset($rollback);
             }
             // echo time() . "\n";
             // exit('success');
