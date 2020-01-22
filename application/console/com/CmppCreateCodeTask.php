@@ -753,14 +753,17 @@ class CmppCreateCodeTask extends Pzlife
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:business:sendtask';
         // for ($i = 20000; $i < 30000; $i++) {
-        // $this->redis->rPush('index:meassage:business:sendtask', 144870);
+        //     $this->redis->rPush('index:meassage:business:sendtask', 144870);
         // }
-
+        $this->redis->rPush('index:meassage:business:sendtask', 151889);
+        $this->redis->rPush('index:meassage:business:sendtask', 151890);
+        $this->redis->rPush('index:meassage:business:sendtask', 151891);
+        $this->redis->rPush('index:meassage:business:sendtask', 151892);
+        $this->redis->rPush('index:meassage:business:sendtask', 151893);
         $push_messages = []; //推送队列
         $rollback = [];
         $all_log = [];
         $j = 1;
-        // echo time() -1574906657;die;
         while (true) {
             // echo time() . "\n";
             while (true) {
@@ -805,6 +808,10 @@ class CmppCreateCodeTask extends Pzlife
                     $sendmessage = [];
                     if (checkMobile(trim($mobilesend[$i])) == true) {
                         // $prefix = substr(trim($mobilesend[$i]), 0, 7);
+                        if (Db::query("SELECT `id` FROM yx_user_send_code_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' and `mobile` = '" . $mobilesend[$i] . "' ")) {
+                            continue;
+                        }
+
                         // $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                         // $newres = array_shift($res);
                         //通道组分配
@@ -862,12 +869,6 @@ class CmppCreateCodeTask extends Pzlife
                         Db::startTrans();
                         try {
                             Db::table('yx_user_send_code_task_log')->insertAll($all_log);
-
-                            foreach ($push_messages as $key => $value) {
-                                $send_channelid = $value['channel_id'];
-                                unset($value['channel_id']);
-                                $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
-                            }
                             Db::commit();
                         } catch (\Exception $e) {
                             // $this->redis->rPush('index:meassage:business:sendtask', $send);
@@ -881,6 +882,11 @@ class CmppCreateCodeTask extends Pzlife
                         unset($push_messages);
                         // echo time() . "\n";
                         unset($rollback);
+                    }
+                    foreach ($push_messages as $key => $value) {
+                        $send_channelid = $value['channel_id'];
+                        unset($value['channel_id']);
+                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
                     }
                 }
 
@@ -897,11 +903,6 @@ class CmppCreateCodeTask extends Pzlife
                 try {
                     Db::table('yx_user_send_code_task_log')->insertAll($all_log);
                     Db::commit();
-                    foreach ($push_messages as $key => $value) {
-                        $send_channelid = $value['channel_id'];
-                        unset($value['channel_id']);
-                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
-                    }
                 } catch (\Exception $e) {
                     // $this->redis->rPush('index:meassage:business:sendtask', $send);
                     foreach ($rollback as $key => $value) {
@@ -913,6 +914,11 @@ class CmppCreateCodeTask extends Pzlife
                 unset($all_log);
                 unset($push_messages);
                 unset($rollback);
+            }
+            foreach ($push_messages as $key => $value) {
+                $send_channelid = $value['channel_id'];
+                unset($value['channel_id']);
+                $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
             }
             // echo time() . "\n";
             // exit('success');
