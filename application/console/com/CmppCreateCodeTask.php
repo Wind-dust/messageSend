@@ -832,7 +832,7 @@ class CmppCreateCodeTask extends Pzlife
                         ];
                         $sendmessage = [
                             'mobile'      => $mobilesend[$i],
-                            'title'       => $sendTask['task_name'],
+                            // 'title'       => $sendTask['task_name'],
                             'mar_task_id' => $sendTask['id'],
                             'content'     => $sendTask['task_content'],
                             'channel_id'  => $channel_id,
