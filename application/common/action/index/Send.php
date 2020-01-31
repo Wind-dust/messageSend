@@ -393,7 +393,7 @@ return $result;
         // print_r($this->redis);
         // die;
         $Mobiles = array_unique(array_filter($Mobiles));
-        $user    = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        $user    = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial,pid', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -467,12 +467,10 @@ return $result;
         $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
         if ($user['free_trial'] == 2) {
             $data['free_trial'] = 2;
-            if ($user['id'] == 56) {
-                $data['channel_id'] = 22;
-            } elseif ($user['id'] == 50) {
-                $data['channel_id'] = 22;
+            if ($user['pid'] == 10) {
+                $data['channel_id'] = 24;
             } else {
-                $data['channel_id'] = 22; //三体
+                $data['channel_id'] = 22; //蓝鲸
             }
         }
         Db::startTrans();
