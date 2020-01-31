@@ -905,7 +905,9 @@ class CmppCreateCodeTask extends Pzlife
                 Db::startTrans();
                 try {
                     Db::table('yx_user_send_code_task_log')->insertAll($true_log);
-                    Db::table('yx_user_send_code_task_log')->insertAll($all_log);
+                    if (!empty($all_log)) {
+                        Db::table('yx_user_send_code_task_log')->insertAll($all_log);
+                    }
                     Db::commit();
                     foreach ($push_messages as $key => $value) {
                         $send_channelid = $value['channel_id'];
@@ -914,8 +916,10 @@ class CmppCreateCodeTask extends Pzlife
                     }
                 } catch (\Exception $e) {
                     // $this->redis->rPush('index:meassage:business:sendtask', $send);
-                    foreach ($rollback as $key => $value) {
-                        $this->redis->rPush('index:meassage:business:sendtask', $value);
+                    if (!empty($rollback)) {
+                        foreach ($rollback as $key => $value) {
+                            $this->redis->rPush('index:meassage:business:sendtask', $value);
+                        }
                     }
                     Db::rollback();
                     exception($e);
@@ -2639,5 +2643,12 @@ Db::rollback();
         $newres = array_shift($res);
         print_r($newres);
         die;
+    }
+
+    public function refureTaskLog()
+    {
+        for ($i = 158640; $i < 162990; $i++) {
+            // $this->redis->rPush('index:meassage:business:sendtask', 151572);
+        }
     }
 }
