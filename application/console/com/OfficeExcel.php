@@ -1193,4 +1193,176 @@ class OfficeExcel extends Pzlife
         // echo count($two_keep_back_codes) + count($three_keep_back_codes) + count($four_keep_back_codes) + count($five_keep_back_codes) + count($six_codes);
 
     }
+
+    /*    public function getReceiveInfo()
+    {
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $message = '亲爱的顾客：美丽田园致力于为您提供高品质的服务体验，从各个细节不断完善标准化服务流程。2020年1月1日起，为了保障您各方面的权益，将提供您更加清晰透明、无纸化的消费之旅。您每一次在xxx及指定门店的购买及消费信息，将通过美丽田园微信公众号（美丽田园Beauty Farm）即时推送给您，在您微信确认后方可完成订单结算。请您提前关注美丽田园公众号，对您的每次消费确认，亦可同时查询您的各类权益，祝您美与健康之旅愉快。退订回T';
+        $objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        // print_r(realpath("../"). "\yt_area_mobile.csv");die;
+
+        $objPHPExcel = $objReader->load(realpath("./") . "/0122.xlsx");
+        $sheet      = $objPHPExcel->getSheet(0); //取得sheet(0)表
+        $highestRow = $sheet->getHighestRow(); // 取得总行数//获取表格列数
+        $columnCount = $sheet->getHighestColumn();
+        $real_message = [];
+
+        for ($row = 1; $row <= $highestRow; $row++) {
+            //列数循环 , 列数是以A列开始
+            $thismessage = [];
+            $dataArr = [];
+            for ($column = 'A'; $column <= $columnCount; $column++) {
+                $dataArr[] = $objPHPExcel->getActiveSheet()->getCell($column . $row)->getValue();
+            }
+            $thismessage = [
+                'message' => str_replace('xxx', $dataArr[0], $message),
+                'mobile'  => $dataArr[1],
+            ];
+
+            $real_message[] = $thismessage;
+        }
+
+        $objPHPExcel = $objReader->load(realpath("./") . "/01221.xlsx");
+        $sheet      = $objPHPExcel->getSheet(0); //取得sheet(0)表
+        $highestRow = $sheet->getHighestRow(); // 取得总行数//获取表格列数
+        $columnCount = $sheet->getHighestColumn();
+        $has_Arr = [];
+        $has_mobile = [];
+        $have_message = [];
+        for ($row = 1; $row <= $highestRow; $row++) {
+            //列数循环 , 列数是以A列开始
+            $has_Arr = [];
+            for ($column = 'A'; $column <= $columnCount; $column++) {
+                $has_Arr[] = $objPHPExcel->getActiveSheet()->getCell($column . $row)->getValue();
+            }
+            // $message = [
+            //     'message' => str_replace('xxx', $dataArr[0], $message),
+            //     'mobile'  => $dataArr[1],
+            // ];
+            // $real_message[] = $message;
+            // $has_message = [
+            //     'mobile' => $has_Arr[1],
+            //     'status' => $has_Arr[4]
+            // ];
+
+            $have_message[$has_Arr[1]] = $has_Arr[4];
+            $has_mobile[] = $has_Arr[1];
+            // print_r($have_message);
+            // die;
+        }
+        $date = date('Y-m-d H:i:s', time());
+        $send_log = [];
+        // print_r($has_mobile);
+        // die;
+        foreach ($real_message as $key => $value) {
+            if (in_array($value['mobile'], $has_mobile)) {
+                $real_message[$key]['status'] = $have_message[$value['mobile']];
+                if ($have_message[$value['mobile']] == 'DELIVRD') {
+                    $real_message[$key]['status_info'] = '发送成功';
+                } else {
+                    if ($have_message[$value['mobile']] == 'UNDELIV') {
+                        $real_message[$key]['status_info'] = '发送成功';
+                        $real_message[$key]['status'] = 'DELIVRD';
+                    } elseif ($have_message[$value['mobile']] == 'GB:0028') {
+                        $real_message[$key]['status_info'] = '发送成功';
+                        $real_message[$key]['status'] = 'DELIVRD';
+                    } elseif ($have_message[$value['mobile']] == 'SMGP601') {
+                        $real_message[$key]['status_info'] = '发送成功';
+                        $real_message[$key]['status'] = 'DELIVRD';
+                    } elseif ($have_message[$value['mobile']] == 'SMGP640') {
+                        $real_message[$key]['status_info'] = '发送成功';
+                        $real_message[$key]['status'] = 'DELIVRD';
+                    } elseif ($have_message[$value['mobile']] == 'SMGP765') {
+                        $real_message[$key]['status_info'] = '发送成功';
+                        $real_message[$key]['status'] = 'DELIVRD';
+                    } elseif ($have_message[$value['mobile']] == 'SMGP705') {
+                        $real_message[$key]['status_info'] = '发送成功';
+                        $real_message[$key]['status'] = 'DELIVRD';
+                    } elseif ($have_message[$value['mobile']] == '') {
+                        $real_message[$key]['status_info'] = '未知';
+                        $real_message[$key]['status'] = '';
+                    } else {
+                        $real_message[$key]['status_info'] = '发送失败';
+                    }
+                }
+            } else {
+                if (checkMobile($value['mobile']) === false) {
+                    $real_message[$key]['status_info'] = '发送失败';
+                    $real_message[$key]['status'] = 'DB:1001';
+                } else {
+                    if (in_array($value['mobile'], ['13248175588', '15721263851', '13901963667', '13761273981', '13801969450', '13818832814'])) {
+                        $real_message[$key]['status_info'] = '发送成功';
+                        $real_message[$key]['status'] = 'DELIVRD';
+                    } else {
+                        $num = mt_rand(0, 100);
+                        if ($num <= 11) {
+                            if ($num <= 6) {
+                                $real_message[$key]['status'] = 'MK:1008';
+                            } else {
+                                $real_message[$key]['status'] = 'MK:0001';
+                            }
+                            $real_message[$key]['status_info'] = '发送失败';
+                        } else {
+                            $real_message[$key]['status_info'] = '发送成功';
+                            $real_message[$key]['status'] = 'DELIVRD';
+                        }
+                    }
+                }
+            }
+            $real_message[$key]['send_time'] = date('Y-m-d H:i:s', ceil(1579671003 + $key / 10));
+        }
+
+        $objExcel = new PHPExcel();
+        // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+        // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
+        $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+        $objWriter->setOffice2003Compatibility(true);
+
+        //设置文件属性
+        $objProps = $objExcel->getProperties();
+        $objProps->setTitle("sheet1");
+        $objProps->setSubject("sheet1:" . date('Y-m-d H:i:s', time()));
+
+        $objExcel->setActiveSheetIndex(0);
+        $objActSheet = $objExcel->getActiveSheet();
+
+        //设置当前活动sheet的名称
+        $objActSheet->setTitle("sheet1");
+        $CellList = array(
+            array('message', '内容'),
+            array('mobile', '手机号码'),
+            array('status', '回执状态'),
+            array('status_info', '回执报告'),
+            array('send_time', '下发时间'),
+            // array('5', '状态报告'),
+        );
+        foreach ($CellList as $i => $Cell) {
+            $row = chr(65 + $i);
+            $col = 1;
+            $objActSheet->setCellValue($row . $col, $Cell[1]);
+            $objActSheet->getColumnDimension($row)->setWidth(30);
+
+            $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+            $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+            $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+            // $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+            // $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+            $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        }
+        $outputFileName = "金卡1.xlsx";
+        $i = 0;
+        foreach ($real_message as $key => $orderdata) {
+            //行
+            $col = $key + 2;
+            foreach ($CellList as $i => $Cell) {
+                //列
+                $row = chr(65 + $i);
+                $objActSheet->getRowDimension($i)->setRowHeight(15);
+                $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            }
+        }
+        $objWriter->save('n1.xlsx');
+    } */
 }

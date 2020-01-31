@@ -752,8 +752,8 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:business:sendtask';
-        // for ($i = 20000; $i < 30000; $i++) {
-        // $this->redis->rPush('index:meassage:business:sendtask', 144870);
+        // for ($i = 158640; $i < 162990; $i++) {
+        //     $this->redis->rPush('index:meassage:business:sendtask', 151572);
         // }
 
         $push_messages = []; //推送队列
@@ -866,8 +866,9 @@ class CmppCreateCodeTask extends Pzlife
                         Db::startTrans();
                         try {
                             Db::table('yx_user_send_code_task_log')->insertAll($true_log);
-                            Db::table('yx_user_send_code_task_log')->insertAll($all_log);
-
+                            if (!empty($all_log)) {
+                                Db::table('yx_user_send_code_task_log')->insertAll($all_log);
+                            }
                             foreach ($push_messages as $key => $value) {
                                 $send_channelid = $value['channel_id'];
                                 unset($value['channel_id']);
@@ -876,9 +877,12 @@ class CmppCreateCodeTask extends Pzlife
                             Db::commit();
                         } catch (\Exception $e) {
                             // $this->redis->rPush('index:meassage:business:sendtask', $send);
-                            foreach ($rollback as $key => $value) {
-                                $this->redis->rPush('index:meassage:business:sendtask', $value);
+                            if (!empty($rollback)) {
+                                foreach ($rollback as $key => $value) {
+                                    $this->redis->rPush('index:meassage:business:sendtask', $value);
+                                }
                             }
+
                             Db::rollback();
                             exception($e);
                         }
