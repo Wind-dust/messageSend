@@ -752,8 +752,8 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:business:sendtask';
-        // for ($i = 158640; $i < 162990; $i++) {
-        //     $this->redis->rPush('index:meassage:business:sendtask', 151572);
+        // for ($i = 158640; $i < 172610; $i++) {
+        //     $this->redis->rPush('index:meassage:business:sendtask', $i);
         // }
 
         $push_messages = []; //推送队列
@@ -868,12 +868,13 @@ class CmppCreateCodeTask extends Pzlife
                             if (!empty($all_log)) {
                                 Db::table('yx_user_send_code_task_log')->insertAll($all_log);
                             }
+                            Db::commit();
                             foreach ($push_messages as $key => $value) {
                                 $send_channelid = $value['channel_id'];
                                 unset($value['channel_id']);
                                 $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
                             }
-                            Db::commit();
+                           
                         } catch (\Exception $e) {
                             // $this->redis->rPush('index:meassage:business:sendtask', $send);
                             if (!empty($rollback)) {
@@ -886,6 +887,7 @@ class CmppCreateCodeTask extends Pzlife
                             exception($e);
                         }
                         unset($all_log);
+                        unset($true_log);
                         unset($push_messages);
                         // echo time() . "\n";
                         unset($rollback);
