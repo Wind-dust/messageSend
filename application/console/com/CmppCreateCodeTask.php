@@ -874,7 +874,6 @@ class CmppCreateCodeTask extends Pzlife
                                 unset($value['channel_id']);
                                 $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
                             }
-                           
                         } catch (\Exception $e) {
                             // $this->redis->rPush('index:meassage:business:sendtask', $send);
                             if (!empty($rollback)) {
@@ -2648,6 +2647,7 @@ Db::rollback();
 
     public function refureTaskLog()
     {
+        $redis = Phpredis::getConn();
         $j = 1;
         for ($i = 158640; $i < 162990; $i++) {
             // $this->redis->rPush('index:meassage:business:sendtask', 151572);
@@ -2700,8 +2700,8 @@ Db::rollback();
                     //     }
 
                     // }
-                    // print_r($newres);
-
+                    // print_r($sendTask);
+                    // die;
                     $send_log = [
                         'task_no'      => $sendTask['task_no'],
                         'uid'          => $sendTask['uid'],
@@ -2712,30 +2712,24 @@ Db::rollback();
                         'channel_id'  => $channel_id,
                         'create_time'  => $sendTask['create_time'],
                     ];
-                    $sendmessage = [
-                        'mobile'      => $mobilesend[$n],
-                        'title'       => $sendTask['task_name'],
-                        'mar_task_id' => $sendTask['id'],
-                        'content'     => $sendTask['task_content'],
-                        'channel_id'  => $channel_id,
-                    ];
+
                     $num = mt_rand(0, 1000);
-                    if ($num <= 11) {
+                    if ($num <= 20) {
                         if ($num <= 6) {
-                            $send_log['Stat'] = 'MK:1008';
+                            $send_log['status_message'] = 'MK:1008';
                         } else {
-                            $send_log['status'] = 'MK:0001';
+                            $send_log['status_message'] = 'MK:0001';
                         }
                         // $send_log['status_info'] = '发送失败';
                     } else {
                         // $send_log['status_info'] = '发送成功';
-                        $send_log['status'] = 'DELIVRD';
+                        $send_log['status_message'] = 'DELIVRD';
                     }
                     // if (!empty($sendTask['develop_no'])) {
                     //     $sendmessage['develop_code'] = $sendTask['develop_no'];
                     // }
                     // $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
-                    $push_messages[] = $sendmessage;
+
                     $true_log[] = $send_log;
                 } else {
                     $send_log = [
@@ -2770,19 +2764,27 @@ Db::rollback();
 
                 if ($sendTask['uid'] == 47 || $sendTask['uid'] == 49 || $sendTask['uid'] == 51 || $sendTask['uid'] == 52 || $sendTask['uid'] == 53 || $sendTask['uid'] == 54 || $sendTask['uid'] == 55) { //推送给美丽田园
                     // https://zhidao.baidu.com/question/412076997.html
-                    // if (strpos($send_log['content'], '问卷') !== false) {
-                    //     $request_url = "http://116.228.60.189:15901/rtreceive?";
-                    //     $request_url .= 'task_no=' . trim($sendTask[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim(date('YmdHis',$send_log['create_time'] + 9));
-                    // } else {
-                    //     $request_url = "http://116.228.60.189:15901/rtreceive?";
-                    //     $request_url .= 'task_no=' . trim($sendTask[0]['task_no']) . "&status_message=" . trim($send_log['Stat']) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim(date('YmdHis',$send_log['create_time'] + 10));
-                    // }
+                    if (strpos($send_log['task_content'], '问卷') !== false) {
+                        $request_url = "http://116.228.60.189:15901/rtreceive?";
+                        $request_url .= 'task_no=' . trim($sendTask['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim(date('YmdHis', $send_log['create_time'] + $num));
+                    } else {
+                        $request_url = "http://116.228.60.189:15901/rtreceive?";
+                        $request_url .= 'task_no=' . trim($sendTask['task_no']) . "&status_message=" . trim($send_log['status_message']) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim(date('YmdHis', $send_log['create_time'] + $num));
+                    }
 
 
-                    // print_r($request_url);
+                    print_r($request_url);
                     // sendRequest($request_url);
 
-                    // usleep(20000);
+                    usleep(20000);
+                } else {
+                    $redis->rpush('index:meassage:code:user:receive:' . $sendTask['uid'], json_encode([
+                        'task_no' =>  trim($sendTask['task_no']),
+                        'status_message' =>   trim($send_log['status_message']),
+                        'mobile' =>   trim($send_log['mobile']),
+                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        'send_time' => trim(date('YmdHis', $send_log['create_time'] + $num)),
+                    ])); //写入用户带处理日志
                 }
             }
 
