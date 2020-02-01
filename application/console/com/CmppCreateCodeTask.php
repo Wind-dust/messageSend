@@ -2773,8 +2773,8 @@ Db::rollback();
                     }
 
 
-                    print_r($request_url);
-                    // sendRequest($request_url);
+                    // print_r($request_url);
+                    sendRequest($request_url);
 
                     usleep(20000);
                 } else {
