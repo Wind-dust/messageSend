@@ -749,7 +749,7 @@ return $result;
         $mobile_content = array_filter($mobile_content);
         $real_mobile    = [];
         foreach ($mobile_content as $key => $value) {
-            if (checkMobile($real_mobile)) {
+            if (checkMobile($value)) {
                 $real_mobile[] = $value;
             }
         }
