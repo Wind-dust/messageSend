@@ -752,9 +752,9 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:business:sendtask';
-        // for ($i = 158640; $i < 172610; $i++) {
-        //     $this->redis->rPush('index:meassage:business:sendtask', $i);
-        // }
+        for ($i = 173993; $i < 174487; $i++) {
+            $this->redis->rPush('index:meassage:business:sendtask', $i);
+        }
 
         $push_messages = []; //推送队列
         $rollback = [];
@@ -2645,63 +2645,34 @@ Db::rollback();
         die;
     }
 
-    public function refureTaskLog()
+    /* public function refureTaskLog()
     {
         $redis = Phpredis::getConn();
         $j = 1;
-        for ($i = 158640; $i < 162990; $i++) {
-            // $this->redis->rPush('index:meassage:business:sendtask', 151572);
+        for ($i = 173993; $i < 174487; $i++) {
             $sendTask = $this->getSendCodeTask($i);
             if (empty($sendTask)) {
-                // echo 'taskId_is_null' . "\n";
-                // break;
+
                 continue;
             }
             if (empty($sendTask['channel_id'])) {
                 continue;
             }
             $mobilesend = [];
-            // print_r($sendTask);
-            // die;
+
             $mobilesend = explode(',', $sendTask['mobile_content']);
             $mobilesend = array_filter($mobilesend);
-            /*  $send_length = mb_strlen($sendTask['task_content'], 'utf8');
-            $real_length = 1;
-            if ($send_length > 70) {
-                $real_length = ceil($send_length / 67);
-            }
-            $real_num = 0;
-            $real_num += $real_length * $sendTask['send_num']; */
+
             $channel_id    = 0;
             $channel_id    = $sendTask['channel_id'];
             if (empty($channel_id)) {
                 continue;
             }
-            //判断任务手机号数量,如果大批量就按任务记录文件夹否则按日期
-            // if (count($mobilesend) > 10000) {//默认1万
 
-            // }
             for ($n = 0; $n < count($mobilesend); $n++) {
                 $send_log = [];
                 $sendmessage = [];
                 if (checkMobile(trim($mobilesend[$n])) == true) {
-                    // $prefix = substr(trim($mobilesend[$i]), 0, 7);
-                    // $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
-                    // $newres = array_shift($res);
-                    //通道组分配
-                    // if ($newres) {
-                    //     if ($newres['source'] == 2) { //米加联通营销
-                    //         $channel_id = 8;
-                    //     } else if ($newres['source'] == 1) { //蓝鲸
-                    //         $channel_id = 2;
-
-                    //     } else if ($newres['source'] == 3) { //米加电信营销
-                    //         $channel_id = 7;
-                    //     }
-
-                    // }
-                    // print_r($sendTask);
-                    // die;
                     $send_log = [
                         'task_no'      => $sendTask['task_no'],
                         'uid'          => $sendTask['uid'],
@@ -2810,6 +2781,39 @@ Db::rollback();
                 Db::rollback();
                 exception($e);
             }
+        }
+    } */
+
+    public function delRepetition()
+    {
+        $del_ids = [];
+        for ($i = 162990; $i < 173332; $i++) {
+            $sendTask = $this->getSendCodeTask($i);
+            if (empty($sendTask)) {
+                continue;
+            }
+            $task_no = $sendTask['task_no'];
+            $mobile = explode(',', $sendTask['mobile_content']);
+            if (count($mobile) > 1) {
+                continue;
+            }
+            $log = Db::query("SELECT `id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '" . $task_no . "'");
+            if (count($log) > 1) {
+                $has = [];
+                $has[] = $log[0]['id'];
+                $logs_id = array_column($log, 'id');
+
+                $del = array_diff($logs_id, $has);
+                foreach ($del as $key => $value) {
+                    $del_ids[] = $value;
+                }
+                // print_r($del_ids);
+                // die;
+            }
+        }
+        if ($del_ids) {
+            $ids = join(',', $del_ids);
+            Db::table('yx_user_send_code_task_log')->where("id in ($ids)")->delete();
         }
     }
 }
