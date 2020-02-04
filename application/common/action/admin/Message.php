@@ -75,7 +75,7 @@ class Message extends CommonIndex
         }
     }
 
-    public function distributionChannel($effective_id = [], $channel_id, $business_id)
+    public function distributionMultimediaChannel($effective_id = [], $channel_id, $business_id)
     {
         $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id, 'business_id' => $business_id], 'id,title,channel_price', true);
         if (empty($channel)) {
