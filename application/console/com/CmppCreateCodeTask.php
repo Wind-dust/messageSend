@@ -633,7 +633,7 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:multimediamessage:sendtask';
-        // $send                      = $this->redis->rPush('index:meassage:multimediamessage:sendtask', 1);
+        // $this->redis->rPush('index:meassage:multimediamessage:sendtask', 7);
         // echo time() -1574906657;die;
         while (true) {
             $real_length = 1;
@@ -724,7 +724,7 @@ class CmppCreateCodeTask extends Pzlife
 
             Db::startTrans();
             try {
-                Db::table('yx_user_multimedia_message')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3, 'log_path' => realpath("") . '/tasklog/marketing/' . $sendTask['task_no'] . ".txt"]);
+                Db::table('yx_user_multimedia_message')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3, 'log_path' => realpath("") . '/tasklog/multimedia/' . $sendTask['task_no'] . ".txt"]);
                 Db::commit();
                 foreach ($push_messages as $key => $value) {
                     $send_channelid = $value['channel_id'];
