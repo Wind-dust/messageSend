@@ -62,7 +62,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
         // print_r(base64_encode(file_get_contents('http://imagesdev.shyuxi.com/20191209/6b97bc91cda37dfbde62dba15b447ca85dee1b09a5251.jpg')));die;
 
         $content                 = 13;
-        $redisMessageCodeSend    = 'index:meassage:multimediamessage:sendtask:' . $content; //彩信发送任务rediskey
+        $redisMessageCodeSend    = 'index:meassage:code:send:13' . $content; //彩信发送任务rediskey
         $redisMessageCodeDeliver = 'index:meassage:multimediamessage:deliver:' . $content; //彩信MsgId
         $user_info               = $this->content();
         /*    $send                 = $redis->rPush($redisMessageCodeSend, json_encode([
