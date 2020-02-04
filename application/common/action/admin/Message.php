@@ -81,7 +81,7 @@ class Message extends CommonIndex
         if (empty($channel)) {
             return ['code' => '3002'];
         }
-        $usertask = DbSendMessage::getUserMultimediaMessage([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,task_content,free_trial,send_num,channel_id', false);
+        $usertask = DbSendMessage::getUserMultimediaMessage([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,free_trial,send_num,channel_id', false);
         if (empty($usertask)) {
             return ['code' => '3001'];
         }
