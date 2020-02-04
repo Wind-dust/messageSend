@@ -10,10 +10,12 @@ use Exception;
 use think\Db;
 
 //http 通道,通道编号10
-class HttpChannelCaiXinHangZhouMaiYuan extends Pzlife {
+class HttpChannelCaiXinHangZhouMaiYuan extends Pzlife
+{
 
     //杭州迈远
-    public function content($content = 13) {
+    public function content($content = 13)
+    {
         return [
             'accesskey' => 'Ef57znngu5K4KFHa',
             'secret' => '1DM8onrpjbJoYVotl3tOr6tjdnVDwoMs',
@@ -27,13 +29,14 @@ class HttpChannelCaiXinHangZhouMaiYuan extends Pzlife {
         // 'appid'    => '674',
     }
 
-    public function Send() {
+    public function Send()
+    {
         $redis = Phpredis::getConn();
         // $a_time = 0;
 
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
 
-/*         $XML = '<?xml version="1.0" encoding="utf-8" ?>
+        /*         $XML = '<?xml version="1.0" encoding="utf-8" ?>
 <returnsms>
 <statusbox>
 <mobile>15023239810</mobile>-------------对应的手机号码
@@ -144,7 +147,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                                 $receive_id[$result['batchId']] = $send_taskid;
                                 $redis->hset('index:meassage:code:back_taskno:' . $content, $result['batchId'], $send_taskid);
                             }
-                           /*  $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+                            /*  $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
                             if ($result['returnstatus'] == 'Success') { //成功
                                 $receive_id[$result['taskID']] = $send_taskid;
                                 $redis->hset('index:meassage:code:back_taskno:' . $content, $result['taskID'], $send_taskid);
@@ -157,7 +160,6 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                         }
                     }
                 }
-
             } while ($send);
             //剩下的号码再做提交
             // print_r($send_num);die;
@@ -187,7 +189,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                         $redis->hset('index:meassage:code:back_taskno:' . $content, $result['batchId'], $send_taskid);
                     }
                     // print_r($res);
-       
+
                     // $result = explode(',', $res);
                     // if ($result['returnstatus'] == 'Success') { //成功
                     //     $receive_id[$result['taskID']] = $send_taskid;
@@ -214,7 +216,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
             // print_r($receive_data);
             // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
             // $receive_data = explode(';', $receive);
-          /*   $receive_data = [
+            /*   $receive_data = [
                 'code' => 0,
                 'msg'  => '',
                 'data' => [
@@ -237,6 +239,9 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                     // $task_id      = $receive_id[$value['taskid']];
                     if (isset($value['batchId'])) {
                         $task_id = $redis->hget('index:meassage:code:back_taskno:' . $content, $value['batchId']);
+                        if (empty($task_id)) {
+                            continue;
+                        }
                         $task    = $this->getSendTask($task_id);
                         if ($task == false) {
                             echo "error task_id" . "\n";
@@ -267,7 +272,6 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                         // }
                         unset($send_status);
                     }
-
                 }
             }
             // print_r($receive_data);die;
@@ -278,15 +282,14 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
             unset($receive_id);
             echo "success";
         }
-
     }
 
-    public function getSendTask($id) {
+    public function getSendTask($id)
+    {
         $task = Db::query("SELECT `task_no`,`uid` FROM yx_user_multimedia_message WHERE `id` =" . $id);
         if ($task) {
             return $task[0];
         }
         return false;
     }
-
 }
