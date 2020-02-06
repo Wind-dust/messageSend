@@ -76,6 +76,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
             $send_content = [];
             $send_title   = [];
             $receive_id   = [];
+            $roallback = [];
             if (date('H') >= 18 || date('H') < 8) {
                 exit("8点前,18点后通道关闭");
             }
@@ -84,6 +85,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                 // $redis->rpush($redisMessageCodeSend, $send);
                 $send_data = json_decode($send, true);
                 if ($send_data) {
+                    $roallback[$send_data['mar_task_id']][] = $send;
                     if (empty($send_task)) {
                         $send_task[]                           = $send_data['mar_task_id'];
                         $send_title[$send_data['mar_task_id']] = $send_data['title'];
@@ -123,6 +125,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                             }
                             $vc = ';';
                         }
+                        $send_content[$send_data['mar_task_id']] = $real_send_content;
                     }
                     $send_num[$send_data['mar_task_id']][] = $send_data['mobile'];
                     foreach ($send_num as $send_taskid => $num) {
@@ -143,17 +146,26 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
 
                             $res    = sendRequest($user_info['send_api'], 'post', $real_send);
                             $result = json_decode($res, true);
+                            // $result['code'] = 2;
                             if ($result['code'] == 0) {
                                 $receive_id[$result['batchId']] = $send_taskid;
                                 $redis->hset('index:meassage:code:back_taskno:' . $content, $result['batchId'], $send_taskid);
+                                unset($roallback[$send_taskid]);
+                            } else {
+                                foreach ($roallback as $key => $value) {
+                                    foreach ($value as $ne => $val) {
+                                        $redis->rpush($redisMessageCodeSend, $val);
+                                    }
+                                }
+                                exit(); //关闭通道
                             }
                             /*  $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-                            if ($result['returnstatus'] == 'Success') { //成功
-                                $receive_id[$result['taskID']] = $send_taskid;
-                                $redis->hset('index:meassage:code:back_taskno:' . $content, $result['taskID'], $send_taskid);
-                            } elseif ($result['returnstatus'] == 'Faild') { //失败
-                                echo "error:" . $result['message'] . "\n";die;
-                            } */
+                                if ($result['returnstatus'] == 'Success') { //成功
+                                    $receive_id[$result['taskID']] = $send_taskid;
+                                    $redis->hset('index:meassage:code:back_taskno:' . $content, $result['taskID'], $send_taskid);
+                                } elseif ($result['returnstatus'] == 'Faild') { //失败
+                                    echo "error:" . $result['message'] . "\n";die;
+                                } */
                             // print_r($result);
                             unset($send_num[$send_taskid]);
                             sleep(1);
@@ -184,9 +196,18 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                     $res = sendRequest($user_info['send_api'], 'post', $real_send);
                     $result = json_decode($res, true);
                     // print_r($result);
+                    // $result['code'] = 2;
                     if ($result['code'] == 0) {
                         $receive_id[$result['batchId']] = $send_taskid;
                         $redis->hset('index:meassage:code:back_taskno:' . $content, $result['batchId'], $send_taskid);
+                        unset($roallback[$send_taskid]);
+                    } else {
+                        foreach ($roallback as $key => $value) {
+                            foreach ($value as $ne => $val) {
+                                $redis->rpush($redisMessageCodeSend, $val);
+                            }
+                        }
+                        exit(); //关闭通道
                     }
                     // print_r($res);
 
@@ -197,7 +218,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                     // } elseif ($result['returnstatus'] == 'Faild') { //失败
                     //     echo "error:" . $result['message'] . "\n";die;
                     // }
-                    unset($send_num[$send]);
+                    unset($send_num[$send_taskid]);
                     sleep(1);
                 }
             }
@@ -217,19 +238,19 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
             // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
             // $receive_data = explode(';', $receive);
             /*   $receive_data = [
-                'code' => 0,
-                'msg'  => '',
-                'data' => [
-                    [
-                        'smUuid' => '26175_12_0_15172413692_0_tejrsVO_1',
-                        'deliverTime' => '2019-12-10 17:27:16',
-                        'mobile' => '15172413692',
-                        'smUuid' => '26175_12_0_15172413692_0_tejrsVO_1',
-                        'deliverResult' => 'REJECT',
-                        'batchId' => 'o0ULmxE'
+                    'code' => 0,
+                    'msg'  => '',
+                    'data' => [
+                        [
+                            'smUuid' => '26175_12_0_15172413692_0_tejrsVO_1',
+                            'deliverTime' => '2019-12-10 17:27:16',
+                            'mobile' => '15172413692',
+                            'smUuid' => '26175_12_0_15172413692_0_tejrsVO_1',
+                            'deliverResult' => 'REJECT',
+                            'batchId' => 'o0ULmxE'
+                        ],
                     ],
-                ],
-            ]; */
+                ]; */
             $send_status = 2;
             if ($receive_data['code'] == 0) {
                 $real_receive_data = $receive_data['data'];
