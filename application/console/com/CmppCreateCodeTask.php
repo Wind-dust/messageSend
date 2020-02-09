@@ -2895,14 +2895,14 @@ Db::rollback();
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
-        $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
+        /*  $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
             'task_no' => 'mul20020515503481449866',
             'uid' => '1',
             'mobile' => '18616279075',
             'status_message' => 'DELIVRD',
             'send_status' => 3,
             'send_time' => '1580889993',
-        )));
+        ))); */
         while (true) {
             $sendlog = $redis->lpop('index:meassage:multimediamessage:deliver:' . $channel_id);
             if (empty($sendlog)) {
