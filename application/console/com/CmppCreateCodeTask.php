@@ -752,7 +752,7 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:business:sendtask';
-        // for ($i = 173993; $i < 174487; $i++) {
+        // for ($i = 175621; $i < 175626; $i++) {
         //     $this->redis->rPush('index:meassage:business:sendtask', $i);
         // }
 
@@ -785,8 +785,8 @@ class CmppCreateCodeTask extends Pzlife
                 // die;
                 $mobilesend = explode(',', $sendTask['mobile_content']);
                 $mobilesend = array_filter($mobilesend);
-                /*  $send_length = mb_strlen($sendTask['task_content'], 'utf8');
-                $real_length = 1;
+                $send_length = mb_strlen($sendTask['task_content'], 'utf8');
+                /*  $real_length = 1;
                 if ($send_length > 70) {
                     $real_length = ceil($send_length / 67);
                 }
@@ -828,6 +828,7 @@ class CmppCreateCodeTask extends Pzlife
                             'mobile'       => $mobilesend[$i],
                             'send_status'  => 2,
                             'channel_id'  => $channel_id,
+                            'send_length'  => $send_length,
                             'create_time'  => time(),
                         ];
                         $sendmessage = [
@@ -851,6 +852,7 @@ class CmppCreateCodeTask extends Pzlife
                             'task_content'        => $sendTask['task_content'],
                             'source'       => $sendTask['source'],
                             'mobile'         => $mobilesend[$i],
+                            'send_length'  => $send_length,
                             'send_status'    => 4,
                             'create_time'    => time(),
                             'status_message' => 'DB:0101', //无效号码
@@ -2337,7 +2339,7 @@ Db::rollback();
                 $all_log[] = $send_log;
                 $j++;
             }
-            if ($j > 5000) {
+            if ($j > 1000) {
                 Db::startTrans();
                 try {
                     Db::table('yx_user_send_task_log')->insertAll($all_log);
@@ -2787,7 +2789,7 @@ Db::rollback();
     public function delRepetition()
     {
         $del_ids = [];
-        for ($i = 162990; $i < 173332; $i++) {
+        for ($i = 158434; $i < 173332; $i++) {
             $sendTask = $this->getSendCodeTask($i);
             if (empty($sendTask)) {
                 continue;
@@ -2814,6 +2816,131 @@ Db::rollback();
         if ($del_ids) {
             $ids = join(',', $del_ids);
             Db::table('yx_user_send_code_task_log')->where("id in ($ids)")->delete();
+        }
+    }
+
+    public function sendLengthUpdate()
+    {
+        for ($i = 104587; $i < 517807; $i++) {
+            $log = Db::query("SELECT `send_length`,`task_content` FROM `yx_user_send_code_task_log` WHERE `id` = '" . $i . "'");
+            if ($log) {
+                if ($log[0]['send_length'] == 0) {
+                    Db::table('yx_user_send_code_task_log')->where("id", $i)->update(['send_length' => mb_strlen($log[0]['task_content'])]);
+                }
+            }
+        }
+    }
+
+    //日志写入到数据表中营销
+    public function removeMultimediaTaskLog()
+    {
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $time = strtotime(date('Y-m-d 0:00:00', time()));
+        // $start_time = strtotime(date('Y-m-d 0:00:00', strtotime("-3 day")));
+        // $ids = Db::query("SELECT `id` FROM  `yx_user_send_task` WHERE `create_time` < " . $time . " AND  `create_time` >= " . $start_time . "   AND  `log_path` <> ''");
+        $ids = Db::query("SELECT `id` FROM  `yx_user_multimedia_message` WHERE `create_time` < " . $time . "   AND  `log_path` <> ''");
+        $all_log = [];
+        $j = 1;
+        // print_r($ids);
+        // die;
+        // echo count($ids);
+        // die;
+        for ($i = 0; $i < count($ids); $i++) {
+            $sendTask = $this->getMultimediaSendTask($ids[$i]['id']);
+            $mobilesend = explode(',', $sendTask['mobile_content']);
+            // print_r($sendTask);
+            // die;
+            foreach ($mobilesend as $key => $value) {
+                $send_log = [];
+                $send_log = [
+                    'uid' => $sendTask['uid'],
+                    'task_no' => $sendTask['task_no'],
+                    'task_id' => $ids[$i]['id'],
+                    'mobile' => $value,
+                    'source' => $sendTask['source'],
+                    'send_status' => 2,
+                    'create_time' => $sendTask['create_time'],
+                ];
+                $all_log[] = $send_log;
+                $j++;
+                if ($j > 1000) {
+                    Db::startTrans();
+                    try {
+                        Db::table('yx_user_multimedia_message_log')->insertAll($all_log);
+                        Db::commit();
+                    } catch (\Exception $e) {
+                        Db::rollback();
+                        exception($e);
+                    }
+                    $j = 1;
+                    unset($all_log);
+                }
+            }
+        }
+        if (!empty($all_log)) {
+            Db::startTrans();
+            try {
+                Db::table('yx_user_multimedia_message_log')->insertAll($all_log);
+                Db::commit();
+            } catch (\Exception $e) {
+                Db::rollback();
+                exception($e);
+            }
+        }
+        exit('Success');
+    }
+
+    /* {"task_no":"mul20020515503481449866","uid":1,"mobile":"18616279075","status_message":"DELIVRD","send_status":3,"send_time":1580889993} */
+    public function receiptMultimediaToBase($channel_id)
+    {
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $redis = Phpredis::getConn();
+        $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
+            'task_no' => 'mul20020515503481449866',
+            'uid' => '1',
+            'mobile' => '18616279075',
+            'status_message' => 'DELIVRD',
+            'send_status' => 3,
+            'send_time' => '1580889993',
+        )));
+        while (true) {
+            $sendlog = $redis->lpop('index:meassage:multimediamessage:deliver:' . $channel_id);
+            if (empty($sendlog)) {
+                exit('Send Log IS null');
+            }
+            $send_log = json_decode($sendlog, true);
+            $sendtasklog = Db::query("SELECT `id`,`create_time` FROM `yx_user_multimedia_message_log` WHERE `task_no` = '" . $send_log['task_no'] . "' AND `mobile` = '" . $send_log['mobile'] . "' ");
+            // die;
+            if (empty($sendtasklog)) {
+                $task =  Db::query("SELECT `id`,`create_time`,`source` FROM `yx_user_multimedia_message` WHERE `task_no` = '" . $send_log['task_no'] . "' ");
+                Db::startTrans();
+                try {
+                    Db::table('yx_user_multimedia_message_log')->insert([
+                        'uid' => $send_log['uid'],
+                        'task_no' => $send_log['task_no'],
+                        'mobile' => $send_log['mobile'],
+                        'send_status' => $send_log['send_status'],
+                        'create_time' => $task[0]['create_time'],
+                        'real_message' => $send_log['status_message'],
+                        'status_message' => $send_log['status_message'],
+                        'task_id' => $task[0]['id'],
+                        'source' => $task[0]['source'],
+                    ]);
+                    Db::commit();
+                } catch (\Exception $e) {
+                    Db::rollback();
+                    exception($e);
+                }
+            } else {
+                Db::startTrans();
+                try {
+                    Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'], 'status_message' => $send_log['status_message'], 'send_status' => $send_log['send_status']]);
+                    Db::commit();
+                } catch (\Exception $e) {
+                    Db::rollback();
+                    exception($e);
+                }
+            }
         }
     }
 }
