@@ -134,7 +134,7 @@ class Message extends AdminController
      * @apiGroup         admin_Message
      * @apiName          exportReceiptReport
      * @apiParam (入参) {String} cms_con_id
-     * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
+     * @apiParam (入参) {String} id 任务id
      * @apiParam (入参) {String} business_id 业务服务id(服务类型)
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
      * @apiSampleRequest /admin/message/exportReceiptReport
@@ -157,6 +157,33 @@ class Message extends AdminController
             return ['code' => '3002'];
         }
         $result =  $this->app->message->exportReceiptReport(intval($id), intval($business_id));
+        return $result;
+    }
+
+    /**
+     * @api              {get} / 导出彩信回执报告
+     * @apiDescription   exportReceiptReport
+     * @apiGroup         admin_Message
+     * @apiName          exportReceiptReport
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 任务id
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /admin/message/exportReceiptReport
+     * @return array
+     * @author rzc
+     */
+    public function exportMultimediaReceiptReport()
+    {
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->get('cms_con_id'));
+        // if ($this->checkPermissions($cmsConId, $apiName) === false) {
+        //     return ['code' => '3100'];
+        // }
+        $id = trim($this->request->get('id'));
+        if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
+            return ['code' => '3001'];
+        }
+        $result =  $this->app->message->exportMultimediaReceiptReport(intval($id));
         return $result;
     }
 
