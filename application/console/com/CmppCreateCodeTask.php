@@ -2934,12 +2934,39 @@ Db::rollback();
             } else {
                 Db::startTrans();
                 try {
-                    Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'], 'status_message' => $send_log['status_message'], 'send_status' => $send_log['send_status']]);
+                    Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'], 'status_message' => $send_log['status_message'], 'send_status' => $send_log['send_status'], 'update_time' => $send_log['send_time']]);
                     Db::commit();
                 } catch (\Exception $e) {
                     Db::rollback();
                     exception($e);
                 }
+            }
+        }
+    }
+
+    public function reciveSendMessageFoMlty()
+    {
+        while (true) {
+            // $time = strtotime(date('Y-m-d 0:00:00', time()));
+            $start_time = strtotime('2020-02-05 0:00:00');
+            $end_time =  strtotime("-3 day");
+            // echo $start_time;
+            // die;
+            $code_task_log = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `uid` IN (47,49,51,52,53,54,55) AND `status_message` = '' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' LIMIT 1 ");
+            if (!empty($code_task_log)) {
+                $request_url = "http://116.228.60.189:15901/rtreceive?";
+                $request_url .= 'task_no=' . trim($code_task_log[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($code_task_log[0]['mobile']) . "&send_time=" . trim(date('YmdHis', time() + mt_rand(0, 500)));
+                // print_r($request_url);
+                sendRequest($request_url);
+                Db::startTrans();
+                try {
+                    Db::table('yx_user_send_code_task_log')->where('id', $code_task_log[0]['id'])->update(['status_message' => 'DELIVRD', 'send_status' => 3, 'update_time' => time()]);
+                    Db::commit();
+                } catch (\Exception $e) {
+                    Db::rollback();
+                    exception($e);
+                }
+                usleep(20000);
             }
         }
     }
