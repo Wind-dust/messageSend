@@ -77,9 +77,9 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
             $send_title   = [];
             $receive_id   = [];
             $roallback = [];
-            if (date('H') >= 18 || date('H') < 8) {
-                exit("8点前,18点后通道关闭");
-            }
+            // if (date('H') >= 18 || date('H') < 8) {
+            //     exit("8点前,18点后通道关闭");
+            // }
             do {
                 $send = $redis->lPop($redisMessageCodeSend);
                 // $redis->rpush($redisMessageCodeSend, $send);
