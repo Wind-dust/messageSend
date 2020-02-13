@@ -361,7 +361,8 @@ class CmppYiXinYiDongBusiness extends Pzlife
                                         }
                                         if ($body['Result'] != 0) { //消息发送失败
                                             echo "发送失败" . "\n";
-                                            $error_msg = "其他错误";
+                                            // $error_msg = "其他错误";
+                                            echo  $error_msg . "\n";
                                         } else {
                                         }
                                     } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
