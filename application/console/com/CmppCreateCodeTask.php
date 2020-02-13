@@ -438,7 +438,7 @@ class CmppCreateCodeTask extends Pzlife
                         // } else if ($newres['source']== 3 && in_array($sendTask['uid'],[47,49,51,52])) { //聚梦电信营销
                         //     $channel_id = 7;
                         // }
-                        if ($newres['source'] == 1) {
+                        if ($newres['source'] == 1 && $channel_id == 17) {
                             $channel_id = 17;
                         } elseif ($channel_id == 17 && $newres['source'] == 2) {
                             // $channel_id = 8;
