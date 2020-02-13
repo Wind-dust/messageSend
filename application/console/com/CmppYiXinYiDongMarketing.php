@@ -308,7 +308,7 @@ class CmppYiXinYiDongMarketing extends Pzlife
                                         }
                                     } else if ($head['Command_Id'] == 0x80000004) {
                                         $body = unpack("N2Msg_Id/CResult", $bodyData);
-                                        // print_r($body);
+                                        print_r($body);
                                         $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                         if ($sequence) {
                                             $sequence           = json_decode($sequence, true);
