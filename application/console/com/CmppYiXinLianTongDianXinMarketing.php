@@ -29,7 +29,7 @@ class CmppYiXinLianTongDianXinMarketing extends Pzlife
             'Shared_secret' => 'jxbf2o82geaa', //网关登录密码
             'template_id'   => "", //模板id
             'Service_Id'    => "280744", //业务代码
-            'Dest_Id'       => "jxbf2o82geaa", //短信接入码 短信端口号
+            'Dest_Id'       => "1069280726", //短信接入码 短信端口号
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
             'master_num'    => 300,

@@ -29,7 +29,7 @@ class CmppYiXinYiDongMarketing extends Pzlife
             'Shared_secret' => '5566vb82gb83', //网关登录密码
             'template_id'   => "", //模板id
             'Service_Id'    => "280702", //业务代码
-            'Dest_Id'       => "5566vb82gb83", //短信接入码 短信端口号
+            'Dest_Id'       => "1069280726", //短信接入码 短信端口号
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
             'master_num'    => 300,
@@ -65,7 +65,7 @@ class CmppYiXinYiDongMarketing extends Pzlife
             'mar_task_id' => '',
             'uid'         => '1',
             'content'     => '【长阳广电】湖北广电网络有线直播中国教育1高清、中国教育4、导视频道三个教育专题电视频道，为全县中小学生提供操作便捷的电视直播课堂（重新搜索），同时，广电全业务用户可在“在线课堂”专区随时收看小学、初高中课程。大屏上课更清晰，保护视力没问题。详情咨询广电各乡镇营业厅。',
-            'develop_code' => '42219',
+            'develop_code' => '',
             'Submit_time' => date('mdHis', time()),
         ]));
         /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
@@ -308,7 +308,7 @@ class CmppYiXinYiDongMarketing extends Pzlife
                                         }
                                     } else if ($head['Command_Id'] == 0x80000004) {
                                         $body = unpack("N2Msg_Id/CResult", $bodyData);
-                                        print_r($body);
+                                        // print_r($body);
                                         $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                         if ($sequence) {
                                             $sequence           = json_decode($sequence, true);
