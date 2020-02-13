@@ -60,14 +60,14 @@ class CmppYiXinYiDongMarketing extends Pzlife
         //     print_r($send);
         // } while ($send);
         // $send = $redis ->lPop($redisMessageCodeSend);
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'uid'         => '1',
             'content'     => '【长阳广电】湖北广电网络有线直播中国教育1高清、中国教育4、导视频道三个教育专题电视频道，为全县中小学生提供操作便捷的电视直播课堂（重新搜索），同时，广电全业务用户可在“在线课堂”专区随时收看小学、初高中课程。大屏上课更清晰，保护视力没问题。详情咨询广电各乡镇营业厅。',
             'develop_code' => '',
             'Submit_time' => date('mdHis', time()),
-        ]));
+        ])); */
         /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15172413982',
             'mar_task_id' => '',
