@@ -446,6 +446,15 @@ class CmppCreateCodeTask extends Pzlife
                         } elseif ($channel_id == 17 && $newres['source'] == 3) {
                             // $channel_id = 7;
                             $channel_id = 17;
+                        } elseif ($channel_id == 56 && $newres['source'] == 1) {
+                            // $channel_id = 7;
+                            $channel_id = 56;
+                        } elseif ($channel_id == 56 && $newres['source'] == 2) {
+                            // $channel_id = 7;
+                            $channel_id = 27;
+                        } elseif ($channel_id == 56 && $newres['source'] == 3) {
+                            // $channel_id = 7;
+                            $channel_id = 27;
                         }
                     }
                     // print_r($newres);
