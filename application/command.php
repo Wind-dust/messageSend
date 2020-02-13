@@ -48,7 +48,7 @@ return [
     'cmppjumengliandianmarketing'      => $commandPath . 'CmppJuMengLianDianMarketing',
     'cmppyixinyidongbusiness'          => $commandPath . 'CmppYiXinYiDongBusiness', //易信移动行业通道
     'cmppyixindianxinbusiness'         => $commandPath . 'CmppYiXinDianxinBusiness', //易信移动行业通道
-    'cmppyixindianxinmarketing'         => $commandPath . 'CmppYiXinYiDongMarketing', //易信移动营销通道
+    'cmppyixinyidongmarketing'         => $commandPath . 'CmppYiXinYiDongMarketing', //易信移动营销通道
     'cmpplanjingmarketing'             => $commandPath . 'CmppLanJingMarketing',
     'cmpplanjingbusiness'              => $commandPath . 'CmppLanJingBusiness',
     'serversocketshuhe'                => $commandPath . 'ServerSocketShuHe',
