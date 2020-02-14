@@ -474,6 +474,9 @@ class CmppCreateCodeTask extends Pzlife
                         'content'     => $sendTask['task_content'],
                         'channel_id'  => $channel_id,
                     ];
+                    if (!empty($sendTask['develop_no'])) {
+                        $sendmessage['develop_code'] = $sendTask['develop_no'];
+                    }
                     // $has = Db::query("SELECT id FROM yx_user_send_task_log WHERE `task_no` = '" . $sendTask['task_no'] . "' AND `mobile` = '" . $mobilesend[$i] . "' ");
                     // echo $i."\n";
                     // if ($has) {
@@ -820,11 +823,11 @@ class CmppCreateCodeTask extends Pzlife
                         // print_r($res);
                         if ($res) {
                             $newres = array_shift($res);
-                            if ($newres['source'] == 2 && $channel_id == 24) { //米加联通营销
+                            if ($newres['source'] == 2 && $channel_id == 24) { //易信联通
                                 $channel_id = 26;
-                            } else if ($newres['source'] == 1 && $channel_id == 24) { //蓝鲸
+                            } else if ($newres['source'] == 1 && $channel_id == 24) { //移动易信
                                 $channel_id = 24;
-                            } else if ($newres['source'] == 3 && $channel_id == 24) { //米加电信营销
+                            } else if ($newres['source'] == 3 && $channel_id == 24) { //易信电信
                                 $channel_id = 26;
                             }
                         }
@@ -2648,7 +2651,7 @@ Db::rollback();
 
     public function verifyMobileSource()
     {
-        $mobilesend = 18017369942;
+        $mobilesend = 15997595078;
         $prefix = substr(trim($mobilesend), 0, 7);
         $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
         $newres = array_shift($res);
