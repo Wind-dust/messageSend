@@ -425,6 +425,7 @@ class CmppCreateCodeTask extends Pzlife
 
             for ($i = 0; $i < count($mobilesend); $i++) {
                 $send_log = [];
+                $channel_id    = $sendTask['channel_id'];
                 if (checkMobile(trim($mobilesend[$i])) == true) {
                     $prefix = substr(trim($mobilesend[$i]), 0, 7);
                     $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
@@ -804,7 +805,7 @@ class CmppCreateCodeTask extends Pzlife
                 }
                 $real_num = 0;
                 $real_num += $real_length * $sendTask['send_num']; */
-                $channel_id    = 0;
+                // $channel_id    = 0;
                 $channel_id    = $sendTask['channel_id'];
                 if (empty($channel_id)) {
                     continue;
@@ -814,6 +815,8 @@ class CmppCreateCodeTask extends Pzlife
 
                 // }
                 for ($i = 0; $i < count($mobilesend); $i++) {
+                    // $channel_id    = 0;
+                    $channel_id    = $sendTask['channel_id'];
                     $send_log = [];
                     $sendmessage = [];
                     if (checkMobile(trim($mobilesend[$i])) == true) {
