@@ -1010,7 +1010,7 @@ class CmppCreateCodeTask extends Pzlife
                             $channel_id = 28;
                         } else if ($newres['source'] == 1) { //蓝鲸
                             $channel_id = 14;
-                        } else if ($newres['source' == 3]) { //米加电信营销
+                        } else if ($newres['source'] == 3) { //米加电信营销
                             $channel_id = 29;
                         }
                     }
@@ -2854,7 +2854,7 @@ Db::rollback();
         $time = strtotime(date('Y-m-d 0:00:00', time()));
         // $start_time = strtotime(date('Y-m-d 0:00:00', strtotime("-3 day")));
         // $ids = Db::query("SELECT `id` FROM  `yx_user_send_task` WHERE `create_time` < " . $time . " AND  `create_time` >= " . $start_time . "   AND  `log_path` <> ''");
-        $ids = Db::query("SELECT `id` FROM  `yx_user_multimedia_message` WHERE `create_time` < " . $time . "   AND  `log_path` <> ''");
+        $ids = Db::query("SELECT `id` FROM  `yx_user_multimedia_message` WHERE `create_time` < " . $time . "   AND  `log_path` <> '' AND `id` > 14 ");
         $all_log = [];
         $j = 1;
         // print_r($ids);
