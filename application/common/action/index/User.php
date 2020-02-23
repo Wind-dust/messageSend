@@ -853,4 +853,94 @@ class User extends CommonIndex
         }
         return ['code' => '200', 'develop_codes' => $has_bind];
     }
+
+    public function getUserMultimediaMessageTask($page, $pageNum, $ConId, $start_time = '', $end_time = '', $title = '')
+    {
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $where = [];
+        array_push($where, ['uid', '=', $uid]);
+        if (!empty($start_time)) {
+            array_push($where, ['create_time', '>=', $start_time]);
+        }
+        if (!empty($end_time)) {
+            array_push($where, ['create_time', '<=', $end_time]);
+        }
+        if (!empty($title)) {
+            array_push($where, ['title', 'LIKE', "%" . $title . "%"]);
+        }
+        $offset = ($page - 1) * $pageNum;
+        $result = DbSendMessage::getUserMultimediaMessage($where, '*', false, '', $offset . ',' . $pageNum);
+        if (empty($result)) {
+            return ['code' => 200, 'message_data' => []];
+        }
+        foreach ($result as $key => $value) {
+            $result[$key]['multimedia_frame'] = DbSendMessage::getUserMultimediaMessageFrame(['multimedia_message_id' => $value['id']], 'num,name,content,image_path,image_type', false, ['num' => 'asc']);
+        }
+        return ['code' => 200, 'message_data' => $result];
+    }
+
+    public function getUserMultimediaMessageTaskInfo($page, $pageNum, $ConId, $id)
+    {
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $offset = ($page - 1) * $pageNum;
+        $task = DbSendMessage::getUserMultimediaMessage(['id' => $id, 'uid' => $uid], '*', true);
+        if (empty($task)) {
+            return ['code' => '3001', 'msg' => '该任务不存在'];
+        }
+        $task_log = DbSendMessage::getUserMultimediaMessageLog(['task_no' => $task['task_no']], '*', false, '', $offset . ',' . $pageNum);
+        $total = DbSendMessage::countUserMultimediaMessageLog(['task_no' => $task['task_no']]);
+        if (!empty($task['log_path']) && empty($task_log)) {
+            $task_log = [];
+            $file = fopen($task['log_path'], "r");
+            $data = array();
+            $i = 0;
+            // $phone = '';
+            // $j     = '';
+            while (!feof($file)) {
+                $cellVal = trim(fgets($file));
+                $log = json_decode($cellVal, true);
+                $log['create_time'] = date('Y-m-d H:i:s', strtotime($task['update_time']));
+                if (isset($log['mobile'])) {
+                    $data[] = $log;
+                }
+                $i++;
+            }
+            fclose($file);
+            $total = count($data);
+            $task_log = array_slice($data, $offset, $pageNum);
+        }
+        foreach ($task_log as $key => $value) {
+            //    if ($value['status_message'] == 'DELIVRD') {
+            //         $task_log[$key]['explanation'] = '成功';
+            //    }
+            if (isset($value['status_message'])) {
+                switch ($value['status_message']) {
+                    case 'DELIVRD':
+                        $task_log[$key]['explanation'] = '成功';
+                        break;
+                    case 'UNDELIV':
+                        $task_log[$key]['explanation'] = '成功';
+                        break;
+                    case 'UNKNOWN':
+                        $task_log[$key]['explanation'] = '未知';
+                        break;
+                    case '':
+                        $task_log[$key]['explanation'] = '成功';
+                        break;
+
+                    default:
+                        $task_log[$key]['explanation'] = '失败';
+                        break;
+                }
+                unset($task_log[$key]['real_message']);
+            }
+        }
+        return ['code' => '200', 'total' => $total, 'task_log' => $task_log];
+    }
 }

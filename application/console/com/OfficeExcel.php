@@ -272,8 +272,8 @@ class OfficeExcel extends Pzlife
         $data1 = array_unique(array_filter($data1));
         // $name2 = 'new.txt';
         // $name2 = '10-1.txt';
-        $name2 = '1220(1).txt';
-        if (!empty($name2)) {
+        $name2 = '';
+        /*  if (!empty($name2)) {
             $file = explode('.', $name2);
             $data2       = array();
             $type = $file[1];
@@ -304,7 +304,7 @@ class OfficeExcel extends Pzlife
                 $data2 = $this->officeReader($types, $name2, 'A');
             }
             $data2 = array_unique(array_filter($data2));
-        }
+        } */
         // print_r(count($data1));
         // print_r(count($data2));
         $putdata = [];
@@ -324,7 +324,7 @@ class OfficeExcel extends Pzlife
         fclose($myfile);
         die; */
         $date = date('Y-m-d H:i:s', time());
-        $time1 = strtotime('2019/12/20 17:10:48');
+        $time1 = strtotime('2020-02-13 18:30:55');
         $i = 0;
         // $CellList = array(
         //     array('title', '标题'),
@@ -337,8 +337,8 @@ class OfficeExcel extends Pzlife
         // );
 
         $send_status = [
-            1 => ceil(0.01 * count($data1)), //空号0.01比例
-            2 => ceil(0.1 * count($data1)), //失败0.1比例
+            1 => 253, //空号0.01比例
+            2 => 842, //失败0.1比例
             3 => count($data1), //总号码
             // 3 => 50000,
             // 4 => 200000,
@@ -350,8 +350,8 @@ class OfficeExcel extends Pzlife
         //     4 => 'DELIVRD'
         // ];
         $send_status_count = [
-            1 => 'UNKNOWN', //空号
-            2 => 'UNDELIV', //失败
+            1 => 'Expired--4441', //空号
+            2 => 'UNDELIVERED', //失败
             3 => 'DELIVRD',
             // 3 => 'DB:0141',
             // 4 => 'DELIVRD'
@@ -359,7 +359,7 @@ class OfficeExcel extends Pzlife
         $send_info_count = [
             1 => '未知', //失败
             2 => '失败', //空号
-            3 => '下发成功',
+            3 => '成功',
             // 3 => 'DB:0141',
             // 4 => 'DELIVRD'
         ];
@@ -368,12 +368,12 @@ class OfficeExcel extends Pzlife
         $j = 1;
         $n = 0;
         // echo  count($data1);die;
-        $data1 = array_diff($data1, $data2);
+        // $data1 = array_diff($data1, $data2);
         foreach ($data1 as $key => $value) {
             $new_value = [];
             if (strpos($value, '00000') || strpos($value, '111111') || strpos($value, '222222') || strpos($value, '333333') || strpos($value, '444444') || strpos($value, '555555') || strpos($value, '666666') || strpos($value, '777777') || strpos($value, '888888') || strpos($value, '999999')) {
-                $status = '空号';
-                $status_info = 'MK:0001';
+                $status_info = '空号';
+                $status = 'MK:0001';
             } else {
                 $num     = mt_rand(1, $max);
                 $sendNum = 0;
@@ -387,16 +387,11 @@ class OfficeExcel extends Pzlife
                 $status_info = $send_info_count[$sendNum];
             }
             $new_value = [
-                'title' => '迪奥新品尝鲜，蕴活肌肤年轻力',
-                'model' => '1551',
                 'mobile' => $value,
-                'content' => '【丝芙兰】迪奥新品尝鲜，蕴活肌肤年轻力
-                DIOR迪奥即将重磅推出护肤新品，DIOR迪奥肌活蕴能系列，一抹唤醒肌肤年轻力，焕现肌肤健康光采。自启肌能，执掌年轻。
-                丝芙兰现为您开启新品抢先体验机会，点击 https://dwz.cn/8D4a5EvQ 前往购物车，仅需支付邮费，即可申领迪奥肌活蕴能精华7日体验装*。令肌肤更加紧致，弹润，平滑，细嫩，充盈， 透亮。
-                *全国限量28,000份。每人限领一份，先到先得，转发无效。回T退订',
+                'title' => '特殊时期，如何提升孕妈和宝宝的抵抗力',
+                'status_info' => $status_info,
                 'status' => $status,
                 'send_time' => date("Y/m/d H:i:s", $time1 + ceil($n / 1000)),
-                'status_info' => $status_info
             ];
             $putdata[] = $new_value;
             $i++;
@@ -418,13 +413,11 @@ class OfficeExcel extends Pzlife
                 //设置当前活动sheet的名称
                 $objActSheet->setTitle("sheet1");
                 $CellList = array(
-                    array('title', '标题'),
-                    array('model', '模板账户'),
                     array('mobile', '手机号码'),
-                    array('content', '发送内容'),
+                    array('title', '标题'),
+                    array('status_info', '状态描述'),
                     array('status', '状态'),
                     array('send_time', '发送时间'),
-                    array('status_info', '状态描述'),
                 );
                 foreach ($CellList as $i => $Cell) {
                     $row = chr(65 + $i);
@@ -453,7 +446,7 @@ class OfficeExcel extends Pzlife
                         $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                     }
                 }
-                $objWriter->save($j . '.csv');
+                $objWriter->save($j . '.xlsx');
                 // exit();
                 $j++;
                 unset($putdata);
@@ -483,12 +476,10 @@ class OfficeExcel extends Pzlife
             $objActSheet->setTitle("sheet1");
             $CellList = array(
                 array('title', '标题'),
-                array('model', '模板账户'),
                 array('mobile', '手机号码'),
-                array('content', '发送内容'),
+                array('status_info', '状态描述'),
                 array('status', '状态'),
                 array('send_time', '发送时间'),
-                array('status_info', '状态描述'),
             );
             foreach ($CellList as $i => $Cell) {
                 $row = chr(65 + $i);
@@ -504,7 +495,7 @@ class OfficeExcel extends Pzlife
                 $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
                 // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
             }
-            $outputFileName = $j . ".csv";
+            $outputFileName = $j . ".xlsx";
             $i = 0;
             foreach ($putdata as $key => $orderdata) {
                 //行
@@ -517,7 +508,7 @@ class OfficeExcel extends Pzlife
                     $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                 }
             }
-            $objWriter->save($j . '.csv');
+            $objWriter->save($j . '.xlsx');
             // exit();
             unset($putdata);
         }
@@ -1365,4 +1356,186 @@ class OfficeExcel extends Pzlife
         }
         $objWriter->save('n1.xlsx');
     } */
+
+    public function oneToOne()
+    {
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $path = realpath("./") . "/111.txt";
+        $file = fopen($path, "r");
+        $data1 = array();
+        $i = 0;
+        // $phone = '';
+        // $j     = '';
+        while (!feof($file)) {
+            $data1[] = trim(fgets($file));
+            // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+            // // print_r($phone);die;
+            // $j = ',';
+            $i++;
+        }
+        fclose($file);
+        $path = realpath("./") . "/112.txt";
+        $file = fopen($path, "r");
+        $data2 = array();
+        $i = 0;
+        // $phone = '';
+        // $j     = '';
+
+        while (!feof($file)) {
+            // $data2[] = trim(fgets($file));
+            // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+            // // print_r($phone);die;
+            // $j = ',';
+            if (!in_array(trim(fgets($file)), $data1)) {
+                $data2[] = trim(fgets($file));
+                // print_r(trim(fgets($file)));
+            }
+            $i++;
+        }
+        fclose($file);
+
+        // $data3 = array_diff(array_filter($data1), array_filter($data2));
+        // print_r(count($data2));
+        // die;
+        $myfile = fopen("11313.txt", "w");
+        for ($i = 0; $i < count($data2); $i++) {
+            $txt = $data2[$i] . "\n";
+            fwrite($myfile, $txt);
+        }
+        fclose($myfile);
+    }
+
+    public function Two()
+    {
+        // $log = Db::query("SELECT `send_length`,`mobile_content` FROM `yx_user_send_code_task` WHERE `id` = '" . 214723 . "'");
+        // $mobile = $log[0]['mobile_content'];
+        // // print_r($mobile);
+        // $mobile_data = explode(',', $mobile);
+        $true_mobile = [];
+
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $path = realpath("./") . "/13213.txt";
+        $file = fopen($path, "r");
+        $data1 = array();
+        $i = 0;
+        // $phone = '';
+        // $j     = '';
+        while (!feof($file)) {
+            $mobile_data[] = trim(fgets($file));
+            // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+            // // print_r($phone);die;
+            // $j = ',';
+            $i++;
+        }
+        fclose($file);
+        for ($i = 0; $i < count($mobile_data); $i++) {
+            if (checkMobile(trim($mobile_data[$i])) == true) {
+                $prefix = substr(trim($mobile_data[$i]), 0, 7);
+                $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                $newres = array_shift($res);
+                //游戏通道分流
+                if ($newres) {
+                    if ($newres['source'] == 2) { //米加联通营销
+
+                    } else if ($newres['source'] == 1) { //蓝鲸
+                        $true_mobile[] = $mobile_data[$i];
+                    } else if ($newres['source'] == 3) { //米加电信营销
+
+                    }
+                }
+            }
+        }
+        $myfile = fopen("10253.txt", "w");
+        for ($i = 0; $i < count($true_mobile); $i++) {
+            $txt = $true_mobile[$i] . "\n";
+            fwrite($myfile, $txt);
+        }
+        fclose($myfile);
+    }
+
+    public function exportMultimediaReceiptReport($id)
+    {
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $result = Db::query("SELECT `task_no`,`title` FROM `yx_user_multimedia_message` WHERE `id` =  " . $id);
+        // print_r($result);
+        // die;
+        $data = Db::query("SELECT * FROM `yx_user_multimedia_message_log` WHERE `task_id` =  " . $id);
+
+        if (empty($data)) {
+            return ['code' => '3002', 'msg' => '发送记录暂未同步'];
+        }
+        foreach ($data as $key => $value) {
+            $data[$key]['task_content'] = $result[0]['title'];
+            $data[$key]['update_time'] = date('Y-m-d H:i:s', $value['create_time'] + ceil($key / 1000));
+            switch ($value['send_status']) {
+                case 2:
+                    $data[$key]['send_status'] = '未知';
+                    break;
+                case 3:
+                    $data[$key]['send_status'] = '成功';
+                    break;
+                case 4:
+                    $data[$key]['send_status'] = '失败';
+                    break;
+                default:
+                    $data[$key]['send_status'] = '未知';
+                    break;
+            }
+        }
+
+        $objExcel = new PHPExcel();
+        // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+        // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
+        $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+        $objWriter->setOffice2003Compatibility(true);
+
+        //设置文件属性
+        $objProps = $objExcel->getProperties();
+        $objProps->setTitle("sheet1");
+        $objProps->setSubject($result[0]['task_no'] . ":" . date('Y-m-d H:i:s', time()));
+
+        $objExcel->setActiveSheetIndex(0);
+        $objActSheet = $objExcel->getActiveSheet();
+
+        $date = date('Y-m-d H:i:s', time());
+
+        //设置当前活动sheet的名称
+        $objActSheet->setTitle("sheet1");
+        $CellList = array(
+            array('task_content', '标题'),
+            array('mobile', '手机号'),
+            array('send_status', '发送状态'),
+            array('status_message', '回执码'),
+            array('update_time', '发送时间'),
+        );
+        foreach ($CellList as $i => $Cell) {
+            $row = chr(65 + $i);
+            $col = 1;
+            $objActSheet->setCellValue($row . $col, $Cell[1]);
+            $objActSheet->getColumnDimension($row)->setWidth(30);
+
+            $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+            $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+            $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+            $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+            $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+            $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        }
+        $outputFileName = $result[0]['task_no'] . "" . date('YmdHis', time()) . ".xlsx";
+        $i = 0;
+        foreach ($data as $key => $orderdata) {
+            //行
+            $col = $key + 2;
+            foreach ($CellList as $i => $Cell) {
+                //列
+                $row = chr(65 + $i);
+                $objActSheet->getRowDimension($i)->setRowHeight(15);
+                $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            }
+        }
+        $objWriter->save($outputFileName);
+        exit;
+    }
 }

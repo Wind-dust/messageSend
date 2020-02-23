@@ -10,6 +10,8 @@ use app\common\model\UserModel;
 use app\common\model\SensitiveWord;
 use app\common\model\UserSignature;
 use app\common\model\DevelopCode;
+use app\common\model\UserMultimediaTemplate;
+use app\common\model\UserMultimediaTemplateFrame;
 use think\Db;
 
 class DbSendMessage extends Db
@@ -74,7 +76,7 @@ class DbSendMessage extends Db
         return $UserMultimediaMessageFrame->save($data, ['id' => $id]);
     }
 
-    public function getUserUserMultimediaMessageLog($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    public function getUserMultimediaMessageLog($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
     {
         $obj = UserMultimediaMessageLog::field($field)->where($where);
         return getResult($obj, $row, $orderBy, $limit);
@@ -211,5 +213,53 @@ class DbSendMessage extends Db
             $obj = $obj->select();
         }
         return $obj->toArray();
+    }
+
+    public function getUserMultimediaTemplate($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = UserMultimediaTemplate::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function addUserMultimediaTemplate($data)
+    {
+        $UserMultimediaTemplate = new UserMultimediaTemplate;
+        $UserMultimediaTemplate->save($data);
+        return $UserMultimediaTemplate->id;
+    }
+
+    public function countUserMultimediaTemplate($where)
+    {
+        return UserMultimediaTemplate::where($where)->count();
+    }
+
+    public function editUserMultimediaTemplate($data, $id)
+    {
+        $UserMultimediaTemplate = new UserMultimediaTemplate;
+        return $UserMultimediaTemplate->save($data, ['id' => $id]);
+    }
+
+    public function getUserMultimediaTemplateFrame($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = UserMultimediaTemplateFrame::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function addUserMultimediaTemplateFrame($data)
+    {
+        $UserMultimediaTemplateFrame = new UserMultimediaTemplateFrame;
+        $UserMultimediaTemplateFrame->save($data);
+        return $UserMultimediaTemplateFrame->id;
+    }
+
+    public function countUserMultimediaTemplateFrame($where)
+    {
+        return UserMultimediaTemplateFrame::where($where)->count();
+    }
+
+    public function editUserMultimediaTemplateFrame($data, $id)
+    {
+        $UserMultimediaTemplateFrame = new UserMultimediaTemplateFrame;
+        return $UserMultimediaTemplateFrame->save($data, ['id' => $id]);
     }
 }

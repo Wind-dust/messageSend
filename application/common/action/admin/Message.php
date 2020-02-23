@@ -267,6 +267,95 @@ class Message extends CommonIndex
         exit;
     }
 
+    public function exportMultimediaReceiptReport($id)
+    {
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $result = DbSendMessage::getUserMultimediaMessage(['id' => $id], '*', true);
+        $data = DbSendMessage::getUserMultimediaMessageLog(['task_id' => $id], '*', false);
+        if (empty($data)) {
+            return ['code' => '3002', 'msg' => '发送记录暂未同步'];
+        }
+        foreach ($data as $key => $value) {
+            switch ($value['send_status']) {
+                case 2:
+                    $data[$key]['send_status'] = '未知';
+                    break;
+                case 3:
+                    $data[$key]['send_status'] = '成功';
+                    break;
+                case 4:
+                    $data[$key]['send_status'] = '失败';
+                    break;
+                default:
+                    $data[$key]['send_status'] = '未知';
+                    break;
+            }
+        }
+        $objExcel = new PHPExcel();
+        // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+        // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
+        $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+        $objWriter->setOffice2003Compatibility(true);
+
+        //设置文件属性
+        $objProps = $objExcel->getProperties();
+        $objProps->setTitle("sheet1");
+        $objProps->setSubject($result['task_no'] . ":" . date('Y-m-d H:i:s', time()));
+
+        $objExcel->setActiveSheetIndex(0);
+        $objActSheet = $objExcel->getActiveSheet();
+
+        $date = date('Y-m-d H:i:s', time());
+
+        //设置当前活动sheet的名称
+        $objActSheet->setTitle("sheet1");
+        $CellList = array(
+            array('task_content', '标题'),
+            array('mobile', '手机号'),
+            array('send_status', '发送状态'),
+            array('status_message', '回执码'),
+            array('update_time', '发送时间'),
+        );
+        foreach ($CellList as $i => $Cell) {
+            $row = chr(65 + $i);
+            $col = 1;
+            $objActSheet->setCellValue($row . $col, $Cell[1]);
+            $objActSheet->getColumnDimension($row)->setWidth(30);
+
+            $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+            $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+            $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+            $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+            $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+            $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        }
+        $outputFileName = $result['task_no'] . ":" . date('Y-m-d H:i:s', time()) . ".xlsx";
+        $i = 0;
+        foreach ($data as $key => $orderdata) {
+            //行
+            $col = $key + 2;
+            foreach ($CellList as $i => $Cell) {
+                //列
+                $row = chr(65 + $i);
+                $objActSheet->getRowDimension($i)->setRowHeight(15);
+                $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            }
+        }
+        header("Content-Type: application/force-download");
+        header("Content-Type: application/octet-stream");
+        header("Content-Type: application/download");
+        header('Content-Disposition:inline;filename="' . $outputFileName . '"');
+        header("Content-Transfer-Encoding: binary");
+        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+        header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header("Pragma: no-cache");
+        $objWriter->save('php://output');
+        exit;
+    }
+
     public function getUserModel($page, $pageNum)
     {
         $offset = $pageNum * ($page - 1);

@@ -685,7 +685,7 @@ return $result;
     // function dbc2Sbc($str){
     //     return preg_replace('/[\x{0020}\x{0020}-\x{7e}]/ue','($unicode=char2Unicode(\'\0\')) == 0x0020 ? unicode2Char（0x3000） : (($code=$unicode+0xfee0) > 256 ? unicode2Char($code) : chr($code))', $str);
     // }
-    public function getSmsMultimediaMessageTask($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title)
+    public function getSmsMultimediaMessageTask($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title, $signature_id = '')
     {
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
@@ -697,6 +697,15 @@ return $result;
         $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 8], 'id,num_balance', true); //彩信
         if (empty($user_equities)) {
             return ['code' => '3005'];
+        }
+        if (!empty($signature_id)) {
+            $signature =  DbSendMessage::getUserSignature(['uid' => $user['uid'], 'signature_id' => $signature_id], '*', true);
+            if (empty($signature)) {
+                return ['code' => '3012'];
+            }
+            if ($signature['status'] != 2) {
+                return ['code' => '3013'];
+            }
         }
         $content_data             = array_filter($content_data);
         $multimedia_message_frame = [];
@@ -855,7 +864,7 @@ return $result;
         if (empty($user_equities)) {
             return ['code' => '3003'];
         }
-        $template_id = getRandomString(8);
+        // $template_id = getRandomString(8);
         do {
             $template_id = getRandomString(8);
             $has = DbSendMessage::getUserModel(['template_id' => $template_id], 'id', true);
@@ -1283,6 +1292,214 @@ return $result;
         } catch (\Exception $e) {
             Db::rollback();
             return ['code' => '3009'];
+        }
+    }
+
+    public function multimediaTemplateSignatureReport($appid, $appkey, $content_data, $title)
+    {
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $content_data             = array_filter($content_data);
+        $multimedia_message_frame = [];
+        $content_length           = 0;
+        $max_length               = 102400; //最大字节长度
+
+        foreach ($content_data as $key => $value) {
+            $frame = [];
+            if (!isset($value['content'])) {
+                $frame['content'] = '';
+            } else {
+                $frame['content'] = $value['content'];
+                $frame['variable_len'] = substr_count($value['content'], "{{var");
+
+                // $content_length+= strlen($value['content']);
+            }
+            $content_length += (strlen($frame['content']) / 8);
+            if (!isset($value['image_path'])) {
+                $frame['image_path'] = '';
+            } else {
+                stream_context_set_default([
+                    'ssl' => [
+                        'verify_peer'      => false,
+                        'verify_peer_name' => false,
+                    ],
+                ]);
+                $head = get_headers($value['image_path'], 1);
+                if ($head['Content-Type'] == 'image/jpeg') {
+                    $frame['image_type'] = 'jpg';
+                } elseif ($head['Content-Type'] == 'image/gif ') {
+                    $frame['image_type'] = 'gif';
+                }
+                if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['image/gif', 'image/jpeg'])) {
+                    return ['code' => '3008'];
+                }
+                $filename = filtraImage(Config::get('qiniu.domain'), $value['image_path']);
+                // print_r($value['image_path']);die;
+                $logfile  = DbImage::getLogImageAll($filename); //判断时候有未完成的图片
+                if (empty($logfile)) { //图片不存在
+                    return ['code' => '3010']; //图片没有上传过
+                }
+                $content_length += $head['Content-Length'];
+                $frame['image_path'] = $value['image_path'];
+            }
+            $frame['name'] = $value['name'];
+            $multimedia_message_frame[] = $frame;
+        }
+        if ($content_length > $max_length) {
+            return ['code' => '3009'];
+        }
+        do {
+            $template_id = getRandomString(8);
+            $has = DbSendMessage::getUserModel(['template_id' => $template_id], 'id', true);
+        } while ($has);
+        $SmsMultimediaMessageTask = [];
+        $SmsMultimediaMessageTask = [
+            'template_id'        => $template_id,
+            'uid'            => $user['id'],
+            'title'          => $title,
+        ];
+
+        Db::startTrans();
+        try {
+            $bId = DbSendMessage::addUserMultimediaTemplate($SmsMultimediaMessageTask); //添加后的商品id
+            if ($bId) {
+                foreach ($multimedia_message_frame as $key => $frame) {
+                    $frame['multimedia_template_id'] = $bId;
+                    $frame['image_path'] = filtraImage(Config::get('qiniu.domain'), $frame['image_path']);
+                    DbSendMessage::addUserMultimediaTemplateFrame($frame); //添加后的商品id
+                }
+            }
+            Db::commit();
+            return ['code' => '200', 'template_id' => $template_id];
+        } catch (\Exception $e) {
+            Db::rollback();
+            // exception($e);
+            return ['code' => '3011'];
+        }
+    }
+
+    public function submitBatchCustomMultimediaMessage($appid, $appkey, $template_id, $connect, $ip, $signature_id = '')
+    {
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 8], 'id,num_balance', true);
+        if (empty($user_equities)) {
+            return ['code' => '3002'];
+        }
+        if (!empty($template_id)) {
+            $template =  DbSendMessage::getUserMultimediaTemplate(['template_id' => $template_id], '*', true);
+            if ($template['status'] != 3) {
+                return ['code' => '3003'];
+            }
+        }
+        if (!empty($signature_id)) {
+            $signature =  DbSendMessage::getUserSignature(['uid' => $user['uid'], 'signature_id' => $signature_id], '*', true);
+            if (empty($signature)) {
+                return ['code' => '3008'];
+            }
+            if ($signature['status'] != 2) {
+                return ['code' => '3010'];
+            }
+        }
+        $connect_data = explode(';', $connect);
+        $connect_data = array_filter($connect_data);
+        $send_data = [];
+        $send_data_mobile = [];
+        foreach ($connect_data as $key => $data) {
+            $send_text = explode(':', $data);
+            if (!empty($template)) {
+                $replace_data = explode(',', $send_text[0]);
+                $real_text = $template['content'];
+                if (!empty($signature)) {
+                    $real_text = $signature['title'] . $template['content'];
+                }
+                //有变量
+                if ($template['variable_len'] > 0) {
+                    if (empty($replace_data)) {
+                        return ['code' => '3005']; //未获取到变量内容
+                    }
+                    for ($i = 0; $i < $template['variable_len']; $i++) {
+                        $var_num = $i + 1;
+                        $real_text = str_replace("{{var" . $var_num . "}}", $replace_data[$i], $template['content']); //内容
+                    }
+                }
+
+                if (in_array($real_text, $send_data)) {
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                } else {
+                    $send_data[] = $real_text;
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                }
+            } else {
+                $real_text = $send_text[0];
+                if (in_array($real_text, $send_data)) {
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                } else {
+                    $send_data[] = $real_text;
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                }
+            }
+        }
+
+        $free_taskno = [];
+        $trial = []; //需审核
+        //组合任务包
+        $real_num = 0;
+
+        $all_task_no = [];
+        $task_no_mobile = [];
+        foreach ($send_data as $key => $value) {
+            $send_task = [];
+            $task_no = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+            $send_task = [
+                'task_no' => $task_no,
+                'uid'     => $user['id'],
+                'task_content' => $value,
+                'mobile_content' => join(',', $send_data_mobile[$key]),
+                'source'         => $ip,
+                'send_length'       => mb_strlen($value),
+                'send_num'       => count($send_data_mobile[$key]),
+            ];
+            if (mb_strlen($value) > 70) {
+                $real_num += ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
+            } else {
+                $real_num += count($send_data_mobile[$key]);
+            }
+            $send_task['free_trial'] = 1;
+
+            $task_as_mobile = [];
+            foreach ($task_no_mobile as $key => $value) {
+                $as_value = [];
+                $as_value['task_no'] = $all_task_no[$key];
+                $as_value['mobiles'] = $value;
+                $task_as_mobile[] = $as_value;
+            }
+            // print_r($trial);
+            // die;
+            if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
+                return ['code' => '3004'];
+            }
+            Db::startTrans();
+            try {
+                $save = DbAdministrator::saveUserSendCodeTask($trial);
+
+                Db::commit();
+                return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
+            } catch (\Exception $e) {
+                Db::rollback();
+                exception($e);
+                return ['code' => '3009'];
+            }
         }
     }
 }

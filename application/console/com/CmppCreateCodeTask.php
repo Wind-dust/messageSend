@@ -765,7 +765,7 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:business:sendtask';
-        // for ($i = 175621; $i < 175626; $i++) {
+        // for ($i = 215906; $i < 216942; $i++) {
         //     $this->redis->rPush('index:meassage:business:sendtask', $i);
         // }
 
@@ -2438,8 +2438,10 @@ Db::rollback();
                         'send_status' => 2,
                         'free_trial' => 2,
                         'create_time' => $sendTask['create_time'],
+                        'send_time' => isset($send_log['Submit_time']) ? $send_log['Submit_time'] : $sendTask['create_time'],
                         'real_message' => $send_log['Stat'],
-                        'status_message' => $status_message
+                        'status_message' => $status_message,
+                        'update_time'    => isset($send_log['Done_time']) ? $send_log['Done_time'] : time(),
                     ]);
                     Db::commit();
                 } catch (\Exception $e) {

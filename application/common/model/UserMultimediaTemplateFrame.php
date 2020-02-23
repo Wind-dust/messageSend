@@ -6,12 +6,12 @@ use think\Model;
 use think\model\concern\SoftDelete;
 use Config;
 
-class UserMultimediaMessageLog extends Model
+class UserMultimediaTemplateFrame extends Model
 {
     use SoftDelete;
     protected $pk = 'id';
     // 设置当前模型对应的完整数据表名称
-    protected $table = 'yx_user_multimedia_message_log';
+    protected $table = 'yx_user_multimedia_template_frame';
     // 设置当前模型的数据库连接
     protected $connection = '';
     protected $deleteTime = 'delete_time';
@@ -22,7 +22,7 @@ class UserMultimediaMessageLog extends Model
         'delete_time' => 'timestamp:Y-m-d H:i:s', //更新时间
         'update_time' => 'timestamp:Y-m-d H:i:s', //更新时间
     ];
-    private $sendStatus = [1 => '待发送', 2 => '已发送', 3 => '成功', 4 => '失败',]; //1.上架 2.下架
+
 
     // 模型初始化
     protected static function init()
@@ -30,12 +30,18 @@ class UserMultimediaMessageLog extends Model
         //TODO:初始化内容
     }
 
-    public function setSendStatusAttr($value)
+    //    public function getLevelAttr($value) {
+    //        return $this->level[$value];
+    //    }
+
+    public function getImagePathAttr($value)
     {
-        if (!in_array($value, $this->sendStatus)) {
-            return $value;
+        if (empty($value)) {
+            return '';
         }
-        $sendStatus = array_flip($this->sendStatus);
-        return $sendStatus[$value];
+        if (stripos($value, 'http') === false) {
+            return Config::get('qiniu.domain') . '/' . $value;
+        }
+        return $value;
     }
 }

@@ -162,13 +162,13 @@ class Message extends AdminController
 
     /**
      * @api              {get} / 导出彩信回执报告
-     * @apiDescription   exportReceiptReport
+     * @apiDescription   exportMultimediaReceiptReport
      * @apiGroup         admin_Message
-     * @apiName          exportReceiptReport
+     * @apiName          exportMultimediaReceiptReport
      * @apiParam (入参) {String} cms_con_id
      * @apiParam (入参) {String} id 任务id
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
-     * @apiSampleRequest /admin/message/exportReceiptReport
+     * @apiSampleRequest /admin/message/exportMultimediaReceiptReport
      * @return array
      * @author rzc
      */

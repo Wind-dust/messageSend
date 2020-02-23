@@ -540,6 +540,76 @@ class User extends MyController
     }
 
     /**
+     * @api              {post} / 查询用户提交任务(彩信)
+     * @apiDescription   getUserMultimediaMessageTask
+     * @apiGroup         index_user
+     * @apiName          getUserMultimediaMessageTask
+     * @apiParam (入参) {String} pageNum 
+     * @apiParam (入参) {String} con_id
+     * @apiParam (入参) {String} page 
+     * @apiParam (入参) {String} title 标题模糊查询 
+     * @apiParam (入参) {String} start_time 创建开始时间
+     * @apiParam (入参) {String} end_time 创建开始时间
+     * @apiSuccess (返回) {String} code 200:成功   3003:用户不存在 / 
+     * @apiSuccess (返回) {Array} data 用户信息
+     * @apiSampleRequest /index/user/getUserMultimediaMessageTask
+     * @return array
+     * @author rzc
+     */
+    public function getUserMultimediaMessageTask()
+    {
+        $ConId = trim($this->request->post('con_id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $title  = trim($this->request->post('title'));
+        $start_time  = trim($this->request->post('start_time'));
+        $end_time  = trim($this->request->post('end_time'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        if (strtotime($start_time) == false && !empty($start_time)) {
+            return ['code' => '3003'];
+        }
+        if (strtotime($end_time)  == false && !empty($end_time)) {
+            return ['code' => '3004'];
+        }
+        $result = $this->app->user->getUserMultimediaMessageTask($page, $pageNum, $ConId, $start_time, $end_time, $title);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 查询用户提交任务详情(彩信)
+     * @apiDescription   getUserMultimediaMessageTaskInfo
+     * @apiGroup         index_user
+     * @apiName          getUserMultimediaMessageTaskInfo
+     * @apiParam (入参) {String} pageNum 
+     * @apiParam (入参) {String} con_id
+     * @apiParam (入参) {String} page 
+     * @apiParam (入参) {String} title 标题模糊查询 
+     * @apiParam (入参) {String} start_time 创建开始时间
+     * @apiParam (入参) {String} end_time 创建开始时间
+     * @apiSuccess (返回) {String} code 200:成功   3003:用户不存在 / 
+     * @apiSuccess (返回) {Array} data 用户信息
+     * @apiSampleRequest /index/user/getUserMultimediaMessageTaskInfo
+     * @return array
+     * @author rzc
+     */
+    public function getUserMultimediaMessageTaskInfo()
+    {
+        $ConId = trim($this->request->post('con_id'));
+        $id = trim($this->request->post('id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        $result = $this->app->user->getUserMultimediaMessageTaskInfo($page, $pageNum, $ConId, $id);
+        return $result;
+    }
+
+    /**
      * @api              {post} / 获取子账户列表
      * @apiDescription   getUserSonAccount
      * @apiGroup         index_user
