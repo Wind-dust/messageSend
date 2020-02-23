@@ -874,11 +874,12 @@ class User extends CommonIndex
         $offset = ($page - 1) * $pageNum;
         $result = DbSendMessage::getUserMultimediaMessage($where, '*', false, '', $offset . ',' . $pageNum);
         if (empty($result)) {
-            return ['code' => 200, 'message_data' => []];
+            return ['code' => 200, 'message_data' => [], 'total' => 0];
         }
         foreach ($result as $key => $value) {
             $result[$key]['multimedia_frame'] = DbSendMessage::getUserMultimediaMessageFrame(['multimedia_message_id' => $value['id']], 'num,name,content,image_path,image_type', false, ['num' => 'asc']);
         }
+        $total = DbSendMessage::countUserMultimediaMessage($where);
         return ['code' => 200, 'message_data' => $result];
     }
 

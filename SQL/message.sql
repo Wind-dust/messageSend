@@ -813,3 +813,9 @@ ADD COLUMN `source` varchar(50) NOT NULL DEFAULT '' COMMENT '请求源（ip）' 
 ALTER TABLE `messagesend`.`yx_user_send_task_log` 
 ADD COLUMN `send_length` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '内容长度' AFTER `send_status`;
 
+ALTER TABLE `messagesend`.`yx_user_model` 
+ADD COLUMN `variable_len` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '变量个数' AFTER `content`;
+
+ALTER TABLE `messagesend`.`yx_model_temeplate` 
+ADD COLUMN `variable_len` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '变量个数' AFTER `content`;
+
