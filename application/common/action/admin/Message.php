@@ -42,7 +42,7 @@ class Message extends CommonIndex
             $total = 1;
         }
 
-        return ['code' => '200', 'data' => $result];
+        return ['code' => '200', 'data' => $result, 'total' => $total];
     }
 
     public function auditMultimediaMessageTask($effective_id = [], $free_trial)

@@ -880,7 +880,7 @@ class User extends CommonIndex
             $result[$key]['multimedia_frame'] = DbSendMessage::getUserMultimediaMessageFrame(['multimedia_message_id' => $value['id']], 'num,name,content,image_path,image_type', false, ['num' => 'asc']);
         }
         $total = DbSendMessage::countUserMultimediaMessage($where);
-        return ['code' => 200, 'message_data' => $result];
+        return ['code' => 200, 'message_data' => $result, 'total' => $total];
     }
 
     public function getUserMultimediaMessageTaskInfo($page, $pageNum, $ConId, $id)
