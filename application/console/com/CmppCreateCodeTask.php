@@ -2971,6 +2971,7 @@ Db::rollback();
             // echo $start_time;
             // die;
             $code_task_log = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `uid` IN (47,49,51,52,53,54,55) AND `status_message` = '' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' LIMIT 1 ");
+
             if (!empty($code_task_log)) {
                 $request_url = "http://116.228.60.189:15901/rtreceive?";
                 $request_url .= 'task_no=' . trim($code_task_log[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($code_task_log[0]['mobile']) . "&send_time=" . trim(date('YmdHis', time() + mt_rand(0, 500)));
@@ -2985,6 +2986,9 @@ Db::rollback();
                     exception($e);
                 }
                 usleep(20000);
+            } else {
+                echo 'Over' . "\n";
+                sleep(120);
             }
         }
     }
