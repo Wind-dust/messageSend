@@ -1048,7 +1048,7 @@ return $result;
             return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
         } catch (\Exception $e) {
             Db::rollback();
-            exception($e);
+            // exception($e);
             return ['code' => '3009'];
         }
     }
@@ -1252,7 +1252,7 @@ return $result;
             return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
         } catch (\Exception $e) {
             Db::rollback();
-            exception($e);
+            // exception($e);
             return ['code' => '3009'];
         }
     }
@@ -1348,6 +1348,7 @@ return $result;
                 $frame['image_path'] = $value['image_path'];
             }
             $frame['name'] = $value['name'];
+            $frame['num'] = $value['num'];
             $multimedia_message_frame[] = $frame;
         }
         if ($content_length > $max_length) {
@@ -1355,7 +1356,7 @@ return $result;
         }
         do {
             $template_id = getRandomString(8);
-            $has = DbSendMessage::getUserModel(['template_id' => $template_id], 'id', true);
+            $has = DbSendMessage::getUserMultimediaTemplate(['template_id' => $template_id], 'id', true);
         } while ($has);
         $SmsMultimediaMessageTask = [];
         $SmsMultimediaMessageTask = [
@@ -1398,9 +1399,10 @@ return $result;
         }
         if (!empty($template_id)) {
             $template =  DbSendMessage::getUserMultimediaTemplate(['template_id' => $template_id], '*', true);
-            if ($template['status'] != 3) {
+            if ($template['status'] != 3 || empty($template)) {
                 return ['code' => '3003'];
             }
+            $template['multimedia_frame'] = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $template['id']], '*', false, ['num' => 'asc']);
         }
         if (!empty($signature_id)) {
             $signature =  DbSendMessage::getUserSignature(['uid' => $user['uid'], 'signature_id' => $signature_id], '*', true);
@@ -1413,40 +1415,58 @@ return $result;
         }
         $connect_data = explode(';', $connect);
         $connect_data = array_filter($connect_data);
-        $send_data = [];
+        // $send_data = [];
         $send_data_mobile = [];
+
+        //有模板目前只支持有模板进行提交
+        $MMS_data = [];
         foreach ($connect_data as $key => $data) {
-            $send_text = explode(':', $data);
+            $send_text = explode('!', $data);
+
             if (!empty($template)) {
-                $replace_data = explode(',', $send_text[0]);
-                $real_text = $template['content'];
-                if (!empty($signature)) {
-                    $real_text = $signature['title'] . $template['content'];
-                }
-                //有变量
-                if ($template['variable_len'] > 0) {
-                    if (empty($replace_data)) {
-                        return ['code' => '3005']; //未获取到变量内容
-                    }
-                    for ($i = 0; $i < $template['variable_len']; $i++) {
-                        $var_num = $i + 1;
-                        $real_text = str_replace("{{var" . $var_num . "}}", $replace_data[$i], $template['content']); //内容
+                $replace_data = explode('^', $send_text[0]); //帧
+                //做变量替换
+                $son_MMS_data = [];
+                $son_MMS_data = [
+                    'title' => $template['title']
+                ];
+                foreach ($replace_data as $key => $value) {
+                    $the_frame = explode(':', $value);
+                    foreach ($template['multimedia_frame'] as $mf => $mula) {
+                        if ($mula['num'] == $the_frame[0]) {
+                            if ($mula['variable_len'] > 0) {
+                                if (empty($the_frame[1])) {
+                                    return ['code' => '3005']; //未获取到变量内容
+                                }
+                                $the_var = explode(',', $the_frame[1]);
+                                for ($i = 0; $i < $mula['variable_len']; $i++) {
+                                    $var_num = $i + 1;
+                                    $mula['content'] = str_replace("{{var" . $var_num . "}}", $the_var[$i], $mula['content']); //内容
+                                }
+                            }
+                        }
+                        $the_mula['content'] = $mula['content'];
+                        $the_mula['num'] = $mula['num'];
+                        $the_mula['name'] = $mula['name'];
+                        $the_mula['image_path'] = $mula['image_path'];
+                        $the_mula['image_type'] = $mula['image_type'];
+                        $son_MMS_data['multimedia_frame'][] = $the_mula;
                     }
                 }
 
-                if (in_array($real_text, $send_data)) {
-                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                if (in_array($son_MMS_data, $MMS_data)) {
+                    $send_data_mobile[array_search($son_MMS_data, $MMS_data)][] = $send_text[1];
                 } else {
-                    $send_data[] = $real_text;
-                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                    $MMS_data[] = $son_MMS_data;
+                    $send_data_mobile[array_search($son_MMS_data, $MMS_data)][] = $send_text[1];
                 }
             } else {
-                $real_text = $send_text[0];
-                if (in_array($real_text, $send_data)) {
-                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                $son_MMS_data = $send_text[0];
+                if (in_array($son_MMS_data, $MMS_data)) {
+                    $send_data_mobile[array_search($son_MMS_data, $MMS_data)][] = $send_text[1];
                 } else {
-                    $send_data[] = $real_text;
-                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                    $MMS_data[] = $son_MMS_data;
+                    $send_data_mobile[array_search($son_MMS_data, $MMS_data)][] = $send_text[1];
                 }
             }
         }
@@ -1455,51 +1475,98 @@ return $result;
         $trial = []; //需审核
         //组合任务包
         $real_num = 0;
-
+        $max_length               = 102400; //最大字节长度
         $all_task_no = [];
         $task_no_mobile = [];
-        foreach ($send_data as $key => $value) {
+        $beyond = '';
+        $a = '';
+        foreach ($MMS_data as $key => $value) {
             $send_task = [];
-            $task_no = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+            $task_no = 'mul' . date('ymdHis') . substr(uniqid('', true), 15, 8);
             $send_task = [
                 'task_no' => $task_no,
                 'uid'     => $user['id'],
-                'task_content' => $value,
+                'title' => $value['title'],
                 'mobile_content' => join(',', $send_data_mobile[$key]),
                 'source'         => $ip,
-                'send_length'       => mb_strlen($value),
                 'send_num'       => count($send_data_mobile[$key]),
             ];
-            if (mb_strlen($value) > 70) {
-                $real_num += ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
-            } else {
-                $real_num += count($send_data_mobile[$key]);
-            }
+
+            $real_num += count($send_data_mobile[$key]);
+
             $send_task['free_trial'] = 1;
 
-            $task_as_mobile = [];
-            foreach ($task_no_mobile as $key => $value) {
-                $as_value = [];
-                $as_value['task_no'] = $all_task_no[$key];
-                $as_value['mobiles'] = $value;
-                $task_as_mobile[] = $as_value;
+            $content_length = 0;
+            foreach ($value['multimedia_frame'] as $ke => $mf) {
+                $frame = [];
+                if (!isset($mf['content'])) {
+                    $frame['content'] = '';
+                } else {
+                    $frame['content'] = $mf['content'];
+                    // $content_length+= strlen($value['content']);
+                }
+                $content_length += (strlen($frame['content']) / 8);
+                if (!isset($mf['image_path'])) {
+                    $frame['image_path'] = '';
+                } else {
+                    stream_context_set_default([
+                        'ssl' => [
+                            'verify_peer'      => false,
+                            'verify_peer_name' => false,
+                        ],
+                    ]);
+                    $head = get_headers($mf['image_path'], 1);
+                    $content_length += $head['Content-Length'];
+                }
             }
-            // print_r($trial);
-            // die;
-            if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
-                return ['code' => '3004'];
+            $send_task['multimedia_frame'] = $value['multimedia_frame'];
+            // $content_length  = 102402;
+            if ($content_length <= $max_length) {
+                array_push($trial, $send_task);
+                $all_task_no[] = $task_no;
+                $task_no_mobile[$key] = $send_data_mobile[$key];
+            } else {
+                $beyond .=  $a . join(',', $send_data_mobile[$key]);
             }
-            Db::startTrans();
-            try {
-                $save = DbAdministrator::saveUserSendCodeTask($trial);
+            $a = ',';
+        }
+        $task_as_mobile = [];
+        foreach ($task_no_mobile as $key => $value) {
+            $as_value = [];
+            $as_value['task_no'] = $all_task_no[$key];
+            $as_value['mobiles'] = $value;
+            $task_as_mobile[] = $as_value;
+        }
+        if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
+            return ['code' => '3004'];
+        }
 
-                Db::commit();
-                return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
-            } catch (\Exception $e) {
-                Db::rollback();
-                exception($e);
-                return ['code' => '3009'];
+        Db::startTrans();
+        try {
+            DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
+
+            Db::commit();
+            foreach ($trial as $tr => $tal) {
+                $son = [];
+                $son = $tal['multimedia_frame'];
+                unset($tal['multimedia_frame']);
+                // print_r($tal);
+                $bId = DbSendMessage::addUserMultimediaMessage($tal); //添加后的商品id
+                if ($bId) {
+                    foreach ($son as $key => $frame) {
+                        $frame['multimedia_message_id'] = $bId;
+                        $frame['image_path'] = filtraImage(Config::get('qiniu.domain'), $frame['image_path']);
+                        DbSendMessage::addUserMultimediaMessageFrame($frame); //添加后的商品id
+                    }
+                }
             }
+
+            Db::commit();
+            return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile, 'beyond' => explode(',', $beyond)];
+        } catch (\Exception $e) {
+            Db::rollback();
+            // exception($e);
+            return ['code' => '3009'];
         }
     }
 }

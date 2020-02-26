@@ -815,9 +815,6 @@ class Send extends MyController
         if (empty($appkey)) {
             return ['code' => '3000'];
         }
-        if (empty($mobile_content)) {
-            return ['code' => '3002'];
-        }
         if (empty($content_data)) {
             return ['code' => '3009'];
         }
@@ -829,7 +826,7 @@ class Send extends MyController
     }
 
     /**
-     * @api              {post} / 彩信模板报备接口
+     * @api              {post} / 自定义彩信提交
      * @apiDescription   submitBatchCustomMultimediaMessage
      * @apiGroup         index_send
      * @apiName          submitBatchCustomMultimediaMessage
@@ -859,6 +856,9 @@ class Send extends MyController
         }
         if (empty($connect)) {
             return ['code' => '3001'];
+        }
+        if (empty($template_id)) {
+            return ['code' => '3003'];
         }
         $ip       = trim($this->request->ip());
         $result = $this->app->send->submitBatchCustomMultimediaMessage($appid, $appkey, $template_id, $connect, $ip);
