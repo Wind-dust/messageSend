@@ -434,7 +434,8 @@ class CmppMiJiaLianDianBusiness extends Pzlife
                                 echo "发送时间：" . date("Y-m-d H:i:s", time()) . "\n";
                                 $num1 = substr($timestring, 0, 8);
                                 $num2 = substr($timestring, 8) . $this->combination($i);
-                                $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
+                                // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
+                                $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
                                 // iconv("UTF-8","gbk",$code);
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
                                 // print_r($code);die;
@@ -452,7 +453,7 @@ class CmppMiJiaLianDianBusiness extends Pzlife
                                         $bodyData .= pack("a21", $mobile);
                                         $bodyData .= pack("C", 0);
                                         $bodyData .= pack("C", 1);
-                                        $bodyData .= pack("C", 15);
+                                        $bodyData .= pack("C", 8);
                                         $bodyData .= pack("a6", $Source_Addr);
                                         $bodyData .= pack("a2", 02);
                                         $bodyData .= pack("a6", '');
@@ -501,7 +502,7 @@ class CmppMiJiaLianDianBusiness extends Pzlife
                                     $bodyData .= pack("a21", $mobile);
                                     $bodyData .= pack("C", 0);
                                     $bodyData .= pack("C", 0);
-                                    $bodyData .= pack("C", 15);
+                                    $bodyData .= pack("C", 8);
                                     $bodyData .= pack("a6", $Source_Addr);
                                     $bodyData .= pack("a2", 02);
                                     $bodyData .= pack("a6", '');
