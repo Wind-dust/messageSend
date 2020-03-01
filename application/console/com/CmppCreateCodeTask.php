@@ -722,7 +722,7 @@ class CmppCreateCodeTask extends Pzlife
                     $send_log = [
                         'task_no'        => $sendTask['task_no'],
                         'uid'            => $sendTask['uid'],
-                        'title'          => $sendTask['task_name'],
+                        'title'          => $sendTask['title'],
                         'content'        => $sendTask['task_content'],
                         'mobile'         => $mobilesend[$i],
                         'send_status'    => 4,
