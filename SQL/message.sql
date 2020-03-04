@@ -819,3 +819,77 @@ ADD COLUMN `variable_len` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '变量
 ALTER TABLE `messagesend`.`yx_model_temeplate` 
 ADD COLUMN `variable_len` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '变量个数' AFTER `content`;
 
+DROP TABLE IF EXISTS `yx_statistics_year`;
+CREATE TABLE `yx_statistics_year` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
+  `timekey` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '时间标记',
+  `num` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '总数',
+  `success` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '成功总数',
+  `unknown` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '未知总数',
+  `default` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '失败总数',
+  `ratio` decimal(10,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '成功比例',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `user_business_timekey` (`uid`,`business_id`,`timekey`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='用户年度统计信息';
+
+DROP TABLE IF EXISTS `yx_statistics_month`;
+CREATE TABLE `yx_statistics_month` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
+  `timekey` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '时间标记',
+  `num` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '总数',
+  `success` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '成功总数',
+  `unknown` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '未知总数',
+  `default` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '失败总数',
+  `ratio` decimal(10,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '成功比例',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `user_business_timekey` (`uid`,`business_id`,`timekey`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='用户月度统计信息';
+
+DROP TABLE IF EXISTS `yx_statistics_day`;
+CREATE TABLE `yx_statistics_day` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
+  `timekey` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '时间标记',
+  `num` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '总数',
+  `success` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '成功总数',
+  `unknown` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '未知总数',
+  `default` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '失败总数',
+  `ratio` decimal(10,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '成功比例',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `user_business_timekey` (`uid`,`business_id`,`timekey`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='用户日统计信息';
+
+DROP TABLE IF EXISTS `yx_log_trading`;
+CREATE TABLE `yx_log_trading` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
+  `number` int(10) NOT NULL DEFAULT 0.00 COMMENT '交易金额',
+  `befor_num_balance` int(10) NOT NULL DEFAULT 0 COMMENT '交易前金额',
+  `after_num_balance` int(10) NOT NULL DEFAULT 0 COMMENT '交易后金额',
+  `to_user` char(30) NOT NULL DEFAULT '' COMMENT '用户名',
+  `to_uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `from_user` char(30) NOT NULL DEFAULT '' COMMENT '用户名',
+  `from_uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `user` (`uid`) USING BTREE,
+  INDEX `to_user` (`to_user`,`to_uid`) USING BTREE,
+  INDEX `from_user` (`from_user`,`from_uid`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='用户账号数量划拨变更信息统计信息';

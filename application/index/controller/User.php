@@ -723,4 +723,193 @@ class User extends MyController
         $result = $this->app->user->getUserDevelopCode($ConId, $business_id);
         return $result;
     }
+
+    /**
+     * @api              {post} / 获取用户统计年度
+     * @apiDescription   getUserStatisticsYear
+     * @apiGroup         index_user
+     * @apiName          getUserStatisticsYear
+     * @apiParam (入参) {String} con_id
+     * @apiParam (入参) {String} page 
+     * @apiParam (入参) {String} pageNum 
+     * @apiParam (入参) {String} [start_timekey] 开始时间标记（如 2019）
+     * @apiParam (入参) {String} [end_timekey] 开始时间标记（如 2020）
+     * @apiSuccess (返回) {String} code 200:成功  
+     * @apiSuccess (返回) {Array} data 
+     * @apiSuccess (data) {string} id 
+     * @apiSuccess (data) {string} uid 
+     * @apiSuccess (data) {string} business_id 服务类型 5，营销；6，行业 7，网贷服务，8图文彩信 9，游戏 
+     * @apiSuccess (data) {string} timekey 时间标记
+     * @apiSuccess (data) {string} num 总数
+     * @apiSuccess (data) {string} success 成功总数
+     * @apiSuccess (data) {string} unknown 未知总数
+     * @apiSuccess (data) {string} default 失败总数
+     * @apiSuccess (data) {string} ratio 成功比例
+     * @apiSuccess (data) {string} update_time 更新时间
+     * @apiSuccess (data) {string} create_time 初次入库时间
+     * @apiSampleRequest /index/user/getUserStatisticsYear
+     * @return array
+     * @author rzc
+     */
+    public function getUserStatisticsYear()
+    {
+        $ConId = trim($this->request->post('con_id'));
+        $start_timekey = trim($this->request->post('start_timekey'));
+        $end_timekey = trim($this->request->post('end_timekey'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        if (!empty($start_timekey) && !empty($end_timekey) && ($end_timekey < $start_timekey)) {
+            return ['code' => '3002', 'Msg' => '结束时间段不能小于开始时间段'];
+        }
+        $result = $this->app->user->getUserDevelopCode($page, $pageNum, $ConId, $start_timekey, $end_timekey);
+        return $result;
+    }
+    /**
+     * @api              {post} / 获取用户统计(月度)
+     * @apiDescription   getUserStatisticsMonth
+     * @apiGroup         index_user
+     * @apiName          getUserStatisticsMonth
+     * @apiParam (入参) {String} con_id
+     * @apiParam (入参) {String} page 
+     * @apiParam (入参) {String} pageNum 
+     * @apiParam (入参) {String} [start_timekey] 开始时间标记（如 202001）
+     * @apiParam (入参) {String} [end_timekey] 开始时间标记（如 202011）
+     * @apiSuccess (返回) {String} code 200:成功 
+     * @apiSuccess (返回) {Array} data 
+     * @apiSuccess (data) {string} id 
+     * @apiSuccess (data) {string} uid 
+     * @apiSuccess (data) {string} business_id 服务类型 5，营销；6，行业 7，网贷服务，8图文彩信 9，游戏 
+     * @apiSuccess (data) {string} timekey 时间标记
+     * @apiSuccess (data) {string} num 总数
+     * @apiSuccess (data) {string} success 成功总数
+     * @apiSuccess (data) {string} unknown 未知总数
+     * @apiSuccess (data) {string} default 失败总数
+     * @apiSuccess (data) {string} ratio 成功比例
+     * @apiSuccess (data) {string} update_time 更新时间
+     * @apiSuccess (data) {string} create_time 初次入库时间
+     * @apiSampleRequest /index/user/getUserStatisticsMonth
+     * @return array
+     * @author rzc
+     */
+    public function getUserStatisticsMonth()
+    {
+        $ConId = trim($this->request->post('con_id'));
+        $start_timekey = trim($this->request->post('start_timekey'));
+        $end_timekey = trim($this->request->post('end_timekey'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        if (!empty($start_timekey) && !empty($end_timekey) && ($end_timekey < $start_timekey)) {
+            return ['code' => '3002', 'Msg' => '结束时间段不能小于开始时间段'];
+        }
+        $result = $this->app->user->getUserStatisticsMonth($page, $pageNum, $ConId, $start_timekey, $end_timekey);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 获取用户统计（日）
+     * @apiDescription   getUserStatisticsDay
+     * @apiGroup         index_user
+     * @apiName          getUserStatisticsDay
+     * @apiParam (入参) {String} con_id
+     * @apiParam (入参) {String} page 
+     * @apiParam (入参) {String} pageNum 
+     * @apiParam (入参) {String} [start_timekey] 开始时间标记（如 20200101）
+     * @apiParam (入参) {String} [end_timekey] 开始时间标记（如 20200131）
+     * @apiSuccess (返回) {String} code 200:成功 
+     * @apiSuccess (返回) {Array} data 
+     * @apiSuccess (data) {string} id 
+     * @apiSuccess (data) {string} uid 
+     * @apiSuccess (data) {string} business_id 服务类型 5，营销；6，行业 7，网贷服务，8图文彩信 9，游戏 
+     * @apiSuccess (data) {string} timekey 时间标记
+     * @apiSuccess (data) {string} num 总数
+     * @apiSuccess (data) {string} success 成功总数
+     * @apiSuccess (data) {string} unknown 未知总数
+     * @apiSuccess (data) {string} default 失败总数
+     * @apiSuccess (data) {string} ratio 成功比例
+     * @apiSuccess (data) {string} update_time 更新时间
+     * @apiSuccess (data) {string} create_time 初次入库时间
+     * @apiSampleRequest /index/user/getUserStatisticsDay
+     * @return array
+     * @author rzc
+     */
+    public function getUserStatisticsDay()
+    {
+        $ConId = trim($this->request->post('con_id'));
+        $start_timekey = trim($this->request->post('start_timekey'));
+        $end_timekey = trim($this->request->post('end_timekey'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        if (!empty($start_timekey) && !empty($end_timekey) && ($end_timekey < $start_timekey)) {
+            return ['code' => '3002', 'Msg' => '结束时间段不能小于开始时间段'];
+        }
+        $result = $this->app->user->getUserStatisticsDay($page, $pageNum, $ConId, $start_timekey, $end_timekey);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 条数划拨
+     * @apiDescription   allocateAgentNumber
+     * @apiGroup         index_user
+     * @apiName          allocateAgentNumber
+     * @apiParam (入参) {String} con_id
+     * @apiParam (入参) {String} nick_name 划拨对象名称
+     * @apiParam (入参) {String} number 划拨数量
+     * @apiParam (入参) {String} business_id 划拨服务类型
+     * @apiSuccess (返回) {String} code 200:成功 
+     * @apiSampleRequest /index/user/allocateAgentNumber
+     * @return array
+     * @author rzc
+     */
+    public function allocateAgentNumber()
+    {
+        $ConId = trim($this->request->post('con_id'));
+        $nick_name = trim($this->request->post('nick_name'));
+        $number = trim($this->request->post('number'));
+        $business_id = trim($this->request->post('business_id'));
+        intval($number);
+        intval($business_id);
+        $result = $this->app->user->allocateAgentNumber($nick_name, $number, $ConId, $business_id);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 获取用户条数划拨
+     * @apiDescription   getAllocateAgentNumber
+     * @apiGroup         index_user
+     * @apiName          getAllocateAgentNumber
+     * @apiParam (入参) {String} con_id
+     * @apiParam (入参) {String} [business_id] 划拨服务类型
+     * @apiParam (入参) {String} page 
+     * @apiParam (入参) {String} pageNum 
+     * @apiSuccess (返回) {String} code 200:成功 
+     * @apiSampleRequest /index/user/getAllocateAgentNumber
+     * @return array
+     * @author rzc
+     */
+    public function getAllocateAgentNumber()
+    {
+        $ConId = trim($this->request->post('con_id'));
+        $business_id = trim($this->request->post('business_id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        intval($business_id);
+        $result = $this->app->user->allocateAgentNumber($page, $pageNum, $ConId, $business_id);
+        return $result;
+    }
 }

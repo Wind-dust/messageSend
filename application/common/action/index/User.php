@@ -944,4 +944,138 @@ class User extends CommonIndex
         }
         return ['code' => '200', 'total' => $total, 'task_log' => $task_log];
     }
+
+    public function getUserStatisticsYear($page, $pageNum, $ConId, $start_timekey = '', $end_timekey = '')
+    {
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $offset = ($page - 1) * $pageNum;
+        $where = [];
+        array_push($where, ['uid', '=', $uid]);
+        if (!empty($start_timekey)) {
+            array_push($where, ['timekey', '>=', $start_timekey]);
+        }
+        if (!empty($end_timekey)) {
+            array_push($where, ['timekey', '<=', $end_timekey]);
+        }
+        $result = DbUser::getUserStatisticsYear($where, '*', false, '', $offset . ',' . $pageNum);
+        $total = DbUser::countUserStatisticsYear($where);
+        return ['code' => '200', 'total' => $total, 'data' => $result];
+    }
+
+    public function getUserStatisticsMonth($page, $pageNum, $ConId, $start_timekey = '', $end_timekey = '')
+    {
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $offset = ($page - 1) * $pageNum;
+        $where = [];
+        array_push($where, ['uid', '=', $uid]);
+        if (!empty($start_timekey)) {
+            array_push($where, ['timekey', '>=', $start_timekey]);
+        }
+        if (!empty($end_timekey)) {
+            array_push($where, ['timekey', '<=', $end_timekey]);
+        }
+        $result = DbUser::getUserStatisticsMonth($where, '*', false, '', $offset . ',' . $pageNum);
+        $total = DbUser::countUserStatisticsMonth($where);
+        return ['code' => '200', 'total' => $total, 'data' => $result];
+    }
+
+    public function getUserStatisticsDay($page, $pageNum, $ConId, $start_timekey = '', $end_timekey = '')
+    {
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $offset = ($page - 1) * $pageNum;
+        $where = [];
+        array_push($where, ['uid', '=', $uid]);
+        if (!empty($start_timekey)) {
+            array_push($where, ['timekey', '>=', $start_timekey]);
+        }
+        if (!empty($end_timekey)) {
+            array_push($where, ['timekey', '<=', $end_timekey]);
+        }
+        $result = DbUser::getUserStatisticsDay($where, '*', false, '', $offset . ',' . $pageNum);
+        $total = DbUser::countUserStatisticsDay($where);
+        return ['code' => '200', 'total' => $total, 'data' => $result];
+    }
+
+    public function allocateAgentNumber($nick_name, $number, $ConId, $business_id)
+    {
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3000'];
+        }
+        $user = DbUser::getUserOne(['id' => $uid], 'pid,user_type,nick_name,passwd');
+        if ($user['pid'] != 0 || $user['user_type'] != 2) {
+            return ['code' => '3001', 'msg' => '非代理商用户无法划拨数量'];
+        }
+        $user_equities = DbAdministrator::getUserEquities(['uid' => $uid, 'business_id' => $business_id], 'num_balance', true);
+        if (empty($user_equities) || $user_equities['num_balance'] < $number) {
+            return ['code' => '3002', 'msg' => '您没有此项服务或者可分配余额不足'];
+        }
+        $be_allocated_user = DbUser::getUserOne(['pid' => $uid, 'nick_name' => $nick_name], 'id,user_type,passwd');
+        if (empty($be_allocated_user)) {
+            return ['code' => '3003', 'msg' => '错误的目标客户'];
+        }
+        $be_allocated_user_equities = DbAdministrator::getUserEquities(['uid' => $be_allocated_user['id'], 'business_id' => $business_id], 'num_balance', true);
+        if (empty($be_allocated_user_equities)) {
+            return ['code' => '3004', 'msg' => '目标用户无此项服务'];
+        }
+        $Agent_trading_data = [];
+        $Agent_trading_data = [
+            'uid' => $uid,
+            'business_id' => $business_id,
+            'befor_num_balance' => $user_equities['num_balance'],
+            'after_num_balance' => bcsub($user_equities['num_balance'], $number),
+            'number' => -$number,
+            'to_user' => $nick_name,
+            'to_uid' =>  $be_allocated_user['id'],
+        ];
+        $get_trading_data = [];
+        $get_trading_data = [
+            'uid' => $be_allocated_user['id'],
+            'business_id' => $business_id,
+            'befor_num_balance' => $user_equities['num_balance'],
+            'after_num_balance' => bcadd($user_equities['num_balance'], $number),
+            'number' => +$number,
+            'from_user' => $user['nick_name'],
+            'from_uid' =>  $user['id'],
+        ];
+        Db::startTrans();
+        try {
+            // DbUser::updateUser(['logo' => $image, 'businesslicense' => $bimage], $uid);
+            DbAdministrator::modifyBalance($user_equities['id'], $number, 'dec');
+            DbUser::addLogTrading($Agent_trading_data);
+            DbAdministrator::modifyBalance($be_allocated_user_equities['id'], $number, 'inc');
+            DbUser::addLogTrading($get_trading_data);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function getAllocateAgentNumber($page, $pageNum, $ConId, $business_id = 0)
+    {
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $offset = ($page - 1) * $pageNum;
+        $where = [];
+        array_push($where, ['uid', '=', $uid]);
+        if (!empty($business_id)) {
+            array_push($where, ['business_id', '=', $business_id]);
+        }
+        $result = DbUser::getLogTrading($where, '*', false, '', $offset . ',' . $pageNum);
+        $total = DbUser::countLogTrading($where);
+        return ['code' => '200', 'total' => $total, 'data' => $result];
+    }
 }

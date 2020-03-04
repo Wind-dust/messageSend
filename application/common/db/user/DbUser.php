@@ -6,6 +6,10 @@ use app\common\model\LogVercode;
 use app\common\model\UserCon;
 use app\common\model\Users;
 use app\common\model\UserDevelopCode;
+use app\common\model\StatisticsYear;
+use app\common\model\StatisticsMonth;
+use app\common\model\StatisticsDay;
+use app\common\model\LogTrading;
 use think\Db;
 
 class DbUser
@@ -192,5 +196,64 @@ class DbUser
     public function delUserDevelopCode($id)
     {
         return UserDevelopCode::destroy($id);
+    }
+
+    public function getUserStatisticsYear($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = StatisticsYear::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function countUserStatisticsYear($where)
+    {
+        return StatisticsYear::where($where)->count();
+    }
+
+    public function getUserStatisticsMonth($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = StatisticsMonth::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function countUserStatisticsMonth($where)
+    {
+        return StatisticsMonth::where($where)->count();
+    }
+
+
+    public function getUserStatisticsDay($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = StatisticsDay::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function countUserStatisticsDay($where)
+    {
+        return StatisticsDay::where($where)->count();
+    }
+
+    public function getLogTrading($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = LogTrading::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+
+    public function addLogTrading($data)
+    {
+        $LogTrading = new LogTrading;
+        $LogTrading->save($data);
+        return $LogTrading->id;
+    }
+
+    public function editLogTrading($data, $id)
+    {
+        $LogTrading = new LogTrading;
+        return $LogTrading->save($data, ['id' => $id]);
+    }
+
+    public function countLogTrading($where)
+    {
+        return LogTrading::where($where)->count();
     }
 }
