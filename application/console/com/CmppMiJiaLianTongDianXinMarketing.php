@@ -50,14 +50,14 @@ class CmppMiJiaLianTongDianXinMarketing extends Pzlife
         $redisMessageCodeDeliver = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
         $redisMessageUnKownDeliver = 'index:meassage:code:unknow:deliver:' . $content; //行业通知MsgId
 
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15601607386',
             'mar_task_id' => '',
             'content'     => '【丝芙兰】天猫SEPHORA海外旗舰店盛大开业！3/5-3/8会员专享9折叠加300-30满减，戳 m.tb.cn/.TS2x7j回T退订 ',
 
-        ]));
+        ])); */
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15316188669',
+            'mobile'      => '18017369942',
             'mar_task_id' => '',
             'content'     => '【丝芙兰】天猫SEPHORA海外旗舰店盛大开业！3/5-3/8会员专享9折叠加300-30满减，戳 m.tb.cn/.TS2x7j回T退订 ',
 
