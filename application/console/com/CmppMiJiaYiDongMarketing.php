@@ -389,8 +389,8 @@ class CmppMiJiaYiDongMarketing extends Pzlife
                                             $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                                         } else { //不在记录中的回执存入缓存，
 
-                                            print_r($body);
-                                            print_r($Msg_Content);
+                                            // print_r($body);
+                                            // print_r($Msg_Content);
                                             $mesage['Stat']        = $Msg_Content['Stat'];
                                             $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                                             $mesage['Done_time']   = $Msg_Content['Done_time'];
@@ -400,7 +400,7 @@ class CmppMiJiaYiDongMarketing extends Pzlife
                                             $redis->rPush($redisMessageUnKownDeliver, json_encode($mesage));
                                         }
                                         $callback_Command_Id = 0x80000005;
-
+                                        print_r($mesage);
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                                         $new_Total_Length = strlen($new_body) + 12;
                                         $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id2']);
