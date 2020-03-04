@@ -44,6 +44,7 @@ return [
     'cmppmijiayidongmarketing'         => $commandPath . 'CmppMiJiaYiDongMarketing',
     'cmppmijialiandianbusiness'        => $commandPath . 'CmppMiJiaLianDianBusiness',
     'cmppmijiayidongbusiness'          => $commandPath . 'CmppMiJiaYiDongBusiness',
+    'cmppmijialiantongdianxinmarketing'        => $commandPath . 'CmppMiJiaLianTongDianXinMarketing', //米加联通电信营销
     'cmppjumengyidongmarketing'        => $commandPath . 'CmppJuMengYiDongMarketing',
     'cmppjumengliandianmarketing'      => $commandPath . 'CmppJuMengLianDianMarketing',
     'cmppyixinyidongbusiness'          => $commandPath . 'CmppYiXinYiDongBusiness', //易信移动行业通道
