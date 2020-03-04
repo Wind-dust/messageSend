@@ -56,12 +56,12 @@ class CmppMiJiaLianTongDianXinMarketing extends Pzlife
             'content'     => '【丝芙兰】天猫SEPHORA海外旗舰店盛大开业！3/5-3/8会员专享9折叠加300-30满减，戳 m.tb.cn/.TS2x7j回T退订 ',
 
         ])); */
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /*   $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '18017369942',
             'mar_task_id' => '',
             'content'     => '【丝芙兰】天猫SEPHORA海外旗舰店盛大开业！3/5-3/8会员专享9折叠加300-30满减，戳 m.tb.cn/.TS2x7j回T退订 ',
 
-        ]));
+        ])); */
 
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/21.log";

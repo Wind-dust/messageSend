@@ -893,3 +893,9 @@ CREATE TABLE `yx_log_trading` (
   INDEX `to_user` (`to_user`,`to_uid`) USING BTREE,
   INDEX `from_user` (`from_user`,`from_uid`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='用户账号数量划拨变更信息统计信息';
+
+
+ALTER TABLE `messagesend`.`yx_user_send_task` 
+CHANGE COLUMN `channel_id` `yidong_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '移动通道ID' AFTER `develop_no`,
+ADD COLUMN `liantong_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '联通通道id' AFTER `yidong_channel_id`,
+ADD COLUMN `dianxin_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '电信通道id' AFTER `liantong_channel_id`;

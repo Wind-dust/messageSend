@@ -385,11 +385,19 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function distributionChannel($effective_id = [], $channel_id, $business_id)
+    public function distributionChannel($effective_id = [], $yidong_channel_id, $liantong_channel_id, $dianxin_channel_id, $business_id)
     {
-        $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id, 'business_id' => $business_id], 'id,title,channel_price', true);
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $yidong_channel_id], 'id,title,channel_price', true);
         if (empty($channel)) {
             return ['code' => '3002'];
+        }
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $liantong_channel_id], 'id,title,channel_price', true);
+        if (empty($channel)) {
+            return ['code' => '3011'];
+        }
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $dianxin_channel_id], 'id,title,channel_price', true);
+        if (empty($channel)) {
+            return ['code' => '3012'];
         }
         $usertask = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,task_content,free_trial,send_num,channel_id,appointment_time', false);
         if (empty($usertask)) {
@@ -406,7 +414,7 @@ class Administrator extends CommonIndex
                 $uids[] = $value['uid'];
             }
             // print_r($value);
-            if ($value['free_trial'] == 2 && !$value['channel_id']) {
+            if ($value['free_trial'] == 2 && (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id'])) {
                 $real_length = 1;
                 $real_usertask[] = $value;
                 $mobilesend       = explode(',', $value['mobile_content']);
@@ -450,7 +458,7 @@ class Administrator extends CommonIndex
 
             // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
             foreach ($real_usertask as $key => $value) {
-                DbAdministrator::editUserSendTask(['free_trial' => $free_trial, 'channel_id' => $channel_id], $value['id']);
+                DbAdministrator::editUserSendTask(['free_trial' => $free_trial, 'yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id], $value['id']);
             }
             foreach ($real_usertask as $real => $usertask) {
                 // $res = $this->redis->rpush("index:meassage:marketing:sendtask",$usertask['id']); 

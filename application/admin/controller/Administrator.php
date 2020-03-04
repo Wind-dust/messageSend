@@ -4,7 +4,8 @@ namespace app\admin\controller;
 
 use app\admin\AdminController;
 
-class Administrator extends AdminController {
+class Administrator extends AdminController
+{
     protected $beforeActionList = [
         'isLogin', //所有方法的前置操作
         // 'isLogin' => ['except' => 'login'], //除去login其他方法都进行isLogin前置操作
@@ -26,7 +27,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function getBusiness() {
+    public function getBusiness()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         $id       = trim($this->request->post('id'));
@@ -57,7 +59,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function addBusiness() {
+    public function addBusiness()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -97,7 +100,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function updateBusiness() {
+    public function updateBusiness()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -137,7 +141,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function getUserQualificationRecord() {
+    public function getUserQualificationRecord()
+    {
         $cmsConId = trim($this->request->post('cms_con_id'));
         $id       = trim($this->request->post('id'));
         $page     = trim($this->request->post('page'));
@@ -164,7 +169,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function auditUserQualificationRecord() {
+    public function auditUserQualificationRecord()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -196,7 +202,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function getUserEquities() {
+    public function getUserEquities()
+    {
         $cmsConId    = trim($this->request->post('cms_con_id'));
         $mobile      = trim($this->request->post('mobile'));
         $business_id = trim($this->request->post('business_id'));
@@ -225,7 +232,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function rechargeApplication() {
+    public function rechargeApplication()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -238,7 +246,7 @@ class Administrator extends AdminController {
         //     return ['code' => '3001'];
         // }
         if (empty($nick_name)) {
-            return ['code' => '3001','msg' => '用户名不存在'];
+            return ['code' => '3001', 'msg' => '用户名不存在'];
         }
         if (empty($business_id) || intval($business_id) < 1 || !is_numeric($business_id)) {
             return ['code' => '3002'];
@@ -264,7 +272,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function getRechargeApplication() {
+    public function getRechargeApplication()
+    {
         $cmsConId = trim($this->request->post('cms_con_id'));
         $id       = trim($this->request->post('id'));
         $page     = trim($this->request->post('page'));
@@ -293,7 +302,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function aduitRechargeApplication() {
+    public function aduitRechargeApplication()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -305,7 +315,7 @@ class Administrator extends AdminController {
         if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
             return ['code' => '3001'];
         }
-        if (!in_array($status,[2,3])) {
+        if (!in_array($status, [2, 3])) {
             return ['code' => '3002'];
         }
         intval($status);
@@ -325,7 +335,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function getChannel(){
+    public function getChannel()
+    {
         $cmsConId = trim($this->request->post('cms_con_id'));
         $result  = $this->app->administrator->getChannel();
         return $result;
@@ -343,7 +354,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function settingChannel(){
+    public function settingChannel()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -361,7 +373,7 @@ class Administrator extends AdminController {
         return $result;
     }
 
-     /**
+    /**
      * @api              {post} / 分配用户通道
      * @apiDescription   distributeUserChannel
      * @apiGroup         admin_Administrator
@@ -375,7 +387,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function distributeUserChannel(){
+    public function distributeUserChannel()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -390,7 +403,7 @@ class Administrator extends AdminController {
         if (empty($channel_id) || intval($channel_id) < 1 || !is_numeric($channel_id)) {
             return ['code' => '3002'];
         }
-        if (!in_array($priority,[1,2])) {
+        if (!in_array($priority, [1, 2])) {
             return ['code' => '3003'];
         }
         $result  = $this->app->administrator->distributeUserChannel(intval($channel_id), intval($user_phone), intval($priority));
@@ -410,7 +423,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function updateUserChannel(){
+    public function updateUserChannel()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -418,11 +432,11 @@ class Administrator extends AdminController {
         }
         $id = trim($this->request->post('id'));
         $priority = trim($this->request->post('priority'));
-       
+
         if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
             return ['code' => '3001'];
         }
-        if (!in_array($priority,[1,2])) {
+        if (!in_array($priority, [1, 2])) {
             return ['code' => '3003'];
         }
         $result  = $this->app->administrator->updateUserChannel(intval($id), intval($priority));
@@ -441,14 +455,15 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function delUserChannel(){
+    public function delUserChannel()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
             return ['code' => '3100'];
         }
         $id = trim($this->request->post('id'));
-       
+
         if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
             return ['code' => '3001'];
         }
@@ -470,7 +485,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function getUserSendTask() {
+    public function getUserSendTask()
+    {
         $id       = trim($this->request->post('id'));
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
@@ -496,7 +512,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function auditUserSendTask(){
+    public function auditUserSendTask()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -504,7 +521,7 @@ class Administrator extends AdminController {
         }
         $id = trim($this->request->post('id'));
         $free_trial = trim($this->request->post('free_trial'));
-        $ids = explode(',',$id);
+        $ids = explode(',', $id);
         $effective_id = [];
         foreach ($ids as $key => $value) {
             if (empty($value) || intval($value) < 1 || !is_numeric($value)) {
@@ -515,8 +532,8 @@ class Administrator extends AdminController {
         if (count($effective_id) > 100 || count($effective_id) < 1) {
             return ['code' => '3001'];
         }
-        
-        if (!in_array($free_trial,[2,3])) {
+
+        if (!in_array($free_trial, [2, 3])) {
             return ['code' => '3003'];
         }
         $result =  $this->app->administrator->auditUserSendTask($effective_id, $free_trial);
@@ -532,23 +549,28 @@ class Administrator extends AdminController {
      * @apiParam (入参) {String} cms_con_id
      * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
      * @apiParam (入参) {String} business_id 业务服务id
-     * @apiParam (入参) {String} channel_id 通道ID
+     * @apiParam (入参) {String} yidong_channel_id 移动通道ID
+     * @apiParam (入参) {String} liantong_channel_id 联通通道ID
+     * @apiParam (入参) {String} dianxin_channel_id 电信通道ID
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:channel_id格式错误 / 3003:business_id格式错误
      * @apiSampleRequest /admin/administrator/distributionChannel
      * @return array
      * @author rzc
      */
-    public function distributionChannel(){
+    public function distributionChannel()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
             return ['code' => '3100'];
         }
         $id = trim($this->request->post('id'));
-        $channel_id = trim($this->request->post('channel_id'));
+        $yidong_channel_id = trim($this->request->post('yidong_channel_id'));
+        $liantong_channel_id = trim($this->request->post('liantong_channel_id'));
+        $dianxin_channel_id = trim($this->request->post('dianxin_channel_id'));
         $business_id = trim($this->request->post('business_id'));
-       
-        $ids = explode(',',$id);
+
+        $ids = explode(',', $id);
         $effective_id = [];
         foreach ($ids as $key => $value) {
             if (empty($value) || intval($value) < 1 || !is_numeric($value)) {
@@ -556,17 +578,23 @@ class Administrator extends AdminController {
             }
             $effective_id[] = $value;
         }
-        if (empty($channel_id) || intval($channel_id) < 1 || !is_numeric($channel_id)) {
+        if (empty($yidong_channel_id) || intval($yidong_channel_id) < 1 || !is_numeric($yidong_channel_id)) {
+            return ['code' => '3002'];
+        }
+        if (empty($liantong_channel_id) || intval($liantong_channel_id) < 1 || !is_numeric($liantong_channel_id)) {
+            return ['code' => '3002'];
+        }
+        if (empty($dianxin_channel_id) || intval($dianxin_channel_id) < 1 || !is_numeric($dianxin_channel_id)) {
             return ['code' => '3002'];
         }
         if (empty($business_id) || intval($business_id) < 1 || !is_numeric($business_id)) {
             return ['code' => '3003'];
         }
-        $result =  $this->app->administrator->distributionChannel($effective_id, intval($channel_id), intval($business_id));
+        $result =  $this->app->administrator->distributionChannel($effective_id, intval($yidong_channel_id), intval($liantong_channel_id), intval($dianxin_channel_id), intval($business_id));
         return $result;
     }
 
-    
+
     /**
      * @api              {post} / 获取行业任务
      * @apiDescription   getUserSendCodeTask
@@ -581,7 +609,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function getUserSendCodeTask(){
+    public function getUserSendCodeTask()
+    {
         $id       = trim($this->request->post('id'));
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
@@ -594,7 +623,7 @@ class Administrator extends AdminController {
         return $result;
     }
 
-       /**
+    /**
      * @api              {post} / 行业任务审核
      * @apiDescription   auditUserSendCodeTask
      * @apiGroup         admin_Administrator
@@ -607,7 +636,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function auditUserSendCodeTask(){
+    public function auditUserSendCodeTask()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -615,7 +645,7 @@ class Administrator extends AdminController {
         }
         $id = trim($this->request->post('id'));
         $free_trial = trim($this->request->post('free_trial'));
-        $ids = explode(',',$id);
+        $ids = explode(',', $id);
         $effective_id = [];
         foreach ($ids as $key => $value) {
             if (empty($value) || intval($value) < 1 || !is_numeric($value)) {
@@ -626,8 +656,8 @@ class Administrator extends AdminController {
         if (count($effective_id) > 100 || count($effective_id) < 1) {
             return ['code' => '3001'];
         }
-        
-        if (!in_array($free_trial,[2,3])) {
+
+        if (!in_array($free_trial, [2, 3])) {
             return ['code' => '3003'];
         }
         $result =  $this->app->administrator->auditUserSendCodeTask($effective_id, $free_trial);
@@ -635,7 +665,7 @@ class Administrator extends AdminController {
     }
 
 
-      /**
+    /**
      * @api              {post} / 分配行业任务通道
      * @apiDescription   distributionCodeTaskChannel
      * @apiGroup         admin_Administrator
@@ -649,7 +679,8 @@ class Administrator extends AdminController {
      * @return array
      * @author rzc
      */
-    public function distributionCodeTaskChannel(){
+    public function distributionCodeTaskChannel()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -658,8 +689,8 @@ class Administrator extends AdminController {
         $id = trim($this->request->post('id'));
         $channel_id = trim($this->request->post('channel_id'));
         $business_id = trim($this->request->post('business_id'));
-       
-        $ids = explode(',',$id);
+
+        $ids = explode(',', $id);
         $effective_id = [];
         foreach ($ids as $key => $value) {
             if (empty($value) || intval($value) < 1 || !is_numeric($value)) {
