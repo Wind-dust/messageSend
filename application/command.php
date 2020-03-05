@@ -30,7 +30,7 @@ return [
     'cmpphainanshixindianxingame'      => $commandPath . 'CmppHaiNanShiXinDianXinGame', //海南始新电信游戏挂机
     'cmppjiangxijumengyidonggame'      => $commandPath . 'CmppJiangXIJuMengYiDongGame', //江西聚梦游戏挂机
     'cmpphainanshiXinyidongmarketing'  => $commandPath . 'CmppHaiNanShiXinYiDongMarketing', //海南始新移动电信营销通道
-    'cmpphainanshiXinliantongmarketing'  => $commandPath . 'CmppHaiNanShiXinLianTongMarketing', //海南始新移动电信营销通道
+    'cmpphainanshiXinliantongmarketing'  => $commandPath . 'CmppHaiNanShiXinLianTongMarketing', //海南始新联通营销通道
     'cmpptestlocal'                    => $commandPath . 'CmppTestLocal',
     'cmppcreatecodetask'               => $commandPath . 'CmppCreateCodeTask',
     'clientSocketwangdai'              => $commandPath . 'ClientSocketWangDai',

@@ -399,7 +399,7 @@ class Administrator extends CommonIndex
         if (empty($channel)) {
             return ['code' => '3012'];
         }
-        $usertask = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,task_content,free_trial,send_num,channel_id,appointment_time', false);
+        $usertask = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,task_content,free_trial,send_num,yidong_channel_id,liantong_channel_id,dianxin_channel_id,appointment_time', false);
         if (empty($usertask)) {
             return ['code' => '3001'];
         }
