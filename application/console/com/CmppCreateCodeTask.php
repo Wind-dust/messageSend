@@ -2608,10 +2608,10 @@ Db::rollback();
                             exception($e);
                         }
                     } else {
-                        if ($sendtasklog[0]['create_time'] > $time) {
-                            $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
-                            exit('today is success');
-                        }
+                        // if ($sendtasklog[0]['create_time'] > $time) {
+                        //     $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, $sendlog);
+                        //     exit('today is success');
+                        // }
                         if (strpos($send_log['content'], '问卷') !== false) {
                             $status_message = 'DELIVRD';
                         } else {
