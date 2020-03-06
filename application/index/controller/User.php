@@ -909,7 +909,7 @@ class User extends MyController
         intval($page);
         intval($pageNum);
         intval($business_id);
-        $result = $this->app->user->allocateAgentNumber($page, $pageNum, $ConId, $business_id);
+        $result = $this->app->user->getAllocateAgentNumber($page, $pageNum, $ConId, $business_id);
         return $result;
     }
 }
