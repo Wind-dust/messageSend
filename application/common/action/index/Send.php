@@ -1337,7 +1337,7 @@ return $result;
                 } elseif ($head['Content-Type'] == 'image/gif ') {
                     $frame['image_type'] = 'gif';
                 }
-                if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['image/gif', 'image/jpeg'])) {
+                if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['image/gif', 'image/jpeg', 'image/png'])) {
                     return ['code' => '3008'];
                 }
                 $filename = filtraImage(Config::get('qiniu.domain'), $value['image_path']);

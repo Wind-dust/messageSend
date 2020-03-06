@@ -899,3 +899,39 @@ ALTER TABLE `messagesend`.`yx_user_send_task`
 CHANGE COLUMN `channel_id` `yidong_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '移动通道ID' AFTER `develop_no`,
 ADD COLUMN `liantong_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '联通通道id' AFTER `yidong_channel_id`,
 ADD COLUMN `dianxin_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '电信通道id' AFTER `liantong_channel_id`;
+
+DROP TABLE IF EXISTS `yx_send_task_receipt`;
+CREATE TABLE `yx_send_task_receipt` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `task_id` char(23) NOT NULL DEFAULT '' COMMENT '任务id',
+  `mobile` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '接收手机',
+  `status_message` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '状态',
+  `real_message` varchar(20) NOT NULL DEFAULT '' COMMENT '真实返回状态',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='营销发送记录表';
+
+DROP TABLE IF EXISTS `yx_send_code_task_receipt`;
+CREATE TABLE `yx_send_code_task_receipt` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `task_id` char(23) NOT NULL DEFAULT '' COMMENT '任务id',
+  `mobile` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '接收手机',
+  `status_message` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '状态',
+  `real_message` varchar(20) NOT NULL DEFAULT '' COMMENT '真实返回状态',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='行业发送记录表';
+
+DROP TABLE IF EXISTS `yx_send_game_task_receipt`;
+CREATE TABLE `yx_send_game_task_receipt` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `task_id` char(23) NOT NULL DEFAULT '' COMMENT '任务id',
+  `mobile` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '接收手机',
+  `status_message` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '状态',
+  `real_message` varchar(20) NOT NULL DEFAULT '' COMMENT '真实返回状态',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='游戏发送记录表';
