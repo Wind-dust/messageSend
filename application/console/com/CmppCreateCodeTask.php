@@ -2692,6 +2692,94 @@ Db::rollback();
         }
     }
 
+    public function receiptMarketingTask($channel_id)
+    {
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $redis = Phpredis::getConn();
+        // $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode($send_log)); //写入通道处理日志      
+    /*     for ($i = 0; $i < 128567; $i++) {
+            $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode(array(
+                'mobile' => '15045451231',
+                'title' => '美丽田园营销短信',
+                'mar_task_id' => '15850',
+                'content' => '【DAPHNE】亲爱的会员：您的30元优惠券已到账，请前往DaphneFashion公众号-会员尊享-会员中心领取！退订回T',
+                'Msg_Id' => '',
+                'Stat' => 'DELIVER',
+                'Submit_time' => '191224164036',
+                'Done_time' => '191224164236',
+                'receive_time' => '1583467981',
+            )));
+        }
+        $time = strtotime(date('Y-m-d 0:00:00', time())); */
+        $channel              = $this->getChannelinfo($channel_id);
+        $i = 0;
+        $receipt_data = [];
+        while (true) {
+            $sendlog = $redis->lpop('index:meassage:code:cms:deliver:' . $channel_id);
+            if (empty($sendlog)) {
+                exit('Send Log IS null');
+            }
+            $send_log = json_decode($sendlog, true);
+
+            if (!isset($send_log['mar_task_id'])) {
+                break;
+            }
+            $data = [];
+            if (strpos($send_log['content'], '问卷') !== false) {
+                $status_message = 'DELIVRD';
+            } else {
+                $status_message =  $send_log['Stat'];
+            }
+            $data = [
+                'task_id' => $send_log['mar_task_id'],
+                'mobile' => $send_log['mobile'],
+                'real_message' => $send_log['Stat'],
+                'status_message' => $status_message,
+                'create_time'    => isset($send_log['receive_time']) ? $send_log['receive_time'] : time(),
+            ];
+
+            $receipt_data[] = $data;
+            if ($i >= 100) {
+                Db::startTrans();
+                try {
+                    if ($channel['business_id'] == 5) { //营销{}
+                        Db::table('yx_send_task_receipt')->insertAll($receipt_data);
+                    } else if ($channel['business_id'] == 6) { //行业
+                        Db::table('yx_send_code_task_receipt')->insertAll($receipt_data);
+                    } elseif ($channel['business_id'] == 9) { //游戏
+                        Db::table('yx_send_game_task_receipt')->insertAll($receipt_data);
+                    }
+
+                    Db::commit();
+                } catch (\Exception $e) {
+                    Db::rollback();
+                    exception($e);
+                }
+                unset($receipt_data);
+                $i = 0;
+            }
+            $i++;
+        }
+        if (!empty($receipt_data)) {
+            Db::startTrans();
+            try {
+                if ($channel['business_id'] == 5) { //营销{}
+                    Db::table('yx_send_task_receipt')->insertAll($receipt_data);
+                } else if ($channel['business_id'] == 6) { //行业
+                    Db::table('yx_send_code_task_receipt')->insertAll($receipt_data);
+                } elseif ($channel['business_id'] == 9) { //游戏
+                    Db::table('yx_send_game_task_receipt')->insertAll($receipt_data);
+                }
+
+                Db::commit();
+            } catch (\Exception $e) {
+                Db::rollback();
+                exception($e);
+            }
+            unset($receipt_data);
+        }
+    }
+
     public function errotRpush()
     {
         $redis = Phpredis::getConn();
