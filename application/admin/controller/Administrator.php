@@ -716,7 +716,7 @@ class Administrator extends AdminController
      * @apiParam (入参) {String} cms_con_id
      * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
      * @apiParam (入参) {Number} arrival_rate 到达率
-     * @apiParam (入参) {String} channel_id 通道ID
+     * @apiParam (入参) {String}  错误码及所占比例
      * @apiParam (入参) {String} is_push_receipt_user 回执是否需要推送到客户队列 1:是, 2,否（如客户主动对接调取回执接口，选是）
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:channel_id格式错误 / 3003:business_id格式错误
      * @apiSampleRequest /admin/administrator/deductionMarketingTask
