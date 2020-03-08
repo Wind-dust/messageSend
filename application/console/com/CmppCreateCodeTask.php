@@ -2697,7 +2697,7 @@ Db::rollback();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
         // $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode($send_log)); //写入通道处理日志      
-    /*     for ($i = 0; $i < 128567; $i++) {
+        /*     for ($i = 0; $i < 128567; $i++) {
             $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode(array(
                 'mobile' => '15045451231',
                 'title' => '美丽田园营销短信',
@@ -3434,6 +3434,9 @@ Db::rollback();
                 foreach ($y_value as $key => $value) {
                     $success = isset($value['success']) ? $value['success'] : 0;
                     $num = isset($value['num']) ? $value['num'] : 0;
+                    if ($key == 47 && $ykey == 2020) {
+                        $num = $num + 5784 + 289;
+                    }
                     $year_user_settlement = [];
                     $year_user_settlement = [
                         'timekey' => $ykey,
@@ -3467,6 +3470,9 @@ Db::rollback();
                     $success = isset($value['success']) ? $value['success'] : 0;
                     $num = isset($value['num']) ? $value['num'] : 0;
                     $month_user_settlement = [];
+                    if ($key == 47 && $mkey == 202001) {
+                        $num = $num + 5784 + 289;
+                    }
                     $month_user_settlement = [
                         'timekey' => $mkey,
                         'uid' => $key,
@@ -3474,7 +3480,7 @@ Db::rollback();
                         'unknown' => isset($value['unknown']) ? $value['unknown'] : 0,
                         'default' => isset($value['default']) ? $value['default'] : 0,
                         'num' => $num,
-                        'ratio' => $success / $num,
+                        'ratio' => $success / $num * 100,
                         'business_id' => '6',
                         'create_time' => time(),
                         'update_time' => time(),
@@ -3498,6 +3504,12 @@ Db::rollback();
                 foreach ($d_value as $key => $value) {
                     $success = isset($value['success']) ? $value['success'] : 0;
                     $num = isset($value['num']) ? $value['num'] : 0;
+                    if ($key == 47 && $dkey == 20200122) {
+                        $num = $num + 5784;
+                    }
+                    if ($key == 47 && $dkey == 20200125) {
+                        $num = $num + 289;
+                    }
                     $day_user_settlement = [];
                     $day_user_settlement = [
                         'timekey' => $dkey,
@@ -3506,7 +3518,7 @@ Db::rollback();
                         'unknown' => isset($value['unknown']) ? $value['unknown'] : 0,
                         'default' => isset($value['default']) ? $value['default'] : 0,
                         'num' => $num,
-                        'ratio' => $success / $num,
+                        'ratio' => $success / $num * 100,
                         'business_id' => '6',
                         'create_time' => time(),
                         'update_time' => time(),
