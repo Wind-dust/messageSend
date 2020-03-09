@@ -725,5 +725,16 @@ class Administrator extends AdminController
      */
     public function deductionMarketingTask()
     {
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id = trim($this->request->post('id'));
+        $channel_id = trim($this->request->post('channel_id'));
+        $business_id = trim($this->request->post('business_id'));
+        
+       $result = ['code' =>200];
+        return $result;
     }
 }
