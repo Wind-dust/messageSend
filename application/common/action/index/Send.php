@@ -428,8 +428,13 @@ return $result;
         }
 
         $effective_mobile = [];
+
         foreach ($Mobiles as $key => $value) {
-            if (checkMobile(($value))) {
+            if (count($Mobiles) > 1 && !in_array($user['id'], [47, 49, 52, 51, 55])) {
+                if (checkMobile(($value))) {
+                    $effective_mobile[] = $value;
+                }
+            } else {
                 $effective_mobile[] = $value;
             }
         }
@@ -939,9 +944,9 @@ return $result;
                     if (empty($replace_data)) {
                         return ['code' => '3005']; //未获取到变量内容
                     }
-                    for ($i = 0; $i < $template['variable_len']; $i++) {
-                        $var_num = $i + 1;
-                        $real_text = str_replace("{{var" . $var_num . "}}", $replace_data[$i], $template['content']); //内容
+                    for ($i = 1; $i <= $template['variable_len']; $i++) {
+                        // $var_num = $i + 1;
+                        $real_text = str_replace("{{var" . $i . "}}", $replace_data[$i - 1], $real_text); //内容
                     }
                 }
 
@@ -1145,9 +1150,9 @@ return $result;
                     if (empty($replace_data)) {
                         return ['code' => '3005']; //未获取到变量内容
                     }
-                    for ($i = 0; $i < $template['variable_len']; $i++) {
-                        $var_num = $i + 1;
-                        $real_text = str_replace("{{var" . $var_num . "}}", $replace_data[$i], $template['content']); //内容
+                    for ($i = 1; $i <= $template['variable_len']; $i++) {
+                        // $var_num = $i + 1;
+                        $real_text = str_replace("{{var" . $i . "}}", $replace_data[$i - 1], $real_text); //内容
                     }
                 }
 
