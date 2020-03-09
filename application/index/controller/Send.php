@@ -712,16 +712,16 @@ class Send extends MyController
 
     /**
      * @api              {post} / 批量自定义短信提交接口（营销）
-     * @apiDescription   submitBatchCustomBusiness
+     * @apiDescription   submitBatchCustomMarketing
      * @apiGroup         index_send
-     * @apiName          submitBatchCustomBusiness
+     * @apiName          submitBatchCustomMarketing
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
      * @apiParam (入参) {String} signature_id 已报备签名ID
      * @apiParam (入参) {String} template_id template_id报备的template_id 如果传template_id 则内容替换为模板中内容变量
      * @apiParam (入参) {String} connect 组合包内容(template组合方式：变量,变量,...:手机号;变量,变量,...:手机号;...  无模板组合方式:内容:手机号;内容:手机号;...)
      * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:提交内容为空
-     * @apiSampleRequest /index/send/submitBatchCustomBusiness
+     * @apiSampleRequest /index/send/submitBatchCustomMarketing
      * @return array
      * @author rzc
      */
