@@ -3228,7 +3228,7 @@ Db::rollback();
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
-        $redis->rpush('index:message:receipt:fillpush', json_encode(['uid' => '47', 'start_time' => '1582992000', 'end_time' => '1583078400', 'type' => 'business']));
+        // $redis->rpush('index:message:receipt:fillpush', json_encode(['uid' => '47', 'start_time' => '1582992000', 'end_time' => '1583078400', 'type' => 'business']));
         while (true) {
             $real_fill_push = $redis->lpop('index:message:receipt:fillpush');
             if ($real_fill_push) {

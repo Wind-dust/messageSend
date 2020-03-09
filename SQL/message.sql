@@ -935,3 +935,9 @@ CREATE TABLE `yx_send_game_task_receipt` (
   `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='游戏发送记录表';
+
+ALTER TABLE `messagesend`.`yx_user_send_task_log` 
+ADD COLUMN `task_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '任务id' AFTER `id`;
+
+ALTER TABLE `messagesend`.`yx_user_send_code_task_log` 
+ADD COLUMN `task_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '任务id' AFTER `id`;
