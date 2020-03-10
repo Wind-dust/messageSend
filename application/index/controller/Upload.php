@@ -304,7 +304,7 @@ class Upload extends MyController
                     $text = '';
                     $cor = '';
                     for ($j = 1; $j < $highestColumnNum; $j++) {
-                        $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . '1';
+                        $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
                         $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
                         if (!empty($cellVal)) {
                             $text .= $cor . $cellVal;
@@ -336,7 +336,7 @@ class Upload extends MyController
                     $text = '';
                     $cor = '';
                     for ($j = 1; $j < $highestColumnNum; $j++) {
-                        $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . '1';
+                        $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
                         $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
                         if (!empty($cellVal)) {
                             $text .= $cor . $cellVal;
@@ -344,7 +344,9 @@ class Upload extends MyController
                         }
                     }
                     $send_data[] = $text . ":" . $mobile;
+                    // print_r($send_data);
                 }
+                // die;
             } elseif ($type == 'xls') {
                 $type = 'Excel5';
                 $objReader = PHPExcel_IOFactory::createReader($type);
@@ -359,7 +361,7 @@ class Upload extends MyController
                     $text = '';
                     $cor = '';
                     for ($j = 1; $j < $highestColumnNum; $j++) {
-                        $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . '1';
+                        $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
                         $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
                         if (!empty($cellVal)) {
                             $text .= $cor . $cellVal;
