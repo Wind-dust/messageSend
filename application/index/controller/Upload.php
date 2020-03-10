@@ -303,8 +303,8 @@ class Upload extends MyController
                     $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
                     $text = '';
                     $cor = '';
-                    for ($i = 1; $i < $highestColumnNum; $i++) {
-                        $cellName = PHPExcel_Cell::stringFromColumnIndex($i) . '1';
+                    for ($j = 1; $j < $highestColumnNum; $j++) {
+                        $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . '1';
                         $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
                         if (!empty($cellVal)) {
                             $text .= $cor . $cellVal;
@@ -327,14 +327,16 @@ class Upload extends MyController
                 $objPHPExcel = $objReader->load($path, $encode = 'utf-8'); //加载文件
                 $sheet = $objPHPExcel->getSheet(0); //取得sheet(0)表
                 $highestRow = $sheet->getHighestRow(); // 取得总行数
+
                 $highestColumn    = $sheet->getHighestColumn();
                 $highestColumnNum = PHPExcel_Cell::columnIndexFromString($highestColumn); //取得字段，这里测试表格中的第一行为数据的字段，因此先取出用来作后面数组的键名
                 for ($i = 1; $i <= $highestRow; $i++) {
                     $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
+
                     $text = '';
                     $cor = '';
-                    for ($i = 1; $i < $highestColumnNum; $i++) {
-                        $cellName = PHPExcel_Cell::stringFromColumnIndex($i) . '1';
+                    for ($j = 1; $j < $highestColumnNum; $j++) {
+                        $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . '1';
                         $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
                         if (!empty($cellVal)) {
                             $text .= $cor . $cellVal;
@@ -356,8 +358,8 @@ class Upload extends MyController
                     $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
                     $text = '';
                     $cor = '';
-                    for ($i = 1; $i < $highestColumnNum; $i++) {
-                        $cellName = PHPExcel_Cell::stringFromColumnIndex($i) . '1';
+                    for ($j = 1; $j < $highestColumnNum; $j++) {
+                        $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . '1';
                         $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
                         if (!empty($cellVal)) {
                             $text .= $cor . $cellVal;
