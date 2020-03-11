@@ -3110,7 +3110,7 @@ Db::rollback();
                     'uid' => $sendTask['uid'],
                     'task_no' => $sendTask['task_no'],
                     'task_id' => $ids[$i]['id'],
-                    'mobile' => $value,
+                    'mobile' => trim($value),
                     'source' => $sendTask['source'],
                     'send_status' => 2,
                     'create_time' => $sendTask['create_time'],
