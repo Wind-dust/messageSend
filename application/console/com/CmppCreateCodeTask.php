@@ -942,6 +942,12 @@ class CmppCreateCodeTask extends Pzlife
                             'status_message' => 'DB:0101', //无效号码
                             'real_message'   => 'DB:0101',
                         ];
+                        if (in_array($sendTask['uid'], [47, 49, 51, 52, 53, 54, 55])) { //推送给美丽田园
+                            // https://zhidao.baidu.com/question/412076997.html
+                            $request_url = "http://116.228.60.189:15901/rtreceive?";
+                            $request_url .= 'task_no=' . $sendTask['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['create_time'];
+                            sendRequest($request_url);
+                        }
                         $all_log[] = $send_log;
                     }
 
@@ -3086,7 +3092,7 @@ Db::rollback();
         $time = strtotime(date('Y-m-d 0:00:00', time()));
         // $start_time = strtotime(date('Y-m-d 0:00:00', strtotime("-3 day")));
         // $ids = Db::query("SELECT `id` FROM  `yx_user_send_task` WHERE `create_time` < " . $time . " AND  `create_time` >= " . $start_time . "   AND  `log_path` <> ''");
-        $ids = Db::query("SELECT `id` FROM  `yx_user_multimedia_message` WHERE `create_time` < " . $time . "   AND  `log_path` <> '' AND `id` > 14 ");
+        $ids = Db::query("SELECT `id` FROM  `yx_user_multimedia_message` WHERE `create_time` < " . $time . "   AND  `log_path` <> '' AND `id` > 23 ");
         $all_log = [];
         $j = 1;
         // print_r($ids);
