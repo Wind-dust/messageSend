@@ -338,6 +338,7 @@ class Upload extends MyController
                     for ($j = 1; $j < $highestColumnNum; $j++) {
                         $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
                         $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
+
                         if (!empty($cellVal)) {
                             $text .= $cor . $cellVal;
                             $cor = ',';

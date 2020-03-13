@@ -941,3 +941,11 @@ ADD COLUMN `task_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '任务id' AFTE
 
 ALTER TABLE `messagesend`.`yx_user_send_code_task_log` 
 ADD COLUMN `task_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '任务id' AFTER `id`;
+
+ALTER TABLE `messagesend`.`yx_statistics_day` 
+ADD COLUMN `mobile_num` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '手机号计数' AFTER `timekey`;
+
+ALTER TABLE `messagesend`.`yx_statistics_month` 
+ADD COLUMN `mobile_num` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '手机号计数' AFTER `timekey`;
+ALTER TABLE `messagesend`.`yx_statistics_year` 
+ADD COLUMN `mobile_num` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '手机号计数' AFTER `timekey`;

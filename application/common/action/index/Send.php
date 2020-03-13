@@ -988,9 +988,12 @@ return $result;
             ];
             if (mb_strlen($value) > 70) {
                 $real_num += ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
+                $send_task['real_num'] =  ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
             } else {
                 $real_num += count($send_data_mobile[$key]);
+                $send_task['real_num'] =  count($send_data_mobile[$key]);
             }
+
             $send_task['free_trial'] = 1;
             if ($user['free_trial'] == 2) {
                 //短信内容分词
@@ -1194,8 +1197,10 @@ return $result;
             ];
             if (mb_strlen($value) > 70) {
                 $real_num += ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
+                $send_task['real_num'] =  ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
             } else {
                 $real_num += count($send_data_mobile[$key]);
+                $send_task['real_num'] =  count($send_data_mobile[$key]);
             }
             $send_task['free_trial'] = 1;
             if ($user['free_trial'] == 2) {

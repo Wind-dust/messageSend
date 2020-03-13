@@ -2698,6 +2698,7 @@ Db::rollback();
         }
     }
 
+    //批量写入回执
     public function receiptMarketingTask($channel_id)
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
@@ -3113,7 +3114,7 @@ Db::rollback();
                     'mobile' => trim($value),
                     'source' => $sendTask['source'],
                     'send_status' => 2,
-                    'create_time' => $sendTask['create_time'],
+                    'create_time' => $sendTask['update_time'],
                 ];
                 $all_log[] = $send_log;
                 $j++;
@@ -3303,6 +3304,7 @@ Db::rollback();
             //年
             if (in_array($value['uid'], $year_users[$year])) {
                 $year_businessSettlement[$year][$value['uid']]['num'] += $num;
+                $year_businessSettlement[$year][$value['uid']]['mobile_num'] += $num;
                 if ($value['status_message'] == 'DELIVRD') {
                     if (isset($year_businessSettlement[$year][$value['uid']]['success'])) {
                         $year_businessSettlement[$year][$value['uid']]['success'] += $num;
@@ -3326,6 +3328,7 @@ Db::rollback();
             } else {
                 $year_users[$year][] = $value['uid'];
                 $year_businessSettlement[$year][$value['uid']]['num'] = $num;
+                $year_businessSettlement[$year][$value['uid']]['mobile_num'] = $num;
                 if ($value['status_message'] == 'DELIVRD') {
                     $year_businessSettlement[$year][$value['uid']]['success'] = $num;
                 } elseif ($value['status_message'] == '') {
@@ -3337,6 +3340,7 @@ Db::rollback();
             //月
             if (in_array($value['uid'], $month_users[$month])) {
                 $month_businessSettlement[$month][$value['uid']]['num'] += $num;
+                $month_businessSettlement[$month][$value['uid']]['mobile_num'] += $num;
                 if ($value['status_message'] == 'DELIVRD') {
                     if (isset($month_businessSettlement[$month][$value['uid']]['success'])) {
                         $month_businessSettlement[$month][$value['uid']]['success'] += $num;
@@ -3360,6 +3364,7 @@ Db::rollback();
             } else {
                 $month_users[$month][] = $value['uid'];
                 $month_businessSettlement[$month][$value['uid']]['num'] = $num;
+                $month_businessSettlement[$month][$value['uid']]['mobile_num'] = $num;
                 if ($value['status_message'] == 'DELIVRD') {
                     $month_businessSettlement[$month][$value['uid']]['success'] = $num;
                 } elseif ($value['status_message'] == '') {
@@ -3371,6 +3376,7 @@ Db::rollback();
             //日
             if (in_array($value['uid'], $day_users[$day])) {
                 $day_businessSettlement[$day][$value['uid']]['num'] += $num;
+                $day_businessSettlement[$day][$value['uid']]['mobile_num'] += $num;
                 if ($value['status_message'] == 'DELIVRD') {
                     if (isset($day_businessSettlement[$day][$value['uid']]['success'])) {
                         $day_businessSettlement[$day][$value['uid']]['success'] += $num;
@@ -3394,6 +3400,7 @@ Db::rollback();
             } else {
                 $day_users[$day][] = $value['uid'];
                 $day_businessSettlement[$day][$value['uid']]['num'] = $num;
+                $day_businessSettlement[$day][$value['uid']]['mobile_num'] = $num;
                 if ($value['status_message'] == 'DELIVRD') {
                     $day_businessSettlement[$day][$value['uid']]['success'] = $num;
                 } elseif ($value['status_message'] == '') {
@@ -3406,7 +3413,7 @@ Db::rollback();
         // print_r($year_businessSettlement);
         // print_r($month_businessSettlement);
         // print_r($day_businessSettlement);
-
+        // die;
         /*         foreach ($day_businessSettlement as $dkey => $d_value) {
             foreach ($d_value as $key => $value) {
                 $success = isset($value['success']) ? $value['success'] : 0;
@@ -3451,6 +3458,7 @@ Db::rollback();
                         'unknown' => isset($value['unknown']) ? $value['unknown'] : 0,
                         'default' => isset($value['default']) ? $value['default'] : 0,
                         'num' => $num,
+                        'mobile_num' => $value['mobile_num'],
                         'ratio' => $success / $num * 100,
                         'business_id' => '6',
                         'create_time' => time(),
@@ -3463,6 +3471,7 @@ Db::rollback();
                             'unknown' => isset($value['unknown']) ? $value['unknown'] : 0,
                             'default' => isset($value['default']) ? $value['default'] : 0,
                             'num' => $num,
+                            'mobile_num' => $value['mobile_num'],
                             'ratio' => $success / $num * 100,
                             'update_time' => time(),
                         ]);
@@ -3487,6 +3496,7 @@ Db::rollback();
                         'default' => isset($value['default']) ? $value['default'] : 0,
                         'num' => $num,
                         'ratio' => $success / $num * 100,
+                        'mobile_num' => $value['mobile_num'],
                         'business_id' => '6',
                         'create_time' => time(),
                         'update_time' => time(),
@@ -3498,6 +3508,7 @@ Db::rollback();
                             'unknown' => isset($value['unknown']) ? $value['unknown'] : 0,
                             'default' => isset($value['default']) ? $value['default'] : 0,
                             'num' => $num,
+                            'mobile_num' => $value['mobile_num'],
                             'ratio' => $success / $num * 100,
                             'update_time' => time(),
                         ]);
@@ -3525,6 +3536,7 @@ Db::rollback();
                         'default' => isset($value['default']) ? $value['default'] : 0,
                         'num' => $num,
                         'ratio' => $success / $num * 100,
+                        'mobile_num' => $value['mobile_num'],
                         'business_id' => '6',
                         'create_time' => time(),
                         'update_time' => time(),
@@ -3536,6 +3548,7 @@ Db::rollback();
                             'unknown' => isset($value['unknown']) ? $value['unknown'] : 0,
                             'default' => isset($value['default']) ? $value['default'] : 0,
                             'num' => $num,
+                            'mobile_num' => $value['mobile_num'],
                             'ratio' => $success / $num * 100,
                             'update_time' => time(),
                         ]);
@@ -3549,5 +3562,21 @@ Db::rollback();
             Db::rollback();
             exception($e);
         }
+    }
+
+    public function isTrueSettlemen()
+    {
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $code_task_log = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `uid` = 47 AND create_time >= 1580486400 AND create_time < 1582992000");
+        $all_num = 0;
+        foreach ($code_task_log as $key => $value) {
+            $send_length = mb_strlen($value['task_content'], 'utf8');
+            $num = 1;
+            if ($send_length > 70) {
+                $num = ceil($send_length / 67);
+            }
+            $all_num += $num;
+        }
+        echo $all_num;
     }
 }

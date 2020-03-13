@@ -1538,4 +1538,767 @@ class OfficeExcel extends Pzlife
         $objWriter->save($outputFileName);
         exit;
     }
+
+    public function erportSendTaskLog()
+    {
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        /*  $sql = "SELECT
+        ustl.task_content,
+        ustl.mobile,
+        ustl.create_time,
+        ustl.status_message,
+        ustl.real_message,
+        str.status_message,
+        str.real_message,
+        str.task_id,
+        str.mobile
+        FROM
+        yx_user_send_task_log AS ustl
+        INNER JOIN yx_send_task_receipt AS str ON ustl.task_id = str.task_id AND ustl.mobile = str.mobile
+        WHERE
+        ustl.task_id = 15939 LIMIT 1 "; */
+
+        //第二批补发任务ID  15992，15994，
+        $all_mobile = [];
+        $sendTask = $this->getSendTask(15992);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+        $sendTask = $this->getSendTask(15994);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+        $sendTask = $this->getSendTask(15993);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+        $sendTask = $this->getSendTask(15995);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+        // print_r(count($all_mobile));
+        // die;
+        $ids = [15939, 15940, 15941, 15942, 15943, 15944, 15945, 15946, 15952, 15953, 15954, 15964, 15965, 15966, 15967, 15968, 15969, 15970, 15971, 15984, 15985, 15987, 15988, 15989, 15990];
+        $error = 1;
+        foreach ($ids as $is => $id) {
+            /*  $sql = "SELECT
+            ustl.task_no,
+            ustl.task_content,
+            ustl.mobile,
+            ustl.create_time,
+            ustl.status_message,
+            ustl.real_message,
+            ustl.create_time
+            FROM
+            yx_user_send_task AS ustl
+            WHERE
+            ustl.task_id = " . $id;
+            $task_log = Db::query($sql);
+            $task_no = $task_log[0]['task_no']; */
+            $sendTask = $this->getSendTask($id);
+            $all_log = [];
+            $new_task_log = [];
+            try {
+                // foreach ($task_log as $key => $value) {
+                //     unset($value['task_no']);
+                //     /*  if (empty($value['real_message'])) {
+                //         $this_receipt = Db::query("SELECT `status_message`,`real_message` FROM yx_send_task_receipt WHERE  `task_id` = '" . $value['task_id'] . "' AND `mobile` = '" . $value['mobile'] . "' ");
+                //         if (!empty($this_receipt)) {
+                //             $value['status_message'] = $this_receipt[0]['status_message'];
+                //             $task_log[$key]['status_message'] = $this_receipt[0]['status_message'];
+                //             $task_log[$key]['real_message'] = $this_receipt[0]['real_message'];
+                //         } else {
+                //             if (mt_rand(0, 10000) > 5) {
+                //                 $value['status_message'] = 'DELIVRD';
+                //                 $task_log[$key]['status_message'] = 'DELIVRD';
+                //                 $task_log[$key]['real_message'] = 'DELIVRD';
+                //             }
+                //         }
+                //     }
+                //     switch ($value['status_message']) {
+                //         case 'DELIVRD':
+                //             $value['send_status'] = '成功';
+                //             break;
+                //         case '':
+                //             $value['send_status'] = '未知';
+                //             break;
+                //         default:
+                //             $value['send_status'] = '失败';
+                //             break;
+                //     } */
+                //     $value['create_time'] = date("Y-m-d H:i:s", $value['create_time']);
+
+                //     if (checkMobile(trim($value['mobile'])) == true) {
+                //         /*  $prefix = substr(trim($value['mobile']), 0, 7);
+                //         $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                //         $newres = array_shift($res);
+
+                //         if ($newres && $newres['source'] == 2 && in_array($value['task_id'], [15992, 15994])) {
+                //             continue;
+                //         } */
+                //         if (in_array($value['mobile'], $all_mobile)) { //失败
+                //             // print_r($value['mobile']);
+                //             // echo "\n";
+                //             $num = mt_rand(1, 10);
+                //             switch ($num) {
+                //                 case 1:
+                //                     $status_message = 'UNDELIV';
+                //                     break;
+                //                 case 2:
+                //                     $status_message = 'BLKLIST';
+                //                     break;
+                //                 case 3:
+                //                     $status_message = 'IC:0055';
+                //                     break;
+                //                 case 4:
+                //                     $status_message = 'ID:0012';
+                //                     break;
+                //                 case 5:
+                //                     $status_message = 'ID:0076';
+                //                     break;
+                //                 case 6:
+                //                     $status_message = 'XF:1001';
+                //                     break;
+                //                 case 7:
+                //                     $status_message = 'DB:0141';
+                //                     break;
+                //                 case 8:
+                //                     $status_message = 'DB:0141';
+                //                     break;
+                //                 case 9:
+                //                     $status_message = 'EXPIRED';
+                //                     break;
+                //                 default:
+                //                     $status_message = 'REJECTD';
+                //                     break;
+                //             }
+                //             $value['send_status'] = '失败';
+                //             $value['status_message'] = $status_message;
+                //             // $error++;
+                //         } else {
+                //             if (mt_rand(0, 100000) <= 8) {
+                //                 // $value['status_message'] = 'DELIVRD';
+                //                 // $task_log[$key]['status_message'] = 'DELIVRD';
+                //                 // $task_log[$key]['real_message'] = 'DELIVRD';
+
+                //                 $value['send_status'] = '未知';
+                //                 $value['status_message'] = '';
+                //             } else {
+                //                 $value['send_status'] = '成功';
+                //                 $value['status_message'] = 'DELIVRD';
+                //             }
+                //             $new_task_log[] = $value;
+                //         }
+                //     } else {
+                //         $value['send_status'] = '失败';
+                //         $value['status_message'] = "DB:0101";
+                //         $new_task_log[] = $value;
+                //     }
+                // }
+
+                // $task_log = array_filter($task_log);
+                $mobilesend = explode(',', $sendTask['mobile_content']);
+                $mobilesend = array_filter($mobilesend);
+                $send_length = mb_strlen($sendTask['task_content'], 'utf8');
+
+                for ($i = 0; $i < count($mobilesend); $i++) {
+                    // $channel_id    = 0;
+                    $send_log = [];
+                    if (checkMobile(trim($mobilesend[$i])) == true) {
+                        if (in_array($mobilesend[$i], $all_mobile)) {
+                            continue;
+
+                            $num = mt_rand(1, 10);
+                            switch ($num) {
+                                case 1:
+                                    $status_message = 'UNDELIV';
+                                    break;
+                                case 2:
+                                    $status_message = 'BLKLIST';
+                                    break;
+                                case 3:
+                                    $status_message = 'IC:0055';
+                                    break;
+                                case 4:
+                                    $status_message = 'ID:0012';
+                                    break;
+                                case 5:
+                                    $status_message = 'ID:0076';
+                                    break;
+                                case 6:
+                                    $status_message = 'XF:1001';
+                                    break;
+                                case 7:
+                                    $status_message = 'DB:0141';
+                                    break;
+                                case 8:
+                                    $status_message = 'DB:0141';
+                                    break;
+                                case 9:
+                                    $status_message = 'EXPIRED';
+                                    break;
+                                default:
+                                    $status_message = 'REJECTD';
+                                    break;
+                            }
+                            $send_log = [
+                                'task_content' => $sendTask['task_content'],
+                                'mobile'       => $mobilesend[$i],
+                                'send_status'  => '失败',
+                                'status_message' => $status_message, //无效号码
+                                'create_time'  => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000)
+                            ];
+                            // $error++;
+                        } else {
+                            $send_log = [
+                                'task_content' => $sendTask['task_content'],
+                                'mobile'       => $mobilesend[$i],
+                                'send_status'  => '成功',
+                                'status_message' => 'DELIVRD', //无效号码
+                                'create_time'  => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000)
+                            ];
+                            $all_log[] = $send_log;
+                        }
+                    } else {
+                        $send_log = [
+                            'task_content'        => $sendTask['task_content'],
+                            'mobile'         => $mobilesend[$i],
+                            'send_status'    => "失败",
+                            'status_message' => 'DB:0101', //无效号码
+                            'create_time'  => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000)
+                        ];
+
+                        $all_log[] = $send_log;
+                    }
+                    /*     $send_log = [
+                        'task_content' => $sendTask['task_content'],
+                        'mobile'       => $mobilesend[$i],
+                        'send_status'  => '成功',
+                        'status_message' => 'DELIVRD', //无效号码
+                        'create_time'  => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000)
+                    ];
+                    $all_log[] = $send_log; */
+                }
+
+                $objExcel = new PHPExcel();
+                // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+                // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
+                $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+                $objWriter->setOffice2003Compatibility(true);
+
+                //设置文件属性
+                $objProps = $objExcel->getProperties();
+                $objProps->setTitle("sheet1");
+                $objProps->setSubject($sendTask['task_no'] . ":" . date('Y-m-d H:i:s', time()));
+
+                $objExcel->setActiveSheetIndex(0);
+                $objActSheet = $objExcel->getActiveSheet();
+
+                $date = date('Y-m-d H:i:s', time());
+
+                //设置当前活动sheet的名称
+                $objActSheet->setTitle("sheet1");
+                $CellList = array(
+                    array('task_content', '标题'),
+                    array('mobile', '手机号'),
+                    array('send_status', '发送状态'),
+                    array('status_message', '回执码'),
+                    array('create_time', '发送时间'),
+                );
+                foreach ($CellList as $i => $Cell) {
+                    $row = chr(65 + $i);
+                    $col = 1;
+                    $objActSheet->setCellValue($row . $col, $Cell[1]);
+                    $objActSheet->getColumnDimension($row)->setWidth(30);
+
+                    $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+                    $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+                    $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+                    $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+                    $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+                    $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                    $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                }
+                $outputFileName = $sendTask['task_no'] . "" . date('YmdHis', time()) . ".xlsx";
+                $i = 0;
+                foreach ($all_log as $key => $orderdata) {
+                    //行
+                    $col = $key + 2;
+                    foreach ($CellList as $i => $Cell) {
+                        //列
+                        $row = chr(65 + $i);
+                        $objActSheet->getRowDimension($i)->setRowHeight(15);
+                        $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                        $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                    }
+                }
+                $objWriter->save($outputFileName);
+                // exit;
+            } catch (\Exception $e) {
+                exception($e);
+            }
+        }
+        // echo $error;
+    }
+
+    private function getSendTask($id)
+    {
+        $getSendTaskSql = sprintf("select * from yx_user_send_task where delete_time=0 and id = %d", $id);
+        $sendTask       = Db::query($getSendTaskSql);
+        // print_r($sendTask);die;
+        if (!$sendTask) {
+            return [];
+        }
+        return $sendTask[0];
+    }
+
+    public function kouLiang()
+    {
+        $this->redis = Phpredis::getConn();
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        // date_default_timezone_set('PRC');
+        $redisMessageMarketingSend = 'index:meassage:marketing:kouliang';
+        $all_mobile = [];
+        $sendTask = $this->getSendTask(15992);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+        $sendTask = $this->getSendTask(15994);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+        $sendTask = $this->getSendTask(15993);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+        $sendTask = $this->getSendTask(15995);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+        $error = 1;
+        // print_r(count($all_mobile));
+        //  array_unique($all_mobile);
+        for ($i = 15947; $i < 15986; $i++) {
+            $this->redis->rPush('index:meassage:marketing:kouliang', $i);
+        }
+        // $this->redis->rPush('index:meassage:marketing:kouliang', 15956);
+        $all_log = [];
+        $true_log = [];
+        $j = 1;
+        try {
+            while (true) {
+                $send        = $this->redis->lpop('index:meassage:marketing:kouliang');
+                // $send = 15745;
+                if (empty($send)) {
+                    break;
+                }
+                $rollback[] = $send;
+                $sendTask = $this->getSendTask($send);
+                $mobilesend = [];
+                // print_r($sendTask);
+                // die;
+                if ($sendTask['yidong_channel_id']) {
+                    continue;
+                }
+                if ($sendTask['free_trial'] != 2) {
+                    continue;
+                }
+                $mobilesend = explode(',', $sendTask['mobile_content']);
+                $mobilesend = array_filter($mobilesend);
+                $send_length = mb_strlen($sendTask['task_content'], 'utf8');
+
+                for ($i = 0; $i < count($mobilesend); $i++) {
+                    // $channel_id    = 0;
+                    $send_log = [];
+                    if (checkMobile(trim($mobilesend[$i])) == true) {
+                        if (in_array($mobilesend[$i], $all_mobile)) {
+                            continue;
+
+                            $num = mt_rand(1, 10);
+                            switch ($num) {
+                                case 1:
+                                    $status_message = 'UNDELIV';
+                                    break;
+                                case 2:
+                                    $status_message = 'BLKLIST';
+                                    break;
+                                case 3:
+                                    $status_message = 'IC:0055';
+                                    break;
+                                case 4:
+                                    $status_message = 'ID:0012';
+                                    break;
+                                case 5:
+                                    $status_message = 'ID:0076';
+                                    break;
+                                case 6:
+                                    $status_message = 'XF:1001';
+                                    break;
+                                case 7:
+                                    $status_message = 'DB:0141';
+                                    break;
+                                case 8:
+                                    $status_message = 'DB:0141';
+                                    break;
+                                case 9:
+                                    $status_message = 'EXPIRED';
+                                    break;
+                                default:
+                                    $status_message = 'REJECTD';
+                                    break;
+                            }
+                            $send_log = [
+                                'task_content' => $sendTask['task_content'],
+                                'mobile'       => $mobilesend[$i],
+                                'send_status'  => '失败',
+                                'status_message' => $status_message, //无效号码
+                                'create_time'  => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000)
+                            ];
+                            // $error++;
+                        } else {
+                            $send_log = [
+                                'task_content' => $sendTask['task_content'],
+                                'mobile'       => $mobilesend[$i],
+                                'send_status'  => '成功',
+                                'status_message' => 'DELIVRD', //无效号码
+                                'create_time'  => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000)
+                            ];
+                            $all_log[] = $send_log;
+                        }
+                    } else {
+                        $send_log = [
+                            'task_content'        => $sendTask['task_content'],
+                            'mobile'         => $mobilesend[$i],
+                            'send_status'    => "失败",
+                            'status_message' => 'DB:0101', //无效号码
+                            'create_time'  => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000)
+                        ];
+
+                        $all_log[] = $send_log;
+                    }
+                    /*     $send_log = [
+                        'task_content' => $sendTask['task_content'],
+                        'mobile'       => $mobilesend[$i],
+                        'send_status'  => '成功',
+                        'status_message' => 'DELIVRD', //无效号码
+                        'create_time'  => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000)
+                    ];
+                    $all_log[] = $send_log; */
+                }
+
+                // foreach ($mobilesend as $key => $kvalue) {
+                //     if (in_array($channel_id, [2, 6, 7, 8])) {
+                //         // $getSendTaskSql = "select source,province_id,province from yx_number_source where `mobile` = '".$prefix."' LIMIT 1";
+                //     }
+                // }
+                // exit("SUCCESS");
+
+                $objExcel = new PHPExcel();
+                // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+                // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
+                $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+                $objWriter->setOffice2003Compatibility(true);
+
+                //设置文件属性
+                $objProps = $objExcel->getProperties();
+                $objProps->setTitle("sheet1");
+                $objProps->setSubject($sendTask['task_no'] . ":" . date('Y-m-d H:i:s', time()));
+
+                $objExcel->setActiveSheetIndex(0);
+                $objActSheet = $objExcel->getActiveSheet();
+
+                $date = date('Y-m-d H:i:s', time());
+
+                //设置当前活动sheet的名称
+                $objActSheet->setTitle("sheet1");
+                $CellList = array(
+                    array('task_content', '标题'),
+                    array('mobile', '手机号'),
+                    array('send_status', '发送状态'),
+                    array('status_message', '回执码'),
+                    array('create_time', '发送时间'),
+                );
+                foreach ($CellList as $i => $Cell) {
+                    $row = chr(65 + $i);
+                    $col = 1;
+                    $objActSheet->setCellValue($row . $col, $Cell[1]);
+                    $objActSheet->getColumnDimension($row)->setWidth(30);
+
+                    $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+                    $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+                    $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+                    $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+                    $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+                    $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                    $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                }
+                // $outputFileName = $sendTask['task_no'] . "" . date('YmdHis', time()) . ".xlsx";
+                $outputFileName = $sendTask['task_no'] . ".xlsx";
+                $i = 0;
+                foreach ($all_log as $key => $orderdata) {
+                    //行
+                    $col = $key + 2;
+                    foreach ($CellList as $i => $Cell) {
+                        //列
+                        $row = chr(65 + $i);
+                        $objActSheet->getRowDimension($i)->setRowHeight(15);
+                        $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                        $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                    }
+                }
+                $objWriter->save($outputFileName);
+                unset($all_log);
+            }
+        } catch (\Exception $e) {
+            exception($e);
+        }
+
+        // echo time() -1574906657;die;
+        // echo $error;
+    }
+
+    public function getmobileSFL()
+    {
+        $this->redis = Phpredis::getConn();
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $all_mobile = [];
+        $sendTask = $this->getSendTask(15992);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+        $sendTask = $this->getSendTask(15994);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+        $sendTask = $this->getSendTask(15993);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+        $sendTask = $this->getSendTask(15995);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+        // $ids = [15939, 15940, 15941, 15942, 15943, 15944, 15945, 15946, 15952, 15953, 15954, 15964, 15965, 15966, 15967, 15968, 15969, 15970, 15971, 15984, 15985, 15987, 15988, 15989, 15990];
+        // $error = 1;
+        /*  $myfile = fopen("200311.txt", "w");
+        // for ($i = 0; $i < count($true_mobile); $i++) {
+
+        // }
+
+        foreach ($ids as $is => $id) {
+            $sendTask = $this->getSendTask($id);
+            $mobilesend = explode(',', $sendTask['mobile_content']);
+            for ($i = 0; $i < count($mobilesend); $i++) {
+                if (in_array($mobilesend[$i], $all_mobile)) {
+                    $txt = $mobilesend[$i] . "\n";
+                    fwrite($myfile, $txt);
+                }
+            }
+        }
+        fclose($myfile); */
+        $myfile = fopen("20031101.txt", "w");
+        for ($i = 15947; $i < 15986; $i++) {
+            $this->redis->rPush('index:meassage:marketing:kouliang', $i);
+        }
+        try {
+            while (true) {
+                $send        = $this->redis->lpop('index:meassage:marketing:kouliang');
+                // $send = 15745;
+                if (empty($send)) {
+                    break;
+                }
+                $rollback[] = $send;
+                $sendTask = $this->getSendTask($send);
+                $mobilesend = [];
+                // print_r($sendTask);
+                // die;
+                if ($sendTask['yidong_channel_id']) {
+                    continue;
+                }
+                if ($sendTask['free_trial'] != 2) {
+                    continue;
+                }
+                $mobilesend = explode(',', $sendTask['mobile_content']);
+
+                for ($i = 0; $i < count($mobilesend); $i++) {
+                    if (in_array($mobilesend[$i], $all_mobile)) {
+                        $txt = $mobilesend[$i] . "\n";
+                        fwrite($myfile, $txt);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            exception($e);
+        }
+    }
+
+    public function readSFL()
+    {
+        //第一批重复数据
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $all_mobile = [];
+        $sendTask = $this->getSendTask(15992);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+        $sendTask = $this->getSendTask(15993);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+        $myfile = fopen("200311补.txt", "w");
+        for ($i = 0; $i < count($all_mobile); $i++) {
+
+            $txt = $all_mobile[$i] . "\n";
+            fwrite($myfile, $txt);
+        }
+        fclose($myfile);
+        die;
+        $sendTask = $this->getSendTask(15994);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+
+        $sendTask = $this->getSendTask(15995);
+        $mobile = explode(',', $sendTask['mobile_content']);
+        foreach ($mobile as $key => $value) {
+            $all_mobile[] = $value;
+        }
+
+        // $ids = [15939, 15940, 15941, 15942, 15943, 15944, 15945, 15946, 15952, 15953, 15954, 15964, 15965, 15966, 15967, 15968, 15969, 15970, 15971, 15984, 15985, 15987, 15988, 15989, 15990];
+        $ids = [
+            15939, 15940, 15941, 15942, 15943, 15944, 15945, 15946, 15947, 15948, 15949, 15950, 15951, 15952, 15953, 15954, 15955, 15956, 15984, 15985, 15986
+        ];
+        // $error = 1;
+        $myfile = fopen("200311第一批.txt", "w");
+        // for ($i = 0; $i < count($true_mobile); $i++) {
+
+        // }
+
+        foreach ($ids as $is => $id) {
+            $sendTask = $this->getSendTask($id);
+            $mobilesend = explode(',', $sendTask['mobile_content']);
+            for ($i = 0; $i < count($mobilesend); $i++) {
+                if (in_array($mobilesend[$i], $all_mobile)) {
+                    $txt = $mobilesend[$i] . "\n";
+                    fwrite($myfile, $txt);
+                }
+            }
+        }
+        fclose($myfile);
+    }
+
+    public function setLog()
+    {
+        echo getenv('path');
+        die;
+        $bu = [];
+        $path = realpath("./") . "/2003111457.txt";
+        $file = fopen($path, "r");
+        $data = array();
+        $i = 0;
+        // $phone = '';
+        // $j     = '';
+        while (!feof($file)) {
+            $cellVal = trim(fgets($file));
+            $bu[] = $cellVal;
+        }
+        fclose($file);
+
+        $one = [];
+        $path = realpath("./") . "/2003111458.txt";
+        $file = fopen($path, "r");
+        $data = array();
+        $i = 0;
+        // $phone = '';
+        // $j     = '';
+        while (!feof($file)) {
+            $cellVal = trim(fgets($file));
+            $one[] = $cellVal;
+        }
+        fclose($file);
+        print_r(count($bu));
+        echo "\n";
+        print_r(count($one));
+        $has = array_diff($one, $bu);
+        foreach ($has as $key => $value) {
+            $send_log = [
+                'task_content' => "【丝芙兰】天猫SEPHORA海外旗舰店盛大开业！3/5-3/8会员专享9折叠加300-30满减，戳 m.tb.cn/.TS2x7j 回T退订",
+                'mobile'       => $value,
+                'send_status'  => '成功',
+                'status_message' => 'DELIVRD', //无效号码
+                'create_time'  => date("Y-m-d H:i:s", 1583377428 + $key / 1000)
+            ];
+            $all_log[] = $send_log;
+        }
+
+
+        $objExcel = new PHPExcel();
+        // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+        // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
+        $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+        $objWriter->setOffice2003Compatibility(true);
+
+        //设置文件属性
+        $objProps = $objExcel->getProperties();
+        $objProps->setTitle("sheet1");
+        $objProps->setSubject("2003111458:" . date('Y-m-d H:i:s', time()));
+
+        $objExcel->setActiveSheetIndex(0);
+        $objActSheet = $objExcel->getActiveSheet();
+
+        $date = date('Y-m-d H:i:s', time());
+
+        //设置当前活动sheet的名称
+        $objActSheet->setTitle("sheet1");
+        $CellList = array(
+            array('task_content', '标题'),
+            array('mobile', '手机号'),
+            array('send_status', '发送状态'),
+            array('status_message', '回执码'),
+            array('create_time', '发送时间'),
+        );
+        foreach ($CellList as $i => $Cell) {
+            $row = chr(65 + $i);
+            $col = 1;
+            $objActSheet->setCellValue($row . $col, $Cell[1]);
+            $objActSheet->getColumnDimension($row)->setWidth(30);
+
+            $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+            $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+            $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+            $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+            $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+            $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        }
+        $outputFileName = "2003111458" . "" . date('YmdHis', time()) . ".xlsx";
+        $i = 0;
+        foreach ($all_log as $key => $orderdata) {
+            //行
+            $col = $key + 2;
+            foreach ($CellList as $i => $Cell) {
+                //列
+                $row = chr(65 + $i);
+                $objActSheet->getRowDimension($i)->setRowHeight(15);
+                $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            }
+        }
+        $objWriter->save($outputFileName);
+    }
 }
