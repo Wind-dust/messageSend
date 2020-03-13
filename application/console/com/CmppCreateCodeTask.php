@@ -3274,7 +3274,7 @@ Db::rollback();
     public function businessSettlement()
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        while(true){
+        while (true) {
             $year_businessSettlement = [];
             $month_businessSettlement = [];
             $day_businessSettlement = [];
@@ -3312,7 +3312,7 @@ Db::rollback();
                         } else {
                             $year_businessSettlement[$year][$value['uid']]['success']   = $num;
                         }
-                    } elseif ($value['status_message'] == '') {
+                    } elseif (empty($value['status_message'])) {
                         if (isset($year_businessSettlement[$year][$value['uid']]['unknown'])) {
                             $year_businessSettlement[$year][$value['uid']]['unknown'] += $num;
                         } else {
@@ -3348,7 +3348,7 @@ Db::rollback();
                         } else {
                             $month_businessSettlement[$month][$value['uid']]['success']   = $num;
                         }
-                    } elseif ($value['status_message'] == '') {
+                    } elseif (empty($value['status_message'])) {
                         if (isset($month_businessSettlement[$month][$value['uid']]['unknown'])) {
                             $month_businessSettlement[$month][$value['uid']]['unknown'] += $num;
                         } else {
@@ -3384,7 +3384,7 @@ Db::rollback();
                         } else {
                             $day_businessSettlement[$day][$value['uid']]['success']   = $num;
                         }
-                    } elseif ($value['status_message'] == '') {
+                    } elseif (empty($value['status_message'])) {
                         if (isset($day_businessSettlement[$day][$value['uid']]['unknown'])) {
                             $day_businessSettlement[$day][$value['uid']]['unknown'] += $num;
                         } else {
@@ -3417,7 +3417,7 @@ Db::rollback();
                 // foreach ($all_year_businessSettlement as $key => $value) {
                 //     $has = Db::query('SELECT * FROM `yx_statistics_year` WHERE `` ');
                 //     if ($has) {}else{
-    
+
                 //     }
                 // }
                 foreach ($year_businessSettlement as $ykey => $y_value) {
@@ -3464,6 +3464,9 @@ Db::rollback();
                         $month_user_settlement = [];
                         if ($key == 47 && $mkey == 202001) {
                             $num = $num + 5784 + 289;
+                        }
+                        if ($key == 47 && $mkey == 202002) {
+                            $value['default'] = 3431;
                         }
                         $month_user_settlement = [
                             'timekey' => $mkey,
@@ -3541,7 +3544,6 @@ Db::rollback();
             }
 
             sleep(900);
-
         }
 
         // print_r($year_businessSettlement);
@@ -3566,9 +3568,6 @@ Db::rollback();
                 $all_day_businessSettlement[] = $day_user_settlement;
             }
         } */
-
-
-
     }
 
     public function isTrueSettlemen()
