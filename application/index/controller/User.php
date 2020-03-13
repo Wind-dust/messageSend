@@ -765,7 +765,7 @@ class User extends MyController
         if (!empty($start_timekey) && !empty($end_timekey) && ($end_timekey < $start_timekey)) {
             return ['code' => '3002', 'Msg' => '结束时间段不能小于开始时间段'];
         }
-        $result = $this->app->user->getUserDevelopCode($page, $pageNum, $ConId, $start_timekey, $end_timekey);
+        $result = $this->app->user->getUserStatisticsYear($page, $pageNum, $ConId, $start_timekey, $end_timekey);
         return $result;
     }
     /**
