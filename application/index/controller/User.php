@@ -918,7 +918,7 @@ class User extends MyController
      * @apiDescription   getUserMultimediaTemplate
      * @apiGroup         index_user
      * @apiName          getUserMultimediaTemplate
-     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} con_id
      * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
      * @apiParam (入参) {String} business_id 业务服务id(服务类型)
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
@@ -928,7 +928,7 @@ class User extends MyController
      */
     public function getUserMultimediaTemplate()
     {
-        $ConId = trim($this->request->post('cms_con_id'));
+        $ConId = trim($this->request->post('con_id'));
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
         $page     = is_numeric($page) ? $page : 1;
