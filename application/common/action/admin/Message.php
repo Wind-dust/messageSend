@@ -551,4 +551,35 @@ class Message extends CommonIndex
             return ['code' => '3009']; //修改失败
         }
     }
+
+    public function getUserMultimediaTemplate($page, $pageNum)
+    {
+        $offset = $pageNum * ($page - 1);
+        $result =  DbSendMessage::getUserMultimediaTemplate([], '*', false, '', $offset . ',' . $pageNum);
+        foreach ($result as $key => $value) {
+            $result[$key]['multimedia_frame'] = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $value['id']], '*', false, ['num' => 'asc']);
+        }
+        $totle = DbSendMessage::countUserMultimediaTemplate([]);
+        return ['code' => '200', 'totle' => $totle, 'result' => $result];
+    }
+
+    public function auditUserMultimediaTemplatel($id, $status)
+    {
+        $result =  DbSendMessage::getUserMultimediaTemplate(['id' => $id], '*', true);
+        if (empty($result)) {
+            return ['code' => '3001'];
+        }
+        if ($result['status'] != 1) {
+            return ['code' => '3003'];
+        }
+        Db::startTrans();
+        try {
+            DbSendMessage::editUserMultimediaTemplate(['status' => $status], $id);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
+    }
 }

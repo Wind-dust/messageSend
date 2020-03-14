@@ -1078,4 +1078,21 @@ class User extends CommonIndex
         $total = DbUser::countLogTrading($where);
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
+
+    public function getUserMultimediaTemplate($ConId, $page, $pageNum)
+    {
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $offset = ($page - 1) * $pageNum;
+        $where = [];
+        array_push($where, ['uid', '=', $uid]);
+        $result =  DbSendMessage::getUserMultimediaTemplate($where, '*', false, '', $offset . ',' . $pageNum);
+        foreach ($result as $key => $value) {
+            $result[$key]['multimedia_frame'] = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $value['id']], '*', false, ['num' => 'asc']);
+        }
+        $totle = DbSendMessage::countUserMultimediaTemplate($where);
+        return ['code' => '200', 'totle' => $totle, 'result' => $result];
+    }
 }

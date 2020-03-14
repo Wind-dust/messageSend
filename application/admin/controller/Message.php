@@ -188,7 +188,7 @@ class Message extends AdminController
     }
 
     /**
-     * @api              {get} / 获取所有用户模板
+     * @api              {get} / 获取所有用户模板（非彩信）
      * @apiDescription   getUserModel
      * @apiGroup         admin_Message
      * @apiName          getUserModel
@@ -483,6 +483,64 @@ class Message extends AdminController
             return ['code' => '3001'];
         }
         $result =  $this->app->message->deluserBindDevelopCode($id);
+        return $result;
+    }
+
+    /**
+     * @api              {get} / 获取所有用户模板（彩信）
+     * @apiDescription   getUserMultimediaTemplate
+     * @apiGroup         admin_Message
+     * @apiName          getUserMultimediaTemplate
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
+     * @apiParam (入参) {String} business_id 业务服务id(服务类型)
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /admin/message/getUserMultimediaTemplate
+     * @return array
+     * @author rzc
+     */
+    public function getUserMultimediaTemplate()
+    {
+        $ConId = trim($this->request->post('cms_con_id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        $result = $this->app->message->getUserMultimediaTemplate($page, $pageNum);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 审核用户彩信模板
+     * @apiDescription   auditUserMultimediaTemplatel
+     * @apiGroup         admin_Message
+     * @apiName          auditUserMultimediaTemplatel
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 模板Id
+     * @apiParam (入参) {String} status 状态:2,审核通过;3,审核不通过;
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:审核状态码错误 / 
+     * @apiSampleRequest /admin/message/auditUserMultimediaTemplatel
+     * @return array
+     * @author rzc
+     */
+    public function auditUserMultimediaTemplatel()
+    {
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id = trim($this->request->post('id'));
+        $status = trim($this->request->post('status'));
+        if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
+            return ['code' => '3001'];
+        }
+        if (!in_array($status, [2, 3])) {
+            return ['code' => '3002'];
+        }
+        $result =  $this->app->message->auditUserMultimediaTemplatel(intval($id), $status);
         return $result;
     }
 }
