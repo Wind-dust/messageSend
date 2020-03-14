@@ -1411,7 +1411,7 @@ return $result;
         }
         if (!empty($template_id)) {
             $template =  DbSendMessage::getUserMultimediaTemplate(['template_id' => $template_id], '*', true);
-            if ($template['status'] != 3 || empty($template)) {
+            if ($template['status'] != 2 || empty($template)) {
                 return ['code' => '3003'];
             }
             $template['multimedia_frame'] = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $template['id']], '*', false, ['num' => 'asc']);
