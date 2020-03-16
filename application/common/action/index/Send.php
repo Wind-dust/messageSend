@@ -1307,7 +1307,7 @@ return $result;
         }
     }
 
-    public function multimediaTemplateSignatureReport($appid, $appkey, $content_data, $title)
+    public function multimediaTemplateSignatureReport($appid, $appkey, $content_data, $title, $name)
     {
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
@@ -1375,6 +1375,7 @@ return $result;
             'template_id'        => $template_id,
             'uid'            => $user['id'],
             'title'          => $title,
+            'name'          => $name,
         ];
 
         Db::startTrans();

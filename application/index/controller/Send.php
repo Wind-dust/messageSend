@@ -792,7 +792,8 @@ class Send extends MyController
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
      * @apiParam (入参) {Array} content_data 短信内容
-     * @apiParam (入参) {String} title 任务名称
+     * @apiParam (入参) {String} title 模板主题
+     * @apiParam (入参) {String} name 模板别名
      * @apiParam (content_data) {String} content 单个帧文字内容
      * @apiParam (content_data) {String} image_path 单个帧图片路径,必须已上传的文件
      * @apiParam (content_data) {String} num 顺序 按自然数排列 从小到大 必传
@@ -806,6 +807,7 @@ class Send extends MyController
         $appid          = trim($this->request->post('appid')); //登录名
         $appkey         = trim($this->request->post('appkey')); //登陆密码
         $title          = trim($this->request->post('title')); //短信标题
+        $name          = trim($this->request->post('name')); //短信标题
         $content_data   = $this->request->post('content_data'); //短信内容
         // $content_data   = json_decode($content_data, true);
         // print_r($content_data);die;
@@ -821,7 +823,10 @@ class Send extends MyController
         if (empty($title)) {
             return ['code' => '3007'];
         }
-        $result = $this->app->send->multimediaTemplateSignatureReport($appid, $appkey, $content_data, $title);
+        if (empty($name)) {
+            return ['code' => '3013', 'msg' => '别名为空'];
+        }
+        $result = $this->app->send->multimediaTemplateSignatureReport($appid, $appkey, $content_data, $title, $name);
         return $result;
     }
 

@@ -949,3 +949,6 @@ ALTER TABLE `messagesend`.`yx_statistics_month`
 ADD COLUMN `mobile_num` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '手机号计数' AFTER `timekey`;
 ALTER TABLE `messagesend`.`yx_statistics_year` 
 ADD COLUMN `mobile_num` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '手机号计数' AFTER `timekey`;
+
+ALTER TABLE `messagesend`.`yx_user_multimedia_template` 
+ADD COLUMN `name` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '模板别名' AFTER `title`;

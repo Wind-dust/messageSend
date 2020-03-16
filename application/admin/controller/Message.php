@@ -246,7 +246,7 @@ class Message extends AdminController
     }
 
     /**
-     * @api              {get} / 获取所有用户签名
+     * @api              {post} / 获取所有用户签名
      * @apiDescription   getUserSignature
      * @apiGroup         admin_Message
      * @apiName          getUserSignature
@@ -487,7 +487,7 @@ class Message extends AdminController
     }
 
     /**
-     * @api              {get} / 获取所有用户模板（彩信）
+     * @api              {post} / 获取所有用户模板（彩信）
      * @apiDescription   getUserMultimediaTemplate
      * @apiGroup         admin_Message
      * @apiName          getUserMultimediaTemplate
