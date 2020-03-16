@@ -1093,6 +1093,6 @@ class User extends CommonIndex
             $result[$key]['multimedia_frame'] = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $value['id']], '*', false, ['num' => 'asc']);
         }
         $total = DbSendMessage::countUserMultimediaTemplate($where);
-        return ['code' => '200', 'totle' => $total, 'result' => $result];
+        return ['code' => '200', 'total' => $total, 'result' => $result];
     }
 }

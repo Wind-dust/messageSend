@@ -721,6 +721,9 @@ return $result;
 
         foreach ($content_data as $key => $value) {
             $frame = [];
+            if (empty($value['image_path']) && empty($value['content'])) {
+                return ['code' => '3010'];
+            }
             if (!isset($value['content'])) {
                 $frame['content'] = '';
             } else {
