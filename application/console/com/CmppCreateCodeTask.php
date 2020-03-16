@@ -3305,7 +3305,7 @@ Db::rollback();
                 //年
                 if (in_array($value['uid'], $year_users[$year])) {
                     $year_businessSettlement[$year][$value['uid']]['num'] += $num;
-                    $year_businessSettlement[$year][$value['uid']]['mobile_num'] += $num;
+                    $year_businessSettlement[$year][$value['uid']]['mobile_num'] += 1;
                     if ($value['status_message'] == 'DELIVRD') {
                         if (isset($year_businessSettlement[$year][$value['uid']]['success'])) {
                             $year_businessSettlement[$year][$value['uid']]['success'] += $num;
@@ -3329,7 +3329,7 @@ Db::rollback();
                 } else {
                     $year_users[$year][] = $value['uid'];
                     $year_businessSettlement[$year][$value['uid']]['num'] = $num;
-                    $year_businessSettlement[$year][$value['uid']]['mobile_num'] = $num;
+                    $year_businessSettlement[$year][$value['uid']]['mobile_num'] = 1;
                     if ($value['status_message'] == 'DELIVRD') {
                         $year_businessSettlement[$year][$value['uid']]['success'] = $num;
                     } elseif ($value['status_message'] == '') {
@@ -3341,7 +3341,7 @@ Db::rollback();
                 //月
                 if (in_array($value['uid'], $month_users[$month])) {
                     $month_businessSettlement[$month][$value['uid']]['num'] += $num;
-                    $month_businessSettlement[$month][$value['uid']]['mobile_num'] += $num;
+                    $month_businessSettlement[$month][$value['uid']]['mobile_num'] += 1;
                     if ($value['status_message'] == 'DELIVRD') {
                         if (isset($month_businessSettlement[$month][$value['uid']]['success'])) {
                             $month_businessSettlement[$month][$value['uid']]['success'] += $num;
@@ -3365,7 +3365,7 @@ Db::rollback();
                 } else {
                     $month_users[$month][] = $value['uid'];
                     $month_businessSettlement[$month][$value['uid']]['num'] = $num;
-                    $month_businessSettlement[$month][$value['uid']]['mobile_num'] = $num;
+                    $month_businessSettlement[$month][$value['uid']]['mobile_num'] = 1;
                     if ($value['status_message'] == 'DELIVRD') {
                         $month_businessSettlement[$month][$value['uid']]['success'] = $num;
                     } elseif ($value['status_message'] == '') {
@@ -3377,7 +3377,7 @@ Db::rollback();
                 //日
                 if (in_array($value['uid'], $day_users[$day])) {
                     $day_businessSettlement[$day][$value['uid']]['num'] += $num;
-                    $day_businessSettlement[$day][$value['uid']]['mobile_num'] += $num;
+                    $day_businessSettlement[$day][$value['uid']]['mobile_num'] += 1;
                     if ($value['status_message'] == 'DELIVRD') {
                         if (isset($day_businessSettlement[$day][$value['uid']]['success'])) {
                             $day_businessSettlement[$day][$value['uid']]['success'] += $num;
@@ -3401,7 +3401,7 @@ Db::rollback();
                 } else {
                     $day_users[$day][] = $value['uid'];
                     $day_businessSettlement[$day][$value['uid']]['num'] = $num;
-                    $day_businessSettlement[$day][$value['uid']]['mobile_num'] = $num;
+                    $day_businessSettlement[$day][$value['uid']]['mobile_num'] = 1;
                     if ($value['status_message'] == 'DELIVRD') {
                         $day_businessSettlement[$day][$value['uid']]['success'] = $num;
                     } elseif ($value['status_message'] == '') {
