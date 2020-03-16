@@ -1092,7 +1092,7 @@ class User extends CommonIndex
         foreach ($result as $key => $value) {
             $result[$key]['multimedia_frame'] = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $value['id']], '*', false, ['num' => 'asc']);
         }
-        $totle = DbSendMessage::countUserMultimediaTemplate($where);
-        return ['code' => '200', 'totle' => $totle, 'result' => $result];
+        $total = DbSendMessage::countUserMultimediaTemplate($where);
+        return ['code' => '200', 'totle' => $total, 'result' => $result];
     }
 }
