@@ -1079,7 +1079,7 @@ class User extends CommonIndex
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
 
-    public function getUserMultimediaTemplate($ConId, $page, $pageNum)
+    public function getUserMultimediaTemplate($ConId, $page, $pageNum, $status)
     {
         $uid = $this->getUidByConId($ConId);
         if (empty($uid)) { //用户不存在
@@ -1088,6 +1088,9 @@ class User extends CommonIndex
         $offset = ($page - 1) * $pageNum;
         $where = [];
         array_push($where, ['uid', '=', $uid]);
+        if (!empty($status)) {
+            array_push($where, ['status', '=', $status]);
+        }
         $result =  DbSendMessage::getUserMultimediaTemplate($where, '*', false, '', $offset . ',' . $pageNum);
         foreach ($result as $key => $value) {
             $result[$key]['multimedia_frame'] = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $value['id']], '*', false, ['num' => 'asc']);
