@@ -3118,7 +3118,7 @@ Db::rollback();
                 ];
                 $all_log[] = $send_log;
                 $j++;
-                if ($j > 1000) {
+                if ($j > 100) {
                     Db::startTrans();
                     try {
                         Db::table('yx_user_multimedia_message_log')->insertAll($all_log);
@@ -3599,11 +3599,11 @@ Db::rollback();
         // print_r(count($task_log));
         // die;
         foreach ($task_log as $key => $value) {
-            print_r($value);
-            die;
+            // print_r($value);
+            // die;
             if (empty($value['status_message']) && empty($value['real_message'])) {
                 $task = Db::query("SELECT id FROM yx_user_send_task WHERE `task_no` = '" . $value['task_no'] . "' LIMIT 1 ");
-                $receipt = Db::query("SELECT id FROM status_message WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $value['mobile'] . "' LIMIT 1 ");
+                $receipt = Db::query("SELECT status_message FROM yx_user_send_task WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $value['mobile'] . "' LIMIT 1 ");
                 if (empty($receipt)) {
                     $value['status_message'] = 'DELIVRD';
                 } else {
