@@ -824,7 +824,7 @@ class User extends CommonIndex
             return ['code' => '3003'];
         }
         $offset = $pageNum * ($page - 1);
-        $result =  DbSendMessage::getUserModel(['uid' => $uid, 'business_id' => $business_id], '*', false, '', $offset . ',' . $pageNum);
+        $result =  DbSendMessage::getUserModel(['uid' => $uid, 'business_id' => $business_id], '*', false, ['id' => 'desc'], $offset . ',' . $pageNum);
         $totle = DbSendMessage::countUserModel(['uid' => $uid, 'business_id' => $business_id]);
         return ['code' => '200', 'total' => $totle, 'result' => $result];
     }
@@ -836,7 +836,7 @@ class User extends CommonIndex
             return ['code' => '3003'];
         }
         $offset = $pageNum * ($page - 1);
-        $result =  DbSendMessage::getUserSignature(['uid' => $uid, 'business_id' => $business_id], '*', false, '', $offset . ',' . $pageNum);
+        $result =  DbSendMessage::getUserSignature(['uid' => $uid, 'business_id' => $business_id], '*', false, ['id' => 'desc'], $offset . ',' . $pageNum);
         $totle = DbSendMessage::countUserSignature(['uid' => $uid, 'business_id' => $business_id]);
         return ['code' => '200', 'total' => $totle, 'result' => $result];
     }
@@ -1091,7 +1091,7 @@ class User extends CommonIndex
         if (!empty($status)) {
             array_push($where, ['status', '=', $status]);
         }
-        $result =  DbSendMessage::getUserMultimediaTemplate($where, '*', false, '', $offset . ',' . $pageNum);
+        $result =  DbSendMessage::getUserMultimediaTemplate($where, '*', false, ['id' => 'desc'], $offset . ',' . $pageNum);
         foreach ($result as $key => $value) {
             $result[$key]['multimedia_frame'] = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $value['id']], '*', false, ['num' => 'asc']);
         }
