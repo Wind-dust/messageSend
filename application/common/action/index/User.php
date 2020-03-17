@@ -661,7 +661,7 @@ class User extends CommonIndex
             return ['code' => '3003'];
         }
         $offset = ($page - 1) * $pageNum;
-        $result = DbAdministrator::getUserSendTask(['uid' => $uid], '*', false, '', $offset . ',' . $pageNum);
+        $result = DbAdministrator::getUserSendTask(['uid' => $uid], '*', false, ['id' => 'desc'], $offset . ',' . $pageNum);
         $total = DbAdministrator::countUserSendTask(['uid' => $uid]);
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
@@ -677,7 +677,7 @@ class User extends CommonIndex
         if (empty($task)) {
             return ['code' => '3001', 'msg' => '该任务不存在'];
         }
-        $task_log = DbAdministrator::getUserSendTaskLog(['task_no' => $task['task_no']], '*', false, '', $offset . ',' . $pageNum);
+        $task_log = DbAdministrator::getUserSendTaskLog(['task_no' => $task['task_no']], '*', false,  ['id' => 'desc'], $offset . ',' . $pageNum);
         $total = DbAdministrator::countUserSendTaskLog(['task_no' => $task['task_no']]);
         if (!empty($task['log_path']) && empty($task_log)) {
             $task_log = [];
@@ -735,7 +735,7 @@ class User extends CommonIndex
             return ['code' => '3003'];
         }
         $offset = ($page - 1) * $pageNum;
-        $result = DbAdministrator::getUserSendCodeTask(['uid' => $uid], '*', false, '', $offset . ',' . $pageNum);
+        $result = DbAdministrator::getUserSendCodeTask(['uid' => $uid], '*', false,  ['id' => 'desc'], $offset . ',' . $pageNum);
         $total = DbAdministrator::countUserSendCodeTask(['uid' => $uid]);
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
@@ -751,7 +751,7 @@ class User extends CommonIndex
         if (empty($task)) {
             return ['code' => '3001', 'msg' => '该任务不存在'];
         }
-        $task_log = DbAdministrator::getUserSendCodeTaskLog(['task_no' => $task['task_no']], '*', false, '', $offset . ',' . $pageNum);
+        $task_log = DbAdministrator::getUserSendCodeTaskLog(['task_no' => $task['task_no']], '*', false,  ['id' => 'desc'], $offset . ',' . $pageNum);
         $total = DbAdministrator::countUserSendCodeTaskLog(['task_no' => $task['task_no']]);
         if (!empty($task['log_path']) && empty($task_log)) {
             $task_log = [];
@@ -872,7 +872,7 @@ class User extends CommonIndex
             array_push($where, ['title', 'LIKE', "%" . $title . "%"]);
         }
         $offset = ($page - 1) * $pageNum;
-        $result = DbSendMessage::getUserMultimediaMessage($where, '*', false, '', $offset . ',' . $pageNum);
+        $result = DbSendMessage::getUserMultimediaMessage($where, '*', false,  ['id' => 'desc'], $offset . ',' . $pageNum);
         if (empty($result)) {
             return ['code' => 200, 'message_data' => [], 'total' => 0];
         }
@@ -894,7 +894,7 @@ class User extends CommonIndex
         if (empty($task)) {
             return ['code' => '3001', 'msg' => '该任务不存在'];
         }
-        $task_log = DbSendMessage::getUserMultimediaMessageLog(['task_no' => $task['task_no']], '*', false, '', $offset . ',' . $pageNum);
+        $task_log = DbSendMessage::getUserMultimediaMessageLog(['task_no' => $task['task_no']], '*', false,  ['id' => 'desc'], $offset . ',' . $pageNum);
         $total = DbSendMessage::countUserMultimediaMessageLog(['task_no' => $task['task_no']]);
         if (!empty($task['log_path']) && empty($task_log)) {
             $task_log = [];
