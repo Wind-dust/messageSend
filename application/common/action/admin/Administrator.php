@@ -358,19 +358,34 @@ class Administrator extends CommonIndex
     public function auditUserSendTask($effective_id = [], $free_trial)
     {
         // print_r($effective_id);die;
-        $userchannel = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'id,mobile_content,free_trial', false);
+        $userchannel = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,task_content,free_trial', false);
 
         if (empty($userchannel)) {
             return ['code' => '3001'];
         }
         $real_effective_id = [];
+        $user_ids = [];
+        $uids = [];
         // print_r($userchannel);die;
         foreach ($userchannel as $key => $value) {
             if ($value['free_trial'] > 1) {
                 continue;
             }
             $real_effective_id[] = $value['id'];
+            // if (!in_array($value['uid'], $uids)) {
+            //     $uids[] = $value['uid'];
+            // }
+
+            if (array_key_exists($value['uid'], $user_ids)) {
+                $user_ids[$value['uid']][] = $value['id'];
+            } else {
+                $user_ids[$value['uid']][] = $value['id'];
+            }
         }
+        foreach ($user_ids as $key => $value) {
+            $user_equities = DbAdministrator::getUserEquities(['uid' => $key, 'business_id' => 5], 'id,num_balance', true);
+        }
+
 
         Db::startTrans();
         try {
