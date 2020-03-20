@@ -53,6 +53,7 @@ return [
     'cmppyixinliantongdianxinmarketing'         => $commandPath . 'CmppYiXinLianTongDianXinMarketing', //易信电信联通营销通道
     'cmpplanjingmarketing'             => $commandPath . 'CmppLanJingMarketing',
     'cmpplanjingbusiness'              => $commandPath . 'CmppLanJingBusiness',
+    'cmppronghebusiness'              => $commandPath . 'CmppRongHeBusiness',
     'serversocketshuhe'                => $commandPath . 'ServerSocketShuHe',
     'ServerSocketjyy'                  => $commandPath . 'ServerSocketJYY',
     'ServerSocketjyylt'                  => $commandPath . 'ServerSocketJYYLT',
