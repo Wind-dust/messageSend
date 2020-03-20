@@ -93,8 +93,8 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                         $real_send_content = '';
                         $vc                = '';
                         foreach ($send_data['content'] as $key => $value) {
-                            // $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
-                            $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode($value['content']);
+                            $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
+                            // $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode($value['content']);
                             if (!empty($value['image_path'])) {
                                 $real_send_content .= ',';
                                 if ($value['image_type'] == 'jpg') {
@@ -115,8 +115,8 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                         $real_send_content = '';
                         $vc                = '';
                         foreach ($send_data['content'] as $key => $value) {
-                            // $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
-                            $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode($value['content']);
+                            $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
+                            // $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode($value['content']);
                             if (!empty($value['image_path'])) {
                                 $real_send_content .= ',';
                                 if ($value['image_type'] == 'jpg') {
