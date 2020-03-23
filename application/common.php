@@ -20,10 +20,6 @@ function filtraImage($domain, $image)
  */
 function checkMobile($mobile)
 {
-    $end_num = substr($mobile, -6);
-    if (in_array($end_num, ['000000', '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999'])) {
-        return false;
-    }
     if (!empty($mobile) && preg_match('/^1[3-9]{1}\d{9}$/', $mobile)) {
         return true;
     }
