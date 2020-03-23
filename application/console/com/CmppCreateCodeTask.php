@@ -1008,7 +1008,7 @@ class CmppCreateCodeTask extends Pzlife
                                 // https://zhidao.baidu.com/question/412076997.html
                                 $request_url = "http://116.228.60.189:15901/rtreceive?";
                                 $request_url .= 'task_no=' . $sendTask['task_no'] . "&status_message=" . $send_log['status_message'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['create_time'];
-                                // sendRequest($request_url);
+                                sendRequest($request_url);
                             }
                             $all_log[] = $send_log;
                         }
