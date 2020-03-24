@@ -50,7 +50,7 @@ class CmppBeiJingBaMiMarketing extends Pzlife
         $redisMessageCodeDeliver = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
         $redisMessageUnKownDeliver = 'index:meassage:code:unknow:deliver:' . $content; //行业通知MsgId
 
-          $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /*   $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
@@ -70,7 +70,7 @@ class CmppBeiJingBaMiMarketing extends Pzlife
             // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
             'content'     => '【方舟药业】秒杀销售KN959.9元/1包（2个装），外科用1.98元/个、一次性1.55元/个，更多点击https://web.fangzhouyy.com/d.htm或应用宝搜索"方舟药业"下载,使用手机号+密码(手机号后六位)登录，退订回T',
             
-        ]));
+        ])); */
 
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/57.log";
