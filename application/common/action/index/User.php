@@ -1015,7 +1015,7 @@ class User extends CommonIndex
         if ($user['pid'] != 0 || $user['user_type'] != 2) {
             return ['code' => '3001', 'msg' => '非代理商用户无法划拨数量'];
         }
-        $user_equities = DbAdministrator::getUserEquities(['uid' => $uid, 'business_id' => $business_id], 'num_balance', true);
+        $user_equities = DbAdministrator::getUserEquities(['uid' => $uid, 'business_id' => $business_id], 'id,num_balance', true);
         if (empty($user_equities) || $user_equities['num_balance'] < $number) {
             return ['code' => '3002', 'msg' => '您没有此项服务或者可分配余额不足'];
         }
@@ -1023,7 +1023,7 @@ class User extends CommonIndex
         if (empty($be_allocated_user)) {
             return ['code' => '3003', 'msg' => '错误的目标客户'];
         }
-        $be_allocated_user_equities = DbAdministrator::getUserEquities(['uid' => $be_allocated_user['id'], 'business_id' => $business_id], 'num_balance', true);
+        $be_allocated_user_equities = DbAdministrator::getUserEquities(['uid' => $be_allocated_user['id'], 'business_id' => $business_id], 'id,num_balance', true);
         if (empty($be_allocated_user_equities)) {
             return ['code' => '3004', 'msg' => '目标用户无此项服务'];
         }
@@ -1058,7 +1058,7 @@ class User extends CommonIndex
             return ['code' => '200'];
         } catch (\Exception $e) {
             Db::rollback();
-            exception($e);
+            // exception($e);
             return ['code' => '3009']; //修改失败
         }
     }
