@@ -373,7 +373,7 @@ class CmppBeiJingBaMiMarketing extends Pzlife
                                         print_r($Msg_Content);
                                         $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                                         if ($mesage) {
-                                            $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
+                                           
                                             // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
                                             $mesage                = json_decode($mesage, true);
                                             $mesage['Stat']        = $Msg_Content['Stat'];
@@ -382,6 +382,7 @@ class CmppBeiJingBaMiMarketing extends Pzlife
                                             $mesage['Done_time']   = isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis', time());
                                             $mesage['receive_time'] = time(); //回执时间戳
                                             $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
+                                            $redis->hdel($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                                         } else { //不在记录中的回执存入缓存，
                                             $mesage['Stat']        = isset($Msg_Content['Stat']) ? $Msg_Content['Stat'] : 'UNKNOWN';
                                             $mesage['Submit_time'] = trim(isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis', time()));

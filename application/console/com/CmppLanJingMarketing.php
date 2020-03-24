@@ -369,7 +369,7 @@ class CmppLanJingMarketing extends Pzlife
                                         // print_r($body);
                                         // print_r($Msg_Content);
                                         if ($mesage) {
-                                            $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
+                                            $redis->hdel($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                                             // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
                                             $mesage                = json_decode($mesage, true);
                                             $mesage['Stat']        = $Msg_Content['Stat'];
