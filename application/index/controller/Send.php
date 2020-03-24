@@ -869,4 +869,6 @@ class Send extends MyController
         $result = $this->app->send->submitBatchCustomMultimediaMessage($appid, $appkey, $template_id, $connect, $ip);
         return $result;
     }
+
+    
 }
