@@ -486,6 +486,7 @@ class CmppBeiJingBaMiMarketing extends Pzlife
                                     if ($i > $security_master) {
                                         $i    = 0;
                                     }
+                                    usleep(100000);
                                     continue;
                                 } else { //单条短信
 
@@ -531,7 +532,7 @@ class CmppBeiJingBaMiMarketing extends Pzlife
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
 
                                     $send_status = 2;
-                                    usleep(300);
+                                    usleep(100000);
                                 }
                             } else { //心跳
                                 $Command_Id  = 0x00000008; //保持连接
