@@ -1045,7 +1045,7 @@ class User extends CommonIndex
             'after_num_balance' => bcadd($user_equities['num_balance'], $number),
             'number' => +$number,
             'from_user' => $user['nick_name'],
-            'from_uid' =>  $user['id'],
+            'from_uid' =>  $uid,
         ];
         Db::startTrans();
         try {
