@@ -3936,7 +3936,7 @@ Db::rollback();
     public function marketingSettlement()
     {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为10G
-        while(true){
+        while (true) {
             $year_businessSettlement = [];
             $month_businessSettlement = [];
             $day_businessSettlement = [];
@@ -3951,8 +3951,10 @@ Db::rollback();
                     if (empty($value['status_message']) && empty($value['real_message'])) {
                         $task = Db::query("SELECT id FROM yx_user_send_task WHERE `task_no` = '" . $value['task_no'] . "' LIMIT 1 ");
                         $receipt = Db::query("SELECT `status_message` FROM yx_send_task_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $value['mobile'] . "' LIMIT 1 ");
-                        if (empty($receipt) && $value['create_time'] + 259200 < time()) {
-                            $value['status_message'] = 'DELIVRD';
+                        if (empty($receipt)) {
+                            if ($value['create_time'] + 259200 < time()) {
+                                $value['status_message'] = 'DELIVRD';
+                            }
                         } else {
                             $value['status_message'] = $receipt[0]['status_message'];
                         }
@@ -4086,21 +4088,21 @@ Db::rollback();
             } catch (\Exception $e) {
                 exception($e);
             }
-    
+
             Db::startTrans();
             try {
                 //年度计费
                 // foreach ($all_year_businessSettlement as $key => $value) {
                 //     $has = Db::query('SELECT * FROM `yx_statistics_year` WHERE `` ');
                 //     if ($has) {}else{
-    
+
                 //     }
                 // }
                 foreach ($year_businessSettlement as $ykey => $y_value) {
                     foreach ($y_value as $key => $value) {
                         $success = isset($value['success']) ? $value['success'] : 0;
                         $num = isset($value['num']) ? $value['num'] : 0;
-    
+
                         $year_user_settlement = [];
                         $year_user_settlement = [
                             'timekey' => $ykey,
@@ -4136,7 +4138,7 @@ Db::rollback();
                         $success = isset($value['success']) ? $value['success'] : 0;
                         $num = isset($value['num']) ? $value['num'] : 0;
                         $month_user_settlement = [];
-    
+
                         $month_user_settlement = [
                             'timekey' => $mkey,
                             'uid' => $key,
@@ -4207,6 +4209,5 @@ Db::rollback();
             }
             sleep(72000);
         }
-       
     }
 }
