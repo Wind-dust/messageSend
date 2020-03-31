@@ -725,9 +725,9 @@ return $result;
                 return ['code' => '3010'];
             }
             if (!isset($value['content'])) {
-                $frame['content'] = '';
+                $frame['content'] = '' . $signature['title'];
             } else {
-                $frame['content'] = $value['content'];
+                $frame['content'] = $signature['title'] . $value['content'];
                 // $content_length+= strlen($value['content']);
             }
             $content_length += (strlen($frame['content']) / 8);
