@@ -3261,6 +3261,7 @@ Db::rollback();
                     Db::commit();
                 } catch (\Exception $e) {
                     Db::rollback();
+                    $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode($send_log));
                     exception($e);
                 }
             } else {
@@ -3270,6 +3271,7 @@ Db::rollback();
                     Db::commit();
                 } catch (\Exception $e) {
                     Db::rollback();
+                    $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode($send_log));
                     exception($e);
                 }
             }
