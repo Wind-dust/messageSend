@@ -1559,9 +1559,17 @@ class CmppCreateCodeTask extends Pzlife
 
                     usleep(20000);
                 } else {
+                    if (strpos($send_log['Stat'], 'DB:0141') !== false || strpos($send_log['Stat'], 'MBBLACK') !== false || strpos($send_log['Stat'], 'BLACK') !== false) {
+                        $message_info = '黑名单';
+                    } else if ($send_log['Stat'] == 'DELIVRD') {
+                        $message_info = '发送成功';
+                    } else {
+                        $message_info = '发送失败';
+                    }
                     $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
                         'task_no' =>  trim($task[0]['task_no']),
                         'status_message' =>   trim($send_log['Stat']),
+                        'message_info' =>   $message_info,
                         'mobile' =>   trim($send_log['mobile']),
                         // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
                         'send_time' => isset($send_log['receive_time']) ? date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
