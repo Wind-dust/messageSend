@@ -1593,4 +1593,34 @@ return $result;
             return ['code' => '3009'];
         }
     }
+
+    public function multimediaReceive($appid, $appkey)
+    {
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        // $offset = ($page - 1) * $pagenum;
+        /* $result = DbAdministrator::getUserSendCodeTaskLog(['uid' => $user['id']], 'task_no,status_message,mobile,send_time', $row = false, '', $offset . ',' . $pagenum);
+        foreach ($result as $key => $value) {
+            $result[$key]['sendtime'] = date("Y-m-d H:i:s", $value['send_time']);
+            unset($result[$key]['send_time']);
+        }
+        $total = DbAdministrator::countUserSendCodeTaskLog(['uid' => $user['id']]); */
+        $result = [];
+        $this->redis = Phpredis::getConn();
+        $i = 0;
+        while ($i < 100) {
+            $userstat = $this->redis->lpop('index:meassage:code:user:mulreceive:' . $user['id']);
+            $userstat = json_decode($userstat, true);
+            if (empty($userstat)) {
+                break;
+            }
+            $result[] = $userstat;
+        }
+        return ['code' => '200', 'data' => $result];
+    }
 }

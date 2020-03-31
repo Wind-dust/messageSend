@@ -3227,7 +3227,7 @@ Db::rollback();
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
-        /*  $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
+    /* $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
             'task_no' => 'mul20020515503481449866',
             'uid' => '1',
             'mobile' => '18616279075',
@@ -3238,7 +3238,9 @@ Db::rollback();
         while (true) {
             $sendlog = $redis->lpop('index:meassage:multimediamessage:deliver:' . $channel_id);
             if (empty($sendlog)) {
-                exit('Send Log IS null');
+                // exit('Send Log IS null');
+                sleep(600);
+                continue;
             }
             $send_log = json_decode($sendlog, true);
             $sendtasklog = Db::query("SELECT `id`,`create_time` FROM `yx_user_multimedia_message_log` WHERE `task_no` = '" . $send_log['task_no'] . "' AND `mobile` = '" . $send_log['mobile'] . "' ");
@@ -3252,7 +3254,8 @@ Db::rollback();
                         'task_no' => $send_log['task_no'],
                         'mobile' => $send_log['mobile'],
                         'send_status' => $send_log['send_status'],
-                        'create_time' => $task[0]['create_time'],
+                        'create_time' => $task[0]['update_time'],
+                        'update_time' => $send_log['send_time'],
                         'real_message' => $send_log['status_message'],
                         'status_message' => $send_log['status_message'],
                         'task_id' => $task[0]['id'],
@@ -3275,6 +3278,22 @@ Db::rollback();
                     exception($e);
                 }
             }
+            if (strpos($send_log['status_message'], 'DB:0141') !== false || strpos($send_log['status_message'], 'MBBLACK') !== false || strpos($send_log['status_message'], 'BLACK') !== false) {
+                $message_info = '黑名单';
+            } else if ($send_log['status_message'] == 'DELIVRD') {
+                $message_info = '发送成功';
+            } else {
+                $message_info = '发送失败';
+            }
+            $redis->rpush('index:meassage:code:user:mulreceive:' . $send_log['uid'], json_encode([
+                'task_no' =>  $send_log['task_no'],
+                'status_message' =>   trim($send_log['status_message']),
+                'message_info' =>   $message_info,
+                'mobile' =>   trim($send_log['mobile']),
+                // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                'send_time' => isset($send_log['send_time']) ? date('Y-m-d H:i:s', trim($send_log['send_time'])) : date('Y-m-d H:i:s', time()),
+            ])); //写入用户带处理日志
+        
         }
     }
 
