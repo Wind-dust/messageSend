@@ -706,7 +706,7 @@ return $result;
             return ['code' => '3005'];
         }
         if (!empty($signature_id)) {
-            $signature =  DbSendMessage::getUserSignature(['uid' => $user['id'], 'signature_id' => $signature_id], '*', true);
+            $signature =  DbSendMessage::getUserSignature(['uid' => $user['uid'], 'signature_id' => $signature_id], '*', true);
             if (empty($signature)) {
                 return ['code' => '3012'];
             }
@@ -725,11 +725,19 @@ return $result;
                 return ['code' => '3010'];
             }
             if (!isset($value['content'])) {
-                $frame['content'] = '' . $signature['title'];
+                $frame['content'] = '';
+                if (!empty($signature)) {
+                    $frame['content'] = '' . $signature['title'];
+                }
             } else {
-                $frame['content'] = $signature['title'] . $value['content'];
+                if (!empty($signature)) {
+                    $frame['content'] = $signature['title'] . $value['content'];
+                } else {
+                    $frame['content'] = $value['content'];
+                }
                 // $content_length+= strlen($value['content']);
             }
+            unset($signature);
             $content_length += (strlen($frame['content']) / 8);
             if (!isset($value['image_path'])) {
                 $frame['image_path'] = '';
