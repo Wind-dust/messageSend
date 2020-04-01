@@ -952,3 +952,51 @@ ADD COLUMN `mobile_num` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '手机号�
 
 ALTER TABLE `messagesend`.`yx_user_multimedia_template` 
 ADD COLUMN `name` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '模板别名' AFTER `title`;
+
+DROP TABLE IF EXISTS `yx_user_channel_group`;
+CREATE TABLE `yx_user_channel_group`(
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '通道组名称',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
+  `priority` tinyint(3) NOT NULL DEFAULT 1 COMMENT '通道组优先级',
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '通道组状态,默认关闭, 1：关闭;2：启动',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `user_business_priority_deletime_status`(`uid`,`business_id`,`priority`,`status`,`delete_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT= "用户通道组";
+
+DROP TABLE IF EXISTS `yx_user_channel_group_son`;
+CREATE TABLE `yx_user_channel_group_son` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uchannel_group_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '用户通道组ID',
+  `channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '通道ID',
+  `operating_range` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '通道发送短信范围： 1：移动；2：联通；3：电信；4：移动联通；5：移动电信；6：联通电信；7：三网',
+  `operating_area` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '通道归属地:0 默认全国',
+  `priority` tinyint(3) NOT NULL DEFAULT 1 COMMENT '通道组优先级,区别省网和全网',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `user_business_priority_deletime_status`(`operating_range`,`operating_area`,`uchannel_group_id`,`delete_time`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT= "用户通道组管理通道";
+
+ALTER TABLE `messagesend`.`yx_users` 
+ADD COLUMN `need_receipt_api` tinyint(3) NOT NULL DEFAULT 1 COMMENT '是否需要从接口调用回执1:不需要;2:需要' AFTER `user_status`,
+ADD COLUMN `need_upriver_api` tinyint(3) NOT NULL DEFAULT 1 COMMENT '是否需要从接口调用上行1:不需要;2:需要' AFTER `user_status`;
+
+DROP TABLE IF EXISTS `yx_user_upriver`;
+CREATE TABLE `yx_user_upriver` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `task_no` char(23) NOT NULL DEFAULT '' COMMENT '任务编号',
+  `message_info` varchar(255) NOT NULL DEFAULT '' COMMENT '上行回复信息',
+  `mobile` char(11) NOT NULL DEFAULT '' COMMENT '手机号',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `uid_task`(`uid`,`task_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT= "用户短信上行";

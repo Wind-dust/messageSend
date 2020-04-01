@@ -18,4 +18,5 @@ return [
     'provinces'     => app\common\action\admin\Provinces::class,
     'upload'        => app\common\action\admin\Upload::class,
     'message'       => app\common\action\admin\Message::class,
+    'channel'       => app\common\action\admin\Channel::class,
 ];

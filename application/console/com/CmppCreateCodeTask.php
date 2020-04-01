@@ -619,8 +619,9 @@ class CmppCreateCodeTask extends Pzlife
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',15741);
         // echo time() -1576290017;die;
         while (true) {
+            die;
             $real_length = 1;
-            // $send        = $this->redis->lpop('index:meassage:marketing:sendtask');
+            $send        = $this->redis->lpop('index:meassage:marketing:sendtask');
             // $send = 15751;
 
             $sendTask = $this->getSendTask($send);
@@ -2901,52 +2902,47 @@ Db::rollback();
     public function getUpRiver()
     {
         $redis = Phpredis::getConn();
-        for ($i = 1; $i < 100; $i++) {
-            $redisMessageUpRiver = 'index:message:code:upriver:' . $i;
-            $redis->rpush($redisMessageUpRiver, json_encode([
-                'mobile' => 15201926171,
-                'message_info' => 'QX',
-            ]));
-            $channel              = $this->getChannelinfo($i);
-
-            if (empty($channel)) {
-                $i = 0;
-            }
-            while (true) {
-                $messageupriver = $redis->lpop($redisMessageUpRiver);
-                if (empty($messageupriver)) {
-                    break;
-                }
-                $encodemessageupriver = json_decode($messageupriver, true);
-                $sql = '';
-                $sql = "SELECT `uid` FROM ";
-                if ($channel['business_id'] == 5) { //营销
-                    $sql .= " yx_user_send_task_log ";
-                } elseif ($channel['business_id'] == 6) { // 行业
-                    $sql .= " yx_user_send_code_task_log ";
-                } elseif ($channel['business_id'] == 9) { //游戏
-                    $sql .= " yx_user_send_game_task ";
-                } elseif ($channel['business_id'] == 7) { //高投诉网贷
-                    $sql .= " yx_user_send_task_log ";
-                } elseif ($channel['business_id'] == 8) { //彩信
-                    $sql .= " yx_user_multimedia_message_log ";
-                }
-                $sql .= " WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "' AND `channel_id` = " . $i . " LIMIT 1 ";
-                $message = Db::query($sql);
-                if (!empty($message)) {
-                    print_r($message);
-                    die;
-                }
-            }
-        }
-
+        $redis->rpush('index:message:code:upriver:22', json_encode([
+            'mobile' => 15201926171,
+            'message_info' => 'QX',
+        ]));
         while (true) {
-            $upriver = $redis->lpop($redisMessageUpRiver);
-            if (empty($upriver)) {
-                continue;
+            $channels = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `delete_time` = 0 ");
+            foreach ($channels as $key => $value) {
+                $redisMessageUpRiver = 'index:message:code:upriver:' . $value['id'];
+                while (true) {
+                    $messageupriver = $redis->lpop($redisMessageUpRiver);
+                    if (empty($messageupriver)) {
+                        break;
+                    }
+                    $encodemessageupriver = json_decode($messageupriver, true);
+                    $sql = '';
+                    $sql = "SELECT `uid`,`id`,`task_no` FROM ";
+                    if ($value['business_id'] == 5) { //营销
+                        $sql .= " yx_user_send_task_log ";
+                    } elseif ($value['business_id'] == 6) { // 行业
+                        $sql .= " yx_user_send_code_task_log ";
+                    } elseif ($value['business_id'] == 9) { //游戏
+                        $sql .= " yx_user_send_game_task ";
+                    } elseif ($value['business_id'] == 7) { //高投诉网贷
+                        $sql .= " yx_user_send_task_log ";
+                    } elseif ($value['business_id'] == 8) { //彩信
+                        $sql .= " yx_user_multimedia_message_log ";
+                    }
+                    $sql .= " WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "' AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ";
+                    $message = Db::query($sql);
+                    if (!empty($message)) {
+                        //上行入库
+                        Db::table('yx_user_upriver')->insert(['mobile' => $encodemessageupriver['mobile'], 'uid' => $message[0]['uid'], 'task_no' => $message[0]['task_no'], 'message_info' => $encodemessageupriver['message_info'], 'create_time' => time()]);
+                        //上行写入用户调用位置
+                        $user = Db::query("SELECT `need_upriver_api` FROM `yx_users` WHERE `id` = " . $message[0]['uid']);
+                        if ($user && $user[0]['need_upriver_api'] == 2) {
+                            $redis->rpush("index:message:upriver:" . $message[0]['uid'], json_encode(['mobile' => $encodemessageupriver['mobile'], 'message_info' => $encodemessageupriver['message_info'], 'get_time' => date('Y-m-d H:i:s', time())]));
+                        }
+                    }
+                }
             }
-            $upriver_data = json_decode($upriver, true);
-            $mobile = $upriver_data['mobile'];
+            sleep(300);
         }
     }
 
@@ -3227,14 +3223,22 @@ Db::rollback();
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
-        /* $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
-            'task_no' => 'mul20020515503481449866',
-            'uid' => '1',
-            'mobile' => '18616279075',
+        $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
+            'task_no' => 'mul20040110342053330898',
+            'uid' => '91',
+            'mobile' => '15021417314',
             'status_message' => 'DELIVRD',
             'send_status' => 3,
-            'send_time' => '1580889993',
-        ))); */
+            'send_time' => '1585710348',
+        )));
+        $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
+            'task_no' => 'mul20040110490391162370',
+            'uid' => '91',
+            'mobile' => '13681834423',
+            'status_message' => 'DELIVRD',
+            'send_status' => 3,
+            'send_time' => '1585709212',
+        )));
         while (true) {
             $sendlog = $redis->lpop('index:meassage:multimediamessage:deliver:' . $channel_id);
             if (empty($sendlog)) {

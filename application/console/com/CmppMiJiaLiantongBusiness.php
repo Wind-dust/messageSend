@@ -49,15 +49,15 @@ class CmppMiJiaYiDongBusiness extends Pzlife
         // $redisMessageCodeDeliver    = 'index:meassage:code:deliver:' . $content; //行业通知MsgId
         $redisMessageCodeDeliver = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
         $redisMessageUnKownDeliver = 'index:meassage:code:unknow:deliver:' . $content; //行业通知MsgId
-
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        $redisMessageUpRiver       = 'index:message:code:upriver:' . $content; //上行队列
+        /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'uid'         => '1',
             'content'     => '【钰蜥科技】您本次登录的验证码为026835,回复QX可取消本次登陆',
             'develop_code' => '323',
             'Submit_time' => date('mdHis', time()),
-        ]));
+        ])); */
 
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/20.log";
@@ -379,6 +379,7 @@ class CmppMiJiaYiDongBusiness extends Pzlife
                                                 'mobile' => trim($body['Src_terminal_Id']),
                                                 'message_info' => trim($body['Msg_Content']),
                                             ];
+                                            $redis->rpush($redisMessageUpRiver, json_encode($up_message));
                                         } elseif ($Registered_Delivery == 1) { //回执报告
 
                                             $stalen = $body['Msg_Length'] - 20 - 8 - 21 - 4;

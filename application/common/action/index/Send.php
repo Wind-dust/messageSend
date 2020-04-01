@@ -417,7 +417,10 @@ return $result;
         //     return ['code' => '3006'];
         // }
         if (!empty($signature_id)) {
+            // $user['id'] = 91;
             $signature =  DbSendMessage::getUserSignature(['uid' => $user['id'], 'signature_id' => $signature_id], '*', true);
+            // echo Db::getLastSQL();
+            // die;
             if (empty($signature)) {
                 return ['code' => '3008'];
             }
