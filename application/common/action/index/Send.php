@@ -321,7 +321,7 @@ return $result;
         }
 
         if (!empty($signature)) {
-            $signature =  DbSendMessage::getUserSignature(['uid' => $user['uid'], 'signature_id' => $signature_id], '*', true);
+            $signature =  DbSendMessage::getUserSignature(['uid' => $user['id'], 'signature_id' => $signature_id], '*', true);
             if (empty($signature)) {
                 return ['code' => '3008'];
             }
