@@ -10,6 +10,7 @@ use app\common\model\StatisticsYear;
 use app\common\model\StatisticsMonth;
 use app\common\model\StatisticsDay;
 use app\common\model\LogTrading;
+use app\common\model\UserUpriver;
 use think\Db;
 
 class DbUser
@@ -255,5 +256,15 @@ class DbUser
     public function countLogTrading($where)
     {
         return LogTrading::where($where)->count();
+    }
+
+    public function getUserUpriver($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = UserUpriver::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function countUserUpriver($where){
+        return UserUpriver::where($where)->count();
     }
 }

@@ -1626,4 +1626,26 @@ return $result;
         }
         return ['code' => '200', 'data' => $result];
     }
+
+    public function upGoing($appid, $appkey){
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $result = [];
+        $this->redis = Phpredis::getConn();
+        $i = 0;
+        while ($i < 100) {
+            $userstat = $this->redis->lpop('index:message:upriver:' . $user['id']);
+            $userstat = json_decode($userstat, true);
+            if (empty($userstat)) {
+                break;
+            }
+            $result[] = $userstat;
+        }
+        return ['code' => '200', 'upGoing' =>$result];
+    }
 }

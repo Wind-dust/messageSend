@@ -921,6 +921,8 @@ class User extends MyController
      * @apiParam (入参) {String} con_id
      * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
      * @apiParam (入参) {String} status 状态:1,提交申请;2,审核通过3,审核不通过;
+     * @apiParam (入参) {String} page 
+     * @apiParam (入参) {String} pageNum 
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
      * @apiSampleRequest /index/user/getUserMultimediaTemplate
      * @return array
@@ -938,6 +940,31 @@ class User extends MyController
         intval($pageNum);
         intval($status);
         $result = $this->app->user->getUserMultimediaTemplate($ConId, $page, $pageNum, $status);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 获取用户上行
+     * @apiDescription   getUserUpriver
+     * @apiGroup         index_user
+     * @apiName          getUserUpriver
+     * @apiParam (入参) {String} con_id
+     * @apiParam (入参) {String} page 
+     * @apiParam (入参) {String} pageNum 
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /index/user/getUserUpriver
+     * @return array
+     * @author rzc
+     */
+    public function getUserUpriver(){
+        $ConId = trim($this->request->post('con_id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        $result = $this->app->user->getUserUpriver($ConId, $page, $pageNum);
         return $result;
     }
 }

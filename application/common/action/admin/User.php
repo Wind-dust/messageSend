@@ -42,7 +42,7 @@ class User extends CommonIndex {
         return ['code' => '200', 'totle' => $totle, 'result' => $result];
     }
 
-    public function seetingUser($uid, $user_status, $reservation_service, $free_trial) {
+    public function seetingUser($uid, $user_status, $reservation_service, $free_trial,$need_receipt_api = 0, $need_upriver_api = 0) {
         $data = [];
         if ($user_status) {
             $data['user_status'] = $user_status;
@@ -50,8 +50,14 @@ class User extends CommonIndex {
         if ($reservation_service) {
             $data['reservation_service'] = $reservation_service;
         }
-        if ($reservation_service) {
+        if ($free_trial) {
             $data['free_trial'] = $free_trial;
+        }
+        if ($need_receipt_api) {
+            $data['need_receipt_api'] = $need_receipt_api;
+        }
+        if ($need_upriver_api) {
+            $data['need_upriver_api'] = $need_upriver_api;
         }
         
         Db::startTrans();
