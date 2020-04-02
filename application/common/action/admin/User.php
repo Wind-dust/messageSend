@@ -6,13 +6,15 @@ use app\facade\DbAdministrator;
 use app\facade\DbUser;
 use think\Db;
 
-class User extends CommonIndex {
+class User extends CommonIndex
+{
     /**
      * 会员列表
      * @return array
      * @author rzc
      */
-    public function getUsers($page, $pagenum, $mobile = '') {
+    public function getUsers($page, $pagenum, $mobile = '')
+    {
         $page    = $page ? $page : 1;
         $pagenum = $pagenum ? $pagenum : 10;
 
@@ -42,7 +44,8 @@ class User extends CommonIndex {
         return ['code' => '200', 'totle' => $totle, 'result' => $result];
     }
 
-    public function seetingUser($uid, $user_status, $reservation_service, $free_trial,$need_receipt_api = 0, $need_upriver_api = 0) {
+    public function seetingUser($uid, $user_status, $reservation_service, $free_trial, $need_receipt_api = 0, $need_upriver_api = 0, $need_receipt_info = 0)
+    {
         $data = [];
         if ($user_status) {
             $data['user_status'] = $user_status;
@@ -59,7 +62,10 @@ class User extends CommonIndex {
         if ($need_upriver_api) {
             $data['need_upriver_api'] = $need_upriver_api;
         }
-        
+        if ($need_receipt_info) {
+            $data['need_receipt_info'] = $need_receipt_info;
+        }
+
         Db::startTrans();
         try {
             if (!empty($data)) {
@@ -74,8 +80,9 @@ class User extends CommonIndex {
         }
     }
 
-    public function seetingUserEquities($uid, $business_id, $agency_price = 0){
-        $business = DbAdministrator::getBusiness(['id' => $business_id],'*',true);
+    public function seetingUserEquities($uid, $business_id, $agency_price = 0)
+    {
+        $business = DbAdministrator::getBusiness(['id' => $business_id], '*', true);
         if (empty($business)) {
             return ['code' => '3001'];
         }
@@ -83,7 +90,7 @@ class User extends CommonIndex {
         if ($user['pid'] > 0) {
             return ['code' => '3006'];
         }
-        if (DbAdministrator::getUserEquities(['uid' => $uid, 'business_id' => $business_id],'id',true)) {
+        if (DbAdministrator::getUserEquities(['uid' => $uid, 'business_id' => $business_id], 'id', true)) {
             return ['code' => '3005'];
         }
         $data = [];
@@ -92,12 +99,12 @@ class User extends CommonIndex {
             'num_balance' => $business['donate_num'],
             'uid'         => $uid,
         ];
-        if ($agency_price){
-            if ($agency_price < $business['price']){
+        if ($agency_price) {
+            if ($agency_price < $business['price']) {
                 return ['code' => '3004'];
             }
             $data['agency_price'] = $agency_price;
-        }else {
+        } else {
             $data['agency_price'] = $business['price'];
         }
         Db::startTrans();
@@ -112,20 +119,21 @@ class User extends CommonIndex {
         }
     }
 
-    public function getUserInfo($uid){
+    public function getUserInfo($uid)
+    {
         $result = DbUser::getUserInfo(['id' => $uid], '*', true);
         if (empty($result)) {
             return ['code' => '3001'];
         }
-        $user_equies = DbAdministrator::getUserEquities(['uid' => $uid],'id,business_id,num_balance,agency_price',false);
+        $user_equies = DbAdministrator::getUserEquities(['uid' => $uid], 'id,business_id,num_balance,agency_price', false);
         if (!empty($user_equies)) {
             foreach ($user_equies as $key => $value) {
-                $user_equies[$key]['business_name'] = DbAdministrator::getBusiness(['id' => $value['business_id'],'title',true])['title'];
+                $user_equies[$key]['business_name'] = DbAdministrator::getBusiness(['id' => $value['business_id'], 'title', true])['title'];
             }
-        }else{
+        } else {
             $user_equies = [];
         }
 
-        return ['code' => '200', 'user_info' => $result,'user_equies' => $user_equies];
+        return ['code' => '200', 'user_info' => $result, 'user_equies' => $user_equies];
     }
 }

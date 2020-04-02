@@ -5,7 +5,8 @@ namespace app\admin\controller;
 use app\admin\AdminController;
 use think\Controller;
 
-class User extends AdminController {
+class User extends AdminController
+{
     protected $beforeActionList = [
         'isLogin', //所有方法的前置操作
         //        'isLogin' => ['except' => 'login'],//除去login其他方法都进行isLogin前置操作
@@ -48,7 +49,8 @@ class User extends AdminController {
      * ]
      * @author rzc
      */
-    public function getUsers() {
+    public function getUsers()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         $page     = trim($this->request->post('page'));
@@ -76,11 +78,13 @@ class User extends AdminController {
      * @apiParam (入参) {Int} [free_trial] 短信发送审核 1:需要审核;2:无需审核
      * @apiParam (入参) {Int} [need_upriver_api] 是否需要从接口调用上行1:不需要;2:需要
      * @apiParam (入参) {Int} [need_receipt_api] 是否需要从接口调用回执1:不需要;2:需要
+     * @apiParam (入参) {Int} [need_receipt_info] 是否开放回执状态信息1:不需要;2:需要
      * @apiSuccess (返回) {String} code 200:成功 / 3000:用户列表空 / 3001:user_status格式错误 / 3002:reservation_service格式错误 / 3003:uid格式错误 / 3004:free_trial格式错误
      * @apiSampleRequest /admin/user/seetingUser
      * @author rzc
      */
-    public function seetingUser() {
+    public function seetingUser()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -92,6 +96,7 @@ class User extends AdminController {
         $free_trial = trim($this->request->post('free_trial'));
         $need_upriver_api = trim($this->request->post('need_upriver_api'));
         $need_receipt_api = trim($this->request->post('need_receipt_api'));
+        $need_receipt_info = trim($this->request->post('need_receipt_info'));
         if (!in_array($user_status, [1, 2]) && !empty($user_status)) {
             return ['code' => '3001'];
         }
@@ -110,7 +115,10 @@ class User extends AdminController {
         if (!in_array($need_receipt_api, [1, 2]) && !empty($need_receipt_api)) {
             return ['code' => '3004'];
         }
-        $result = $this->app->user->seetingUser($uid, $user_status, $reservation_service, $free_trial, $need_receipt_api, $need_upriver_api);
+        if (!in_array($need_receipt_info, [1, 2]) && !empty($need_receipt_info)) {
+            return ['code' => '3004'];
+        }
+        $result = $this->app->user->seetingUser($uid, $user_status, $reservation_service, $free_trial, $need_receipt_api, $need_upriver_api, $need_receipt_info);
         $this->apiLog($apiName, [$cmsConId, $uid, $user_status, $reservation_service], $result['code'], $cmsConId);
         return $result;
     }
@@ -128,7 +136,8 @@ class User extends AdminController {
      * @apiSampleRequest /admin/user/seetingUserEquities
      * @author rzc
      */
-    public function seetingUserEquities() {
+    public function seetingUserEquities()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -163,7 +172,8 @@ class User extends AdminController {
      * @apiSampleRequest /admin/user/getUserInfo
      * @author rzc
      */
-    public function getUserInfo(){
+    public function getUserInfo()
+    {
         $cmsConId = trim($this->request->post('cms_con_id'));
         $uid          = trim($this->request->post('uid'));
         if (empty($uid) || intval($uid) < 1 || !is_numeric($uid)) {

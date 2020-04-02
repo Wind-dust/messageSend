@@ -986,6 +986,7 @@ CREATE TABLE `yx_user_channel_group_son` (
 ALTER TABLE `messagesend`.`yx_users` 
 ADD COLUMN `need_receipt_api` tinyint(3) NOT NULL DEFAULT 1 COMMENT '是否需要从接口调用回执1:不需要;2:需要' AFTER `user_status`,
 ADD COLUMN `need_upriver_api` tinyint(3) NOT NULL DEFAULT 1 COMMENT '是否需要从接口调用上行1:不需要;2:需要' AFTER `user_status`;
+ADD COLUMN `need_receipt_info` tinyint(3) NOT NULL DEFAULT 1 COMMENT '是否需要开发回执信息1:不需要;2:需要' AFTER `user_status`;
 
 DROP TABLE IF EXISTS `yx_user_upriver`;
 CREATE TABLE `yx_user_upriver` (
