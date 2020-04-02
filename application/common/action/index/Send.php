@@ -675,7 +675,7 @@ return $result;
         $real_mobile = array_unique(array_filter($real_mobile));
         $phone    = join(',', $real_mobile);
         $real_num = count($real_mobile);
-        return ['code' => '200', 'submit_num' => $submit_num, 'real_num' => $real_num, 'default_nu' => bcsub($submit_num, $real_num), 'mobile_num' => $mobile_num, 'unicom_num' => $unicom_num, 'telecom_num' => $telecom_num, 'virtual_num' => $virtual_num, 'unknown_num' => $unknown_num, 'mobile_phone' => $mobile_phone, 'unicom_phone' => $unicom_phone, 'telecom_phone' => $telecom_phone, 'virtual_phone' => $virtual_phone, 'phone' => $phone, 'error_phone' => $error_phone];
+        return ['code' => '200', 'submit_num' => $submit_num, 'real_num' => $real_num, 'default_num' => bcsub($submit_num, $real_num), 'mobile_num' => $mobile_num, 'unicom_num' => $unicom_num, 'telecom_num' => $telecom_num, 'virtual_num' => $virtual_num, 'unknown_num' => $unknown_num, 'mobile_phone' => $mobile_phone, 'unicom_phone' => $unicom_phone, 'telecom_phone' => $telecom_phone, 'virtual_phone' => $virtual_phone, 'phone' => $phone, 'error_phone' => $error_phone];
     }
 
     /**
