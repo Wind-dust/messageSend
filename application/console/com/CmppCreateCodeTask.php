@@ -4243,4 +4243,53 @@ Db::rollback();
             sleep(72000);
         }
     }
+
+    public function mulTaksLogUpdate()
+    {
+        $task = Db::query("SELECT * FROM yx_user_multimedia_message WHERE free_trial = 2 ");
+        foreach ($task as $key => $value) {
+            $mobile = explode(',', $value['mobile_content']);
+            $mobile = array_filter($mobile);
+            if ($mobile) {
+                foreach ($mobile as $mkey => $ml) {
+                    if (!Db::query("SELECT `id` FROM yx_user_multimedia_message_log WHERE `task_no` = '" . $value['task_no'] . "' AND `mobile` = '" . $ml . "' ")) {
+                        /* print_r("SELECT `id` FROM yx_user_multimedia_message_log WHERE `task_no` = '" . $value['task_no'] . "' AND `mobile` = '" . $ml . "' ");
+                        die; */
+                        Db::table('yx_user_multimedia_message_log')->insert([
+                            'task_no' => $value['task_no'],
+                            'task_id' => $value['id'],
+                            'uid' => $value['uid'],
+                            'mobile' => $ml,
+                            'channel_id' => $value['channel_id'],
+                            'source' => $value['source'],
+                            'send_status' => 3,
+                            'source_status' => 3,
+                            'status_message' => 'DELIVRD',
+                            'create_time' => $value['update_time']
+                        ]);
+                    }
+                }
+            }
+        }
+    }
+
+    public function BufaCodetaskLog()
+    {
+        $redis = Phpredis::getConn();
+        $task_log = Db::query("SELECT * FROM `yx_user_send_code_task` WHERE `id` >= '338053 ' AND `id` <=  '338371' AND `real_num` > '1' AND `task_content` NOT LIKE '%4日9时%' AND `task_content` NOT LIKE '%4日10时%' AND `task_content` NOT LIKE '%4日11时%' AND `task_content` NOT LIKE '%4日12时%' ");
+        foreach ($task_log as $key => $value) {
+            // # code...
+            $sendmessage = [];
+            $sendmessage = [
+                'mobile'      => $value['mobile_content'],
+                'title'       => $value['task_name'],
+                'mar_task_id' => $value['id'],
+                'content'     => $value['task_content'],
+            ];
+            if (!empty($value['develop_no'])) {
+                $sendmessage['develop_code'] = $value['develop_no'];
+            }
+            $redis->rpush('index:meassage:code:send:22', json_encode($sendmessage));
+        }
+    }
 }
