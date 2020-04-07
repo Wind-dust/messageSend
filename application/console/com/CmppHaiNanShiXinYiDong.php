@@ -68,11 +68,11 @@ class CmppHaiNanShiXinYiDong extends Pzlife
         $redisMessageCodeDeliver = 'index:meassage:game:new:deliver:' . $content; //行业通知MsgId
         $redisMessageUnKownDeliver = 'index:meassage:game:unknow:deliver:' . $content; //行业通知MsgId
         $redisMessageUpRiver       = 'index:message:code:upriver:' . $content; //上行队列
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'content'     => '【至尊之刃】我是给您致电过的游戏推荐师，已经成功为您开通v20+海量元宝，今日点：url.cn/5fRs4P3 下载，退订回T',
-        ]));
+        ])); */
 /* 
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15172413692',
