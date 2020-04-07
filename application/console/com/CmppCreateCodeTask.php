@@ -4416,7 +4416,7 @@ Db::rollback();
                 }
                 $redis->set('index:calculate:StartTime', time());
             }
-            sleep(30);
+            sleep(60);
         }
     }
 }
