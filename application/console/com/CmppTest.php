@@ -258,7 +258,7 @@ class CmppTest extends Pzlife
         // $code = mb_convert_encoding($code1, 'UTF-8');
         // print_r($code);die;
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $content = 1;
+        // $content = 1;
         $contdata = $this->content($content);
 
         print_r($contdata);die;
