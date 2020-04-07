@@ -1650,4 +1650,73 @@ return $result;
         }
         return ['code' => '200', 'upGoing' => $result];
     }
+
+    public function submitTemplateMultimediaMessage($appid, $appkey, $template_id, $mobile_content, $ip)
+    {
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $template =  DbSendMessage::getUserMultimediaTemplate(['template_id' => $template_id], '*', true);
+        if ($template['status'] != 2 || empty($template)) {
+            return ['code' => '3003'];
+        }
+        $multimedia_message_frame = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $template['id']], 'num,name,content,image_path,image_type,variable_len', false, ['num' => 'asc']);
+        foreach ($multimedia_message_frame as $key => $value) {
+            if ($value['variable_len'] > 0) {
+                return ['code' => '3006'];
+            }
+            unset($multimedia_message_frame[$key]['variable_len']);
+        }
+        $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 8], 'id,num_balance', true); //彩信
+        if (empty($user_equities)) {
+            return ['code' => '3004'];
+        }
+        $mobile_content = array_filter($mobile_content);
+        $real_mobile    = [];
+        foreach ($mobile_content as $key => $value) {
+            if (checkMobile($value)) {
+                $real_mobile[] = $value;
+            }
+        }
+
+        $send_num = count($mobile_content);
+        $real_num = count($real_mobile); //真实发送数量
+        if ($send_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
+            return ['code' => '3005'];
+        }
+        $SmsMultimediaMessageTask = [];
+        $SmsMultimediaMessageTask = [
+            'task_no'        => 'mul' . date('ymdHis') . substr(uniqid('', true), 15, 8),
+            'uid'            => $user['id'],
+            'title'          => $template['title'],
+            'mobile_content' => join(',', $mobile_content),
+            'source'         => $ip,
+            'send_num'       => $send_num,
+            'real_num'       => $real_num,
+            'free_trial'     => 1,
+        ];
+
+        Db::startTrans();
+        try {
+            DbAdministrator::modifyBalance($user_equities['id'], $send_num, 'dec');
+            $bId = DbSendMessage::addUserMultimediaMessage($SmsMultimediaMessageTask);
+            if ($bId) {
+                foreach ($multimedia_message_frame as $key => $frame) {
+                    $frame['multimedia_message_id'] = $bId;
+                    $frame['image_path'] = filtraImage(Config::get('qiniu.domain'), $frame['image_path']);
+                    DbSendMessage::addUserMultimediaMessageFrame($frame); //添加后的商品id
+                }
+            }
+            Db::commit();
+            return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no']];
+        } catch (\Exception $e) {
+            Db::rollback();
+            exception($e);
+            return ['code' => '3011'];
+        }
+    }
 }
