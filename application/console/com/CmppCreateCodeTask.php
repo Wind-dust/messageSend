@@ -2819,6 +2819,7 @@ Db::rollback();
             while (true) {
                 $sendlog = $redis->lpop('index:meassage:code:cms:deliver:' . $channel_id);
                 if (empty($sendlog)) {
+                    sleep(60);
                     continue;
                 }
                 $send_log = json_decode($sendlog, true);
