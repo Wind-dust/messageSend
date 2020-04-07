@@ -150,6 +150,19 @@ class CmppTest extends Pzlife
                 'SP_ID'         => "",
                 'master_num'    => 300,
             ];
+        }elseif ($content == 9) {
+            return [
+                'host'          => "47.101.75.174", //服务商ip
+                'port'          => "7890", //短连接端口号   17890长连接端口号
+                'Source_Addr'   => "101161", //企业id  企业代码
+                'Shared_secret' => '5hsey6u9', //网关登录密码
+                'Service_Id'    => "101101", //业务代码
+                'template_id'   => "", //模板id
+                'Dest_Id'       => "106929879601", //短信接入码 短信端口号 服务代码
+                'Sequence_Id'   => 1,
+                'SP_ID'         => "",
+                'master_num'    => 300,
+            ];
         }
     }
 
@@ -479,7 +492,7 @@ class CmppTest extends Pzlife
                                             $sequence['Msg_Id'] = $msgid;
                                             $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                             $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
-                                            $redis->expire($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], 259200); //设置有效时间
+                                            // $redis->expire($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], 259200); //设置有效时间
                                         }
 
                                         switch ($body['Result']) {
@@ -726,18 +739,51 @@ class CmppTest extends Pzlife
                             fwrite($myfile, $e . "\n");
                             fclose($myfile);
                             // exception($e);
+                            sleep(5);
+                            //重新创建连接
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-                            socket_connect($socket, $host, $port);
-                            $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
-                            $Timestamp           = date('mdHis');
-                            $AuthenticatorSource = md5($Source_Addr . pack("a9", "") . $Shared_secret . $Timestamp, true);
-                            $bodyData   = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
-                            $Command_Id = 0x00000001;
-                            $Total_Length = strlen($bodyData) + 12;
-                            $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                            socket_write($socket, $headData . $bodyData, $Total_Length);
-                            ++$i;
-                            ++$Sequence_Id;
+                            if (socket_connect($socket, $host, $port) == false) {
+                                $myfile = fopen($log_path, 'a+');
+                                fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
+                                fwrite($myfile,  "通道延迟5秒后再次连接失败，请联系通道方检查原因\n");
+                                fclose($myfile);
+                                $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
+                                    'mobile'      => 15201926171,
+                                    'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
+                                ])); //三体营销通道
+                                $redis->rpush('index:meassage:code:send' . ":" . 24, json_encode([
+                                    'mobile'      => 15201926171,
+                                    'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
+                                ])); //易信行业通道
+                                exit();
+                            }else{
+                                $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
+                                $Timestamp           = date('mdHis');
+                                $AuthenticatorSource = md5($Source_Addr . pack("a9", "") . $Shared_secret . $Timestamp, true);
+                                $bodyData   = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
+                                $Command_Id = 0x00000001;
+                                $Total_Length = strlen($bodyData) + 12;
+                                $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                // socket_write($socket, $headData . $bodyData, $Total_Length);
+                                if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
+                                    // echo 'write_verify fail massege:' . socket_strerror(socket_last_error());
+                                    $myfile = fopen($log_path, 'a+');
+                                    fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
+                                    fwrite($myfile,  "通道延迟5秒后写入socket失败，请联系通道方检查原因\n");
+                                    fclose($myfile);
+                                    $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
+                                        'mobile'      => 15201926171,
+                                        'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
+                                    ])); //三体营销通道
+                                    $redis->rpush('index:meassage:code:send' . ":" . 24, json_encode([
+                                        'mobile'      => 15201926171,
+                                        'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
+                                    ])); //易信行业通道
+                                    exit();
+                                }
+                                ++$i;
+                                ++$Sequence_Id;
+                            }   
                         }
                     }
                 }
