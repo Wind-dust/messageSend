@@ -43,9 +43,9 @@ class CmppHaiNanShiXinYiDong extends Pzlife
         return [
             'host'          => "123.56.225.148", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "001938", //企业id  企业代码
-            'Shared_secret' => '509464', //网关登录密码
-            'Service_Id'    => "001938", //业务代码
+            'Source_Addr'   => "004986", //企业id  企业代码
+            'Shared_secret' => '657994', //网关登录密码
+            'Service_Id'    => "004986", //业务代码
             'template_id'   => "", //模板id
             'Dest_Id'       => "", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
@@ -68,12 +68,12 @@ class CmppHaiNanShiXinYiDong extends Pzlife
         $redisMessageCodeDeliver = 'index:meassage:game:new:deliver:' . $content; //行业通知MsgId
         $redisMessageUnKownDeliver = 'index:meassage:game:unknow:deliver:' . $content; //行业通知MsgId
         $redisMessageUpRiver       = 'index:message:code:upriver:' . $content; //上行队列
-        /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '13651913994',
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15201926171',
             'mar_task_id' => '',
-            'content'     => '【冰雪传奇】我是给您致电的推荐师萌萌，您[m4]账户已激活V15，礼包码：cxk8888，领：https://68p6.cn/0G。退订回T',
+            'content'     => '【至尊之刃】我是给您致电过的游戏推荐师，已经成功为您开通v20+海量元宝，今日点：url.cn/5fRs4P3 下载，退订回T',
         ]));
-
+/* 
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15172413692',
             'mar_task_id' => '',
