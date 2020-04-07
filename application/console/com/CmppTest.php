@@ -207,56 +207,15 @@ class CmppTest extends Pzlife
         // $redisMessageCodeMsgId      = 'index:meassage:marketing:msg:id:' . $content; //营销行业通知SequenceId
         // $redisMessageCodeDeliver    = 'index:meassage:marketing:deliver:' . $content; //营销行业通知MsgId
         // echo $redisMessageCodeSend;die;
-        // do {
-        //     $send = $redis ->lPop($redisMessageCodeSend);
-        //     print_r($send);
-        // } while ($send);
-        // $send = $redis ->lPop($redisMessageCodeSend);
-
-        // print_r($send);die;
-        // $code   = '短信发送测试';
-        // print_r($redisMessageCodeSend);die;
-        // echo $redisMessageCodeSend;die;
-        // $send = $redis->lPop("index:meassage:code:send:1");
-        // $send = $redis->rPush($redisMessageCodeSend,"15555555555:12:【品质生活】祝您生活愉快");
-
-        // echo $code;
-        // die;
-        //  echo 0x80000008;
-        //  die;
-        // print_r('3049152064' & 0x0fffffff );die;
-        // $v = base_convert(time(), 10, 16)."\n";
-        // $a = pack("a8",$v);
-        // echo $v."\n";
-        // echo $a."\n";
-        // print_r( unpack("a8",$a));
-        // echo $v;
-        // $str = "´&´'pӄELIVRD1911080943191108094315201926171Ȕ26";
-        // $new = substr($str,0,8);
-        // $new = base_convert($new, 16, 2);
-        // echo $new;die;
-
-        // // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´&´'pӄELIVRD1911080943191108094315201926171Ȕ26");
-        // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´6h󿾧>gDELIVRD1911081338191108134415201926171&b");
-        // $arr = unpack("I2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","µ»'sDELIVRD1911111456191111150615201926171e韚");
-        // print_r($arr['Msg_Id1'] & 0x0fffffff);die;
-        // // echo 0x00000010;
-        // die;
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+    
+     /*    $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'uid'         => '',
             'content'     => '【宝洁中国】风倍清去味除菌喷雾~懒人清洁神器，一喷清新！付几套送几套，限量送加湿器 http://weu.me/_4BbkA 回QX退订',
             'Submit_time' => date('mdHis', time()),
-        ]));
-        // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
-        // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
-        // $send = $redis->lpop($redisMessageCodeSend);
-        // $send = json_decode($send,true);
-        // $code1 = mb_convert_encoding($send['content'], 'ASCII');
-        // echo $this->decode($code1);die;
-        // $code = mb_convert_encoding($code1, 'UTF-8');
-        // print_r($code);die;
+        ])); */
+
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         // $content = 1;
         $contdata = $this->content($content);
@@ -274,14 +233,6 @@ class CmppTest extends Pzlife
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
 
-        // $host                 = '47.103.200.251'; //服务商ip
-        // $port                 = '7890'; //短连接端口号   17890长连接端口号
-
-        // echo $security_master;die;
-        // die;
-        // $send = $this->redis->lPop($redisMessageCodeSend);
-        // print_r($send);
-        // die;
         if (socket_connect($socket, $host, $port) == false) {
             echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
