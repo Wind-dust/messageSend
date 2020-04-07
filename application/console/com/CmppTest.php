@@ -261,6 +261,7 @@ class CmppTest extends Pzlife
         $content = 1;
         $contdata = $this->content($content);
 
+        print_r($contdata);die;
         $host                 = $contdata['host']; //服务商ip
         $port                 = $contdata['port']; //短连接端口号   17890长连接端口号
         $Source_Addr          = $contdata['Source_Addr']; //企业id  企业代码
