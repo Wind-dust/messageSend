@@ -1103,7 +1103,7 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:game:sendtask';
-        // for ($i=6; $i < 49; $i++) { 
+        // for ($i = 6; $i < 6028; $i++) {
         //     $send                      = $this->redis->rPush('index:meassage:game:sendtask', $i);
         // }
         // echo time() -1574906657;die;
@@ -1145,12 +1145,14 @@ class CmppCreateCodeTask extends Pzlife
 
             for ($i = 0; $i < count($mobilesend); $i++) {
                 $send_log = [];
+                $channel_id    = 0;
+                $channel_id = 14;
                 if (checkMobile(trim($mobilesend[$i])) == true) {
                     $prefix = substr(trim($mobilesend[$i]), 0, 7);
                     $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                     $newres = array_shift($res);
                     //游戏通道分流
-                    if ($newres) {
+                    /*   if ($newres) {
                         if ($newres['source'] == 2) { //米加联通营销
                             $channel_id = 28;
                         } else if ($newres['source'] == 1) { //蓝鲸
@@ -1158,8 +1160,9 @@ class CmppCreateCodeTask extends Pzlife
                         } else if ($newres['source'] == 3) { //米加电信营销
                             $channel_id = 29;
                         }
-                    }
-                    print_r($newres);
+                    } */
+
+                    // print_r($newres);
                     if (strpos($mobilesend[$i], '00000') || strpos($mobilesend[$i], '111111') || strpos($mobilesend[$i], '222222') || strpos($mobilesend[$i], '333333') || strpos($mobilesend[$i], '444444') || strpos($mobilesend[$i], '555555') || strpos($mobilesend[$i], '666666') || strpos($mobilesend[$i], '777777') || strpos($mobilesend[$i], '888888') || strpos($mobilesend[$i], '999999')) {
                         $send_log = [
                             'task_no'        => $sendTask['task_no'],
@@ -1201,14 +1204,14 @@ class CmppCreateCodeTask extends Pzlife
                             'content'     => $sendTask['task_content'],
                             'channel_id'  => $channel_id,
                         ];
-                        $min = 100 - ceil(4.6 / 5.2 * 100);
+                        $min = 100 - floor(4.6 / 5.2 * 100);
                         $max = mt_rand($min - 1, $min + 1);
                         $num     = mt_rand(0, 100);
                         if ($num <= $max) { //扣量
-
                             if (in_array($mobilesend[$i], [18339998120, 13812895012])) {
                                 $push_messages[] = $sendmessage; //实际发送队列
                             } else {
+                                $push_messages[] = $sendmessage; //实际发送队列
                                 $channel_calculate =  $this->redis->get('index:meassage:calculate:' . $channel_id);
                                 $channel_calculate = json_decode($channel_calculate, true);
 
@@ -1221,22 +1224,18 @@ class CmppCreateCodeTask extends Pzlife
                                             break;
                                         }
                                     }
-                                    // $this->redis->rPush('index:meassage:game:waitcmppdeliver', json_encode([
-                                    //     'Stat'        => $send_log['status_message'],
-                                    //     'send_msgid'  => [$sendTask['send_msg_id']],
-                                    //     'Done_time'   => date('ymdHis', time() + mt_rand($channel_calculate['min_time'], $channel_calculate['max_time'])),
-                                    //     'content'     =>  $sendTask['task_content'],
-                                    //     'Submit_time' => date('ymdHis', time()),
-                                    //     'mobile'      => $send_log['mobile'],
-                                    //     'uid'         =>  $sendTask['uid'],
-                                    //     'mar_task_id' => $sendTask['id'],
-                                    // ]));
+                                   /*  $this->redis->rPush('index:meassage:game:waitcmppdeliver', json_encode([
+                                        'Stat'        => $send_log['status_message'],
+                                        'send_msgid'  => [$sendTask['send_msg_id']],
+                                        'Done_time'   => date('ymdHis', time() + mt_rand($channel_calculate['min_time'], $channel_calculate['max_time'])),
+                                        'content'     =>  $sendTask['task_content'],
+                                        'Submit_time' => date('ymdHis', time()),
+                                        'mobile'      => $send_log['mobile'],
+                                        'uid'         =>  $sendTask['uid'],
+                                        'mar_task_id' => $sendTask['id'],
+                                    ])); */
                                 }
                             }
-
-                            $push_messages[] = $sendmessage; //实际发送队列
-
-
                             // die;
                         } else { //不扣量
                             $push_messages[] = $sendmessage; //实际发送队列
@@ -2971,6 +2970,14 @@ Db::rollback();
         }
     }
 
+    public function updateUpRiver()
+    {
+        $upriver = Db::query("SELECT * FROM yx_user_upriver");
+        foreach ($upriver as $key => $value) {
+            # code...
+        }
+    }
+
     public function verifyMobileSource()
     {
         $mobilesend = 15997595078;
@@ -4409,6 +4416,7 @@ Db::rollback();
                 }
                 $redis->set('index:calculate:StartTime', time());
             }
+            sleep(30);
         }
     }
 }
