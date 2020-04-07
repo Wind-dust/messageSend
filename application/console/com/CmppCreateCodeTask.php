@@ -3724,9 +3724,10 @@ Db::rollback();
     {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为10G
         while (true) {
-            if (date('H:i:s') != "02:00:00") {
+            if (date('H')> 2) {
                 // echo date('H:i:s');
                 // die;
+               sleep(3000);
                 continue;
             }
             $year_businessSettlement = [];
@@ -4002,6 +4003,7 @@ Db::rollback();
                 Db::rollback();
                 exception($e);
             }
+            sleep(3000);
         }
     }
 
@@ -4279,7 +4281,7 @@ Db::rollback();
                 Db::rollback();
                 exception($e);
             }
-            sleep(72000);
+            sleep(7200);
         }
     }
 
