@@ -1362,13 +1362,13 @@ return $result;
                     $frame['image_type'] = 'gif';
                 }
                 if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['image/gif', 'image/jpeg', 'image/png'])) {
-                    return ['code' => '3008'];
+                    return ['code' => '3004'];
                 }
                 $filename = filtraImage(Config::get('qiniu.domain'), $value['image_path']);
                 // print_r($value['image_path']);die;
                 $logfile  = DbImage::getLogImageAll($filename); //判断时候有未完成的图片
                 if (empty($logfile)) { //图片不存在
-                    return ['code' => '3010']; //图片没有上传过
+                    return ['code' => '3005']; //图片没有上传过
                 }
                 $content_length += $head['Content-Length'];
                 $frame['image_path'] = $value['image_path'];
@@ -1378,7 +1378,7 @@ return $result;
             $multimedia_message_frame[] = $frame;
         }
         if ($content_length > $max_length) {
-            return ['code' => '3009'];
+            return ['code' => '3006'];
         }
         do {
             $template_id = getRandomString(8);
@@ -1407,7 +1407,7 @@ return $result;
         } catch (\Exception $e) {
             Db::rollback();
             // exception($e);
-            return ['code' => '3011'];
+            return ['code' => '3007'];
         }
     }
 
@@ -1698,6 +1698,7 @@ return $result;
             'send_num'       => $send_num,
             'real_num'       => $real_num,
             'free_trial'     => 1,
+            'template_id'     => $template_id,
         ];
 
         Db::startTrans();

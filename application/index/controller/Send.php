@@ -818,13 +818,13 @@ class Send extends MyController
             return ['code' => '3000'];
         }
         if (empty($content_data)) {
-            return ['code' => '3009'];
+            return ['code' => '3001'];
         }
         if (empty($title)) {
-            return ['code' => '3007'];
+            return ['code' => '3002'];
         }
         if (empty($name)) {
-            return ['code' => '3013', 'msg' => '别名为空'];
+            return ['code' => '3003', 'msg' => '别名为空'];
         }
         $result = $this->app->send->multimediaTemplateSignatureReport($appid, $appkey, $content_data, $title, $name);
         return $result;
