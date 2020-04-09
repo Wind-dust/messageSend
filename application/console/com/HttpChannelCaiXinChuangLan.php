@@ -22,7 +22,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
             'send_api'    => 'http://caixin.253.com/api/send', //正式发送地址
             'test_api'    => 'http://115.28.174.119:8080/api/send', //正式发送地址
             'call_api'    => 'http://api.1cloudsp.com/report/up', //上行地址
-            'call_back'    => 'www.shyuxi.com', //回执回调地址
+            'call_back'    => 'http://sendapidev.shyuxi.com/index/send/chuangLanMmsCallBack', //回执回调地址
             'overage_api' => '', //余额地址
             // 'receive_api' => 'http://api.1cloudsp.com/report/status', //回执，报告
         ];
