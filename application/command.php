@@ -39,6 +39,7 @@ return [
     'httpchannelkemengzhuangxiu'       => $commandPath . 'HttpChannelKeMengZhuangXiu',
     'httpchannelcaixinhuaxingtongxun'  => $commandPath . 'HttpChannelCaiXinHuaxingtongxun',
     'httpchannelcaixinhangzhoumaiyuan' => $commandPath . 'HttpChannelCaiXinHangZhouMaiYuan',
+    'httpchannelcaixinchuanglan' => $commandPath . 'HttpChannelCaiXinChuangLan',
     'cmppmijiadianxinmarketing'        => $commandPath . 'CmppMiJiaDianXinMarketing',
     'cmppmijialiantongmarketing'       => $commandPath . 'CmppMiJiaLianTongMarketing',
     'cmppmijiayidongmarketing'         => $commandPath . 'CmppMiJiaYiDongMarketing',
@@ -59,4 +60,5 @@ return [
     'ServerSocketjyy'                  => $commandPath . 'ServerSocketJYY',
     'ServerSocketjyylt'                  => $commandPath . 'ServerSocketJYYLT',
     'ServerSocketjyydx'                  => $commandPath . 'ServerSocketJYYDX',
+    'serversocket'                  => $commandPath . 'ServerSocket',
 ];

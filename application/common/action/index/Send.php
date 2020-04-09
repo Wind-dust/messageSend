@@ -1717,7 +1717,36 @@ return $result;
         } catch (\Exception $e) {
             Db::rollback();
             exception($e);
-            return ['code' => '3011'];
+            return ['code' => '3007'];
+        }
+    }
+
+    public function chuangLanMmsCallBack($code, $desc, $task_id, $phone)
+    {
+        $task = DbSendMessage::getUserMultimediaMessage(['id' => $task_id], 'uid,task_no', true);
+        if (!empty($task)) {
+            $redisMessageCodeDeliver = 'index:meassage:multimediamessage:deliver:59'; //创蓝彩信回执通道
+            $redis = Phpredis::getConn();
+            $send_task_log = [];
+            if ($desc == '发送成功') {
+                $code = 'DELIVRD';
+                $send_status = 3;
+            } else {
+                $send_status = 4;
+            }
+            $send_task_log = [
+                'task_no'        => $task['task_no'],
+                'uid'            => $task['uid'],
+                'mobile'         => $phone,
+                'status_message' => $code,
+                'send_status'    => $send_status,
+                'send_time'      => time(),
+            ];
+            // print_r($send_task_log);
+            $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
+            return "OK";
+        } else {
+            return "error";
         }
     }
 }

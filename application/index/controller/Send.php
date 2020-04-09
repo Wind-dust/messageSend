@@ -929,4 +929,27 @@ class Send extends MyController
         $result = $this->app->send->multimediaReceive($appid, $appkey);
         return $result;
     }
+
+    /**
+     * @api              {post} / 创蓝彩信回调接口
+     * @apiDescription   chuangLanMmsCallBack
+     * @apiGroup         index_send
+     * @apiName          chuangLanMmsCallBack
+     * @apiParam (入参) {String} code 返回码
+     * @apiParam (入参) {String} desc 状态说明
+     * @apiParam (入参) {String} ext_id 彩信任务id
+     * @apiParam (入参) {String} phone 号码
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误
+     * @apiSampleRequest /index/send/chuangLanMmsCallBack
+     * @author rzc
+     */
+    public function chuangLanMmsCallBack()
+    {
+        $code   = trim($this->request->post('code')); //返回码
+        $desc  = trim($this->request->post('desc')); //状态说明
+        $task_id  = trim($this->request->post('ext_id')); //登陆密码
+        $phone  = trim($this->request->post('phone')); //登陆密码
+        $result = $this->app->send->chuangLanMmsCallBack($code, $desc, $task_id, $phone);
+        return $result;
+    }
 }
