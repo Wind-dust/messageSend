@@ -1728,7 +1728,7 @@ return $result;
             $redisMessageCodeDeliver = 'index:meassage:multimediamessage:deliver:59'; //创蓝彩信回执通道
             $redis = Phpredis::getConn();
             $send_task_log = [];
-            if ($desc == '发送成功') {
+            if ($code == '30') {
                 $code = 'DELIVRD';
                 $send_status = 3;
             } else {
