@@ -835,7 +835,7 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:business:sendtask';
-      /*   for ($i = 215906; $i < 216942; $i++) {
+        /*   for ($i = 215906; $i < 216942; $i++) {
             $this->redis->rPush('index:meassage:business:sendtask', $i);
         } */
 
@@ -1224,7 +1224,7 @@ class CmppCreateCodeTask extends Pzlife
                                             break;
                                         }
                                     }
-                                   /*  $this->redis->rPush('index:meassage:game:waitcmppdeliver', json_encode([
+                                    /*  $this->redis->rPush('index:meassage:game:waitcmppdeliver', json_encode([
                                         'Stat'        => $send_log['status_message'],
                                         'send_msgid'  => [$sendTask['send_msg_id']],
                                         'Done_time'   => date('ymdHis', time() + mt_rand($channel_calculate['min_time'], $channel_calculate['max_time'])),
@@ -2626,7 +2626,7 @@ Db::rollback();
 
                 Db::startTrans();
                 try {
-                    Db::table('yx_user_send_code_task_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $status_message]);
+                    Db::table('yx_user_send_code_task_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['Stat'], 'send_time' => isset($send_log['Submit_time']) ? $send_log['Submit_time'] : $sendTask['create_time'], 'status_message' => $status_message]);
                     Db::commit();
                 } catch (\Exception $e) {
                     Db::rollback();
@@ -3725,10 +3725,10 @@ Db::rollback();
     {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为10G
         while (true) {
-            if (date('H')> 2) {
+            if (date('H') > 2) {
                 // echo date('H:i:s');
                 // die;
-               sleep(3000);
+                sleep(3000);
                 continue;
             }
             $year_businessSettlement = [];
