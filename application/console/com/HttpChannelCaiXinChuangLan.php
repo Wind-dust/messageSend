@@ -38,37 +38,24 @@ class HttpChannelCaiXinChuangLan extends Pzlife
 
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
 
-        /*   $sign = '';
+        /*  $sign = '';
         $user_info               = $this->content();
         $time = time();
-        // $send_data['title'] = '标题：恭喜您已升级为SEPHORA黑卡会员，快来领取您的专属黑卡权益！';
-        $send_data['title'] = '大金空调健康购惠州站';
+        $send_data['title'] = '【恭喜您已升级为SEPHORA黑卡会员，快来领取您的专属黑卡权益！】';
+        // $send_data['title'] = '大金空调健康购惠州站';
         $send_data['mar_task_id'] = 107;
         echo Config::get('qiniu.domain') . '/' . "20200408/f1a62696f90cb8560db0cd6351174bfd5e8d904c2a736.gif";
         $real_send_content = [
             [
                 "frame" => 4,
-                "part" => 1, "type" => 1, "content" => base64_encode('亲爱的{FULL_NAME}会员：   
-         
-                         恭喜您已升级成Sephora黑卡会员！并成功解锁多项黑卡专属权益！
-                         
-                        您有{RESERVED_FIELD_3}张九折购物券，有效期至{RESERVED_FIELD_2}。黑卡会员享有专属生日三重礼、尊美周8折优惠等更多礼遇。
-                         
-                        生日月更可尊享丝芙兰专属生日礼盒，一张价值50元的生日礼券（仅限官网、APP、小程序使用）以及双倍积分礼遇。
-                         
-                         若您还未给我们留下您的生日及通信地址，请快去丝芙兰官网、App、小程序会员俱乐部登录后更新您的会员信息，以收到我们的生日礼物及其它黑卡优惠。  
-                         
-                          －－－－－－－－－－－－ 
-                         SEPHORA客服热线400-670-0055  
-                         
-                        编辑短信TD回复至本号码，即可取消赠阅  [SEPHORA]'),
+                "part" => 1, "type" => 1, "content" => base64_encode("【丝芙兰】亲爱的彪1会员：\n\n恭喜您已升级成Sephora黑卡会员！并同时获得1张九折购物券！\n\n黑卡会员8折特卖、生日礼物等更多黑卡独享惊喜等着您！\n\n至任一门店，出示您的白卡和此短信，我们会为您奉上九折券，您马上就能使用，九折券有效期至2020-05-09。\n\n若您还未给我们留下您的生日及通信地址，请快去 www.sephora.cn 会员俱乐部登录后更新您的会员信息，以收到我们的生日礼物及其它黑卡优惠。\n\n－－－－－－－－－－－－ \nSEPHORA客服热线400-670-0055 \n\n编辑短信TD回复至本号码，即可取消赠阅  [SEPHORA]"),
             ],
             [
                 "frame" => 4,
                 "part" => 1, "type" => 4, "content" => base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . "20200408/f1a62696f90cb8560db0cd6351174bfd5e8d904c2a736.gif")),
             ]
-        ];
-        $real_send_content = [
+        ]; */
+        /*  $real_send_content = [
             [
                 "frame" => 4,
                 "part" => 1, "type" => 1, "content" => base64_encode('【大金中国】尊敬的用户，您好！为了便于我们及时跟进您的安装进度，并提供丰富的产品资讯及优惠活动，请扫码关注大金官方微信公众号，或微信直接搜索“大金空调中国”关注公众号并回复“AZJD”填写金制家中用户安装进度选项表。退订回T'),
@@ -77,9 +64,9 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                 "frame" => 4,
                 "part" => 1, "type" => 4, "content" => base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . "20200408/f1a62696f90cb8560db0cd6351174bfd5e8d904c2a736.gif")),
             ]
-        ];
+        ]; */
         // $sign = "account=" . $user_info['account'] . "timestamp=" . $time . "url=" . $user_info['call_back'] . "phones=15201926171" . "title=" . $send_data['title'] . "msg=" . json_encode($real_send_content) . "ext_id=" . $send_data['mar_task_id'] . "key=" . $user_info['key'];
-        $sign = "account=" . $user_info['account']  . "ext_id=" . $send_data['mar_task_id'] . "msg=" . json_encode($real_send_content) . "phones=15201926171" . "timestamp=" . $time . "title=" . $send_data['title'] . "url=" . $user_info['call_back'] . "key=" . $user_info['key'];
+        /*    $sign = "account=" . $user_info['account']  . "ext_id=" . $send_data['mar_task_id'] . "msg=" . json_encode($real_send_content) . "phones=15201926171" . "timestamp=" . $time . "title=" . $send_data['title'] . "url=" . $user_info['call_back'] . "key=" . $user_info['key'];
         $sign = md5($sign);
         // print_r($sign);
         // die;
@@ -104,8 +91,8 @@ class HttpChannelCaiXinChuangLan extends Pzlife
         $res = sendRequest($user_info['send_api'], 'post', $real_send);
         $result = json_decode($res, true);
         print_r($result);
-        die; */
-
+        die;
+ */
         $content                 = 59;
         $redisMessageCodeSend    = 'index:meassage:code:send:' . $content; //彩信发送任务rediskey
         $redisMessageCodeDeliver = 'index:meassage:multimediamessage:deliver:' . $content; //彩信MsgId
@@ -115,6 +102,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
         'mobile' => '13476024461',
         'content' =>'【鼎业装饰】鼎礼相祝！跨年巨惠！定单送欧派智能晾衣架一套。选欧派产品可秒杀欧派智能马桶999元一个。终极预存大礼，来店给你个超大的惊喜！！！大到超乎您想象！一年只有这一次！电话3236788回T退订',
         ])); */
+
         while (true) {
             $send_task    = [];
             $send_num     = [];
@@ -235,7 +223,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                             $real_send = [];
                             $time = time();
                             $sign = '';
-                            $sign = "account=" . $user_info['account']  . "ext_id=" . $send_data['mar_task_id'] . "msg=" . json_encode($real_send_content) . "phones=" . join(',', $new_num) . "timestamp=" . $time . "title=" . $send_title[$send_taskid] . "url=" . $user_info['call_back'] . "key=" . $user_info['key'];
+                            $sign = "account=" . $user_info['account']  . "ext_id=" . $send_taskid . "msg=" . $send_content[$send_taskid] . "phones=" . join(',', $new_num) . "timestamp=" . $time . "title=" . $send_title[$send_taskid] . "url=" . $user_info['call_back'] . "key=" . $user_info['key'];
                             $sign = md5($sign);
                             $real_send = [
                                 'account'    => $user_info['account'],
@@ -243,10 +231,11 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                 'url' => $user_info['call_back'],
                                 'phones'    => join(',', $new_num),
                                 'title'     => $send_title[$send_taskid],
-                                'msg'   => json_encode($real_send_content),
+                                'msg'   => $send_content[$send_taskid],
                                 'ext_id'   => $send_taskid,
                                 'sign'   => $sign,
                             ];
+
                             $res = sendRequest($user_info['send_api'], 'post', $real_send);
                             $result = json_decode($res, true);
                             // $result['code'] = 2;
@@ -275,6 +264,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                 }
             } while ($send);
             //剩下的号码再做提交
+            print_r($send_content);
             // print_r($send_num);die;
             if (!empty($send_num)) {
                 foreach ($send_num as $send_taskid => $num) {
@@ -285,7 +275,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                     $real_send = [];
                     $sign = '';
                     $time = time();
-                    $sign = "account=" . $user_info['account']  . "ext_id=" . $send_data['mar_task_id'] . "msg=" . json_encode($real_send_content) . "phones=" . join(',', $new_num) . "timestamp=" . $time . "title=" . $send_title[$send_taskid] . "url=" . $user_info['call_back'] . "key=" . $user_info['key'];
+                    $sign = "account=" . $user_info['account']  . "ext_id=" . $send_taskid . "msg=" . $send_content[$send_taskid] . "phones=" . join(',', $new_num) . "timestamp=" . $time . "title=" . $send_title[$send_taskid] . "url=" . $user_info['call_back'] . "key=" . $user_info['key'];
                     $sign = md5($sign);
                     $real_send = [
                         'account'    => $user_info['account'],
@@ -294,7 +284,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                         // 'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time()))),
                         'phones'    => join(',', $new_num),
                         'title'     => $send_title[$send_taskid],
-                        'msg'   => urlencode($send_content[$send_taskid]),
+                        'msg'   => $send_content[$send_taskid],
                         'ext_id'   => $send_taskid,
                         'sign'   => $sign,
                     ];
