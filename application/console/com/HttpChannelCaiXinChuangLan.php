@@ -257,6 +257,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                         $redis->rpush($redisMessageCodeSend, $val);
                                     }
                                 }
+                                print_r($result);
                                 exit(); //关闭通道
                             }
                             /*  $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
@@ -308,6 +309,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                 $redis->rpush($redisMessageCodeSend, $val);
                             }
                         }
+                        print_r($result);
                         exit(); //关闭通道
                     }
                     // print_r($res);
