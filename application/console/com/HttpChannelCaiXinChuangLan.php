@@ -292,7 +292,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                     $result = json_decode($res, true);
                     // print_r($result);
                     // $result['code'] = 2;
-                    if ($result['code'] == 0) {
+                    if ($result['code'] == 1) {
                     } else {
                         foreach ($roallback as $key => $value) {
                             foreach ($value as $ne => $val) {
