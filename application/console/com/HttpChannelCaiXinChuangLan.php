@@ -299,7 +299,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                 $redis->rpush($redisMessageCodeSend, $val);
                             }
                         }
-                        print_r($result);
+                        // print_r($result);
                         exit(); //关闭通道
                     }
                     // print_r($res);
