@@ -986,6 +986,8 @@ CREATE TABLE `yx_user_channel_group_son` (
 ALTER TABLE `messagesend`.`yx_users` 
 ADD COLUMN `need_receipt_api` tinyint(3) NOT NULL DEFAULT 1 COMMENT '是否需要从接口调用回执1:不需要;2:需要' AFTER `user_status`,
 ADD COLUMN `need_upriver_api` tinyint(3) NOT NULL DEFAULT 1 COMMENT '是否需要从接口调用上行1:不需要;2:需要' AFTER `user_status`;
+
+ALTER TABLE `messagesend`.`yx_users` 
 ADD COLUMN `need_receipt_info` tinyint(3) NOT NULL DEFAULT 1 COMMENT '是否需要开发回执信息1:不需要;2:需要' AFTER `user_status`;
 
 DROP TABLE IF EXISTS `yx_user_upriver`;
@@ -1001,3 +1003,31 @@ CREATE TABLE `yx_user_upriver` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `uid_task`(`uid`,`task_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT= "用户短信上行";
+
+ALTER TABLE `messagesend`.`yx_user_multimedia_message` 
+ADD COLUMN `template_id` char(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '彩信模板id' AFTER `task_no`;
+
+ALTER TABLE `messagesend`.`yx_user_send_task` 
+ADD COLUMN `template_id` char(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '彩信模板id' AFTER `task_no`;
+
+ALTER TABLE `messagesend`.`yx_user_send_code_task` 
+ADD COLUMN `template_id` char(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '彩信模板id' AFTER `task_no`;
+
+ALTER TABLE `messagesend`.`yx_user_send_game_task` 
+ADD COLUMN `template_id` char(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '彩信模板id' AFTER `task_no`;
+
+ALTER TABLE `messagesend`.`yx_user_upriver` 
+ADD COLUMN `business_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '业务服务id' AFTER `task_no`;
+
+DROP TABLE IF EXISTS `yx_third_party_mms_template_report`;
+CREATE TABLE `yx_third_party_mms_template_report` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `sms_channel_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '通道id',
+  `template_id` char(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '彩信模板id',
+  `third_template_id` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '第三方彩信模板id',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `template_id`(`third_template_id`,`template_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT= "用户彩信模板第三方";

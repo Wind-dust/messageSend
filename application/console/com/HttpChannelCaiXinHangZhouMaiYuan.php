@@ -229,7 +229,6 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
             // ];
             // print_r($receive_id);
             // die;
-            //该通道方不支持彩信状态查询
             $receive = sendRequest($user_info['receive_api'], 'post', ['accesskey' => $user_info['accesskey'], 'secret' => $user_info['secret']]);
             if (empty($receive)) {
                 sleep(60);

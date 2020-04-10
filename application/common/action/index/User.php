@@ -1099,4 +1099,20 @@ class User extends CommonIndex
         $total = DbSendMessage::countUserMultimediaTemplate($where);
         return ['code' => '200', 'total' => $total, 'result' => $result];
     }
+
+    public function getUserUpriver($ConId, $page, $pageNum, $start_time, $end_time)
+    {
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $where = [];
+        array_push($where, ['uid', '=', $uid]);
+        if (!empty($start_time)) {
+            array_push($where, ['create_time', '>=', $start_time]);
+        }
+        if (!empty($end_time)) {
+            array_push($where, ['create_time', '<=', $end_time]);
+        }
+    }
 }

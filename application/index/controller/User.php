@@ -951,20 +951,33 @@ class User extends MyController
      * @apiParam (入参) {String} con_id
      * @apiParam (入参) {String} page 
      * @apiParam (入参) {String} pageNum 
+     * @apiParam (入参) {String} start_time 开始时间
+     * @apiParam (入参) {String} end_time 结束时间
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
      * @apiSampleRequest /index/user/getUserUpriver
      * @return array
      * @author rzc
      */
-    public function getUserUpriver(){
+    public function getUserUpriver()
+    {
         $ConId = trim($this->request->post('con_id'));
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
+        $start_time  = trim($this->request->post('start_time'));
+        $end_time  = trim($this->request->post('end_time'));
         $page     = is_numeric($page) ? $page : 1;
         $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
         intval($page);
         intval($pageNum);
-        $result = $this->app->user->getUserUpriver($ConId, $page, $pageNum);
+        if (strtotime($start_time) == false && !empty($start_time)) {
+            return ['code' => '3003'];
+        }
+        if (strtotime($end_time)  == false && !empty($end_time)) {
+            return ['code' => '3004'];
+        }
+        intval($page);
+        intval($pageNum);
+        $result = $this->app->user->getUserUpriver($ConId, $page, $pageNum, $start_time, $end_time);
         return $result;
     }
 }

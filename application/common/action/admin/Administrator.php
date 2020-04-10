@@ -4,7 +4,7 @@ namespace app\common\action\admin;
 
 use app\common\action\notify\Note;
 use app\facade\DbAdmin;
-use app\facade\DbProvinces;
+use app\facade\DbSendMessage;
 use app\facade\DbAdministrator;
 use app\facade\DbUser;
 use cache\Phpredis;
@@ -663,6 +663,55 @@ class Administrator extends CommonIndex
             exception($e);
             Db::rollback();
             return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function thirdPartyMMSTemplateReport($channel_id,$template_id){
+        $template =  DbSendMessage::getUserMultimediaTemplate(['template_id' => $template_id], '*', true);
+        if ($template['status'] != 2 || empty($template)) {
+            return ['code' => '3003', 'msg' => '模板未审核通过或者该模板不存在'];
+        }
+        $multimedia_message_frame = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $template['id']], 'num,name,content,image_path,image_type', false, ['num' => 'asc']);
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id], 'id,title,business_id,channel_price', true);
+        if (empty($channel)) {
+            return ['code' => '3002'];
+        }
+        if ($channel['business_id'] != 8) {
+            return ['code' => '3004', '非彩信通道不能使用此接口'];
+        }
+        if ($channel_id == 58) {
+            $report_api = 'http://mms.mms-sender.cn:8080/mmsServer/sendMms';
+            $data = [];
+            $data['id'] = '200401';
+            $data['pwd']  = 'zd1403';
+            $data['subject']= bin2hex($template['title']);
+            // $subject  = $template['title'];
+           /*  $desubject = hex2bin($subject);
+            echo $subject."\n";
+            echo $desubject."\n";
+            die; */
+            $tdata = [];
+            $tvdata = [];
+            $pdata = [];
+            $pvdata = [];
+           
+            foreach ($multimedia_message_frame as $key => $value) {
+                if (!empty($value['content'])) {
+                    $tdata[] = 'tt'.$value['num'].'=txt';
+                    $tvdata[] = 'tv'.$value['num'].'='.bin2hex($value['content']);
+                    $data['tt'.$value['num']] = 'txt';
+                    $data['tv'.$value['num']] = bin2hex($value['content']);
+                }
+                if (!empty($value['image_path'])) {
+                    $pdata[] = 'pt'.$value['num'].'='.$value['image_type'];
+                    $pvdata[] = 'pv'.$value['num'].'='.bin2hex($value['image_path']);
+                    $data['pt'.$value['num']] = $value['image_type'];
+                    $data['pv'.$value['num']] = bin2hex(file_get_contents($value['image_path']));
+                }
+            }
+            print_r($data);die;
+            $result = sendRequest($report_api, 'post', $data);
+            print_r($result);die;
         }
     }
 }

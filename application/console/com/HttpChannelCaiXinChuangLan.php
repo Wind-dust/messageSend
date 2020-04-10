@@ -264,7 +264,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                 }
             } while ($send);
             //剩下的号码再做提交
-            print_r($send_content);
+            // print_r($send_content);
             // print_r($send_num);die;
             if (!empty($send_num)) {
                 foreach ($send_num as $send_taskid => $num) {

@@ -14,7 +14,7 @@ class ServerSocket extends Pzlife
     // private $bodyData;
 
     public function Service($content)
-    {
+    {    
         $contdata                 = $this->content($content);
         $redis                    = Phpredis::getConn();
         $content                  = 9; //绑定通道
@@ -67,7 +67,7 @@ class ServerSocket extends Pzlife
                 if ($headData != false) {
                     $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                     // $bodyData = socket_read($accept_resource, $head['Total_Length'] - 12);
-                    // print_r($head);
+                    print_r($head);
                     // print_r($bodyData);
                     // echo "\n";
                     //获取请求源ip
@@ -433,14 +433,14 @@ class ServerSocket extends Pzlife
         if ($content == 1) { //本机测试
             return [
                 'host'          => "127.0.0.1", //服务商ip
-                'port'          => "8888", //短连接端口号   17890长连接端口号
+                'port'          => "7890", //短连接端口号   17890长连接端口号
                 'Source_Addr'   => "101161", //企业id  企业代码
                 'Shared_secret' => '5hsey6u9', //网关登录密码
-                'Service_Id'    => "217062",
+                'Service_Id'    => "101161",
                 'Dest_Id'       => "106928080159", //短信接入码 短信端口号
                 'Sequence_Id'   => 1,
                 'SP_ID'         => "",
-                'bin_ip'        => ["127.0.0.1"], //客户端绑定IP
+                'bin_ip'        => ["127.0.0.1","47.103.200.251"], //客户端绑定IP
                 'free_trial'    => 2,
                 'master_num'    => 300,
                 'uid'           => 1,

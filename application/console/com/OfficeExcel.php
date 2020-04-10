@@ -2301,4 +2301,51 @@ class OfficeExcel extends Pzlife
         }
         $objWriter->save($outputFileName);
     }
+
+    public function apitest(){
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $url = "http://127.0.0.1:1007/index/send/getSmsBuiness";
+        // $url = "http://127.0.0.1:1007/index/send/getSmsMarketingTask";
+        // getSmsMarketingTask
+        $task = Db::query("SELECT * FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '92'");
+        $mobile = [];
+        foreach ($task as $key => $value) {
+            $mobile_content = explode(',',$value['mobile_content']);
+            foreach ($mobile_content as $key => $con) {
+                $mobile[] = $con;
+            }
+        }
+        // echo count($mobile);
+        echo "开始时间".date('Y-m-d H:i:s',time());
+        echo "\n";
+        $all_num = count($mobile);
+        $send_num = [];
+        $j = 1;
+        $send_data = [];
+        $send_data = [
+            'appid' => '5e17dbaaddbb7',
+            'appkey' => '50da9965e43a2fdf69118bf6791f6cd3',
+            'signature_id' => 'guatGcEq',
+            'content' => '1张9折券已飞奔向您！亲爱的测试会员，您所获赠的九折券自2020-03-30起生效，有效期截止2020-09-29，请在有效期间内前往门店选购哦！(在sephora.cn购物时需与官网账号绑定。累积消费积分1500分或四次不同日消费即自动兑换1张九折劵)/回T退订',
+        ];
+        for ($i=0; $i < $all_num; $i++) { 
+            $send_num[] = $mobile[$i];
+            $j++;
+            // if ($j >= 2000) {
+            //     $send_data['mobile'] = join(',',$send_num);
+            //     sendRequest($url,'post',$send_data);
+            //     unset($send_data['mobile']);
+            //     unset($send_num);
+            //     $j = 1;
+            // }
+            $send_data['mobile'] = $mobile[$i];
+            $result =    sendRequest($url,'post',$send_data);
+            // print_r($result);die;
+        }
+        // if ($send_num) {
+        //     $send_data['mobile'] = join(',',$send_num);
+        //         sendRequest($url,'post',$send_data);
+        // }
+        echo "结束时间".date('Y-m-d H:i:s',time());
+    }
 }

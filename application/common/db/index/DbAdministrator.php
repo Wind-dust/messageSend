@@ -16,6 +16,7 @@ use app\common\model\UserSendTask;
 use app\common\model\UserSendCodeTask;
 use app\common\model\UserSendTaskLog;
 use app\common\model\UserSendCodeTaskLog;
+use app\common\model\ThirdPartyMmsTemplateReport;
 use think\Db;
 
 class DbAdministrator
@@ -366,5 +367,29 @@ class DbAdministrator
     public function countUserSendCodeTaskLog($where)
     {
         return UserSendCodeTaskLog::where($where)->count();
+    }
+
+    public function getThirdPartyMmsTemplateReport($where, $field, $row = false, $orderBy = '', $limit = '')
+    {
+        $obj = ThirdPartyMmsTemplateReport::field($field)->where($where);
+        return $this->getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function addThirdPartyMmsTemplateReport($data)
+    {
+        $UserSendCodeTaskLog = new ThirdPartyMmsTemplateReport;
+        $UserSendCodeTaskLog->save($data);
+        return $UserSendCodeTaskLog->id;
+    }
+
+    public function editThirdPartyMmsTemplateReport($data, $id)
+    {
+        $ThirdPartyMmsTemplateReport = new ThirdPartyMmsTemplateReport;
+        return $ThirdPartyMmsTemplateReport->save($data, ['id' => $id]);
+    }
+
+    public function countThirdPartyMmsTemplateReport($where)
+    {
+        return ThirdPartyMmsTemplateReport::where($where)->count();
     }
 }
