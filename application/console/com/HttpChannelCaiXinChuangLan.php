@@ -247,6 +247,10 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                     }
                                 }
                                 print_r($result);
+                                $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
+                                    'mobile'      => 15201926171,
+                                    'content'     => $res
+                                ])); //三体营销通道
                                 exit(); //关闭通道
                             }
                             /*  $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
@@ -299,7 +303,11 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                 $redis->rpush($redisMessageCodeSend, $val);
                             }
                         }
-                        // print_r($result);
+                        print_r($result);
+                        $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
+                            'mobile'      => 15201926171,
+                            'content'     => $res
+                        ])); //三体营销通道
                         exit(); //关闭通道
                     }
                     // print_r($res);

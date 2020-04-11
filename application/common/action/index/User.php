@@ -1100,7 +1100,7 @@ class User extends CommonIndex
         return ['code' => '200', 'total' => $total, 'result' => $result];
     }
 
-    public function getUserUpriver($ConId, $page, $pageNum, $start_time, $end_time)
+    public function getUserUpriver($ConId, $page, $pageNum, $start_time, $end_time, $business_id)
     {
         $uid = $this->getUidByConId($ConId);
         if (empty($uid)) { //用户不存在
@@ -1114,5 +1114,15 @@ class User extends CommonIndex
         if (!empty($end_time)) {
             array_push($where, ['create_time', '<=', $end_time]);
         }
+        $offset = ($page - 1) * $pageNum;
+        if ($offset < 0) {
+            return ['code' => '200', 'total' => 0, 'upriver' => []];
+        }
+        if (!empty($business_id)) {
+            array_push($where, ['business_id', '=', $business_id]);
+        }
+        $result = DbUser::getUserUpriver($where, '*', false, '', $offset . ',' . $pageNum);
+        $total = DbUser::countUserUpriver($where);
+        return ['code' => '200', 'total' => $total, 'upriver' => $result];
     }
 }

@@ -953,6 +953,7 @@ class User extends MyController
      * @apiParam (入参) {String} pageNum 
      * @apiParam (入参) {String} start_time 开始时间
      * @apiParam (入参) {String} end_time 结束时间
+     * @apiParam (入参) {String} business_id 类型
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
      * @apiSampleRequest /index/user/getUserUpriver
      * @return array
@@ -965,6 +966,7 @@ class User extends MyController
         $pageNum  = trim($this->request->post('pageNum'));
         $start_time  = trim($this->request->post('start_time'));
         $end_time  = trim($this->request->post('end_time'));
+        $business_id  = trim($this->request->post('business_id'));
         $page     = is_numeric($page) ? $page : 1;
         $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
         intval($page);
@@ -977,7 +979,7 @@ class User extends MyController
         }
         intval($page);
         intval($pageNum);
-        $result = $this->app->user->getUserUpriver($ConId, $page, $pageNum, $start_time, $end_time);
+        $result = $this->app->user->getUserUpriver($ConId, $page, $pageNum, $start_time, $end_time, $business_id);
         return $result;
     }
 }

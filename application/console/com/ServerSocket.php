@@ -14,7 +14,7 @@ class ServerSocket extends Pzlife
     // private $bodyData;
 
     public function Service($content)
-    {    
+    {
         $contdata                 = $this->content($content);
         $redis                    = Phpredis::getConn();
         $content                  = 9; //绑定通道
@@ -440,7 +440,7 @@ class ServerSocket extends Pzlife
                 'Dest_Id'       => "106928080159", //短信接入码 短信端口号
                 'Sequence_Id'   => 1,
                 'SP_ID'         => "",
-                'bin_ip'        => ["127.0.0.1","47.103.200.251"], //客户端绑定IP
+                'bin_ip'        => ["127.0.0.1", "47.103.200.251"], //客户端绑定IP
                 'free_trial'    => 2,
                 'master_num'    => 300,
                 'uid'           => 1,

@@ -1031,3 +1031,5 @@ CREATE TABLE `yx_third_party_mms_template_report` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `template_id`(`third_template_id`,`template_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT= "用户彩信模板第三方";
+
+ThirdPartyMmsTemplateReport
