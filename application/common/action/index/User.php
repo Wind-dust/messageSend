@@ -945,7 +945,7 @@ class User extends CommonIndex
         return ['code' => '200', 'total' => $total, 'task_log' => $task_log];
     }
 
-    public function getUserStatisticsYear($page, $pageNum, $ConId, $start_timekey = '', $end_timekey = '')
+    public function getUserStatisticsYear($page, $pageNum, $ConId, $start_timekey = '', $end_timekey = '', $business_id = 0)
     {
         $uid = $this->getUidByConId($ConId);
         if (empty($uid)) { //用户不存在
@@ -959,13 +959,16 @@ class User extends CommonIndex
         }
         if (!empty($end_timekey)) {
             array_push($where, ['timekey', '<=', $end_timekey]);
+        }
+        if (!empty($business_id)) {
+            array_push($where, ['business_id', '=', $business_id]);
         }
         $result = DbUser::getUserStatisticsYear($where, '*', false, '', $offset . ',' . $pageNum);
         $total = DbUser::countUserStatisticsYear($where);
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
 
-    public function getUserStatisticsMonth($page, $pageNum, $ConId, $start_timekey = '', $end_timekey = '')
+    public function getUserStatisticsMonth($page, $pageNum, $ConId, $start_timekey = '', $end_timekey = '', $business_id = 0)
     {
         $uid = $this->getUidByConId($ConId);
         if (empty($uid)) { //用户不存在
@@ -979,13 +982,16 @@ class User extends CommonIndex
         }
         if (!empty($end_timekey)) {
             array_push($where, ['timekey', '<=', $end_timekey]);
+        }
+        if (!empty($business_id)) {
+            array_push($where, ['business_id', '=', $business_id]);
         }
         $result = DbUser::getUserStatisticsMonth($where, '*', false, '', $offset . ',' . $pageNum);
         $total = DbUser::countUserStatisticsMonth($where);
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
 
-    public function getUserStatisticsDay($page, $pageNum, $ConId, $start_timekey = '', $end_timekey = '')
+    public function getUserStatisticsDay($page, $pageNum, $ConId, $start_timekey = '', $end_timekey = '', $business_id = 0)
     {
         $uid = $this->getUidByConId($ConId);
         if (empty($uid)) { //用户不存在
@@ -999,6 +1005,9 @@ class User extends CommonIndex
         }
         if (!empty($end_timekey)) {
             array_push($where, ['timekey', '<=', $end_timekey]);
+        }
+        if (!empty($business_id)) {
+            array_push($where, ['business_id', '=', $business_id]);
         }
         $result = DbUser::getUserStatisticsDay($where, '*', false, '', $offset . ',' . $pageNum);
         $total = DbUser::countUserStatisticsDay($where);

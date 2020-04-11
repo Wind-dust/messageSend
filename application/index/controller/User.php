@@ -732,6 +732,7 @@ class User extends MyController
      * @apiParam (入参) {String} con_id
      * @apiParam (入参) {String} page 
      * @apiParam (入参) {String} pageNum 
+     * @apiParam (入参) {String} business_id 类型
      * @apiParam (入参) {String} [start_timekey] 开始时间标记（如 2019）
      * @apiParam (入参) {String} [end_timekey] 开始时间标记（如 2020）
      * @apiSuccess (返回) {String} code 200:成功  
@@ -758,14 +759,16 @@ class User extends MyController
         $end_timekey = trim($this->request->post('end_timekey'));
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
+        $business_id  = trim($this->request->post('business_id'));
         $page     = is_numeric($page) ? $page : 1;
         $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
         intval($page);
         intval($pageNum);
+        intval($business_id);
         if (!empty($start_timekey) && !empty($end_timekey) && ($end_timekey < $start_timekey)) {
             return ['code' => '3002', 'Msg' => '结束时间段不能小于开始时间段'];
         }
-        $result = $this->app->user->getUserStatisticsYear($page, $pageNum, $ConId, $start_timekey, $end_timekey);
+        $result = $this->app->user->getUserStatisticsYear($page, $pageNum, $ConId, $start_timekey, $end_timekey, $business_id);
         return $result;
     }
     /**
@@ -776,6 +779,7 @@ class User extends MyController
      * @apiParam (入参) {String} con_id
      * @apiParam (入参) {String} page 
      * @apiParam (入参) {String} pageNum 
+     * @apiParam (入参) {String} business_id 类型
      * @apiParam (入参) {String} [start_timekey] 开始时间标记（如 202001）
      * @apiParam (入参) {String} [end_timekey] 开始时间标记（如 202011）
      * @apiSuccess (返回) {String} code 200:成功 
@@ -802,14 +806,16 @@ class User extends MyController
         $end_timekey = trim($this->request->post('end_timekey'));
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
+        $business_id  = trim($this->request->post('business_id'));
         $page     = is_numeric($page) ? $page : 1;
         $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
         intval($page);
         intval($pageNum);
+        intval($business_id);
         if (!empty($start_timekey) && !empty($end_timekey) && ($end_timekey < $start_timekey)) {
             return ['code' => '3002', 'Msg' => '结束时间段不能小于开始时间段'];
         }
-        $result = $this->app->user->getUserStatisticsMonth($page, $pageNum, $ConId, $start_timekey, $end_timekey);
+        $result = $this->app->user->getUserStatisticsMonth($page, $pageNum, $ConId, $start_timekey, $end_timekey, $business_id);
         return $result;
     }
 
@@ -821,6 +827,7 @@ class User extends MyController
      * @apiParam (入参) {String} con_id
      * @apiParam (入参) {String} page 
      * @apiParam (入参) {String} pageNum 
+     * @apiParam (入参) {String} business_id 类型
      * @apiParam (入参) {String} [start_timekey] 开始时间标记（如 20200101）
      * @apiParam (入参) {String} [end_timekey] 开始时间标记（如 20200131）
      * @apiSuccess (返回) {String} code 200:成功 
@@ -847,14 +854,16 @@ class User extends MyController
         $end_timekey = trim($this->request->post('end_timekey'));
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
+        $business_id  = trim($this->request->post('business_id'));
         $page     = is_numeric($page) ? $page : 1;
         $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
         intval($page);
         intval($pageNum);
+        intval($business_id);
         if (!empty($start_timekey) && !empty($end_timekey) && ($end_timekey < $start_timekey)) {
             return ['code' => '3002', 'Msg' => '结束时间段不能小于开始时间段'];
         }
-        $result = $this->app->user->getUserStatisticsDay($page, $pageNum, $ConId, $start_timekey, $end_timekey);
+        $result = $this->app->user->getUserStatisticsDay($page, $pageNum, $ConId, $start_timekey, $end_timekey, $business_id);
         return $result;
     }
 
