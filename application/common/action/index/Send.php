@@ -729,18 +729,20 @@ return $result;
             }
             if (!isset($value['content'])) {
                 $frame['content'] = '';
-                if (!empty($signature)) {
-                    $frame['content'] = '' . $signature['title'];
-                }
+                // if (!empty($signature)) {
+                //     $frame['content'] = '' . $signature['title'];
+                // }
             } else {
                 if (!empty($signature)) {
                     $frame['content'] = $signature['title'] . $value['content'];
+                    unset($signature);
                 } else {
                     $frame['content'] = $value['content'];
                 }
                 // $content_length+= strlen($value['content']);
+
             }
-            unset($signature);
+
             $content_length += (strlen($frame['content']) / 8);
             if (!isset($value['image_path'])) {
                 $frame['image_path'] = '';
