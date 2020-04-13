@@ -59,7 +59,7 @@ class CmppRongHeYiDongBusiness extends Pzlife
         ])); */
 
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15271120197',
+            'mobile'      => '15201926171',
             'mar_task_id' => '',
             // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
             'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
