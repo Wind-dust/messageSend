@@ -179,7 +179,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                 $frame['frame'] = $value['num'];
                                 $frame['part'] = 1;
                                 $frame['type'] = 1;
-                                $frame['content'] = $value['content'];
+                                $frame['content'] = base64_encode($value['content']);
                                 $real_send_content[] = $frame;
                             }
                             $frame = [];
