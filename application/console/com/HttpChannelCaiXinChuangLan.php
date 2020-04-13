@@ -240,6 +240,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                             $result = json_decode($res, true);
                             // $result['code'] = 2;
                             if ($result['code'] == 1) { //提交成功
+                                unset($roallback[$send_taskid]);
                             } else {
                                 foreach ($roallback as $key => $value) {
                                     foreach ($value as $ne => $val) {
@@ -281,8 +282,6 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                     $time = time();
                     $sign = "account=" . $user_info['account']  . "ext_id=" . $send_taskid . "msg=" . $send_content[$send_taskid] . "phones=" . join(',', $new_num) . "timestamp=" . $time . "title=" . $send_title[$send_taskid] . "url=" . $user_info['call_back'] . "key=" . $user_info['key'];
                     $sign = md5($sign);
-                    print_r($send_taskid);
-                    echo "\n";
                     $real_send = [
                         'account'    => $user_info['account'],
                         'timestamp' => $time,
@@ -299,6 +298,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                     // print_r($result);
                     // $result['code'] = 2;
                     if ($result['code'] == 1) {
+                        unset($roallback[$send_taskid]);
                     } else {
                         foreach ($roallback as $key => $value) {
                             foreach ($value as $ne => $val) {
