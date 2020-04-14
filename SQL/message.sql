@@ -1033,3 +1033,8 @@ CREATE TABLE `yx_third_party_mms_template_report` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT= "用户彩信模板第三方";
 
 ThirdPartyMmsTemplateReport
+
+ALTER TABLE `messagesend`.`yx_users` 
+MODIFY COLUMN `free_trial` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '行业短信审核:1:需要审核;2:无需审核' AFTER `money`,
+ADD COLUMN `marketing_free_trial` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '营销短信审核:1:需要审核;2:免审' AFTER `free_trial`,
+ADD COLUMN `mul_free_trial` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '彩信审核状态:1:需要审核;2:免审' AFTER `marketing_free_trial`;

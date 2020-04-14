@@ -54,9 +54,9 @@ return [
     'cmppyixinliantongdianxinmarketing'         => $commandPath . 'CmppYiXinLianTongDianXinMarketing', //易信电信联通营销通道
     'cmpplanjingmarketing'             => $commandPath . 'CmppLanJingMarketing',
     'cmpplanjingbusiness'              => $commandPath . 'CmppLanJingBusiness',
-    'Cmpprongheyidongbusiness'              => $commandPath . 'CmppRongHeYiDongBusiness', //融合移动行业
-    'Cmpprongheliantonggbusiness'              => $commandPath . 'CmppRongHeLianTongBusiness', //融合联通行业
-    'CmppronghedianXinBusiness'              => $commandPath . 'CmppRongHeDianXinBusiness', //融合电信行业
+    'cmpprongheyidongbusiness'              => $commandPath . 'CmppRongHeYiDongBusiness', //融合移动行业
+    'cmpprongheliantongbusiness'              => $commandPath . 'CmppRongHeLianTongBusiness', //融合联通行业
+    'cmppronghedianXinBusiness'              => $commandPath . 'CmppRongHeDianXinBusiness', //融合电信行业
     'cmppbeijingbamimarketing'              => $commandPath . 'CmppBeiJingBaMiMarketing',
     'serversocketshuhe'                => $commandPath . 'ServerSocketShuHe',
     'ServerSocketjyy'                  => $commandPath . 'ServerSocketJYY',
