@@ -51,13 +51,13 @@ class CmppRongHeLianTongBusiness extends Pzlife
         $redisMessageUnKownDeliver = 'index:meassage:code:unknow:deliver:' . $content; //行业通知MsgId
         $redisMessageUpRiver       = 'index:message:code:upriver:' . $content;
 
-        /*   $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15201926171',
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15601607386',
             'mar_task_id' => '',
             // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
-            'content'     => '您的验证码是：8791【美丽田园】',
-            
-        ])); */
+            'content'     => '【丝芙兰】尊贵的黑卡会员唐亮，【丝芙兰】祝您生日快乐！三重生日豪礼，伴您享受生日喜悦！一重奏:【丝芙兰门店明星礼包】二重奏: 【丝芙兰官网50元无门槛券】三重奏:生日月订单享受一次双倍积分礼遇。会员生日福利，明星热卖产品大放送！特权来袭，不容错过。请于2020-05-20前至丝芙兰门店或官网sephora.cn领取您的专属生日礼物！以上三重生日礼，皆不可与其他优惠叠加使用。/回T退订',
+
+        ]));
 
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
