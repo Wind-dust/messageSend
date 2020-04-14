@@ -2610,7 +2610,7 @@ Db::rollback();
                         'send_time' => isset($send_log['Submit_time']) ? $send_log['Submit_time'] : $sendTask['create_time'],
                         'real_message' => $send_log['Stat'],
                         'status_message' => $status_message,
-                        'update_time'    => isset($send_log['Done_time']) ? $send_log['Done_time'] : time(),
+                        'update_time'    => isset($send_log['receive_time']) ? $send_log['receive_time'] : time(),
                     ]);
                     Db::commit();
                 } catch (\Exception $e) {
@@ -2626,7 +2626,7 @@ Db::rollback();
 
                 Db::startTrans();
                 try {
-                    Db::table('yx_user_send_code_task_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['Stat'], 'update_time' => isset($send_log['Done_time']) ? $send_log['Done_time'] : time(), 'status_message' => $status_message]);
+                    Db::table('yx_user_send_code_task_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['Stat'], 'update_time' => isset($send_log['receive_time']) ? $send_log['receive_time'] : time(), 'status_message' => $status_message]);
                     Db::commit();
                 } catch (\Exception $e) {
                     Db::rollback();
