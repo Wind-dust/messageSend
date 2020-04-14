@@ -697,7 +697,8 @@ return $result;
     // }
     public function getSmsMultimediaMessageTask($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title, $signature_id = '')
     {
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        $this->redis = Phpredis::getConn();
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial,mul_free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -790,6 +791,12 @@ return $result;
         if ($send_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3007'];
         }
+        $channel_id = 0;
+        $free_trial = 1;
+        if ($user['mul_free_trial'] == 2) {
+            $free_trial = 2;
+            $channel_id = 59;
+        }
 
         $SmsMultimediaMessageTask = [];
         $SmsMultimediaMessageTask = [
@@ -800,7 +807,8 @@ return $result;
             'source'         => $ip,
             'send_num'       => $send_num,
             'real_num'       => $real_num,
-            'free_trial'     => 1,
+            'free_trial'     => $free_trial,
+            'channel_id'     => $channel_id,
         ];
 
         Db::startTrans();
@@ -815,6 +823,9 @@ return $result;
                 }
             }
             Db::commit();
+            if ($free_trial == 2) {
+                $this->redis->rpush("index:meassage:multimediamessage:sendtask", $bId);
+            }
             return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no']];
         } catch (\Exception $e) {
             Db::rollback();

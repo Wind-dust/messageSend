@@ -75,11 +75,13 @@ class User extends AdminController
      * @apiParam (入参) {Int} uid 账户id
      * @apiParam (入参) {Int} [user_status] 账户服务状态 1停止服务 2启用服务
      * @apiParam (入参) {Int} [reservation_service] 可否预用服务 1不可 2可以
-     * @apiParam (入参) {Int} [free_trial] 短信发送审核 1:需要审核;2:无需审核
+     * @apiParam (入参) {Int} [free_trial] 行业发送审核 1:需要审核;2:无需审核
+     * @apiParam (入参) {Int} [marketing_free_trial] 营销发送审核 1:需要审核;2:无需审核
+     * @apiParam (入参) {Int} [mul_free_trial] 彩信发送审核 1:需要审核;2:无需审核
      * @apiParam (入参) {Int} [need_upriver_api] 是否需要从接口调用上行1:不需要;2:需要
      * @apiParam (入参) {Int} [need_receipt_api] 是否需要从接口调用回执1:不需要;2:需要
      * @apiParam (入参) {Int} [need_receipt_info] 是否开放回执状态信息1:不需要;2:需要
-     * @apiSuccess (返回) {String} code 200:成功 / 3000:用户列表空 / 3001:user_status格式错误 / 3002:reservation_service格式错误 / 3003:uid格式错误 / 3004:free_trial格式错误
+     * @apiSuccess (返回) {String} code 200:成功 / 3000:用户列表空 / 3001:user_status格式错误 / 3002:reservation_service格式错误 / 3003:uid格式错误 / 3004:free_trial格式错误 / 3005:need_upriver_api格式错误 / 3006:need_receipt_api格式错误 / 3007:need_receipt_info格式错误 / 3008:marketing_free_trial格式错误  / 3009:mul_free_trial格式错误  / 
      * @apiSampleRequest /admin/user/seetingUser
      * @author rzc
      */
@@ -94,6 +96,8 @@ class User extends AdminController
         $user_status         = trim($this->request->post('user_status'));
         $reservation_service = trim($this->request->post('reservation_service'));
         $free_trial = trim($this->request->post('free_trial'));
+        $marketing_free_trial = trim($this->request->post('marketing_free_trial'));
+        $mul_free_trial = trim($this->request->post('mul_free_trial'));
         $need_upriver_api = trim($this->request->post('need_upriver_api'));
         $need_receipt_api = trim($this->request->post('need_receipt_api'));
         $need_receipt_info = trim($this->request->post('need_receipt_info'));
@@ -110,13 +114,13 @@ class User extends AdminController
             return ['code' => '3004'];
         }
         if (!in_array($need_upriver_api, [1, 2]) && !empty($need_upriver_api)) {
-            return ['code' => '3004'];
+            return ['code' => '3005'];
         }
         if (!in_array($need_receipt_api, [1, 2]) && !empty($need_receipt_api)) {
-            return ['code' => '3004'];
+            return ['code' => '3006'];
         }
         if (!in_array($need_receipt_info, [1, 2]) && !empty($need_receipt_info)) {
-            return ['code' => '3004'];
+            return ['code' => '3007'];
         }
         $result = $this->app->user->seetingUser($uid, $user_status, $reservation_service, $free_trial, $need_receipt_api, $need_upriver_api, $need_receipt_info);
         $this->apiLog($apiName, [$cmsConId, $uid, $user_status, $reservation_service], $result['code'], $cmsConId);

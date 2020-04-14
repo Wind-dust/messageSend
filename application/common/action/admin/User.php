@@ -44,7 +44,7 @@ class User extends CommonIndex
         return ['code' => '200', 'totle' => $totle, 'result' => $result];
     }
 
-    public function seetingUser($uid, $user_status, $reservation_service, $free_trial, $need_receipt_api = 0, $need_upriver_api = 0, $need_receipt_info = 0)
+    public function seetingUser($uid, $user_status, $reservation_service, $free_trial, $need_receipt_api = 0, $need_upriver_api = 0, $need_receipt_info = 0, $marketing_free_trial = 0, $mul_free_trial = 0)
     {
         $data = [];
         if ($user_status) {
@@ -64,6 +64,12 @@ class User extends CommonIndex
         }
         if ($need_receipt_info) {
             $data['need_receipt_info'] = $need_receipt_info;
+        }
+        if ($marketing_free_trial) {
+            $data['marketing_free_trial'] = $marketing_free_trial;
+        }
+        if ($mul_free_trial) {
+            $data['mul_free_trial'] = $mul_free_trial;
         }
 
         Db::startTrans();
