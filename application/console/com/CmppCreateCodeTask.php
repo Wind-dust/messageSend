@@ -383,6 +383,7 @@ class CmppCreateCodeTask extends Pzlife
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15826,'send_time' => 0]));
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15827,'send_time' => 0]));
         // echo time() -1576290017;die;
+
         echo date('Y-m-d H:i:s');
         echo "\n";
         $j = 1;
@@ -551,29 +552,7 @@ class CmppCreateCodeTask extends Pzlife
                 }
             }
 
-            /*       Db::startTrans();
-            try {
-                Db::table('yx_user_send_task')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3, 'log_path' => realpath("") . '/tasklog/marketing/' . $sendTask['task_no'] . ".txt"]);
-                Db::commit();
-                foreach ($push_messages as $key => $value) {
-                    $send_channelid = $value['channel_id'];
-                    // $send_channelid =1;
-                    unset($value['channel_id']);
-                    $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $send_channelid, json_encode($value)); //三体营销通道
-                }
-                foreach ($error_mobile as $key => $value) {
-                    if ($value['uid'] == 47 || $value['uid'] == 51) {
-                        $request_url = "http://116.228.60.189:25902/rtreceive?";
-                        $request_url .= 'task_no=' . $value['task_no'] . "&status_message=" . $value['Stat'] . "&mobile=" . $value['mobile'] . "&send_time=" . $value['create_time'];
-                        sendRequest($request_url);
-                        print_r($request_url);
-                    }
-                }
-            } catch (\Exception $e) {
-                $this->redis->rPush('index:meassage:marketing:sendtask', $send);
-                exception($e);
-                Db::rollback();
-            } */
+
 
             if (!empty($true_log)) {
                 Db::startTrans();
@@ -604,9 +583,6 @@ class CmppCreateCodeTask extends Pzlife
                 unset($rollback);
             }
         }
-        print_r(date('Y-m-d H:i:s', time()));
-        echo "\n";
-        exit("SUCCESS");
     }
     //  大批量扣量任务扣量
     public function createNoSendMessageSendTaskLog()
