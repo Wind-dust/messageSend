@@ -395,9 +395,11 @@ class CmppCreateCodeTask extends Pzlife
             $send        = $this->redis->lpop('index:meassage:marketing:sendtask');
             // $send = 15753;
             if (empty($send)) {
-                print_r(date('Y-m-d H:i:s', time()));
-                echo "\n";
-                exit('taskId_is_null');
+                // print_r(date('Y-m-d H:i:s', time()));
+                // echo "\n";
+                // exit('taskId_is_null');
+                sleep(1);
+                continue;
             }
             $real_send = json_decode($send, true);
             if ($real_send['send_time'] > time()) {
