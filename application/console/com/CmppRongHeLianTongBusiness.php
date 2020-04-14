@@ -23,11 +23,11 @@ class CmppRongHeLianTongBusiness extends Pzlife
     public function content($content)
     {
         return [
-            'host'          => "117.122.225.52", //服务商ip
+            'host'          => "39.98.238.240", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "shxjhy", //企业id  企业代码
-            'Shared_secret' => 'p0d4ccba', //网关登录密码
-            'Service_Id'    => "shxjhy", //业务代码
+            'Source_Addr'   => "922111", //企业id  企业代码
+            'Shared_secret' => '473308', //网关登录密码
+            'Service_Id'    => "922111", //业务代码
             'template_id'   => "", //模板id
             'Dest_Id'       => "", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
