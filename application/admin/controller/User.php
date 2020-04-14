@@ -122,7 +122,13 @@ class User extends AdminController
         if (!in_array($need_receipt_info, [1, 2]) && !empty($need_receipt_info)) {
             return ['code' => '3007'];
         }
-        $result = $this->app->user->seetingUser($uid, $user_status, $reservation_service, $free_trial, $need_receipt_api, $need_upriver_api, $need_receipt_info);
+        if (!in_array($marketing_free_trial, [1, 2]) && !empty($marketing_free_trial)) {
+            return ['code' => '3008'];
+        }
+        if (!in_array($mul_free_trial, [1, 2]) && !empty($mul_free_trial)) {
+            return ['code' => '3009'];
+        }
+        $result = $this->app->user->seetingUser($uid, $user_status, $reservation_service, $free_trial, $need_receipt_api, $need_upriver_api, $need_receipt_info, $marketing_free_trial, $mul_free_trial);
         $this->apiLog($apiName, [$cmsConId, $uid, $user_status, $reservation_service], $result['code'], $cmsConId);
         return $result;
     }
