@@ -745,7 +745,7 @@ return $result;
             }
 
             $content_length += (strlen($frame['content']) / 8);
-            if (!isset($value['image_path'])) {
+            if (!isset($value['image_path']) || empty($value['image_path'])) {
                 $frame['image_path'] = '';
             } else {
                 stream_context_set_default([
