@@ -411,7 +411,7 @@ class CmppCreateCodeTask extends Pzlife
                 $sendTask = $this->getSendTask($real_send['id']);
                 // print_r($sendTask);die;
                 if (empty($sendTask)) {
-                  continue;
+                    continue;
                 }
                 $mobilesend = [];
                 // print_r($sendTask);die;
@@ -3536,6 +3536,17 @@ Db::rollback();
             foreach ($code_task_log as $key => $value) {
                 $send_length = mb_strlen($value['task_content'], 'utf8');
                 $num = 1;
+                if (empty($value['status_message']) && empty($value['real_message'])) {
+                    $task = Db::query("SELECT id FROM yx_user_send_code_task WHERE `task_no` = '" . $value['task_no'] . "' LIMIT 1 ");
+                    $receipt = Db::query("SELECT `status_message` FROM yx_send_code_task_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $value['mobile'] . "' LIMIT 1 ");
+                    if (empty($receipt)) {
+                        if ($value['create_time'] + 259200 < time()) {
+                            $value['status_message'] = 'DELIVRD';
+                        }
+                    } else {
+                        $value['status_message'] = $receipt[0]['status_message'];
+                    }
+                }
                 if ($send_length > 70) {
                     $num = ceil($send_length / 67);
                 }
@@ -4534,6 +4545,47 @@ Db::rollback();
                 $redis->set('index:calculate:StartTime', time());
             }
             sleep(60);
+        }
+    }
+
+    public function receiptCallBack()
+    {
+        $redis = Phpredis::getConn();
+        $redis->rpush("index:message:task:callback", json_encode([
+            'start_time' => 1586880000,
+            'end_time' => 1586966400,
+            'type' => 'game',
+            'way' => 'cmpp',
+            'uid' => 45
+        ]));
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为10G
+        while (true) {
+            $receiptmessage = $redis->lpop("index:message:task:callback");
+            if (empty($receiptmessage)) {
+                sleep('60');
+                continue;
+            }
+            $receiptmessage = json_decode($receiptmessage, true);
+            if ($receiptmessage['type'] == 'game') {
+                $receipts = Db::query("SELECT mobile_content,send_msg_id,real_message,submit_time,real_message,create_time FROM yx_user_send_game_task WHERE `create_time` >= " . $receiptmessage['start_time'] . " AND `create_time` <= " . $receiptmessage['end_time'] . " AND `uid` = " . $receiptmessage['uid']);
+                foreach ($receipts as $key => $value) {
+                    if ($receiptmessage['way'] == 'cmpp') {
+                        $send_msgid = explode(',', $value['send_msg_id']);
+                        foreach ($send_msgid as $key => $svalue) {
+                            $redis->rPush('index:meassage:game:cmppdeliver:' . $receiptmessage['uid'], json_encode([
+                                'Stat'        => $value['real_message'],
+                                'send_msgid'  => [$svalue],
+                                'Done_time'   => $value['submit_time'],
+                                'Submit_time' => $value['create_time'],
+                                'mobile'      => $value['mobile_content'],
+                            ]));
+                            // if ($value == $send_log['Msg_Id']){
+
+                            // }
+                        }
+                    }
+                }
+            }
         }
     }
 }
