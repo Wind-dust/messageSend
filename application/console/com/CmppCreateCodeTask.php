@@ -4491,8 +4491,8 @@ Db::rollback();
             }
         } */
 
-        $redis->set('index:calculate:StartTime', time());
-        $starttime = 1586966400;
+        $redis->set('index:calculate:StartTime', 1586966400);
+        // $starttime = 1586880000;
         ini_set('memory_limit', '1024M'); // 临时设置最大内存占用为10G
         while (true) {
             $starttime = $redis->get('index:calculate:StartTime');
@@ -4544,7 +4544,7 @@ Db::rollback();
                     }
                 }
 
-                // print_r($all_status);
+                print_r($all_status);
                 foreach ($all_status as $all => $status) {
                     $redis->set('index:meassage:calculate:' . $all, json_encode($status));
                 }
