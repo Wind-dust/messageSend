@@ -1190,6 +1190,8 @@ class CmppCreateCodeTask extends Pzlife
                                         'uid'         =>  $sendTask['uid'],
                                         'mar_task_id' => $sendTask['id'],
                                     ]));
+                                } else {
+                                    $push_messages[] = $sendmessage; //实际发送队列
                                 }
                             }
                             // die;
