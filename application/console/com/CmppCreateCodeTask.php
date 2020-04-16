@@ -4523,9 +4523,9 @@ Db::rollback();
             if (time() - $starttime >= 300) {
                 $all_task = [];
                 $all_status = [];
-                $all_task = Db::query("SELECT * FROM yx_user_send_game_task WHERE `update_time` >=  '" . $starttime . "' AND `update_time` <= '" . time() . "'");
-                print("SELECT * FROM yx_user_send_game_task WHERE `update_time` >=  '" . $starttime . "' AND `update_time` <= '" . time() . "'");
-                die;
+                $all_task = Db::query("SELECT * FROM yx_user_send_game_task WHERE `update_time` >=  '" . $starttime . "' AND `update_time` <= '" . time() . "' AND `create_time` >= " . $starttime);
+                // print("SELECT * FROM yx_user_send_game_task WHERE `update_time` >=  '" . $starttime . "' AND `update_time` <= '" . time() . "'");
+                // die;
                 // $all_num = count($all_task);
                 foreach ($all_task as $key => $value) {
                     // print_r($value);
