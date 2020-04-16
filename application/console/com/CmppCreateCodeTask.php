@@ -3381,13 +3381,29 @@ Db::rollback();
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
-        /*       $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
+        /*         $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
             'task_no' => 'mul20040110342053330898',
             'uid' => '91',
             'mobile' => '15021417314',
             'status_message' => 'DELIVRD',
             'send_status' => 3,
             'send_time' => '1585710348',
+        )));
+        $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
+            'task_no' => 'mul20040110490391162370',
+            'uid' => '91',
+            'mobile' => '13681834423',
+            'status_message' => 'DELIVRD',
+            'send_status' => 3,
+            'send_time' => '1585709212',
+        )));
+        $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
+            'task_no' => 'mul20040110490391162370',
+            'uid' => '91',
+            'mobile' => '13681834423',
+            'status_message' => 'DELIVRD',
+            'send_status' => 3,
+            'send_time' => '1585709212',
         )));
         $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
             'task_no' => 'mul20040110490391162370',
@@ -3405,7 +3421,7 @@ Db::rollback();
                 continue;
             }
             $send_log = json_decode($sendlog, true);
-            $sendtasklog = Db::query("SELECT `id`,`create_time` FROM `yx_user_multimedia_message_log` WHERE `task_no` = '" . $send_log['task_no'] . "' AND `mobile` = '" . $send_log['mobile'] . "' ");
+            $sendtasklog = Db::query("SELECT `id`,`create_time`,`real_message` FROM `yx_user_multimedia_message_log` WHERE `task_no` = '" . $send_log['task_no'] . "' AND `mobile` = '" . $send_log['mobile'] . "' ");
             // die;
             if (empty($sendtasklog)) {
                 $task =  Db::query("SELECT `id`,`create_time`,`update_time`,`source` FROM `yx_user_multimedia_message` WHERE `task_no` = '" . $send_log['task_no'] . "' ");
