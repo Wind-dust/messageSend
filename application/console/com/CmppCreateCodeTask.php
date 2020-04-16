@@ -4527,53 +4527,56 @@ Db::rollback();
                 // print("SELECT * FROM yx_user_send_game_task WHERE `update_time` >=  '" . $starttime . "' AND `update_time` <= '" . time() . "'");
                 // die;
                 // $all_num = count($all_task);
-                foreach ($all_task as $key => $value) {
-                    // print_r($value);
-                    if (isset($all_status[$value['channel_id']]['min_time'])) {
-                        if ($value['create_time'] && $value['update_time']) {
-                            $recive_time =  $value['update_time'] - $value['create_time'];
-                            if ($all_status[$value['channel_id']]['min_time'] >=  $recive_time) {
-                                $all_status[$value['channel_id']]['min_time'] = $recive_time;
+                if (!empty($all_task)) {
+                    foreach ($all_task as $key => $value) {
+                        // print_r($value);
+                        if (isset($all_status[$value['channel_id']]['min_time'])) {
+                            if ($value['create_time'] && $value['update_time']) {
+                                $recive_time =  $value['update_time'] - $value['create_time'];
+                                if ($all_status[$value['channel_id']]['min_time'] >=  $recive_time) {
+                                    $all_status[$value['channel_id']]['min_time'] = $recive_time;
+                                }
                             }
+                        } else {
+                            $all_status[$value['channel_id']]['min_time'] = 3;
                         }
-                    } else {
-                        $all_status[$value['channel_id']]['min_time'] = 3;
-                    }
-                    if (isset($all_status[$value['channel_id']]['max_time'])) {
-                        if ($value['create_time'] && $value['update_time']) {
-                            $recive_time =  $value['update_time'] - $value['create_time'];
-                            if ($all_status[$value['channel_id']]['max_time'] <=  $recive_time) {
-                                $all_status[$value['channel_id']]['max_time'] = $recive_time;
+                        if (isset($all_status[$value['channel_id']]['max_time'])) {
+                            if ($value['create_time'] && $value['update_time']) {
+                                $recive_time =  $value['update_time'] - $value['create_time'];
+                                if ($all_status[$value['channel_id']]['max_time'] <=  $recive_time) {
+                                    $all_status[$value['channel_id']]['max_time'] = $recive_time;
+                                }
                             }
+                        } else {
+                            $all_status[$value['channel_id']]['max_time'] = 10;
                         }
-                    } else {
-                        $all_status[$value['channel_id']]['max_time'] = 10;
-                    }
 
-                    if (isset($all_status[$value['channel_id']]['all_num'])) {
-                        $all_status[$value['channel_id']]['all_num'] += 1;
-                    } else {
-                        $all_status[$value['channel_id']]['all_num'] = 1;
-                    }
-                    if ($value['real_message'] == '') {
-                        // $value['real_message'] = 'UNKNOWN';
-                        continue;
-                    }
-                    if (isset($all_status[$value['channel_id']])) {
-                        if (isset($all_status[$value['channel_id']]['status'][$value['real_message']])) {
-                            $all_status[$value['channel_id']]['status'][$value['real_message']] += 1;
+                        if (isset($all_status[$value['channel_id']]['all_num'])) {
+                            $all_status[$value['channel_id']]['all_num'] += 1;
+                        } else {
+                            $all_status[$value['channel_id']]['all_num'] = 1;
+                        }
+                        if ($value['real_message'] == '') {
+                            // $value['real_message'] = 'UNKNOWN';
+                            continue;
+                        }
+                        if (isset($all_status[$value['channel_id']])) {
+                            if (isset($all_status[$value['channel_id']]['status'][$value['real_message']])) {
+                                $all_status[$value['channel_id']]['status'][$value['real_message']] += 1;
+                            } else {
+                                $all_status[$value['channel_id']]['status'][$value['real_message']] = 1;
+                            }
                         } else {
                             $all_status[$value['channel_id']]['status'][$value['real_message']] = 1;
                         }
-                    } else {
-                        $all_status[$value['channel_id']]['status'][$value['real_message']] = 1;
+                    }
+
+                    print_r($all_status);
+                    foreach ($all_status as $all => $status) {
+                        $redis->set('index:meassage:calculate:' . $all, json_encode($status));
                     }
                 }
 
-                print_r($all_status);
-                foreach ($all_status as $all => $status) {
-                    $redis->set('index:meassage:calculate:' . $all, json_encode($status));
-                }
                 // $redis->set('index:calculate:StartTime', time());
             }
             sleep(60);
