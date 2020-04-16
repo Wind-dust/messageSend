@@ -2004,9 +2004,13 @@ class CmppCreateCodeTask extends Pzlife
                 }
                 if (empty($task[0]['status_message'])) {
                     $send_msgid = explode(',', $task[0]['send_msg_id']);
+                    $stat = $send_log['Stat'];
+                    if (trim($stat) == 'ID:0076' || trim($stat) == 'ZZ:9003') {
+                        $stat = 'DELIVRD';
+                    }
                     foreach ($send_msgid as $key => $value) {
                         $redis->rPush('index:meassage:game:cmppdeliver:' . $task[0]['uid'], json_encode([
-                            'Stat'        => $send_log['Stat'],
+                            'Stat'        => $stat,
                             'send_msgid'  => [$value],
                             'Done_time'   => $send_log['Done_time'],
                             'Submit_time' => $task[0]['create_time'],
@@ -2088,9 +2092,13 @@ class CmppCreateCodeTask extends Pzlife
                     continue;
                 }
                 $send_msgid = explode(',', $witenosend_task[0]['send_msg_id']);
+                $stat = $witenosend_log['Stat'];
+                if (trim($stat) == 'ID:0076' || trim($stat) == 'ZZ:9003') {
+                    $stat = 'DELIVRD';
+                }
                 foreach ($send_msgid as $key => $value) {
                     $redis->rPush('index:meassage:game:cmppdeliver:' . $witenosend_task[0]['uid'], json_encode([
-                        'Stat'        => $witenosend_log['Stat'],
+                        'Stat'        => $stat,
                         'send_msgid'  => [$value],
                         'Done_time'   => $send_log['Done_time'],
                         'Submit_time' => date('ymdHis', time()),
