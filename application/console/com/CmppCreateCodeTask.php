@@ -1160,14 +1160,14 @@ class CmppCreateCodeTask extends Pzlife
                             'content'     => $sendTask['task_content'],
                             'channel_id'  => $channel_id,
                         ];
-                        $min = 100 - floor(4.6 / 5.2 * 100);
+                        $min = 100 - floor(4.5 / 5.2 * 100);
                         $max = mt_rand($min - 1, $min + 1);
                         $num     = mt_rand(0, 100);
                         if ($num <= $max) { //扣量
                             if (in_array($mobilesend[$i], [18339998120, 13812895012])) {
                                 $push_messages[] = $sendmessage; //实际发送队列
                             } else {
-                                $push_messages[] = $sendmessage; //实际发送队列
+                                // $push_messages[] = $sendmessage; //实际发送队列
                                 $channel_calculate =  $this->redis->get('index:meassage:calculate:' . $channel_id);
                                 $channel_calculate = json_decode($channel_calculate, true);
 
@@ -1180,7 +1180,7 @@ class CmppCreateCodeTask extends Pzlife
                                             break;
                                         }
                                     }
-                                    /*  $this->redis->rPush('index:meassage:game:waitcmppdeliver', json_encode([
+                                    $this->redis->rPush('index:meassage:game:waitcmppdeliver', json_encode([
                                         'Stat'        => $send_log['status_message'],
                                         'send_msgid'  => [$sendTask['send_msg_id']],
                                         'Done_time'   => date('ymdHis', time() + mt_rand($channel_calculate['min_time'], $channel_calculate['max_time'])),
@@ -1189,7 +1189,7 @@ class CmppCreateCodeTask extends Pzlife
                                         'mobile'      => $send_log['mobile'],
                                         'uid'         =>  $sendTask['uid'],
                                         'mar_task_id' => $sendTask['id'],
-                                    ])); */
+                                    ]));
                                 }
                             }
                             // die;
@@ -2914,8 +2914,8 @@ Db::rollback();
             while (true) {
                 $sendlog = $redis->lpop('index:meassage:code:cms:deliver:' . $channel_id);
                 if (empty($sendlog)) {
-                    sleep(60);
-                    continue;
+
+                    break;
                 }
                 $send_log = json_decode($sendlog, true);
 
@@ -2995,6 +2995,7 @@ Db::rollback();
                 }
                 unset($receipt_data);
             }
+            sleep(60);
         }
     }
 
@@ -4489,14 +4490,14 @@ Db::rollback();
         } */
 
         $redis->set('index:calculate:StartTime', time());
-        $starttime = 1576130448;
+        $starttime = 1586966400;
         ini_set('memory_limit', '1024M'); // 临时设置最大内存占用为10G
         while (true) {
             $starttime = $redis->get('index:calculate:StartTime');
-            if (time() - $starttime >= 60) {
+            if (time() - $starttime >= 300) {
                 $all_task = [];
                 $all_status = [];
-                $all_task = Db::query("SELECT * FROM yx_user_send_game_task WHERE `create_time` >=  '" . $starttime . "' AND `create_time` <= '" . time() . "'");
+                $all_task = Db::query("SELECT * FROM yx_user_send_game_task WHERE `update_time` >=  '" . $starttime . "' AND `update_time` <= '" . time() . "'");
                 // $all_num = count($all_task);
                 foreach ($all_task as $key => $value) {
                     // print_r($value);
@@ -4545,7 +4546,7 @@ Db::rollback();
                 foreach ($all_status as $all => $status) {
                     $redis->set('index:meassage:calculate:' . $all, json_encode($status));
                 }
-                $redis->set('index:calculate:StartTime', time());
+                // $redis->set('index:calculate:StartTime', time());
             }
             sleep(60);
         }
