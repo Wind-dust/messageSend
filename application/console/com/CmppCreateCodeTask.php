@@ -3568,14 +3568,16 @@ Db::rollback();
                 $num = 1;
                 if (empty($value['status_message']) && empty($value['real_message'])) {
                     $task = Db::query("SELECT id FROM yx_user_send_code_task WHERE `task_no` = '" . $value['task_no'] . "' LIMIT 1 ");
-                    $value['status_message'] = $receipt[0]['status_message'];
-                    if (!empty($task)) {
-                        $receipt = Db::query("SELECT `status_message` FROM yx_send_code_task_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $value['mobile'] . "' LIMIT 1 ");
-                        if (empty($receipt)) {
-                            if ($value['create_time'] + 259200 < time()) {
-                                $value['status_message'] = 'DELIVRD';
-                            }
+                    if (empty($task)) {
+                        continue;
+                    }
+                    $receipt = Db::query("SELECT `status_message` FROM yx_send_code_task_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $value['mobile'] . "' LIMIT 1 ");
+                    if (empty($receipt)) {
+                        if ($value['create_time'] + 259200 < time()) {
+                            $value['status_message'] = 'DELIVRD';
                         }
+                    } else {
+                        $value['status_message'] = $receipt[0]['status_message'];
                     }
                 }
                 if ($send_length > 70) {
