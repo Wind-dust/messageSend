@@ -4676,8 +4676,8 @@ Db::rollback();
                                     'channel_id'  => $channel_id,
                                     'send_length'  => $send_length,
                                     'status_message' => $status_message,
-                                    'create_time'  => time(),
-                                    'update_time'  => time() + mt_rand(0, 450),
+                                    'create_time'  => $value['create_time'],
+                                    'update_time'  =>  $value['create_time'] + mt_rand(0, 450),
                                 ];
                                 $true_log[] = $send_log;
                             } else {
@@ -4690,8 +4690,8 @@ Db::rollback();
                                     'mobile'         => $value[$i],
                                     'send_length'  => $send_length,
                                     'send_status'    => 4,
-                                    'create_time'    => time(),
-                                    'update_time'  => time() + mt_rand(0, 20),
+                                    'create_time'    =>  $value['create_time'],
+                                    'update_time'  =>  $value['create_time'] + mt_rand(0, 20),
                                     'status_message' => 'DB:0101', //无效号码
                                     'real_message'   => 'DB:0101',
                                 ];
@@ -4707,8 +4707,8 @@ Db::rollback();
                                 'mobile'         => $mobile[$i],
                                 'send_length'  => $send_length,
                                 'send_status'    => 4,
-                                'create_time'    => time(),
-                                'update_time'  => time() + mt_rand(0, 20),
+                                'create_time'    =>  $value['create_time'],
+                                'update_time'  =>  $value['create_time'] + mt_rand(0, 20),
                                 'status_message' => 'DB:0101', //无效号码
                                 'real_message'   => 'DB:0101',
                             ];
@@ -4788,8 +4788,8 @@ Db::rollback();
                                 'status_message' => $status_message,
                                 'channel_id'  => $channel_id,
                                 'send_length'  => $send_length,
-                                'create_time'  => time(),
-                                'update_time'  => time() + mt_rand(0, 450),
+                                'create_time'  =>  $value['create_time'],
+                                'update_time'  =>  $value['create_time'] + mt_rand(0, 450),
                             ];
                             if (!empty($value['develop_no'])) {
                                 $sendmessage['develop_code'] = $value['develop_no'];
@@ -4806,8 +4806,8 @@ Db::rollback();
                                 'mobile'         => $value[$i],
                                 'send_length'  => $send_length,
                                 'send_status'    => 4,
-                                'create_time'    => time(),
-                                'update_time'  => time() + mt_rand(0, 20),
+                                'create_time'    =>  $value['create_time'],
+                                'update_time'  =>  $value['create_time'] + mt_rand(0, 20),
                                 'status_message' => 'DB:0101', //无效号码
                                 'real_message'   => 'DB:0101',
                             ];
@@ -4823,8 +4823,8 @@ Db::rollback();
                             'mobile'         => $value['mobile_content'],
                             'send_length'  => $send_length,
                             'send_status'    => 4,
-                            'create_time'    => time(),
-                            'update_time'  => time() + mt_rand(0, 20),
+                            'create_time'    =>  $value['create_time'],
+                            'update_time'  =>  $value['create_time'] + mt_rand(0, 20),
                             'status_message' => 'DB:0101', //无效号码
                             'real_message'   => 'DB:0101',
                         ];
