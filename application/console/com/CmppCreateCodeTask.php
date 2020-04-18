@@ -3514,7 +3514,7 @@ Db::rollback();
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
-        // $redis->rpush('index:message:receipt:fillpush', json_encode(['uid' => '47', 'start_time' => '1582992000', 'end_time' => '1583078400', 'type' => 'business']));
+        $redis->rpush('index:message:receipt:fillpush', json_encode(['uid' => '47', 'start_time' => '1587216387', 'end_time' => '1587219548', 'type' => 'business']));
         while (true) {
             $real_fill_push = $redis->lpop('index:message:receipt:fillpush');
             if ($real_fill_push) {
@@ -3533,6 +3533,7 @@ Db::rollback();
                 if ($receipt_data) {
                     foreach ($receipt_data as $key => $value) {
                         echo $value['id'] . "\n";
+                        $value['status_message'] = 'UNDELIV';
                         if ($value['status_message']) {
                             $request_url = "http://116.228.60.189:15901/rtreceive?";
                             $request_url .= 'task_no=' . trim($value['task_no']) . "&status_message=" . trim($value['status_message']) . "&mobile=" . trim($value['mobile']) . "&send_time=" . trim(date('YmdHis', $value['create_time'] + mt_rand(0, 10)));

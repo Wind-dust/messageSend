@@ -576,7 +576,7 @@ class CmppLanJingBusiness extends Pzlife
                             fwrite($myfile, $e . "\n");
                             fclose($myfile);
                             //  exception($e);
-                            sleep(5);
+                            sleep(20);
                             //重新创建连接
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                             if (socket_connect($socket, $host, $port) == false) {
