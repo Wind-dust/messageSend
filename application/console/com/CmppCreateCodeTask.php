@@ -46,20 +46,20 @@ class CmppCreateCodeTask extends Pzlife
             // $user = $this->getUserInfo($send[0]);
             $channel_id = 0;
 
-            if ($send['Source_Addr'] == 101102) { //移动
+            if (trim($send['Source_Addr']) == 101102) { //移动
                 $uid = 45;
                 $channel_id = 14;
             }
-            if ($send['Source_Addr'] == 101103) { //联通
+            if (trim($send['Source_Addr']) == 101103) { //联通
                 $uid = 58;
                 $channel_id = 28;
             }
-            if ($send['Source_Addr'] == 101104) { //电信
+            if (trim($send['Source_Addr']) == 101104) { //电信
                 $uid = 59;
                 $channel_id = 29;
             }
 
-            if ($send['Source_Addr'] == 101105) { //移动
+            if (trim($send['Source_Addr']) == 101105) { //移动
                 $uid = 115;
                 $channel_id = 14;
             }
