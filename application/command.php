@@ -63,4 +63,5 @@ return [
     'ServerSocketjyylt'                  => $commandPath . 'ServerSocketJYYLT',
     'ServerSocketjyydx'                  => $commandPath . 'ServerSocketJYYDX',
     'serversocket'                  => $commandPath . 'ServerSocket',
+    'serversocketjgz'   => $commandPath . 'ServerSocketJGZ',
 ];

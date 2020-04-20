@@ -58,6 +58,11 @@ class CmppCreateCodeTask extends Pzlife
                 $uid = 59;
                 $channel_id = 29;
             }
+
+            if ($send['Source_Addr'] == 101105) { //移动
+                $uid = 115;
+                $channel_id = 14;
+            }
             $user = $this->getUserInfo($uid);
             if (empty($user) || $user['user_status'] == 1) {
                 continue;
@@ -1160,7 +1165,8 @@ class CmppCreateCodeTask extends Pzlife
                             'content'     => $sendTask['task_content'],
                             'channel_id'  => $channel_id,
                         ];
-                        $min = 100 - floor(4.5 / 5.2 * 100);
+                        $push_messages[] = $sendmessage; //实际发送队列
+                        /*           $min = 100 - floor(4.5 / 5.2 * 100);
                         $max = mt_rand($min - 1, $min + 1);
                         $num     = mt_rand(0, 100);
                         if ($num <= $max) { //扣量
@@ -1197,7 +1203,7 @@ class CmppCreateCodeTask extends Pzlife
                             // die;
                         } else { //不扣量
                             $push_messages[] = $sendmessage; //实际发送队列
-                        }
+                        } */
                     }
 
                     // $txt = json_encode($send_log) . "\n";
