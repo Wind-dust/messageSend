@@ -306,7 +306,7 @@ class Send extends MyController
         }
         // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
         if (empty($signature_id)) {
-            if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 10) {
+            if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 20) {
                 return ['code' => '3003'];
             }
         }
