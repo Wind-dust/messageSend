@@ -3514,7 +3514,7 @@ Db::rollback();
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
-        $redis->rpush('index:message:receipt:fillpush', json_encode(['uid' => '47', 'start_time' => '1587216387', 'end_time' => '1587219548', 'type' => 'business']));
+        // $redis->rpush('index:message:receipt:fillpush', json_encode(['uid' => '47', 'start_time' => '1587216387', 'end_time' => '1587219548', 'type' => 'business']));
         while (true) {
             $real_fill_push = $redis->lpop('index:message:receipt:fillpush');
             if ($real_fill_push) {
@@ -3532,11 +3532,11 @@ Db::rollback();
                 // echo count($receipt_data);die;
                 if ($receipt_data) {
                     foreach ($receipt_data as $key => $value) {
-                        echo $value['id'] . "\n";
-                        $value['status_message'] = 'UNDELIV';
+                        // echo $value['id'] . "\n";
+                        // $value['status_message'] = 'UNDELIV';
                         if ($value['status_message']) {
                             $request_url = "http://116.228.60.189:15901/rtreceive?";
-                            $request_url .= 'task_no=' . trim($value['task_no']) . "&status_message=" . trim($value['status_message']) . "&mobile=" . trim($value['mobile']) . "&send_time=" . trim(date('YmdHis', $value['create_time'] + mt_rand(0, 10)));
+                            $request_url .= 'task_no=' . trim($value['task_no']) . "&status_message=" . trim($value['status_message']) . "&mobile=" . trim($value['mobile']) . "&send_time=" . trim(date('YmdHis', $value['create_time'] + mt_rand(0, 20)));
                             // print_r($request_url);
                             // die;
                             sendRequest($request_url);
@@ -4167,7 +4167,8 @@ Db::rollback();
         $year_users = [];
         $month_users = [];
         $day_users = [];
-        $task_log = Db::query("SELECT * FROM yx_user_send_task_log WHERE `create_time` < " . time());
+        $start_time = strtotime(date('Y-m', time()));
+        $task_log = Db::query("SELECT * FROM yx_user_send_task_log WHERE `create_time` < " . time() . " AND `create_time` >= " . $start_time);
         try {
             foreach ($task_log as $key => $value) {
                 // print_r($value);
@@ -4322,7 +4323,7 @@ Db::rollback();
 
             //     }
             // }
-            foreach ($year_businessSettlement as $ykey => $y_value) {
+            /*          foreach ($year_businessSettlement as $ykey => $y_value) {
                 foreach ($y_value as $key => $value) {
                     $success = isset($value['success']) ? $value['success'] : 0;
                     $num = isset($value['num']) ? $value['num'] : 0;
@@ -4356,7 +4357,7 @@ Db::rollback();
                         Db::table('yx_statistics_year')->insert($year_user_settlement);
                     }
                 }
-            }
+            } */
             foreach ($month_businessSettlement as $mkey => $m_value) {
                 foreach ($m_value as $key => $value) {
                     $success = isset($value['success']) ? $value['success'] : 0;

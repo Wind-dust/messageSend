@@ -577,21 +577,51 @@ class ClientSocketSantiBusiness extends Pzlife
                             // //  exception($e);
                             // $log_path = realpath("")."/error/1.log";
                             // $myfile = fopen($log_path,'a+');
-                            fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
-                            fwrite($myfile, " Begin" . "\n");
-                            fclose($myfile);
+                            sleep(20);
+                            //重新创建连接
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-                            socket_connect($socket, $host, $port);
-                            $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
-                            $Timestamp           = date('mdHis');
-                            $AuthenticatorSource = md5($Source_Addr . pack("a9", "") . $Shared_secret . $Timestamp, true);
-                            $bodyData   = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
-                            $Command_Id = 0x00000001;
-                            $Total_Length = strlen($bodyData) + 12;
-                            $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                            socket_write($socket, $headData . $bodyData, $Total_Length);
-                            ++$i;
-                            ++$Sequence_Id;
+                            if (socket_connect($socket, $host, $port) == false) {
+                                $myfile = fopen($log_path, 'a+');
+                                fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
+                                fwrite($myfile,  "通道延迟5秒后再次连接失败，请联系通道方检查原因\n");
+                                fclose($myfile);
+                                $redis->rpush('index:meassage:code:send' . ":" . 9, json_encode([
+                                    'mobile'      => 15201926171,
+                                    'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
+                                ])); //三体营销通道
+                                $redis->rpush('index:meassage:code:send' . ":" . 24, json_encode([
+                                    'mobile'      => 15201926171,
+                                    'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
+                                ])); //易信行业通道
+                                exit();
+                            } else {
+                                $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
+                                $Timestamp           = date('mdHis');
+                                $AuthenticatorSource = md5($Source_Addr . pack("a9", "") . $Shared_secret . $Timestamp, true);
+                                $bodyData   = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
+                                $Command_Id = 0x00000001;
+                                $Total_Length = strlen($bodyData) + 12;
+                                $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                // socket_write($socket, $headData . $bodyData, $Total_Length);
+                                if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
+                                    // echo 'write_verify fail massege:' . socket_strerror(socket_last_error());
+                                    $myfile = fopen($log_path, 'a+');
+                                    fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
+                                    fwrite($myfile,  "通道延迟5秒后写入socket失败，请联系通道方检查原因\n");
+                                    fclose($myfile);
+                                    $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
+                                        'mobile'      => 15201926171,
+                                        'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
+                                    ])); //三体营销通道
+                                    $redis->rpush('index:meassage:code:send' . ":" . 24, json_encode([
+                                        'mobile'      => 15201926171,
+                                        'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
+                                    ])); //易信行业通道
+                                    exit();
+                                }
+                                ++$i;
+                                ++$Sequence_Id;
+                            }
                         }
                     }
                 }
