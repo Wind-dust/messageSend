@@ -344,7 +344,7 @@ class ServerSocketJGZ extends Pzlife
                             //     ],
                             // ];
                             // $redis->rPush('index:meassage:code:cmppdeliver:'.$uid,json_encode($deliver));
-                            $deliver = $redis->lpop('index:meassage:game:cmppdeliver:45'); //取出用户发送任务
+                            $deliver = $redis->lpop('index:meassage:game:cmppdeliver:115'); //取出用户发送任务
                             if (!empty($deliver)) {
                                 $deliver            = json_decode($deliver, true);
                                 $deliver_timestring = time();
