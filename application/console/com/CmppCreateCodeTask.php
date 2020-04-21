@@ -810,7 +810,7 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:business:sendtask';
-        /*   for ($i = 215906; $i < 216942; $i++) {
+          /* for ($i = 215906; $i < 216942; $i++) {
             $this->redis->rPush('index:meassage:business:sendtask', $i);
         } */
 
@@ -829,7 +829,6 @@ class CmppCreateCodeTask extends Pzlife
                     if (empty($send)) {
                         break;
                     }
-                    $rollback[] = $send;
                     $sendTask = $this->getSendCodeTask($send);
                     if (empty($sendTask)) {
                         // echo 'taskId_is_null' . "\n";
@@ -839,6 +838,11 @@ class CmppCreateCodeTask extends Pzlife
                     if (empty($sendTask['channel_id'])) {
                         continue;
                     }
+                    if ($sendTask['uid'] == 91 && (date("H",$sendTask['create_time'])>= 20 || date("H",$sendTask['create_time'])<= 10)) {
+                        $this->redis->rPush('index:meassage:business:sendtask', $send);
+                        continue;
+                    }
+                    $rollback[] = $send;
                     $mobilesend = [];
                     $mobilesend = explode(',', $sendTask['mobile_content']);
                     $mobilesend = array_filter($mobilesend);
@@ -4885,5 +4889,76 @@ Db::rollback();
         } catch (\Exception $e) {
             exception($e);
         }
+    }
+
+    public function SFLpush() {
+        // $start_time = strtotime("2020-04-22 19:59:00");
+        // $end_time = strtotime("2020-04-23 10:01:00");
+        $this->redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        // date_default_timezone_set('PRC');
+        $redisMessageMarketingSend = 'index:meassage:business:sendtask';
+          /* for ($i = 215906; $i < 216942; $i++) {
+            
+        } */
+        try {
+            $all_task = Db::query("SELECT `id`,`mobile_content` FROM `yx_user_send_code_task` WHERE `uid` = '91' AND `free_trial` = 1  AND `create_time` >= '1587470340'  AND `create_time` <= '1587607260'");
+            $ids = [];
+            if ($all_task) {
+                // echo "SELECT `id` FROM `yx_user_send_code_task` WHERE `uid` = '91' AND `create_time` >= '1587470340'  AND `create_time` <= '1587607260'";
+                foreach ($$all_task as $key => $value) {
+                    $prefix = substr(trim($value['mobile_content']), 0, 7);
+                    $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                    // print_r($res);
+                    if ($res) {
+                        $newres = array_shift($res);
+                        if ($newres['source'] == 2 ) { //易信联通
+                            $channel_id = 30;
+                        } else if ($newres['source'] == 1) { //移动易信
+                            $channel_id = 17;
+                        } else if ($newres['source'] == 3 ) { //易信电信
+                            $channel_id = 17;
+                        } 
+                    }
+                    Db::startTrans();
+                    try {
+                        Db::table('yx_user_send_code_task')->where('id',$value['id'])->update(['free_trial' => 2, 'update_time' => time(),'channel_id' => $channel_id]);
+                       
+                        Db::commit();
+                        $this->redis->rPush('index:meassage:business:sendtask', $value['id']);
+                    } catch (\Exception $e) {
+                        // $this->redis->rPush('index:meassage:business:sendtask', $send);
+        
+                        Db::rollback();
+                        exception($e);
+                    }
+                }
+
+            }
+            $all_task = [];
+            $all_task = Db::query("SELECT `id` FROM `yx_user_multimedia_message` WHERE `uid` = '91' AND `free_trial` = 1 AND `create_time` >= '1587470340'  AND `create_time` <= '1587607260'");
+            $ids = [];
+            if ($all_task) {
+                foreach ($all_task as $key => $value) {
+                    Db::startTrans();
+                    try {
+                        Db::table('yx_user_multimedia_message')->where('id',$value['id'])->update(['free_trial' => 2, 'update_time' => time(),'channel_id' =>59]);
+                       
+                        Db::commit();
+                        $this->redis->rPush('index:meassage:multimediamessage:sendtask', $value['id']);
+                    } catch (\Exception $e) {
+                        // $this->redis->rPush('index:meassage:business:sendtask', $send);
+        
+                        Db::rollback();
+                        exception($e);
+                    }
+                }
+
+            }
+        } catch (\exception $e) {
+            exception($e);
+        }
+     
+
     }
 }
