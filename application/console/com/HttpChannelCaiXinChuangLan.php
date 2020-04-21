@@ -263,7 +263,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                 } */
                             // print_r($result);
                             unset($send_num[$send_taskid]);
-                            sleep(1);
+                            usleep(12500);
                         }
                     }
                 }
@@ -322,7 +322,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                     //     echo "error:" . $result['message'] . "\n";die;
                     // }
                     unset($send_num[$send_taskid]);
-                    sleep(1);
+                    usleep(12500);
                 }
             }
             // $receive_id = [
