@@ -4906,18 +4906,18 @@ Db::rollback();
             $ids = [];
             if ($all_task) {
                 // echo "SELECT `id` FROM `yx_user_send_code_task` WHERE `uid` = '91' AND `create_time` >= '1587470340'  AND `create_time` <= '1587607260'";
-                foreach ($$all_task as $key => $value) {
+                foreach ($all_task as $key => $value) {
                     $prefix = substr(trim($value['mobile_content']), 0, 7);
                     $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
                     // print_r($res);
                     if ($res) {
                         $newres = array_shift($res);
                         if ($newres['source'] == 2 ) { //易信联通
-                            $channel_id = 30;
+                            $channel_id = 22;
                         } else if ($newres['source'] == 1) { //移动易信
-                            $channel_id = 17;
+                            $channel_id = 22;
                         } else if ($newres['source'] == 3 ) { //易信电信
-                            $channel_id = 17;
+                            $channel_id = 22;
                         } 
                     }
                     Db::startTrans();
