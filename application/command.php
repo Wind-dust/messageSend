@@ -40,6 +40,7 @@ return [
     'httpchannelcaixinhuaxingtongxun'  => $commandPath . 'HttpChannelCaiXinHuaxingtongxun',
     'httpchannelcaixinhangzhoumaiyuan' => $commandPath . 'HttpChannelCaiXinHangZhouMaiYuan',
     'httpchannelcaixinchuanglan' => $commandPath . 'HttpChannelCaiXinChuangLan',
+    'httpchannelcaixinmeilian' => $commandPath .'HttpChannelCaiXinMeiLian',
     'cmppmijiadianxinmarketing'        => $commandPath . 'CmppMiJiaDianXinMarketing',
     'cmppmijialiantongmarketing'       => $commandPath . 'CmppMiJiaLianTongMarketing',
     'cmppmijiayidongmarketing'         => $commandPath . 'CmppMiJiaYiDongMarketing',
@@ -55,9 +56,13 @@ return [
     'cmpplanjingmarketing'             => $commandPath . 'CmppLanJingMarketing',
     'cmpplanjingbusiness'              => $commandPath . 'CmppLanJingBusiness',
     'cmpprongheyidongbusiness'              => $commandPath . 'CmppRongHeYiDongBusiness', //融合移动行业
+    'cmpprongheyidongmarketingreport'              => $commandPath . 'CmppRongHeYiDongMarketingReport', //融合移动营销报备
+    'cmpprongheyidongmarketing'              => $commandPath . 'CmppRongHeYiDongMarketing', //融合移动营销
     'cmpprongheliantongbusiness'              => $commandPath . 'CmppRongHeLianTongBusiness', //融合联通行业
+    'cmpprongheliantongmarketing'              => $commandPath . 'CmppRongHeLianTongMarketing', //融合联通营销
     'cmppronghedianXinBusiness'              => $commandPath . 'CmppRongHeDianXinBusiness', //融合电信行业
-    'cmppbeijingbamimarketing'              => $commandPath . 'CmppBeiJingBaMiMarketing',
+    'cmppronghedianXinmarketing'              => $commandPath . 'CmppRongHeDianXinMarketing', //融合电信营销
+    'cmppbeijingbamimarketing'              => $commandPath . 'CmppBeiJingBaMiMarketing', //北京八米
     'serversocketshuhe'                => $commandPath . 'ServerSocketShuHe',
     'ServerSocketjyy'                  => $commandPath . 'ServerSocketJYY',
     'ServerSocketjyylt'                  => $commandPath . 'ServerSocketJYYLT',
