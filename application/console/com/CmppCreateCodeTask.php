@@ -842,9 +842,12 @@ class CmppCreateCodeTask extends Pzlife
                     if (empty($sendTask['channel_id'])) {
                         continue;
                     }
-                    if ($sendTask['uid'] == 91 && (date("H",time())>= 20 || date("H",time())< 10)) {
-                        $this->redis->rPush('index:meassage:business:sendtask', $send);
-                        continue;
+                    if ($sendTask['uid'] == 91 ) {
+                        if ((date("H",time())>= 20 || date("H",time())< 10)) {
+                            $this->redis->rPush('index:meassage:business:sendtask', $send);
+                            continue;
+                        }
+                        
                     }
                     $rollback[] = $send;
                     $mobilesend = [];
@@ -1052,7 +1055,6 @@ class CmppCreateCodeTask extends Pzlife
                     unset($push_messages);
                     unset($rollback);
                 }
-                usleep(500000);
                 // echo time() . "\n";
                 // exit('success');
             } catch (\Exception $e) {
