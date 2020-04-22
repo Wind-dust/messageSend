@@ -51,11 +51,11 @@ class CmppMeiLianRuanTongYiDongGame extends Pzlife
         $redisMessageUnKownDeliver = 'index:meassage:code:unknow:deliver:' . $content; //行业通知MsgId
         $redisMessageUpRiver       = 'index:message:code:upriver:' . $content;
 
-         $send = $redis->rPush($redisMessageCodeSend, json_encode([
+         /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'content'     => '【传奇超爆版】4月官方提醒：您1232账号累计收到9779786元宝，取件码： http://y4o.cn/9ldrnz 退订回T',
-        ]));
+        ])); */
 
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/".$content.".log";
