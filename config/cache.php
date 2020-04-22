@@ -44,7 +44,7 @@ return [
         'type' => 'redis',
         'host' => Env::get('redis.hostname'),
         'port' => '6379',
-        'password' => Env::get('redis.password'),
+        'password' => "as6d7g&h",
         'timeout' => 3600,
         'select' => 2,
     ]
