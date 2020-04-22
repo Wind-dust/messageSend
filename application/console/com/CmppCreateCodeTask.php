@@ -702,6 +702,10 @@ class CmppCreateCodeTask extends Pzlife
             if (empty($sendTask)) {
                 exit('taskId_is_null');
             }
+            if ($sendTask['uid'] == 91 && (date("H",time())>= 20 || date("H",time())< 10)) {
+                $this->redis->rPush('index:meassage:multimediamessage:sendtask', $send);
+                continue;
+            }
             $mobilesend = [];
             // print_r($sendTask);die;
             $mobilesend = explode(',', $sendTask['mobile_content']);
