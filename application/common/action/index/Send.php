@@ -1755,11 +1755,10 @@ return $result;
                 'send_status'    => $send_status,
                 'send_time'      => time(),
             ];
-            // print_r($send_task_log);
             $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
-            return "OK";
+            return 'OK';
         } else {
-            return "error";
+            return 'error';
         }
     }
 }

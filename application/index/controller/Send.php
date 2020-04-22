@@ -950,6 +950,12 @@ class Send extends MyController
         $task_id  = trim($this->request->post('ext_id')); //登陆密码
         $phone  = trim($this->request->post('phone')); //登陆密码
         $result = $this->app->send->chuangLanMmsCallBack($code, $desc, $task_id, $phone);
-        return $result;
+        if ($result == 'OK') {
+            echo 'OK';
+            exit;
+        }else{
+            echo 'error';
+            exit;
+        }
     }
 }
