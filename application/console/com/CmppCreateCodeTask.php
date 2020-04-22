@@ -838,7 +838,7 @@ class CmppCreateCodeTask extends Pzlife
                     if (empty($sendTask['channel_id'])) {
                         continue;
                     }
-                    if ($sendTask['uid'] == 91 && (date("H",time())>= 20 || date("H",time())<= 10)) {
+                    if ($sendTask['uid'] == 91 && (date("H",time())>= 20 || date("H",time())< 10)) {
                         $this->redis->rPush('index:meassage:business:sendtask', $send);
                         continue;
                     }
