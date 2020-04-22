@@ -332,7 +332,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
             // die;
 
             // print_r($receive_data);die;
-            sleep(60);
+            sleep(10);
 
             unset($send_num);
             unset($send_content);
