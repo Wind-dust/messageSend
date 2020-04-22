@@ -18,3 +18,4 @@ invoice.json
 apidoc.json
 tasklog/
 error/
+config/cache.php
