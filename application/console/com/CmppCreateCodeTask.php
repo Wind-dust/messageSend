@@ -844,7 +844,7 @@ class CmppCreateCodeTask extends Pzlife
                     }
                     if ($sendTask['uid'] == 91 ) {
                         if ((date("H",time())>= 20 || date("H",time())< 10)) {
-                            $this->redis->rPush('index:meassage:business:sendtask', $send);
+                            $this->redis->rPush('index:meassage:business:buffersendtask', $send);//缓存队列
                             continue;
                         }
                         
