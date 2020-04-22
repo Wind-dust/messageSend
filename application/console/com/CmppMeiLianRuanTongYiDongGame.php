@@ -25,9 +25,9 @@ class CmppMeiLianRuanTongYiDongGame extends Pzlife
         return [
             'host'          => "120.27.22.231", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "20632", //企业id  企业代码
+            'Source_Addr'   => "shxjym", //企业id  企业代码
             'Shared_secret' => '0cd2c7', //网关登录密码
-            'Service_Id'    => "20632", //业务代码
+            'Service_Id'    => "shxjym", //业务代码
             'template_id'   => "", //模板id
             'Dest_Id'       => "20632", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
