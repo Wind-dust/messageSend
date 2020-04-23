@@ -85,6 +85,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                 $send = $redis->lPop($redisMessageCodeSend);
                 // $redis->rpush($redisMessageCodeSend, $send);
                 $send_data = json_decode($send, true);
+                
                 if ($send_data) {
                     $roallback[$send_data['mar_task_id']][] = $send;
                     if (empty($send_task)) {
@@ -136,6 +137,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                         if (count($new_num) >= 5000) { //超出2000条做一次提交
                             $real_send = [];
                             $real_send = [
+                                'action'    => "send",
                                 'userid'    => $user_info['userid'],
                                 'account'   => $user_info['account'],
                                 'password'   => $user_info['password'],
@@ -188,6 +190,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                     }
                     $real_send = [];
                     $real_send = [
+                        'action'    => "send",
                         'userid'    => $user_info['userid'],
                         'account'   => $user_info['account'],
                         'password'   => $user_info['password'],
@@ -201,7 +204,6 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                     ];
                     $res = sendRequest($user_info['send_api'], 'post', $real_send);
                     $result = explode(':',$res);
-                    print_r($result);
                     // $result['code'] = 2;
                     if (isset($result[1])) {
                         $receive_id[$result[1]] = $send_taskid;
