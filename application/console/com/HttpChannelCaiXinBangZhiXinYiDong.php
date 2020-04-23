@@ -237,7 +237,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
             // die;
             $receive = sendRequest($user_info['receive_api'], 'post', ['userid' => $user_info['userid'], 'account' => $user_info['account'], 'password' => $user_info['password']]);
             if (empty($receive)) {
-                sleep(10);
+                sleep(60);
                 continue;
             }
             
@@ -282,6 +282,8 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                     // }
                     unset($send_status);
                 }
+            }else{
+                sleep(10);
             }
             // print_r($receive_data);die;
             // sleep(10);
