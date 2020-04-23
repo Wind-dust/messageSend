@@ -2383,7 +2383,7 @@ class OfficeExcel extends Pzlife
             $objReader = PHPExcel_IOFactory::createReader('Excel5');
             // print_r(realpath("./") . "\asd.xlsx");die;
 
-            $objPHPExcel = $objReader->load(realpath("./") . "\asd.xls");
+            $objPHPExcel = $objReader->load(realpath("./") . "/asd.xls");
             // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
             //选择标签页
             $sheet      = $objPHPExcel->getSheet(0); //取得sheet(0)表
