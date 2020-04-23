@@ -2350,6 +2350,7 @@ class OfficeExcel extends Pzlife
     }
 
     public function FirstDaySupplyAgain(){
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
    /*      $type = 'Excel2007';
         $objReader = PHPExcel_IOFactory::createReader($type);
         $path      = $info->getpathName();
@@ -2376,27 +2377,121 @@ class OfficeExcel extends Pzlife
             $send_data[] = $text . ":" . $mobile;
             // print_r($send_data);
         } */
+        try {
+            $redis = Phpredis::getConn();
+            $type = 'Excel5';
+            $objReader = PHPExcel_IOFactory::createReader('Excel5');
+            // print_r(realpath("./") . "\asd.xlsx");die;
 
-                 $objReader = PHPExcel_IOFactory::createReader('Excel2007');
-        // print_r(realpath("../"). "\yt_area_mobile.csv");die;
+            $objPHPExcel = $objReader->load(realpath("./") . "\asd.xls");
+            // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
+            //选择标签页
+            $sheet      = $objPHPExcel->getSheet(0); //取得sheet(0)表
+            $highestRow = $sheet->getHighestRow(); // 取得总行数
+            $highestColumn    = $sheet->getHighestColumn();
+            $highestColumnNum = PHPExcel_Cell::columnIndexFromString($highestColumn); //取得字段，这里测试表格中的第一行为数据的字段，因此先取出用来作后面数组的键名
+            $data       = array();
+            $all_status = [];
+            for ($i = 2; $i < $highestRow; $i++) {
+                $value = [];
+                // $cellVal = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
+                for ($j = 1; $j < $highestColumnNum; $j++) {
+                    $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
+                    $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
 
-        $objPHPExcel = $objReader->load(realpath("./") . "\金卡.xlsx");
-        // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
-        //选择标签页
-        $sheet      = $objPHPExcel->getSheet(0); //取得sheet(0)表
-        $highestRow = $sheet->getHighestRow(); // 取得总行数
-        $highestColumn    = $sheet->getHighestColumn();
-        $highestColumnNum = PHPExcel_Cell::columnIndexFromString($highestColumn); //取得字段，这里测试表格中的第一行为数据的字段，因此先取出用来作后面数组的键名
-        $data       = array();
-        for ($i = 1; $i < $highestRow; $i++) {
-            // $cellVal = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
-            for ($j = 1; $j < $highestColumnNum; $j++) {
-                $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
-                $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
-
-                print_r($cellVal);die;
+                   switch ($j) {
+                       case '1':
+                           $value['task_id'] = $cellVal;
+                           break;
+                           case '5':
+                            $value['mobile'] = $cellVal;
+                            break;
+                            case '7':
+                                $value['message_info'] = $cellVal;
+                                break;
+                            case '8':
+                                $value['status_message'] = $cellVal;
+                                break;
+                                case '9':
+                                    $value['time'] = strtotime($cellVal);
+                                    break;
+                       default:
+                           # code...
+                           break;
+                   }
+                   $value['uid'] = 91;
+                }
+                $all_status[] = $value;
+                
             }
-            
+            $suppay = [];
+            foreach ($all_status as $key => $value) {
+                // print_r($value);
+                $mul_task_log = Db::query("SELECT * FROM yx_user_multimedia_message_log where `task_id` = '".$value['task_id']."' AND `mobile` = '".$value['mobile']."' ");
+                //没有回执
+                if (empty($mul_task_log)) {
+                    $task =  Db::query("SELECT `id`,`create_time`,`update_time`,`source`,`task_no` FROM `yx_user_multimedia_message` WHERE `id` = '" . $value['task_id'] . "' ");
+                    Db::startTrans();
+                    try {
+                        if ($value['status_message'] == 1000) {
+                            $send_status = 3;
+                            $status_message = "DELIVRD";
+                            $real_message = "DELIVRD";
+                            Db::table('yx_user_multimedia_message_log')->insert([
+                                'uid' => $value['uid'],
+                                'task_no' => $task[0]['task_no'],
+                                'mobile' => $value['mobile'],
+                                'send_status' => $send_status,
+                                'create_time' => $task[0]['update_time'],
+                                'update_time' => $value['time'],
+                                'real_message' => $real_message,
+                                'status_message' => $status_message,
+                                'task_id' => $task[0]['id'],
+                                'source' => $task[0]['source'],
+                            ]);
+                            //推送给用户
+                            $redis->rpush('index:meassage:code:user:mulreceive:' . $value['uid'], json_encode([
+                                'task_no' =>   $task[0]['task_no'],
+                                'status_message' =>   $real_message,
+                                'message_info' =>  '发送成功',
+                                'mobile' =>   $value['mobile'],
+                                // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                'send_time' => isset($value['time']) ? date('Y-m-d H:i:s', trim($value['time'])) : date('Y-m-d H:i:s', time()),
+                            ])); //写入用户带处理日志
+                        }else{//失败 补发
+                            // $send_status = 4;
+                            // $status_message = "发送失败";
+                            // $real_message = "发送失败";
+                            if (!in_array($value['mobile'],['13681834423','13585872995','15021417314','15921904656'])) {
+                                $suppay[] = $value['task_id'];
+                            }
+                        }
+                       
+                        Db::commit();
+                    } catch (\Exception $e) {
+                        Db::rollback();
+                        exception($e);
+                    }
+                }else{
+                    //失败补发
+                    if ($value['status_message'] != 1000) {
+                        if (!in_array($value['mobile'],['13681834423','13585872995','15021417314','15921904656'])) {
+                            $suppay[] = $value['task_id'];
+                        }
+                    }
+                }
+            }
+            // print_r($suppay);
+            // $suppay_id = join(',',$suppay);
+            // echo count($suppay);
+            // print_r($suppay_id);
+            foreach ($suppay as $key => $a) {
+                $redis->rpush("index:meassage:multimediamessage:sendtask", $a);
+            }
+        } catch (\Exception $E) {
+            //throw $th;
+            exception($E);
         }
+
     } 
 }
