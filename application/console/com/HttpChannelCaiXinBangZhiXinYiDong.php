@@ -201,7 +201,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                     ];
                     $res = sendRequest($user_info['send_api'], 'post', $real_send);
                     $result = json_decode($res, true);
-                    // print_r($result);
+                    print_r($result);
                     // $result['code'] = 2;
                     if ($result['code'] == 0) {
                         $receive_id[$result['batchId']] = $send_taskid;
