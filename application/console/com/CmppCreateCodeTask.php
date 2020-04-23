@@ -4909,7 +4909,7 @@ Db::rollback();
             
         } */
         try {
-            $all_task = Db::query("SELECT `id`,`mobile_content` FROM `yx_user_send_code_task` WHERE `uid` = '91' AND `free_trial` = 1  AND `create_time` >= '1587470340'  AND `create_time` <= '1587607260'");
+            $all_task = Db::query("SELECT `id`,`mobile_content` FROM `yx_user_send_code_task` WHERE `uid` = '91'  AND `id` > '446787'  AND `id` < '448343'");
             $ids = [];
             if ($all_task) {
                 // echo "SELECT `id` FROM `yx_user_send_code_task` WHERE `uid` = '91' AND `create_time` >= '1587470340'  AND `create_time` <= '1587607260'";
@@ -4943,7 +4943,7 @@ Db::rollback();
 
             }
             $all_task = [];
-            $all_task = Db::query("SELECT `id` FROM `yx_user_multimedia_message` WHERE `uid` = '91' AND `free_trial` = 1 AND `create_time` >= '1587470340'  AND `create_time` <= '1587607260'");
+            $all_task = Db::query("SELECT `id` FROM `yx_user_multimedia_message` WHERE `uid` = '91'  AND `id` >= '1853'  AND `id` <= '2038'");
             $ids = [];
             if ($all_task) {
                 foreach ($all_task as $key => $value) {
