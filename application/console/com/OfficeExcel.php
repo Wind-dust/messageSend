@@ -2348,4 +2348,55 @@ class OfficeExcel extends Pzlife
         // }
         echo "结束时间".date('Y-m-d H:i:s',time());
     }
+
+    public function FirstDaySupplyAgain(){
+   /*      $type = 'Excel2007';
+        $objReader = PHPExcel_IOFactory::createReader($type);
+        $path      = $info->getpathName();
+        $objPHPExcel = $objReader->load($path, $encode = 'utf-8'); //加载文件
+        $sheet = $objPHPExcel->getSheet(0); //取得sheet(0)表
+        $highestRow = $sheet->getHighestRow(); // 取得总行数
+
+        $highestColumn    = $sheet->getHighestColumn();
+        $highestColumnNum = PHPExcel_Cell::columnIndexFromString($highestColumn); //取得字段，这里测试表格中的第一行为数据的字段，因此先取出用来作后面数组的键名
+        for ($i = 1; $i <= $highestRow; $i++) {
+            $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
+
+            $text = '';
+            $cor = '';
+            for ($j = 1; $j < $highestColumnNum; $j++) {
+                $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
+                $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
+
+                if (!empty($cellVal)) {
+                    $text .= $cor . $cellVal;
+                    $cor = ',';
+                }
+            }
+            $send_data[] = $text . ":" . $mobile;
+            // print_r($send_data);
+        } */
+
+                 $objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        // print_r(realpath("../"). "\yt_area_mobile.csv");die;
+
+        $objPHPExcel = $objReader->load(realpath("./") . "\金卡.xlsx");
+        // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
+        //选择标签页
+        $sheet      = $objPHPExcel->getSheet(0); //取得sheet(0)表
+        $highestRow = $sheet->getHighestRow(); // 取得总行数
+        $highestColumn    = $sheet->getHighestColumn();
+        $highestColumnNum = PHPExcel_Cell::columnIndexFromString($highestColumn); //取得字段，这里测试表格中的第一行为数据的字段，因此先取出用来作后面数组的键名
+        $data       = array();
+        for ($i = 1; $i < $highestRow; $i++) {
+            // $cellVal = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
+            for ($j = 1; $j < $highestColumnNum; $j++) {
+                $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
+                $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
+
+                print_r($cellVal);die;
+            }
+            
+        }
+    } 
 }

@@ -252,7 +252,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                     // $receive_info = [];
                     // $receive_info = explode(',', $value);
                     // $task_id      = $receive_id[$value['taskid']];
-                    $task_id      = $redis->hget('index:meassage:code:back_taskno:'.$content,$value['taskid']);
+                    $task_id      = $redis->hget('index:meassage:code:back_taskno:'.$content,trim($value['taskid']));
                     $task         = $this->getSendTask($task_id);
                     if ($task == false) {
                         echo "error task_id" . "\n";
