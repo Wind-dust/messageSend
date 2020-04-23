@@ -247,8 +247,8 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
             // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
             // $receive_data = explode(';', $receive);
             if (isset($receive_data['statusbox'])) {
-                $real_receive_data = $receive_data['statusbox'];
-                foreach ($real_receive_data as $key => $value) {
+                // $real_receive_data = $receive_data['statusbox'];
+                foreach ($receive_data as $key => $value) {
                     // $receive_info = [];
                     // $receive_info = explode(',', $value);
                     // $task_id      = $receive_id[$value['taskid']];
