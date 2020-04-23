@@ -700,7 +700,7 @@ class CmppCreateCodeTask extends Pzlife
 
             $sendTask = $this->getMultimediaSendTask($send);
             if (empty($sendTask)) {
-                exit('taskId_is_null');
+               sleep(10);
             }
             if ($sendTask['uid'] == 91 && (date("H",time())>= 20 || date("H",time())< 10)) {
                 $this->redis->rPush('index:meassage:multimediamessage:sendtask', $send);
