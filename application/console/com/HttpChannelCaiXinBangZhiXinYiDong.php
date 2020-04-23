@@ -188,15 +188,16 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                     }
                     $real_send = [];
                     $real_send = [
-                        'accesskey'    => $user_info['accesskey'],
-                        'secret'   => $user_info['secret'],
+                        'userid'    => $user_info['userid'],
+                        'account'   => $user_info['account'],
+                        'password'   => $user_info['password'],
                         // 'timestamp' => date('YmdHis',time()),
                         // 'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time()))),
                         'mobile'    => join(',', $new_num),
                         'starttime' => '',
                         'title'     => $send_title[$send_taskid],
-                        // 'content'   => $send_content[$send_taskid],
-                        'content'   => urlencode($send_content[$send_taskid]),
+                        'content'   => $send_content[$send_taskid], 
+                        // 'content'   => urlencode($send_content[$send_taskid]),
                     ];
                     $res = sendRequest($user_info['send_api'], 'post', $real_send);
                     $result = json_decode($res, true);
