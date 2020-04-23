@@ -152,9 +152,9 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                             // $result = json_decode($res, true);
                             $result = explode(':',$res);
                             // $result['code'] = 2;
-                            if ($result['code'] == 0) {
-                                $receive_id[$result['batchId']] = $send_taskid;
-                                $redis->hset('index:meassage:code:back_taskno:' . $content, $result['batchId'], $send_taskid);
+                            if (isset($result[1])) {
+                                $receive_id[$result[1]] = $send_taskid;
+                                $redis->hset('index:meassage:code:back_taskno:' . $content, $result[1], $send_taskid);
                                 unset($roallback[$send_taskid]);
                             } else {
                                 foreach ($roallback as $key => $value) {
@@ -200,12 +200,12 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                         // 'content'   => urlencode($send_content[$send_taskid]),
                     ];
                     $res = sendRequest($user_info['send_api'], 'post', $real_send);
-                    $result = json_decode($res, true);
+                    $result = explode(':',$res);
                     print_r($result);
                     // $result['code'] = 2;
-                    if ($result['code'] == 0) {
-                        $receive_id[$result['batchId']] = $send_taskid;
-                        $redis->hset('index:meassage:code:back_taskno:' . $content, $result['batchId'], $send_taskid);
+                    if (isset($result[1])) {
+                        $receive_id[$result[1]] = $send_taskid;
+                        $redis->hset('index:meassage:code:back_taskno:' . $content, $result[1], $send_taskid);
                         unset($roallback[$send_taskid]);
                     } else {
                         foreach ($roallback as $key => $value) {
