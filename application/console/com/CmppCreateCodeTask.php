@@ -3388,7 +3388,7 @@ class CmppCreateCodeTask extends Pzlife {
             $sendlog = $redis->lpop('index:meassage:multimediamessage:deliver:' . $channel_id);
             if (empty($sendlog)) {
                 // exit('Send Log IS null');
-                sleep(600);
+                sleep(60);
                 continue;
             }
             $send_log    = json_decode($sendlog, true);
