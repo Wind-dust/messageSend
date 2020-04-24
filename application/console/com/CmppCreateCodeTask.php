@@ -5162,9 +5162,10 @@ exception($e);
     public function receiptMulToBase(){
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $start_time = strtotime('2020-04-21 0:00:00');
-        // $end_time = strtotime('2020-04-21 20:00:00');
+        $end_time = strtotime('2020-04-21 20:00:00');
         // $end_time   = strtotime("-3 day");
-        $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . time() . "' ");
+        // $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . time() . "' ");
+        $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' ");
         // $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . time() . "' ");
         // print_r("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . time() . "' ");die;
         // echo count($mul_task);die;
@@ -5172,11 +5173,11 @@ exception($e);
             $mobile_content = $value['mobile_content'];
             $mobile_content = explode(',', $mobile_content);
             $time = $value['update_time'];
-            if ($value['create_time'] >= 1587470400 && $value['create_time'] <= 1587520800) {
+            if ($time >= 1587470400 && $time <= 1587520800) {
                 $time = '1587520801';
-            }elseif ($value['create_time'] >= 1587556800 && $value['create_time'] <= 1587607200) {
+            }elseif ($time >= 1587556800 && $time <= 1587607200) {
                 $time = '1587607201';
-            }elseif ($value['create_time'] >= 1587643200 && $value['create_time'] <= 1587693600) {
+            }elseif ($time >= 1587643200 && $time <= 1587693600) {
                 $time = '1587607201';
             }
             for ($i = 0; $i < count($mobile_content); $i++) {
