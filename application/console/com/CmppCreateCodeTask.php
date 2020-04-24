@@ -3392,7 +3392,7 @@ class CmppCreateCodeTask extends Pzlife {
                 continue;
             }
             $send_log    = json_decode($sendlog, true);
-            $sendtasklog = Db::query("SELECT `id`,`create_time`,`real_message` FROM `yx_user_multimedia_message_log` WHERE `task_no` = '" . $send_log['task_no'] . "' AND `mobile` = '" . $send_log['mobile'] . "' ");
+            $sendtasklog = Db::query("SELECT `id`,`create_time`,`real_message`,`status_message` FROM `yx_user_multimedia_message_log` WHERE `task_no` = '" . $send_log['task_no'] . "' AND `mobile` = '" . $send_log['mobile'] . "' ");
             // die;
             if (empty($sendtasklog)) {
                 $task = Db::query("SELECT `id`,`create_time`,`update_time`,`source` FROM `yx_user_multimedia_message` WHERE `task_no` = '" . $send_log['task_no'] . "' ");
