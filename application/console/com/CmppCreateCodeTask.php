@@ -5017,7 +5017,7 @@ exception($e);
                         'message_info'   => '发送失败',
                         'mobile'         => $value['mobile'],
                         // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                        'send_time'      => trim($time),
+                        'send_time'      => date('Y-m-d H:i:s',$time),
                     ])); //写入用户带处理日志
                     continue;
                 }
@@ -5037,7 +5037,7 @@ exception($e);
                         'message_info'   => '发送成功',
                         'mobile'         => $value['mobile'],
                         // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                        'send_time'      => trim($time),
+                        'send_time'      => date('Y-m-d H:i:s',$time),
                     ])); //写入用户带处理日志
                 } catch (\Exception $e) {
                     // $this->redis->rPush('index:meassage:business:sendtask', $send);
@@ -5071,7 +5071,7 @@ exception($e);
                         'message_info'   => '发送失败',
                         'mobile'         => $value['mobile'],
                         // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                        'send_time'      => trim($time),
+                        'send_time'      => date('Y-m-d H:i:s',$time),
                     ])); //写入用户带处理日志
                     continue;
                 }
@@ -5091,7 +5091,7 @@ exception($e);
                         'message_info'   => '发送成功',
                         'mobile'         => $value['mobile'],
                         // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                        'send_time'      => trim($time),
+                        'send_time'      => date('Y-m-d H:i:s',$time),
                     ])); //写入用户带处理日志
                 } catch (\Exception $e) {
                     // $this->redis->rPush('index:meassage:business:sendtask', $send);
