@@ -5171,6 +5171,14 @@ exception($e);
         foreach ($mul_task as $key => $value) {
             $mobile_content = $value['mobile_content'];
             $mobile_content = explode(',', $mobile_content);
+            $time = $value['update_time'];
+            if ($value['create_time'] >= 1587470400 && $value['create_time'] <= 1587520800) {
+                $time = '1587520801';
+            }elseif ($value['create_time'] >= 1587556800 && $value['create_time'] <= 1587607200) {
+                $time = '1587607201';
+            }elseif ($value['create_time'] >= 1587643200 && $value['create_time'] <= 1587693600) {
+                $time = '1587607201';
+            }
             for ($i = 0; $i < count($mobile_content); $i++) {
                 $task_log = Db::query("SELECT `id`,`status_message` FROM yx_user_multimedia_message_log WHERE `task_no` = '" . $value['task_no'] . "' AND `mobile` = '" . $mobile_content[$i] . "'");
                 if (empty($task_log)) {
@@ -5181,7 +5189,7 @@ exception($e);
                             'task_no'        => $value['task_no'],
                             'mobile'         => $mobile_content[$i],
                             'send_status'    => 3,
-                            'create_time'    => $value['update_time'],
+                            'create_time'    => $time,
                             'update_time'    => time(),
                             'task_id'        => $value['id'],
                             'source'         => $value['source'],
@@ -5197,7 +5205,7 @@ exception($e);
                 }else{
                     Db::table('yx_user_multimedia_message_log')->where('id',$task_log[0]['id'])->update(
                         [
-                            'create_time' => $value['update_time'],
+                            'create_time' => $time,
                         ]
                     );
                 }
