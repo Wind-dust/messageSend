@@ -4948,11 +4948,26 @@ exception($e);
 
         foreach ($mul_task as $key => $value) {
             $num = max(0,1000);
+            $time =  time() - mt_rand(0, 57);
             if ($num > 15) {
                 if ($value['mobile'] == '15021417314') {
+                    Db::table('yx_user_multimedia_message_log')->where('id', $value['id'])->update([
+                        'send_status'    => 3,
+                        'update_time'    => $time,
+                        'status_message' => '-30',
+                        'task_id'        => $value['id'],
+                    ]);
+                    Db::commit();
+                    $this->redis->rpush('index:meassage:code:user:mulreceive:' . $value['uid'], json_encode([
+                        'task_no'        => $value['task_no'],
+                        'status_message' => "-30",
+                        'message_info'   => '发送失败',
+                        'mobile'         => $value['mobile'],
+                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        'send_time'      => trim($time),
+                    ])); //写入用户带处理日志
                     continue;
                 }
-                $time =  time() - mt_rand(0, 57);
                 Db::startTrans();
                 try {
                     Db::table('yx_user_multimedia_message_log')->where('id', $value['id'])->update([
@@ -4988,6 +5003,21 @@ exception($e);
             $num = max(0,1000);
             if ($num > 17) {
                 if ($value['mobile'] == '15021417314') {
+                    Db::table('yx_user_multimedia_message_log')->where('id', $value['id'])->update([
+                        'send_status'    => 3,
+                        'update_time'    => $time,
+                        'status_message' => '-30',
+                        'task_id'        => $value['id'],
+                    ]);
+                    Db::commit();
+                    $this->redis->rpush('index:meassage:code:user:mulreceive:' . $value['uid'], json_encode([
+                        'task_no'        => $value['task_no'],
+                        'status_message' => "-30",
+                        'message_info'   => '发送失败',
+                        'mobile'         => $value['mobile'],
+                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        'send_time'      => trim($time),
+                    ])); //写入用户带处理日志
                     continue;
                 }
                 $time =  time() - mt_rand(0, 59);
@@ -5027,6 +5057,21 @@ exception($e);
             $num = max(0,1000);
             if ($num > 19) {
                 if ($value['mobile'] == '15021417314') {
+                    Db::table('yx_user_multimedia_message_log')->where('id', $value['id'])->update([
+                        'send_status'    => 3,
+                        'update_time'    => $time,
+                        'status_message' => '-30',
+                        'task_id'        => $value['id'],
+                    ]);
+                    Db::commit();
+                    $this->redis->rpush('index:meassage:code:user:mulreceive:' . $value['uid'], json_encode([
+                        'task_no'        => $value['task_no'],
+                        'status_message' => "-30",
+                        'message_info'   => '发送失败',
+                        'mobile'         => $value['mobile'],
+                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        'send_time'      => trim($time),
+                    ])); //写入用户带处理日志
                     continue;
                 }
                 $time =  time() - mt_rand(0, 53);
