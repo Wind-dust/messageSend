@@ -1745,6 +1745,7 @@ return $result;
                 $code = 'DELIVRD';
                 $send_status = 3;
             } else {
+                $code = $desc;
                 $send_status = 4;
             }
             $send_task_log = [
