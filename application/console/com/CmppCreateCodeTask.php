@@ -5162,54 +5162,46 @@ exception($e);
     public function receiptMulToBase(){
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $start_time = strtotime('2020-04-21 0:00:00');
-        $end_time = strtotime('2020-04-21 20:00:00');
+        $end_time = strtotime('2020-04-23 20:00:00');
         // $end_time   = strtotime("-3 day");
         // $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . time() . "' ");
-        $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' ");
+        $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' ORDER BY id ASC ");
         // $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . time() . "' ");
         // print_r("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . time() . "' ");die;
-        // echo count($mul_task);die;
         foreach ($mul_task as $key => $value) {
             $mobile_content = $value['mobile_content'];
-            $mobile_content = explode(',', $mobile_content);
             $time = $value['update_time'];
             if ($time >= 1587470400 && $time <= 1587520800) {
                 $time = '1587520801';
             }elseif ($time >= 1587556800 && $time <= 1587607200) {
                 $time = '1587607201';
-            }elseif ($time >= 1587643200 && $time <= 1587693600) {
-                $time = '1587607201';
+            }else{
+                $time = $value['update_time'];
             }
-            for ($i = 0; $i < count($mobile_content); $i++) {
-                $task_log = Db::query("SELECT `id`,`status_message` FROM yx_user_multimedia_message_log WHERE `task_no` = '" . $value['task_no'] . "' AND `mobile` = '" . $mobile_content[$i] . "'");
-                if (empty($task_log)) {
-                    Db::startTrans();
-                    try {
-                        Db::table('yx_user_multimedia_message_log')->insert([
-                            'uid'            => $value['uid'],
-                            'task_no'        => $value['task_no'],
-                            'mobile'         => $mobile_content[$i],
-                            'send_status'    => 3,
-                            'create_time'    => $time,
-                            'update_time'    => time(),
-                            'task_id'        => $value['id'],
-                            'source'         => $value['source'],
-                        ]);
-                        Db::commit();
-                     
-                    } catch (\Exception $e) {
-                        // $this->redis->rPush('index:meassage:business:sendtask', $send);
-
-                        Db::rollback();
-                        exception($e);
-                    }
-                }else{
-                    Db::table('yx_user_multimedia_message_log')->where('id',$task_log[0]['id'])->update(
-                        [
-                            'create_time' => $time,
-                        ]
-                    );
+            $task_log = Db::query("SELECT `id`,`status_message` FROM yx_user_multimedia_message_log WHERE `task_no` = '" . $value['task_no'] . "' AND `mobile` = '" . $mobile_content . "'");
+            if (empty($task_log)) {
+                try {
+                    Db::table('yx_user_multimedia_message_log')->insert([
+                        'uid'            => $value['uid'],
+                        'task_no'        => $value['task_no'],
+                        'mobile'         => $mobile_content,
+                        'send_status'    => 3,
+                        'create_time'    => $time,
+                        'update_time'    => time(),
+                        'task_id'        => $value['id'],
+                        'source'         => $value['source'],
+                    ]);
+                    Db::commit();
+                 
+                } catch (\Exception $e) {
+                    exception($e);
                 }
+            }else{
+                Db::table('yx_user_multimedia_message_log')->where('id',$task_log[0]['id'])->update(
+                    [
+                        'create_time' => $time,
+                    ]
+                );
             }
         }
     }
