@@ -1543,11 +1543,13 @@ class CmppCreateCodeTask extends Pzlife {
 
                     usleep(20000);
                 } else {
+                    $stat = trim($send_log['Stat']);
                     if (strpos($send_log['Stat'], 'DB:0141') !== false || strpos($send_log['Stat'], 'MBBLACK') !== false || strpos($send_log['Stat'], 'BLACK') !== false) {
                         $message_info = '黑名单';
                     } else if (trim($send_log['Stat'] == 'DELIVRD')) {
                         $message_info = '发送成功';
                     } else if (in_array(trim($send_log['Stat']) ,['REJECTD','REJECT','MA:0001'])){
+                        $stat = 'DELIVRD';
                         $message_info = '发送成功';
                     }else {
                         $message_info = '发送失败';
@@ -1558,7 +1560,7 @@ class CmppCreateCodeTask extends Pzlife {
                     } */
                     $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
                         'task_no'        => trim($task[0]['task_no']),
-                        'status_message' => trim($send_log['Stat']),
+                        'status_message' => $stat,
                         'message_info'   => $message_info,
                         'mobile'         => trim($send_log['mobile']),
                         // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
@@ -5260,9 +5262,13 @@ exception($e);
                 if (!empty($task)) {
                     $task_log = Db::query("SELECT * FROM  yx_send_task_log WHERE `task_no` = '".$task[0]['task_no']."'");
                     if (!empty($task_log)){
+                        if () 
                         Db::table('yx_send_task_log')->where('id',$task_log[0]['id'])->update(
                             [
-                                ''
+                                'status_message' => $task[0]['status_message'],
+                                'real_message' => $task[0]['real_message'],
+                                'update_time' => $task[0]['create_time'],
+                                'message_info' => $message_info,
                             ]
                         );
                     }
