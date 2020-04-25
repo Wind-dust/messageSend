@@ -3439,7 +3439,7 @@ class CmppCreateCodeTask extends Pzlife {
                 $message_info = '黑名单';
             } else if ($send_log['status_message'] == 'DELIVRD') {
                 $message_info = '发送成功';
-            }else if (in_array(trim($send_log['status_message']) ,['REJECTD','REJECT','MA:0001'])){
+            }else if (in_array(trim($send_log['status_message']) ,['REJECTD','REJECT','MA:0001','4442'])){
                 $$send_log['status_message'] = 'DELIVRD';
                 $message_info = '发送成功';
             } else {
@@ -5215,7 +5215,7 @@ exception($e);
         $end_time = strtotime('2020-04-23 20:00:00');
         // $end_time   = strtotime("-3 day");
         // $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . time() . "' ");
-        $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' ORDER BY id ASC ");
+        $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message WHERE  `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' ORDER BY id ASC ");
         // $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . time() . "' ");
         // print_r("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . time() . "' ");die;
         foreach ($mul_task as $key => $value) {

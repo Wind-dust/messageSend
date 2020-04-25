@@ -71,4 +71,5 @@ return [
     'ServerSocketjyydx'                  => $commandPath . 'ServerSocketJYYDX',
     'serversocket'                  => $commandPath . 'ServerSocket',
     'serversocketjgz'   => $commandPath . 'ServerSocketJGZ',
+    'sflupload'   => $commandPath . 'SflUpload',
 ];
