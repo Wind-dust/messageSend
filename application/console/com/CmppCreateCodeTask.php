@@ -5261,8 +5261,7 @@ exception($e);
                 $task = Db::query("SELECT `task_no` FROM yx_send_task WHERE `id` = ".$task_code_receipt[0]['task_id']);
                 if (!empty($task)) {
                     $task_log = Db::query("SELECT * FROM  yx_send_task_log WHERE `task_no` = '".$task[0]['task_no']."'");
-                    if (!empty($task_log)){
-                        if () 
+                    /* if (!empty($task_log)){
                         Db::table('yx_send_task_log')->where('id',$task_log[0]['id'])->update(
                             [
                                 'status_message' => $task[0]['status_message'],
@@ -5271,7 +5270,7 @@ exception($e);
                                 'message_info' => $message_info,
                             ]
                         );
-                    }
+                    } */
                 }
             }
     }
