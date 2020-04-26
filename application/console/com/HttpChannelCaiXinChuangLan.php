@@ -269,7 +269,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                 usleep(12500);
                             }
                         }
-                        usleep(1);
+                        sleep(1);
                     }
                 } while ($send);
                 //剩下的号码再做提交
