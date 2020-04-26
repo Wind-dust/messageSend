@@ -480,6 +480,9 @@ return $result;
             } else {
                 $data['channel_id'] = 22; //蓝鲸
             }
+            if ($user['id'] == 47) {
+                $data['channel_id'] = 24;
+            }
         }
         Db::startTrans();
         try {
