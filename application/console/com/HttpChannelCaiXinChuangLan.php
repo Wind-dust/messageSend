@@ -110,6 +110,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                 $send_content = [];
                 $send_title   = [];
                 $receive_id   = [];
+                $image_data = [];
                 $roallback = [];
                 
                 // if (date('H') >= 18 || date('H') < 8) {
@@ -164,7 +165,17 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                     } elseif ($type[1] == 'midi') {
                                         $frame['type'] = 7;
                                     }
-                                    $frame['content'] = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                    $md5 = md5(Config::get('qiniu.domain') . '/' . $value['image_path']);
+                                    if (isset($image_data[$md5])) {
+                                        $frame['content'] = $image_data[$md5];
+                            
+                                    }else{
+                                        $imagebase = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                        $image_data[$md5] = $imagebase;
+                                        $frame['content'] =$imagebase;
+                                       
+                                    }
+                                    // $frame['content'] = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                     $real_send_content[] = $frame;
                                 }
                             }
@@ -210,9 +221,19 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                     } elseif ($type[1] == 'midi') {
                                         $frame['type'] = 7;
                                     }
-                                    $frame['content'] = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                    $md5 = md5(Config::get('qiniu.domain') . '/' . $value['image_path']);
+                                    if (isset($image_data[$md5])) {
+                                        $frame['content'] = $image_data[$md5];
+                            
+                                    }else{
+                                        $imagebase = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                        $image_data[$md5] = $imagebase;
+                                        $frame['content'] =$imagebase;
+                                       
+                                    }
+                                    // $frame['content'] = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                     $real_send_content[] = $frame;
-                                    sleep(1);
+                                    // sleep(1);
                                 }
                             }
                             // $send_content[$send_data['mar_task_id']] = $send_data['content'];
@@ -357,6 +378,10 @@ class HttpChannelCaiXinChuangLan extends Pzlife
             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
             fwrite($myfile, $th . "\n");
             fclose($myfile);
+            $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
+                'mobile'      => 15201926171,
+                'content'     => "创蓝彩信通道出现异常"
+            ])); //三体营销通道
 
         }
         

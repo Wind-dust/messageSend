@@ -71,227 +71,289 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
         'mobile' => '13476024461',
         'content' =>'【鼎业装饰】鼎礼相祝！跨年巨惠！定单送欧派智能晾衣架一套。选欧派产品可秒杀欧派智能马桶999元一个。终极预存大礼，来店给你个超大的惊喜！！！大到超乎您想象！一年只有这一次！电话3236788回T退订',
         ])); */
-        while (true) {
-            $send_task    = [];
-            $send_num     = [];
-            $send_content = [];
-            $send_title   = [];
-            $receive_id   = [];
-            $roallback = [];
-            // if (date('H') >= 18 || date('H') < 8) {
-            //     exit("8点前,18点后通道关闭");
-            // }
-            do {
-                $send = $redis->lPop($redisMessageCodeSend);
-                // $redis->rpush($redisMessageCodeSend, $send);
-                $send_data = json_decode($send, true);
-                
-                if ($send_data) {
-                    $roallback[$send_data['mar_task_id']][] = $send;
-                    if (empty($send_task)) {
-                        $send_task[]                           = $send_data['mar_task_id'];
-                        $send_title[$send_data['mar_task_id']] = $send_data['title'];
-                        //处理内容
-                        $real_send_content = '';
-                        $vc                = '';
-                        foreach ($send_data['content'] as $key => $value) {
-                            $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
-                            // $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode($value['content']);
-                            if (!empty($value['image_path'])) {
-                                $real_send_content .= ',';
-                                if ($value['image_type'] == 'jpg') {
-                                    $real_send_content .= 'jpg|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
-                                } elseif ($value['image_type'] == 'gif') {
-                                    $real_send_content .= 'gif|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+        try {
+            while (true) {
+                $send_task    = [];
+                $send_num     = [];
+                $send_content = [];
+                $send_title   = [];
+                $receive_id   = [];
+                $roallback = [];
+                $image_data = [];
+                // if (date('H') >= 18 || date('H') < 8) {
+                //     exit("8点前,18点后通道关闭");
+                // }
+                do {
+                    $send = $redis->lPop($redisMessageCodeSend);
+                    // $redis->rpush($redisMessageCodeSend, $send);
+                    $send_data = json_decode($send, true);
+                    
+                    if ($send_data) {
+                        $roallback[$send_data['mar_task_id']][] = $send;
+                        if (empty($send_task)) {
+                            $send_task[]                           = $send_data['mar_task_id'];
+                            $send_title[$send_data['mar_task_id']] = $send_data['title'];
+                            //处理内容
+                            $real_send_content = '';
+                            $vc                = '';
+                            foreach ($send_data['content'] as $key => $value) {
+                                $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
+                                // $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode($value['content']);
+                                if (!empty($value['image_path'])) {
+                                    $real_send_content .= ',';
+                                    $md5 = md5(Config::get('qiniu.domain') . '/' . $value['image_path']);
+                                    if (isset($image_data[$md5])) {
+                                        if ($value['image_type'] == 'jpg') {
+                                            // $real_send_content .= 'jpg|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                            $real_send_content .= 'jpg|' . $image_data[$md5];
+                                        } elseif ($value['image_type'] == 'gif') {
+                                            $real_send_content .= 'gif|' . $image_data[$md5];
+                                            // $real_send_content .= 'gif|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                        }
+                                      
+                                    }else{
+                                        $imagebase = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                        $image_data[$md5] = $imagebase;
+                                        // $frame['content'] =$imagebase;
+                                        if ($value['image_type'] == 'jpg') {
+                                            // $real_send_content .= 'jpg|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                            $real_send_content .= 'jpg|' . $image_data[$md5];
+                                        } elseif ($value['image_type'] == 'gif') {
+                                            $real_send_content .= 'gif|' . $image_data[$md5];
+                                            // $real_send_content .= 'gif|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                        }
+                                    }
+                                   
                                 }
+                                $vc = ';';
                             }
-                            $vc = ';';
-                        }
-                        // $send_content[$send_data['mar_task_id']] = $send_data['content'];
-                        $send_content[$send_data['mar_task_id']] = $real_send_content;
-                    } elseif (!in_array($send_data['mar_task_id'], $send_task)) {
-                        $send_task[]                           = $send_data['mar_task_id'];
-                        $send_title[$send_data['mar_task_id']] = $send_data['title'];
-                        //处理内容
-                        // $send_content[$send_data['mar_task_id']] = $send_data['content'];
-                        $real_send_content = '';
-                        $vc                = '';
-                        foreach ($send_data['content'] as $key => $value) {
-                            $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
-                            // $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode($value['content']);
-                            if (!empty($value['image_path'])) {
-                                $real_send_content .= ',';
-                                if ($value['image_type'] == 'jpg') {
-                                    $real_send_content .= 'jpg|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
-                                } elseif ($value['image_type'] == 'gif') {
-                                    $real_send_content .= 'gif|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
-                                }
-                            }
-                            $vc = ';';
-                        }
-                        $send_content[$send_data['mar_task_id']] = $real_send_content;
-                    }
-                    $send_num[$send_data['mar_task_id']][] = $send_data['mobile'];
-                    foreach ($send_num as $send_taskid => $num) {
-                        $new_num = array_unique($num);
-                        if (count($new_num) >= 5000) { //超出2000条做一次提交
-                            $real_send = [];
-                            $real_send = [
-                                'action'    => "send",
-                                'userid'    => $user_info['userid'],
-                                'account'   => $user_info['account'],
-                                'password'   => $user_info['password'],
-                                // 'timestamp' => date('YmdHis',time()),
-                                // 'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time()))),
-                                'mobile'    => join(',', $new_num),
-                                'starttime' => '',
-                                'title'     => $send_title[$send_taskid],
-                                'content'   => $send_content[$send_taskid], 
-                                // 'content'   => urlencode($send_content[$send_taskid]),
-                            ];
-
-                            $res    = sendRequest($user_info['send_api'], 'post', $real_send);
-                            // $result = json_decode($res, true);
-                            $result = explode(':',$res);
-                            // $result['code'] = 2;
-                            if (isset($result[1])) {
-                                $receive_id[$result[1]] = $send_taskid;
-                                $redis->hset('index:meassage:code:back_taskno:' . $content, $result[1], $send_taskid);
-                                unset($roallback[$send_taskid]);
-                            } else {
-                                foreach ($roallback as $key => $value) {
-                                    foreach ($value as $ne => $val) {
-                                        $redis->rpush($redisMessageCodeSend, $val);
+                            // $send_content[$send_data['mar_task_id']] = $send_data['content'];
+                            $send_content[$send_data['mar_task_id']] = $real_send_content;
+                        } elseif (!in_array($send_data['mar_task_id'], $send_task)) {
+                            $send_task[]                           = $send_data['mar_task_id'];
+                            $send_title[$send_data['mar_task_id']] = $send_data['title'];
+                            //处理内容
+                            // $send_content[$send_data['mar_task_id']] = $send_data['content'];
+                            $real_send_content = '';
+                            $vc                = '';
+                            foreach ($send_data['content'] as $key => $value) {
+                                $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
+                                // $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode($value['content']);
+                                if (!empty($value['image_path'])) {
+                                    $real_send_content .= ',';
+                                    /* if ($value['image_type'] == 'jpg') {
+                                        $real_send_content .= 'jpg|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                    } elseif ($value['image_type'] == 'gif') {
+                                        $real_send_content .= 'gif|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                    } */
+                                    $md5 = md5(Config::get('qiniu.domain') . '/' . $value['image_path']);
+                                    if (isset($image_data[$md5])) {
+                                        if ($value['image_type'] == 'jpg') {
+                                            // $real_send_content .= 'jpg|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                            $real_send_content .= 'jpg|' . $image_data[$md5];
+                                        } elseif ($value['image_type'] == 'gif') {
+                                            $real_send_content .= 'gif|' . $image_data[$md5];
+                                            // $real_send_content .= 'gif|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                        }
+                                      
+                                    }else{
+                                        $imagebase = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                        $image_data[$md5] = $imagebase;
+                                        // $frame['content'] =$imagebase;
+                                        if ($value['image_type'] == 'jpg') {
+                                            // $real_send_content .= 'jpg|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                            $real_send_content .= 'jpg|' . $image_data[$md5];
+                                        } elseif ($value['image_type'] == 'gif') {
+                                            $real_send_content .= 'gif|' . $image_data[$md5];
+                                            // $real_send_content .= 'gif|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                        }
                                     }
                                 }
-                                exit(); //关闭通道
+                                $vc = ';';
                             }
-                            /*  $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-                                if ($result['returnstatus'] == 'Success') { //成功
-                                    $receive_id[$result['taskID']] = $send_taskid;
-                                    $redis->hset('index:meassage:code:back_taskno:' . $content, $result['taskID'], $send_taskid);
-                                } elseif ($result['returnstatus'] == 'Faild') { //失败
-                                    echo "error:" . $result['message'] . "\n";die;
-                                } */
-                            // print_r($result);
-                            unset($send_num[$send_taskid]);
-                            sleep(1);
+                            $send_content[$send_data['mar_task_id']] = $real_send_content;
+                        }
+                        $send_num[$send_data['mar_task_id']][] = $send_data['mobile'];
+                        foreach ($send_num as $send_taskid => $num) {
+                            $new_num = array_unique($num);
+                            if (count($new_num) >= 5000) { //超出2000条做一次提交
+                                $real_send = [];
+                                $real_send = [
+                                    'action'    => "send",
+                                    'userid'    => $user_info['userid'],
+                                    'account'   => $user_info['account'],
+                                    'password'   => $user_info['password'],
+                                    // 'timestamp' => date('YmdHis',time()),
+                                    // 'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time()))),
+                                    'mobile'    => join(',', $new_num),
+                                    'starttime' => '',
+                                    'title'     => $send_title[$send_taskid],
+                                    'content'   => $send_content[$send_taskid], 
+                                    // 'content'   => urlencode($send_content[$send_taskid]),
+                                ];
+    
+                                $res    = sendRequest($user_info['send_api'], 'post', $real_send);
+                                // $result = json_decode($res, true);
+                                $result = explode(':',$res);
+                                // $result['code'] = 2;
+                                if (isset($result[1])) {
+                                    $receive_id[$result[1]] = $send_taskid;
+                                    $redis->hset('index:meassage:code:back_taskno:' . $content, $result[1], $send_taskid);
+                                    unset($roallback[$send_taskid]);
+                                } else {
+                                    foreach ($roallback as $key => $value) {
+                                        foreach ($value as $ne => $val) {
+                                            $redis->rpush($redisMessageCodeSend, $val);
+                                        }
+                                    }
+                                    exit(); //关闭通道
+                                }
+                                /*  $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+                                    if ($result['returnstatus'] == 'Success') { //成功
+                                        $receive_id[$result['taskID']] = $send_taskid;
+                                        $redis->hset('index:meassage:code:back_taskno:' . $content, $result['taskID'], $send_taskid);
+                                    } elseif ($result['returnstatus'] == 'Faild') { //失败
+                                        echo "error:" . $result['message'] . "\n";die;
+                                    } */
+                                // print_r($result);
+                                unset($send_num[$send_taskid]);
+                                usleep(12500);
+                            }
                         }
                     }
-                }
-            } while ($send);
-            //剩下的号码再做提交
-            // print_r($send_num);die;
-            if (!empty($send_num)) {
-                foreach ($send_num as $send_taskid => $num) {
-                    $new_num = array_unique($num);
-                    if (empty($new_num)) {
-                        continue;
-                    }
-                    $real_send = [];
-                    $real_send = [
-                        'action'    => "send",
-                        'userid'    => $user_info['userid'],
-                        'account'   => $user_info['account'],
-                        'password'   => $user_info['password'],
-                        // 'timestamp' => date('YmdHis',time()),
-                        // 'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time()))),
-                        'mobile'    => join(',', $new_num),
-                        'starttime' => '',
-                        'title'     => $send_title[$send_taskid],
-                        'content'   => $send_content[$send_taskid], 
-                        // 'content'   => urlencode($send_content[$send_taskid]),
-                    ];
-                    $res = sendRequest($user_info['send_api'], 'post', $real_send);
-                    $result = explode(':',$res);
-                    // $result['code'] = 2;
-                    if (isset($result[1])) {
-                        $receive_id[$result[1]] = $send_taskid;
-                        $redis->hset('index:meassage:code:back_taskno:' . $content, $result[1], $send_taskid);
-                        unset($roallback[$send_taskid]);
-                    } else {
-                        foreach ($roallback as $key => $value) {
-                            foreach ($value as $ne => $val) {
-                                $redis->rpush($redisMessageCodeSend, $val);
-                            }
+                } while ($send);
+                //剩下的号码再做提交
+                // print_r($send_num);die;
+                if (!empty($send_num)) {
+                    foreach ($send_num as $send_taskid => $num) {
+                        $new_num = array_unique($num);
+                        if (empty($new_num)) {
+                            continue;
                         }
-                        exit(); //关闭通道
+                        $real_send = [];
+                        $real_send = [
+                            'action'    => "send",
+                            'userid'    => $user_info['userid'],
+                            'account'   => $user_info['account'],
+                            'password'   => $user_info['password'],
+                            // 'timestamp' => date('YmdHis',time()),
+                            // 'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time()))),
+                            'mobile'    => join(',', $new_num),
+                            'starttime' => '',
+                            'title'     => $send_title[$send_taskid],
+                            'content'   => $send_content[$send_taskid], 
+                            // 'content'   => urlencode($send_content[$send_taskid]),
+                        ];
+                        $res = sendRequest($user_info['send_api'], 'post', $real_send);
+                        $result = explode(':',$res);
+                        // $result['code'] = 2;
+                        if (isset($result[1])) {
+                            $receive_id[$result[1]] = $send_taskid;
+                            $redis->hset('index:meassage:code:back_taskno:' . $content, $result[1], $send_taskid);
+                            unset($roallback[$send_taskid]);
+                        } else {
+                            foreach ($roallback as $key => $value) {
+                                foreach ($value as $ne => $val) {
+                                    $redis->rpush($redisMessageCodeSend, $val);
+                                }
+                            }
+                            exit(); //关闭通道
+                        }
+                        // print_r($res);
+    
+                        // $result = explode(',', $res);
+                        // if ($result['returnstatus'] == 'Success') { //成功
+                        //     $receive_id[$result['taskID']] = $send_taskid;
+                        //     $redis->hset('index:meassage:code:back_taskno:' . $content, $result['taskID'], $send_taskid);
+                        // } elseif ($result['returnstatus'] == 'Faild') { //失败
+                        //     echo "error:" . $result['message'] . "\n";die;
+                        // }
+                        unset($send_num[$send_taskid]);
+                        usleep(12500);
                     }
-                    // print_r($res);
-
-                    // $result = explode(',', $res);
-                    // if ($result['returnstatus'] == 'Success') { //成功
-                    //     $receive_id[$result['taskID']] = $send_taskid;
-                    //     $redis->hset('index:meassage:code:back_taskno:' . $content, $result['taskID'], $send_taskid);
-                    // } elseif ($result['returnstatus'] == 'Faild') { //失败
-                    //     echo "error:" . $result['message'] . "\n";die;
-                    // }
-                    unset($send_num[$send_taskid]);
-                    sleep(1);
+                }
+                // $receive_id = [
+                //     '866214' => '15745'
+                // ];
+                // print_r($receive_id);
+                // die;
+                $receive = sendRequest($user_info['receive_api'], 'post', ['userid' => $user_info['userid'], 'account' => $user_info['account'], 'password' => $user_info['password']]);
+                if (empty($receive)) {
+                    sleep(10);
+                    continue;
+                }
+                
+                $send_status = 2;
+                $receive_data = json_decode(json_encode(simplexml_load_string($receive, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+                print_r($receive_data);
+                // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
+                // $receive_data = explode(';', $receive);
+                if (isset($receive_data['statusbox'])) {
+                    // $real_receive_data = $receive_data['statusbox'];
+                    foreach ($receive_data as $key => $value) {
+                        // $receive_info = [];
+                        // $receive_info = explode(',', $value);
+                        // $task_id      = $receive_id[$value['taskid']];
+                        $task_id      = $redis->hget('index:meassage:code:back_taskno:'.$content,trim($value['taskid']));
+                        $task         = $this->getSendTask($task_id);
+                        if ($task == false) {
+                            echo "error task_id" . "\n";
+                        }
+                        $stat = $value['errorcode'];
+                        $send_task_log = [];
+                        if ($value['errorcode'] == '10') {
+                            
+                            $send_status = 3;
+                            $stat = 'DELIVRD';
+                        }else{
+                            $send_status = 4;
+                        }
+                        $send_task_log = [
+                            'task_no'        => $task['task_no'],
+                            'uid'            => $task['uid'],
+                            'mobile'         => $value['mobile'],
+                            'status_message' => $stat,
+                            'send_status'    => $send_status,
+                            'send_time'      => strtotime($value['receivetime']),
+                        ];
+                        $redis->rpush($redisMessageCodeDeliver,json_encode($send_task_log));
+                        // Db::startTrans();
+                        // try {
+                        //     Db::table('yx_user_send_task_log')->insert($send_task_log);
+                        //     Db::commit();
+                        // } catch (\Exception $e) {
+                        //     Db::rollback();
+                        //     return ['code' => '3009']; //修改失败
+                        // }
+                        unset($send_status);
+                    }
+                }else{
+                    sleep(10);
+                }
+                // print_r($receive_data);die;
+                // sleep(10);
+    
+                unset($send_num);
+                unset($send_content);
+                unset($receive_id);
+                echo "success";
+            }
+        } catch (\Exception $th) {
+            foreach ($roallback as $key => $value) {
+                foreach ($value as $ne => $val) {
+                    $redis->rpush($redisMessageCodeSend, $val);
                 }
             }
-            // $receive_id = [
-            //     '866214' => '15745'
-            // ];
-            // print_r($receive_id);
-            // die;
-            $receive = sendRequest($user_info['receive_api'], 'post', ['userid' => $user_info['userid'], 'account' => $user_info['account'], 'password' => $user_info['password']]);
-            if (empty($receive)) {
-                sleep(60);
-                continue;
-            }
-            
-            $send_status = 2;
-            $receive_data = json_decode(json_encode(simplexml_load_string($receive, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-            print_r($receive_data);
-            // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
-            // $receive_data = explode(';', $receive);
-            if (isset($receive_data['statusbox'])) {
-                // $real_receive_data = $receive_data['statusbox'];
-                foreach ($receive_data as $key => $value) {
-                    // $receive_info = [];
-                    // $receive_info = explode(',', $value);
-                    // $task_id      = $receive_id[$value['taskid']];
-                    $task_id      = $redis->hget('index:meassage:code:back_taskno:'.$content,trim($value['taskid']));
-                    $task         = $this->getSendTask($task_id);
-                    if ($task == false) {
-                        echo "error task_id" . "\n";
-                    }
-                    $send_task_log = [];
-                    if ($value['errorcode'] == '10') {
-                        $send_status = 3;
-                    }else{
-                        $send_status = 4;
-                    }
-                    $send_task_log = [
-                        'task_no'        => $task['task_no'],
-                        'uid'            => $task['uid'],
-                        'mobile'         => $value['mobile'],
-                        'status_message' => $value['errorcode'],
-                        'send_status'    => $send_status,
-                        'send_time'      => strtotime($value['receivetime']),
-                    ];
-                    $redis->rpush($redisMessageCodeDeliver,json_encode($send_task_log));
-                    // Db::startTrans();
-                    // try {
-                    //     Db::table('yx_user_send_task_log')->insert($send_task_log);
-                    //     Db::commit();
-                    // } catch (\Exception $e) {
-                    //     Db::rollback();
-                    //     return ['code' => '3009']; //修改失败
-                    // }
-                    unset($send_status);
-                }
-            }else{
-                sleep(10);
-            }
-            // print_r($receive_data);die;
-            // sleep(10);
 
-            unset($send_num);
-            unset($send_content);
-            unset($receive_id);
-            echo "success";
+            $log_path = realpath("") . "/error/".$content.".log";
+            $myfile = fopen($log_path, 'a+');
+            fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
+            fwrite($myfile, $th . "\n");
+            fclose($myfile);
+            $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
+                'mobile'      => 15201926171,
+                'content'     => "【钰晰科技】邦之信移动彩信通道出现异常"
+            ])); //三体营销通道
         }
     }
 

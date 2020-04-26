@@ -2597,4 +2597,25 @@ class OfficeExcel extends Pzlife
         }
 
     } 
+
+    public function imageTest(){
+        $image_data = [];
+        $value['image_path'] = "20200413/b29288993583d9cc5de893a8704fecf95e93cc10d9775.jpg";
+        // $path = Config::get('qiniu.domain') . '/' . $value['image_path'];
+        $md5 = md5(Config::get('qiniu.domain') . '/' . $value['image_path']);
+        if (isset($image_data[$md5])) {
+            $frame['content'] = $image_data[$md5];
+
+        }else{
+            $imagebase = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+            $image_data[$md5] = $imagebase;
+            $frame['content'] =$imagebase;
+           
+        }
+        for ($i=0; $i < 2; $i++) { 
+           
+        }
+       
+        print_r($image_data);
+    }
 }
