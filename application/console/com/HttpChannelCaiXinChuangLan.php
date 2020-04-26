@@ -212,6 +212,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                     }
                                     $frame['content'] = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                     $real_send_content[] = $frame;
+                                    sleep(1);
                                 }
                             }
                             // $send_content[$send_data['mar_task_id']] = $send_data['content'];
@@ -269,7 +270,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                 usleep(12500);
                             }
                         }
-                        sleep(1);
+                        
                     }
                 } while ($send);
                 //剩下的号码再做提交
