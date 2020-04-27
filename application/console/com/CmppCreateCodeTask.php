@@ -3424,7 +3424,7 @@ class CmppCreateCodeTask extends Pzlife {
                 }
                 Db::startTrans();
                 try {
-                    Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'], 'status_message' => $send_log['status_message'], 'send_status' => $send_log['send_status'], 'update_time' => $send_log['send_time']]);
+                    Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'], 'send_status' => $send_log['send_status'], 'update_time' => $send_log['send_time']]);
                     Db::commit();
                 } catch (\Exception $e) {
                     Db::rollback();
@@ -4950,7 +4950,7 @@ exception($e);
         $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' " );
         // echo "SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' " ;die;
         // echo count($mul_task);die;
-        $num = count($mul_task)-15;
+        // $num = count($mul_task)-15;
         $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' ORDER BY rand() LIMIT  ".$num );
         // echo count($mul_task);die;
         foreach ($mul_task as $key => $value) {
