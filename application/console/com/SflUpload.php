@@ -98,41 +98,48 @@ class SflUpload extends Pzlife {
             // $sftp = new SFTPConnection("10.157.52.197", 20981);
             // $sftp->login("CHN-SMSDATA-sms", "TZYB@zn7");
             // $sftp->uploadFile("/CN-SMSDATA", "/tmp/to_be_received");
-          /*   $host = "47.103.200.251";
+            $host = "47.103.200.251";
             $prot = "22";
             $username = "root";
-            $password = "a!s^d(7)#f@g&h(9)"; */
-            $host = "esftp.sephora.com.cn";
+            $password = "a!s^d(7)#f@g&h(9)";
+           /*  $host = "esftp.sephora.com.cn";
             $prot = "20981";
             $username = "CHN-SMSDATA-sms";
-            $password = "TZYB@zn7";
+            $password = "TZYB@zn7"; */
             $sftp = new SFTPConnection($host, $prot);
             $sftp->login($username, $password);
             //本地目录
-            $local_directory = "/uploads/excel/";
+            $local_directory = "/uploads/SFL/";
             //远程目录
             // $remote_directory = "/root/club776/";
-            $remote_directory = "/CN-SMSDATA/";
+            $remote_directory_host = "/CN-SMSDATA/";
             //判断远程目录是否存在
-            $address = $sftp->dirExits($remote_directory);
+            $address = $sftp->dirExits($remote_directory_host);
             // print_r();die;
+            $remote_directory_data = [];
             if ($address) {
+                if (!empty($remote_directory_data)) {
+                    foreach ($remote_directory_data as $key => $value) {
+                        $this_directory = $remote_directory_data.$value."/";
+                        $sms = $sftp->scanFileSystem($this_directory);
+                        print_r($sms);die;
+                        if (!empty($sms)) {
+                            //下载文件
+                            // $sftp->downFile("/root/club776/","/uploads/excel");
+                            // $sftp->downFile(realpath("")."/uploads/excel/mysql.sh","/root/club776/mysql.sh");
+                            foreach ($sms as $key => $value) {
+                                //下载远程文件
+                                $sftp->downFile(realpath("").$local_directory.$value,$this_directory.$value);
+                                //上传至七牛云
+                            }
+                            // ssh2_scp_recv($cn,"\"".$remote_file_name."\"",$local_path."/".$remote_file_name); //OK 
+        
+                        }
+                    }
+                }
             //    $sftp->uploadFile("/root/club776/", "/tmp/to_be_received");
             //获取远程目录下文件
-                $sms = $sftp->scanFileSystem($remote_directory);
-                print_r($sms);die;
-                if (!empty($sms)) {
-                    //下载文件
-                    // $sftp->downFile("/root/club776/","/uploads/excel");
-                    // $sftp->downFile(realpath("")."/uploads/excel/mysql.sh","/root/club776/mysql.sh");
-                    foreach ($sms as $key => $value) {
-                        //下载远程文件
-                        $sftp->downFile(realpath("").$local_directory.$value,$remote_directory.$value);
-                        //上传至七牛云
-                    }
-                    // ssh2_scp_recv($cn,"\"".$remote_file_name."\"",$local_path."/".$remote_file_name); //OK 
-
-                }
+           
             }
         } catch (Exception $e) {
             echo $e->getMessage() . "\n";
