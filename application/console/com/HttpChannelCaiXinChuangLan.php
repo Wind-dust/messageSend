@@ -380,7 +380,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
             fclose($myfile);
             $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
                 'mobile'      => 15201926171,
-                'content'     => "创蓝彩信通道出现异常"
+                'content'     => "【钰晰科技】创蓝彩信通道出现异常"
             ])); //三体营销通道
 
         }

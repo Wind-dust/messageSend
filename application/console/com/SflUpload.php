@@ -8,6 +8,7 @@ use Config;
 use Env;
 use Exception;
 use think\Db;
+use ZipArchive;
 
 class SflUpload extends Pzlife {
     private $redis;
@@ -90,6 +91,103 @@ class SflUpload extends Pzlife {
         }
     }
 
+    public function sflZip() {
+        ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
+
+        $zip = new ZipArchive();
+
+        $path      = realpath("") . "/uploads/SFL/";
+        $path_data = $this->getDirContent($path);
+        // print_r($path_data);
+        if ($path_data == false) {
+            exit("This Dir IS null");
+        }
+        try {
+            foreach ($path_data as $key => $value) {
+                if ($value == 'UnZip') {
+                    continue;
+                }
+                $son_path_data = $this->getDirContent($path . $value);
+                if ($son_path_data !== false) {
+                  
+                    foreach ($son_path_data as $skey => $svalue) {
+                        $son_path = $path . $value . "/" . $svalue;
+                        // $file = fopen($path.$value."/".$svalue,"r");
+                        $file_info = explode('.', $svalue);
+                        if ($file_info[1] == 'zip') { //需要解压
+                            //开始解压
+                            if ($zip->open($son_path) === true) {
+                                $unpath = $path . 'UnZip' . "/".$value."/" . $file_info[0];
+                                $mcw = $zip->extractTo($unpath); //解压到$route这个目录中
+                                $zip->close();
+                                //解压完成
+                                $unzip = $this->getDirContent($unpath);
+                                // print_r($unzip);die;
+                                foreach ($unzip as $ukey => $uvalue) {
+                                    $un_file_info = explode('.', $svalue);
+                                    if ($un_file_info[1] == 'jpg') {//图片
+    
+                                    }
+                                }
+                            }
+                        } else if ($file_info[1] == 'txt') {
+                            $file_data = $this->readForTxt($son_path);
+    
+                            // print_r($file_data);die;
+                        }
+                    }
+                }
+    
+            }
+            
+        } catch (\Exception $e) {
+            exception($e);
+        }
+    }
+
+    function readForTxt($path) {
+        // $path = realpath("./") . "/191111.txt";
+        if (!is_file($path)) {
+            return false;
+        }
+
+        $file = fopen($path, "r");
+        $data = array();
+        while (!feof($file)) {
+            $cellVal = trim(fgets($file));
+            if (!empty($cellVal)) {
+                $value = explode(',', $cellVal);
+                array_push($data, $value);
+            }
+        }
+        return $data;
+    }
+
+    function getDirContent($path) {
+        if (!is_dir($path)) {
+            return false;
+        }
+        //readdir方法
+        /* $dir = opendir($path);
+        $arr = array();
+        while($content = readdir($dir)){
+        if($content != '.' && $content != '..'){
+        $arr[] = $content;
+        }
+        }
+        closedir($dir); */
+
+        //scandir方法
+        $arr  = array();
+        $data = scandir($path);
+        foreach ($data as $value) {
+            if ($value != '.' && $value != '..') {
+                $arr[] = $value;
+            }
+        }
+        return $arr;
+    }
+
     public function sftpForSfl() {
         try
         {
@@ -98,11 +196,11 @@ class SflUpload extends Pzlife {
             // $sftp = new SFTPConnection("10.157.52.197", 20981);
             // $sftp->login("CHN-SMSDATA-sms", "TZYB@zn7");
             // $sftp->uploadFile("/CN-SMSDATA", "/tmp/to_be_received");
-            $host = "47.103.200.251";
-            $prot = "22";
+            $host     = "47.103.200.251";
+            $prot     = "22";
             $username = "root";
             $password = "a!s^d(7)#f@g&h(9)";
-           /*  $host = "esftp.sephora.com.cn";
+            /*  $host = "esftp.sephora.com.cn";
             $prot = "20981";
             $username = "CHN-SMSDATA-sms";
             $password = "TZYB@zn7"; */
@@ -120,8 +218,8 @@ class SflUpload extends Pzlife {
             if ($address) {
                 if (!empty($remote_directory_data)) {
                     foreach ($remote_directory_data as $key => $value) {
-                        $this_directory = $remote_directory_data.$value."/";
-                        $sms = $sftp->scanFileSystem($this_directory);
+                        $this_directory = $remote_directory_data . $value . "/";
+                        $sms            = $sftp->scanFileSystem($this_directory);
                         print_r($sms);die;
                         if (!empty($sms)) {
                             //下载文件
@@ -129,17 +227,17 @@ class SflUpload extends Pzlife {
                             // $sftp->downFile(realpath("")."/uploads/excel/mysql.sh","/root/club776/mysql.sh");
                             foreach ($sms as $key => $value) {
                                 //下载远程文件
-                                $sftp->downFile(realpath("").$local_directory.$value,$this_directory.$value);
+                                $sftp->downFile(realpath("") . $local_directory . $value, $this_directory . $value);
                                 //上传至七牛云
                             }
-                            // ssh2_scp_recv($cn,"\"".$remote_file_name."\"",$local_path."/".$remote_file_name); //OK 
-        
+                            // ssh2_scp_recv($cn,"\"".$remote_file_name."\"",$local_path."/".$remote_file_name); //OK
+
                         }
                     }
                 }
-            //    $sftp->uploadFile("/root/club776/", "/tmp/to_be_received");
-            //获取远程目录下文件
-           
+                //    $sftp->uploadFile("/root/club776/", "/tmp/to_be_received");
+                //获取远程目录下文件
+
             }
         } catch (Exception $e) {
             echo $e->getMessage() . "\n";
@@ -192,7 +290,7 @@ class SFTPConnection {
 
         fclose($stream);
     }
- /**
+    /**
      * 下载文件
      * @param $local_file
      * @param $remote_file
@@ -325,5 +423,4 @@ class Sftp {
         return $is_true;
     }
 
-   
 }

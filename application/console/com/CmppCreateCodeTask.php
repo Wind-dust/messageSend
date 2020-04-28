@@ -5264,23 +5264,93 @@ exception($e);
         }
     }
 
-    public function taskCodeReceipt(){
-            while(true){
-                $task_code_receipt = Db::query("SELECT * FROM yx_send_task_receipt LIMIT 1");
-                $task = Db::query("SELECT `task_no` FROM yx_send_task WHERE `id` = ".$task_code_receipt[0]['task_id']);
+    public function taskReceipt(){
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $num = Db::query("SELECT count(`id`) FROM yx_send_task_receipt ");
+        $id_num = $num[0]['count(`id`)'];
+        // print_r($id_num);die;
+        $del_ids = [];
+        try {
+            
+            for ($i=0; $i < $id_num; $i++) { 
+                $this_id = $i +1;
+                $task_code_receipt = Db::query("SELECT * FROM yx_send_task_receipt WHERE `id` = ". $this_id);
+                $task = Db::query("SELECT `task_no` FROM yx_user_send_task WHERE `id` = ".$task_code_receipt[0]['task_id']);
                 if (!empty($task)) {
-                    $task_log = Db::query("SELECT * FROM  yx_send_task_log WHERE `task_no` = '".$task[0]['task_no']."'");
-                    /* if (!empty($task_log)){
-                        Db::table('yx_send_task_log')->where('id',$task_log[0]['id'])->update(
+                    $task_log = Db::query("SELECT * FROM  yx_user_send_task_log WHERE `task_no` = '".$task[0]['task_no']."'");
+                    if (!empty($task_log)){
+                        if (strpos($task_log[0]['status_message'], 'DB:0141') !== false || strpos($task_log[0]['status_message'], 'MBBLACK') !== false || strpos($task_log[0]['status_message'], 'BLACK') !== false) {
+                            $message_info = '黑名单';
+                        } else if (trim($task_log[0]['status_message'] == 'DELIVRD')) {
+                            $message_info = '发送成功';
+                        } else if (in_array(trim($task_log[0]['status_message']) ,['REJECTD','REJECT','MA:0001'])){
+                            $message_info = '发送成功';
+                        }else {
+                            $message_info = '发送失败';
+                        }
+                        Db::table('yx_user_send_task_log')->where('id',$task_log[0]['id'])->update(
                             [
-                                'status_message' => $task[0]['status_message'],
-                                'real_message' => $task[0]['real_message'],
-                                'update_time' => $task[0]['create_time'],
+                                'status_message' => $task_code_receipt[0]['status_message'],
+                                'real_message' => $task_code_receipt[0]['real_message'],
+                                'update_time' => $task_code_receipt[0]['create_time'],
                                 'message_info' => $message_info,
                             ]
                         );
-                    } */
+                        $del_ids[] = $i;
+                    }
                 }
             }
+            die;
+            $ids = join(',', $del_ids);
+            Db::table('yx_user_send_code_task_log')->where("id in ($ids)")->delete();
+        } catch (\Exception $th) {
+            exception($th);
+        }
+       
+    }
+
+    public function taskCodeReceipt(){
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $num = Db::query("SELECT count(`id`) FROM yx_send_code_task_receipt ");
+        $id_num = $num[0]['count(`id`)'];
+        // print_r($id_num);die;
+        $del_ids = [];
+        try {
+            
+            for ($i=0; $i < $id_num; $i++) { 
+                $this_id = $i +1;
+                $task_code_receipt = Db::query("SELECT * FROM yx_send_code_task_receipt WHERE `id` = ". $this_id);
+                $task = Db::query("SELECT `task_no` FROM yx_user_send_code_task WHERE `id` = ".$task_code_receipt[0]['task_id']);
+                if (!empty($task)) {
+                    $task_log = Db::query("SELECT * FROM  yx_user_send_code_task_log WHERE `task_no` = '".$task[0]['task_no']."'");
+                    if (!empty($task_log)){
+                        if (strpos($task_log[0]['status_message'], 'DB:0141') !== false || strpos($task_log[0]['status_message'], 'MBBLACK') !== false || strpos($task_log[0]['status_message'], 'BLACK') !== false) {
+                            $message_info = '黑名单';
+                        } else if (trim($task_log[0]['status_message'] == 'DELIVRD')) {
+                            $message_info = '发送成功';
+                        } else if (in_array(trim($task_log[0]['status_message']) ,['REJECTD','REJECT','MA:0001'])){
+                            $message_info = '发送成功';
+                        }else {
+                            $message_info = '发送失败';
+                        }
+                        Db::table('yx_user_send_code_task_log')->where('id',$task_log[0]['id'])->update(
+                            [
+                                'status_message' => $task_code_receipt[0]['status_message'],
+                                'real_message' => $task_code_receipt[0]['real_message'],
+                                'update_time' => $task_code_receipt[0]['create_time'],
+                                'message_info' => $message_info,
+                            ]
+                        );
+                        $del_ids[] = $i;
+                    }
+                }
+            }
+            die;
+            $ids = join(',', $del_ids);
+            Db::table('yx_user_send_code_task_log')->where("id in ($ids)")->delete();
+        } catch (\Exception $th) {
+            exception($th);
+        }
+       
     }
 }
