@@ -104,6 +104,7 @@ class SflUpload extends Pzlife {
         }
         try {
             foreach ($path_data as $key => $value) {
+                //跳过本地解压文件夹
                 if ($value == 'UnZip') {
                     continue;
                 }
@@ -123,6 +124,10 @@ class SflUpload extends Pzlife {
                                 //解压完成
                                 $unzip = $this->getDirContent($unpath);
                                 // print_r($unzip);die;
+                                //先上传模板内容
+                                if (strpos("targets",$svalue) != false) {
+
+                                }
                                 foreach ($unzip as $ukey => $uvalue) {
                                     $un_file_info = explode('.', $svalue);
                                     if ($un_file_info[1] == 'jpg') {//图片
