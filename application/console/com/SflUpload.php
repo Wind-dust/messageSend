@@ -9,15 +9,18 @@ use Env;
 use Exception;
 use think\Db;
 use ZipArchive;
+use CURLFile;
+use upload\Imageupload;
 
-class SflUpload extends Pzlife {
+class SflUpload extends Pzlife
+{
     private $redis;
-
     /**
      * 数据库连接
      *
      */
-    public function dbConnect($databasename) {
+    public function dbConnect($databasename)
+    {
         if ($databasename == 'old') {
             return Db::connect(Config::get('database.db_config'));
         } else {
@@ -28,11 +31,13 @@ class SflUpload extends Pzlife {
     /**
      * ftp 测试
      */
-    public function ftpConfig() {
+    public function ftpConfig()
+    {
         return ['host' => '127.0.0.1', 'port' => '8007', 'user' => '', 'password' => ''];
     }
 
-    public function testFtp() {
+    public function testFtp()
+    {
         $ftp_config = $this->ftpConfig();
         $ftp        = ftp_connect($ftp_config['host'], $ftp_config['port']);
         if (!$ftp) {
@@ -91,9 +96,10 @@ class SflUpload extends Pzlife {
         }
     }
 
-    public function sflZip() {
+    public function sflZip()
+    {
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-
+        $this->upload = new Imageupload();
         $zip = new ZipArchive();
 
         $path      = realpath("") . "/uploads/SFL/";
@@ -104,13 +110,14 @@ class SflUpload extends Pzlife {
         }
         try {
             foreach ($path_data as $key => $value) {
+                //进入二级目录 MMS 或者 SMS 等
                 //跳过本地解压文件夹
                 if ($value == 'UnZip') {
                     continue;
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($son_path_data !== false) {
-                  
+
                     foreach ($son_path_data as $skey => $svalue) {
                         $son_path = $path . $value . "/" . $svalue;
                         // $file = fopen($path.$value."/".$svalue,"r");
@@ -118,39 +125,64 @@ class SflUpload extends Pzlife {
                         if ($file_info[1] == 'zip') { //需要解压
                             //开始解压
                             if ($zip->open($son_path) === true) {
-                                $unpath = $path . 'UnZip' . "/".$value."/" . $file_info[0];
+                                $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0];
                                 $mcw = $zip->extractTo($unpath); //解压到$route这个目录中
                                 $zip->close();
                                 //解压完成
                                 $unzip = $this->getDirContent($unpath);
                                 // print_r($unzip);die;
                                 //先上传模板内容
-                                if (strpos("targets",$svalue) != false) {
-
+                                if (strpos("targets", $svalue) != false) {
                                 }
+                                $fram_model = [];
                                 foreach ($unzip as $ukey => $uvalue) {
-                                    $un_file_info = explode('.', $svalue);
-                                    if ($un_file_info[1] == 'jpg') {//图片
-    
+                                    $fram = [];
+                                    $un_file_info = explode('.', $uvalue);
+                                    // if ($un_file_info[1] == 'jpg') { //图片
+
+                                    // }elseif ($un_file_info[1] == '') {}
+                                    if ($uvalue == '1.jpg' || $uvalue == '1.gif') {
+                                        $image   = $unpath . "/" . $uvalue;
+                                        //调用内部api 上传图片
+                                        $data = [
+                                            'appid' => '5e17e42ae9fe3',
+                                            'appkey' => 'da1416c4d51b8edd58596ca4b56ca267',
+                                            'image' => new CURLFile($image, '', 'aaa')
+                                        ];
+                                        $ch = curl_init();
+                                        curl_setopt($ch, CURLOPT_HEADER, false);
+                                        //启用时会发送一个常规的POST请求，类型为：application/x-www-form-urlencoded，就像表单提交的一样。
+                                        curl_setopt($ch, CURLOPT_POST, true);
+                                        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+                                        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+                                        // curl_setopt($ch, CURLOPT_URL, 'http://sendapidev.shyuxi.com/index/upload/uploadfile');
+                                        curl_setopt($ch, CURLOPT_URL, 'http://127.0.0.1:1007/index/upload/uploadfile');
+                                        curl_setopt($ch, CURLOPT_USERAGENT, 'Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400'); // 模拟用户使用的浏览器
+                                        $info = curl_exec($ch);
+                                        curl_close($ch);
+                                        // $result = sendRequest('', 'post',  $data);
+                                        // $fileInfo = $this->getInfo($image);
+                                        print_r($data);
+                                        die;
                                     }
                                 }
                             }
                         } else if ($file_info[1] == 'txt') {
-                            $file_data = $this->readForTxt($son_path);
-    
+                            $file_data = $this->readForTxtToDyadicArray($son_path);
+
                             // print_r($file_data);die;
                         }
                     }
                 }
-    
             }
-            
         } catch (\Exception $e) {
             exception($e);
         }
     }
 
-    function readForTxt($path) {
+    //读文件输出成二维数组
+    function readForTxtToDyadicArray($path)
+    {
         // $path = realpath("./") . "/191111.txt";
         if (!is_file($path)) {
             return false;
@@ -168,7 +200,27 @@ class SflUpload extends Pzlife {
         return $data;
     }
 
-    function getDirContent($path) {
+
+    //读文件输出成一维数组
+    function readForTxtToArray($path)
+    {
+        if (!is_file($path)) {
+            return false;
+        }
+
+        $file = fopen($path, "r");
+        $data = array();
+        while (!feof($file)) {
+            $cellVal = trim(fgets($file));
+            if (!empty($cellVal)) {
+                array_push($data, $cellVal);
+            }
+        }
+        return $data;
+    }
+
+    function getDirContent($path)
+    {
         if (!is_dir($path)) {
             return false;
         }
@@ -193,9 +245,9 @@ class SflUpload extends Pzlife {
         return $arr;
     }
 
-    public function sftpForSfl() {
-        try
-        {
+    public function sftpForSfl()
+    {
+        try {
             // $sftp = new SFTPConnection("localhost", 8080);
             // $sftp = new SFTPConnection("esftp.sephora.com.cn", 20981);
             // $sftp = new SFTPConnection("10.157.52.197", 20981);
@@ -225,7 +277,8 @@ class SflUpload extends Pzlife {
                     foreach ($remote_directory_data as $key => $value) {
                         $this_directory = $remote_directory_data . $value . "/";
                         $sms            = $sftp->scanFileSystem($this_directory);
-                        print_r($sms);die;
+                        print_r($sms);
+                        die;
                         if (!empty($sms)) {
                             //下载文件
                             // $sftp->downFile("/root/club776/","/uploads/excel");
@@ -248,22 +301,23 @@ class SflUpload extends Pzlife {
             echo $e->getMessage() . "\n";
         }
     }
-
 }
 
-class SFTPConnection {
+class SFTPConnection
+{
     private $connection;
     private $sftp;
 
-    public function __construct($host, $port = 22) {
+    public function __construct($host, $port = 22)
+    {
         $this->connection = ssh2_connect($host, $port);
         if (!$this->connection) {
             throw new Exception("Could not connect to $host on port $port.");
         }
-
     }
 
-    public function login($username, $password) {
+    public function login($username, $password)
+    {
         if (!ssh2_auth_password($this->connection, $username, $password)) {
             throw new Exception("Could not authenticate with username $username " .
                 "and password $password.");
@@ -273,10 +327,10 @@ class SFTPConnection {
         if (!$this->sftp) {
             throw new Exception("Could not initialize SFTP subsystem.");
         }
-
     }
 
-    public function uploadFile($local_file, $remote_file) {
+    public function uploadFile($local_file, $remote_file)
+    {
         $sftp   = $this->sftp;
         $stream = fopen("ssh2.sftp://$sftp$remote_file", 'w');
 
@@ -300,7 +354,8 @@ class SFTPConnection {
      * @param $local_file
      * @param $remote_file
      */
-    public function downFile($local_file, $remote_file) {
+    public function downFile($local_file, $remote_file)
+    {
         ssh2_scp_recv($this->connection, $remote_file, $local_file);
     }
 
@@ -309,7 +364,8 @@ class SFTPConnection {
      * @param string $dir  目录名称
      * @return bool
      */
-    public function dirExits($dir) {
+    public function dirExits($dir)
+    {
         return file_exists("ssh2.sftp://$this->sftp" . $dir);
     }
 
@@ -324,7 +380,6 @@ class SFTPConnection {
         if ($end !== true) {
             throw new Exception('文件夹创建失败');
         }
-
     }
 
     /**
@@ -333,7 +388,8 @@ class SFTPConnection {
      * $dir 示例：/var/file/image
      * @return bool
      */
-    public function rename($old_dir, $new_dir) {
+    public function rename($old_dir, $new_dir)
+    {
         $is_true = ssh2_sftp_rename($this->sftp, $old_dir, $new_dir);
         return $is_true;
     }
@@ -344,7 +400,8 @@ class SFTPConnection {
      * $dir 示例：/var/file/image/404NotFound.png
      * @return bool
      */
-    public function delFile($dir) {
+    public function delFile($dir)
+    {
         $is_true = ssh2_sftp_unlink($this->sftp, $dir);
         return $is_true;
     }
@@ -354,7 +411,8 @@ class SFTPConnection {
      * @param string $remote_file 文件路径 例：/var/file/image
      * @return array
      */
-    public function scanFileSystem($remote_file) {
+    public function scanFileSystem($remote_file)
+    {
         $sftp      = $this->sftp;
         $dir       = "ssh2.sftp://$sftp$remote_file";
         $tempArray = array();
@@ -363,7 +421,7 @@ class SFTPConnection {
         while (false !== ($file = readdir($handle))) {
             if (substr("$file", 0, 1) != ".") {
                 if (is_dir($file)) {
-//                $tempArray[$file] = $this->scanFilesystem("$dir/$file");
+                    //                $tempArray[$file] = $this->scanFilesystem("$dir/$file");
                 } else {
                     $tempArray[] = $file;
                 }
@@ -372,19 +430,19 @@ class SFTPConnection {
         closedir($handle);
         return $tempArray;
     }
-
 }
-class Sftp {
+class Sftp
+{
     private $connection;
     private $sftp;
-    public function __construct($params) {
+    public function __construct($params)
+    {
         $host             = $params['host']; //地址
         $port             = $params['port']; //端口
         $this->connection = ssh2_connect($host, $port);
         if (!$this->connection) {
             throw new Exception("$host 连接 $port 端口失败");
         }
-
     }
 
     /**
@@ -396,14 +454,15 @@ class Sftp {
      * @param string $pri_key  私钥
      * @throws Exception]
      */
-    public function login($login_type, $username, $password = null, $pub_key = null, $pri_key = null) {
+    public function login($login_type, $username, $password = null, $pub_key = null, $pri_key = null)
+    {
         switch ($login_type) {
-        case 'username': //通过用户名密码登录
-            $login_result = ssh2_auth_password($this->connection, $username, $password);
-            break;
-        case 'pub_key': //公钥私钥登录
-            $login_result = ssh2_auth_pubkey_file($this->connection, $username, $pub_key, $pri_key);
-            break;
+            case 'username': //通过用户名密码登录
+                $login_result = ssh2_auth_password($this->connection, $username, $password);
+                break;
+            case 'pub_key': //公钥私钥登录
+                $login_result = ssh2_auth_pubkey_file($this->connection, $username, $pub_key, $pri_key);
+                break;
         }
         if (!$login_result) {
             throw new Exception("身份验证失败");
@@ -423,9 +482,9 @@ class Sftp {
      * @param string $remote_file  远程文件
      * @throws Exception
      */
-    public function uploadFile($local_file, $remote_file) {
+    public function uploadFile($local_file, $remote_file)
+    {
         $is_true = ssh2_scp_send($this->connection, $local_file, $remote_file, 0777);
         return $is_true;
     }
-
 }

@@ -462,4 +462,46 @@ class Upload extends MyController
         // $this->apiLog($apiName, [$conId, $image], $result['code'], $conId);
         return $result;
     }
+
+    /**
+     * @api              {post} / 上传单个图片
+     * @apiDescription   uploadFileTest
+     * @apiGroup         index_upload
+     * @apiName          uploadFileTest
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {file} image 图片
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:appid或者appkey错误/ 3001:上传的不是图片 / 3002:上传图片不能超过2M / 3003:上传失败 / 3004:上传文件不能为空
+     * @apiSuccess (data) {Array} data 结果
+     * @apiSampleRequest /index/upload/uploadFileTest
+     * @author zyr
+     */
+    public function uploadFileTest()
+    {
+        $apiName = classBasename($this) . '/' . __function__;
+        // $conId   = trim($this->request->post('con_id'));
+        $appid = trim($this->request->post('appid')); //登录名
+        $appkey = trim($this->request->post('appkey')); //登陆密码
+        $image   = $this->request->file('image');
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        if (empty($image)) {
+            return ['code' => '3004'];
+        }
+        $fileInfo = $image->getInfo();
+        $fileType = explode('/', $fileInfo['type']);
+        if ($fileType[0] != 'image') {
+            return ['3001']; //上传的不是图片
+        }
+        if ($fileInfo['size'] > 1024 * 1024 * 2) {
+            return ['3002']; //上传图片不能超过2M
+        }
+        $result = $this->app->upload->uploadFile($appid, $appkey, $fileInfo);
+        // $this->apiLog($apiName, [$conId, $image], $result['code'], $conId);
+        return $result;
+    }
 }
