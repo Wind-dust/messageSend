@@ -493,6 +493,7 @@ class Upload extends MyController
             return ['code' => '3004'];
         }
         $fileInfo = $image->getInfo();
+        print_r($fileInfo);
         $fileType = explode('/', $fileInfo['type']);
         if ($fileType[0] != 'image') {
             return ['3001']; //上传的不是图片
