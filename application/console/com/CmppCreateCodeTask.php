@@ -8,9 +8,11 @@ use Config;
 use Env;
 use think\Db;
 
-class CmppCreateCodeTask extends Pzlife {
+class CmppCreateCodeTask extends Pzlife
+{
     //游戏任务创建function
-    public function CreateGameCodeTask() { //CMPP创建单条任务营销
+    public function CreateGameCodeTask()
+    { //CMPP创建单条任务营销
         $redis                    = Phpredis::getConn();
         $redisMessageCodeSend     = 'index:meassage:game:sendtask'; //游戏日志待发送通道
         $redisMessageCodeSendReal = 'index:meassage:game:send:realtask'; //验证码发送真实任务rediskey CMPP接口 营销
@@ -132,7 +134,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    private function getUserInfo($uid) {
+    private function getUserInfo($uid)
+    {
         $getUserSql = sprintf("select id,user_status,reservation_service,free_trial from yx_users where delete_time=0 and id = %d", $uid);
         // print_r($getUserSql);die;
         $userInfo = Db::query($getUserSql);
@@ -142,7 +145,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $userInfo[0];
     }
 
-    private function getUserEquities($uid, $business_id) {
+    private function getUserEquities($uid, $business_id)
+    {
 
         $userEquities = Db::query("SELECT `id`,`num_balance` FROM yx_user_equities WHERE  `delete_time` = 0 AND `uid` = " . $uid . " AND `business_id` = " . $business_id);
         // print_r("SELECT `id`,`num_balance` FROM yx_user_equities WHERE  `delete_time` = 0 AND `uid` = " . $uid . " AND `business_id` = " . $business_id);
@@ -152,7 +156,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $userEquities[0];
     }
 
-    public function getMessageLog() {
+    public function getMessageLog()
+    {
         $redis                = Phpredis::getConn();
         $redisMessageCodeSend = 'index:meassage:code:deliver:'; //验证码发送任务rediskey
         for ($i = 0; $i < 5; $i++) {
@@ -197,7 +202,8 @@ class CmppCreateCodeTask extends Pzlife {
         echo "sucess";
     }
 
-    private function getSendTask($id) {
+    private function getSendTask($id)
+    {
         $getSendTaskSql = sprintf("select * from yx_user_send_task where delete_time=0 and id = %d", $id);
         $sendTask       = Db::query($getSendTaskSql);
         // print_r($sendTask);die;
@@ -207,7 +213,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $sendTask[0];
     }
 
-    private function getSendCodeTask($id) {
+    private function getSendCodeTask($id)
+    {
         $getSendTaskSql = sprintf("select * from yx_user_send_code_task where delete_time=0 and id = %d", $id);
         $sendTask       = Db::query($getSendTaskSql);
 
@@ -217,7 +224,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $sendTask[0];
     }
 
-    private function getSendGameTask($id) {
+    private function getSendGameTask($id)
+    {
         $getSendTaskSql = sprintf("select * from yx_user_send_game_task where delete_time=0 and id = %d", $id);
         $sendTask       = Db::query($getSendTaskSql);
         // print_r($sendTask);die;
@@ -227,7 +235,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $sendTask[0];
     }
 
-    private function getSendTaskLog($task_no, $mobile) {
+    private function getSendTaskLog($task_no, $mobile)
+    {
         $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `task_no` = '" . $task_no . "' and `mobile` = '" . $mobile . "'";
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
@@ -237,7 +246,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $sendTask[0];
     }
 
-    private function getMultimediaSendTask($id) {
+    private function getMultimediaSendTask($id)
+    {
         $getSendTaskSql = sprintf("select * from yx_user_multimedia_message where delete_time=0 and id = %d", $id);
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
@@ -250,7 +260,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $sendTask;
     }
 
-    private function getMultimediaSendTaskLog($task_no, $mobile) {
+    private function getMultimediaSendTaskLog($task_no, $mobile)
+    {
         $getSendTaskSql = "select `id` from yx_user_multimedia_message_log where delete_time=0 and `task_no` = '" . $task_no . "' and `mobile` = '" . $mobile . "'";
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
@@ -260,7 +271,8 @@ class CmppCreateCodeTask extends Pzlife {
         return $sendTask[0];
     }
 
-    public function getNewMessageLog() {
+    public function getNewMessageLog()
+    {
         $redis                      = Phpredis::getConn();
         $redisMessageCodeSend       = 'index:meassage:code:new:deliver:'; //验证码发送任务rediskey
         $content                    = 2;
@@ -304,7 +316,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //免审任务客户
-    public function MisumiTaskSend() {
+    public function MisumiTaskSend()
+    {
         $this->redis = Phpredis::getConn();
         // $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
@@ -362,7 +375,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //书写营销任务日志并写入通道
-    public function createMessageSendTaskLog() {
+    public function createMessageSendTaskLog()
+    {
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
@@ -568,7 +582,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
     //  大批量扣量任务扣量
-    public function createNoSendMessageSendTaskLog() {
+    public function createNoSendMessageSendTaskLog()
+    {
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
@@ -670,7 +685,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //书写彩信任务日志并写入通道
-    public function createMultimediaMessageSendTaskLog() {
+    public function createMultimediaMessageSendTaskLog()
+    {
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
@@ -793,7 +809,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //书写行业通知任务日志并写入通道
-    public function createBusinessMessageSendTaskLog() {
+    public function createBusinessMessageSendTaskLog()
+    {
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
@@ -831,7 +848,6 @@ class CmppCreateCodeTask extends Pzlife {
                             $this->redis->rPush('index:meassage:business:buffersendtask', $send); //缓存队列
                             continue;
                         }
-
                     }
                     $rollback[]  = $send;
                     $mobilesend  = [];
@@ -1052,7 +1068,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //书写游戏任务日志并写入通道
-    public function createGameMessageSendTaskLog() {
+    public function createGameMessageSendTaskLog()
+    {
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
@@ -1253,7 +1270,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //http通道日志
-    public function getChannelSendLog($content) {
+    public function getChannelSendLog($content)
+    {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // $redisMessageCodeSend = 'index:meassage:code:new:deliver:'.$content; //验证码发送任务rediskey
@@ -1396,7 +1414,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function unknowLog($channel_id) {
+    public function unknowLog($channel_id)
+    {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redisMessageCodeSend = 'index:meassage:code:unknow:deliver:' . $channel_id; //验证码发送任务rediskey
@@ -1464,7 +1483,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function updateLog($channel_id) {
+    public function updateLog($channel_id)
+    {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:' . $channel_id; //验证码发送任务rediskey
@@ -1548,10 +1568,10 @@ class CmppCreateCodeTask extends Pzlife {
                         $message_info = '黑名单';
                     } else if (trim($send_log['Stat'] == 'DELIVRD')) {
                         $message_info = '发送成功';
-                    } else if (in_array(trim($send_log['Stat']) ,['REJECTD','REJECT','MA:0001'])){
+                    } else if (in_array(trim($send_log['Stat']), ['REJECTD', 'REJECT', 'MA:0001'])) {
                         $stat = 'DELIVRD';
                         $message_info = '发送成功';
-                    }else {
+                    } else {
                         $message_info = '发送失败';
                     }
                     /*  if (trim($send_log['mobile']) == '18616841500') {
@@ -1582,7 +1602,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //处理通道消息队列中的回执日志
-    public function updateCmppChannelLog($channel_id) {
+    public function updateCmppChannelLog($channel_id)
+    {
 
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
@@ -1762,7 +1783,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function supplyMessageAgain() { //行业重推
+    public function supplyMessageAgain()
+    { //行业重推
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
 
@@ -1846,7 +1868,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    private function getChannelinfo($channel_id) {
+    private function getChannelinfo($channel_id)
+    {
         $channel = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `id` = " . $channel_id);
         if (empty($channel)) {
             return false;
@@ -1857,7 +1880,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //游戏日志通道
-    public function getCmppChannelSendLog($content) {
+    public function getCmppChannelSendLog($content)
+    {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // $redisMessageCodeSend = 'index:meassage:code:new:deliver:'.$content; //验证码发送任务rediskey
@@ -2162,7 +2186,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function getNumberSource($prefix) {
+    public function getNumberSource($prefix)
+    {
         $getSendTaskSql = "select source,province_id,province from yx_number_source where delete_time=0 and `mobile` = '" . $prefix . "'";
 
         // echo "\n";
@@ -2176,7 +2201,8 @@ class CmppCreateCodeTask extends Pzlife {
         // print_r($sendTask);
     }
 
-    public function getSendLog() {
+    public function getSendLog()
+    {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // echo time()-1574480118;die;
@@ -2309,7 +2335,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function logReader() {
+    public function logReader()
+    {
         $id = 15753;
         // while (true) {
 
@@ -2343,7 +2370,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //使用数量更正
-    public function businessTaskLogMove() {
+    public function businessTaskLogMove()
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $upnum_data  = [];
         $upnum_uid   = [];
@@ -2395,7 +2423,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //日志写入到数据表中行业
-    public function removeCodeTaskLog() {
+    public function removeCodeTaskLog()
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $time       = strtotime(date('Y-m-d 0:00:00', time()));
         $start_time = strtotime(date('Y-m-d 0:00:00', strtotime("-1 day")));
@@ -2453,7 +2482,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //日志写入到数据表中营销
-    public function removeMarketingTaskLog() {
+    public function removeMarketingTaskLog()
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $time       = strtotime(date('Y-m-d 0:00:00', time()));
         $start_time = strtotime(date('Y-m-d 0:00:00', strtotime("-1 day")));
@@ -2515,7 +2545,8 @@ class CmppCreateCodeTask extends Pzlife {
         exit('Success');
     }
 
-    public function receiptBusinessToBase($channel_id) {
+    public function receiptBusinessToBase($channel_id)
+    {
         // $redis->rpush('index:meassage:Buiness:cms:deliver:', json_encode($send_log));
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
@@ -2680,7 +2711,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function receiptMarketingToBase($channel_id) {
+    public function receiptMarketingToBase($channel_id)
+    {
         // $redis->rpush('index:meassage:Buiness:cms:deliver:', json_encode($send_log));
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
@@ -2831,7 +2863,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //批量写入回执
-    public function receiptMarketingTask($channel_id) {
+    public function receiptMarketingTask($channel_id)
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
         if (empty($channel_id)) {
@@ -2914,12 +2947,11 @@ class CmppCreateCodeTask extends Pzlife {
                     $status_message = 'DELIVRD';
                 } else {
                     $status_message = $send_log['Stat'];
-                    if (in_array(trim($send_log['Stat']) ,['REJECTD','REJECT','MA:0001'])){
+                    if (in_array(trim($send_log['Stat']), ['REJECTD', 'REJECT', 'MA:0001'])) {
                         $status_message = 'DELIVRD';
                     }
-                   
                 }
-               
+
                 $data = [
                     'task_id'        => $send_log['mar_task_id'],
                     'mobile'         => $send_log['mobile'],
@@ -2991,7 +3023,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function errotRpush() {
+    public function errotRpush()
+    {
         $redis                 = Phpredis::getConn();
         $redisMessageCodeMsgId = 'index:meassage:code:msg:id:1';
 
@@ -3024,7 +3057,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function getUpRiver() {
+    public function getUpRiver()
+    {
         $redis = Phpredis::getConn();
         /*  $redis->rpush('index:message:code:upriver:22', json_encode([
         'mobile' => 15201926171,
@@ -3076,14 +3110,16 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function updateUpRiver() {
+    public function updateUpRiver()
+    {
         $upriver = Db::query("SELECT * FROM yx_user_upriver");
         foreach ($upriver as $key => $value) {
             # code...
         }
     }
 
-    public function verifyMobileSource() {
+    public function verifyMobileSource()
+    {
         $mobilesend = 15997595078;
         $prefix     = substr(trim($mobilesend), 0, 7);
         $res        = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
@@ -3230,7 +3266,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
     } */
 
-    public function delRepetition() {
+    public function delRepetition()
+    {
         $del_ids = [];
         //  for ($i = 158434; $i < 173332; $i++) {
         for ($i = 143748; $i < 155742; $i++) {
@@ -3281,7 +3318,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function sendLengthUpdate() {
+    public function sendLengthUpdate()
+    {
         for ($i = 104587; $i < 517807; $i++) {
             $log = Db::query("SELECT `send_length`,`task_content` FROM `yx_user_send_code_task_log` WHERE `id` = '" . $i . "'");
             if ($log) {
@@ -3293,7 +3331,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //日志写入到数据表中营销
-    public function removeMultimediaTaskLog() {
+    public function removeMultimediaTaskLog()
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $time = strtotime(date('Y-m-d 0:00:00', time()));
         // $start_time = strtotime(date('Y-m-d 0:00:00', strtotime("-3 day")));
@@ -3351,7 +3390,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     /* {"task_no":"mul20020515503481449866","uid":1,"mobile":"18616279075","status_message":"DELIVRD","send_status":3,"send_time":1580889993} */
-    public function receiptMultimediaToBase($channel_id) {
+    public function receiptMultimediaToBase($channel_id)
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
         /*         $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
@@ -3439,7 +3479,7 @@ class CmppCreateCodeTask extends Pzlife {
                 $message_info = '黑名单';
             } else if ($send_log['status_message'] == 'DELIVRD') {
                 $message_info = '发送成功';
-            }else if (in_array(trim($send_log['status_message']) ,['REJECTD','REJECT','MA:0001','4442'])){
+            } else if (in_array(trim($send_log['status_message']), ['REJECTD', 'REJECT', 'MA:0001', '4442'])) {
                 $$send_log['status_message'] = 'DELIVRD';
                 $message_info = '发送成功';
             } else {
@@ -3457,7 +3497,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function reciveSendMessageFoMlty() {
+    public function reciveSendMessageFoMlty()
+    {
         while (true) {
             // $time = strtotime(date('Y-m-d 0:00:00', time()));
             $start_time = strtotime('2020-02-05 0:00:00');
@@ -3493,7 +3534,6 @@ class CmppCreateCodeTask extends Pzlife {
                         exception($e);
                     }
                 }
-
             } else {
                 echo 'Over' . "\n";
                 sleep(120);
@@ -3502,7 +3542,8 @@ class CmppCreateCodeTask extends Pzlife {
     }
 
     //回执补推方法
-    public function receiptFillPush() {
+    public function receiptFillPush()
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
         // $redis->rpush('index:message:receipt:fillpush', json_encode(['uid' => '47', 'start_time' => '1587216387', 'end_time' => '1587219548', 'type' => 'business']));
@@ -3542,7 +3583,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function businessSettlement() {
+    public function businessSettlement()
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         while (true) {
             $year_businessSettlement  = [];
@@ -3854,7 +3896,8 @@ class CmppCreateCodeTask extends Pzlife {
     } */
     }
 
-    public function isTrueSettlemen() {
+    public function isTrueSettlemen()
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $code_task_log = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `uid` = 47 AND create_time >= 1580486400 AND create_time < 1582992000");
         $all_num       = 0;
@@ -3869,7 +3912,8 @@ class CmppCreateCodeTask extends Pzlife {
         echo $all_num;
     }
 
-    public function MultimediaSettlement() {
+    public function MultimediaSettlement()
+    {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为10G
         $year_businessSettlement  = [];
         $month_businessSettlement = [];
@@ -4146,7 +4190,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function marketingSettlement() {
+    public function marketingSettlement()
+    {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为10G
         $year_businessSettlement  = [];
         $month_businessSettlement = [];
@@ -4421,7 +4466,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function mulTaksLogUpdate() {
+    public function mulTaksLogUpdate()
+    {
         $task = Db::query("SELECT * FROM yx_user_multimedia_message WHERE free_trial = 2 ");
         foreach ($task as $key => $value) {
             $mobile = explode(',', $value['mobile_content']);
@@ -4449,7 +4495,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function BufaCodetaskLog() {
+    public function BufaCodetaskLog()
+    {
         $redis    = Phpredis::getConn();
         $task_log = Db::query("SELECT * FROM `yx_user_send_code_task` WHERE `id` >= '338053 ' AND `id` <=  '338371' AND `real_num` > '1' AND `task_content` NOT LIKE '%4日9时%' AND `task_content` NOT LIKE '%4日10时%' AND `task_content` NOT LIKE '%4日11时%' AND `task_content` NOT LIKE '%4日12时%' ");
         foreach ($task_log as $key => $value) {
@@ -4468,7 +4515,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function calculateGameTaskReceip() {
+    public function calculateGameTaskReceip()
+    {
         $redis = Phpredis::getConn();
         /*        while (true) {
         $min = 100 - ceil(4.6 / 5.2 * 100);
@@ -4560,7 +4608,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function receiptCallBack() {
+    public function receiptCallBack()
+    {
         $redis = Phpredis::getConn();
         $redis->rpush("index:message:task:callback", json_encode([
             'start_time' => 1586880000,
@@ -4600,7 +4649,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function zlsUpdate() {
+    public function zlsUpdate()
+    {
         $task     = Db::query("SELECT * FROM yx_user_send_code_task WHERE `uid` = 94");
         $j        = 1;
         $all_log  = [];
@@ -4863,7 +4913,8 @@ class CmppCreateCodeTask extends Pzlife {
         }
     }
 
-    public function SFLpush() {
+    public function SFLpush()
+    {
         // $start_time = strtotime("2020-04-22 19:59:00");
         // $end_time = strtotime("2020-04-23 10:01:00");
         $this->redis = Phpredis::getConn();
@@ -4882,7 +4933,7 @@ class CmppCreateCodeTask extends Pzlife {
                 }
                 $this->redis->rpush("index:meassage:business:sendtask", $task_id);
             }
-/*             $all_task = Db::query("SELECT `id`,`mobile_content` FROM `yx_user_send_code_task` WHERE `uid` = '91'  AND `id` > '446787'  AND `id` < '448343'");
+            /*             $all_task = Db::query("SELECT `id`,`mobile_content` FROM `yx_user_send_code_task` WHERE `uid` = '91'  AND `id` > '446787'  AND `id` < '448343'");
 $ids = [];
 if ($all_task) {
 // echo "SELECT `id` FROM `yx_user_send_code_task` WHERE `uid` = '91' AND `create_time` >= '1587470340'  AND `create_time` <= '1587607260'";
@@ -4935,30 +4986,29 @@ exception($e);
 }
 
 } */
-
         } catch (\exception $e) {
             exception($e);
         }
-
     }
     //彩信
-    public function receiptMulForSFL() {
+    public function receiptMulForSFL()
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $this->redis = Phpredis::getConn();
         $start_time = strtotime('2020-04-26 20:00:00');
         $end_time   = strtotime("2020-04-27 20:00:00");
-        $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' " );
+        $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "') AND `status_message` = '' ");
         // echo "SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' " ;die;
         // echo count($mul_task);die;
         // $num = count($mul_task)-18;
         // $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' ORDER BY rand() LIMIT  ".$num );
         // echo count($mul_task);die;
         foreach ($mul_task as $key => $value) {
-            $num = max(0,1000);
+            $num = max(0, 1000);
             $time =  time() - mt_rand(0, 57);
             // if ($num > 15) {
-                if ($value['mobile'] == '15021417314') {
-                   /*  Db::table('yx_user_multimedia_message_log')->where('id', $value['id'])->update([
+            if ($value['mobile'] == '15021417314') {
+                /*  Db::table('yx_user_multimedia_message_log')->where('id', $value['id'])->update([
                         'send_status'    => 3,
                         'update_time'    => $time,
                         'status_message' => '-30',
@@ -4973,42 +5023,42 @@ exception($e);
                         // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
                         'send_time'      => date('Y-m-d H:i:s',$time),
                     ])); //写入用户带处理日志 */
-                    continue;
-                }
-                Db::startTrans();
-                try {
-                    Db::table('yx_user_multimedia_message_log')->where('id', $value['id'])->update([
-                        'send_status'    => 3,
-                        'update_time'    => $time,
-                        'status_message' => 'DELIVRD',
-                        'task_id'        => $value['id'],
-                    ]);
-                    Db::commit();
-                    $this->redis->rpush('index:meassage:code:user:mulreceive:' . $value['uid'], json_encode([
-                        'task_no'        => $value['task_no'],
-                        'status_message' => "DELIVRD",
-                        'message_info'   => '发送成功',
-                        'mobile'         => $value['mobile'],
-                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                        'send_time'      => date('Y-m-d H:i:s',$time),
-                    ])); //写入用户带处理日志
-                } catch (\Exception $e) {
-                    // $this->redis->rPush('index:meassage:business:sendtask', $send);
+                continue;
+            }
+            Db::startTrans();
+            try {
+                Db::table('yx_user_multimedia_message_log')->where('id', $value['id'])->update([
+                    'send_status'    => 3,
+                    'update_time'    => $time,
+                    'status_message' => 'DELIVRD',
+                    'task_id'        => $value['id'],
+                ]);
+                Db::commit();
+                $this->redis->rpush('index:meassage:code:user:mulreceive:' . $value['uid'], json_encode([
+                    'task_no'        => $value['task_no'],
+                    'status_message' => "DELIVRD",
+                    'message_info'   => '发送成功',
+                    'mobile'         => $value['mobile'],
+                    // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                    'send_time'      => date('Y-m-d H:i:s', $time),
+                ])); //写入用户带处理日志
+            } catch (\Exception $e) {
+                // $this->redis->rPush('index:meassage:business:sendtask', $send);
 
-                    Db::rollback();
-                    exception($e);
-                }
-               
+                Db::rollback();
+                exception($e);
+            }
+
             // }
         }
         exit;
         $start_time = strtotime('2020-04-21 20:00:00');
         $end_time   = strtotime("2020-04-22 20:00:00");
-        $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' " );
+        $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "') AND `status_message` = '' ");
         // echo "SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' " ;die;
         foreach ($mul_task as $key => $value) {
             $time =  time() - mt_rand(0, 57);
-            $num = max(0,1000);
+            $num = max(0, 1000);
             if ($num > 17) {
                 if ($value['mobile'] == '15021417314') {
                     Db::table('yx_user_multimedia_message_log')->where('id', $value['id'])->update([
@@ -5024,7 +5074,7 @@ exception($e);
                         'message_info'   => '发送失败',
                         'mobile'         => $value['mobile'],
                         // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                        'send_time'      => date('Y-m-d H:i:s',$time),
+                        'send_time'      => date('Y-m-d H:i:s', $time),
                     ])); //写入用户带处理日志
                     continue;
                 }
@@ -5044,7 +5094,7 @@ exception($e);
                         'message_info'   => '发送成功',
                         'mobile'         => $value['mobile'],
                         // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                        'send_time'      => date('Y-m-d H:i:s',$time),
+                        'send_time'      => date('Y-m-d H:i:s', $time),
                     ])); //写入用户带处理日志
                 } catch (\Exception $e) {
                     // $this->redis->rPush('index:meassage:business:sendtask', $send);
@@ -5052,17 +5102,16 @@ exception($e);
                     Db::rollback();
                     exception($e);
                 }
-               
             }
         }
 
         $start_time = strtotime('2020-04-22 20:00:00');
         $end_time   = strtotime("2020-04-23 20:00:00");
-        $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' " );
+        $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "') AND `status_message` = '' ");
         // echo "SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' " ;die;
         foreach ($mul_task as $key => $value) {
             $time =  time() - mt_rand(0, 57);
-            $num = max(0,1000);
+            $num = max(0, 1000);
             if ($num > 19) {
                 if ($value['mobile'] == '15021417314') {
                     Db::table('yx_user_multimedia_message_log')->where('id', $value['id'])->update([
@@ -5078,7 +5127,7 @@ exception($e);
                         'message_info'   => '发送失败',
                         'mobile'         => $value['mobile'],
                         // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                        'send_time'      => date('Y-m-d H:i:s',$time),
+                        'send_time'      => date('Y-m-d H:i:s', $time),
                     ])); //写入用户带处理日志
                     continue;
                 }
@@ -5098,7 +5147,7 @@ exception($e);
                         'message_info'   => '发送成功',
                         'mobile'         => $value['mobile'],
                         // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                        'send_time'      => date('Y-m-d H:i:s',$time),
+                        'send_time'      => date('Y-m-d H:i:s', $time),
                     ])); //写入用户带处理日志
                 } catch (\Exception $e) {
                     // $this->redis->rPush('index:meassage:business:sendtask', $send);
@@ -5106,12 +5155,11 @@ exception($e);
                     Db::rollback();
                     exception($e);
                 }
-               
             }
         }
 
 
-   /*      while (true) {
+        /*      while (true) {
             //彩信部分
             $start_time = strtotime('2020-04-21 0:00:00');
             $end_time   = strtotime("-3 day");
@@ -5209,11 +5257,12 @@ exception($e);
         } */
     }
 
-    public function receiptCodeTaskForSFL(){
-
+    public function receiptCodeTaskForSFL()
+    {
     }
 
-    public function receiptMulToBase(){
+    public function receiptMulToBase()
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $start_time = strtotime('2020-04-21 20:00:00');
         // $end_time = strtotime('2020-04-23 20:00:00');
@@ -5225,70 +5274,69 @@ exception($e);
         foreach ($mul_task as $key => $value) {
             $mobile_content = $value['mobile_content'];
             $time = $value['update_time'];
-           /*  if ($time >= 1587470400 && $time <= 1587520800 && $value['uid']) {
+            /*  if ($time >= 1587470400 && $time <= 1587520800 && $value['uid']) {
                 $time = '1587520801';
             }elseif ($time >= 1587556800 && $time <= 1587607200) {
                 $time = '1587607201';
             }else{
                 $time = $value['update_time'];
             } */
-            $mobile_data = explode(',',$mobile_content);
-            for ($i=0; $i < count($mobile_data); $i++) { 
+            $mobile_data = explode(',', $mobile_content);
+            for ($i = 0; $i < count($mobile_data); $i++) {
                 $task_log = Db::query("SELECT `id`,`status_message` FROM yx_user_multimedia_message_log WHERE `task_no` = '" . $value['task_no'] . "' AND `mobile` = '" . $mobile_data[$i] . "'");
-            if (empty($task_log)) {
-                try {
-                    Db::table('yx_user_multimedia_message_log')->insert([
-                        'uid'            => $value['uid'],
-                        'task_no'        => $value['task_no'],
-                        'mobile'         => $mobile_data[$i],
-                        'send_status'    => 3,
-                        'create_time'    => $time,
-                        'update_time'    => time(),
-                        'task_id'        => $value['id'],
-                        'source'         => $value['source'],
-                    ]);
-                    Db::commit();
-                 
-                } catch (\Exception $e) {
-                    exception($e);
+                if (empty($task_log)) {
+                    try {
+                        Db::table('yx_user_multimedia_message_log')->insert([
+                            'uid'            => $value['uid'],
+                            'task_no'        => $value['task_no'],
+                            'mobile'         => $mobile_data[$i],
+                            'send_status'    => 3,
+                            'create_time'    => $time,
+                            'update_time'    => time(),
+                            'task_id'        => $value['id'],
+                            'source'         => $value['source'],
+                        ]);
+                        Db::commit();
+                    } catch (\Exception $e) {
+                        exception($e);
+                    }
+                } else {
+                    Db::table('yx_user_multimedia_message_log')->where('id', $task_log[0]['id'])->update(
+                        [
+                            'create_time' => $time,
+                        ]
+                    );
                 }
-            }else{
-                Db::table('yx_user_multimedia_message_log')->where('id',$task_log[0]['id'])->update(
-                    [
-                        'create_time' => $time,
-                    ]
-                );
             }
-            }
-            
         }
     }
 
-    public function taskReceipt(){
+    public function taskReceipt()
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $num = Db::query("SELECT count(`id`) FROM yx_send_task_receipt ");
         $id_num = $num[0]['count(`id`)'];
         // print_r($id_num);die;
         $del_ids = [];
         try {
-            
-            for ($i=0; $i < $id_num; $i++) { 
-                $this_id = $i +1;
-                $task_code_receipt = Db::query("SELECT * FROM yx_send_task_receipt WHERE `id` = ". $this_id);
-                $task = Db::query("SELECT `task_no` FROM yx_user_send_task WHERE `id` = ".$task_code_receipt[0]['task_id']);
+
+            for ($i = 0; $i < $id_num; $i++) {
+                $this_id = $i + 1;
+                $task_code_receipt = Db::query("SELECT * FROM yx_send_task_receipt WHERE `id` = " . $this_id);
+                $task = Db::query("SELECT `task_no` FROM yx_user_send_task WHERE `id` = " . $task_code_receipt[0]['task_id']);
                 if (!empty($task)) {
-                    $task_log = Db::query("SELECT * FROM  yx_user_send_task_log WHERE `task_no` = '".$task[0]['task_no']."'");
-                    if (!empty($task_log)){
+                    $task_log = Db::query("SELECT * FROM  yx_user_send_task_log WHERE `task_no` = '" . $task[0]['task_no'] . "'");
+                    if (!empty($task_log)) {
                         if (strpos($task_log[0]['status_message'], 'DB:0141') !== false || strpos($task_log[0]['status_message'], 'MBBLACK') !== false || strpos($task_log[0]['status_message'], 'BLACK') !== false) {
                             $message_info = '黑名单';
                         } else if (trim($task_log[0]['status_message'] == 'DELIVRD')) {
                             $message_info = '发送成功';
-                        } else if (in_array(trim($task_log[0]['status_message']) ,['REJECTD','REJECT','MA:0001'])){
+                        } else if (in_array(trim($task_log[0]['status_message']), ['REJECTD', 'REJECT', 'MA:0001'])) {
                             $message_info = '发送成功';
-                        }else {
+                        } else {
                             $message_info = '发送失败';
                         }
-                        Db::table('yx_user_send_task_log')->where('id',$task_log[0]['id'])->update(
+                        Db::table('yx_user_send_task_log')->where('id', $task_log[0]['id'])->update(
                             [
                                 'status_message' => $task_code_receipt[0]['status_message'],
                                 'real_message' => $task_code_receipt[0]['real_message'],
@@ -5306,34 +5354,34 @@ exception($e);
         } catch (\Exception $th) {
             exception($th);
         }
-       
     }
 
-    public function taskCodeReceipt(){
+    public function taskCodeReceipt()
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $num = Db::query("SELECT count(`id`) FROM yx_send_code_task_receipt ");
         $id_num = $num[0]['count(`id`)'];
         // print_r($id_num);die;
         $del_ids = [];
         try {
-            
-            for ($i=0; $i < $id_num; $i++) { 
-                $this_id = $i +1;
-                $task_code_receipt = Db::query("SELECT * FROM yx_send_code_task_receipt WHERE `id` = ". $this_id);
-                $task = Db::query("SELECT `task_no` FROM yx_user_send_code_task WHERE `id` = ".$task_code_receipt[0]['task_id']);
+
+            for ($i = 0; $i < $id_num; $i++) {
+                $this_id = $i + 1;
+                $task_code_receipt = Db::query("SELECT * FROM yx_send_code_task_receipt WHERE `id` = " . $this_id);
+                $task = Db::query("SELECT `task_no` FROM yx_user_send_code_task WHERE `id` = " . $task_code_receipt[0]['task_id']);
                 if (!empty($task)) {
-                    $task_log = Db::query("SELECT * FROM  yx_user_send_code_task_log WHERE `task_no` = '".$task[0]['task_no']."'");
-                    if (!empty($task_log)){
+                    $task_log = Db::query("SELECT * FROM  yx_user_send_code_task_log WHERE `task_no` = '" . $task[0]['task_no'] . "'");
+                    if (!empty($task_log)) {
                         if (strpos($task_log[0]['status_message'], 'DB:0141') !== false || strpos($task_log[0]['status_message'], 'MBBLACK') !== false || strpos($task_log[0]['status_message'], 'BLACK') !== false) {
                             $message_info = '黑名单';
                         } else if (trim($task_log[0]['status_message'] == 'DELIVRD')) {
                             $message_info = '发送成功';
-                        } else if (in_array(trim($task_log[0]['status_message']) ,['REJECTD','REJECT','MA:0001'])){
+                        } else if (in_array(trim($task_log[0]['status_message']), ['REJECTD', 'REJECT', 'MA:0001'])) {
                             $message_info = '发送成功';
-                        }else {
+                        } else {
                             $message_info = '发送失败';
                         }
-                        Db::table('yx_user_send_code_task_log')->where('id',$task_log[0]['id'])->update(
+                        Db::table('yx_user_send_code_task_log')->where('id', $task_log[0]['id'])->update(
                             [
                                 'status_message' => $task_code_receipt[0]['status_message'],
                                 'real_message' => $task_code_receipt[0]['real_message'],
@@ -5351,6 +5399,5 @@ exception($e);
         } catch (\Exception $th) {
             exception($th);
         }
-       
     }
 }
