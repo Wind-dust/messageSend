@@ -4950,8 +4950,8 @@ exception($e);
         $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' " );
         // echo "SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' " ;die;
         // echo count($mul_task);die;
-        $num = count($mul_task)-18;
-        $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' ORDER BY rand() LIMIT  ".$num );
+        // $num = count($mul_task)-18;
+        // $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' ORDER BY rand() LIMIT  ".$num );
         // echo count($mul_task);die;
         foreach ($mul_task as $key => $value) {
             $num = max(0,1000);
