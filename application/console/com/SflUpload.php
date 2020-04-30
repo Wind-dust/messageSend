@@ -108,6 +108,7 @@ class SflUpload extends Pzlife
         if ($path_data == false) {
             exit("This Dir IS null");
         }
+        $all_models = [];
         try {
             foreach ($path_data as $key => $value) {
                 //进入二级目录 MMS 或者 SMS 等
@@ -116,68 +117,153 @@ class SflUpload extends Pzlife
                     continue;
                 }
                 $son_path_data = $this->getDirContent($path . $value);
-                if ($son_path_data !== false) {
+                if ($value == 'MMS') {
+                    if ($son_path_data !== false) {
 
-                    foreach ($son_path_data as $skey => $svalue) {
-                        $son_path = $path . $value . "/" . $svalue;
-                        // $file = fopen($path.$value."/".$svalue,"r");
-                        $file_info = explode('.', $svalue);
-                        if ($file_info[1] == 'zip') { //需要解压
-                            //开始解压
-                            if ($zip->open($son_path) === true) {
-                                $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0];
-                                $mcw = $zip->extractTo($unpath); //解压到$route这个目录中
-                                $zip->close();
-                                //解压完成
-                                $unzip = $this->getDirContent($unpath);
-                                // print_r($unzip);die;
-                                //先上传模板内容
-                                if (strpos("targets", $svalue) != false) {
-                                }
-                                $fram_model = [];
-                                foreach ($unzip as $ukey => $uvalue) {
-                                    $fram = [];
-                                    $un_file_info = explode('.', $uvalue);
-                                    // if ($un_file_info[1] == 'jpg') { //图片
+                        foreach ($son_path_data as $skey => $svalue) {
+                            $son_path = $path . $value . "/" . $svalue;
+                            // $file = fopen($path.$value."/".$svalue,"r");
+                            $file_info = explode('.', $svalue);
+                            if ($file_info[1] == 'zip') { //需要解压
+                                //开始解压
+                                if ($zip->open($son_path) === true) {
+                                    $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0];
+                                    $mcw = $zip->extractTo($unpath); //解压到$route这个目录中
+                                    $zip->close();
+                                    //解压完成
+                                    $unzip = $this->getDirContent($unpath);
+                                    //先上传模板内容
 
-                                    // }elseif ($un_file_info[1] == '') {}
-                                    if ($uvalue == '1.jpg' || $uvalue == '1.gif') {
-                                        $image   = $unpath . "/" . $uvalue;
-                                        //调用内部api 上传图片
-                                        $data = [
-                                            'appid' => '5e17e42ae9fe3',
-                                            'appkey' => 'da1416c4d51b8edd58596ca4b56ca267',
-                                            'image' => new CURLFile($image, '', 'aaa')
-                                        ];
-                                        $ch = curl_init();
-                                        curl_setopt($ch, CURLOPT_HEADER, false);
-                                        //启用时会发送一个常规的POST请求，类型为：application/x-www-form-urlencoded，就像表单提交的一样。
-                                        curl_setopt($ch, CURLOPT_POST, true);
-                                        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
-                                        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-                                        // curl_setopt($ch, CURLOPT_URL, 'http://sendapidev.shyuxi.com/index/upload/uploadfile');
-                                        curl_setopt($ch, CURLOPT_URL, 'http://127.0.0.1:1007/index/upload/uploadfile');
-                                        curl_setopt($ch, CURLOPT_USERAGENT, 'Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400'); // 模拟用户使用的浏览器
-                                        $info = curl_exec($ch);
-                                        curl_close($ch);
-                                        // $result = sendRequest('', 'post',  $data);
-                                        // $fileInfo = $this->getInfo($image);
-                                        print_r($data);
-                                        die;
+                                    if (strpos($file_info[0], "targets")) {
+                                        foreach ($unzip as $ukey => $uvalue) {
+                                            $send_data[] = $unpath . '/' . $uvalue;
+                                        }
+                                        continue;
                                     }
-                                }
-                            }
-                        } else if ($file_info[1] == 'txt') {
-                            $file_data = $this->readForTxtToDyadicArray($son_path);
+                                    $fram_model = [];
+                                    foreach ($unzip as $ukey => $uvalue) {
+                                        $fram = [];
+                                        $un_file_info = explode('.', $uvalue);
+                                        // if ($un_file_info[1] == 'jpg') { //图片
 
-                            // print_r($file_data);die;
+                                        // }elseif ($un_file_info[1] == '') {}
+                                        $son_dir_path   = $unpath . "/" . $uvalue;
+                                        if ($uvalue == '1.jpg' || $uvalue == '1.gif') {
+
+                                            //调用内部api 上传图片
+                                            $data = [
+                                                'appid' => '5e17e42ae9fe3',
+                                                'appkey' => 'da1416c4d51b8edd58596ca4b56ca267',
+                                                'image' => new CURLFile($son_dir_path, 'image', $uvalue)
+                                            ];
+                                            $info = $this->uploadFileToBase($data);
+                                            // $result = sendRequest('', 'post',  $data);
+                                            // $fileInfo = $this->getInfo($image);
+
+                                            if (isset($info['code']) && $info['code'] == 200) {
+                                                $fram['num'] = 1;
+                                                $fram['name'] = "第一帧";
+                                                $fram['image_path']  = filtraImage(Config::get('qiniu.domain'), $info['image_path']);
+                                                $fram_model[] = $fram;
+                                                // array_push($fram, $fram_model);
+                                            }
+                                        } else if ($uvalue == '1.txt') {
+                                            $txt = $this->readForTxtToArray($son_dir_path);
+                                            $fram['num'] = 2;
+                                            $fram['name'] = "第二帧";
+                                            $fram['content'] = join('\n', $txt);
+                                            $fram_model[] = $fram;
+                                            // array_push($fram, $fram_model);
+                                        } else if ($uvalue == '2.jpg' || $uvalue == '2.gif') {
+                                            $data = [
+                                                'appid' => '5e17e42ae9fe3',
+                                                'appkey' => 'da1416c4d51b8edd58596ca4b56ca267',
+                                                'image' => new CURLFile($son_dir_path, 'image', $uvalue)
+                                            ];
+                                            // $info = $this->uploadFileToBase($data);
+                                            // $result = sendRequest('', 'post',  $data);
+                                            // $fileInfo = $this->getInfo($image);
+                                            if (isset($info['code']) && $info['code'] == 200) {
+                                                $fram['num'] = 3;
+                                                $fram['name'] = "第三帧";
+                                                $fram['image_path']  = filtraImage(Config::get('qiniu.domain'), $info['image_path']);
+                                                $fram_model[] = $fram;
+                                                // array_push($fram, $fram_model);
+                                            }
+                                        } else if ($uvalue == '2.txt') {
+                                            $txt = $this->readForTxtToArray($son_dir_path);
+                                            $fram['num'] = 4;
+                                            $fram['name'] = "第四帧";
+                                            $fram['content'] = join('\n', $txt);
+                                            $fram_model[] = $fram;
+                                            // array_push($fram, $fram_model);
+                                        } elseif ($uvalue == 'SUBJECT.txt') { //标题
+                                            $txt = $this->readForTxtToArray($son_dir_path);
+                                            $fram_model['title'] = $txt[0];
+                                        }
+                                    }
+                                    $all_models[$file_info[0]] = $fram_model;
+                                    // print_r($all_models);
+                                    // die;
+                                }
+                            } else if ($file_info[1] == 'txt') {
+                                $file_data = $this->readForTxtToDyadicArray($son_path); //关联关系
+
+                                // print_r($file_data);
+                                // die;
+                            }
                         }
+
+                        //创建模板
+
+                        foreach ($file_data as $fkey => $fvalue) {
+                            /* (
+                                [0] => "100178136"
+                                [1] => "白卡会员积分近1500"
+                                [2] => "6"
+                                [3] => "100088234"
+                                [4] => "100088234_20200424155750.zip"
+                                [5] => "2020-04-24 00:00:00"
+                            ) */
+
+                            $sfl_model = [];
+                            $sfl_model = [
+                                'sfl_relation_id' => $fvalue[0],
+                                'sfl_model_name' => $fvalue[1],
+                                'sfl_model_id' => $fvalue[3],
+                                'sfl_model_filename' => $fvalue[4],
+                            ];
+                            $fram_key = explode('.', $fvalue[4]);
+                            $sfl_SMS_fram = $all_models[$fram_key[0]];
+                            $sfl_model['title'] = $sfl_SMS_fram['title'];
+                            unset($sfl_SMS_fram['title']);
+                        }
+                        print_r($send_data);
+                        print_r($all_models);
+                        die;
                     }
+                } elseif ($value == 'SMS') {
                 }
             }
         } catch (\Exception $e) {
             exception($e);
         }
+    }
+
+    public function uploadFileToBase($data)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        //启用时会发送一个常规的POST请求，类型为：application/x-www-form-urlencoded，就像表单提交的一样。
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_URL, 'http://sendapidev.shyuxi.com/index/upload/uploadFile');
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400'); // 模拟用户使用的浏览器
+        $res = curl_exec($ch); // 运行cURL，请求网页
+        curl_close($ch);
+        return json_decode($res, true);
     }
 
     //读文件输出成二维数组
@@ -193,6 +279,8 @@ class SflUpload extends Pzlife
         while (!feof($file)) {
             $cellVal = trim(fgets($file));
             if (!empty($cellVal)) {
+                // $cellVal = trim($cellVal, '"');
+                $cellVal = str_replace('"', '', $cellVal);
                 $value = explode(',', $cellVal);
                 array_push($data, $value);
             }
@@ -212,6 +300,7 @@ class SflUpload extends Pzlife
         $data = array();
         while (!feof($file)) {
             $cellVal = trim(fgets($file));
+            $cellVal = str_replace('"', '', $cellVal);
             if (!empty($cellVal)) {
                 array_push($data, $cellVal);
             }
@@ -286,7 +375,7 @@ class SflUpload extends Pzlife
                             foreach ($sms as $key => $value) {
                                 //下载远程文件
                                 $sftp->downFile(realpath("") . $local_directory . $value, $this_directory . $value);
-                                //上传至七牛云
+                                //解压至文件目录
                             }
                             // ssh2_scp_recv($cn,"\"".$remote_file_name."\"",$local_path."/".$remote_file_name); //OK
 

@@ -1038,3 +1038,18 @@ ALTER TABLE `messagesend`.`yx_users`
 MODIFY COLUMN `free_trial` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '行业短信审核:1:需要审核;2:无需审核' AFTER `money`,
 ADD COLUMN `marketing_free_trial` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '营销短信审核:1:需要审核;2:免审' AFTER `free_trial`,
 ADD COLUMN `mul_free_trial` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '彩信审核状态:1:需要审核;2:免审' AFTER `marketing_free_trial`;
+
+CREATE TABLE `yx_sfl_multimedia_template` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `template_id` char(23) NOT NULL DEFAULT '' COMMENT '短信模板id',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `title` varchar(255) NOT NULL DEFAULT '' COMMENT '模板id',
+  `name` varchar(40) NOT NULL DEFAULT '' COMMENT '模板别名',
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '状态:1,提交申请;2,审核通过3,审核不通过;',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `template_id` (`template_id`,`uid`) USING BTREE,
+  KEY `title` (`title`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='彩信模板主表';
