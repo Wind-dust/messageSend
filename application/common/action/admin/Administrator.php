@@ -645,9 +645,9 @@ class Administrator extends CommonIndex
             return ['code' => '3006'];
         }
         // print_r($num);die;
-        if ($num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
+       /*  if ($num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3007'];
-        }
+        } */
         $free_trial = 2;
         if ($userEquities['agency_price'] < $channel['channel_price']) {
             $free_trial = 4;
