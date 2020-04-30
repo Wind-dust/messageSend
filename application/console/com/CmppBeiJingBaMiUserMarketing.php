@@ -32,7 +32,7 @@ class CmppBeiJingBaMiUserMarketing extends Pzlife
             'Dest_Id'       => "10690128", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
-            'master_num'    => 400,
+            'master_num'    => 200,
         ];
     }
 
@@ -514,7 +514,7 @@ class CmppBeiJingBaMiUserMarketing extends Pzlife
                                     if ($i > $security_master) {
                                         $i    = 0;
                                     }
-                                    usleep(10000);
+                                    usleep(50000);
                                     continue;
                                 } else { //单条短信
 
@@ -560,7 +560,7 @@ class CmppBeiJingBaMiUserMarketing extends Pzlife
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
 
                                     $send_status = 2;
-                                    usleep(10000);
+                                    usleep(50000);
                                 }
                             } else { //心跳
                                 $Command_Id  = 0x00000008; //保持连接
