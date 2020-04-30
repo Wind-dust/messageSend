@@ -3638,74 +3638,74 @@ class CmppCreateCodeTask extends Pzlife
         'send_status' => 3,
         'send_time' => '1585709212',
         ))); */
+       
         while (true) {
-            $sendlog = $redis->lpop('index:meassage:multimediamessage:deliver:' . $channel_id);
-            if (empty($sendlog)) {
-                // exit('Send Log IS null');
-                sleep(60);
-                continue;
-            }
-            $send_log    = json_decode($sendlog, true);
-            $sendtasklog = Db::query("SELECT `id`,`create_time`,`real_message`,`status_message` FROM `yx_user_multimedia_message_log` WHERE `task_no` = '" . $send_log['task_no'] . "' AND `mobile` = '" . $send_log['mobile'] . "' ");
-            // die;
-            if (empty($sendtasklog)) {
-                $task = Db::query("SELECT `id`,`create_time`,`update_time`,`source` FROM `yx_user_multimedia_message` WHERE `task_no` = '" . $send_log['task_no'] . "' ");
-                Db::startTrans();
-                try {
-                    Db::table('yx_user_multimedia_message_log')->insert([
-                        'uid'            => $send_log['uid'],
-                        'task_no'        => $send_log['task_no'],
-                        'mobile'         => $send_log['mobile'],
-                        'send_status'    => $send_log['send_status'],
-                        'create_time'    => $task[0]['update_time'],
-                        'update_time'    => $send_log['send_time'],
-                        'real_message'   => $send_log['status_message'],
-                        'status_message' => $send_log['status_message'],
-                        'task_id'        => $task[0]['id'],
-                        'source'         => $task[0]['source'],
-                    ]);
-                    Db::commit();
-                } catch (\Exception $e) {
-                    Db::rollback();
-                    $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode($send_log));
-                    exception($e);
-                }
-            } else {
-                if (!empty($sendtasklog[0]['real_message'])) {
+            try {
+                $sendlog = $redis->lpop('index:meassage:multimediamessage:deliver:' . $channel_id);
+                if (empty($sendlog)) {
+                    // exit('Send Log IS null');
+                    sleep(60);
                     continue;
                 }
-                Db::startTrans();
-                try {
-                    Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'], 'send_status' => $send_log['send_status'], 'update_time' => $send_log['send_time']]);
-                    Db::commit();
-                } catch (\Exception $e) {
-                    Db::rollback();
-                    $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode($send_log));
-                    exception($e);
+                $send_log    = json_decode($sendlog, true);
+                $sendtasklog = Db::query("SELECT `id`,`create_time`,`real_message`,`status_message` FROM `yx_user_multimedia_message_log` WHERE `task_no` = '" . $send_log['task_no'] . "' AND `mobile` = '" . $send_log['mobile'] . "' ");
+                // die;
+                if (empty($sendtasklog)) {
+                    $task = Db::query("SELECT `id`,`create_time`,`update_time`,`source` FROM `yx_user_multimedia_message` WHERE `task_no` = '" . $send_log['task_no'] . "' ");
+                    Db::startTrans();
+                   
+                        Db::table('yx_user_multimedia_message_log')->insert([
+                            'uid'            => $send_log['uid'],
+                            'task_no'        => $send_log['task_no'],
+                            'mobile'         => $send_log['mobile'],
+                            'send_status'    => $send_log['send_status'],
+                            'create_time'    => $task[0]['update_time'],
+                            'update_time'    => $send_log['send_time'],
+                            'real_message'   => $send_log['status_message'],
+                            'status_message' => $send_log['status_message'],
+                            'task_id'        => $task[0]['id'],
+                            'source'         => $task[0]['source'],
+                        ]);
+                        Db::commit();
+                   
+                        $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode($send_log));
+                  
+                } else {
+                    if (!empty($sendtasklog[0]['real_message'])) {
+                        continue;
+                    }
+                    Db::startTrans();
+                        Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'], 'send_status' => $send_log['send_status'], 'update_time' => $send_log['send_time']]);
+                        Db::commit();
+                    if (!empty($sendtasklog[0]['status_message'])) {
+                        continue;
+                    }
                 }
-                if (!empty($sendtasklog[0]['status_message'])) {
-                    continue;
+                if (strpos($send_log['status_message'], 'DB:0141') !== false || strpos($send_log['status_message'], 'MBBLACK') !== false || strpos($send_log['status_message'], 'BLACK') !== false) {
+                    $message_info = '黑名单';
+                } else if ($send_log['status_message'] == 'DELIVRD') {
+                    $message_info = '发送成功';
+                } else if (in_array(trim($send_log['status_message']), ['REJECTD', 'REJECT', 'MA:0001', '4442'])) {
+                    $$send_log['status_message'] = 'DELIVRD';
+                    $message_info = '发送成功';
+                } else {
+                    $message_info = '发送失败';
                 }
+                $redis->rpush('index:meassage:code:user:mulreceive:' . $send_log['uid'], json_encode([
+                    'task_no'        => $send_log['task_no'],
+                    'status_message' => trim($send_log['status_message']),
+                    'message_info'   => $message_info,
+                    'mobile'         => trim($send_log['mobile']),
+                    // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                    'send_time'      => isset($send_log['send_time']) ? date('Y-m-d H:i:s', trim($send_log['send_time'])) : date('Y-m-d H:i:s', time()),
+                ])); //写入用户带处理日志
+    
+            } catch (\Exception $th) {
+                Db::rollback();
+                $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode($send_log));
+                exception($th);
             }
-            if (strpos($send_log['status_message'], 'DB:0141') !== false || strpos($send_log['status_message'], 'MBBLACK') !== false || strpos($send_log['status_message'], 'BLACK') !== false) {
-                $message_info = '黑名单';
-            } else if ($send_log['status_message'] == 'DELIVRD') {
-                $message_info = '发送成功';
-            } else if (in_array(trim($send_log['status_message']), ['REJECTD', 'REJECT', 'MA:0001', '4442'])) {
-                $$send_log['status_message'] = 'DELIVRD';
-                $message_info = '发送成功';
-            } else {
-                $message_info = '发送失败';
-            }
-            $redis->rpush('index:meassage:code:user:mulreceive:' . $send_log['uid'], json_encode([
-                'task_no'        => $send_log['task_no'],
-                'status_message' => trim($send_log['status_message']),
-                'message_info'   => $message_info,
-                'mobile'         => trim($send_log['mobile']),
-                // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                'send_time'      => isset($send_log['send_time']) ? date('Y-m-d H:i:s', trim($send_log['send_time'])) : date('Y-m-d H:i:s', time()),
-            ])); //写入用户带处理日志
-
+           
         }
     }
 
