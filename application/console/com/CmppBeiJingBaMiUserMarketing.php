@@ -42,7 +42,7 @@ class CmppBeiJingBaMiUserMarketing extends Pzlife
         $redis = Phpredis::getConn();
         date_default_timezone_set('PRC');
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $content                    = 57;
+        $content                    = 72;
         $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
         $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
         $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
@@ -73,7 +73,7 @@ class CmppBeiJingBaMiUserMarketing extends Pzlife
         ])); */
 
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $log_path = realpath("") . "/error/57.log";
+        $log_path = realpath("") . "/error/72.log";
         $myfile = fopen($log_path, 'a+');
         fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
         fwrite($myfile, " Begin" . "\n");
@@ -98,7 +98,7 @@ class CmppBeiJingBaMiUserMarketing extends Pzlife
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
 
-        $log_path = realpath("") . "/error/57.log";
+        $log_path = realpath("") . "/error/72.log";
         $myfile = fopen($log_path, 'a+');
         fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
         fwrite($myfile, " host:" . $host . " port:" . $port . "\n");
@@ -584,7 +584,7 @@ class CmppBeiJingBaMiUserMarketing extends Pzlife
                             }
                             socket_close($socket);
 
-                            $log_path = realpath("") . "/error/57.log";
+                            $log_path = realpath("") . "/error/72.log";
                             $myfile = fopen($log_path, 'a+');
                             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                             fwrite($myfile, $e . "\n");
