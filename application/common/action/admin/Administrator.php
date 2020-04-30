@@ -358,7 +358,7 @@ class Administrator extends CommonIndex
     public function auditUserSendTask($effective_id = [], $free_trial)
     {
         // print_r($effective_id);die;
-        $userchannel = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,task_content,free_trial', false);
+        $userchannel = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,task_content,free_trial,real_num', false);
 
         if (empty($userchannel)) {
             return ['code' => '3001'];
@@ -367,30 +367,48 @@ class Administrator extends CommonIndex
         $user_ids = [];
         $uids = [];
         // print_r($userchannel);die;
+        $billing  = [];
         foreach ($userchannel as $key => $value) {
             if ($value['free_trial'] > 1) {
                 continue;
             }
             $real_effective_id[] = $value['id'];
-            // if (!in_array($value['uid'], $uids)) {
-            //     $uids[] = $value['uid'];
-            // }
+            if (!in_array($value['uid'], $uids)) {
+                $uids[] = $value['uid'];
+            }
 
             if (array_key_exists($value['uid'], $user_ids)) {
                 $user_ids[$value['uid']][] = $value['id'];
             } else {
                 $user_ids[$value['uid']][] = $value['id'];
             }
+
+            if (array_key_exists($value['uid'],$billing)) {
+                $billing[$value['uid']] += $value['real_num'];
+            }else{
+                $billing[$value['uid']] = $value['real_num'];
+            }
         }
-        foreach ($user_ids as $key => $value) {
-            $user_equities = DbAdministrator::getUserEquities(['uid' => $key, 'business_id' => 5], 'id,num_balance', true);
-        }
+        
+        $where_equitise = [
+            ['uid', 'IN', join(',',$uids)],['business_id', '=', 5]
+        ];
+
+        
+        $user_equities = DbAdministrator::getUserEquities($where_equitise, 'id,uid,num_balance', false);
+        
 
 
         Db::startTrans();
         try {
             foreach ($real_effective_id as $real => $efid) {
                 DbAdministrator::editUserSendTask(['free_trial' => $free_trial], $efid);
+            }
+            //审核失败退回
+            if ($free_trial == 3) {
+                foreach ($user_equities as $key => $value) {
+                    DbAdministrator::modifyBalance($value['id'], $billing[$value['uid']], 'inc');
+                }
             }
             Db::commit();
             return ['code' => '200'];
@@ -565,24 +583,55 @@ class Administrator extends CommonIndex
     public function auditUserSendCodeTask($effective_id = [], $free_trial)
     {
         // print_r($effective_id);die;
-        $userchannel = DbAdministrator::getUserSendCodeTask([['id', 'in', join(',', $effective_id)]], 'id,mobile_content,free_trial', false);
+        $userchannel = DbAdministrator::getUserSendCodeTask([['id', 'in', join(',', $effective_id)]], 'id,uid,real_num,mobile_content,free_trial', false);
 
         if (empty($userchannel)) {
             return ['code' => '3001'];
         }
         $real_effective_id = [];
         // print_r($userchannel);die;
+        $real_effective_id = [];
+        $user_ids = [];
+        $uids = [];
+        // print_r($userchannel);die;
+        $billing  = [];
         foreach ($userchannel as $key => $value) {
             if ($value['free_trial'] > 1) {
                 continue;
             }
             $real_effective_id[] = $value['id'];
-        }
+            if (!in_array($value['uid'], $uids)) {
+                $uids[] = $value['uid'];
+            }
 
+            if (array_key_exists($value['uid'], $user_ids)) {
+                $user_ids[$value['uid']][] = $value['id'];
+            } else {
+                $user_ids[$value['uid']][] = $value['id'];
+            }
+
+            if (array_key_exists($value['uid'],$billing)) {
+                $billing[$value['uid']] += $value['real_num'];
+            }else{
+                $billing[$value['uid']] = $value['real_num'];
+            }
+        }
+        $where_equitise = [
+            ['uid', 'IN', join(',',$uids)],['business_id', '=', 6]
+        ];
+
+        
+        $user_equities = DbAdministrator::getUserEquities($where_equitise, 'id,uid,num_balance', false);
         Db::startTrans();
         try {
             foreach ($real_effective_id as $real => $efid) {
                 DbAdministrator::editUserSendCodeTask(['free_trial' => $free_trial], $efid);
+            }
+            //审核失败退回
+            if ($free_trial == 3) {
+                foreach ($user_equities as $key => $value) {
+                    DbAdministrator::modifyBalance($value['id'], $billing[$value['uid']], 'inc');
+                }
             }
             Db::commit();
             return ['code' => '200'];
