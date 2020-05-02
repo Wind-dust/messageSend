@@ -92,7 +92,9 @@ class Message extends AdminController
      * @apiParam (入参) {String} cms_con_id
      * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
      * @apiParam (入参) {String} business_id 业务服务id
-     * @apiParam (入参) {String} channel_id 通道ID
+     * @apiParam (入参) {String} yidong_channel_id 移动通道ID
+     * @apiParam (入参) {String} liantong_channel_id 联通通道ID
+     * @apiParam (入参) {String} dianxin_channel_id 电信通道ID
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:channel_id格式错误 / 3003:business_id格式错误
      * @apiSampleRequest /admin/message/distributionMultimediaChannel
      * @return array
@@ -108,7 +110,9 @@ class Message extends AdminController
         $id = trim($this->request->post('id'));
         $channel_id = trim($this->request->post('channel_id'));
         $business_id = trim($this->request->post('business_id'));
-
+        $yidong_channel_id = trim($this->request->post('yidong_channel_id'));
+        $liantong_channel_id = trim($this->request->post('liantong_channel_id'));
+        $dianxin_channel_id = trim($this->request->post('dianxin_channel_id'));
         $ids = explode(',', $id);
         $effective_id = [];
         foreach ($ids as $key => $value) {
@@ -117,13 +121,19 @@ class Message extends AdminController
             }
             $effective_id[] = $value;
         }
-        if (empty($channel_id) || intval($channel_id) < 1 || !is_numeric($channel_id)) {
+        if (empty($yidong_channel_id) || intval($yidong_channel_id) < 1 || !is_numeric($yidong_channel_id)) {
+            return ['code' => '3002'];
+        }
+        if (empty($liantong_channel_id) || intval($liantong_channel_id) < 1 || !is_numeric($liantong_channel_id)) {
+            return ['code' => '3002'];
+        }
+        if (empty($dianxin_channel_id) || intval($dianxin_channel_id) < 1 || !is_numeric($dianxin_channel_id)) {
             return ['code' => '3002'];
         }
         if (empty($business_id) || intval($business_id) < 1 || !is_numeric($business_id)) {
             return ['code' => '3003'];
         }
-        $result =  $this->app->message->distributionMultimediaChannel($effective_id, intval($channel_id), intval($business_id));
+        $result =  $this->app->message->distributionMultimediaChannel($effective_id, intval($yidong_channel_id), intval($liantong_channel_id), intval($dianxin_channel_id), intval($business_id));
         return $result;
     }
 

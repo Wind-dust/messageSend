@@ -1053,3 +1053,11 @@ CREATE TABLE `yx_sfl_multimedia_template` (
   KEY `template_id` (`template_id`,`uid`) USING BTREE,
   KEY `title` (`title`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='彩信模板主表';
+
+ALTER TABLE `messagesend`.`yx_user_multimedia_message` 
+CHANGE COLUMN `channel_id` `yidong_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '移动通道ID' AFTER `free_trial`,
+ADD COLUMN `liantong_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '联通通道id' AFTER `yidong_channel_id`,
+ADD COLUMN `dianxin_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '电信通道id' AFTER `liantong_channel_id`;
+
+ALTER TABLE `messagesend`.`yx_user_multimedia_message_log` 
+MODIFY COLUMN `task_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '任务id' AFTER `uid`;

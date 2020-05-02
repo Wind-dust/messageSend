@@ -496,11 +496,11 @@ class Administrator extends CommonIndex
             foreach ($real_usertask as $real => $usertask) {
                 // $res = $this->redis->rpush("index:meassage:marketing:sendtask",$usertask['id']); 
                 if (isset($usertask['appointment_time']) && $usertask['appointment_time'] > 0) {
-                    $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => $usertask['appointment_time']]));//定时
+                    $res = $this->redis->rpush("index:meassage:marketingtiming:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => $usertask['appointment_time']]));//定时
                 }else{
-                    $res = $this->redis->rpush("index:meassage:marketingtiming:sendtask", json_encode(['id' => $usertask['id'],'send_time' => 0]));//非定时
+                    $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $usertask['id'],'send_time' => 0]));//非定时
                 }
-               
+                // marketing
             }
             /*  if ($free_trial == 2) {
                 foreach ($real_usertask as $real => $usertask) {

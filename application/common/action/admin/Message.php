@@ -75,11 +75,19 @@ class Message extends CommonIndex
         }
     }
 
-    public function distributionMultimediaChannel($effective_id = [], $channel_id, $business_id)
+    public function distributionMultimediaChannel($effective_id = [], $yidong_channel_id, $liantong_channel_id, $dianxin_channel_id, $business_id)
     {
-        $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id, 'business_id' => $business_id], 'id,title,channel_price', true);
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $yidong_channel_id], 'id,title,channel_price', true);
         if (empty($channel)) {
             return ['code' => '3002'];
+        }
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $liantong_channel_id], 'id,title,channel_price', true);
+        if (empty($channel)) {
+            return ['code' => '3011'];
+        }
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $dianxin_channel_id], 'id,title,channel_price', true);
+        if (empty($channel)) {
+            return ['code' => '3012'];
         }
         $usertask = DbSendMessage::getUserMultimediaMessage([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,free_trial,send_num,channel_id', false);
         if (empty($usertask)) {
