@@ -810,7 +810,7 @@ return $result;
             'send_num'       => $send_num,
             'real_num'       => $real_num,
             'free_trial'     => $free_trial,
-            'channel_id'     => $channel_id,
+            'yidong_channel_id'     => $yidong_channel_id,
             'liantong_channel_id'     => $liantong_channel_id,
             'dianxin_channel_id'     => $dianxin_channel_id,
         ];
