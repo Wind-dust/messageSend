@@ -3790,7 +3790,7 @@ class CmppCreateCodeTask extends Pzlife
                 } else if ($send_log['status_message'] == 'DELIVRD') {
                     $message_info = '发送成功';
                 } else if (in_array(trim($send_log['status_message']), ['REJECTD', 'REJECT', 'MA:0001', '4442'])) {
-                    $$send_log['status_message'] = 'DELIVRD';
+                    $send_log['status_message'] = 'DELIVRD';
                     $message_info = '发送成功';
                 } else {
                     $message_info = '发送失败';
