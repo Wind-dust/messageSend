@@ -795,9 +795,10 @@ return $result;
         $free_trial = 1;
         if ($user['mul_free_trial'] == 2) {
             $free_trial = 2;
-            $yidong_channel_id = 59;
-            $liantong_channel_id = 59;
-            $dianxin_channel_id = 59;
+            // $yidong_channel_id = 59;
+            // $liantong_channel_id = 59;
+            // $dianxin_channel_id = 59;
+            $channel_id = 59;
         }
 
         $SmsMultimediaMessageTask = [];
@@ -810,9 +811,10 @@ return $result;
             'send_num'       => $send_num,
             'real_num'       => $real_num,
             'free_trial'     => $free_trial,
-            'yidong_channel_id'     => $yidong_channel_id,
-            'liantong_channel_id'     => $liantong_channel_id,
-            'dianxin_channel_id'     => $dianxin_channel_id,
+            'channel_id'     => $channel_id,
+            // 'yidong_channel_id'     => $yidong_channel_id,
+            // 'liantong_channel_id'     => $liantong_channel_id,
+            // 'dianxin_channel_id'     => $dianxin_channel_id,
         ];
 
         Db::startTrans();
