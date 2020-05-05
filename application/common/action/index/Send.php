@@ -477,6 +477,8 @@ return $result;
             $data['free_trial'] = 2;
             if ($user['pid'] == 10) {
                 $data['channel_id'] = 24;
+            }elseif ($user['id'] == 91){
+                $data['channel_id'] = 9; //蓝鲸营销
             } else {
                 $data['channel_id'] = 22; //蓝鲸
             }

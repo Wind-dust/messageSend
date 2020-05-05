@@ -1192,7 +1192,7 @@ class CmppCreateCodeTask extends Pzlife
                                             $channel_id = 24;
                                         } else if ($newres['source'] == 3 && $channel_id == 24) { //易信电信
                                             $channel_id = 26;
-                                        } else if ($channel_id == 22 && $newres['source'] == 2 && $sendTask['uid'] == 91) {
+                                        } else if ($newres['source'] == 2 && $sendTask['uid'] == 91) {
                                             $channel_id = 9; //蓝鲸营销
                                         }
                                     }
