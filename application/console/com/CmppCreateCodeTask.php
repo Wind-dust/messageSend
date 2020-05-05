@@ -5240,7 +5240,7 @@ class CmppCreateCodeTask extends Pzlife
         /* for ($i = 215906; $i < 216942; $i++) {
 
         } */
-        $this->redis->rpush($redisMessageMarketingSend,456987);
+        // $this->redis->rpush($redisMessageMarketingSend,456987);
         try {
             while (true) {
                 $task_id = $this->redis->lpop($redisMessageMarketingSend);
