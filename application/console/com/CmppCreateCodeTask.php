@@ -5240,13 +5240,14 @@ class CmppCreateCodeTask extends Pzlife
         /* for ($i = 215906; $i < 216942; $i++) {
 
         } */
-        // $this->redis->rpush($redisMessageMarketingSend,456987);
+        $this->redis->rpush($redisMessageMarketingSend,456987);
         try {
             while (true) {
                 $task_id = $this->redis->lpop($redisMessageMarketingSend);
                 if (empty($task_id)) {
                     exit('OVER');
                 }
+                Db::table('yx_user_send_code_task')->where('id',$task_id)->update(['channel_id' => 9]);
                 $this->redis->rpush("index:meassage:business:sendtask", $task_id);
             }
             /*             $all_task = Db::query("SELECT `id`,`mobile_content` FROM `yx_user_send_code_task` WHERE `uid` = '91'  AND `id` > '446787'  AND `id` < '448343'");
