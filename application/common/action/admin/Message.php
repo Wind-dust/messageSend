@@ -89,7 +89,7 @@ class Message extends CommonIndex
         if (empty($channel)) {
             return ['code' => '3012'];
         }
-        $usertask = DbSendMessage::getUserMultimediaMessage([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,free_trial,send_num,channel_id', false);
+        $usertask = DbSendMessage::getUserMultimediaMessage([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,free_trial,send_num,yidong_channel_id,liantong_channel_id,dianxin_channel_id', false);
         if (empty($usertask)) {
             return ['code' => '3001'];
         }
@@ -104,7 +104,7 @@ class Message extends CommonIndex
                 $uids[] = $value['uid'];
             }
             // print_r($value);
-            if ($value['free_trial'] == 2 && !$value['channel_id']) {
+            if ($value['free_trial'] == 2 && !$value['yidong_channel_id']) {
                 $real_length = 1;
                 $real_usertask[] = $value;
                 $mobilesend       = explode(',', $value['mobile_content']);
