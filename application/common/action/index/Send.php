@@ -812,14 +812,14 @@ return $result;
             // 'dianxin_channel_id'     => $dianxin_channel_id,
         ];
         if ($user['mul_free_trial'] == 2) {
-            // $free_trial = 2;
-            // $yidong_channel_id = 59;
-            // $liantong_channel_id = 59;
-            // $dianxin_channel_id = 59;
-            $SmsMultimediaMessageTask['free_trial'] = 2;
-            $SmsMultimediaMessageTask['yidong_channel_id'] = 59;
-            $SmsMultimediaMessageTask['liantong_channel_id'] = 59;
-            $SmsMultimediaMessageTask['dianxin_channel_id'] = 59;
+            $free_trial = 2;
+            $yidong_channel_id = 59;
+            $liantong_channel_id = 59;
+            $dianxin_channel_id = 59;
+            $SmsMultimediaMessageTask['free_trial'] = $free_trial;
+            $SmsMultimediaMessageTask['yidong_channel_id'] = $yidong_channel_id;
+            $SmsMultimediaMessageTask['liantong_channel_id'] = $liantong_channel_id;
+            $SmsMultimediaMessageTask['dianxin_channel_id'] = $dianxin_channel_id;
             // $channel_id = 59;
         }
 

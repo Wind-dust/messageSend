@@ -898,7 +898,7 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:multimediamessage:sendtask';
-        for ($i=22905; $i < 23013; $i++) { 
+        for ($i=22905; $i < 23078; $i++) { 
             $this->redis->rPush('index:meassage:multimediamessage:sendtask', $i);
         }
         // exit();
@@ -942,7 +942,6 @@ class CmppCreateCodeTask extends Pzlife
                 $liantong_channel_id = $sendTask['liantong_channel_id'];
                 $dianxin_channel_id  = 0;
                 $dianxin_channel_id  = $sendTask['dianxin_channel_id'];
-                $push_messages = [];
                 $send_content  = '';
                 // if (file_exists(realpath("") . '/tasklog/multimedia/' . $sendTask['task_no'] . ".txt")) {
                 //     continue;
