@@ -901,6 +901,7 @@ class CmppCreateCodeTask extends Pzlife
         for ($i=22905; $i < 23085; $i++) { 
             $this->redis->rPush('index:meassage:multimediamessage:sendtask', $i);
         }
+        $this->redis->rPush('index:meassage:multimediamessage:sendtask', 22886);
         // exit();
         // echo time() -1574906657;die;
 
