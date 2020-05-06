@@ -1103,7 +1103,7 @@ class CmppCreateCodeTask extends Pzlife
                 unset($push_messages);
                 unset($rollback);
             }
-            Db::startTrans();
+            /* Db::startTrans();
             try {
                 Db::table('yx_user_multimedia_message')->where(['id',' in', join(',',$send_task)])->update(['send_status' => 3]);
                
@@ -1118,7 +1118,7 @@ class CmppCreateCodeTask extends Pzlife
                 }
                 Db::rollback();
                 exception($e);
-            }
+            } */
             sleep(1);
             } catch (\Exception $th) {
                 //throw $th;
