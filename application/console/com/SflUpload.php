@@ -118,6 +118,7 @@ class SflUpload extends Pzlife
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
+                    $send_data = [];
                     if ($son_path_data !== false) {
 
                         foreach ($son_path_data as $skey => $svalue) {
@@ -237,12 +238,60 @@ class SflUpload extends Pzlife
                             $sfl_SMS_fram = $all_models[$fram_key[0]];
                             $sfl_model['title'] = $sfl_SMS_fram['title'];
                             unset($sfl_SMS_fram['title']);
+                            if (Db::query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = ".$fvalue[3])) {
+                                continue;
+                            }
+                            $sfl_multimedia_template_id = Db::table('yx_sfl_multimedia_template')->insertGetId($sfl_model);
+
+                        // print_r($sfl_SMS_fram);
+                        foreach ($sfl_SMS_fram as $key => $value) {
+                            // # code...
+                            $value['sfl_multimedia_template_id'] = $sfl_multimedia_template_id;
+                            $value['sfl_model_id'] = $fvalue[3];
+                            Db::table('yx_sfl_multimedia_template_frame')->insert($value);
                         }
-                        print_r($send_data);
-                        print_r($all_models);
-                        die;
+
+                        }
+                        // print_r($send_data);
+                        if (!empty($send_data)) {
+                            foreach ($send_data as $key => $value) {
+                                $txt = $this->readForTxtToArray($value);# code...
+                                // print_r($txt);
+                            }
+                        }
+                        // print_r($all_models);
+                        // die;
                     }
                 } elseif ($value == 'SMS') {
+                    $send_data = [];
+                    $SMS_model = [];
+                    if ($son_path_data !== false) {
+                        foreach ($son_path_data as $skey => $svalue) {
+                            $son_path = $path . $value . "/" . $svalue;
+                            // $file = fopen($path.$value."/".$svalue,"r");
+                            $file_info = explode('.', $svalue);
+                            if ($file_info[1] == 'zip') { //需要解压
+                                if ($zip->open($son_path) === true) {
+                                    $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0];
+                                    $mcw = $zip->extractTo($unpath); //解压到$route这个目录中
+                                    $zip->close();
+                                    //解压完成
+                                    $unzip = $this->getDirContent($unpath);
+                                    //先上传模板内容
+                                    print_r($unzip);
+                                    if (strpos($file_info[0], "targets")) {
+                                        foreach ($unzip as $ukey => $uvalue) {
+                                            $send_data[] = $unpath . '/' . $uvalue;
+                                        }
+                                        continue;
+                                    }
+                                }
+                            }else{//获取模板信息
+
+                            }
+                            print_r($send_data);
+                        }
+                    }
                 }
             }
         } catch (\Exception $e) {

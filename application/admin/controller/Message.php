@@ -553,4 +553,64 @@ class Message extends AdminController
         $result =  $this->app->message->auditUserMultimediaTemplatel(intval($id), $status);
         return $result;
     }
+
+    /**
+     * @api              {post} / 获取丝芙兰SFTP营销任务
+     * @apiDescription   getSflSendTask
+     * @apiGroup         admin_Administrator
+     * @apiName          getSflSendTask
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 任务id
+     * @apiParam (入参) {String} page 页码 默认1
+     * @apiParam (入参) {String} pageNum 条数 默认10
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 
+     * @apiSampleRequest /admin/administrator/getSflSendTask
+     * @return array
+     * @author rzc
+     */
+    public function getSflSendTask()
+    {
+        $id       = trim($this->request->post('id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        $result = $this->app->administrator->getSflSendTask($page, $pageNum, $id);
+        return $result;
+    }
+    /**
+     * @api              {post} / 丝芙兰sftp营销任务审核
+     * @apiDescription   auditSflSendTask
+     * @apiGroup         admin_Administrator
+     * @apiName          auditSflSendTask
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} model_id 任务id,多个用半角,分隔开,一次最多100
+     * @apiParam (入参) {String} start_time 开始时间
+     * @apiParam (入参) {String} end_time 结束时间
+     * @apiParam (入参) {String} free_trial 审核状态 2:审核通过;3:审核不通过
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:有效任务ID为空或者不能超过100个 
+     * @apiSampleRequest /admin/administrator/auditUserSendTask
+     * @return array
+     * @author rzc
+     */
+    public function auditSflSendTask()
+    {
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $model_id = trim($this->request->post('id'));
+        $start_time = trim($this->request->post('start_time'));
+        $end_time = trim($this->request->post('end_time'));
+        $free_trial = trim($this->request->post('free_trial'));
+        if (!in_array($free_trial, [2, 3])) {
+            return ['code' => '3003'];
+        }
+        $result =  $this->app->administrator->auditSflSendTask($model_id, $free_trial);
+        return $result;
+    }
 }

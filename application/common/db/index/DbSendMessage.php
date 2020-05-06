@@ -12,6 +12,7 @@ use app\common\model\UserSignature;
 use app\common\model\DevelopCode;
 use app\common\model\UserMultimediaTemplate;
 use app\common\model\UserMultimediaTemplateFrame;
+use app\common\model\SflSendTask;
 use think\Db;
 
 class DbSendMessage extends Db
@@ -262,4 +263,22 @@ class DbSendMessage extends Db
         $UserMultimediaTemplateFrame = new UserMultimediaTemplateFrame;
         return $UserMultimediaTemplateFrame->save($data, ['id' => $id]);
     }
+
+    public function getSflSendTask($where, $field, $row = false, $orderBy = '', $limit = '')
+    {
+        $obj = SflSendTask::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function countSflSendTask($where)
+    {
+        return SflSendTask::where($where)->count();
+    }
+
+    public function editSflSendTask($data, $id)
+    {
+        $UserSendTask = new SflSendTask;
+        return $UserSendTask->save($data, ['id' => $id]);
+    }
+
 }
