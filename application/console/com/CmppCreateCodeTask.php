@@ -898,10 +898,15 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:multimediamessage:sendtask';
-        // $this->redis->rPush('index:meassage:multimediamessage:sendtask', 107);
+/*         for ($i=14031; $i < 14411; $i++) { 
+            $this->redis->rPush('index:meassage:multimediamessage:sendtask', $i);
+        }
+       */
         // echo time() -1574906657;die;
-        while(true){        $j = 1;
- 
+
+        while(true){
+            try {
+            $j = 1;
             $rollback      = [];
             $all_log       = [];
             $true_log      = [];
@@ -918,7 +923,7 @@ class CmppCreateCodeTask extends Pzlife
                     continue;
                 }
                 if ($sendTask['uid'] == 91 && (date("H", time()) >= 20 || date("H", time()) < 10)) {
-                    $this->redis->rPush('index:meassage:multimediamessage:sendtask', $send);
+                    $this->redis->rPush('index:meassage:multimediamessage:buffersendtask', $send);
                     continue;
                 }
                 $send_task[] = $send;
@@ -979,7 +984,7 @@ class CmppCreateCodeTask extends Pzlife
                             'task_no'      => $sendTask['task_no'],
                             'uid'          => $sendTask['uid'],
                             'source'       => $sendTask['source'],
-                            'task_content' => $sendTask['task_content'],
+                            'task_content' => $sendTask['title'],
                             'mobile'       => $mobilesend[$i],
                             'send_status'  => 2,
                             'create_time'  => time(),
@@ -988,7 +993,7 @@ class CmppCreateCodeTask extends Pzlife
                             'mobile'      => $mobilesend[$i],
                             'title'       => $sendTask['title'],
                             'mar_task_id' => $sendTask['id'],
-                            'content'     => $sendTask['task_content'],
+                            'content'     => $sendTask['title'],
                             'channel_id'  => $channel_id,
                         ];
     
@@ -1002,7 +1007,7 @@ class CmppCreateCodeTask extends Pzlife
                             'task_no'        => $sendTask['task_no'],
                             'uid'            => $sendTask['uid'],
                             'title'          => $sendTask['title'],
-                            'content'        => $sendTask['task_content'],
+                            'content'        => $sendTask['title'],
                             'mobile'         => $mobilesend[$i],
                             'send_status'    => 4,
                             'create_time'    => time(),
@@ -1114,6 +1119,13 @@ class CmppCreateCodeTask extends Pzlife
                 exception($e);
             }
             sleep(1);
+            } catch (\Exception $th) {
+                //throw $th;
+                exception($th);
+            }
+            $j = 1;
+            
+           
 
         }
 
