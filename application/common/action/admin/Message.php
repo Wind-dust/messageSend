@@ -148,7 +148,7 @@ class Message extends CommonIndex
 
             // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
             foreach ($real_usertask as $key => $value) {
-                DbSendMessage::editUserMultimediaMessage(['free_trial' => $free_trial, 'channel_id' => $channel_id], $value['id']);
+                DbSendMessage::editUserMultimediaMessage(['free_trial' => $free_trial, 'yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id], $value['id']);
             }
             if ($free_trial == 2) {
                 foreach ($real_usertask as $real => $usertask) {
