@@ -290,7 +290,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                 // $receive_data = explode(';', $receive);
                 if (isset($receive_data['statusbox'])) {
                     //数组维度
-                    $array_dimension = $this->arrayLevel($receive_data);
+                    $array_dimension =arrayLevel($receive_data);
                     if ($array_dimension >3 ) {
                         foreach ($receive_data['statusbox'] as $key => $value) {
                             // $receive_info = [];
@@ -415,4 +415,6 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
         aL($arr, $al);
         return max($al);
     }
+
+
 }

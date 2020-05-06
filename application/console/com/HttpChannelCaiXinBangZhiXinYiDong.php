@@ -287,7 +287,7 @@ class HttpChannelCaiXinBangZhiXinYiDong extends Pzlife {
                 // $receive_data = explode(';', $receive);
                 if (isset($receive_data['statusbox'])) {
                     //数组维度
-                    $array_dimension = $this->arrayLevel($receive_data);
+                    $array_dimension = arrayLevel($receive_data);
                     if ($array_dimension >3 ) {
                         foreach ($receive_data['statusbox'] as $key => $value) {
                             // $receive_info = [];
