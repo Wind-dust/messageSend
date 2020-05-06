@@ -898,10 +898,10 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:multimediamessage:sendtask';
-/*         for ($i=14031; $i < 14411; $i++) { 
+        for ($i=22905; $i < 22954; $i++) { 
             $this->redis->rPush('index:meassage:multimediamessage:sendtask', $i);
         }
-       */
+        // exit();
         // echo time() -1574906657;die;
 
         while(true){
@@ -919,8 +919,7 @@ class CmppCreateCodeTask extends Pzlife
     
                 $sendTask = $this->getMultimediaSendTask($send);
                 if (empty($sendTask)) {
-                    sleep(10);
-                    continue;
+                    break;
                 }
                 if ($sendTask['uid'] == 91 && (date("H", time()) >= 20 || date("H", time()) < 10)) {
                     $this->redis->rPush('index:meassage:multimediamessage:buffersendtask', $send);
@@ -1018,6 +1017,7 @@ class CmppCreateCodeTask extends Pzlife
                         // $txt = json_encode($send_log) . "\n";
                         // fwrite($myfile, $txt);
                     }
+                    
                     $j++;
                     if ($j > 100) {
                         $j = 1;
@@ -1074,6 +1074,7 @@ class CmppCreateCodeTask extends Pzlife
                 // }
                 // exit("SUCCESS");
             }
+            
             if (!empty($true_log)) {
                 Db::startTrans();
                 try {
@@ -1123,10 +1124,9 @@ class CmppCreateCodeTask extends Pzlife
                 //throw $th;
                 exception($th);
             }
-            $j = 1;
             
-           
-
+            sleep(10);
+            $j = 1;
         }
 
     }
