@@ -981,6 +981,7 @@ class CmppCreateCodeTask extends Pzlife
         /* for ($i = 215906; $i < 216942; $i++) {
         $this->redis->rPush('index:meassage:business:sendtask', $i);
         } */
+        // $this->redis->rPush('index:meassage:business:sendtask',643374);
         $push_messages = []; //推送队列
         $rollback      = [];
         $all_log       = [];
@@ -1029,7 +1030,6 @@ class CmppCreateCodeTask extends Pzlife
                     // }
                     for ($i = 0; $i < count($mobilesend); $i++) {
                         // $channel_id    = 0;
-                        $channel_id  = $sendTask['channel_id'];
                         $send_log    = [];
                         $sendmessage = [];
                         if (checkMobile(trim($mobilesend[$i])) == true) {
