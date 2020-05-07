@@ -17756,8 +17756,8 @@ $XML  = '<?xml version="1.0" encoding="utf-8" ?>
    
     </returnsms>';
     $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', LIBXML_NOCDATA)), true); 
-  print_r($XML);die;
-        $weidu = $this->arrayLevel($XML);
+//   print_r($XML);die;
+        $weidu = arrayLevel($XML);
         echo $weidu;
       
         // echo count($XML['statusbox']);
@@ -17771,25 +17771,7 @@ $XML  = '<?xml version="1.0" encoding="utf-8" ?>
     }
 
     }
-    /**
- * 返回数组的维度
- * @param  [type] $arr [description]
- * @return [type]      [description]
- */
-function arrayLevel($arr){
-    $al = array(0);
-    function aL($arr,&$al,$level=0){
-        if(is_array($arr)){
-            $level++;
-            $al[] = $level;
-            foreach($arr as $v){
-                aL($v,$al,$level);
-            }
-        }
-    }
-    aL($arr,$al);
-    return max($al);
-}
+
 }
 
 
