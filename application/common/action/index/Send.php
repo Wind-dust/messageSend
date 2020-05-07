@@ -480,7 +480,7 @@ return $result;
             }elseif ($user['id'] == 91){
                 $data['channel_id'] = 9; //蓝鲸营销
             } else {
-                $data['channel_id'] = 24;
+                $data['channel_id'] = 22; //蓝鲸
             }
         }
         Db::startTrans();
