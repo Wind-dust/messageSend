@@ -1018,10 +1018,15 @@ class CmppCreateCodeTask extends Pzlife
                     $mobilesend  = array_filter($mobilesend);
                     $send_length = mb_strlen($sendTask['task_content'], 'utf8');
                     // $channel_id    = 0;
-                    $channel_id = $sendTask['channel_id'];
-                    if (empty($channel_id)) {
-                        continue;
-                    }
+                    $yidong_channel_id   = 0;
+                    $yidong_channel_id   = $sendTask['yidong_channel_id'];
+                    $liantong_channel_id = 0;
+                    $liantong_channel_id = $sendTask['liantong_channel_id'];
+                    $dianxin_channel_id  = 0;
+                    $dianxin_channel_id  = $sendTask['dianxin_channel_id'];
+                    // if (empty($channel_id)) {
+                    //     continue;
+                    // }
                     for ($i = 0; $i < count($mobilesend); $i++) {
                         // $channel_id    = 0;
                         $channel_id  = $sendTask['channel_id'];
@@ -1038,7 +1043,7 @@ class CmppCreateCodeTask extends Pzlife
                                     // print_r($res);
                                     if ($res) {
                                         $newres = array_shift($res);
-                                        if ($newres['source'] == 2 && $channel_id == 24) { //易信联通
+                                       /*  if ($newres['source'] == 2 && $channel_id == 24) { //易信联通
                                             $channel_id = 26;
                                         } else if ($newres['source'] == 1 && $channel_id == 24) { //移动易信
                                             $channel_id = 24;
@@ -1046,6 +1051,13 @@ class CmppCreateCodeTask extends Pzlife
                                             $channel_id = 26;
                                         } else if ($newres['source'] == 2 && $sendTask['uid'] == 91) {
                                             $channel_id = 9; //蓝鲸营销
+                                        } */
+                                        if ($newres['source'] == 1) {
+                                            $channel_id = $yidong_channel_id;
+                                        } elseif ($newres['source'] == 2) {
+                                            $channel_id = $liantong_channel_id;
+                                        } elseif ($newres['source'] == 3) {
+                                            $channel_id = $dianxin_channel_id;
                                         }
                                     }
 
@@ -5205,8 +5217,6 @@ class CmppCreateCodeTask extends Pzlife
             $i = $j;
         }
         // print_r($new_receipts);die;
-      
-        die;
         // echo $num;
         $start_time = strtotime("2020-05-06 20:00:00");
        
@@ -5260,7 +5270,7 @@ class CmppCreateCodeTask extends Pzlife
                             'task_no'        => $value['task_no'],
                             'status_message' => "DELIVRD",
                             'message_info'   => $message_info,
-                            'mobile'         => $value['mobile'],
+                            'mobile'         => $mobile_data[$i],
                             // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
                             'send_time'      => date('Y-m-d H:i:s', $time),
                         ])); //写入用户带处
