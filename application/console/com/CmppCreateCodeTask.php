@@ -5220,7 +5220,7 @@ class CmppCreateCodeTask extends Pzlife
         // echo $num;
         $start_time = strtotime("2020-05-06 20:00:00");
        
-         $end_time   = strtotime("2020-05-07 20:00:00");;
+         $end_time   = strtotime("2020-05-08 20:00:00");;
         $mul_task   = Db::query("SELECT * FROM yx_user_send_code_task WHERE `uid` = 91 AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' ORDER BY id ASC ");
         foreach ($mul_task as $key => $value) {
             $mobile_content = $value['mobile_content'];
