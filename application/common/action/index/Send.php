@@ -480,7 +480,7 @@ return $result;
             }elseif ($user['id'] == 91){
                 $data['channel_id'] = 9; //蓝鲸营销
             } else {
-                $data['channel_id'] = 22; //蓝鲸
+                $data['channel_id'] = 24;
             }
         }
         Db::startTrans();
@@ -811,6 +811,9 @@ return $result;
             // 'liantong_channel_id'     => $liantong_channel_id,
             // 'dianxin_channel_id'     => $dianxin_channel_id,
         ];
+        if (!empty($send_time)) {
+            $SmsMultimediaMessageTask['appointment_time'] = strtotime($send_time);
+        }
         if ($user['mul_free_trial'] == 2) {
             $free_trial = 2;
             $yidong_channel_id = 59;
