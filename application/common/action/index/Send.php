@@ -476,11 +476,20 @@ return $result;
         if ($user['free_trial'] == 2) {
             $data['free_trial'] = 2;
             if ($user['pid'] == 10) {
-                $data['channel_id'] = 24;
+                $data['yidong_channel_id'] = 24;
+                $data['liantong_channel_id'] = 26;
+                $data['dianxin_channel_id'] = 26;
             }elseif ($user['id'] == 91){
-                $data['channel_id'] = 9; //蓝鲸营销
+                // $data['yidong_channel_id'] = 73;
+                // $data['liantong_channel_id'] = 75;
+                // $data['dianxin_channel_id'] = 76;
+                $data['yidong_channel_id'] = 9;
+                $data['liantong_channel_id'] = 9;
+                $data['dianxin_channel_id'] = 9;
             } else {
-                $data['channel_id'] = 22; //蓝鲸
+                $data['yidong_channel_id'] = 22;
+                $data['liantong_channel_id'] = 22;
+                $data['dianxin_channel_id'] = 22;
             }
         }
         Db::startTrans();

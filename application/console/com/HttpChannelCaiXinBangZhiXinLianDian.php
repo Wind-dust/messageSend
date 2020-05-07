@@ -356,7 +356,7 @@ $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', L
                         $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
                     }
                     // $real_receive_data = $receive_data['statusbox'];
-                   
+                    sleep(1);
                 } else {
                     sleep(10);
                 }

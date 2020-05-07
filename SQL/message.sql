@@ -1101,3 +1101,8 @@ ADD COLUMN `dianxin_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '电
 
 ALTER TABLE `messagesend`.`yx_user_multimedia_message_log` 
 MODIFY COLUMN `task_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '任务id' AFTER `uid`;
+
+ALTER TABLE `messagesend`.`yx_user_send_code_task` 
+CHANGE COLUMN `channel_id` `yidong_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '移动通道ID' AFTER `free_trial`,
+ADD COLUMN `liantong_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '联通通道id' AFTER `yidong_channel_id`,
+ADD COLUMN `dianxin_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '电信通道id' AFTER `liantong_channel_id`;

@@ -300,7 +300,7 @@ class HttpChannelCaiXinBangZhiXinYiDong extends Pzlife {
                             }
                             $stat          = $value['errorcode'];
                             $send_task_log = [];
-                            if ($value['errorcode'] == '10') {
+                            if ($value['status'] == '10') {
     
                                 $send_status = 3;
                                 $stat        = 'DELIVRD';
@@ -335,7 +335,7 @@ class HttpChannelCaiXinBangZhiXinYiDong extends Pzlife {
                         }
                         $stat          = $receive_data['statusbox']['errorcode'];
                         $send_task_log = [];
-                        if ($receive_data['statusbox']['errorcode'] == '10') {
+                        if ($receive_data['statusbox']['status'] == '10') {
 
                             $send_status = 3;
                             $stat        = 'DELIVRD';
