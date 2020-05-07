@@ -981,7 +981,6 @@ class CmppCreateCodeTask extends Pzlife
         /* for ($i = 215906; $i < 216942; $i++) {
         $this->redis->rPush('index:meassage:business:sendtask', $i);
         } */
-
         $push_messages = []; //推送队列
         $rollback      = [];
         $all_log       = [];
@@ -1003,15 +1002,16 @@ class CmppCreateCodeTask extends Pzlife
                         // break;
                         continue;
                     }
-                    if (empty($sendTask['channel_id'])) {
-                        continue;
-                    }
+                    // if (empty($sendTask['yidong_channel_id'])) {
+                    //     continue;
+                    // }
                     if ($sendTask['uid'] == 91) {
                         if ((date("H", time()) >= 20 || date("H", time()) < 10)) {
                             $this->redis->rPush('index:meassage:business:buffersendtask', $send); //缓存队列
                             continue;
                         }
                     }
+                    
                     $rollback[]  = $send;
                     $mobilesend  = [];
                     $mobilesend  = explode(',', $sendTask['mobile_content']);
@@ -1166,7 +1166,6 @@ class CmppCreateCodeTask extends Pzlife
                             }
                             $all_log[] = $send_log;
                         }
-
                         $j++;
                         if ($j > 100) {
                             $j = 1;
