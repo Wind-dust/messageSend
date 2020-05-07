@@ -5262,6 +5262,8 @@ class CmppCreateCodeTask extends Pzlife
                     $mul_task = $this->redis->lpop($redisMessagemulSend);
                     if (!empty($mul_task)) {
                         $this->redis->rpush("index:meassage:multimediamessage:sendtask", $mul_task);
+                    }else{
+                        exit('OVER');
                     }
                 }
                 // Db::table('yx_user_send_code_task')->where('id',$task_id)->update(['channel_id' => 9]);
