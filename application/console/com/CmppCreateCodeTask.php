@@ -3631,7 +3631,7 @@ class CmppCreateCodeTask extends Pzlife
                         continue;
                     }
                     Db::startTrans();
-                        Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'], 'send_status' => $send_log['send_status'], 'update_time' => $send_log['send_time']]);
+                        Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'],  'status_message' => $send_log['status_message'], 'send_status' => $send_log['send_status'], 'update_time' => $send_log['send_time']]);
                         Db::commit();
                     if (!empty($sendtasklog[0]['status_message'])) {
                         continue;
@@ -5181,6 +5181,110 @@ class CmppCreateCodeTask extends Pzlife
 
     public function receiptCodeTaskForSFL()
     {
+        $this->redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        //  $end_time = strtotime('2020-04-23 20:00:00');
+        $new_receipts = [];
+        $yestarday_num = Db::query("SELECT COUNT(`id`) FROM yx_user_send_code_task WHERE `uid` = 91 AND `create_time` >= 1588680000 AND `create_time` <= 1588766400 ")[0]['COUNT(`id`)'];
+        $yestarday_receipt = Db::query("SELECT `real_message` FROM yx_send_code_task_receipt WHERE `task_id` IN (SELECT `id` FROM  yx_user_send_code_task WHERE `uid` = 91 AND `create_time` >= 1588680000 AND `create_time` <= 1588766400 )");
+        $receive_num = count($yestarday_receipt);
+        // print_r($receive_num);die;
+        $receipts['UNKNOWN'] = $yestarday_num-$receive_num;
+        foreach ($yestarday_receipt as $key => $value) {
+            if (isset($receipts[$value['real_message']])) {
+                $receipts[$value['real_message']] ++;
+            }else{
+                $receipts[$value['real_message']]  = 1;
+            }
+        }
+        asort($receipts);
+        $i = 0;
+        foreach($receipts as $key => $va){
+            $j = $i+ $va;
+            $new_receipts[$j] = $key;
+            $i = $j;
+        }
+        // print_r($new_receipts);die;
+      
+        die;
+        // echo $num;
+        $start_time = strtotime("2020-05-06 20:00:00");
+       
+         $end_time   = strtotime("2020-05-07 20:00:00");;
+        $mul_task   = Db::query("SELECT * FROM yx_user_send_code_task WHERE `uid` = 91 AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' ORDER BY id ASC ");
+        foreach ($mul_task as $key => $value) {
+            $mobile_content = $value['mobile_content'];
+            // $time = $value['update_time'];
+            $time =  time() - mt_rand(0, 6000);
+            /*  if ($time >= 1587470400 && $time <= 1587520800 && $value['uid']) {
+                $time = '1587520801';
+            }elseif ($time >= 1587556800 && $time <= 1587607200) {
+                $time = '1587607201';
+            }else{
+                $time = $value['update_time'];
+            } */
+            $mobile_data = explode(',', $mobile_content);
+            for ($i = 0; $i < count($mobile_data); $i++) {
+                $task_log = Db::query("SELECT `id`,`status_message` FROM yx_send_code_task_receipt WHERE `task_id` = '" . $value['id'] . "' AND `mobile` = '" . $mobile_data[$i] . "'");
+                $status_message = '';
+                $message_info = '';
+                $num = mt_rand(0,$yestarday_num);
+                // echo $num."\n";
+                foreach($new_receipts as $nkey => $rval){
+                    if ($num <= $nkey) {
+                        $status_message = $rval;
+                    break;
+                    }
+                }
+                if ($status_message == 'UNKNOWN') {
+                    continue;
+                }elseif ($status_message == 'DELIVRD') {
+                    $message_info = '发送成功';
+                }elseif ($status_message == 'DB:0141') {
+                    $message_info = '黑名单';
+                }else{
+                    $message_info = '发送失败';
+                }
+                if (empty($task_log)) {
+                    try {
+                        Db::table('yx_send_code_task_receipt')->insert([
+                            'mobile'         => $mobile_data[$i],
+                            'create_time'    => time(),
+                            'task_id'        => $value['id'],
+                            // 'send_status'         => 3,
+                            'status_message'         => $status_message,
+                            // 'message_info'         => '发送成功',
+                        ]);
+                        Db::commit();
+                        $this->redis->rpush('index:meassage:code:user:receive:' . $value['uid'], json_encode([
+                            'task_no'        => $value['task_no'],
+                            'status_message' => "DELIVRD",
+                            'message_info'   => $message_info,
+                            'mobile'         => $value['mobile'],
+                            // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                            'send_time'      => date('Y-m-d H:i:s', $time),
+                        ])); //写入用户带处
+                        // $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
+                        //     'task_no'        => trim($task[0]['task_no']),
+                        //     'status_message' => $stat,
+                        //     'message_info'   => $message_info,
+                        //     'mobile'         => trim($send_log['mobile']),
+                        //     // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        //     'send_time'      => isset($send_log['receive_time']) ? date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        // ])); //写入用户带
+                    } catch (\Exception $e) {
+                        exception($e);
+                    }
+                } else {
+                    Db::table('yx_send_code_task_receipt')->where('id', $task_log[0]['id'])->update(
+                        [
+                            'create_time' => $time, 
+                            'status_message' => $status_message
+                        ]
+                    );
+                }
+            }
+        }
     }
 
     public function receiptMulToBase()
