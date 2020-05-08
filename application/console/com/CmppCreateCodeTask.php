@@ -978,10 +978,16 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:business:sendtask';
-        /* for ($i = 215906; $i < 216942; $i++) {
-        $this->redis->rPush('index:meassage:business:sendtask', $i);
-        } */
-        // $this->redis->rPush('index:meassage:business:sendtask',643374);
+        // for ($i = 643386; $i < 643416; $i++) {
+        // $this->redis->rPush('index:meassage:business:sendtask', $i);
+        // }
+        // $this->redis->rPush('index:meassage:business:sendtask',643377);
+        // $this->redis->rPush('index:meassage:business:sendtask',643379);
+        // $this->redis->rPush('index:meassage:business:sendtask',643380);
+        // $this->redis->rPush('index:meassage:business:sendtask',643381);
+        // $this->redis->rPush('index:meassage:business:sendtask',643382);
+        // $this->redis->rPush('index:meassage:business:sendtask',643383);
+        // $this->redis->rPush('index:meassage:business:sendtask',643384);
         $push_messages = []; //推送队列
         $rollback      = [];
         $all_log       = [];
@@ -1109,12 +1115,12 @@ class CmppCreateCodeTask extends Pzlife
                                 // print_r($res);
                                 if ($res) {
                                     $newres = array_shift($res);
-                                    if ($newres['source'] == 2 && $channel_id == 24) { //易信联通
-                                        $channel_id = 26;
-                                    } else if ($newres['source'] == 1 && $channel_id == 24) { //移动易信
-                                        $channel_id = 24;
-                                    } else if ($newres['source'] == 3 && $channel_id == 24) { //易信电信
-                                        $channel_id = 26;
+                                    if ($newres['source'] == 1) {
+                                        $channel_id = $yidong_channel_id;
+                                    } elseif ($newres['source'] == 2) {
+                                        $channel_id = $liantong_channel_id;
+                                    } elseif ($newres['source'] == 3) {
+                                        $channel_id = $dianxin_channel_id;
                                     }
                                 }
 
@@ -1200,7 +1206,6 @@ class CmppCreateCodeTask extends Pzlife
                         }
                     }
                 }
-
                 if (!empty($true_log)) {
                     Db::startTrans();
                     try {
