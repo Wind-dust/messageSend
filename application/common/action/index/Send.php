@@ -480,16 +480,16 @@ return $result;
                 $data['liantong_channel_id'] = 26;
                 $data['dianxin_channel_id'] = 26;
             }elseif ($user['id'] == 91){
-                // $data['yidong_channel_id'] = 73;
-                // $data['liantong_channel_id'] = 75;
-                // $data['dianxin_channel_id'] = 76;
-                $data['yidong_channel_id'] = 9;
-                $data['liantong_channel_id'] = 9;
-                $data['dianxin_channel_id'] = 9;
+                $data['yidong_channel_id'] = 73;
+                $data['liantong_channel_id'] = 75;
+                $data['dianxin_channel_id'] = 76;
+                // $data['yidong_channel_id'] = 9;
+                // $data['liantong_channel_id'] = 9;
+                // $data['dianxin_channel_id'] = 9;
             } else {
-                $data['yidong_channel_id'] = 22;
-                $data['liantong_channel_id'] = 22;
-                $data['dianxin_channel_id'] = 22;
+                $data['yidong_channel_id'] = 60;
+                $data['liantong_channel_id'] = 62;
+                $data['dianxin_channel_id'] = 61;
             }
         }
         Db::startTrans();
