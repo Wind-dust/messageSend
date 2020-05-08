@@ -4098,14 +4098,16 @@ class CmppCreateCodeTask extends Pzlife
 
     public function MultimediaSettlement()
     {
-        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为10G
+        ini_set('memory_limit', '1024M'); // 临时设置最大内存占用为10G
         $year_businessSettlement  = [];
         $month_businessSettlement = [];
         $day_businessSettlement   = [];
         $year_users               = [];
         $month_users              = [];
         $day_users                = [];
-        $task_log                 = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `create_time` < " . time());
+        $start_time               = strtotime("2020-04-01");
+        $end_time               = strtotime("2020-05-01");
+        $task_log                 = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `create_time` <= '" . $end_time."' AND `create_time` >= ".$start_time);
         // print_r(count($task_log));
         // die;
         try {
