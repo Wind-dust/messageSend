@@ -5105,6 +5105,7 @@ class CmppCreateCodeTask extends Pzlife
 
         } */
         // $this->redis->rpush($redisMessageMarketingSend,456987);
+
         try {
             while (true) {
                 $task_id = $this->redis->lpop($redisMessageMarketingSend);
@@ -5114,12 +5115,17 @@ class CmppCreateCodeTask extends Pzlife
                     if (!empty($mul_task)) {
                         $this->redis->rpush("index:meassage:multimediamessage:sendtask", $mul_task);
                     }else{
+                        // $task = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE `uid` = 91 AND `id` >= 641731 AND `id` <= 643837 ");
+                        // foreach ($task as $key => $value) {
+                        //     Db::table('yx_user_send_code_task')->where('id',$value['id'])->update(['yidong_channel_id' => 9, 'liantong_channel_id' => 9, 'dianxin_channel_id' => 9]);
+                        // }
                         exit('OVER');
                     }
                 }
-                // Db::table('yx_user_send_code_task')->where('id',$task_id)->update(['channel_id' => 9]);
+                Db::table('yx_user_send_code_task')->where('id',$task_id)->update(['yidong_channel_id' => 9, 'liantong_channel_id' => 9, 'dianxin_channel_id' => 9]);
                 $this->redis->rpush("index:meassage:business:sendtask", $task_id);
             }
+           
 
         } catch (\exception $e) {
             exception($e);
