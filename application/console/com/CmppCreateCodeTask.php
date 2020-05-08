@@ -4114,18 +4114,13 @@ class CmppCreateCodeTask extends Pzlife
             foreach ($task_log as $key => $value) {
                 // print_r($value);
                 // die;
-                /* if (empty($value['status_message']) && empty($value['real_message'])) {
-                $task = Db::query("SELECT id FROM yx_user_send_task WHERE `task_no` = '" . $value['task_no'] . "' LIMIT 1 ");
-                $receipt = Db::query("SELECT `status_message` FROM yx_send_task_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $value['mobile'] . "' LIMIT 1 ");
-                if (empty($receipt)) {
-                $value['status_message'] = 'DELIVRD';
-                } else {
-                $value['status_message'] = $receipt[0]['status_message'];
-                }
-                } */
-                if ($value['create_time'] + 259200 < time()) {
+                if (empty($value['status_message']) && empty($value['real_message']) && $value['create_time'] + 259200 < time()) {
                     $value['status_message'] = 'DELIVRD';
+                    
+                }else {
+                    $value['status_message'] = $value['status_message'];
                 }
+               
                 $send_length = mb_strlen($value['task_content'], 'utf8');
                 $num         = 1;
                 if ($send_length > 70) {
@@ -4265,7 +4260,7 @@ class CmppCreateCodeTask extends Pzlife
 
             //     }
             // }
-            foreach ($year_businessSettlement as $ykey => $y_value) {
+            /* foreach ($year_businessSettlement as $ykey => $y_value) {
                 foreach ($y_value as $key => $value) {
                     $success = isset($value['success']) ? $value['success'] : 0;
                     $num     = isset($value['num']) ? $value['num'] : 0;
@@ -4299,7 +4294,7 @@ class CmppCreateCodeTask extends Pzlife
                         Db::table('yx_statistics_year')->insert($year_user_settlement);
                     }
                 }
-            }
+            } */
             foreach ($month_businessSettlement as $mkey => $m_value) {
                 foreach ($m_value as $key => $value) {
                     $success               = isset($value['success']) ? $value['success'] : 0;
