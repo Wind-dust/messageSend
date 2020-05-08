@@ -487,9 +487,9 @@ return $result;
                 // $data['liantong_channel_id'] = 9;
                 // $data['dianxin_channel_id'] = 9;
             } else {
-                $data['yidong_channel_id'] = 60;
-                $data['liantong_channel_id'] = 62;
-                $data['dianxin_channel_id'] = 61;
+                $data['yidong_channel_id'] = 24;
+                $data['liantong_channel_id'] = 26;
+                $data['dianxin_channel_id'] = 26;
             }
         }
         Db::startTrans();
