@@ -5473,7 +5473,7 @@ class CmppCreateCodeTask extends Pzlife
                                         'from'        => 'yx_user_send_code_task',
         ]; */
         
-        // $this->redis = Phpredis::getConn();
+        $this->redis = Phpredis::getConn();
 
         $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode([
             'mobile'      => 13611664019,
