@@ -1747,7 +1747,7 @@ class CmppCreateCodeTask extends Pzlife
                         $message_info = '黑名单';
                     } else if (trim($send_log['Stat'] == 'DELIVRD')) {
                         $message_info = '发送成功';
-                    } else if (in_array(trim($send_log['Stat']), ['REJECTD', 'REJECT', 'MA:0001'])) {
+                    } else if (in_array(trim($send_log['Stat']), ['REJECTD', 'REJECT', 'MA:0001', 'DB:0141'])) {
                         $stat = 'DELIVRD';
                         $message_info = '发送成功';
                     } else {
@@ -1757,6 +1757,12 @@ class CmppCreateCodeTask extends Pzlife
                     $send_log['Stat'] = 'DELIVRD';
                     $message_info = '发送成功';
                     } */
+                    if ($task[0]['uid'] == '91') {
+                        if (strpos($send_log['Stat'], 'DB:0141') !== false) {
+                            $stat = 'DELIVRD';
+                            $message_info = '发送成功';
+                        }
+                    }
                     $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
                         'task_no'        => trim($task[0]['task_no']),
                         'status_message' => $stat,
@@ -5452,14 +5458,76 @@ class CmppCreateCodeTask extends Pzlife
     }
 
     public function Bufa(){
-        $send = [
+       /*  $send = [
             'mobile'      => 18721762967,
                                         'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
                                         'mar_task_id' => 659346,
                                         'content'     => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
                                         'from'        => 'yx_user_send_code_task',
-        ];
-        $this->redis = Phpredis::getConn();
-        $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode($send)); //三体营销通道
+        ]; */
+    /*     $send = [
+            'mobile'      => 15921904656,
+                                        'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'mar_task_id' => 650803,
+                                        'content'     => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'from'        => 'yx_user_send_code_task',
+        ]; */
+        
+        // $this->redis = Phpredis::getConn();
+
+        $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode([
+            'mobile'      => 13611664019,
+                                        'title'       => '【丝芙兰】感谢您成功推荐一位好友加入丝芙兰大家庭，礼物已下发至账户，期待您的领取。即日起至2020-06-07，前往丝芙兰门店无需消费即可领取或在丝芙兰官网、APP、小程序随单赠送。限量5万份，赠完即止。每人最多可享受5次好礼。【限时美礼，与友同享】/回T退订',
+                                        'mar_task_id' => 650803,
+                                        'content'     => '【丝芙兰】感谢您成功推荐一位好友加入丝芙兰大家庭，礼物已下发至账户，期待您的领取。即日起至2020-06-07，前往丝芙兰门店无需消费即可领取或在丝芙兰官网、APP、小程序随单赠送。限量5万份，赠完即止。每人最多可享受5次好礼。【限时美礼，与友同享】/回T退订',
+                                        'from'        => 'yx_user_send_code_task',
+        ])); //三体营销通道
+        exit;
+        $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode([
+            'mobile'      => 15921904656,
+                                        'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'mar_task_id' => 650803,
+                                        'content'     => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'from'        => 'yx_user_send_code_task',
+        ])); //三体营销通道
+
+        $res = $this->redis->rpush('index:meassage:code:send' . ":" . 75, json_encode([
+            'mobile'      => 13023216322,
+                                        'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'mar_task_id' => 650707,
+                                        'content'     => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'from'        => 'yx_user_send_code_task',
+        ])); //三体营销通道
+
+        $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode([
+            'mobile'      => 13795388454,
+                                        'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'mar_task_id' => 651236,
+                                        'content'     => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'from'        => 'yx_user_send_code_task',
+        ])); //三体营销通道
+
+        $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode([
+            'mobile'      => 18810272016,
+                                        'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'mar_task_id' => 651267,
+                                        'content'     => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'from'        => 'yx_user_send_code_task',
+        ])); //三体营销通道
+
+        $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode([
+            'mobile'      => 18121252120,
+                                        'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'mar_task_id' => 658389,
+                                        'content'     => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'from'        => 'yx_user_send_code_task',
+        ])); //三体营销通道
+        $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode([
+            'mobile'      => 15216719779,
+                                        'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'mar_task_id' => 660377,
+                                        'content'     => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'from'        => 'yx_user_send_code_task',
+        ])); //三体营销通道
     }
 }
