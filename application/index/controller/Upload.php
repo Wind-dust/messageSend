@@ -120,8 +120,11 @@ class Upload extends MyController
                     //     $row[$filed[$j]] = trim($cellVal);
                     // }
                     // $data[] = $row;
-                    $phone .= $j . trim($cellVal);
-                    $j = ',';
+                    if (empty($cellVal)) {
+                        $phone .= $j . trim($cellVal);
+                        $j = ',';
+                    }
+                   
                 }
             } else if ($type == 'xlsx') {
                 $type = 'Excel2007';
@@ -135,8 +138,10 @@ class Upload extends MyController
                 for ($i = 1; $i <= $highestRow; $i++) {
                     $cellVal = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
                     // $phone_data[]= trim($cellVal);
-                    $phone .= $j . trim($cellVal);
-                    $j = ',';
+                    if (empty($cellVal)) {
+                        $phone .= $j . trim($cellVal);
+                        $j = ',';
+                    }
                 }
             } elseif ($type == 'xls') {
                 $type = 'Excel5';
@@ -152,8 +157,10 @@ class Upload extends MyController
                     $cellVal = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
                     // $phone_data[]= trim($cellVal);
                     // $j = ',';
-                    $phone .= $j . trim($cellVal);
-                    $j = ',';
+                    if (empty($cellVal)) {
+                        $phone .= $j . trim($cellVal);
+                        $j = ',';
+                    }
                 }
             }
             if (empty($phone)) {
@@ -301,6 +308,9 @@ class Upload extends MyController
                 $highestColumnNum = PHPExcel_Cell::columnIndexFromString($highestColumn); //取得字段，这里测试表格中的第一行为数据的字段，因此先取出用来作后面数组的键名
                 for ($i = 1; $i <= $highestRowNum; $i++) {
                     $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
+                    if (empty($mobile)) {
+                        continue;
+                    }
                     $text = '';
                     $cor = '';
                     for ($j = 1; $j < $highestColumnNum; $j++) {
@@ -332,7 +342,9 @@ class Upload extends MyController
                 $highestColumnNum = PHPExcel_Cell::columnIndexFromString($highestColumn); //取得字段，这里测试表格中的第一行为数据的字段，因此先取出用来作后面数组的键名
                 for ($i = 1; $i <= $highestRow; $i++) {
                     $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
-
+                    if (empty($mobile)) {
+                        continue;
+                    }
                     $text = '';
                     $cor = '';
                     for ($j = 1; $j < $highestColumnNum; $j++) {
@@ -359,6 +371,9 @@ class Upload extends MyController
                 $highestColumnNum = PHPExcel_Cell::columnIndexFromString($highestColumn); //取得字段，这里测试表格中的第一行为数据的字段，因此先取出用来作后面数组的键名
                 for ($i = 1; $i <= $highestRow; $i++) {
                     $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
+                    if (empty($mobile)) {
+                        continue;
+                    }
                     $text = '';
                     $cor = '';
                     for ($j = 1; $j < $highestColumnNum; $j++) {
