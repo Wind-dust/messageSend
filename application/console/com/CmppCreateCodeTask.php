@@ -5115,7 +5115,7 @@ class CmppCreateCodeTask extends Pzlife
 
         } */
         $this->redis->rpush($redisMessageMarketingSend,674922);
-die;
+
         try {
             while (true) {
                 $task_id = $this->redis->lpop($redisMessageMarketingSend);
