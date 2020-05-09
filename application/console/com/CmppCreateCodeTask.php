@@ -4111,9 +4111,9 @@ class CmppCreateCodeTask extends Pzlife
         $year_users               = [];
         $month_users              = [];
         $day_users                = [];
-        // $start_time               = strtotime("2020-04-01");
-        $start_time               = strtotime(date('Y-m', time()));
-        // $end_time               = strtotime("2020-05-01");
+        $start_time               = strtotime("2020-04-01");
+        // $start_time               = strtotime(date('Y-m', time()));
+        $end_time               = strtotime("2020-05-01");
         $end_time               = time();
         $task_log                 = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `create_time` <= '" . $end_time."' AND `create_time` >= ".$start_time);
         // print_r(count($task_log));
@@ -5114,7 +5114,7 @@ class CmppCreateCodeTask extends Pzlife
         /* for ($i = 215906; $i < 216942; $i++) {
 
         } */
-        $this->redis->rpush($redisMessageMarketingSend,674827);
+        $this->redis->rpush($redisMessageMarketingSend,674922);
 
         try {
             while (true) {
