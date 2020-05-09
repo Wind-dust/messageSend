@@ -4105,8 +4105,10 @@ class CmppCreateCodeTask extends Pzlife
         $year_users               = [];
         $month_users              = [];
         $day_users                = [];
-        $start_time               = strtotime("2020-04-01");
-        $end_time               = strtotime("2020-05-01");
+        // $start_time               = strtotime("2020-04-01");
+        $start_time               = strtotime(date('Y-m', time()));
+        // $end_time               = strtotime("2020-05-01");
+        $end_time               = time();
         $task_log                 = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `create_time` <= '" . $end_time."' AND `create_time` >= ".$start_time);
         // print_r(count($task_log));
         // die;
@@ -5124,7 +5126,7 @@ class CmppCreateCodeTask extends Pzlife
                         exit('OVER');
                     }
                 }
-                Db::table('yx_user_send_code_task')->where('id',$task_id)->update(['yidong_channel_id' => 9, 'liantong_channel_id' => 9, 'dianxin_channel_id' => 9]);
+                // Db::table('yx_user_send_code_task')->where('id',$task_id)->update(['yidong_channel_id' => 9, 'liantong_channel_id' => 9, 'dianxin_channel_id' => 9]);
                 $this->redis->rpush("index:meassage:business:sendtask", $task_id);
             }
            
