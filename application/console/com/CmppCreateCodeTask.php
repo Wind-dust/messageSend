@@ -5450,4 +5450,16 @@ class CmppCreateCodeTask extends Pzlife
             exception($th);
         }
     }
+
+    public function Bufa(){
+        $send = [
+            'mobile'      => 18721762967,
+                                        'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'mar_task_id' => 659346,
+                                        'content'     => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'from'        => 'yx_user_send_code_task',
+        ];
+        $this->redis = Phpredis::getConn();
+        $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode($send)); //三体营销通道
+    }
 }
