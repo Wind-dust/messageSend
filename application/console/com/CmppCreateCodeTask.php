@@ -3783,7 +3783,9 @@ class CmppCreateCodeTask extends Pzlife
             $year_users               = [];
             $month_users              = [];
             $day_users                = [];
-            $code_task_log            = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `create_time` < " . time());
+            $start_time               = strtotime(date('Y-m', time()));
+            // $task_log                 = Db::query("SELECT * FROM yx_user_send_task_log WHERE `create_time` < " . time() . " AND `create_time` >= " . $start_time);
+            $code_task_log            = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `create_time` < " . time(). " AND `create_time` >= " . $start_time);
             // print_r(count($code_task_log));
             // die;
             foreach ($code_task_log as $key => $value) {
