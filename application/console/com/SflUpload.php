@@ -256,7 +256,7 @@ class SflUpload extends Pzlife
                         if (!empty($send_data)) {
                             foreach ($send_data as $key => $value) {
                                 $txt = $this->readForTxtToArray($value);# code...
-                                // print_r($txt);
+                                print_r($txt);
                             }
                         }
                         // print_r($all_models);
