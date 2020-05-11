@@ -9,7 +9,7 @@ use Env;
 use Exception;
 use think\Db;
 
-class CmppLvChengYiDongBusiness extends Pzlife {
+class CmppBiShangYiDongBusiness extends Pzlife {
 
     // protected $redis;
 
@@ -20,11 +20,11 @@ class CmppLvChengYiDongBusiness extends Pzlife {
     //绿城移动行业
     public function content($content) {
         return [
-            'host'          => "114.55.53.120", //服务商ip
-            'port'          => "7890", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "xjyhyy", //企业id  企业代码
-            'Shared_secret' => 'xjyhyy001', //网关登录密码
-            'Service_Id'    => "xjyhyy", //业务代码
+            'host'          => "47.111.174.41", //服务商ip
+            'port'          => "7892", //短连接端口号   17890长连接端口号
+            'Source_Addr'   => "003400", //企业id  企业代码
+            'Shared_secret' => '980929', //网关登录密码
+            'Service_Id'    => "003400", //业务代码
             'template_id'   => "", //模板id
             'Dest_Id'       => "4253", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
@@ -38,7 +38,7 @@ class CmppLvChengYiDongBusiness extends Pzlife {
         $redis = Phpredis::getConn();
         date_default_timezone_set('PRC');
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $content                    = 77;
+        $content                    = 83;
         $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
         $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
         $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
@@ -371,7 +371,6 @@ class CmppLvChengYiDongBusiness extends Pzlife {
                                             echo "发送失败" . "\n";
                                             $error_msg = "其他错误";
                                         } else {
-                                            
                                         }
                                     } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                                         $Result              = 0;
