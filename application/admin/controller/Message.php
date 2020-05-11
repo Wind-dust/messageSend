@@ -566,8 +566,10 @@ class Message extends AdminController {
         $cmsConId     = trim($this->request->post('cms_con_id'));
         $start_time   = trim($this->request->post('start_time'));
         $end_time     = trim($this->request->post('end_time'));
-        if (strtotime($start_time) == false || strtotime($end_time) == false) {
-            return ['code' => '3002'];
+        if (!empty($start_time) || !empty($end_time)) {
+            if (strtotime($start_time) == false || strtotime($end_time) == false) {
+                return ['code' => '3002'];
+            }
         }
         $start_time = strtotime($start_time);
         $end_time   = strtotime($end_time);
