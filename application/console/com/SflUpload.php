@@ -126,7 +126,7 @@ class SflUpload extends Pzlife {
                                 if ($zip->open($son_path) === true) {
                                     $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0];
                                     // print_r($unpath);die;
-                                    $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
+                                    $mcw    = $zip->extractTo($unpath,$son_path); //解压到$route这个目录中
                                     $zip->close();
                                     //解压完成
                                     $unzip = $this->getDirContent($unpath);
