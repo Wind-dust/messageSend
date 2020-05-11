@@ -594,8 +594,8 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                      foreach ($receipt_data as $key => $value) {
                                          $new_body         = pack("N", $value['Msg_Id1']) . pack("N", $value['Msg_Id2']) . pack("C", $value['Result']);
                                          $new_Total_Length = strlen($new_body) + 12;
-                                         $new_headData     = pack("NNN", $Total_Length, $value['callback_Command_Id'], $value['Msg_Id2']);
-                                        //  socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                                         $new_headData     = pack("NNN", $Total_Length,  0x80000005, $value['Msg_Id2']);
+                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                      }
                                     //  sleep(1);
                                     
