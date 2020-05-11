@@ -67,6 +67,8 @@ return [
     'cmppronghedianXinmarketing'              => $commandPath . 'CmppRongHeDianXinMarketing', //融合电信营销
     'cmppbeijingbamimarketing'              => $commandPath . 'CmppBeiJingBaMiMarketing', //北京八米
     'cmppbeijingbamiusermarketing'              => $commandPath . 'CmppBeiJingBaMiUserMarketing', //北京八米会员营销
+    'cmpplvchengyidongbusiness'          => $commandPath . 'CmppLvChengYiDongBusiness', //易信移动行业通道
+    'cmpplvchengdianxinbusiness'         => $commandPath . 'CmppLvChengDianxinBusiness', //易信移动行业通道
     'serversocketshuhe'                => $commandPath . 'ServerSocketShuHe',
     'ServerSocketjyy'                  => $commandPath . 'ServerSocketJYY',
     'ServerSocketjyylt'                  => $commandPath . 'ServerSocketJYYLT',
