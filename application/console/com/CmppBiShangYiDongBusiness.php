@@ -437,13 +437,13 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                                         $new_Total_Length = strlen($new_body) + 12;
                                         $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id2']);
-                                        $receipts = [];
+                                        /* $receipts = [];
                                         $receipts = [
                                             'new_headData' => $new_headData,
                                             'new_body' => $new_body,
                                             'new_Total_Length' => $new_Total_Length,
                                         ];
-                                        $receipt_data[] = $receipts;
+                                        $receipt_data[] = $receipts; */
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                     } else if ($head['Command_Id'] == 0x00000008) {
                                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构
@@ -458,10 +458,10 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                             }
                             //在发送
                             if (!empty($receipt_data)) {
-                                print_r($receipt_data);
-                                foreach ($receipt_data as $key => $value) {
+                                // print_r($receipt_data);
+                              /*   foreach ($receipt_data as $key => $value) {
                                     // socket_write($socket, $value['new_headData'] . $value['new_body'], $value['new_Total_Length']);
-                                }
+                                } */
                             }
                             $send = $redis->lPop($redisMessageCodeSend);
                             if (!empty($send)) { //正式使用从缓存中读取数据并且有待发送数据
