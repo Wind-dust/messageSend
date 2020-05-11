@@ -457,7 +457,12 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                 }
                             }
                             //在发送
-                            
+                            if (!empty($receipt_data)) {
+                                print_r($receipt_data);
+                                foreach ($receipt_data as $key => $value) {
+                                    // socket_write($socket, $value['new_headData'] . $value['new_body'], $value['new_Total_Length']);
+                                }
+                            }
                             $send = $redis->lPop($redisMessageCodeSend);
                             if (!empty($send)) { //正式使用从缓存中读取数据并且有待发送数据
 
@@ -581,19 +586,11 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                     usleep(350);
                                 }
                             } else { //心跳
-                                if (!empty($receipt_data)) {
-                                    print_r($receipt_data);
-                                    foreach ($receipt_data as $key => $value) {
-                                        // socket_write($socket, $value['new_headData'] . $value['new_body'], $value['new_Total_Length']);
-                                    }
-                                }else{
-                                    $Command_Id   = 0x00000008; //保持连接
-                                    $Total_Length = 12;
-                                    $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                    socket_write($socket, $headData, $Total_Length);
-                                    sleep(1);
-                                }
-                                
+                                $Command_Id   = 0x00000008; //保持连接
+                                $Total_Length = 12;
+                                $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                socket_write($socket, $headData, $Total_Length);
+                                sleep(1);
                             }
 
                             ++$i;
