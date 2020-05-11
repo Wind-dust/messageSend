@@ -117,17 +117,46 @@ class SflUpload extends Pzlife {
                     if ($son_path_data !== false) {
 
                         foreach ($son_path_data as $skey => $svalue) {
+                            $son_path = '';
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
-                            // print_r($son_path);die;
                             $file_info = explode('.', $svalue);
                             if ($file_info[1] == 'zip') { //需要解压
                                 //开始解压
                                 if ($zip->open($son_path) === true) {
-                                    $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0];
-                                    // print_r($unpath);die;
-                                    // $mcw    = $zip->extractTo($unpath,$son_path); //解压到$route这个目录中
-                                    $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
+                                    $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0];//解压目录
+                                    $count = $zip->numFiles;
+                                    // $results = [];
+                                    $files_name = [];
+                                    for ($i = 0; $i < $count; $i++) {
+                                        $entry = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
+                                        $entry['name'] = rtrim(str_replace('\\', '/', $entry['name']), '/');
+                                        $encoding = mb_detect_encoding($entry['name'], array('Shift_JIS','EUC_JP','EUC_KR','KOI8-R','ASCII','GB2312','GBK','BIG5','UTF-8'));
+                                        $filename = iconv($encoding, 'UTF-8', $entry['name']);
+                                        $filename = $filename ?: $entry['name'];
+                                        $size = $entry['size'];
+                                        $comp_size = $entry['comp_size'];
+                                        $mtime = $entry['mtime'];
+                                        $crc = $entry['crc'];
+                                        $is_dir = ($crc == 0);
+                                        // $path = '/' . $filename;
+                                      
+                                        $_names = explode('/', $filename);
+                                        $_idx = count($_names)-1;
+                                        
+                                        $name = $_names[$_idx];
+                                        if (empty($name)) {
+                                            continue;
+                                        }
+                                        $files_name[] = $name;
+                                        $index = $i;
+                                        //$data = $zip->getFromIndex($i);
+                                        $entry = compact('name', 'path', 'size', 'comp_size', 'mtime', 'crc', 'index', 'is_dir');
+                                        // $results[] = $entry;
+                                    }
+                                    // print_r($files_name);die;
+                                    $mcw    = $zip->extractTo($unpath,$files_name); //解压到$route这个目录中
+                                    // // $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
                                     $zip->close();
                                     //解压完成
                                     $unzip = $this->getDirContent($unpath);
@@ -219,7 +248,7 @@ class SflUpload extends Pzlife {
                             } else if ($file_info[1] == 'txt') {
                                 $file_data = $this->readForTxtToDyadicArray($son_path); //关联关系
 
-                                // print_r($file_data);
+                                // print_r($son_path);
                                 // die;
                             }
                         }
@@ -406,7 +435,38 @@ class SflUpload extends Pzlife {
                             if ($file_info[1] == 'zip') { //需要解压
                                 if ($zip->open($son_path) === true) {
                                     $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0];
-                                    $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
+                                    $count = $zip->numFiles;
+                                    // $results = [];
+                                    $files_name = [];
+                                    for ($i = 0; $i < $count; $i++) {
+                                        $entry = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
+                                        $entry['name'] = rtrim(str_replace('\\', '/', $entry['name']), '/');
+                                        $encoding = mb_detect_encoding($entry['name'], array('Shift_JIS','EUC_JP','EUC_KR','KOI8-R','ASCII','GB2312','GBK','BIG5','UTF-8'));
+                                        $filename = iconv($encoding, 'UTF-8', $entry['name']);
+                                        $filename = $filename ?: $entry['name'];
+                                        $size = $entry['size'];
+                                        $comp_size = $entry['comp_size'];
+                                        $mtime = $entry['mtime'];
+                                        $crc = $entry['crc'];
+                                        $is_dir = ($crc == 0);
+                                        // $path = '/' . $filename;
+                                      
+                                        $_names = explode('/', $filename);
+                                        $_idx = count($_names)-1;
+                                        
+                                        $name = $_names[$_idx];
+                                        if (empty($name)) {
+                                            continue;
+                                        }
+                                        $files_name[] = $name;
+                                        $index = $i;
+                                        //$data = $zip->getFromIndex($i);
+                                        $entry = compact('name', 'path', 'size', 'comp_size', 'mtime', 'crc', 'index', 'is_dir');
+                                        // $results[] = $entry;
+                                    }
+                                    // print_r($files_name);die;
+                                    $mcw    = $zip->extractTo($unpath,$files_name); //解压到$route这个目录中
+                                    // $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
                                     $zip->close();
                                     //解压完成
                                     $unzip = $this->getDirContent($unpath);
