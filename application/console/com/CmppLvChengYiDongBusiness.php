@@ -453,15 +453,16 @@ class CmppLvChengYiDongBusiness extends Pzlife {
                                         echo "未声明head['Command_Id']:" . $head['Command_Id'];
                                     }
                                 } else {
+                                   if (!empty($receipt_data)) {
+                                        foreach ($receipt_data as $key => $value) {
+                                            socket_write($socket, $value['new_headData'] . $value['new_body'], $value['new_Total_Length']);
+                                        }
+                                    }
                                     break;
                                 }
                             }
                             //在发送
-                            // if (!empty($receipt_data)) {
-                            //     foreach ($receipt_data as $key => $value) {
-                            //         socket_write($socket, $value['new_headData'] . $value['new_body'], $value['new_Total_Length']);
-                            //     }
-                            // }
+                            
                             $send = $redis->lPop($redisMessageCodeSend);
                             if (!empty($send)) { //正式使用从缓存中读取数据并且有待发送数据
 
