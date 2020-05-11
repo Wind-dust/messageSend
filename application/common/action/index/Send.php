@@ -487,9 +487,20 @@ return $result;
                 // $data['liantong_channel_id'] = 9;
                 // $data['dianxin_channel_id'] = 9;
             } else {
-                $data['yidong_channel_id'] = 60;
-                $data['liantong_channel_id'] = 62;
-                $data['dianxin_channel_id'] = 61;
+                if (strpos($Content,'亲爱的美田会员') !== false) {
+                    $data['yidong_channel_id'] = 22;
+                    $data['liantong_channel_id'] = 22;
+                    $data['dianxin_channel_id'] = 22;
+                }elseif (strpos($Content,'问卷') !== false) {
+                    $data['yidong_channel_id'] = 22;
+                    $data['liantong_channel_id'] = 22;
+                    $data['dianxin_channel_id'] = 22;
+                }else{
+                    $data['yidong_channel_id'] = 60;
+                    $data['liantong_channel_id'] = 62;
+                    $data['dianxin_channel_id'] = 61;
+                }
+               
             }
         }
         Db::startTrans();
