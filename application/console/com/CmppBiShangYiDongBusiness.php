@@ -435,7 +435,8 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                         $callback_Command_Id = 0x80000005;
 
                                         // $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
-                                        // $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id2']);
+                                        // $new_Total_Length = strlen($new_body) + 12;
+                                        // $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $body['Msg_Id2']);
                                         $receipts = [];
                                         $receipts = [
                                             'Msg_Id1' => $body['Msg_Id1'],
@@ -594,7 +595,7 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                      foreach ($receipt_data as $key => $value) {
                                          $new_body         = pack("N", $value['Msg_Id1']) . pack("N", $value['Msg_Id2']) . pack("C", $value['Result']);
                                          $new_Total_Length = strlen($new_body) + 12;
-                                         $new_headData     = pack("NNN", $Total_Length,  0x80000005, $value['Msg_Id2']);
+                                         $new_headData     = pack("NNN", $new_Total_Length,  0x80000005, $value['Msg_Id2']);
                                          socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                      }
                                     //  sleep(1);
