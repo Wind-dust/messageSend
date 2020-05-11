@@ -457,11 +457,7 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                 }
                             }
                             //在发送
-                            if (!empty($receipt_data)) {
-                                foreach ($receipt_data as $key => $value) {
-                                    socket_write($socket, $value['new_headData'] . $value['new_body'], $value['new_Total_Length']);
-                                }
-                            }
+                            
                             $send = $redis->lPop($redisMessageCodeSend);
                             if (!empty($send)) { //正式使用从缓存中读取数据并且有待发送数据
 
@@ -536,7 +532,7 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                     if ($i > $security_master) {
                                         $i = 0;
                                     }
-                                    usleep(670);
+                                    usleep(350);
                                     continue;
                                 } else { //单条短信
 
@@ -582,14 +578,22 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
 
                                     $send_status = 2;
-                                    usleep(670);
+                                    usleep(350);
                                 }
                             } else { //心跳
-                                $Command_Id   = 0x00000008; //保持连接
-                                $Total_Length = 12;
-                                $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                socket_write($socket, $headData, $Total_Length);
-                                sleep(1);
+                                if (!empty($receipt_data)) {
+                                    print_r($receipt_data);
+                                    foreach ($receipt_data as $key => $value) {
+                                        // socket_write($socket, $value['new_headData'] . $value['new_body'], $value['new_Total_Length']);
+                                    }
+                                }else{
+                                    $Command_Id   = 0x00000008; //保持连接
+                                    $Total_Length = 12;
+                                    $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                    socket_write($socket, $headData, $Total_Length);
+                                    sleep(1);
+                                }
+                                
                             }
 
                             ++$i;
@@ -612,7 +616,7 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                             fwrite($myfile, $e . "\n");
                             fclose($myfile);
                             //  exception($e);
-                            sleep(5);
+                            sleep(20);
                             //重新创建连接
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                             if (socket_connect($socket, $host, $port) == false) {
