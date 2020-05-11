@@ -270,7 +270,7 @@ class CmppRongHeYiDongMarketing extends Pzlife
 
                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                         $new_Total_Length = strlen($new_body) + 12;
-                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $body['Msg_Id2']);
+                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                     } else if ($head['Command_Id'] == 0x00000008) {
                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构
@@ -413,7 +413,7 @@ class CmppRongHeYiDongMarketing extends Pzlife
 
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                                         $new_Total_Length = strlen($new_body) + 12;
-                                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $body['Msg_Id2']);
+                                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                     } else if ($head['Command_Id'] == 0x00000008) {
                                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构

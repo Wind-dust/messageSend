@@ -5548,17 +5548,59 @@ class CmppCreateCodeTask extends Pzlife
             $this->redis->rpush('index:meassage:sflmessage:sendtask',$i);
         }
         $ids = [];
+        $j = 1;
         while (true) {
             $task_id = $this->redis->lpop('index:meassage:sflmessage:sendtask');
             if (empty($task_id)) {
                 break;
             }
             $ids[] = $task_id;
+            $j++;
+            if ($j > 100) {
+                $all_send_task = Db::query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (".join(',',$ids).") ");
+                foreach ($all_send_task as $key => $value) {
+                    if (checkMobile($value['mobile']) != false) {
+                        $end_num = substr($value['mobile'], -6);
+                        //按无效号码计算
+                        if (!in_array($end_num, ['000000', '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999'])) {
+                            $prefix = '';
+                            $prefix = substr(trim($value['mobile']), 0, 7);
+                            $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                            // print_r($res);
+                            if ($res) {
+                                $newres = array_shift($res);
+                                if ($newres['source'] == 1) {
+                                    $channel_id = $value['yidong_channel_id'];
+                                } elseif ($newres['source'] == 2) {
+                                    $channel_id = $value['liantong_channel_id'];
+                                } elseif ($newres['source'] == 3) {
+                                    $channel_id = $value['dianxin_channel_id'];
+                                }
+                            }
+
+                            //正常发送
+                            $sendmessage = [
+                                'mobile'      => $value['mobile'],
+                                'mar_task_id' => $value['id'],
+                                'content'     => $value['task_content'],
+                                'channel_id'  => $channel_id,
+                                'from'        => 'yx_sfl_send_task',
+                            ];
+                            
+                        }else{
+                            Db::table('yx_sfl_send_task_receipt')->insert(
+                                
+                            );
+                        }
+                       
+                    }else{
+                        //错号
+                    }
+                    
+                }
+            }
         }
-        $all_send_task = Db::query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (".join(',',$ids).") ");
-        foreach ($all_send_task as $key => $value) {
-            # code...
-        }
+       
         print_r($all_send_task);
     }
 }
