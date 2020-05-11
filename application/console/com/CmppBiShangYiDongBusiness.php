@@ -590,11 +590,12 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                             } else { //心跳
                                  
                                  if (!empty($receipt_data)) {
+                                     print_r($receipt_data);
                                      foreach ($receipt_data as $key => $value) {
                                          $new_body         = pack("N", $value['Msg_Id1']) . pack("N", $value['Msg_Id2']) . pack("C", $value['Result']);
                                          $new_Total_Length = strlen($new_body) + 12;
                                          $new_headData     = pack("NNN", $Total_Length, $value['callback_Command_Id'], $value['Msg_Id2']);
-                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                                        //  socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                      }
                                     //  sleep(1);
                                     
