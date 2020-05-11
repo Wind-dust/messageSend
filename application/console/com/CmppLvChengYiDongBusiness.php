@@ -371,7 +371,7 @@ class CmppLvChengYiDongBusiness extends Pzlife {
                                             echo "发送失败" . "\n";
                                             $error_msg = "其他错误";
                                         } else {
-                                            
+
                                         }
                                     } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                                         $Result              = 0;
@@ -458,11 +458,11 @@ class CmppLvChengYiDongBusiness extends Pzlife {
                                 }
                             }
                             //在发送
-                            if (!empty($receipt_data)) {
+                            /* if (!empty($receipt_data)) {
                                 foreach ($receipt_data as $key => $value) {
                                     socket_write($socket, $value['new_headData'] . $value['new_body'], $value['new_Total_Length']);
                                 }
-                            }
+                            } */
                             $send = $redis->lPop($redisMessageCodeSend);
                             if (!empty($send)) { //正式使用从缓存中读取数据并且有待发送数据
 
