@@ -776,7 +776,7 @@ class Message extends AdminController {
     }
 
      /**
-     * @api              {post} / 丝芙兰sftp营销任务模板批量审核
+     * @api              {post} / 丝芙兰sftp彩信任务模板批量审核
      * @apiDescription   auditSflMulSendTask
      * @apiGroup         admin_Message
      * @apiName          auditSflMulSendTask
@@ -816,7 +816,7 @@ class Message extends AdminController {
     }
 
      /**
-     * @api              {post} / 丝芙兰sftp营销任务模板批量分配通道
+     * @api              {post} / 丝芙兰sftp彩信任务模板批量分配通道
      * @apiDescription   distributionSflMulSendTaskChannel
      * @apiGroup         admin_Message
      * @apiName          distributionSflMulSendTaskChannel
