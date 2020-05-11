@@ -119,14 +119,15 @@ class SflUpload extends Pzlife {
                         foreach ($son_path_data as $skey => $svalue) {
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
-                            // print_r($svalue);die;
+                            // print_r($son_path);die;
                             $file_info = explode('.', $svalue);
                             if ($file_info[1] == 'zip') { //需要解压
                                 //开始解压
                                 if ($zip->open($son_path) === true) {
                                     $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0];
                                     // print_r($unpath);die;
-                                    $mcw    = $zip->extractTo($unpath,$son_path); //解压到$route这个目录中
+                                    // $mcw    = $zip->extractTo($unpath,$son_path); //解压到$route这个目录中
+                                    $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
                                     $zip->close();
                                     //解压完成
                                     $unzip = $this->getDirContent($unpath);
