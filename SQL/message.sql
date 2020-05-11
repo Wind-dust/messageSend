@@ -1053,6 +1053,7 @@ CREATE TABLE `yx_sfl_multimedia_template` (
   KEY `sfl_model_id` (`sfl_model_id`) USING BTREE,
   KEY `title` (`title`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='丝芙兰彩信模板主表';
+
 DROP TABLE IF EXISTS `yx_sfl_multimedia_template_frame`;
 CREATE TABLE `yx_sfl_multimedia_template_frame` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -1070,11 +1071,44 @@ CREATE TABLE `yx_sfl_multimedia_template_frame` (
   KEY `sfl_multimedia_template_id` (`sfl_multimedia_template_id`,`sfl_model_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='丝芙兰彩信模板副表（帧）';
 
+-- SflMultimediaMessage
+
+-- SflMultimediaTemplateFrame
+-- SflMultimediaTemplate
+DROP TABLE IF EXISTS `yx_sfl_multimedia_message`;
+CREATE TABLE `yx_sfl_multimedia_message` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `sfl_relation_id` varchar(30) NOT NULL DEFAULT '' COMMENT '丝芙兰彩信关系id',
+  `mseeage_id` varchar(30) NOT NULL DEFAULT '' COMMENT '丝芙兰彩信id',
+  `variable` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  COMMENT '变量内容',
+  `mobile` char(20) NOT NULL DEFAULT '' COMMENT '接收手机',
+  `sfl_model_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '丝芙兰彩信模板id',
+  `real_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '实际数量',
+  `send_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发送数量',
+  `free_trial` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '1:需要审核;2:审核通过;3:审核不通过',
+  `send_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '1：待发送,2:发送中;3:成功;4:失败',
+  `yidong_channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '移动通道ID',
+  `liantong_channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '联通通道id',
+  `dianxin_channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '电信通道id',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `sfl_model_id` (`sfl_model_id`) USING BTREE,
+  KEY `mobile` (`mobile`) USING BTREE,
+  KEY `update_time` (`update_time`) USING BTREE,
+  KEY `create_time` (`create_time`) USING BTREE,
+  KEY `delete_time` (`delete_time`) USING BTREE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='丝芙兰彩信主表';
+
+
+
 DROP TABLE IF EXISTS `yx_sfl_send_task`;
 CREATE TABLE `yx_sfl_send_task` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `template_id` char(8) NOT NULL DEFAULT '' COMMENT '模板id',
+  `template_id` varchar(20)  CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '模板id',
   `task_content` text COMMENT '发送内容',
+  `mseeage_id` varchar(30) NOT NULL DEFAULT '' COMMENT '丝芙兰彩信id',
   `mobile` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ''  COMMENT '发送号码集合',
   `real_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '计费数量',
   `send_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发送数量',
@@ -1091,7 +1125,11 @@ CREATE TABLE `yx_sfl_send_task` (
   `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
   `appointment_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '预约时间',
   PRIMARY KEY (`id`) USING BTREE,
-  KEY `template_id` (`template_id`) USING BTREE
+  KEY `template_id` (`template_id`) USING BTREE,
+  KEY `mobile` (`mobile`) USING BTREE,
+  KEY `update_time` (`update_time`) USING BTREE,
+  KEY `create_time` (`create_time`) USING BTREE,
+  KEY `delete_time` (`delete_time`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='丝芙兰sftp营销任务表';
 
 ALTER TABLE `messagesend`.`yx_user_multimedia_message` 

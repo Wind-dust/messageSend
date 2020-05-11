@@ -8,25 +8,23 @@ use app\facade\DbUser;
 use PHPExcel;
 use PHPExcel_Cell;
 use PHPExcel_IOFactory;
-use PHPExcel_Writer_Excel2007;
 use PHPExcel_Style_Alignment;
 use PHPExcel_Style_Fill;
+use PHPExcel_Writer_Excel2007;
 use think\Db;
 
-class Message extends CommonIndex
-{
+class Message extends CommonIndex {
     /**
      * @param $page
      * @param $pageNum
      * @return array
      * @author rzc
      */
-    public function  getMultimediaMessageTask($page, $pageNum, $id = 0, $title = '')
-    {
+    public function getMultimediaMessageTask($page, $pageNum, $id = 0, $title = '') {
         $offset = ($page - 1) * $pageNum;
-        $where = [];
+        $where  = [];
         if (!empty($id)) {
-            $result = DbSendMessage::getUserMultimediaMessage(['id' => $id], '*', true);
+            $result            = DbSendMessage::getUserMultimediaMessage(['id' => $id], '*', true);
             $result['content'] = DbSendMessage::getUserMultimediaMessageFrame(['multimedia_message_id' => $id], '*', false, ['num' => 'asc']);
         } else {
             if (empty($title)) {
@@ -45,8 +43,7 @@ class Message extends CommonIndex
         return ['code' => '200', 'data' => $result, 'total' => $total];
     }
 
-    public function auditMultimediaMessageTask($effective_id = [], $free_trial)
-    {
+    public function auditMultimediaMessageTask($effective_id = [], $free_trial) {
         // print_r($effective_id);die;
         $userchannel = DbSendMessage::getUserMultimediaMessage([['id', 'in', join(',', $effective_id)]], 'id,mobile_content,free_trial', false);
 
@@ -75,8 +72,7 @@ class Message extends CommonIndex
         }
     }
 
-    public function distributionMultimediaChannel($effective_id = [], $yidong_channel_id, $liantong_channel_id, $dianxin_channel_id, $business_id)
-    {
+    public function distributionMultimediaChannel($effective_id = [], $yidong_channel_id, $liantong_channel_id, $dianxin_channel_id, $business_id) {
         $channel = DbAdministrator::getSmsSendingChannel(['id' => $yidong_channel_id], 'id,title,channel_price', true);
         if (empty($channel)) {
             return ['code' => '3002'];
@@ -105,9 +101,9 @@ class Message extends CommonIndex
             }
             // print_r($value);
             if ($value['free_trial'] == 2 && !$value['yidong_channel_id']) {
-                $real_length = 1;
+                $real_length     = 1;
                 $real_usertask[] = $value;
-                $mobilesend       = explode(',', $value['mobile_content']);
+                $mobilesend      = explode(',', $value['mobile_content']);
                 // $send_length     = mb_strlen($value['task_content'], 'utf8');
                 // if ($send_length > 70) {
                 //     $real_length = ceil($send_length / 67);
@@ -137,7 +133,7 @@ class Message extends CommonIndex
         }
         // print_r($num);die;
         /* if ($num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
-            return ['code' => '3007'];
+        return ['code' => '3007'];
         } */
         $free_trial = 2;
         if ($userEquities['agency_price'] < $channel['channel_price']) {
@@ -165,8 +161,7 @@ class Message extends CommonIndex
         }
     }
 
-    public function exportReceiptReport($id, $business_id)
-    {
+    public function exportReceiptReport($id, $business_id) {
         if ($business_id == 5) { //营销
             $result = DbAdministrator::getUserSendTask(['id' => $id], 'log_path,update_time,task_no', true);
         } elseif ($business_id == 6) { // 行业
@@ -185,12 +180,12 @@ class Message extends CommonIndex
             }
 
             $data = array();
-            $i = 0;
+            $i    = 0;
             // $phone = '';
             // $j     = '';
             while (!feof($file)) {
                 $cellVal = trim(fgets($file));
-                $log = json_decode($cellVal, true);
+                $log     = json_decode($cellVal, true);
                 if (isset($log['mobile'])) {
                     if (!isset($log['status_message'])) {
                         $log['status_message'] = '';
@@ -250,7 +245,7 @@ class Message extends CommonIndex
             $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
         }
         $outputFileName = "金卡1.xlsx";
-        $i = 0;
+        $i              = 0;
         foreach ($data as $key => $orderdata) {
             //行
             $col = $key + 2;
@@ -275,28 +270,27 @@ class Message extends CommonIndex
         exit;
     }
 
-    public function exportMultimediaReceiptReport($id)
-    {
+    public function exportMultimediaReceiptReport($id) {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
         $result = DbSendMessage::getUserMultimediaMessage(['id' => $id], '*', true);
-        $data = DbSendMessage::getUserMultimediaMessageLog(['task_id' => $id], '*', false);
+        $data   = DbSendMessage::getUserMultimediaMessageLog(['task_id' => $id], '*', false);
         if (empty($data)) {
             return ['code' => '3002', 'msg' => '发送记录暂未同步'];
         }
         foreach ($data as $key => $value) {
             switch ($value['send_status']) {
-                case 2:
-                    $data[$key]['send_status'] = '未知';
-                    break;
-                case 3:
-                    $data[$key]['send_status'] = '成功';
-                    break;
-                case 4:
-                    $data[$key]['send_status'] = '失败';
-                    break;
-                default:
-                    $data[$key]['send_status'] = '未知';
-                    break;
+            case 2:
+                $data[$key]['send_status'] = '未知';
+                break;
+            case 3:
+                $data[$key]['send_status'] = '成功';
+                break;
+            case 4:
+                $data[$key]['send_status'] = '失败';
+                break;
+            default:
+                $data[$key]['send_status'] = '未知';
+                break;
             }
         }
         $objExcel = new PHPExcel();
@@ -339,7 +333,7 @@ class Message extends CommonIndex
             $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
         }
         $outputFileName = $result['task_no'] . ":" . date('Y-m-d H:i:s', time()) . ".xlsx";
-        $i = 0;
+        $i              = 0;
         foreach ($data as $key => $orderdata) {
             //行
             $col = $key + 2;
@@ -364,17 +358,15 @@ class Message extends CommonIndex
         exit;
     }
 
-    public function getUserModel($page, $pageNum)
-    {
+    public function getUserModel($page, $pageNum) {
         $offset = $pageNum * ($page - 1);
-        $result =  DbSendMessage::getUserModel([], '*', false, '', $offset . ',' . $pageNum);
-        $totle = DbSendMessage::countUserModel([]);
+        $result = DbSendMessage::getUserModel([], '*', false, '', $offset . ',' . $pageNum);
+        $totle  = DbSendMessage::countUserModel([]);
         return ['code' => '200', 'totle' => $totle, 'result' => $result];
     }
 
-    public function auditUserModel($id, $status)
-    {
-        $result =  DbSendMessage::getUserModel(['id' => $id], '*', true);
+    public function auditUserModel($id, $status) {
+        $result = DbSendMessage::getUserModel(['id' => $id], '*', true);
         if (empty($result)) {
             return ['code' => '3001'];
         }
@@ -392,17 +384,15 @@ class Message extends CommonIndex
         }
     }
 
-    public function getUserSignature($page, $pageNum)
-    {
+    public function getUserSignature($page, $pageNum) {
         $offset = $pageNum * ($page - 1);
-        $result =  DbSendMessage::getUserSignature([], '*', false, '', $offset . ',' . $pageNum);
-        $totle = DbSendMessage::countUserSignature([]);
+        $result = DbSendMessage::getUserSignature([], '*', false, '', $offset . ',' . $pageNum);
+        $totle  = DbSendMessage::countUserSignature([]);
         return ['code' => '200', 'total' => $totle, 'result' => $result];
     }
 
-    public function auditUserSignature($id, $audit_status)
-    {
-        $result =  DbSendMessage::getUserSignature(['id' => $id], '*', true);
+    public function auditUserSignature($id, $audit_status) {
+        $result = DbSendMessage::getUserSignature(['id' => $id], '*', true);
         if (empty($result)) {
             return ['code' => '3001'];
         }
@@ -425,8 +415,7 @@ class Message extends CommonIndex
         }
     }
 
-    public function getDevelopCode($page, $pageNum, $no_lenth = 0, $develop_no = '', $is_bind = 0)
-    {
+    public function getDevelopCode($page, $pageNum, $no_lenth = 0, $develop_no = '', $is_bind = 0) {
         $where = [];
         if (!empty($no_lenth)) {
             array_push($where, [['no_lenth', '=', $no_lenth]]);
@@ -442,12 +431,11 @@ class Message extends CommonIndex
             return ['code' => '200', 'total' => 0, 'develop' => []];
         }
         $result = DbSendMessage::getDevelopCode($where, '*', false, '', $offset . ',' . $pageNum);
-        $total = DbSendMessage::countDevelopCode($where);
+        $total  = DbSendMessage::countDevelopCode($where);
         return ['code' => '200', 'total' => $total, 'develop' => $result];
     }
 
-    public function getOneRandomDevelopCode($no_lenth)
-    {
+    public function getOneRandomDevelopCode($no_lenth) {
         $result = DbSendMessage::getRandomDevelopCode(['no_lenth' => $no_lenth, 'is_bind' => 1], 'develop_no', true);
         if (empty($result)) {
             return ['code' => '3002'];
@@ -455,8 +443,7 @@ class Message extends CommonIndex
         return ['code' => '200', 'develop_no' => $result['develop_no']];
     }
 
-    public function verifyDevelopCode($develop_no)
-    {
+    public function verifyDevelopCode($develop_no) {
         $result = DbSendMessage::getDevelopCode(['develop_no' => $develop_no, 'is_bind' => 1], 'develop_no', true);
         if (!empty($result)) {
             return ['code' => '200'];
@@ -464,8 +451,7 @@ class Message extends CommonIndex
         return ['code' => '3002'];
     }
 
-    public function userBindDevelopCode($develop_no, $nick_name, $business_id, $source)
-    {
+    public function userBindDevelopCode($develop_no, $nick_name, $business_id, $source) {
         $user = DbUser::getUserInfo(['nick_name' => $nick_name], 'id,reservation_service,user_status', true);
         if (empty($user) || $user['user_status'] != 2) {
             return ['code' => '3003'];
@@ -479,10 +465,10 @@ class Message extends CommonIndex
             try {
                 $data = [];
                 $data = [
-                    'develop_no' => $develop_no,
-                    'uid' => $user['id'],
+                    'develop_no'  => $develop_no,
+                    'uid'         => $user['id'],
                     'business_id' => $business_id,
-                    'source' => $source,
+                    'source'      => $source,
                 ];
                 Dbuser::addUserDevelopCode($data);
                 DbSendMessage::updateDevelopCode(['is_bind' => 2], $result['id']);
@@ -510,10 +496,10 @@ class Message extends CommonIndex
             try {
                 $data = [];
                 $data = [
-                    'develop_no' => $develop_no,
-                    'uid' => $user['id'],
+                    'develop_no'  => $develop_no,
+                    'uid'         => $user['id'],
                     'business_id' => $business_id,
-                    'source' => $source,
+                    'source'      => $source,
                 ];
                 Dbuser::addUserDevelopCode($data);
                 Db::commit();
@@ -525,8 +511,7 @@ class Message extends CommonIndex
         }
     }
 
-    public function getuserBindDevelopCode($develop_no)
-    {
+    public function getuserBindDevelopCode($develop_no) {
         $has_bind = Dbuser::getUserDevelopCode(['develop_no' => $develop_no], 'id,uid,business_id,source', false);
         if (empty($has_bind)) {
             return ['code' => '3000'];
@@ -537,8 +522,7 @@ class Message extends CommonIndex
         return ['code' => '200', 'data' => $has_bind];
     }
 
-    public function deluserBindDevelopCode($id)
-    {
+    public function deluserBindDevelopCode($id) {
         $has_bind = Dbuser::getUserDevelopCode(['id' => $id], 'uid,business_id,source,develop_no', true);
         if (empty($has_bind)) {
             return ['code' => '3000'];
@@ -560,10 +544,9 @@ class Message extends CommonIndex
         }
     }
 
-    public function getUserMultimediaTemplate($page, $pageNum)
-    {
+    public function getUserMultimediaTemplate($page, $pageNum) {
         $offset = $pageNum * ($page - 1);
-        $result =  DbSendMessage::getUserMultimediaTemplate([], '*', false, '', $offset . ',' . $pageNum);
+        $result = DbSendMessage::getUserMultimediaTemplate([], '*', false, '', $offset . ',' . $pageNum);
         foreach ($result as $key => $value) {
             $result[$key]['multimedia_frame'] = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $value['id']], '*', false, ['num' => 'asc']);
         }
@@ -571,9 +554,8 @@ class Message extends CommonIndex
         return ['code' => '200', 'totle' => $totle, 'result' => $result];
     }
 
-    public function auditUserMultimediaTemplatel($id, $status)
-    {
-        $result =  DbSendMessage::getUserMultimediaTemplate(['id' => $id], '*', true);
+    public function auditUserMultimediaTemplatel($id, $status) {
+        $result = DbSendMessage::getUserMultimediaTemplate(['id' => $id], '*', true);
         if (empty($result)) {
             return ['code' => '3001'];
         }
@@ -587,6 +569,315 @@ class Message extends CommonIndex
             return ['code' => '200'];
         } catch (\Exception $e) {
             Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function getSflSendTask($page, $pageNum, $id = 0, $template_id = '', $task_content = '', $mseeage_id = '', $mobile = '', $start_time = 0, $end_time = 0) {
+        $offset = ($page - 1) * $pageNum;
+        if ($offset < 0) {
+            return ['code' => 200, 'total' => '0', 'data' => []];
+        }
+        if (!empty($id)) {
+            $result = DbSendMessage::getSflSendTask(['id' => $id], '*', true);
+            return ['code' => 200, 'total' => '1', 'data' => $result];
+        } else {
+            $where = [];
+            if (!empty($template_id)) {
+                array_push($where, ['template_id', '=', $template_id]);
+            }
+
+            if (!empty($task_content)) {
+                array_push($where, ['task_content', 'LIKE', '%' . $task_content . '%']);
+            }
+
+            if (!empty($mseeage_id)) {
+                array_push($where, ['mseeage_id', '=', $mseeage_id]);
+            }
+
+            if (!empty($mobile)) {
+                array_push($where, ['mobile', '=', $mobile]);
+            }
+
+            if (!empty($start_time)) {
+                array_push($where, ['create_time', '>=', $start_time]);
+            }
+
+            if (!empty($end_time)) {
+                array_push($where, ['create_time', '<=', $end_time]);
+            }
+
+            $result = DbSendMessage::getSflSendTask($where, '*', false, ['id' => 'desc'], $offset . ',' . $pageNum);
+            $total  = DbSendMessage::countSflSendTask($where);
+            return ['code' => 200, 'total' => $total, 'data' => $result];
+        }
+    }
+
+    public function auditSflSendTask($template_id, $free_trial, $start_time, $end_time) {
+        $where = [];
+        $where = [
+            ['template_id', '=', $template_id],
+            ['free_trial', '=', 1],
+            ['create_time', '>=', $start_time],
+            ['create_time', '<=', $end_time],
+        ];
+        $task = DbSendMessage::getSflSendTask($where, 'id', false);
+        //  echo Db::getlastsql();die;
+        // print_r($task);die;
+        $updateAll = [];
+        $ids       = [];
+        foreach ($task as $key => $value) {
+            $update = [];
+            $update = [
+                'id'         => $value['id'],
+                'free_trial' => $free_trial,
+            ];
+
+            $updateAll[] = $update;
+            $ids[]       = $value['id'];
+        }
+
+        Db::startTrans();
+        try {
+            $res = DbSendMessage::saveAllSflSendTask($updateAll);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            exception($e);
+            return ['code' => '3009']; //修改失败
+        }
+
+    }
+
+    public function distributionSflSendTaskChannel($template_id, $yidong_channel_id, $liantong_channel_id, $dianxin_channel_id, $start_time, $end_time) {
+        $where = [];
+        $where = [
+            ['template_id', '=', $template_id],
+            ['free_trial', '=', 2],
+            ['create_time', '>=', $start_time],
+            ['create_time', '<=', $end_time],
+        ];
+        $task      = DbSendMessage::getSflSendTask($where, 'id', false);
+        $updateAll = [];
+        $ids       = [];
+        foreach ($task as $key => $value) {
+            $update = [];
+            $update = [
+                'id'                  => $value['id'],
+                'yidong_channel_id'   => $yidong_channel_id,
+                'liantong_channel_id' => $liantong_channel_id,
+                'dianxin_channel_id'  => $dianxin_channel_id,
+            ];
+
+            $updateAll[] = $update;
+            $ids[]       = $value['id'];
+        }
+        Db::startTrans();
+        try {
+            $res = DbSendMessage::saveAllSflSendTask($updateAll);
+            Db::commit();
+            foreach ($ids as $key => $value) {
+                $res = $this->redis->rpush("index:meassage:sflmessage:sendtask", $value);
+            }
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            exception($e);
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function auditOneSflSendTask($id, $free_trial) {
+        $task = DbSendMessage::getSflSendTask(['id' => $id, 'free_trial' => 1], 'id', true);
+        if (empty($task)) {
+            return ['code' => '3001'];
+        }
+        // echo Db::getlastsql();die;
+        Db::startTrans();
+        try {
+            DbSendMessage::editSflSendTask(['free_trial' => $free_trial], $id);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            exception($e);
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function distributionOneSflSendTaskChannel($id, $yidong_channel_id, $liantong_channel_id, $dianxin_channel_id) {
+        $task = DbSendMessage::getSflSendTask(['id' => $id, 'free_trial' => 2, 'yidong_channel_id' => 0, 'liantong_channel_id' => 0, 'dianxin_channel_id' => 0], 'id', true);
+        if (empty($task)) {
+            return ['code' => '3001'];
+        }
+
+        Db::startTrans();
+        try {
+            DbSendMessage::editSflSendTask(['yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id], $id);
+            Db::commit();
+            $res = $this->redis->rpush("index:meassage:sflmessage:sendtask", $id);
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            exception($e);
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function getSflSendMulTask($page, $pageNum, $id = 0, $sfl_relation_id = '', $mseeage_id = '', $mobile = '', $start_time = 0, $end_time = 0) {
+        $offset = ($page - 1) * $pageNum;
+        if ($offset < 0) {
+            return ['code' => 200, 'total' => '0', 'data' => []];
+        }
+        if (!empty($id)) {
+            $result   = DbSendMessage::getSflMultimediaMessage(['id' => $id], '*', true);
+            $mul      = DbSendMessage::getSflMultimediaTemplate(['sfl_relation_id' => $result['sfl_relation_id']], '*', true);
+            $fram     = DbSendMessage::getSflMultimediaTemplateFrame(['sfl_multimedia_template_id' => $mul['id'], 'sfl_model_id' => $mul['sfl_model_id']], '*', false);
+            $variable = json_decode($result['variable'], true);
+            foreach ($fram as $key => $value) {
+                if (!empty($value['content'])) {
+                    foreach ($variable as $vkey => $val) {
+                        $fram[$key]['content'] = str_replace($vkey, $val, $fram[$key]['content']);
+                    }
+                }
+            }
+
+            return ['code' => 200, 'total' => '1', 'data' => $result, 'mul' => $mul, 'fram' => $fram];
+        } else {
+            $where = [];
+            if (!empty($sfl_relation_id)) {
+                array_push($where, ['sfl_relation_id', '=', $sfl_relation_id]);
+            }
+
+            if (!empty($mseeage_id)) {
+                array_push($where, ['mseeage_id', '=', $mseeage_id]);
+            }
+
+            if (!empty($mobile)) {
+                array_push($where, ['mobile', '=', $mobile]);
+            }
+
+            if (!empty($start_time)) {
+                array_push($where, ['create_time', '>=', $start_time]);
+            }
+
+            if (!empty($end_time)) {
+                array_push($where, ['create_time', '<=', $end_time]);
+            }
+            $result = DbSendMessage::getSflMultimediaMessage($where, '*', false, ['id' => 'desc'], $offset . ',' . $pageNum);
+            $total  = DbSendMessage::countSflMultimediaMessage($where);
+            return ['code' => 200, 'total' => $total, 'data' => $result];
+        }
+    }
+
+    public function auditSflMulSendTask($sfl_relation_id, $free_trial, $start_time, $end_time) {
+        $where = [];
+        $where = [
+            ['sfl_relation_id', '=', $sfl_relation_id],
+            ['free_trial', '=', 1],
+            ['create_time', '>=', $start_time],
+            ['create_time', '<=', $end_time],
+        ];
+        $task = DbSendMessage::getSflMultimediaMessage($where, 'id', false);
+        //  echo Db::getlastsql();die;
+        // print_r($task);die;
+        $updateAll = [];
+        $ids       = [];
+        foreach ($task as $key => $value) {
+            $update = [];
+            $update = [
+                'id'         => $value['id'],
+                'free_trial' => $free_trial,
+            ];
+
+            $updateAll[] = $update;
+            $ids[]       = $value['id'];
+        }
+
+        Db::startTrans();
+        try {
+            $res = DbSendMessage::saveSflMultimediaMessage($updateAll);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            exception($e);
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function distributionSflMulSendTaskChannel($sfl_relation_id, $yidong_channel_id, $liantong_channel_id, $dianxin_channel_id, $start_time, $end_time) {
+        $where = [];
+        $where = [
+            ['sfl_relation_id', '=', $sfl_relation_id],
+            ['free_trial', '=', 2],
+            ['create_time', '>=', $start_time],
+            ['create_time', '<=', $end_time],
+        ];
+        $task      = DbSendMessage::getSflMultimediaMessage($where, 'id', false);
+        $updateAll = [];
+        $ids       = [];
+        foreach ($task as $key => $value) {
+            $update = [];
+            $update = [
+                'id'                  => $value['id'],
+                'yidong_channel_id'   => $yidong_channel_id,
+                'liantong_channel_id' => $liantong_channel_id,
+                'dianxin_channel_id'  => $dianxin_channel_id,
+            ];
+
+            $updateAll[] = $update;
+            $ids[]       = $value['id'];
+        }
+        Db::startTrans();
+        try {
+            $res = DbSendMessage::saveSflMultimediaMessage($updateAll);
+            Db::commit();
+            foreach ($ids as $key => $value) {
+                $res = $this->redis->rpush("index:meassage:sflmulmessage:sendtask", $value);
+            }
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            exception($e);
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function auditOneSflMulSendTask($id, $free_trial){
+        $task = DbSendMessage::getSflMultimediaMessage(['id' => $id, 'free_trial' => 1], 'id', true);
+        if (empty($task)) {
+            return ['code' => '3001'];
+        }
+        // echo Db::getlastsql();die;
+        Db::startTrans();
+        try {
+            DbSendMessage::editSflMultimediaMessage(['free_trial' => $free_trial], $id);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            exception($e);
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function distributionOneSflMulSendTaskChannel($id, $yidong_channel_id, $liantong_channel_id, $dianxin_channel_id) {
+        $task = DbSendMessage::getSflMultimediaMessage(['id' => $id, 'free_trial' => 2, 'yidong_channel_id' => 0, 'liantong_channel_id' => 0, 'dianxin_channel_id' => 0], 'id', true);
+        if (empty($task)) {
+            return ['code' => '3001'];
+        }
+
+        Db::startTrans();
+        try {
+            DbSendMessage::editSflMultimediaMessage(['yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id], $id);
+            Db::commit();
+            $res = $this->redis->rpush("index:meassage:sflmulmessage:sendtask", $id);
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            exception($e);
             return ['code' => '3009']; //修改失败
         }
     }

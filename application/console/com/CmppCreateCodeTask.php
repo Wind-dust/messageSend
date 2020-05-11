@@ -4113,9 +4113,9 @@ class CmppCreateCodeTask extends Pzlife
         $year_users               = [];
         $month_users              = [];
         $day_users                = [];
-        // $start_time               = strtotime("2020-04-01");
-        $start_time               = strtotime(date('Y-m', time()));
-        // $end_time               = strtotime("2020-05-01");
+        $start_time               = strtotime("2020-04-01");
+        // $start_time               = strtotime(date('Y-m', time()));
+        $end_time               = strtotime("2020-05-01");
         $end_time               = time();
         $task_log                 = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `create_time` <= '" . $end_time."' AND `create_time` >= ".$start_time);
         // print_r(count($task_log));
@@ -5372,43 +5372,52 @@ class CmppCreateCodeTask extends Pzlife
     public function taskReceipt()
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $num = Db::query("SELECT count(`id`) FROM yx_send_task_receipt ");
-        $id_num = $num[0]['count(`id`)'];
-        // print_r($id_num);die;
+        $num = Db::query("SELECT * FROM yx_send_task_receipt LIMIT 50000 ");
+        // $id_num = $num[0]['count(`id`)'];
+        // print_r(count($num));die;
+        
         $del_ids = [];
         try {
 
-            for ($i = 0; $i < $id_num; $i++) {
-                $this_id = $i + 1;
-                $task_code_receipt = Db::query("SELECT * FROM yx_send_task_receipt WHERE `id` = " . $this_id);
-                $task = Db::query("SELECT `task_no` FROM yx_user_send_task WHERE `id` = " . $task_code_receipt[0]['task_id']);
-                if (!empty($task)) {
-                    $task_log = Db::query("SELECT * FROM  yx_user_send_task_log WHERE `task_no` = '" . $task[0]['task_no'] . "'");
-                    if (!empty($task_log)) {
-                        if (strpos($task_log[0]['status_message'], 'DB:0141') !== false || strpos($task_log[0]['status_message'], 'MBBLACK') !== false || strpos($task_log[0]['status_message'], 'BLACK') !== false) {
-                            $message_info = '黑名单';
-                        } else if (trim($task_log[0]['status_message'] == 'DELIVRD')) {
-                            $message_info = '发送成功';
-                        } else if (in_array(trim($task_log[0]['status_message']), ['REJECTD', 'REJECT', 'MA:0001'])) {
-                            $message_info = '发送成功';
-                        } else {
-                            $message_info = '发送失败';
+            do {
+                $del_ids = [];
+                $num = Db::query("SELECT * FROM yx_send_task_receipt LIMIT 50000 ");
+                foreach($num as $key => $value){
+                    $task = Db::query("SELECT `task_no` FROM yx_user_send_task WHERE `id` = " . $value['task_id']);
+                    if (!empty($task)) {
+                        $task_log = Db::query("SELECT * FROM  yx_user_send_task_log WHERE `task_no` = '" . $task[0]['task_no'] . "'");
+                        if (!empty($task_log)) {
+                            if (strpos($value['real_message'], 'DB:0141') !== false || strpos($value['real_message'], 'MBBLACK') !== false || strpos($value['real_message'], 'BLACK') !== false) {
+                                $message_info = '黑名单';
+                            } else if (trim($value['real_message'] == 'DELIVRD')) {
+                                $message_info = '发送成功';
+                            } else if (in_array(trim($value['real_message']), ['REJECTD', 'REJECT', 'MA:0001'])) {
+                                $message_info = '发送成功';
+                            } else {
+                                $message_info = '发送失败';
+                            }
+                            if ($task_log[0]['uid'] == '91') {
+                                if (strpos($value['real_message'], 'DB:0141') !== false ){
+                                    $message_info = '发送成功';
+                                    $value['status_message'] = 'DELIVRD';
+                                }
+                            }
+                            Db::table('yx_user_send_task_log')->where('id', $task_log[0]['id'])->update(
+                                [
+                                    'status_message' => $value['status_message'],
+                                    'real_message' => $value['real_message'],
+                                    'update_time' => $value['create_time'],
+                                    'message_info' => $message_info,
+                                ]
+                            );
+                            $del_ids[] = $value['id'];
                         }
-                        Db::table('yx_user_send_task_log')->where('id', $task_log[0]['id'])->update(
-                            [
-                                'status_message' => $task_code_receipt[0]['status_message'],
-                                'real_message' => $task_code_receipt[0]['real_message'],
-                                'update_time' => $task_code_receipt[0]['create_time'],
-                                'message_info' => $message_info,
-                            ]
-                        );
-                        $del_ids[] = $i;
                     }
                 }
-            }
-            die;
-            $ids = join(',', $del_ids);
-            Db::table('yx_user_send_code_task_log')->where("id in ($ids)")->delete();
+                $ids = join(',', $del_ids);
+                Db::table('yx_user_send_code_task_log')->where("id in ($ids)")->delete();
+                die;
+            } while ($num);
         } catch (\Exception $th) {
             exception($th);
         }
@@ -5518,5 +5527,27 @@ class CmppCreateCodeTask extends Pzlife
                                         'from'        => 'yx_user_send_code_task',
         ])); //三体营销通道
 
+    }
+
+    /* SFL sftp 独立发送体系 */
+    public function SendSflTask(){
+        $this->redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        for ($i=1; $i < 31; $i++) { 
+            $this->redis->rpush('index:meassage:sflmessage:sendtask',$i);
+        }
+        $ids = [];
+        while (true) {
+            $task_id = $this->redis->lpop('index:meassage:sflmessage:sendtask');
+            if (empty($task_id)) {
+                break;
+            }
+            $ids[] = $task_id;
+        }
+        $all_send_task = Db::query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (".join(',',$ids).") ");
+        foreach ($all_send_task as $key => $value) {
+            # code...
+        }
+        print_r($all_send_task);
     }
 }

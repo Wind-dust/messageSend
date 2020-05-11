@@ -13,6 +13,9 @@ use app\common\model\DevelopCode;
 use app\common\model\UserMultimediaTemplate;
 use app\common\model\UserMultimediaTemplateFrame;
 use app\common\model\SflSendTask;
+use app\common\model\SflMultimediaMessage;
+use app\common\model\SflMultimediaTemplateFrame;
+use app\common\model\SflMultimediaTemplate;
 use think\Db;
 
 class DbSendMessage extends Db
@@ -278,6 +281,71 @@ class DbSendMessage extends Db
     public function editSflSendTask($data, $id)
     {
         $UserSendTask = new SflSendTask;
+        return $UserSendTask->save($data, ['id' => $id]);
+    }
+
+    public function saveAllSflSendTask($data)
+    {
+        $SflSendTask = new SflSendTask;
+        $rs = $SflSendTask->saveAll($data);
+        return $rs;
+    }
+
+    public function getSflMultimediaMessage($where, $field, $row = false, $orderBy = '', $limit = '')
+    {
+        $obj = SflMultimediaMessage::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function countSflMultimediaMessage($where)
+    {
+        return SflMultimediaMessage::where($where)->count();
+    }
+
+    public function editSflMultimediaMessage($data, $id)
+    {
+        $SflMultimediaMessage = new SflMultimediaMessage;
+        return $SflMultimediaMessage->save($data, ['id' => $id]);
+    }
+
+    public function saveSflMultimediaMessage($data)
+    {
+        $SflMultimediaMessage = new SflMultimediaMessage;
+        $rs = $SflMultimediaMessage->saveAll($data);
+        return $rs;
+    }
+
+    public function getSflMultimediaTemplate($where, $field, $row = false, $orderBy = '', $limit = '')
+    {
+        $obj = SflMultimediaTemplate::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function countSflMultimediaTemplate($where)
+    {
+        return SflMultimediaTemplate::where($where)->count();
+    }
+
+    public function editSflMultimediaTemplate($data, $id)
+    {
+        $UserSendTask = new SflMultimediaTemplate;
+        return $UserSendTask->save($data, ['id' => $id]);
+    }
+
+    public function getSflMultimediaTemplateFrame($where, $field, $row = false, $orderBy = '', $limit = '')
+    {
+        $obj = SflMultimediaTemplateFrame::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function countSflMultimediaTemplateFrame($where)
+    {
+        return SflMultimediaTemplateFrame::where($where)->count();
+    }
+
+    public function editSflMultimediaTemplateFrame($data, $id)
+    {
+        $UserSendTask = new SflMultimediaTemplateFrame;
         return $UserSendTask->save($data, ['id' => $id]);
     }
 
