@@ -670,7 +670,7 @@ class Administrator extends CommonIndex
                 $uids[] = $value['uid'];
             }
             // print_r($value);
-            if ($value['free_trial'] == 2 && !$value['channel_id']) {
+            if ($value['free_trial'] == 2 && !$value['yidong_channel_id']) {
                 $real_length = 1;
                 $real_usertask[] = $value;
                 $mobilesend       = explode(',', $value['mobile_content']);
