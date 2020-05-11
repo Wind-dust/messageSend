@@ -438,7 +438,6 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                         // $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id2']);
                                         $receipts = [];
                                         $receipts = [
-                                            'new_headData' => $new_headData,
                                             'Msg_Id1' => $body['Msg_Id1'],
                                             'Msg_Id2' => $body['Msg_Id2'],
                                             'Result' => $Result,
