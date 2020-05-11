@@ -5116,7 +5116,7 @@ class CmppCreateCodeTask extends Pzlife
         /* for ($i = 215906; $i < 216942; $i++) {
 
         } */
-        $this->redis->rpush($redisMessageMarketingSend,674922);
+        // $this->redis->rpush($redisMessageMarketingSend,674922);
 
         try {
             while (true) {
