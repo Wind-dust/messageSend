@@ -588,18 +588,6 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                     usleep(350);
                                 }
                             } else { //心跳
-                                 // $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
-                               
-                              /*    $receipts = [];
-                                 $receipts = [
-                                     'new_headData' => $new_headData,
-                                     'Msg_Id1' => $body['Msg_Id1'],
-                                     'Msg_Id2' => $body['Msg_Id2'],
-                                     'Result' => $Result,
-                                     'callback_Command_Id' => $callback_Command_Id,
-                                 ];
-                                 $receipt_data[] = $receipts; */
-                                 
                                  
                                  if (!empty($receipt_data)) {
                                      foreach ($receipt_data as $key => $value) {
@@ -608,7 +596,8 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                          $new_headData     = pack("NNN", $Total_Length, $value['callback_Command_Id'], $value['Msg_Id2']);
                                          socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                      }
-                                     sleep(1);
+                                    //  sleep(1);
+                                    
                                  }else{
                                     $Command_Id   = 0x00000008; //保持连接
                                     $Total_Length = 12;
