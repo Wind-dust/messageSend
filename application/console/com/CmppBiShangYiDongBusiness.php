@@ -437,16 +437,17 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                                         $new_Total_Length = strlen($new_body) + 12;
                                         $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $body['Msg_Id2']);
-                                        $receipts = [];
+                                        
+                                        socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+
+                                       /*  $receipts = [];
                                         $receipts = [
                                             'Msg_Id1' => $body['Msg_Id1'],
                                             'Msg_Id2' => $body['Msg_Id2'],
                                             'Result' => $Result,
                                             'callback_Command_Id' => $callback_Command_Id,
                                         ];
-                                        $receipt_data[] = $receipts;
-                                        
-                                        socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                                        $receipt_data[] = $receipts; */
                                         // $huifu = 1;
                                     } else if ($head['Command_Id'] == 0x00000008) {
                                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构
@@ -590,7 +591,7 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                 }
                             } else { //心跳
                                  
-                                 if (!empty($receipt_data)) {
+                                 /* if (!empty($receipt_data)) {
                                      print_r($receipt_data);
                                      foreach ($receipt_data as $key => $value) {
                                          $new_body         = pack("N", $value['Msg_Id1']) . pack("N", $value['Msg_Id2']) . pack("C", $value['Result']);
@@ -601,14 +602,14 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                     //  sleep(1);
                                     
                                  }else{
-                                    $Command_Id   = 0x00000008; //保持连接
-                                    $Total_Length = 12;
-                                    $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                    socket_write($socket, $headData, $Total_Length);
-                                    sleep(1);
-                                 }
+                                   
+                                 } */
                                
-                               
+                                 $Command_Id   = 0x00000008; //保持连接
+                                 $Total_Length = 12;
+                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                 socket_write($socket, $headData, $Total_Length);
+                                 sleep(1);
                             }
 
                             ++$i;
