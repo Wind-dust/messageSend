@@ -3215,7 +3215,7 @@ class CmppCreateCodeTask extends Pzlife
                 }
                 unset($receipt_data);
             }
-            sleep(60);
+            sleep(10);
         }
     }
 
