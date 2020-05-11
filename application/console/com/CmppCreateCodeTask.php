@@ -1733,8 +1733,19 @@ class CmppCreateCodeTask extends Pzlife
                         $request_url = "http://116.228.60.189:15901/rtreceive?";
                         $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
                     } else {
+                        $stat = trim($send_log['Stat']);
+                        if (strpos($send_log['Stat'], 'DB:0141') !== false || strpos($send_log['Stat'], 'MBBLACK') !== false || strpos($send_log['Stat'], 'BLACK') !== false) {
+                            $message_info = '黑名单';
+                        } else if (trim($send_log['Stat'] == 'DELIVRD')) {
+                            $message_info = '发送成功';
+                        } else if (in_array(trim($send_log['Stat']), ['REJECTD', 'REJECT', 'MA:0001'])) {
+                            $stat = 'DELIVRD';
+                            $message_info = '发送成功';
+                        } else {
+                            $message_info = '发送失败';
+                        }
                         $request_url = "http://116.228.60.189:15901/rtreceive?";
-                        $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . trim($send_log['Stat']) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
+                        $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . trim($stat) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
                     }
 
                     print_r($request_url);
