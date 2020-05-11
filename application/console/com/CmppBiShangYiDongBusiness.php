@@ -281,7 +281,7 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                         $receipt_data = [];
                         echo $Sequence_Id . "\n";
                         try {
-
+                            $huifu = 0;
                             //先接收
                             while (true) {
                                 $headData = socket_read($socket, 12);
@@ -444,7 +444,9 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                             'new_Total_Length' => $new_Total_Length,
                                         ];
                                         $receipt_data[] = $receipts; */
+                                        
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                                        $huifu = 1;
                                     } else if ($head['Command_Id'] == 0x00000008) {
                                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                                     } else if ($head['Command_Id'] == 0x80000008) {
@@ -457,12 +459,12 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                 }
                             }
                             //在发送
-                            if (!empty($receipt_data)) {
+                            /* if (!empty($receipt_data)) {
                                 // print_r($receipt_data);
-                              /*   foreach ($receipt_data as $key => $value) {
+                                foreach ($receipt_data as $key => $value) {
                                     // socket_write($socket, $value['new_headData'] . $value['new_body'], $value['new_Total_Length']);
-                                } */
-                            }
+                                }
+                            } */
                             $send = $redis->lPop($redisMessageCodeSend);
                             if (!empty($send)) { //正式使用从缓存中读取数据并且有待发送数据
 
@@ -589,7 +591,9 @@ class CmppBiShangYiDongBusiness extends Pzlife {
                                 $Command_Id   = 0x00000008; //保持连接
                                 $Total_Length = 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                socket_write($socket, $headData, $Total_Length);
+                                if ($huifu == 0) {
+                                    socket_write($socket, $headData, $Total_Length);
+                                }
                                 sleep(1);
                             }
 
