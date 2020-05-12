@@ -1104,7 +1104,9 @@ CREATE TABLE `yx_sfl_multimedia_message` (
 DROP TABLE IF EXISTS `yx_sfl_send_task_receipt`;
 CREATE TABLE `yx_sfl_send_task_receipt` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `task_id` char(23) NOT NULL DEFAULT '' COMMENT '任务id',
+  `task_id` int(10) NOT NULL DEFAULT 0 COMMENT '任务id',
+  `template_id` varchar(20)  CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '模板id',
+  `mseeage_id` varchar(30) NOT NULL DEFAULT '' COMMENT '丝芙兰彩信id',
   `mobile` char(11) NOT NULL DEFAULT '' COMMENT '接收手机',
   `status_message` varchar(20) DEFAULT '' COMMENT '状态',
   `real_message` varchar(20) NOT NULL DEFAULT '' COMMENT '真实返回状态',
