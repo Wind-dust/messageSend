@@ -201,7 +201,7 @@ class SflUpload extends Pzlife {
                                             $fram['num']     = 2;
                                             $fram['name']    = "第二帧";
                                             
-                                            $fram['content'] = join('\n', $txt);
+                                            $fram['content'] = join('\\n', $txt);
                                             
                                             if (strpos($fram['content'],'【丝芙兰】') !== false) {
                                             }else{
@@ -481,10 +481,11 @@ class SflUpload extends Pzlife {
                                 }
                             } else { //获取模板信息
                                 $file_data = $this->readForTxtToDyadicArray($son_path); //关联关系
+                                // print_r($son_path);die;
                             }
 
                         }
-                        // print_r($file_data);
+                      
                         foreach ($file_data as $fkey => $fvalue) {
                             // print_r($fvalue);
                             $tem                   = [];
@@ -495,6 +496,74 @@ class SflUpload extends Pzlife {
                         // print_r($SMS_model);
                         // die;
                         // print_r($send_data);
+                        foreach ($send_data as $key => $value) {
+                            $txt = [];
+                            $txt = $this->readForTxtToDyadicArray($value); # code...
+                            if (!empty($txt)) {
+                                foreach ($txt as $tkey => $tvalue) {
+                                    if (isset($model_check[$tvalue[2]])) {
+                                        $model_check[$tvalue[2]]++;
+                                    } else {
+                                        $model_check[$tvalue[2]] = 1;
+                                    }
+                                   /*  $SMS_real_send               = [];
+                                    $SMS_real_send               = [];
+                                    $SMS_real_send['mseeage_id'] = $tvalue[0];
+                                    $SMS_real_send['mobile']     = $tvalue[3];
+                                    $SMS_real_send['free_trial'] = 1;
+                                    // $SMS_real_send['real_num'] = 1;
+                                    $SMS_real_send['send_num']     = 1;
+                                    $SMS_real_send['send_status']  = 1;
+                                    $SMS_real_send['template_id'] = $tvalue[2];
+                                    $SMS_real_send['create_time']  = time();
+                                    $content                       = $SMS_model[$tvalue[2]]['content'];
+                                    $content                       = str_replace('{FULL_NAME}', $tvalue[4], $content);
+                                    $content                       = str_replace('{RESERVED_FIELD_1}', $tvalue[7], $content);
+                                    $content                       = str_replace('{RESERVED_FIELD_2}', $tvalue[8], $content);
+                                    $content                       = str_replace('{RESERVED_FIELD_3}', $tvalue[9], $content);
+                                    $content                       = str_replace('{RESERVED_FIELD_4}', $tvalue[10], $content);
+                                    $content                       = str_replace('{RESERVED_FIELD_5}', $tvalue[11], $content);
+                                    $content                       = str_replace('{ACCOUNT_NUMBER}', $tvalue[1], $content);
+                                    $content                       = str_replace('{MOBILE}', $tvalue[3], $content);
+                                    $content                       = str_replace('{POINTS_AVAILABLE}', $tvalue[5], $content);
+                                    $content                       = str_replace('{TOTAL_POINTS}', $tvalue[6], $content);
+                                    if (strpos($content,'【丝芙兰】') !== false) {
+                                       
+                                    }else{
+                                        $content = '【丝芙兰】'.$content;
+                                    }
+                                    if (strpos($content,'回T退订') !== false) {
+                                       
+                                    }else{
+                                        $content = $content."/回T退订";
+                                    }
+                                    // print_r($content);die;
+                                    $send_length = mb_strlen($content, 'utf8');
+                                    $real_length = 1;
+                                    if ($send_length > 70) {
+                                        $real_length = ceil($send_length / 67);
+                                    }
+                                    $SMS_real_send['task_content'] = $content;
+                                    $SMS_real_send['real_num'] = $real_length;
+                                    $SMS_real_send['send_length'] = $send_length;
+                                    $SMSmessage[] = $SMS_real_send; */
+                                    // print_r($content);die;
+                                }
+
+                            }
+                        }
+
+                        foreach ($file_data as $key => $value) {
+                            // print_r($value[2]);
+                            // print_r($model_check[$value[0]]);
+
+                            // die;
+                            if ($value[2] != $model_check[$value[0]]) {
+                                //校验失败
+                                return  [ 'code' => 200, "error"=>"校验失败"];
+                            }
+                        }
+                        $j = 1;
                         foreach ($send_data as $key => $value) {
                             $txt = [];
                             $txt = $this->readForTxtToDyadicArray($value); # code...
@@ -531,6 +600,11 @@ class SflUpload extends Pzlife {
                                     }else{
                                         $content = '【丝芙兰】'.$content;
                                     }
+                                    if (strpos($content,'回T退订') !== false) {
+                                       
+                                    }else{
+                                        $content = $content."/回T退订";
+                                    }
                                     // print_r($content);die;
                                     $send_length = mb_strlen($content, 'utf8');
                                     $real_length = 1;
@@ -542,22 +616,26 @@ class SflUpload extends Pzlife {
                                     $SMS_real_send['send_length'] = $send_length;
                                     $SMSmessage[] = $SMS_real_send;
                                     // print_r($content);die;
+                                    $j++;
+                                    if ($j > 100) {
+                                        Db::startTrans();
+                                        try {
+                                            Db::table('yx_sfl_send_task')->insertAll($SMSmessage);
+                                            unset($SMSmessage);
+                                            $j = 1;
+                                            Db::commit();
+        
+                                        } catch (\Exception $e) {
+                                            exception($e);
+                                        }
+                                        // $this->redis->rPush('index:meassage:business:sendtask', $send);
+        
+                                    }
                                 }
 
                             }
                         }
-
-                        foreach ($file_data as $key => $value) {
-                            // print_r($value[2]);
-                            // print_r($model_check[$value[0]]);
-
-                            // die;
-                            if ($value[2] != $model_check[$value[0]]) {
-                                //校验失败
-                                return false;
-                            }
-                        }
-                        $insertSMS = [];
+                      /*   $insertSMS = [];
                         $j         = 1;
                         for ($i = 0; $i < count($SMSmessage); $i++) {
                             array_push($insertSMS, $SMSmessage[$i]);
@@ -576,12 +654,12 @@ class SflUpload extends Pzlife {
                                 // $this->redis->rPush('index:meassage:business:sendtask', $send);
 
                             }
-                        }
-                        if (!empty($insertSMS)) {
+                        } */
+                        if (!empty($SMSmessage)) {
                             Db::startTrans();
                             try {
-                                Db::table('yx_sfl_send_task')->insertAll($insertSMS);
-                                unset($insertSMS);
+                                Db::table('yx_sfl_send_task')->insertAll($SMSmessage);
+                                unset($SMSmessage);
                                 Db::commit();
 
                             } catch (\Exception $e) {

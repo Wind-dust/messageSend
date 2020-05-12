@@ -17753,23 +17753,105 @@ $XML  = '<?xml version="1.0" encoding="utf-8" ?>
             <![CDATA[]]>
         </extno>
     </statusbox>
-   
+
     </returnsms>';
-    $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', LIBXML_NOCDATA)), true); 
+    $receive_data = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', LIBXML_NOCDATA)), true); 
 //   print_r($XML);die;
-        $weidu = arrayLevel($XML);
-        echo $weidu;
+        // $weidu = arrayLevel($XML);
+        // echo $weidu;
       
         // echo count($XML['statusbox']);
-        die;
+        // die;
+        $redis = Phpredis::getConn();
+        $redisMessageCodeDeliver = 'index:meassage:multimediamessage:deliver:' . 13; //彩信MsgId
     if (isset($receive_data['statusbox'])) {
         // print_r($receive_data['statusbox']);
-        echo count($receive_data['statusbox']);die;
         foreach ($receive_data['statusbox'] as $key => $value) {
+           if (is_array($value)) {
+               echo "多条回执";
+           }else{
+               echo "单条回执";
+           }
+        }
+
+        foreach ($receive_data['statusbox'] as $key => $value) {
+            // $receive_info = [];
+            // $receive_info = explode(',', $value);
+            // $task_id      = $receive_id[$value['taskid']];
+            if (is_array($value)) {
+                $task_id = $redis->hget('index:meassage:code:back_taskno:' . 13, trim($value['taskid']));
+                // print_r($value);die;
+                $task    = $this->getSendTask($task_id);
+                if ($task == false) {
+                    echo "error task_id" . "\n";
+                }
+                $stat          = $value['errorcode'];
+                $send_task_log = [];
+                if ($value['status'] == '10') {
+
+                    $send_status = 3;
+                    $stat        = 'DELIVRD';
+                } else {
+                    $send_status = 4;
+                }
+                $send_task_log = [
+                    'task_no'        => $task['task_no'],
+                    'uid'            => $task['uid'],
+                    'mobile'         => $value['mobile'],
+                    'status_message' => $stat,
+                    'send_status'    => $send_status,
+                    'send_time'      => strtotime($value['receivetime']),
+                ];
+                $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
+                // Db::startTrans();
+                // try {
+                //     Db::table('yx_user_send_task_log')->insert($send_task_log);
+                //     Db::commit();
+                // } catch (\Exception $e) {
+                //     Db::rollback();
+                //     return ['code' => '3009']; //修改失败
+                // }
+                unset($send_status);
+            }else{
+                $task_id = $redis->hget('index:meassage:code:back_taskno:' . 13, trim($receive_data['statusbox']['taskid']));
+                print_r($receive_data['statusbox']['taskid']);die;
+                $task    = $this->getSendTask($task_id);
+                if ($task == false) {
+                    echo "error task_id" . "\n";
+                    break;
+                }
+                $stat          = $receive_data['statusbox']['errorcode'];
+                $send_task_log = [];
+                if ($receive_data['statusbox']['status'] == '10') {
+
+                    $send_status = 3;
+                    $stat        = 'DELIVRD';
+                } else {
+                    $send_status = 4;
+                }
+                $send_task_log = [
+                    'task_no'        => $task['task_no'],
+                    'uid'            => $task['uid'],
+                    'mobile'         => $receive_data['statusbox']['mobile'],
+                    'status_message' => $stat,
+                    'send_status'    => $send_status,
+                    'send_time'      => strtotime($receive_data['statusbox']['receivetime']),
+                ];
+                $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
+                break;
+            }
            
         }
     }
 
+    }
+
+    public function getSendTask($id) {
+        $task = Db::query("SELECT `task_no`,`uid` FROM yx_user_multimedia_message WHERE `id` =" . $id);
+        if ($task) {
+            return $task[0];
+        }
+        return false;
     }
 
 }

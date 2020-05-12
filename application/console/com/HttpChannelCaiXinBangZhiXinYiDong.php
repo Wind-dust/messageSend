@@ -286,73 +286,72 @@ class HttpChannelCaiXinBangZhiXinYiDong extends Pzlife {
                 // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
                 // $receive_data = explode(';', $receive);
                 if (isset($receive_data['statusbox'])) {
-                    //数组维度
-                    $array_dimension = arrayLevel($receive_data);
-                    if ($array_dimension >3 ) {
                         foreach ($receive_data['statusbox'] as $key => $value) {
                             // $receive_info = [];
                             // $receive_info = explode(',', $value);
                             // $task_id      = $receive_id[$value['taskid']];
-                            $task_id = $redis->hget('index:meassage:code:back_taskno:' . $content, trim($value['taskid']));
-                            $task    = $this->getSendTask($task_id);
-                            if ($task == false) {
-                                echo "error task_id" . "\n";
+                            if (is_array($value)) {
+                                $task_id = $redis->hget('index:meassage:code:back_taskno:' . $content, trim($value['taskid']));
+                                $task    = $this->getSendTask($task_id);
+                                if ($task == false) {
+                                    echo "error task_id" . "\n";
+                                }
+                                $stat          = $value['errorcode'];
+                                $send_task_log = [];
+                                if ($value['status'] == '10') {
+        
+                                    $send_status = 3;
+                                    $stat        = 'DELIVRD';
+                                } else {
+                                    $send_status = 4;
+                                }
+                                $send_task_log = [
+                                    'task_no'        => $task['task_no'],
+                                    'uid'            => $task['uid'],
+                                    'mobile'         => $value['mobile'],
+                                    'status_message' => $stat,
+                                    'send_status'    => $send_status,
+                                    'send_time'      => strtotime($value['receivetime']),
+                                ];
+                                $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
+                                // Db::startTrans();
+                                // try {
+                                //     Db::table('yx_user_send_task_log')->insert($send_task_log);
+                                //     Db::commit();
+                                // } catch (\Exception $e) {
+                                //     Db::rollback();
+                                //     return ['code' => '3009']; //修改失败
+                                // }
+                                unset($send_status);
+                            }else{
+                                $task_id = $redis->hget('index:meassage:code:back_taskno:' . $content, trim($receive_data['statusbox']['taskid']));
+                                $task    = $this->getSendTask($task_id);
+                                if ($task == false) {
+                                    echo "error task_id" . "\n";
+                                    break;
+                                }
+                                $stat          = $receive_data['statusbox']['errorcode'];
+                                $send_task_log = [];
+                                if ($receive_data['statusbox']['status'] == '10') {
+        
+                                    $send_status = 3;
+                                    $stat        = 'DELIVRD';
+                                } else {
+                                    $send_status = 4;
+                                }
+                                $send_task_log = [
+                                    'task_no'        => $task['task_no'],
+                                    'uid'            => $task['uid'],
+                                    'mobile'         => $receive_data['statusbox']['mobile'],
+                                    'status_message' => $stat,
+                                    'send_status'    => $send_status,
+                                    'send_time'      => strtotime($receive_data['statusbox']['receivetime']),
+                                ];
+                                $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
+                                break;
                             }
-                            $stat          = $value['errorcode'];
-                            $send_task_log = [];
-                            if ($value['status'] == '10') {
-    
-                                $send_status = 3;
-                                $stat        = 'DELIVRD';
-                            } else {
-                                $send_status = 4;
-                            }
-                            $send_task_log = [
-                                'task_no'        => $task['task_no'],
-                                'uid'            => $task['uid'],
-                                'mobile'         => $value['mobile'],
-                                'status_message' => $stat,
-                                'send_status'    => $send_status,
-                                'send_time'      => strtotime($value['receivetime']),
-                            ];
-                            $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
-                            // Db::startTrans();
-                            // try {
-                            //     Db::table('yx_user_send_task_log')->insert($send_task_log);
-                            //     Db::commit();
-                            // } catch (\Exception $e) {
-                            //     Db::rollback();
-                            //     return ['code' => '3009']; //修改失败
-                            // }
-                            unset($send_status);
+                           
                         }
-                    }else{
-
-                        $task_id = $redis->hget('index:meassage:code:back_taskno:' . $content, trim($receive_data['statusbox']['taskid']));
-                        $task    = $this->getSendTask($task_id);
-                        if ($task == false) {
-                            echo "error task_id" . "\n";
-                        }
-                        $stat          = $receive_data['statusbox']['errorcode'];
-                        $send_task_log = [];
-                        if ($receive_data['statusbox']['status'] == '10') {
-
-                            $send_status = 3;
-                            $stat        = 'DELIVRD';
-                        } else {
-                            $send_status = 4;
-                        }
-                        $send_task_log = [
-                            'task_no'        => $task['task_no'],
-                            'uid'            => $task['uid'],
-                            'mobile'         => $receive_data['statusbox']['mobile'],
-                            'status_message' => $stat,
-                            'send_status'    => $send_status,
-                            'send_time'      => strtotime($receive_data['statusbox']['receivetime']),
-                        ];
-                        $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
-                    }
-                    // $real_receive_data = $receive_data['statusbox'];
                    
                 } else {
                     sleep(10);
