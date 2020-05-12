@@ -1681,111 +1681,117 @@ class CmppCreateCodeTask extends Pzlife
 
         // $request_url = 'http://116.228.60.189:15901/rtreceive?task_no=bus19123111560308152071&status_message=E:CHAN&mobile=18643198590&send_time=1912311333';
         // sendRequest($request_url);
-        if ($channel['channel_type'] == 2) { //cmpp的
-            while (true) {
-                $send_log = $redis->lpop($redisMessageCodeSend);
-                if (empty($send_log)) {
-                    continue;
-                }
-                // $redis->rpush($redisMessageCodeSend, $send_log);
-                // print_r($send_log);die;
-                $send_log = json_decode($send_log, true);
-
-                //获取通道属性
-                if (!isset($send_log['mar_task_id']) || empty($send_log['mar_task_id'])) {
-                    continue;
-                }
-                $sql = "SELECT `task_no`,`uid` FROM ";
-                if ($channel['business_id'] == 5) { //营销
-                    if (isset($send_log['from'])) {
-                        $sql .= " " . $send_log['from'] . " ";
-                    } else {
-                        $sql .= " yx_user_send_task ";
+        try {
+            if ($channel['channel_type'] == 2) { //cmpp的
+                while (true) {
+                    $send_log = $redis->lpop($redisMessageCodeSend);
+                    if (empty($send_log)) {
+                        continue;
                     }
-                } elseif ($channel['business_id'] == 6) { // 行业
-                    if (isset($send_log['from'])) {
-                        $sql .= " " . $send_log['from'] . " ";
-                    } else {
-                        $sql .= " yx_user_send_code_task ";
+                    // $redis->rpush($redisMessageCodeSend, $send_log);
+                    // print_r($send_log);die;
+                    $send_log = json_decode($send_log, true);
+    
+                    //获取通道属性
+                    if (!isset($send_log['mar_task_id']) || empty($send_log['mar_task_id'])) {
+                        continue;
                     }
-                    // $sql .= " yx_user_send_code_task ";
-                } elseif ($channel['business_id'] == 9) { //游戏
-                    if (isset($send_log['from'])) {
-                        $sql .= " " . $send_log['from'] . " ";
-                    } else {
-                        $sql .= " yx_user_send_game_task ";
+                    $sql = "SELECT `task_no`,`uid` FROM ";
+                    if ($channel['business_id'] == 5) { //营销
+                        if (isset($send_log['from'])) {
+                            $sql .= " " . $send_log['from'] . " ";
+                        } else {
+                            $sql .= " yx_user_send_task ";
+                        }
+                    } elseif ($channel['business_id'] == 6) { // 行业
+                        if (isset($send_log['from'])) {
+                            $sql .= " " . $send_log['from'] . " ";
+                        } else {
+                            $sql .= " yx_user_send_code_task ";
+                        }
+                        // $sql .= " yx_user_send_code_task ";
+                    } elseif ($channel['business_id'] == 9) { //游戏
+                        if (isset($send_log['from'])) {
+                            $sql .= " " . $send_log['from'] . " ";
+                        } else {
+                            $sql .= " yx_user_send_game_task ";
+                        }
+                        // $sql .= " yx_user_send_game_task ";
                     }
-                    // $sql .= " yx_user_send_game_task ";
-                }
-                $sql .= "WHERE `id` = " . $send_log['mar_task_id'];
-                $task = Db::query($sql);
-                // print_r($sql);die;
-                if (empty($task)) {
-                    $redis->rpush($redisMessageCodeSend, json_encode($send_log));
-                    // continue;
-                }
-                // $redis->rpush($redisMessageCodeSend, json_encode($send_log));
-                // $request_url = "http://116.228.60.189:15902/rtreceive?";
-                // $request_url .= 'task_no=' . $task[0]['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['Submit_time'];
-                if ($task[0]['uid'] == 47 || $task[0]['uid'] == 49 || $task[0]['uid'] == 51 || $task[0]['uid'] == 52 || $task[0]['uid'] == 53 || $task[0]['uid'] == 54 || $task[0]['uid'] == 55) { //推送给美丽田园
-                    // https://zhidao.baidu.com/question/412076997.html
-                    if (strpos($send_log['content'], '问卷') !== false) {
-                        $request_url = "http://116.228.60.189:15901/rtreceive?";
-                        $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
+                    $sql .= "WHERE `id` = " . $send_log['mar_task_id'];
+                    $task = Db::query($sql);
+                    // print_r($sql);die;
+                    if (empty($task)) {
+                        $redis->rpush($redisMessageCodeSend, json_encode($send_log));
+                        // continue;
+                    }
+                    // $redis->rpush($redisMessageCodeSend, json_encode($send_log));
+                    // $request_url = "http://116.228.60.189:15902/rtreceive?";
+                    // $request_url .= 'task_no=' . $task[0]['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['Submit_time'];
+                    if ($task[0]['uid'] == 47 || $task[0]['uid'] == 49 || $task[0]['uid'] == 51 || $task[0]['uid'] == 52 || $task[0]['uid'] == 53 || $task[0]['uid'] == 54 || $task[0]['uid'] == 55) { //推送给美丽田园
+                        // https://zhidao.baidu.com/question/412076997.html
+                        if (strpos($send_log['content'], '问卷') !== false) {
+                            $request_url = "http://116.228.60.189:15901/rtreceive?";
+                            $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
+                        } else {
+                            $stat = trim($send_log['Stat']);
+                            if (strpos($send_log['Stat'], 'DB:0141') !== false || strpos($send_log['Stat'], 'MBBLACK') !== false || strpos($send_log['Stat'], 'BLACK') !== false) {
+                                $message_info = '黑名单';
+                            } else if (trim($send_log['Stat'] == 'DELIVRD')) {
+                                $message_info = '发送成功';
+                            } else if (in_array(trim($send_log['Stat']), ['REJECTD', 'REJECT', 'MA:0001'])) {
+                                $stat = 'DELIVRD';
+                                $message_info = '发送成功';
+                            } else {
+                                $message_info = '发送失败';
+                            }
+                            $request_url = "http://116.228.60.189:15901/rtreceive?";
+                            $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . trim($stat) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
+                        }
+    
+                        print_r($request_url);
+                        sendRequest($request_url);
+    
+                        usleep(20000);
                     } else {
                         $stat = trim($send_log['Stat']);
                         if (strpos($send_log['Stat'], 'DB:0141') !== false || strpos($send_log['Stat'], 'MBBLACK') !== false || strpos($send_log['Stat'], 'BLACK') !== false) {
                             $message_info = '黑名单';
                         } else if (trim($send_log['Stat'] == 'DELIVRD')) {
                             $message_info = '发送成功';
-                        } else if (in_array(trim($send_log['Stat']), ['REJECTD', 'REJECT', 'MA:0001'])) {
+                        } else if (in_array(trim($send_log['Stat']), ['REJECTD', 'REJECT', 'MA:0001', 'DB:0141'])) {
                             $stat = 'DELIVRD';
                             $message_info = '发送成功';
                         } else {
                             $message_info = '发送失败';
                         }
-                        $request_url = "http://116.228.60.189:15901/rtreceive?";
-                        $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . trim($stat) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
-                    }
-
-                    print_r($request_url);
-                    sendRequest($request_url);
-
-                    usleep(20000);
-                } else {
-                    $stat = trim($send_log['Stat']);
-                    if (strpos($send_log['Stat'], 'DB:0141') !== false || strpos($send_log['Stat'], 'MBBLACK') !== false || strpos($send_log['Stat'], 'BLACK') !== false) {
-                        $message_info = '黑名单';
-                    } else if (trim($send_log['Stat'] == 'DELIVRD')) {
+                        /*  if (trim($send_log['mobile']) == '18616841500') {
+                        $send_log['Stat'] = 'DELIVRD';
                         $message_info = '发送成功';
-                    } else if (in_array(trim($send_log['Stat']), ['REJECTD', 'REJECT', 'MA:0001', 'DB:0141'])) {
-                        $stat = 'DELIVRD';
-                        $message_info = '发送成功';
-                    } else {
-                        $message_info = '发送失败';
-                    }
-                    /*  if (trim($send_log['mobile']) == '18616841500') {
-                    $send_log['Stat'] = 'DELIVRD';
-                    $message_info = '发送成功';
-                    } */
-                    if ($task[0]['uid'] == '91') {
-                        if (strpos($send_log['Stat'], 'DB:0141') !== false) {
-                            $stat = 'DELIVRD';
-                            $message_info = '发送成功';
+                        } */
+                        if ($task[0]['uid'] == '91') {
+                            if (strpos($send_log['Stat'], 'DB:0141') !== false) {
+                                $stat = 'DELIVRD';
+                                $message_info = '发送成功';
+                            }
                         }
+                        $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
+                            'task_no'        => trim($task[0]['task_no']),
+                            'status_message' => $stat,
+                            'message_info'   => $message_info,
+                            'mobile'         => trim($send_log['mobile']),
+                            // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                            'send_time'      => isset($send_log['receive_time']) ? date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        ])); //写入用户带处理日志
                     }
-                    $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
-                        'task_no'        => trim($task[0]['task_no']),
-                        'status_message' => $stat,
-                        'message_info'   => $message_info,
-                        'mobile'         => trim($send_log['mobile']),
-                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                        'send_time'      => isset($send_log['receive_time']) ? date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                    ])); //写入用户带处理日志
+                    $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode($send_log)); //写入通道处理日志
                 }
-                $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode($send_log)); //写入通道处理日志
             }
+        } catch (\Exception $th) {
+             $redis->rpush($redisMessageCodeSend, $send_log);
+             exception($th);
         }
+        
         // try {
         //     //code...
         // } catch (\Exception $e) {
