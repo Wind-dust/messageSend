@@ -5699,9 +5699,9 @@ class CmppCreateCodeTask extends Pzlife
     public function SendSflMulTask(){
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        for ($i=1; $i < 31; $i++) { 
+        /* for ($i=1; $i < 31; $i++) { 
             $this->redis->rpush('index:meassage:sflmulmessage:sendtask',$i);
-        }
+        } */
         $ids = [];
         $j = 1;
         try {
