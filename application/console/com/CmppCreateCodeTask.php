@@ -1696,6 +1696,9 @@ class CmppCreateCodeTask extends Pzlife
                     if (!isset($send_log['mar_task_id']) || empty($send_log['mar_task_id'])) {
                         continue;
                     }
+                    if (!empty($send_log['from']) && $send_log['from'] == 'yx_sfl_send_task') {
+                        continue;
+                    }
                     $sql = "SELECT `task_no`,`uid` FROM ";
                     if ($channel['business_id'] == 5) { //营销
                         if (isset($send_log['from'])) {
