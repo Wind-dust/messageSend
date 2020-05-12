@@ -1101,6 +1101,25 @@ CREATE TABLE `yx_sfl_multimedia_message` (
   KEY `delete_time` (`delete_time`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='丝芙兰彩信主表';
 
+DROP TABLE IF EXISTS `yx_sfl_send_multimediatask_receipt`;
+CREATE TABLE `yx_sfl_send_multimediatask_receipt` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `task_id` int(10) NOT NULL DEFAULT 0 COMMENT '任务id',
+  `template_id` varchar(20)  CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '模板id',
+  `mseeage_id` varchar(30) NOT NULL DEFAULT '' COMMENT '丝芙兰彩信id',
+  `mobile` char(11) NOT NULL DEFAULT '' COMMENT '接收手机',
+  `status_message` varchar(20) DEFAULT '' COMMENT '状态',
+  `real_message` varchar(20) NOT NULL DEFAULT '' COMMENT '真实返回状态',
+  `messageinfo` varchar(20) NOT NULL DEFAULT '' COMMENT '状态说明',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `task_id_uid_mobile` (`task_id`,`mobile`) USING BTREE,
+  KEY `task` (`task_id`) USING BTREE,
+  KEY `mobile` (`mobile`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=2008832 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='丝芙兰彩信发送回执';
+
+
 DROP TABLE IF EXISTS `yx_sfl_send_task_receipt`;
 CREATE TABLE `yx_sfl_send_task_receipt` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

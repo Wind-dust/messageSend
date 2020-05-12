@@ -868,7 +868,6 @@ class Message extends CommonIndex {
         if (empty($task)) {
             return ['code' => '3001'];
         }
-
         Db::startTrans();
         try {
             DbSendMessage::editSflMultimediaMessage(['yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id], $id);
