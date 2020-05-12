@@ -657,6 +657,9 @@ class Message extends CommonIndex {
             ['free_trial', '=', 2],
             ['create_time', '>=', $start_time],
             ['create_time', '<=', $end_time],
+            ['yidong_channel_id', '=', 0],
+            ['liantong_channel_id', '=', 0],
+            ['dianxin_channel_id', '=', 0],
         ];
         $task      = DbSendMessage::getSflSendTask($where, 'id', false);
         $updateAll = [];
@@ -814,6 +817,9 @@ class Message extends CommonIndex {
             ['free_trial', '=', 2],
             ['create_time', '>=', $start_time],
             ['create_time', '<=', $end_time],
+            ['yidong_channel_id', '=', 0],
+            ['liantong_channel_id', '=', 0],
+            ['dianxin_channel_id', '=', 0],
         ];
         $task      = DbSendMessage::getSflMultimediaMessage($where, 'id', false);
         $updateAll = [];
