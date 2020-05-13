@@ -138,11 +138,13 @@ class Upload extends MyController
                 for ($i = 1; $i <= $highestRow; $i++) {
                     $cellVal = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
                     // $phone_data[]= trim($cellVal);
-                    if (empty($cellVal)) {
+                    if (!empty($cellVal)) {
                         $phone .= $j . trim($cellVal);
                         $j = ',';
                     }
+                    
                 }
+               
             } elseif ($type == 'xls') {
                 $type = 'Excel5';
                 $objReader = PHPExcel_IOFactory::createReader($type);
