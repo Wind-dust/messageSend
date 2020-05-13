@@ -761,14 +761,14 @@ class SflUpload extends Pzlife {
             // $sftp = new SFTPConnection("10.157.52.197", 20981);
             // $sftp->login("CHN-SMSDATA-sms", "TZYB@zn7");
             // $sftp->uploadFile("/CN-SMSDATA", "/tmp/to_be_received");
-            $host     = "47.103.200.251";
+            /* $host     = "47.103.200.251";
             $prot     = "22";
             $username = "root";
-            $password = "a!s^d(7)#f@g&h(9)";
-            /*  $host = "esftp.sephora.com.cn";
+            $password = "a!s^d(7)#f@g&h(9)"; */
+             $host = "esftp.sephora.com.cn";
             $prot = "20981";
             $username = "CHN-SMSDATA-sms";
-            $password = "TZYB@zn7"; */
+            $password = "TZYB@zn7";
             $sftp = new SFTPConnection($host, $prot);
             $sftp->login($username, $password);
             //本地目录
