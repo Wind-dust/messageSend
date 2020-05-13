@@ -47,7 +47,7 @@ class CmppJuMengYiDongMarketing extends Pzlife
             'Shared_secret' => '123ABC', //网关登录密码
             'Service_Id'    => "440667", //业务代码
             'template_id'   => "", //模板id
-            'Dest_Id'       => "1069610666", //短信接入码 短信端口号 服务代码
+            'Dest_Id'       => "1069440667", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
             'master_num'    => 300,
