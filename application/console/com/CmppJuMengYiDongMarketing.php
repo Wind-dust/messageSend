@@ -265,8 +265,8 @@ class CmppJuMengYiDongMarketing extends Pzlife
 
                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                         $new_Total_Length = strlen($new_body) + 12;
-                        $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id2']);
-                        // socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
+                        socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                     } else if ($head['Command_Id'] == 0x00000008) {
                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                     } else if ($head['Command_Id'] == 0x80000008) {
@@ -280,7 +280,7 @@ class CmppJuMengYiDongMarketing extends Pzlife
 
                         echo $Sequence_Id . "\n";
                         try {
-
+                            $receive = 1;
                             //先接收
                             while (true) {
                                 $headData = socket_read($socket, 12);
@@ -435,8 +435,9 @@ class CmppJuMengYiDongMarketing extends Pzlife
 
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                                         $new_Total_Length = strlen($new_body) + 12;
-                                        $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id2']);
-                                        // socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
+                                        socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                                        $receive = 2;
                                     } else if ($head['Command_Id'] == 0x00000008) {
                                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                                     } else if ($head['Command_Id'] == 0x80000008) {
@@ -575,7 +576,9 @@ class CmppJuMengYiDongMarketing extends Pzlife
                                 $Command_Id  = 0x00000008; //保持连接
                                 $Total_Length = 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                socket_write($socket, $headData, $Total_Length);
+                                if ( $receive != 2) {
+                                    socket_write($socket, $headData, $Total_Length);
+                                }
                                 sleep(1);
                             }
 
