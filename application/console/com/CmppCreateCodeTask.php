@@ -1733,7 +1733,7 @@ class CmppCreateCodeTask extends Pzlife
                     // $request_url .= 'task_no=' . $task[0]['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['Submit_time'];
                     if ($task[0]['uid'] == 47 || $task[0]['uid'] == 49 || $task[0]['uid'] == 51 || $task[0]['uid'] == 52 || $task[0]['uid'] == 53 || $task[0]['uid'] == 54 || $task[0]['uid'] == 55) { //推送给美丽田园
                         // https://zhidao.baidu.com/question/412076997.html
-                        if (strpos($send_log['content'], '问卷') !== false) {
+                        if (strpos($send_log['content'], '评价') !== false) {
                             $request_url = "http://116.228.60.189:15901/rtreceive?";
                             $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
                         } else {
