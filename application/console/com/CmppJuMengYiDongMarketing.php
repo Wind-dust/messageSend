@@ -43,9 +43,9 @@ class CmppJuMengYiDongMarketing extends Pzlife
         return [
             'host'          => "47.106.127.182", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "610666", //企业id  企业代码
-            'Shared_secret' => '123456', //网关登录密码
-            'Service_Id'    => "610666", //业务代码
+            'Source_Addr'   => "440667", //企业id  企业代码
+            'Shared_secret' => '123ABC', //网关登录密码
+            'Service_Id'    => "440667", //业务代码
             'template_id'   => "", //模板id
             'Dest_Id'       => "1069610666", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
@@ -78,11 +78,11 @@ class CmppJuMengYiDongMarketing extends Pzlife
             'mar_task_id' => '',
             'content'     => '【美丽田园】尊敬的顾客您好！即日起非会员只需支付212元即可尊享指定护理一折体验，每月前20位体验顾客加赠精美化妆包1个，10/22-12/31日我和万象城有个约会，万象城全体员工恭候您的体验，竭诚为您的皮肤保驾护航！详询：021-54700816 回T退订',
         ])); */
-        /*     $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
-            'content'     => '【美丽田园】尊敬的顾客您好！万象城全体员工恭候您的体验，竭诚为您的皮肤保驾护航！详询：021-54700816 回T退订',
-        ])); */
+            'content'     => '【丝芙兰】尊贵的黑卡会员 杨蕾，祝您生日快乐！三重生日豪礼，伴您享受生日喜悦！一重奏:【丝芙兰门店明星礼包】二重奏: 【丝芙兰官网50元电子礼券】三重奏:生日月订单享受一次双倍积分礼遇。会员生日福利，明星热卖产品大放送！请于2020-05-20前至丝芙兰官网sephora.cn 、App、小程序或门店领取您的专属生日礼物！以上三重生日礼，皆不可与其他优惠叠加使用。/回T退订',
+        ]));
 
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/18.log";
