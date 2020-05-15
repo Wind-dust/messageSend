@@ -92,6 +92,509 @@ class SflUpload extends Pzlife {
         }
     }
 
+    public function fileCheck(){
+        // $path = 'D:\Dev\Dev.Data\www\messageSend\uploads\SFL\MMS\100088234_20200424155750.zip';
+        // echo md5_file($path);
+        // 25c9bf2d94b4106dff22399dd41e7321
+        // 25c9bf2d94b4106dff22399dd41e7321
+        $path = '';
+        //校验成功后推送核验成功
+    }
+
+    //文件夹解压并上传彩信模板
+    public function unZip(){
+        $redis = Phpredis::getConn();
+        ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
+        $zip          = new ZipArchive();
+        $path      = realpath("") . "/uploads/SFL/";
+        $path_data = $this->getDirContent($path);
+        // print_r($path_data);
+        if ($path_data == false) {
+            exit("This Dir IS null");
+        }
+        if ($path_data == false) {
+            exit("This Dir IS null");
+        }
+
+        //队列名称
+        $mms_send_had_file = "sftp:mms:sfl:hadsendfile";//sftp彩信丝芙兰已发送
+        $mms_send_have_file = "sftp:mms:sfl:havesendfile";//sftp彩信丝芙兰待发送
+        $sms_send_model = "sftp:sms:sfl:model";//sftp短信模板
+        $sms_send_had_file = "sftp:sms:sfl:hadsendfile";//sftp短信丝芙兰已发送
+        $sms_send_have_file = "sftp:sms:sfl:havesendfile";//sftp短信丝芙兰待发送
+        try {
+            foreach ($path_data as $key => $value) {
+                //进入二级目录 MMS 或者 SMS 等
+                //跳过本地解压文件夹
+                if ($value == 'UnZip') {
+                    continue;
+                }
+                $son_path_data = $this->getDirContent($path . $value);
+                if ($value == 'MMS') {
+                    $send_data = [];
+                    if ($son_path_data !== false) {
+
+                        foreach ($son_path_data as $skey => $svalue) {
+                            $son_path = '';
+                            $son_path = $path . $value . "/" . $svalue;
+                            // $file = fopen($path.$value."/".$svalue,"r");
+                            $file_info = explode('.', $svalue);
+                            if ($file_info[1] == 'zip') { //需要解压
+                                //开始解压
+                                if ($zip->open($son_path) === true) {
+                                    $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0];//解压目录
+                                    $count = $zip->numFiles;
+                                    // $results = [];
+                                    $files_name = [];
+                                    for ($i = 0; $i < $count; $i++) {
+                                        $entry = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
+                                        $entry['name'] = rtrim(str_replace('\\', '/', $entry['name']), '/');
+                                        $encoding = mb_detect_encoding($entry['name'], array('Shift_JIS','EUC_JP','EUC_KR','KOI8-R','ASCII','GB2312','GBK','BIG5','UTF-8'));
+                                        $filename = iconv($encoding, 'UTF-8', $entry['name']);
+                                        $filename = $filename ?: $entry['name'];
+                                        $size = $entry['size'];
+                                        $comp_size = $entry['comp_size'];
+                                        $mtime = $entry['mtime'];
+                                        $crc = $entry['crc'];
+                                        $is_dir = ($crc == 0);
+                                        // $path = '/' . $filename;
+                                      
+                                        $_names = explode('/', $filename);
+                                        $_idx = count($_names)-1;
+                                        
+                                        $name = $_names[$_idx];
+                                        if (empty($name)) {
+                                            continue;
+                                        }
+                                        $files_name[] = $name;
+                                        $index = $i;
+                                        //$data = $zip->getFromIndex($i);
+                                        $entry = compact('name', 'path', 'size', 'comp_size', 'mtime', 'crc', 'index', 'is_dir');
+                                        // $results[] = $entry;
+                                    }
+                                    // print_r($files_name);die;
+                                    $mcw    = $zip->extractTo($unpath,$files_name); //解压到$route这个目录中
+                                    // // $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
+                                    $zip->close();
+                                    //解压完成
+                                    //获取解压完成地址
+                                    $unzip = $this->getDirContent($unpath);
+                                    //先上传模板内容
+
+                                    //发送内容跳出并写入待处理缓存
+                                    if (strpos($file_info[0], "targets")) {
+                                        foreach ($unzip as $ukey => $uvalue) {
+                                            $send_data[] = $unpath . '/' . $uvalue;
+                                        }
+                                        continue;
+                                    }
+                                    $fram_model = [];
+                                    foreach ($unzip as $ukey => $uvalue) {
+                                        $fram         = [];
+                                        $un_file_info = explode('.', $uvalue);
+                                        // if ($un_file_info[1] == 'jpg') { //图片
+
+                                        // }elseif ($un_file_info[1] == '') {}
+                                        $son_dir_path = $unpath . "/" . $uvalue;
+                                        if ($uvalue == '1.jpg' || $uvalue == '1.gif') {
+
+                                            //调用内部api 上传图片
+                                            $data = [
+                                                'appid'  => '5e17e42ae9fe3',
+                                                'appkey' => 'da1416c4d51b8edd58596ca4b56ca267',
+                                                'image'  => new CURLFile($son_dir_path, 'image', $uvalue),
+                                            ];
+                                            $info = $this->uploadFileToBase($data);
+                                            // $result = sendRequest('', 'post',  $data);
+                                            // $fileInfo = $this->getInfo($image);
+
+                                            if (isset($info['code']) && $info['code'] == 200) {
+                                                $fram['num']        = 1;
+                                                $fram['name']       = "第一帧";
+                                                $fram['image_path'] = filtraImage(Config::get('qiniu.domain'), $info['image_path']);
+                                                $fram_model[]       = $fram;
+                                                // array_push($fram, $fram_model);
+                                            }
+                                        } else if ($uvalue == '1.txt') {
+                                            $fram['content'] = '';
+                                            $txt             = $this->readForTxtToArray($son_dir_path);
+                                            $fram['num']     = 2;
+                                            $fram['name']    = "第二帧";
+                                            
+                                            $fram['content'] = join('\\n', $txt);
+                                            
+                                            if (strpos($fram['content'],'【丝芙兰】') !== false) {
+                                            }else{
+                                                $fram['content'] = '【丝芙兰】'.$fram['content'];
+                                            }
+                                            // print_r($fram['content']);
+                                            
+                                            // die;
+                                            $fram_model[]    = $fram;
+                                            // array_push($fram, $fram_model);
+                                        } else if ($uvalue == '2.jpg' || $uvalue == '2.gif') {
+                                            $data = [
+                                                'appid'  => '5e17e42ae9fe3',
+                                                'appkey' => 'da1416c4d51b8edd58596ca4b56ca267',
+                                                'image'  => new CURLFile($son_dir_path, 'image', $uvalue),
+                                            ];
+                                            // $info = $this->uploadFileToBase($data);
+                                            // $result = sendRequest('', 'post',  $data);
+                                            // $fileInfo = $this->getInfo($image);
+                                            if (isset($info['code']) && $info['code'] == 200) {
+                                                $fram['num']        = 3;
+                                                $fram['name']       = "第三帧";
+                                                $fram['image_path'] = filtraImage(Config::get('qiniu.domain'), $info['image_path']);
+                                                $fram_model[]       = $fram;
+                                                // array_push($fram, $fram_model);
+                                            }
+                                        } else if ($uvalue == '2.txt') {
+                                            $txt             = $this->readForTxtToArray($son_dir_path);
+                                            $fram['num']     = 4;
+                                            $fram['name']    = "第四帧";
+                                           
+                                            $fram['content'] = join('\n', $txt);
+                                            $fram_model[]    = $fram;
+                                            // array_push($fram, $fram_model);
+                                        } elseif ($uvalue == 'SUBJECT.txt') { //标题
+                                            $txt                 = $this->readForTxtToArray($son_dir_path);
+                                            $fram_model['title'] = $txt[0];
+                                        }
+                                    }
+                                    $all_models[$file_info[0]] = $fram_model;
+                                    // print_r($all_models);
+                                    // die;
+                                }
+                            } else if ($file_info[1] == 'txt') {
+                                $file_data = $this->readForTxtToDyadicArray($son_path); //关联关系
+
+                                // print_r($son_path);
+                                // die;
+                            }
+                        }
+                        
+                        //创建模板
+                        /* (
+                        [0] => "100178136"
+                        [1] => "白卡会员积分近1500"
+                        [2] => "6"
+                        [3] => "100088234"
+                        [4] => "100088234_20200424155750.zip"
+                        [5] => "2020-04-24 00:00:00"
+                        ) */
+
+                        foreach ($file_data as $fkey => $fvalue) {
+
+                            $sfl_model = [];
+                            $sfl_model = [
+                                'sfl_relation_id'    => $fvalue[0], //对应communication_channel_id 渠道id 关联target目标的唯一识别码
+                                'sfl_model_name'     => $fvalue[1], //communication_name 渠道名称
+                                'sfl_model_id'       => $fvalue[3], //模板id
+                                'sfl_model_filename' => $fvalue[4], //主题的名称 对应MMS模板的主题 图片以及内容的压缩文件
+                            ];
+                            $fram_key           = explode('.', $fvalue[4]);
+                            $sfl_SMS_fram       = $all_models[$fram_key[0]];
+                            $sfl_model['title'] = $sfl_SMS_fram['title'];
+                            $sfl_model['create_time'] =time();
+                            unset($sfl_SMS_fram['title']);
+                            if (Db::query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
+                                continue;
+                            }
+                            $sfl_multimedia_template_id = Db::table('yx_sfl_multimedia_template')->insertGetId($sfl_model);
+
+                            // print_r($sfl_SMS_fram);
+                            foreach ($sfl_SMS_fram as $key => $value) {
+                                // # code...
+                                $value['sfl_multimedia_template_id'] = $sfl_multimedia_template_id;
+                                $value['sfl_model_id']               = $fvalue[3];
+                                $value['create_time']               = time();
+                                Db::table('yx_sfl_multimedia_template_frame')->insert($value);
+                            }
+
+                        }
+                        // print_r($file_data);die;
+                        //发送内容并 进行拼接
+
+                        if (!empty($send_data)) {
+                            foreach ($send_data as $key => $value) {
+                                // print_r($redis->hset($mms_send_had_file,$value,1));
+                                if ($redis->hget($mms_send_had_file,$value)) {
+                                    continue;
+                                }
+                                $redis->hset($mms_send_have_file,$value,1);
+                            }
+                        }
+
+                        // print_r($model_check);
+                       
+                        // continue;
+                      
+                        // print_r($MMSmessage);
+                        // die;
+                    }
+                } elseif ($value == 'SMS') {
+                    $send_data = [];
+                    $SMS_model = [];
+                    $SMSmessage = [];
+                    $model_check = [];
+                    if ($son_path_data !== false) {
+                        foreach ($son_path_data as $skey => $svalue) {
+                            $son_path = $path . $value . "/" . $svalue;
+                            // $file = fopen($path.$value."/".$svalue,"r");
+                            $file_info = explode('.', $svalue);
+                            if ($file_info[1] == 'zip') { //需要解压
+                                if ($zip->open($son_path) === true) {
+                                    $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0];
+                                    $count = $zip->numFiles;
+                                    // $results = [];
+                                    $files_name = [];
+                                    for ($i = 0; $i < $count; $i++) {
+                                        $entry = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
+                                        $entry['name'] = rtrim(str_replace('\\', '/', $entry['name']), '/');
+                                        $encoding = mb_detect_encoding($entry['name'], array('Shift_JIS','EUC_JP','EUC_KR','KOI8-R','ASCII','GB2312','GBK','BIG5','UTF-8'));
+                                        $filename = iconv($encoding, 'UTF-8', $entry['name']);
+                                        $filename = $filename ?: $entry['name'];
+                                        $size = $entry['size'];
+                                        $comp_size = $entry['comp_size'];
+                                        $mtime = $entry['mtime'];
+                                        $crc = $entry['crc'];
+                                        $is_dir = ($crc == 0);
+                                        // $path = '/' . $filename;
+                                      
+                                        $_names = explode('/', $filename);
+                                        $_idx = count($_names)-1;
+                                        
+                                        $name = $_names[$_idx];
+                                        if (empty($name)) {
+                                            continue;
+                                        }
+                                        $files_name[] = $name;
+                                        $index = $i;
+                                        //$data = $zip->getFromIndex($i);
+                                        $entry = compact('name', 'path', 'size', 'comp_size', 'mtime', 'crc', 'index', 'is_dir');
+                                        // $results[] = $entry;
+                                    }
+                                    // print_r($files_name);die;
+                                    $mcw    = $zip->extractTo($unpath,$files_name); //解压到$route这个目录中
+                                    // $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
+                                    $zip->close();
+                                    //解压完成
+                                    $unzip = $this->getDirContent($unpath);
+                                    //先上传模板内容
+                                    // print_r($unzip);
+                                    if (strpos($file_info[0], "targets")) {
+                                        foreach ($unzip as $ukey => $uvalue) {
+                                            $send_data[] = $unpath . '/' . $uvalue;
+                                        }
+                                        continue;
+                                    }
+                                }
+                            } else { //获取模板信息
+                                $file_data = $this->readForTxtToDyadicArray($son_path); //关联关系
+                                // print_r($son_path);die;
+                            }
+
+                        }
+                      
+                        foreach ($file_data as $fkey => $fvalue) {
+                            // print_r($fvalue);
+                            $tem                   = [];
+                            $tem['num']            = $fvalue[2];
+                            $tem['content']        = $fvalue[4];
+                            // $SMS_model[$fvalue[0]] = $tem;
+                            if ($redis->hget($sms_send_model,$fvalue[0])) {
+                                continue;
+                            }
+                            $redis->hset($sms_send_model,$fvalue[0],json_encode($tem));
+                        }
+                        // print_r($SMS_model);
+                        // die;
+                        // print_r($send_data);
+                        foreach ($send_data as $key => $value) {
+                            $txt = [];
+                            // $txt = $this->readForTxtToDyadicArray($value); # code...
+                            if ($redis->hget($sms_send_had_file,$value)) {
+                                continue;
+                            }
+                            $redis->hset($sms_send_have_file,$value,1);
+                        }
+                     
+                    }
+                }
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
+
+    /* sftp 彩信任务拼接 */
+
+    public function sftpSflMms(){
+        $mms_send_had_file = "sftp:mms:sfl:hadsendfile";//sftp彩信丝芙兰已发送
+        $mms_send_have_file = "sftp:mms:sfl:havesendfile";//sftp彩信丝芙兰待发送
+        $mms_send_task = "sftp:mms:sfl:sendtask";
+        $redis = Phpredis::getConn();
+        ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
+        $file_data = $redis->hgetall($mms_send_have_file);
+        // print_r($file_data);
+        if (!empty($file_data)) {
+            foreach ($file_data as $key => $value) {
+                sleep(1);
+                //锁
+
+                if ($redis->setNx($key,1) === FALSE) {
+                    continue;
+                }
+                if (!is_file($key)) {
+                    exit("Thefile IS NOT A FILE");
+                }
+                
+                $file = fopen($key, "r");
+                $data = array();
+                while (!feof($file)) {
+                    $cellVal = trim(fgets($file));
+                    if (!empty($cellVal)) {
+                        // $cellVal = trim($cellVal, '"');
+                        $cellVal = str_replace('"', '', $cellVal);
+                        $value   = explode(',', $cellVal);
+                        // array_push($data, $value);
+                        
+                        $MMS_real_send = [];
+    
+                            $MMS_real_send['mseeage_id']   = $value[0];
+                            $MMS_real_send['mobile']       = $value[3];
+                            $MMS_real_send['free_trial']   = 1;
+                            $MMS_real_send['real_num']     = 1;
+                            $MMS_real_send['send_num']     = 1;
+                            $MMS_real_send['send_status']  = 1;
+                            $MMS_real_send['sfl_model_id'] = 1;
+                            $MMS_real_send['create_time']  = time();
+                            
+                            $variable = [];
+                            $variable = [
+                                '{ACCOUNT_NUMBER}'   => $value[1],
+                                '{MOBILE}'           => $value[3],
+                                '{FULL_NAME}'        => $value[4],
+                                '{POINTS_AVAILABLE}' => $value[5],
+                                '{TOTAL_POINTS}'     => $value[6],
+                                '{RESERVED_FIELD_1}' => $value[7],
+                                '{RESERVED_FIELD_2}' => $value[8],
+                                '{RESERVED_FIELD_3}' => $value[9],
+                                '{RESERVED_FIELD_4}' => $value[10],
+                                '{RESERVED_FIELD_5}' => $value[11],
+                            ];
+    
+                            $MMS_real_send['sfl_relation_id'] = $value[2];
+                            $MMS_real_send['variable'] = $variable;
+                        // print_r($MMS_real_send);die;
+                        $redis->Hset($mms_send_task,json_encode($MMS_real_send),1);
+                          
+                    }
+                }
+                fclose($file);
+                $redis->hset($mms_send_had_file,$key,1);
+                $redis->hdel($mms_send_have_file,$key);
+                //解锁
+                $redis->del($key);
+            }
+        }
+
+    }
+
+    /* 短信任务拼接 */
+
+    public function sftpSflSms(){
+        
+        $sms_send_model = "sftp:sms:sfl:model";//sftp短信模板
+        $sms_send_had_file = "sftp:sms:sfl:hadsendfile";//sftp短信丝芙兰已发送
+        $sms_send_have_file = "sftp:sms:sfl:havesendfile";//sftp短信丝芙兰待发送
+        $sms_send_task = "sftp:sms:sfl:sendtask";
+        $redis = Phpredis::getConn();
+        ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
+        $file_data = $redis->hgetall($sms_send_have_file);
+        // print_r($file_data);
+        if (!empty($file_data)) {
+            foreach ($file_data as $key => $value) {
+                sleep(1);
+                //锁
+               
+                if ($redis->setNx($key,1) === FALSE) {
+                    continue;
+                }
+                if (!is_file($key)) {
+                    exit("Thefile IS NOT A FILE");
+                }
+                $file = fopen($key, "r");
+                $data = array();
+                while (!feof($file)) {
+                    $cellVal = trim(fgets($file));
+                    if (!empty($cellVal)) {
+                        // $cellVal = trim($cellVal, '"');
+                        $cellVal = str_replace('"', '', $cellVal);
+                        $value   = explode(',', $cellVal);
+                        // array_push($data, $value);
+                        $model = $redis->hget($sms_send_model,$value[2]);
+                        if (empty($model)) {
+                            exit("The Sms Model Is Not Null");
+                        }
+                        $model = json_decode($model,true);
+                        $SMS_real_send               = [];
+                        $SMS_real_send               = [];
+                        $SMS_real_send['mseeage_id'] = $value[0];
+                        $SMS_real_send['mobile']     = $value[3];
+                        $SMS_real_send['free_trial'] = 1;
+                        // $SMS_real_send['real_num'] = 1;
+                        $SMS_real_send['send_num']     = 1;
+                        $SMS_real_send['send_status']  = 1;
+                        $SMS_real_send['template_id'] = $value[2];
+                        $SMS_real_send['create_time']  = time();
+                        $content                       = $model['content'];
+                        $content                       = str_replace('{FULL_NAME}', $value[4], $content);
+                        $content                       = str_replace('{RESERVED_FIELD_1}', $value[7], $content);
+                        $content                       = str_replace('{RESERVED_FIELD_2}', $value[8], $content);
+                        $content                       = str_replace('{RESERVED_FIELD_3}', $value[9], $content);
+                        $content                       = str_replace('{RESERVED_FIELD_4}', $value[10], $content);
+                        $content                       = str_replace('{RESERVED_FIELD_5}', $value[11], $content);
+                        $content                       = str_replace('{ACCOUNT_NUMBER}', $value[1], $content);
+                        $content                       = str_replace('{MOBILE}', $value[3], $content);
+                        $content                       = str_replace('{POINTS_AVAILABLE}', $value[5], $content);
+                        $content                       = str_replace('{TOTAL_POINTS}', $value[6], $content);
+                        if (strpos($content,'【丝芙兰】') !== false) {
+                           
+                        }else{
+                            $content = '【丝芙兰】'.$content;
+                        }
+                        if (strpos($content,'回T退订') !== false) {
+                           
+                        }else{
+                            $content = $content."/回T退订";
+                        }
+                        // print_r($content);die;
+                        $send_length = mb_strlen($content, 'utf8');
+                        $real_length = 1;
+                        if ($send_length > 70) {
+                            $real_length = ceil($send_length / 67);
+                        }
+                        $SMS_real_send['task_content'] = $content;
+                        $SMS_real_send['real_num'] = $real_length;
+                        $SMS_real_send['send_length'] = $send_length;
+                        $redis->Hset($sms_send_task,json_encode($SMS_real_send),1);
+                       
+                    }
+                }
+                fclose($file);
+                $redis->hset($sms_send_had_file,$key,1);
+                $redis->hdel($sms_send_have_file,$key);
+                //解锁
+                $redis->del($key);
+
+            }
+        }
+    }
+
+    /* sftp 彩信任务入库 */
+    
+    /* sftp 短信任务入库 */
     public function sflZip() {
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $this->upload = new Imageupload();
@@ -761,46 +1264,55 @@ class SflUpload extends Pzlife {
             // $sftp = new SFTPConnection("10.157.52.197", 20981);
             // $sftp->login("CHN-SMSDATA-sms", "TZYB@zn7");
             // $sftp->uploadFile("/CN-SMSDATA", "/tmp/to_be_received");
-            /* $host     = "47.103.200.251";
+            $host     = "47.103.200.251";
             $prot     = "22";
             $username = "root";
-            $password = "a!s^d(7)#f@g&h(9)"; */
-             $host = "esftp.sephora.com.cn";
+            $password = "a!s^d(7)#f@g&h(9)";
+            /*  $host = "esftp.sephora.com.cn";
             $prot = "20981";
             $username = "CHN-SMSDATA-sms";
-            $password = "TZYB@zn7";
+            $password = "TZYB@zn7"; */
             $sftp = new SFTPConnection($host, $prot);
             $sftp->login($username, $password);
             //本地目录
-            $local_directory = "/uploads/SFL/";
+            $env = getenv('tmp');
+            if (!empty($env)) {
+                $local_directory = $env;
+            }else{
+                $local_directory = "/tmp/sftp/SFL";
+            }
+           
             //远程目录
             // $remote_directory = "/root/club776/";
             $remote_directory_host = "/CN-SMSDATA/";
             //判断远程目录是否存在
             $address = $sftp->dirExits($remote_directory_host);
-            // print_r();die;
             $remote_directory_data = [];
             if ($address) {
-                if (!empty($remote_directory_data)) {
-                    foreach ($remote_directory_data as $key => $value) {
-                        $this_directory = $remote_directory_data . $value . "/";
-                        $sms            = $sftp->scanFileSystem($this_directory);
-                        print_r($sms);
-                        die;
-                        if (!empty($sms)) {
-                            //下载文件
-                            // $sftp->downFile("/root/club776/","/uploads/excel");
-                            // $sftp->downFile(realpath("")."/uploads/excel/mysql.sh","/root/club776/mysql.sh");
-                            foreach ($sms as $key => $value) {
-                                //下载远程文件
-                                $sftp->downFile(realpath("") . $local_directory . $value, $this_directory . $value);
-                                //解压至文件目录
+                $this_directory = '';
+                $this_directory = $remote_directory_host;
+                $address_son = $sftp->scanFileSystem($this_directory);
+                if (!empty($address_son)) {
+                    foreach ($address_son as $key => $value) {
+                        $son_directory = $this_directory.'/' . $value . "/";
+                        $sms            = $sftp->scanFileSystem($son_directory);
+                        foreach ($sms as $key => $svalue) {
+                            //下载远程文件
+                            if (!empty($env)) {
+                                // print_r("本地路径：" .realpath("./").'/uploads/SFL/' . $value);die;
+                                // echo "\n";
+                                // print_r("远程文件：".realpath("") . $son_directory . $svalue);
+                                $sftp->downFile( realpath("./").'/uploads/SFL/' . $value, $son_directory . $svalue);
+                            }else{
+                                $local_directory = "/tmp/sftp/SFL";
+                                $sftp->downFile($local_directory . $value, $son_directory . $svalue);
                             }
-                            // ssh2_scp_recv($cn,"\"".$remote_file_name."\"",$local_path."/".$remote_file_name); //OK
-
+                          
+                            //解压至文件目录
                         }
                     }
                 }
+               
                 //    $sftp->uploadFile("/root/club776/", "/tmp/to_be_received");
                 //获取远程目录下文件
 
