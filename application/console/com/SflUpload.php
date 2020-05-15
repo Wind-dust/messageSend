@@ -982,13 +982,12 @@ class SflUpload extends Pzlife {
                                         continue;
                                     }
                                 }
-                            } else { //获取模板信息
+                            } elseif ($file_info[1] == 'txt') { //获取模板信息
                                 $file_data = $this->readForTxtToDyadicArray($son_path); //关联关系
                                 // print_r($son_path);die;
                             }
 
                         }
-                        print_r($file_data);die;
                         foreach ($file_data as $fkey => $fvalue) {
                             // print_r($fvalue);
                             $tem                   = [];
