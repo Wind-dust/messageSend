@@ -306,10 +306,10 @@ return $result;
         }
         $userEquities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 5], 'id,agency_price,num_balance', true);
         if (empty($userEquities)) {
-            return ['code' => '3005'];
+            return ['code' => '3008'];
         }
         if ($user['user_status'] != 2) {
-            return ['code' => '3006'];
+            return ['code' => '3009'];
         }
         $send_num = count(array_filter($Mobiles));
 
@@ -377,7 +377,7 @@ return $result;
         } catch (\Exception $e) {
             // exception($e);
             Db::rollback();
-            return ['code' => '3009'];
+            return ['code' => '3012'];
         }
         // $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageMarketingSend');
         // foreach ($effective_mobile as $key => $value) {
@@ -811,7 +811,7 @@ return $result;
         $send_num = count($mobile_content);
         $real_num = count($real_mobile); //真实发送数量
         if ($send_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
-            return ['code' => '3007'];
+            return ['code' => '3001'];
         }
         $channel_id = 0;
         $free_trial = 1;
