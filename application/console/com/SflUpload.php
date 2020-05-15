@@ -988,7 +988,7 @@ class SflUpload extends Pzlife {
                             }
 
                         }
-                      
+                        print_r($file_data);die;
                         foreach ($file_data as $fkey => $fvalue) {
                             // print_r($fvalue);
                             $tem                   = [];
