@@ -43,14 +43,14 @@ class CmppJuMengLianDianMarketing extends Pzlife
         return [
             'host'          => "47.106.127.182", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "240666", //企业id  企业代码
+            'Source_Addr'   => "440666", //企业id  企业代码
             'Shared_secret' => '123456', //网关登录密码
-            'Service_Id'    => "240666", //业务代码
+            'Service_Id'    => "440666", //业务代码
             'template_id'   => "", //模板id
-            'Dest_Id'       => "1069240666", //短信接入码 短信端口号 服务代码
+            'Dest_Id'       => "1069440666", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
-            'master_num'    => 300,
+            'master_num'    => 500,
         ];
     }
 
