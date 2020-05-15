@@ -5168,8 +5168,8 @@ class CmppCreateCodeTask extends Pzlife
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $this->redis = Phpredis::getConn();
-        $start_time = strtotime('2020-05-08 20:00:00');
-        $end_time   = strtotime("2020-05-10 20:00:00");
+        $start_time = strtotime('2020-05-10 20:00:00');
+        $end_time   = strtotime("2020-05-12 20:00:00");
         $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "') AND `status_message` = '' ");
         // echo "SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' " ;die;
         // echo count($mul_task);die;
@@ -5552,9 +5552,10 @@ class CmppCreateCodeTask extends Pzlife
     /* SFL sftp 独立发送体系 */
     /* 短信模块 */
     public function SendSflTask(){
+        $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        /* for ($i=1; $i < 31; $i++) { 
+       /*  for ($i=1; $i < 31; $i++) { 
             $this->redis->rpush('index:meassage:sflmessage:sendtask',$i);
         } */
         $ids = [];
@@ -5567,7 +5568,7 @@ class CmppCreateCodeTask extends Pzlife
             $ids[] = $task_id;
             $j++;
             if ($j > 100) {
-                $all_send_task = Db::query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (".join(',',$ids).") ");
+                $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (".join(',',$ids).") ");
                 foreach ($all_send_task as $key => $value) {
                     if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                         continue;
@@ -5608,7 +5609,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'from'        => 'yx_sfl_send_task',
                             ])); //三体营销通道
                         }else{
-                            Db::table('yx_sfl_send_task_receipt')->insert([
+                            $mysql_connect->table('yx_sfl_send_task_receipt')->insert([
                                 'mseeage_id'      => $value['mseeage_id'],
                                 'template_id'      => $value['template_id'],
                                 'task_id' => $value['id'],
@@ -5619,7 +5620,7 @@ class CmppCreateCodeTask extends Pzlife
                         }
                         
                     }else{
-                        Db::table('yx_sfl_send_task_receipt')->insert([
+                        $mysql_connect->table('yx_sfl_send_task_receipt')->insert([
                             'mseeage_id'      => $value['mseeage_id'],
                             'template_id'      => $value['template_id'],
                             'task_id' => $value['id'],
@@ -5637,7 +5638,7 @@ class CmppCreateCodeTask extends Pzlife
        
        
         if (!empty($ids)) {
-            $all_send_task = Db::query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (".join(',',$ids).") ");
+            $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (".join(',',$ids).") ");
             foreach ($all_send_task as $key => $value) {
                 if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                     continue;
@@ -5679,7 +5680,7 @@ class CmppCreateCodeTask extends Pzlife
                             'from'        => 'yx_sfl_send_task',
                         ])); //三体营销通道
                     }else{
-                        Db::table('yx_sfl_send_task_receipt')->insert([
+                        $mysql_connect->table('yx_sfl_send_task_receipt')->insert([
                             'mseeage_id'      => $value['mseeage_id'],
                             'template_id'      => $value['template_id'],
                             'task_id' => $value['id'],
@@ -5690,7 +5691,7 @@ class CmppCreateCodeTask extends Pzlife
                     }
                    
                 }else{
-                    Db::table('yx_sfl_send_task_receipt')->insert([
+                    $mysql_connect->table('yx_sfl_send_task_receipt')->insert([
                         'mseeage_id'      => $value['mseeage_id'],
                         'template_id'      => $value['template_id'],
                         'task_id' => $value['id'],
@@ -5707,8 +5708,9 @@ class CmppCreateCodeTask extends Pzlife
     /* 彩信模块 */
     public function SendSflMulTask(){
         $this->redis = Phpredis::getConn();
+        $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        /* for ($i=1; $i < 31; $i++) { 
+      /*   for ($i=1; $i < 31; $i++) { 
             $this->redis->rpush('index:meassage:sflmulmessage:sendtask',$i);
         } */
         $ids = [];
@@ -5722,7 +5724,7 @@ class CmppCreateCodeTask extends Pzlife
                 $ids[] = $task_id;
                 $j++;
                 if ($j > 100) {
-                    $all_send_task = Db::query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (".join(',',$ids).") ");
+                    $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (".join(',',$ids).") ");
                     foreach ($all_send_task as $key => $value) {
                         if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                             continue;
@@ -5745,10 +5747,10 @@ class CmppCreateCodeTask extends Pzlife
                                         $channel_id = $value['dianxin_channel_id'];
                                     }
                                 }
-                                $mul      = Db::query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '".$value['sfl_relation_id'] ."' LIMIT 1");
+                                $mul      = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '".$value['sfl_relation_id'] ."' LIMIT 1");
                                 // $content_data             = Db::query("select `id`,`content`,`num`,`image_path`,`image_type` from yx_user_multimedia_message_frame where delete_time=0 and `multimedia_message_id` = " . $sendTask['id'] . "  ORDER BY `num` ASC ");
                                 
-                                $fram     = Db::query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '".$mul[0]['id'] ."'");
+                                $fram     = $mysql_connect->query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '".$mul[0]['id'] ."'");
                                 $variable = json_decode($value['variable'], true);
                                 foreach ($fram as $fkey => $fvalue) {
                                     if (!empty($fvalue['content'])) {
@@ -5773,7 +5775,7 @@ class CmppCreateCodeTask extends Pzlife
                                 //正常发送
                                
                             }else{
-                                Db::table('yx_sfl_send_multimediatask_receipt')->insert([
+                                $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insert([
                                     'mseeage_id'      => $value['mseeage_id'],
                                     'template_id'      => $value['sfl_relation_id'],
                                     'task_id' => $value['id'],
@@ -5784,7 +5786,7 @@ class CmppCreateCodeTask extends Pzlife
                             }
                             
                         }else{
-                            Db::table('yx_sfl_send_multimediatask_receipt')->insert([
+                            $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insert([
                                 'mseeage_id'      => $value['mseeage_id'],
                                 'template_id'      => $value['sfl_relation_id'],
                                 'task_id' => $value['id'],
@@ -5802,7 +5804,7 @@ class CmppCreateCodeTask extends Pzlife
            
            
             if (!empty($ids)) {
-                $all_send_task = Db::query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (".join(',',$ids).") ");
+                $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (".join(',',$ids).") ");
                 foreach ($all_send_task as $key => $value) {
                      
                    
@@ -5828,10 +5830,10 @@ class CmppCreateCodeTask extends Pzlife
                                     $channel_id = $value['dianxin_channel_id'];
                                 }
                             }
-                            $mul      = Db::query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '".$value['sfl_relation_id'] ."' LIMIT 1");
+                            $mul      = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '".$value['sfl_relation_id'] ."' LIMIT 1");
                             // $content_data             = Db::query("select `id`,`content`,`num`,`image_path`,`image_type` from yx_user_multimedia_message_frame where delete_time=0 and `multimedia_message_id` = " . $sendTask['id'] . "  ORDER BY `num` ASC ");
                             
-                            $fram     = Db::query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '".$mul[0]['id'] ."'");
+                            $fram     = $mysql_connect->query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '".$mul[0]['id'] ."'");
                             $variable = json_decode($value['variable'], true);
                             foreach ($fram as $fkey => $fvalue) {
                                 if (!empty($fvalue['content'])) {
@@ -5854,7 +5856,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'content'     => $fram,
                             ])); //三体营销通道
                         }else{
-                            Db::table('yx_sfl_send_multimediatask_receipt')->insert([
+                            $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insert([
                                 'mseeage_id'      => $value['mseeage_id'],
                                 'template_id'      => $value['sfl_relation_id'],
                                 'task_id' => $value['id'],
@@ -5865,7 +5867,7 @@ class CmppCreateCodeTask extends Pzlife
                         }
                        
                     }else{
-                        Db::table('yx_sfl_send_multimediatask_receipt')->insert([
+                        $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insert([
                             'mseeage_id'      => $value['mseeage_id'],
                             'template_id'      => $value['sfl_relation_id'],
                             'task_id' => $value['id'],

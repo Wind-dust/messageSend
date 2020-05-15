@@ -555,7 +555,9 @@ class CmppRongHeYiDongMarketing extends Pzlife
                                 $Command_Id  = 0x00000008; //保持连接
                                 $Total_Length = 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                socket_write($socket, $headData, $Total_Length);
+                                if ($receive = !2) {
+                                    socket_write($socket, $headData, $Total_Length);
+                                }
                                 sleep(1);
                             }
 

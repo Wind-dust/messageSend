@@ -581,8 +581,12 @@ class CmppRongHeDianXinMarketing extends Pzlife
                             fwrite($myfile, $e . "\n");
                             fclose($myfile);
                             //  exception($e);
-                            sleep(5);
+                            sleep(20);
                             //重新创建连接
+                            $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
+                                'mobile'      => 15201926171,
+                                'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
+                            ])); //易信行业通道
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                             if (socket_connect($socket, $host, $port) == false) {
                                 $myfile = fopen($log_path, 'a+');
@@ -597,10 +601,7 @@ class CmppRongHeDianXinMarketing extends Pzlife
                                     'mobile'      => 15201926171,
                                     'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
                                 ])); //易信行业通道
-                                $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
-                                    'mobile'      => 15201926171,
-                                    'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
-                                ])); //易信行业通道
+                               
                                 exit();
                             } else {
                                 $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
