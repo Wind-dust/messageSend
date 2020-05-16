@@ -120,6 +120,7 @@ class CmppRongHeYiDongMarketing extends Pzlife
                 echo "认证连接中..." . "\n";
                 $headData = socket_read($socket, 12);
                 if ($headData != false) {
+                    echo "连接成功..." . "\n";
                     $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                     $bodyData = socket_read($socket, $head['Total_Length'] - 12);
                     if ($head['Command_Id'] == 0x80000001) {
@@ -612,7 +613,6 @@ class CmppRongHeYiDongMarketing extends Pzlife
                             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                             fwrite($myfile, $e . "\n");
                             fclose($myfile);
-                             exception($e);
                             $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
                                 'mobile'      => 15201926171,
                                 'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
