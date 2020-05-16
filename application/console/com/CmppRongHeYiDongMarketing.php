@@ -601,7 +601,7 @@ class CmppRongHeYiDongMarketing extends Pzlife
                         }
                         //捕获异常
                         catch (Exception $e) {
-                            if ($send_status == 1) {
+                            if ($send_status == 1 && !isset($send_status)) {
                                 $redis->push($redisMessageCodeSend, $redisMessageCodeSend);
                                 $redis->hset($redisMessageCodeSequenceId, $Sequence_Id);
                             }
@@ -612,7 +612,7 @@ class CmppRongHeYiDongMarketing extends Pzlife
                             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                             fwrite($myfile, $e . "\n");
                             fclose($myfile);
-                            //  exception($e);
+                             exception($e);
                             $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
                                 'mobile'      => 15201926171,
                                 'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
