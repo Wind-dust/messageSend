@@ -492,9 +492,9 @@ return $result;
                     $data['liantong_channel_id'] = 22;
                     $data['dianxin_channel_id'] = 22;
                 }elseif (strpos($Content,'问卷') !== false) {
-                    $data['yidong_channel_id'] = 9;
-                    $data['liantong_channel_id'] = 9;
-                    $data['dianxin_channel_id'] = 9;
+                    $data['yidong_channel_id'] = 18;
+                    $data['liantong_channel_id'] = 19;
+                    $data['dianxin_channel_id'] = 19;
                 }else{
                     $data['yidong_channel_id'] = 60;
                     $data['liantong_channel_id'] = 62;
