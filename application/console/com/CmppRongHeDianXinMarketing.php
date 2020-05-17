@@ -289,6 +289,9 @@ class CmppRongHeDianXinMarketing extends Pzlife
                             //先接收
                             while (true) {
                                 $headData = socket_read($socket, 12);
+                                if (strlen($headData) < 12) {
+                                    continue;
+                                }
                                 if ($headData != false) {
                                     $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                                     $bodyData = socket_read($socket, $head['Total_Length'] - 12);
@@ -316,7 +319,7 @@ class CmppRongHeDianXinMarketing extends Pzlife
                                         }
                                         //通道断口处理
                                         if ($body['Status'] != 0) {
-                                            exit($error_msg);
+                                            exit($error_msg."错误码：".$verify_status);
                                         }
                                     } else if ($head['Command_Id'] == 0x80000004) {
                                         $body = unpack("N2Msg_Id/CResult", $bodyData);

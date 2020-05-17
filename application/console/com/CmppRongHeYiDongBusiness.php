@@ -58,13 +58,13 @@ class CmppRongHeYiDongBusiness extends Pzlife
 
         ])); */
 
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+      /*   $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
             'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
 
-        ]));
+        ])); */
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
         $myfile = fopen($log_path, 'a+');
@@ -146,7 +146,7 @@ class CmppRongHeYiDongBusiness extends Pzlife
                         }
                         //通道断口处理
                         if ($body['Status'] != 0) {
-                            exit($error_msg);
+                            exit($error_msg." 错误代码:".$body['Status']);
                         }
                     } else if ($head['Command_Id'] == 0x80000004) {
                         $body = unpack("N2Msg_Id/CResult", $bodyData);
@@ -239,6 +239,7 @@ class CmppRongHeYiDongBusiness extends Pzlife
                             $stalen = $body['Msg_Length'] - 20 - 8 - 21 - 4;
                             if (strlen($body['Msg_Content']) < 60) {
                                 $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat", $body['Msg_Content']);
+                                $Result = 1;
                             } else {
                                 $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence", $body['Msg_Content']);
                             }
@@ -255,6 +256,7 @@ class CmppRongHeYiDongBusiness extends Pzlife
                                 $mesage['receive_time'] = time(); //回执时间戳
                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                             } else { //不在记录中的回执存入缓存，
+                                $Result = 9;
                                 $mesage['Stat']        = isset($Msg_Content['Stat']) ? $Msg_Content['Stat'] : 'UNKNOWN';
                                 $mesage['Submit_time'] = trim(isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis', time()));
                                 $mesage['Done_time']   = trim(isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis', time()));
@@ -290,6 +292,10 @@ class CmppRongHeYiDongBusiness extends Pzlife
                             while (true) {
                                 $headData = socket_read($socket, 12);
                                 if ($headData != false) {
+                                    if (strlen($headData) < 12) {
+                                        continue;
+                                    }
+                                    
                                     $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                                     $bodyData = socket_read($socket, $head['Total_Length'] - 12);
                                     if ($head['Command_Id'] == 0x80000001) {

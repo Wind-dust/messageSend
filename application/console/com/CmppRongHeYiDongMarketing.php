@@ -290,7 +290,7 @@ class CmppRongHeYiDongMarketing extends Pzlife
                             //先接收
                             while (true) {
                                 $headData = socket_read($socket, 12);
-                                if (strlen($headData['Msg_Content']) < 12) {
+                                if (strlen($headData) < 12) {
                                     continue;
                                 }
                                 if ($headData != false) {
