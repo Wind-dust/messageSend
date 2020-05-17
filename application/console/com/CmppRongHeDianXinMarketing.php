@@ -146,7 +146,7 @@ class CmppRongHeDianXinMarketing extends Pzlife
                         }
                         //通道断口处理
                         if ($body['Status'] != 0) {
-                            exit($error_msg);
+                            exit($error_msg."错误码：".$body['Status']);
                         }
                     } else if ($head['Command_Id'] == 0x80000004) {
                         $body = unpack("N2Msg_Id/CResult", $bodyData);
@@ -319,7 +319,7 @@ class CmppRongHeDianXinMarketing extends Pzlife
                                         }
                                         //通道断口处理
                                         if ($body['Status'] != 0) {
-                                            exit($error_msg."错误码：".$verify_status);
+                                            exit($error_msg."错误码：".$body['Status']);
                                         }
                                     } else if ($head['Command_Id'] == 0x80000004) {
                                         $body = unpack("N2Msg_Id/CResult", $bodyData);
