@@ -5861,8 +5861,8 @@ class CmppCreateCodeTask extends Pzlife
 
     /* 彩信模块 */
     public function SendSflMulTask(){
-        // $this->redis = Phpredis::getConn();
-        $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
+        $this->redis = Phpredis::getConn();
+        // $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
       /*   for ($i=1; $i < 31; $i++) { 
             $this->redis->rpush('index:meassage:sflmulmessage:sendtask',$i);
