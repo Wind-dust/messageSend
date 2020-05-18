@@ -5940,7 +5940,7 @@ class CmppCreateCodeTask extends Pzlife
                             }
                             
                         }else{
-                            $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insert([
+                            Db::table('yx_sfl_send_multimediatask_receipt')->insert([
                                 'mseeage_id'      => $value['mseeage_id'],
                                 'template_id'      => $value['sfl_relation_id'],
                                 'task_id' => $value['id'],

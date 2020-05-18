@@ -156,7 +156,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
         $this->origin = $this->data;
 
         $config = Db::getConfig();
-
         if (empty($this->name)) {
             // 当前模型名
             $name       = str_replace('\\', '/', static::class);
@@ -180,7 +179,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
         if (is_null($this->resultSetType)) {
             $this->resultSetType = $config['resultset_type'];
         }
-
         if (!empty($this->connection) && is_array($this->connection)) {
             // 设置模型的数据库连接
             $this->connection = array_merge($config, $this->connection);

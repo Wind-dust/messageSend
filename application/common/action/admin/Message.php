@@ -735,6 +735,7 @@ class Message extends CommonIndex {
         }
         if (!empty($id)) {
             $result   = DbSendMessage::getSflMultimediaMessage(['id' => $id], '*', true);
+            // echo Db::getLastSQL();die;
             $mul      = DbSendMessage::getSflMultimediaTemplate(['sfl_relation_id' => $result['sfl_relation_id']], '*', true);
             $fram     = DbSendMessage::getSflMultimediaTemplateFrame(['sfl_multimedia_template_id' => $mul['id'], 'sfl_model_id' => $mul['sfl_model_id']], '*', false);
             $variable = json_decode($result['variable'], true);

@@ -11,7 +11,7 @@ class SflSendTask extends Model {
     // 设置当前模型对应的完整数据表名称
     protected $table = 'yx_sfl_send_task';
     // 设置当前模型的数据库连接
-    protected $connection = '';
+    protected $connection = 'db_sflsftp';
     protected $deleteTime = 'delete_time';
     protected $defaultSoftDelete = 0;
     protected $autoWriteTimestamp = true;

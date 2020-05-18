@@ -1117,7 +1117,7 @@ CREATE TABLE `yx_sfl_send_multimediatask_receipt` (
   KEY `task_id_uid_mobile` (`task_id`,`mobile`) USING BTREE,
   KEY `task` (`task_id`) USING BTREE,
   KEY `mobile` (`mobile`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2008832 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='丝芙兰彩信发送回执';
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='丝芙兰彩信发送回执';
 
 
 DROP TABLE IF EXISTS `yx_sfl_send_task_receipt`;
@@ -1136,7 +1136,7 @@ CREATE TABLE `yx_sfl_send_task_receipt` (
   KEY `task_id_uid_mobile` (`task_id`,`mobile`) USING BTREE,
   KEY `task` (`task_id`) USING BTREE,
   KEY `mobile` (`mobile`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2008832 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='丝芙兰营销发送记录表';
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='丝芙兰营销发送记录表';
 
 
 DROP TABLE IF EXISTS `yx_sfl_send_task`;
