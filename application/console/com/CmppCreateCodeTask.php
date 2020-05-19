@@ -3756,7 +3756,7 @@ class CmppCreateCodeTask extends Pzlife
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
-        // $redis->rpush('index:message:receipt:fillpush', json_encode(['uid' => '47', 'start_time' => '1587216387', 'end_time' => '1587219548', 'type' => 'business']));
+        // $redis->rpush('index:message:receipt:fillpush', json_encode(['uid' => '47', 'start_time' => '1587216387', 'end_time' => '1587219548', 'type' => 'business', 'channel_id' => 61]));
         while (true) {
             $real_fill_push = $redis->lpop('index:message:receipt:fillpush');
             if ($real_fill_push) {
@@ -3770,8 +3770,10 @@ class CmppCreateCodeTask extends Pzlife
                     $sql = "SELECT * FROM yx_user_multimedia_message_log ";
                 }
                 $sql .= " WHERE `uid` = '" . $real_fill_push['uid'] . "' AND `create_time` >= '" . $real_fill_push['start_time'] . "' AND  `create_time` <= '" . $real_fill_push['end_time'] . "'";
+                if (isset($real_fill_push['channel_id'])) {
+                    $sql.= " AND `channel_id` = ".$real_fill_push['channel_id'];
+                }
                 $receipt_data = Db::query($sql);
-                // echo count($receipt_data);die;
                 if ($receipt_data) {
                     foreach ($receipt_data as $key => $value) {
                         // echo $value['id'] . "\n";
@@ -6218,6 +6220,7 @@ class CmppCreateCodeTask extends Pzlife
        
     }
 
+    /* 丝芙兰未知补推 */
     public function SflUnknownReceipt(){
         
         $redis = Phpredis::getConn();
@@ -6270,5 +6273,24 @@ class CmppCreateCodeTask extends Pzlife
            
         }
       
+    }
+
+    /* 美田回执推送 */
+    public function MltyReceipt(){
+        $task_log = Db::query("SELECT `*` FROM yx_user_send_code_task_log WHERE `channel_id` = '61' AND `uid` = '47' AND `create_time` >= 1589864233 AND `create_time` <= 1589876607 ");
+        foreach ($task_log as $key => $value) {
+            $request_url = "http://116.228.60.189:15901/rtreceive?";
+            $request_url .= 'task_no=' . trim($value['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($value['mobile']) . "&send_time=" . trim(date('YmdHis', time() - mt_rand(0, 500)));
+            // print_r($request_url);
+            sendRequest($request_url);
+            Db::startTrans();
+            try {
+                Db::table('yx_user_send_code_task_log')->where('id', $value['id'])->update(['status_message' => 'DELIVRD', 'send_status' => 3, 'update_time' => time()]);
+                Db::commit();
+            } catch (\Exception $e) {
+                Db::rollback();
+                exception($e);
+            }
+        }
     }
 }
