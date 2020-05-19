@@ -5500,35 +5500,18 @@ class CmppCreateCodeTask extends Pzlife
         ]; */
 
         $this->redis = Phpredis::getConn();
-
-        // $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode([
-        //     'mobile'      => 13611664019,
-        //                                 'title'       => '【丝芙兰】感谢您成功推荐一位好友加入丝芙兰大家庭，礼物已下发至账户，期待您的领取。即日起至2020-06-07，前往丝芙兰门店无需消费即可领取或在丝芙兰官网、APP、小程序随单赠送。限量5万份，赠完即止。每人最多可享受5次好礼。【限时美礼，与友同享】/回T退订',
-        //                                 'mar_task_id' => 650803,
-        //                                 'content'     => '【丝芙兰】感谢您成功推荐一位好友加入丝芙兰大家庭，礼物已下发至账户，期待您的领取。即日起至2020-06-07，前往丝芙兰门店无需消费即可领取或在丝芙兰官网、APP、小程序随单赠送。限量5万份，赠完即止。每人最多可享受5次好礼。【限时美礼，与友同享】/回T退订',
-        //                                 'from'        => 'yx_user_send_code_task',
-        // ])); //三体营销通道
-       
-        $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode([
-            'mobile'      => 15921904656,
+/*         $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode([
+            'mobile'      => 13424037312,
                                         'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
-                                        'mar_task_id' => 650803,
-                                        'content'     => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
+                                        'mar_task_id' => 806902,
+                                        'content'     => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-17前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
                                         'from'        => 'yx_user_send_code_task',
-        ])); //三体营销通道
-
-        // $res = $this->redis->rpush('index:meassage:code:send' . ":" . 75, json_encode([
-        //     'mobile'      => 13023216322,
-        //                                 'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
-        //                                 'mar_task_id' => 650707,
-        //                                 'content'     => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
-        //                                 'from'        => 'yx_user_send_code_task',
-        // ])); //三体营销通道
+        ])); 
 
         $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode([
-            'mobile'      => 13788982848,
+            'mobile'      => 18813759286,
                                         'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
-                                        'mar_task_id' => 673201,
+                                        'mar_task_id' => 806906,
                                         'content'     => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
                                         'from'        => 'yx_user_send_code_task',
         ])); //三体营销通道
@@ -5547,8 +5530,43 @@ class CmppCreateCodeTask extends Pzlife
                                         'mar_task_id' => 674657,
                                         'content'     => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
                                         'from'        => 'yx_user_send_code_task',
-        ])); //三体营销通道
+        ])); //三体营销通道 */
 
+        $task_id =  Db::query("SELECT `id`,mobile_content,`task_content`,`task_no` FROM `messagesend`.`yx_user_send_code_task` WHERE `uid` = '91' AND `create_time` >= '1589803200' AND `create_time` <= '1589880600' AND `task_content` LIKE '%您的【邀请有礼】优惠券已经到账%'");
+        $ids = [];
+        foreach ($task_id as $key => $value) {
+            // $ids = $value['id'];
+            if (!Db::query("SELECT `id` FROM yx_send_code_task_receipt WHERE `task_id` = ".$value['id'])) {
+                if ($value['mobile_content'] != '13815879494') {
+                    $task_log = Db::query("SELECT `task_content`,`channel_id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '".$value['task_no']."' ");
+                    $res = $this->redis->rpush('index:meassage:code:send' . ":" . $task_log[0]['channel_id'], json_encode([
+                        'mobile'      =>$value['mobile_content'],
+                                                    'title'       => $value['task_content'],
+                                                    'mar_task_id' => $value['id'],
+                                                    'content'     =>  $value['task_content'],
+                                                    'from'        => 'yx_user_send_code_task',
+                    ])); //三体营销通道 */
+                }
+            }
+        }
+
+        $task_id =  Db::query("SELECT `id`,mobile_content,`task_content`,`task_no` FROM `messagesend`.`yx_user_send_code_task` WHERE `uid` = '91' AND `create_time` >= '1589803200' AND `create_time` <= '1589880600' AND `task_content` LIKE '%感谢您成功推荐一位好友加入丝芙兰大家庭%'");
+        $ids = [];
+        foreach ($task_id as $key => $value) {
+            // $ids = $value['id'];
+            if (!Db::query("SELECT `id` FROM yx_send_code_task_receipt WHERE `task_id` = ".$value['id'])) {
+                if ($value['mobile_content'] != '13815879494') {
+                    $task_log = Db::query("SELECT `task_content`,`channel_id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '".$value['task_no']."' ");
+                    $res = $this->redis->rpush('index:meassage:code:send' . ":" . $task_log[0]['channel_id'], json_encode([
+                        'mobile'      =>$value['mobile_content'],
+                                                    'title'       => $value['task_content'],
+                                                    'mar_task_id' => $value['id'],
+                                                    'content'     =>  $value['task_content'],
+                                                    'from'        => 'yx_user_send_code_task',
+                    ])); //三体营销通道 */
+                }
+            }
+        }
     }
 
     /* SFL sftp 独立发送体系 */
