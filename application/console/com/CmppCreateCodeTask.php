@@ -6217,4 +6217,58 @@ class CmppCreateCodeTask extends Pzlife
         }
        
     }
+
+    public function SflUnknownReceipt(){
+        
+        $redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        while (true) {
+            try {
+                $end_time   = strtotime("-3 day");
+                $taskcode = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE `uid` = '91' AND `create_time` >= 1588262400 AND `create_time` <= " . $end_time);
+                $ids = [];
+                foreach ($taskcode as $key => $value) {
+                    $ids[] = $value['id'];
+                }
+                $receipts_id = [];
+                // echo "SELECT `task_id` FROM yx_send_code_task_receipt WHERE `task_id` IN (".join(',',$ids).") GROUP BY `task_id`";die;
+                $task_receipt = Db::query("SELECT `task_id` FROM yx_send_code_task_receipt WHERE `task_id` IN (".join(',',$ids).") GROUP BY `task_id`");
+                foreach ($task_receipt as $key => $value) {
+                    $receipts_id[] = $value['task_id'];
+                }
+                $unknow = array_diff($ids, $receipts_id);
+                if (empty($unknow)) {
+                    sleep(600);
+                    continue;
+                }
+                echo "总数:".count($ids)."\n";
+                echo "已回:".count($receipts_id)."\n";
+                echo "未知:".count($unknow)."\n";
+                $unknow_task = Db::query("SELECT `id`,`task_no`,`mobile_content`,`create_time` FROM yx_user_send_code_task WHERE `id` IN (".join(',',$unknow).") ");
+                foreach ($unknow_task as $key => $value) {
+                    $task_receipt_log = [];
+                    $receive_time = $value['create_time'] + 3600*72 - mt_rand(0,1800);
+                    $task_receipt_log = [
+                        'task_id' => $value['id'],
+                        'mobile' => $value['mobile_content'],
+                        'status_message' => 'DELIVRD',
+                        'create_time' => $receive_time,
+                    ];
+                    Db::table('yx_send_code_task_receipt')->insert($task_receipt_log);
+                    $redis->rpush('index:meassage:code:user:receive:91', json_encode([
+                        'task_no'        => trim($value['task_no']),
+                        'status_message' => 'DELIVRD',
+                        'message_info'   => '发送成功',
+                        'mobile'         => trim($value['mobile_content']),
+                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        'send_time'      => date('Y-m-d H:i:s', $receive_time),
+                    ])); //写入用户带处理日志
+                }
+            } catch (\Exception $th) {
+                exception($th);
+            }
+           
+        }
+      
+    }
 }
