@@ -292,9 +292,9 @@ class CmppRongHeYiDongBusiness extends Pzlife
                             while (true) {
                                 $headData = socket_read($socket, 12);
                                 if ($headData != false) {
-                                    if (strlen($headData) < 12) {
+                                 /*    if (strlen($headData) < 12) {
                                         continue;
-                                    }
+                                    } */
                                     
                                     $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                                     $bodyData = socket_read($socket, $head['Total_Length'] - 12);
