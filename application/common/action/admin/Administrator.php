@@ -777,4 +777,25 @@ class Administrator extends CommonIndex
             print_r($result);die;
         }
     }
+
+    public function sflThirdPartyMMSTemplateReport($channel_id,$sfl_relation_id){
+        $mul      = DbSendMessage::getSflMultimediaTemplate(['sfl_relation_id' => $sfl_relation_id], '*', true);
+        $fram     = DbSendMessage::getSflMultimediaTemplateFrame(['sfl_multimedia_template_id' => $mul['id'], 'sfl_model_id' => $mul['sfl_model_id']], '*', false);
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id], 'id,title,business_id,channel_price', true);
+        if (empty($channel)) {
+            return ['code' => '3002'];
+        }
+        if ($channel_id == 99) {
+
+        }
+        $account = 'C4786051';
+        $title = $mul['title'];
+        $notifyUrl = '';
+        $timestamp = time();
+        foreach ($fram as $key => $value) {
+            # code...
+        }
+        // C4786051
+        // 38gHTjrzh
+    }
 }

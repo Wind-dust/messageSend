@@ -719,7 +719,7 @@ class Administrator extends AdminController
     }
 
     /**
-     * @api              {post} / 第三方彩信模板报备接口
+     * @api              {post} / 第三方彩信模板报备接口(普通彩信)
      * @apiDescription   thirdPartyMMSTemplateReport
      * @apiGroup         admin_Administrator
      * @apiName          thirdPartyMMSTemplateReport
@@ -746,6 +746,37 @@ class Administrator extends AdminController
             return ['code' => '3002', 'msg' => '模板Id 为空'];
         }
         $result = $this->app->administrator->thirdPartyMMSTemplateReport($channel_id,$template_id);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 丝芙兰SFTP第三方彩信模板报备接口
+     * @apiDescription   sflThirdPartyMMSTemplateReport
+     * @apiGroup         admin_Administrator
+     * @apiName          sflThirdPartyMMSTemplateReport
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} sfl_relation_id 模板id
+     * @apiParam (入参) {String} channel_id 通道ID
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:channel_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /admin/administrator/sflThirdPartyMMSTemplateReport
+     * @return array
+     * @author rzc
+     */
+    public function sflThirdPartyMMSTemplateReport(){
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $channel_id = trim($this->request->post('channel_id'));
+        $sfl_relation_id = trim($this->request->post('sfl_relation_id'));
+        if (empty($channel_id) || intval($channel_id) < 1 || !is_numeric($channel_id)) {
+            return ['code' => '3001', 'msg' => '通道id为空'];
+        }
+        if (empty($sfl_relation_id)) {
+            return ['code' => '3002', 'msg' => '模板Id 为空'];
+        }
+        $result = $this->app->administrator->sflThirdPartyMMSTemplateReport($channel_id,$sfl_relation_id);
         return $result;
     }
 }

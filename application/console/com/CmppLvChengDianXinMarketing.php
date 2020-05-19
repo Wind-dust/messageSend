@@ -9,52 +9,48 @@ use Env;
 use Exception;
 use think\Db;
 
-class CmppRongHeYiDongMarketingReport extends Pzlife
-{
+class CmppLvChengDianXinMarketing extends Pzlife {
 
     // protected $redis;
 
-    private function clientSocketInit()
-    {
+    private function clientSocketInit() {
         $this->redis = Phpredis::getConn();
         //        $this->connect = Db::connect(Config::get('database.db_config'));
     }
-    //融合移动营销报备
-    public function content($content)
-    {
+    //绿城移动行业
+    public function content($content) {
         return [
-            'host'          => "39.98.238.240", //服务商ip
+            'host'          => "114.55.53.120", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "379924", //企业id  企业代码
-            'Shared_secret' => '663778', //网关登录密码
-            'Service_Id'    => "379924", //业务代码
+            'Source_Addr'   => "xjyyxx", //企业id  企业代码
+            'Shared_secret' => 'xjyyxl001', //网关登录密码
+            'Service_Id'    => "xjyyxx", //业务代码
             'template_id'   => "", //模板id
-            'Dest_Id'       => "", //短信接入码 短信端口号 服务代码
+            'Dest_Id'       => "4259", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
-            'master_num'    => 160,
+            'master_num'    => 200,
         ];
     }
 
-    public function Send($content)
-    {
+    public function Send($content) {
         // $this->clientSocketInit();
         $redis = Phpredis::getConn();
         date_default_timezone_set('PRC');
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $content                    = 74;
+        $content                    = 82;
         $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
         $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
         $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
         // $redisMessageCodeDeliver    = 'index:meassage:code:deliver:' . $content; //行业通知MsgId
-        $redisMessageCodeDeliver = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
+        $redisMessageCodeDeliver   = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
         $redisMessageUnKownDeliver = 'index:meassage:code:unknow:deliver:' . $content; //行业通知MsgId
         $redisMessageUpRiver       = 'index:message:code:upriver:' . $content; //上行队列
         /*   $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15271120197',
-            'mar_task_id' => '',
-            // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
-            'content'     => '您的验证码是：8791【美丽田园】',
+        'mobile'      => '15271120197',
+        'mar_task_id' => '',
+        // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
+        'content'     => '您的验证码是：8791【美丽田园】',
 
         ])); */
 
@@ -62,12 +58,12 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
-            'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
+            'content'     => '【钰晰科技】您的验证码为2310。',
 
         ])); */
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
-        $myfile = fopen($log_path, 'a+');
+        $myfile   = fopen($log_path, 'a+');
         fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
         fwrite($myfile, " Begin" . "\n");
         fclose($myfile);
@@ -88,7 +84,7 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
         $security_master      = $master_num * $security_coefficient;
 
         $log_path = realpath("") . "/error/" . $content . ".log";
-        $myfile = fopen($log_path, 'a+');
+        $myfile   = fopen($log_path, 'a+');
         fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
         fwrite($myfile, " host:" . $host . " port:" . $port . "\n");
         fclose($myfile);
@@ -105,10 +101,10 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
             $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
             $Timestamp           = date('mdHis');
             $AuthenticatorSource = md5($Source_Addr . pack("a9", "") . $Shared_secret . $Timestamp, true);
-            $bodyData   = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
-            $Command_Id = 0x00000001;
-            $Total_Length = strlen($bodyData) + 12;
-            $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+            $bodyData            = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
+            $Command_Id          = 0x00000001;
+            $Total_Length        = strlen($bodyData) + 12;
+            $headData            = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
             // ;
             if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
                 echo 'write_verify fail massege:' . socket_strerror(socket_last_error());
@@ -120,29 +116,29 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                 echo "认证连接中..." . "\n";
                 $headData = socket_read($socket, 12);
                 if ($headData != false) {
-                    $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
+                    $head     = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                     $bodyData = socket_read($socket, $head['Total_Length'] - 12);
                     if ($head['Command_Id'] == 0x80000001) {
-                        $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
+                        $body          = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
                         $verify_status = $body['Status'];
                         switch ($body['Status']) {
-                            case 0:
-                                break;
-                            case 1:
-                                $error_msg = "消息结构错";
-                                break;
-                            case 2:
-                                $error_msg = "非法源地址";
-                                break;
-                            case 3:
-                                $error_msg = "认证错误";
-                                break;
-                            case 4:
-                                $error_msg = "版本错误";
-                                break;
-                            default:
-                                $error_msg = "其他错误";
-                                break;
+                        case 0:
+                            break;
+                        case 1:
+                            $error_msg = "消息结构错";
+                            break;
+                        case 2:
+                            $error_msg = "非法源地址";
+                            break;
+                        case 3:
+                            $error_msg = "认证错误";
+                            break;
+                        case 4:
+                            $error_msg = "版本错误";
+                            break;
+                        default:
+                            $error_msg = "其他错误";
+                            break;
                         }
                         //通道断口处理
                         if ($body['Status'] != 0) {
@@ -161,45 +157,45 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                         }
 
                         switch ($body['Result']) {
-                            case 0:
-                                echo "发送成功" . "\n";
-                                break;
-                            case 1:
-                                echo "消息结构错" . "\n";
-                                $error_msg = "消息结构错";
-                                break;
-                            case 2:
-                                echo "命令字错" . "\n";
-                                $error_msg = "命令字错";
-                                break;
-                            case 3:
-                                echo "消息序号重复" . "\n";
-                                $error_msg = "消息序号重复";
-                                break;
-                            case 4:
-                                echo "消息长度错" . "\n";
-                                $error_msg = "消息长度错";
-                                break;
-                            case 5:
-                                echo "资费代码错" . "\n";
-                                $error_msg = "资费代码错";
-                                break;
-                            case 6:
-                                echo "超过最大信息长" . "\n";
-                                $error_msg = "超过最大信息长";
-                                break;
-                            case 7:
-                                echo "业务代码错" . "\n";
-                                $error_msg = "业务代码错";
-                                break;
-                            case 8:
-                                echo "流量控制错" . "\n";
-                                $error_msg = "业务代码错";
-                                break;
-                            default:
-                                echo "其他错误" . "\n";
-                                $error_msg = "其他错误";
-                                break;
+                        case 0:
+                            echo "发送成功" . "\n";
+                            break;
+                        case 1:
+                            echo "消息结构错" . "\n";
+                            $error_msg = "消息结构错";
+                            break;
+                        case 2:
+                            echo "命令字错" . "\n";
+                            $error_msg = "命令字错";
+                            break;
+                        case 3:
+                            echo "消息序号重复" . "\n";
+                            $error_msg = "消息序号重复";
+                            break;
+                        case 4:
+                            echo "消息长度错" . "\n";
+                            $error_msg = "消息长度错";
+                            break;
+                        case 5:
+                            echo "资费代码错" . "\n";
+                            $error_msg = "资费代码错";
+                            break;
+                        case 6:
+                            echo "超过最大信息长" . "\n";
+                            $error_msg = "超过最大信息长";
+                            break;
+                        case 7:
+                            echo "业务代码错" . "\n";
+                            $error_msg = "业务代码错";
+                            break;
+                        case 8:
+                            echo "流量控制错" . "\n";
+                            $error_msg = "业务代码错";
+                            break;
+                        default:
+                            echo "其他错误" . "\n";
+                            $error_msg = "其他错误";
+                            break;
                         }
                         if ($body['Result'] != 0) { //消息发送失败
                             echo "发送失败" . "\n";
@@ -207,9 +203,9 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                         } else {
                         }
                     } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
-                        $Result = 0;
-                        $contentlen = $head['Total_Length'] - 65 - 12;
-                        $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
+                        $Result              = 0;
+                        $contentlen          = $head['Total_Length'] - 65 - 12;
+                        $body                = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
                         $Registered_Delivery = trim($body['Registered_Delivery']);
                         print_r($body);
                         if ($Registered_Delivery == 0) { //上行
@@ -230,7 +226,7 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                             }
                             $up_message = [];
                             $up_message = [
-                                'mobile' => trim($body['Src_terminal_Id']),
+                                'mobile'       => trim($body['Src_terminal_Id']),
                                 'message_info' => trim($body['Msg_Content']),
                             ];
                             $redis->rpush($redisMessageUpRiver, json_encode($up_message));
@@ -247,11 +243,11 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                             if ($mesage) {
                                 $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                                 // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
-                                $mesage                = json_decode($mesage, true);
-                                $mesage['Stat']        = $Msg_Content['Stat'];
+                                $mesage         = json_decode($mesage, true);
+                                $mesage['Stat'] = $Msg_Content['Stat'];
                                 // $mesage['Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
-                                $mesage['Submit_time'] = isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis', $mesage['my_submit_time']);
-                                $mesage['Done_time']   = isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis', time());
+                                $mesage['Submit_time']  = isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis', $mesage['my_submit_time']);
+                                $mesage['Done_time']    = isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis', time());
                                 $mesage['receive_time'] = time(); //回执时间戳
                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                             } else { //不在记录中的回执存入缓存，
@@ -259,9 +255,9 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                                 $mesage['Submit_time'] = trim(isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis', time()));
                                 $mesage['Done_time']   = trim(isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis', time()));
                                 // $mesage['mobile']      = $body['Dest_Id '];//手机号
-                                $mesage['mobile']   = isset($Msg_Content['Dest_terminal_Id']) ? $Msg_Content['Dest_terminal_Id'] : '';
+                                $mesage['mobile']       = isset($Msg_Content['Dest_terminal_Id']) ? $Msg_Content['Dest_terminal_Id'] : '';
                                 $mesage['receive_time'] = time(); //回执时间戳
-                                $mesage['Msg_Id']   = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
+                                $mesage['Msg_Id']       = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
                                 $redis->rPush($redisMessageUnKownDeliver, json_encode($mesage));
                             }
                         }
@@ -270,8 +266,10 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
 
                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                         $new_Total_Length = strlen($new_body) + 12;
-                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $body['Msg_Id2']);
+                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id,$head['Sequence_Id']);
                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                        usleep(550);
+                        $receive = 2;
                     } else if ($head['Command_Id'] == 0x00000008) {
                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                     } else if ($head['Command_Id'] == 0x80000008) {
@@ -282,7 +280,7 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                 }
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
                     while (true) {
-
+                        $receipt_data = [];
                         echo $Sequence_Id . "\n";
                         try {
                             $receive = 1;
@@ -290,29 +288,29 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                             while (true) {
                                 $headData = socket_read($socket, 12);
                                 if ($headData != false) {
-                                    $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
+                                    $head     = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                                     $bodyData = socket_read($socket, $head['Total_Length'] - 12);
                                     if ($head['Command_Id'] == 0x80000001) {
-                                        $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
+                                        $body          = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
                                         $verify_status = $body['Status'];
                                         switch ($body['Status']) {
-                                            case 0:
-                                                break;
-                                            case 1:
-                                                $error_msg = "消息结构错";
-                                                break;
-                                            case 2:
-                                                $error_msg = "非法源地址";
-                                                break;
-                                            case 3:
-                                                $error_msg = "认证错误";
-                                                break;
-                                            case 4:
-                                                $error_msg = "版本错误";
-                                                break;
-                                            default:
-                                                $error_msg = "其他错误";
-                                                break;
+                                        case 0:
+                                            break;
+                                        case 1:
+                                            $error_msg = "消息结构错";
+                                            break;
+                                        case 2:
+                                            $error_msg = "非法源地址";
+                                            break;
+                                        case 3:
+                                            $error_msg = "认证错误";
+                                            break;
+                                        case 4:
+                                            $error_msg = "版本错误";
+                                            break;
+                                        default:
+                                            $error_msg = "其他错误";
+                                            break;
                                         }
                                         //通道断口处理
                                         if ($body['Status'] != 0) {
@@ -331,92 +329,120 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                                         }
 
                                         switch ($body['Result']) {
-                                            case 0:
-                                                echo "发送成功" . "\n";
-                                                break;
-                                            case 1:
-                                                echo "消息结构错" . "\n";
-                                                $error_msg = "消息结构错";
-                                                break;
-                                            case 2:
-                                                echo "命令字错" . "\n";
-                                                $error_msg = "命令字错";
-                                                break;
-                                            case 3:
-                                                echo "消息序号重复" . "\n";
-                                                $error_msg = "消息序号重复";
-                                                break;
-                                            case 4:
-                                                echo "消息长度错" . "\n";
-                                                $error_msg = "消息长度错";
-                                                break;
-                                            case 5:
-                                                echo "资费代码错" . "\n";
-                                                $error_msg = "资费代码错";
-                                                break;
-                                            case 6:
-                                                echo "超过最大信息长" . "\n";
-                                                $error_msg = "超过最大信息长";
-                                                break;
-                                            case 7:
-                                                echo "业务代码错" . "\n";
-                                                $error_msg = "业务代码错";
-                                                break;
-                                            case 8:
-                                                echo "流量控制错" . "\n";
-                                                $error_msg = "业务代码错";
-                                                break;
-                                            default:
-                                                echo "其他错误" . "\n";
-                                                $error_msg = "其他错误";
-                                                break;
+                                        case 0:
+                                            echo "发送成功" . "\n";
+                                            break;
+                                        case 1:
+                                            echo "消息结构错" . "\n";
+                                            $error_msg = "消息结构错";
+                                            break;
+                                        case 2:
+                                            echo "命令字错" . "\n";
+                                            $error_msg = "命令字错";
+                                            break;
+                                        case 3:
+                                            echo "消息序号重复" . "\n";
+                                            $error_msg = "消息序号重复";
+                                            break;
+                                        case 4:
+                                            echo "消息长度错" . "\n";
+                                            $error_msg = "消息长度错";
+                                            break;
+                                        case 5:
+                                            echo "资费代码错" . "\n";
+                                            $error_msg = "资费代码错";
+                                            break;
+                                        case 6:
+                                            echo "超过最大信息长" . "\n";
+                                            $error_msg = "超过最大信息长";
+                                            break;
+                                        case 7:
+                                            echo "业务代码错" . "\n";
+                                            $error_msg = "业务代码错";
+                                            break;
+                                        case 8:
+                                            echo "流量控制错" . "\n";
+                                            $error_msg = "业务代码错";
+                                            break;
+                                        default:
+                                            echo "其他错误" . "\n";
+                                            $error_msg = "其他错误";
+                                            break;
                                         }
                                         if ($body['Result'] != 0) { //消息发送失败
                                             echo "发送失败" . "\n";
                                             $error_msg = "其他错误";
                                         } else {
+
                                         }
                                     } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
-                                        $Result = 0;
-                                        $contentlen = $head['Total_Length'] - 65 - 12;
-                                        $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
-                                        $stalen = $body['Msg_Length'] - 20 - 8 - 21 - 4;
-                                        if (strlen($body['Msg_Content']) < 60) {
-                                            $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat", $body['Msg_Content']);
-                                        } else {
-                                            $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence", $body['Msg_Content']);
-                                        }
-                                        print_r($Msg_Content);
-                                        $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
-                                        if ($mesage) {
-                                            $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
-                                            // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
-                                            $mesage                = json_decode($mesage, true);
-                                            $mesage['Stat']        = $Msg_Content['Stat'];
-                                            // $mesage['Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
-                                            $mesage['Submit_time'] = isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis', $mesage['my_submit_time']);
-                                            $mesage['Done_time']   = isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis', time());
-                                            $mesage['receive_time'] = time(); //回执时间戳
-                                            $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
-                                        } else { //不在记录中的回执存入缓存，
-                                            $mesage['Stat']        = isset($Msg_Content['Stat']) ? $Msg_Content['Stat'] : 'UNKNOWN';
-                                            $mesage['Submit_time'] = trim(isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis', time()));
-                                            $mesage['Done_time']   = trim(isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis', time()));
-                                            // $mesage['mobile']      = $body['Dest_Id '];//手机号
-                                            $mesage['mobile']   = isset($Msg_Content['Dest_terminal_Id']) ? $Msg_Content['Dest_terminal_Id'] : '';
-                                            $mesage['receive_time'] = time(); //回执时间戳
-                                            $mesage['Msg_Id']   = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
-                                            $redis->rPush($redisMessageUnKownDeliver, json_encode($mesage));
+                                        $Result              = 0;
+                                        $contentlen          = $head['Total_Length'] - 65 - 12;
+                                        $body                = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
+                                        $Registered_Delivery = trim($body['Registered_Delivery']);
+                                        print_r($body);
+                                        if ($Registered_Delivery == 0) { //上行
+                                            // if ($mesage) { //
+
+                                            // }else{
+
+                                            // }
+                                            if ($body['Msg_Fmt'] == 15) {
+                                                $body['Msg_Content'] = mb_convert_encoding($body['Msg_Content'], 'UTF-8', 'GBK');
+                                            } elseif ($body['Msg_Fmt'] == 0) { //ASCII进制码
+                                                $encode = mb_detect_encoding($body['Msg_Content'], array('ASCII', 'GB2312', 'GBK', 'UTF-8'));
+                                                if ($encode != 'UTF-8') {
+                                                    $body['Msg_Content'] = mb_convert_encoding($body['Msg_Content'], 'UTF-8', $encode);
+                                                }
+                                            } elseif ($body['Msg_Fmt'] == 8) { //USC2
+                                                $body['Msg_Content'] = mb_convert_encoding($body['Msg_Content'], 'UTF-8', 'UCS-2');
+                                            }
+                                            $up_message = [];
+                                            $up_message = [
+                                                'mobile'       => trim($body['Src_terminal_Id']),
+                                                'message_info' => trim($body['Msg_Content']),
+                                            ];
+                                            $redis->rpush($redisMessageUpRiver, json_encode($up_message));
+                                        } elseif ($Registered_Delivery == 1) { //回执报告
+
+                                            $stalen = $body['Msg_Length'] - 20 - 8 - 21 - 4;
+                                            if (strlen($body['Msg_Content']) < 60) {
+                                                $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat", $body['Msg_Content']);
+                                            } else {
+                                                $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence", $body['Msg_Content']);
+                                            }
+                                            print_r($Msg_Content);
+                                            $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
+                                            if ($mesage) {
+                                                $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
+                                                // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
+                                                $mesage         = json_decode($mesage, true);
+                                                $mesage['Stat'] = $Msg_Content['Stat'];
+                                                // $mesage['Msg_Id']        = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
+                                                $mesage['Submit_time']  = isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis', $mesage['my_submit_time']);
+                                                $mesage['Done_time']    = isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis', time());
+                                                $mesage['receive_time'] = time(); //回执时间戳
+                                                $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
+                                            } else { //不在记录中的回执存入缓存，
+                                                $mesage['Stat']        = isset($Msg_Content['Stat']) ? $Msg_Content['Stat'] : 'UNKNOWN';
+                                                $mesage['Submit_time'] = trim(isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis', time()));
+                                                $mesage['Done_time']   = trim(isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis', time()));
+                                                // $mesage['mobile']      = $body['Dest_Id '];//手机号
+                                                $mesage['mobile']       = isset($Msg_Content['Dest_terminal_Id']) ? $Msg_Content['Dest_terminal_Id'] : '';
+                                                $mesage['receive_time'] = time(); //回执时间戳
+                                                $mesage['Msg_Id']       = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
+                                                $redis->rPush($redisMessageUnKownDeliver, json_encode($mesage));
+                                            }
                                         }
                                         print_r($mesage);
                                         $callback_Command_Id = 0x80000005;
 
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                                         $new_Total_Length = strlen($new_body) + 12;
-                                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $body['Msg_Id2']);
+                                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id,$head['Sequence_Id']);
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                                        usleep(550);
                                         $receive = 2;
-                                        usleep(250);
                                     } else if ($head['Command_Id'] == 0x00000008) {
                                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                                     } else if ($head['Command_Id'] == 0x80000008) {
@@ -429,19 +455,23 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                                 }
                             }
                             //在发送
-
+                            /* if (!empty($receipt_data)) {
+                                foreach ($receipt_data as $key => $value) {
+                                    socket_write($socket, $value['new_headData'] . $value['new_body'], $value['new_Total_Length']);
+                                }
+                            } */
                             $send = $redis->lPop($redisMessageCodeSend);
                             if (!empty($send)) { //正式使用从缓存中读取数据并且有待发送数据
 
                                 $send_status = 1;
-                                $send_data = [];
-                                $send_data = json_decode($send, true);
+                                $send_data   = [];
+                                $send_data   = json_decode($send, true);
                                 // $mobile = $senddata['mobile_content'];
-                                $mobile   = $send_data['mobile'];
-                                $txt_head = 6;
-                                $txt_len  = 140;
-                                $max_len  = $txt_len - $txt_head;
-                                $code = $send_data['content']; //带签名
+                                $mobile     = $send_data['mobile'];
+                                $txt_head   = 6;
+                                $txt_len    = 140;
+                                $max_len    = $txt_len - $txt_head;
+                                $code       = $send_data['content']; //带签名
                                 $uer_num    = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
                                 $timestring = time();
                                 echo "发送时间：" . date("Y-m-d H:i:s", time()) . "\n";
@@ -466,7 +496,7 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                                         $bodyData .= pack("a21", $mobile);
                                         $bodyData .= pack("C", 0);
                                         $bodyData .= pack("C", 1);
-                                        // $bodyData.= pack("C", 15); 
+                                        // $bodyData.= pack("C", 15);
                                         $bodyData .= pack("C", 8);
                                         $bodyData .= pack("a6", $Source_Addr);
                                         $bodyData .= pack("a2", 02);
@@ -479,7 +509,7 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                                             $bodyData .= pack("a21", $Dest_Id);
                                         }
                                         $bodyData .= pack("C", $uer_num);
-                                        $p_n      = 21 * $uer_num;
+                                        $p_n = 21 * $uer_num;
                                         $bodyData .= pack("a" . $p_n, $mobile);
                                         $udh     = pack("cccccc", 5, 0, 3, $Sequence_Id, $num_messages, $j + 1);
                                         $newcode = $udh . substr($code, $j * $max_len, $max_len);
@@ -487,9 +517,9 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                                         $bodyData .= pack("C", $len);
                                         $bodyData .= pack("a" . $len, $newcode);
                                         $bodyData .= pack("a8", '');
-                                        $Command_Id = 0x00000004; // 短信发送
-                                        $Total_Length = strlen($bodyData) + 12;
-                                        $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                        $Command_Id                  = 0x00000004; // 短信发送
+                                        $Total_Length                = strlen($bodyData) + 12;
+                                        $headData                    = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                         $send_data['my_submit_time'] = time(); //发送时间戳
                                         $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, json_encode($send_data));
                                         usleep(300);
@@ -502,9 +532,9 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                                         $Sequence_Id = 1;
                                     }
                                     if ($i > $security_master) {
-                                        $i    = 0;
+                                        $i = 0;
                                     }
-                                    usleep(8500);
+                                    usleep(550);
                                     continue;
                                 } else { //单条短信
 
@@ -531,14 +561,14 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                                         $bodyData .= pack("a21", $Dest_Id);
                                     }
                                     $bodyData .= pack("C", $uer_num);
-                                    $p_n      = 21 * $uer_num;
+                                    $p_n = 21 * $uer_num;
                                     $bodyData .= pack("a" . $p_n, $mobile);
-                                    $len      = strlen($code);
+                                    $len = strlen($code);
                                     $bodyData .= pack("C", $len);
                                     $bodyData .= pack("a" . $len, $code);
                                     $bodyData .= pack("a8", '');
                                     $Command_Id = 0x00000004; // 短信发送
-                                    $time = 0;
+                                    $time       = 0;
                                     if ($i > $security_master) {
                                         $time = 1;
                                         $i    = 0;
@@ -550,14 +580,13 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
 
                                     $send_status = 2;
-                                    usleep(8500);
+                                    usleep(550);
                                 }
                             } else { //心跳
-                                $Command_Id  = 0x00000008; //保持连接
+                                $Command_Id   = 0x00000008; //保持连接
                                 $Total_Length = 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                if ( $receive != 2){
-
+                                if ($receive != 2) {
                                     socket_write($socket, $headData, $Total_Length);
                                 }
                                 sleep(1);
@@ -570,7 +599,7 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                             }
                         }
                         //捕获异常
-                        catch (Exception $e) {
+                         catch (Exception $e) {
                             if ($send_status == 1) {
                                 $redis->push($redisMessageCodeSend, $redisMessageCodeSend);
                                 $redis->hset($redisMessageCodeSequenceId, $Sequence_Id);
@@ -578,30 +607,30 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                             socket_close($socket);
 
                             $log_path = realpath("") . "/error/" . $content . ".log";
-                            $myfile = fopen($log_path, 'a+');
+                            $myfile   = fopen($log_path, 'a+');
                             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                             fwrite($myfile, $e . "\n");
                             fclose($myfile);
                             //  exception($e);
-                            sleep(30);
+                            sleep(5);
                             //重新创建连接
                             $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
-                                'mobile'      => 15201926171,
-                                'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
+                                'mobile'  => 15201926171,
+                                'content' => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
                             ])); //易信行业通道
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                             if (socket_connect($socket, $host, $port) == false) {
                                 $myfile = fopen($log_path, 'a+');
                                 fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
-                                fwrite($myfile,  "通道延迟5秒后再次连接失败，请联系通道方检查原因\n");
+                                fwrite($myfile, "通道延迟5秒后再次连接失败，请联系通道方检查原因\n");
                                 fclose($myfile);
                                 $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
-                                    'mobile'      => 15201926171,
-                                    'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
+                                    'mobile'  => 15201926171,
+                                    'content' => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
                                 ])); //三体营销通道
                                 $redis->rpush('index:meassage:code:send' . ":" . 24, json_encode([
-                                    'mobile'      => 15201926171,
-                                    'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
+                                    'mobile'  => 15201926171,
+                                    'content' => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
                                 ])); //易信行业通道
                                
                                 exit();
@@ -609,28 +638,28 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
                                 $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
                                 $Timestamp           = date('mdHis');
                                 $AuthenticatorSource = md5($Source_Addr . pack("a9", "") . $Shared_secret . $Timestamp, true);
-                                $bodyData   = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
-                                $Command_Id = 0x00000001;
-                                $Total_Length = strlen($bodyData) + 12;
-                                $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                $bodyData            = pack("a6a16CN", $Source_Addr, $AuthenticatorSource, $Version, $Timestamp);
+                                $Command_Id          = 0x00000001;
+                                $Total_Length        = strlen($bodyData) + 12;
+                                $headData            = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                 // socket_write($socket, $headData . $bodyData, $Total_Length);
                                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
                                     // echo 'write_verify fail massege:' . socket_strerror(socket_last_error());
                                     $myfile = fopen($log_path, 'a+');
                                     fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
-                                    fwrite($myfile,  "通道延迟5秒后写入socket失败，请联系通道方检查原因\n");
+                                    fwrite($myfile, "通道延迟5秒后写入socket失败，请联系通道方检查原因\n");
                                     fclose($myfile);
                                     $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
-                                        'mobile'      => 15201926171,
-                                        'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
+                                        'mobile'  => 15201926171,
+                                        'content' => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
                                     ])); //三体营销通道
                                     $redis->rpush('index:meassage:code:send' . ":" . 24, json_encode([
-                                        'mobile'      => 15201926171,
-                                        'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
+                                        'mobile'  => 15201926171,
+                                        'content' => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
                                     ])); //易信行业通道
                                     $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
-                                        'mobile'      => 15201926171,
-                                        'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
+                                        'mobile'  => 15201926171,
+                                        'content' => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
                                     ])); //易信行业通道
                                     exit();
                                 }
@@ -645,8 +674,7 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
     }
 
     //16进制转2进制
-    function StrToBin($str)
-    {
+    function StrToBin($str) {
         //1.列出每个字符
         $arr = preg_split('/(?<!^)(?!$)/u', $str);
         //2.unpack字符
@@ -659,8 +687,7 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
         return join('', $arr);
     }
 
-    public function decodeString()
-    {
+    public function decodeString() {
         // echo strlen("³½'¹ ");
         $timestring = time();
         $num1       = substr($timestring, 0, 8);
@@ -682,30 +709,29 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
      * @param string $pdu
      * @return string
      */
-    function combination($num)
-    {
+    function combination($num) {
         $num     = intval($num);
         $num     = strval($num);
         $new_num = '';
         switch (strlen($num)) {
-            case 0:
-                $new_num = "000000";
-                break;
-            case 1:
-                $new_num = "00000" . $num;
-                break;
-            case 2:
-                $new_num = "0000" . $num;
-                break;
-            case 3:
-                $new_num = "000" . $num;
-                break;
-            case 4:
-                $new_num = "00" . $num;
-                break;
-            case 5:
-                $new_num = "0" . $num;
-                break;
+        case 0:
+            $new_num = "000000";
+            break;
+        case 1:
+            $new_num = "00000" . $num;
+            break;
+        case 2:
+            $new_num = "0000" . $num;
+            break;
+        case 3:
+            $new_num = "000" . $num;
+            break;
+        case 4:
+            $new_num = "00" . $num;
+            break;
+        case 5:
+            $new_num = "0" . $num;
+            break;
         }
         return $new_num;
     }
@@ -715,8 +741,7 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
      * @param string $pdu
      * @return string
      */
-    public function pduord($pdu)
-    {
+    public function pduord($pdu) {
         $ord_pdu = '';
         for ($i = 0; $i < strlen($pdu); $i++) {
             $ord_pdu .= sprintf("%02x", ord($pdu[$i])) . ' ';
@@ -735,8 +760,7 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
      * @param type $prefix 前缀，默认:&#
      * @return type
      */
-    function decode($str, $prefix = "&#")
-    {
+    function decode($str, $prefix = "&#") {
         $str = str_replace($prefix, "", $str);
         $a   = explode(";", $str);
         $utf = '';
@@ -755,8 +779,7 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
         return $utf;
     }
 
-    public function getSendCodeTask()
-    {
+    public function getSendCodeTask() {
         $task = Db::query("SELECT * FROM yx_user_send_code_task WHERE `send_status` = 1 ORDER BY id ASC LIMIT 1");
         if ($task) {
             return $task[0];
@@ -764,8 +787,7 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
         return [];
     }
 
-    private function getSendTask($id)
-    {
+    private function getSendTask($id) {
         $getSendTaskSql = sprintf("select * from yx_user_send_task where delete_time=0 and id = %d", $id);
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
@@ -775,8 +797,7 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
         return $sendTask[0];
     }
 
-    private function getSendTaskLog($task_no, $mobile)
-    {
+    private function getSendTaskLog($task_no, $mobile) {
         $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `task_no` = '" . $task_no . "' and `mobile` = '" . $mobile . "'";
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
@@ -786,8 +807,7 @@ class CmppRongHeYiDongMarketingReport extends Pzlife
         return $sendTask[0];
     }
 
-    private function getSendTaskLogByMsgid($msgid)
-    {
+    private function getSendTaskLogByMsgid($msgid) {
         $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `msgid` = '" . $msgid . "'";
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);

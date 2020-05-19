@@ -270,7 +270,7 @@ class CmppLvChengDianXinBusiness extends Pzlife
 
                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                         $new_Total_Length = strlen($new_body) + 12;
-                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $body['Msg_Id2']);
+                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id,$head['Sequence_Id']);
                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                     } else if ($head['Command_Id'] == 0x00000008) {
                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构
@@ -285,7 +285,7 @@ class CmppLvChengDianXinBusiness extends Pzlife
 
                         echo $Sequence_Id . "\n";
                         try {
-
+                            $receive = 1;
                             //先接收
                             while (true) {
                                 $headData = socket_read($socket, 12);
@@ -438,8 +438,10 @@ class CmppLvChengDianXinBusiness extends Pzlife
 
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                                         $new_Total_Length = strlen($new_body) + 12;
-                                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $body['Msg_Id2']);
+                                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id,$head['Sequence_Id']);
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                                        usleep(550);
+                                        $receive = 2;
                                     } else if ($head['Command_Id'] == 0x00000008) {
                                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                                     } else if ($head['Command_Id'] == 0x80000008) {
@@ -527,7 +529,7 @@ class CmppLvChengDianXinBusiness extends Pzlife
                                     if ($i > $security_master) {
                                         $i    = 0;
                                     }
-                                    usleep(670);
+                                    usleep(550);
                                     continue;
                                 } else { //单条短信
 
@@ -573,13 +575,15 @@ class CmppLvChengDianXinBusiness extends Pzlife
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
 
                                     $send_status = 2;
-                                    usleep(670);
+                                    usleep(550);
                                 }
                             } else { //心跳
                                 $Command_Id  = 0x00000008; //保持连接
                                 $Total_Length = 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                socket_write($socket, $headData, $Total_Length);
+                                if ($receive != 2) {
+                                    socket_write($socket, $headData, $Total_Length);
+                                }
                                 sleep(1);
                             }
 
@@ -605,6 +609,10 @@ class CmppLvChengDianXinBusiness extends Pzlife
                             //  exception($e);
                             sleep(5);
                             //重新创建连接
+                            $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
+                                'mobile'      => 15201926171,
+                                'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
+                            ])); //易信行业通道
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                             if (socket_connect($socket, $host, $port) == false) {
                                 $myfile = fopen($log_path, 'a+');
@@ -619,10 +627,7 @@ class CmppLvChengDianXinBusiness extends Pzlife
                                     'mobile'      => 15201926171,
                                     'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
                                 ])); //易信行业通道
-                                $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
-                                    'mobile'      => 15201926171,
-                                    'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
-                                ])); //易信行业通道
+                               
                                 exit();
                             } else {
                                 $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本

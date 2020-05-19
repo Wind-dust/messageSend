@@ -1797,4 +1797,33 @@ return $result;
             return 'error';
         }
     }
+
+    public function chuangLanMmsSftpCallBack($code, $desc, $task_id, $phone)
+    {
+        $task = DbSendMessage::getUserMultimediaMessage(['id' => $task_id], 'uid,task_no', true);
+        if (!empty($task)) {
+            $redisMessageCodeDeliver = 'index:meassage:multimediamessage:deliver:85'; //创蓝彩信回执通道
+            $redis = Phpredis::getConn();
+            $send_task_log = [];
+            if ($code == '30') {
+                $code = 'DELIVRD';
+                $send_status = 3;
+            } else {
+                $code = $desc;
+                $send_status = 4;
+            }
+            $send_task_log = [
+                'task_no'        => $task['task_no'],
+                'uid'            => $task['uid'],
+                'mobile'         => $phone,
+                'status_message' => $code,
+                'send_status'    => $send_status,
+                'send_time'      => time(),
+            ];
+            $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
+            return 'OK';
+        } else {
+            return 'error';
+        }
+    }
 }
