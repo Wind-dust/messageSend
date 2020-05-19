@@ -5539,13 +5539,13 @@ class CmppCreateCodeTask extends Pzlife
             if (!Db::query("SELECT `id` FROM yx_send_code_task_receipt WHERE `task_id` = ".$value['id'])) {
                 if ($value['mobile_content'] != '13815879494') {
                     $task_log = Db::query("SELECT `task_content`,`channel_id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '".$value['task_no']."' ");
-                    $res = $this->redis->rpush('index:meassage:code:send' . ":" . $task_log[0]['channel_id'], json_encode([
+                 /*    $res = $this->redis->rpush('index:meassage:code:send' . ":" . $task_log[0]['channel_id'], json_encode([
                         'mobile'      =>$value['mobile_content'],
                                                     'title'       => $value['task_content'],
                                                     'mar_task_id' => $value['id'],
                                                     'content'     =>  $value['task_content'],
                                                     'from'        => 'yx_user_send_code_task',
-                    ])); //三体营销通道 */
+                    ])); //三体营销通道 */ 
                 }
             }
         }
@@ -5557,13 +5557,13 @@ class CmppCreateCodeTask extends Pzlife
             if (!Db::query("SELECT `id` FROM yx_send_code_task_receipt WHERE `task_id` = ".$value['id'])) {
                 if ($value['mobile_content'] != '13815879494') {
                     $task_log = Db::query("SELECT `task_content`,`channel_id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '".$value['task_no']."' ");
-                    $res = $this->redis->rpush('index:meassage:code:send' . ":" . $task_log[0]['channel_id'], json_encode([
+                  /*   $res = $this->redis->rpush('index:meassage:code:send' . ":" . $task_log[0]['channel_id'], json_encode([
                         'mobile'      =>$value['mobile_content'],
                                                     'title'       => $value['task_content'],
                                                     'mar_task_id' => $value['id'],
                                                     'content'     =>  $value['task_content'],
                                                     'from'        => 'yx_user_send_code_task',
-                    ])); //三体营销通道 */
+                    ])); //三体营销通道  */
                 }
             }
         }
