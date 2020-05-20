@@ -479,7 +479,7 @@ return $result;
                 $data['yidong_channel_id'] = 60;
                 $data['liantong_channel_id'] = 62;
                 $data['dianxin_channel_id'] = 61;
-            }elseif ($user['id'] == 91){
+            } elseif ($user['id'] == 91) {
                 $data['yidong_channel_id'] = 73;
                 $data['liantong_channel_id'] = 75;
                 $data['dianxin_channel_id'] = 76;
@@ -487,20 +487,19 @@ return $result;
                 // $data['liantong_channel_id'] = 9;
                 // $data['dianxin_channel_id'] = 9;
             } else {
-                if (strpos($Content,'亲爱的美田会员') !== false) {
+                if (strpos($Content, '亲爱的美田会员') !== false) {
                     $data['yidong_channel_id'] = 22;
                     $data['liantong_channel_id'] = 22;
                     $data['dianxin_channel_id'] = 22;
-                }elseif (strpos($Content,'问卷') !== false) {
+                } elseif (strpos($Content, '问卷') !== false) {
                     $data['yidong_channel_id'] = 18;
                     $data['liantong_channel_id'] = 19;
                     $data['dianxin_channel_id'] = 19;
-                }else{
+                } else {
                     $data['yidong_channel_id'] = 60;
                     $data['liantong_channel_id'] = 62;
                     $data['dianxin_channel_id'] = 61;
                 }
-               
             }
         }
         Db::startTrans();
@@ -815,7 +814,7 @@ return $result;
         }
         $channel_id = 0;
         $free_trial = 1;
-        
+
 
         $SmsMultimediaMessageTask = [];
         $SmsMultimediaMessageTask = [
@@ -1802,7 +1801,7 @@ return $result;
     {
         $task = DbSendMessage::getUserMultimediaMessage(['id' => $task_id], 'uid,task_no', true);
         if (!empty($task)) {
-            $redisMessageCodeDeliver = 'index:meassage:multimediamessage:deliver:85'; //创蓝彩信回执通道
+            $redisMessageCodeDeliver = 'index:meassage:multimediamessage:deliver:94'; //创蓝彩信回执通道
             $redis = Phpredis::getConn();
             $send_task_log = [];
             if ($code == '30') {
