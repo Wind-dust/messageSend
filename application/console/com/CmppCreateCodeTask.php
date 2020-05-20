@@ -3316,6 +3316,7 @@ class CmppCreateCodeTask extends Pzlife
                         }
                         $sql .= " WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "' AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ";
                         $message = Db::query($sql);
+                        print_r($message);die;
                         if (!empty($message)) {
                             //上行入库
                             Db::table('yx_user_upriver')->insert(['mobile' => $encodemessageupriver['mobile'], 'uid' => $message[0]['uid'], 'task_no' => $message[0]['task_no'], 'message_info' => $encodemessageupriver['message_info'], 'create_time' => time(), 'business_id' => $business_id]);
