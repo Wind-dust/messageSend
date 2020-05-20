@@ -595,6 +595,7 @@ class SflUpload extends Pzlife {
     /* sftp 彩信任务入库 */
     
     /* sftp 短信任务入库 */
+
     public function sflZip() {
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $this->upload = new Imageupload();
