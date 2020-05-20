@@ -3299,23 +3299,22 @@ class CmppCreateCodeTask extends Pzlife
                         $sql                  = '';
                         $sql                  = "SELECT `uid`,`id`,`task_no` FROM ";
                         if ($value['business_id'] == 5) { //营销
-                            $sql .= " yx_user_send_task_log ";
+                            $sql .= " yx_user_send_task_log  WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'";
                             $business_id = 5;
                         } elseif ($value['business_id'] == 6) { // 行业
-                            $sql .= " yx_user_send_code_task_log ";
+                            $sql .= " yx_user_send_code_task_log WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "' ";
                             $business_id = 6;
                         } elseif ($value['business_id'] == 9) { //游戏
-                            $sql .= " yx_user_send_game_task ";
+                            $sql .= " yx_user_send_game_task WHERE `mobile_content` = '" . $encodemessageupriver['mobile'] . "' ";
                             $business_id = 9;
                         } elseif ($value['business_id'] == 7) { //高投诉网贷
-                            $sql .= " yx_user_send_task_log ";
+                            $sql .= " yx_user_send_task_log WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'";
                             $business_id = 7;
                         } elseif ($value['business_id'] == 8) { //彩信
-                            $sql .= " yx_user_multimedia_message_log ";
+                            $sql .= " yx_user_multimedia_message_log WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'";
                             $business_id = 8;
                         }
-                        $sql .= " WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "' AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ";
-                        print_r($sql);die;
+                        $sql .= "  AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ";
                         $message = Db::query($sql);
                         if (!empty($message)) {
                             //上行入库
