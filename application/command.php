@@ -82,6 +82,8 @@ return [
     'cmppsflrongheyidongmarketing'         => $commandPath . 'CmppSflRongHeYiDongMarketing', //丝芙兰融合
     'cmppsflronghedianxinmarketing'         => $commandPath . 'CmppSflRongHeDianXinMarketing', //丝芙兰融合
     'cmppsflrongheliantongmarketing'         => $commandPath . 'CmppSflRongHeLianTongMarketing', //丝芙兰融合
+    'httpchannelcaixinsftpchuanglan'         => $commandPath . 'HttpChannelCaiXinSFTPChuangLan', //丝芙兰sftp创蓝彩信
+    'httpchannelcaixinjumengliantong'         => $commandPath . 'HttpChannelCaiXinJuMengLianTong', //聚梦联通sftp彩信
     'cmppbeijingmiaoxinbusiness'         => $commandPath . 'CmppBeiJingMiaoXinBusiness', //北京秒信行业
     'cmppbeijingmiaoxinmarketing'         => $commandPath . 'CmppBeiJingMiaoXinMarketing', //北京秒信会员营销
     'cmppbishangyidongbusiness'         => $commandPath . 'CmppBiShangYiDongBusiness',//比上移动行业
