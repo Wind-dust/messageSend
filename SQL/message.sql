@@ -1180,3 +1180,22 @@ ALTER TABLE `messagesend`.`yx_user_send_code_task`
 CHANGE COLUMN `channel_id` `yidong_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '移动通道ID' AFTER `free_trial`,
 ADD COLUMN `liantong_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '联通通道id' AFTER `yidong_channel_id`,
 ADD COLUMN `dianxin_channel_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '电信通道id' AFTER `liantong_channel_id`;
+
+DROP TABLE IF EXISTS `yx_country_code`;
+CREATE TABLE `yx_country_code` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Coutry` varchar(50)  CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '国家全称(英文)',
+  `chinese_name` varchar(25)  CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '中文名称',
+  `abbreviation` varchar(10)  CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '英文大写缩写',
+  `country_code` varchar(10)  CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '区号',
+  `price` decimal(10,5) unsigned NOT NULL DEFAULT '0.00000' COMMENT '人民币价格',
+  `dollar` decimal(10,5) unsigned NOT NULL DEFAULT '0.00000' COMMENT '美元价格',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `Coutry` (`Coutry`) USING BTREE,
+  KEY `chinese_name` (`chinese_name`) USING BTREE,
+  KEY `abbreviation` (`abbreviation`) USING BTREE,
+  KEY `country_code` (`country_code`) USING BTREE
+)  ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='国际号码区号';

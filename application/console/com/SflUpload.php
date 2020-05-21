@@ -110,11 +110,11 @@ class SflUpload extends Pzlife
     public function unZip()
     {
         $redis = Phpredis::getConn();
+        $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $zip          = new ZipArchive();
         $path      = realpath("") . "/uploads/SFL/";
         $path_data = $this->getDirContent($path);
-        // print_r($path_data);
         if ($path_data == false) {
             exit("This Dir IS null");
         }
@@ -303,10 +303,10 @@ class SflUpload extends Pzlife
                             $sfl_model['title'] = $sfl_SMS_fram['title'];
                             $sfl_model['create_time'] = time();
                             unset($sfl_SMS_fram['title']);
-                            if (Db::query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
+                            if ($mysql_connect->query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
                                 continue;
                             }
-                            $sfl_multimedia_template_id = Db::table('yx_sfl_multimedia_template')->insertGetId($sfl_model);
+                            $sfl_multimedia_template_id = $mysql_connect->table('yx_sfl_multimedia_template')->insertGetId($sfl_model);
 
                             // print_r($sfl_SMS_fram);
                             foreach ($sfl_SMS_fram as $key => $value) {
@@ -314,12 +314,11 @@ class SflUpload extends Pzlife
                                 $value['sfl_multimedia_template_id'] = $sfl_multimedia_template_id;
                                 $value['sfl_model_id']               = $fvalue[3];
                                 $value['create_time']               = time();
-                                Db::table('yx_sfl_multimedia_template_frame')->insert($value);
+                                $mysql_connect->table('yx_sfl_multimedia_template_frame')->insert($value);
                             }
                         }
-                        // print_r($file_data);die;
-                        //发送内容并 进行拼接
 
+                        //发送内容并 进行拼接
                         if (!empty($send_data)) {
                             foreach ($send_data as $key => $value) {
                                 // print_r($redis->hset($mms_send_had_file,$value,1));
@@ -411,8 +410,6 @@ class SflUpload extends Pzlife
                             }
                             $redis->hset($sms_send_model, $fvalue[0], json_encode($tem));
                         }
-                        // print_r($SMS_model);
-                        // die;
                         // print_r($send_data);
                         foreach ($send_data as $key => $value) {
                             $txt = [];

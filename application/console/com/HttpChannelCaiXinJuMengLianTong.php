@@ -229,7 +229,6 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
                         }
                         $real_send = [];
                         $real_send = [
-                            'action'    => "send",
                             'userid'    => $user_info['userid'],
                             'account'   => $user_info['account'],
                             'password'  => $user_info['password'],
@@ -241,7 +240,14 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
                             'content'   => $send_content[$send_taskid],
                             // 'content'   => urlencode($send_content[$send_taskid]),
                         ];
-                        print_r($real_send);
+                        // print_r($real_send);
+                        $log_path = realpath("") . "/sign.log";
+                        $myfile = fopen($log_path, 'w');
+                
+                        foreach ($real_send as $key => $value) {
+                            fwrite($myfile, $key . ":" . $value . "\n");
+                        }
+                        fclose($myfile);
                         $res    = sendRequest($user_info['send_api'], 'post', $real_send);
                         
                         $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
