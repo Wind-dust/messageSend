@@ -9,16 +9,19 @@ use Env;
 use Exception;
 use think\Db;
 
-class CmppBeiJingMiaoXinMarketing extends Pzlife {
+class CmppBeiJingMiaoXinMarketing extends Pzlife
+{
 
     // protected $redis;
 
-    private function clientSocketInit() {
+    private function clientSocketInit()
+    {
         $this->redis = Phpredis::getConn();
         //        $this->connect = Db::connect(Config::get('database.db_config'));
     }
     //绿城移动行业
-    public function content($content) {
+    public function content($content)
+    {
         return [
             'host'          => "120.133.40.140", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
@@ -33,7 +36,8 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
         ];
     }
 
-    public function Send($content) {
+    public function Send($content)
+    {
         // $this->clientSocketInit();
         $redis = Phpredis::getConn();
         date_default_timezone_set('PRC');
@@ -54,7 +58,7 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
 
         ])); */
 
-       /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
@@ -122,23 +126,23 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
                         $body          = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
                         $verify_status = $body['Status'];
                         switch ($body['Status']) {
-                        case 0:
-                            break;
-                        case 1:
-                            $error_msg = "消息结构错";
-                            break;
-                        case 2:
-                            $error_msg = "非法源地址";
-                            break;
-                        case 3:
-                            $error_msg = "认证错误";
-                            break;
-                        case 4:
-                            $error_msg = "版本错误";
-                            break;
-                        default:
-                            $error_msg = "其他错误";
-                            break;
+                            case 0:
+                                break;
+                            case 1:
+                                $error_msg = "消息结构错";
+                                break;
+                            case 2:
+                                $error_msg = "非法源地址";
+                                break;
+                            case 3:
+                                $error_msg = "认证错误";
+                                break;
+                            case 4:
+                                $error_msg = "版本错误";
+                                break;
+                            default:
+                                $error_msg = "其他错误";
+                                break;
                         }
                         //通道断口处理
                         if ($body['Status'] != 0) {
@@ -147,60 +151,70 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
                     } else if ($head['Command_Id'] == 0x80000004) {
                         $body = unpack("N2Msg_Id/CResult", $bodyData);
                         // print_r($body);
-                        $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
-                        if ($sequence) {
-                            $sequence           = json_decode($sequence, true);
-                            $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
-                            $sequence['Msg_Id'] = $msgid;
-                            $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
-                            $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
-                        }
-
                         switch ($body['Result']) {
-                        case 0:
-                            echo "发送成功" . "\n";
-                            break;
-                        case 1:
-                            echo "消息结构错" . "\n";
-                            $error_msg = "消息结构错";
-                            break;
-                        case 2:
-                            echo "命令字错" . "\n";
-                            $error_msg = "命令字错";
-                            break;
-                        case 3:
-                            echo "消息序号重复" . "\n";
-                            $error_msg = "消息序号重复";
-                            break;
-                        case 4:
-                            echo "消息长度错" . "\n";
-                            $error_msg = "消息长度错";
-                            break;
-                        case 5:
-                            echo "资费代码错" . "\n";
-                            $error_msg = "资费代码错";
-                            break;
-                        case 6:
-                            echo "超过最大信息长" . "\n";
-                            $error_msg = "超过最大信息长";
-                            break;
-                        case 7:
-                            echo "业务代码错" . "\n";
-                            $error_msg = "业务代码错";
-                            break;
-                        case 8:
-                            echo "流量控制错" . "\n";
-                            $error_msg = "业务代码错";
-                            break;
-                        default:
-                            echo "其他错误" . "\n";
-                            $error_msg = "其他错误";
-                            break;
+                            case 0:
+                                echo "发送成功" . "\n";
+                                break;
+                            case 1:
+                                echo "消息结构错" . "\n";
+                                $error_msg = "消息结构错";
+                                break;
+                            case 2:
+                                echo "命令字错" . "\n";
+                                $error_msg = "命令字错";
+                                break;
+                            case 3:
+                                echo "消息序号重复" . "\n";
+                                $error_msg = "消息序号重复";
+                                break;
+                            case 4:
+                                echo "消息长度错" . "\n";
+                                $error_msg = "消息长度错";
+                                break;
+                            case 5:
+                                echo "资费代码错" . "\n";
+                                $error_msg = "资费代码错";
+                                break;
+                            case 6:
+                                echo "超过最大信息长" . "\n";
+                                $error_msg = "超过最大信息长";
+                                break;
+                            case 7:
+                                echo "业务代码错" . "\n";
+                                $error_msg = "业务代码错";
+                                break;
+                            case 8:
+                                echo "流量控制错" . "\n";
+                                $error_msg = "业务代码错";
+                                break;
+                            default:
+                                echo "其他错误" . "\n";
+                                $error_msg = "其他错误";
+                                break;
                         }
+                        $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                         if ($body['Result'] != 0) { //消息发送失败
                             echo "发送失败" . "\n";
                             $error_msg = "其他错误";
+                            if ($sequence) {
+                                $sequence           = json_decode($sequence, true);
+                                $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
+                                // $sequence['Msg_Id'] = $msgid;
+
+                                $sequence['Stat'] = $body['Result'];
+                                $sequence['receive_time'] = time(); //回执时间戳
+                                $redis->rpush($redisMessageCodeDeliver, json_encode($sequence));
+                                $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
+                            }
                         } else {
+
+                            if ($sequence) {
+                                $sequence           = json_decode($sequence, true);
+                                $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
+                                $sequence['Msg_Id'] = $msgid;
+                                $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
+                                $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
+                            }
                         }
                     } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                         $Result              = 0;
@@ -266,7 +280,7 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
 
                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                         $new_Total_Length = strlen($new_body) + 12;
-                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id,$head['Sequence_Id']);
+                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                         usleep(250);
                         $receive = 2;
@@ -294,23 +308,23 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
                                         $body          = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
                                         $verify_status = $body['Status'];
                                         switch ($body['Status']) {
-                                        case 0:
-                                            break;
-                                        case 1:
-                                            $error_msg = "消息结构错";
-                                            break;
-                                        case 2:
-                                            $error_msg = "非法源地址";
-                                            break;
-                                        case 3:
-                                            $error_msg = "认证错误";
-                                            break;
-                                        case 4:
-                                            $error_msg = "版本错误";
-                                            break;
-                                        default:
-                                            $error_msg = "其他错误";
-                                            break;
+                                            case 0:
+                                                break;
+                                            case 1:
+                                                $error_msg = "消息结构错";
+                                                break;
+                                            case 2:
+                                                $error_msg = "非法源地址";
+                                                break;
+                                            case 3:
+                                                $error_msg = "认证错误";
+                                                break;
+                                            case 4:
+                                                $error_msg = "版本错误";
+                                                break;
+                                            default:
+                                                $error_msg = "其他错误";
+                                                break;
                                         }
                                         //通道断口处理
                                         if ($body['Status'] != 0) {
@@ -318,62 +332,70 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
                                         }
                                     } else if ($head['Command_Id'] == 0x80000004) {
                                         $body = unpack("N2Msg_Id/CResult", $bodyData);
-                                        print_r($body);
-                                        $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
-                                        if ($sequence) {
-                                            $sequence           = json_decode($sequence, true);
-                                            $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
-                                            $sequence['Msg_Id'] = $msgid;
-                                            $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
-                                            $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
-                                        }
-
+                                        // print_r($body);
                                         switch ($body['Result']) {
-                                        case 0:
-                                            echo "发送成功" . "\n";
-                                            break;
-                                        case 1:
-                                            echo "消息结构错" . "\n";
-                                            $error_msg = "消息结构错";
-                                            break;
-                                        case 2:
-                                            echo "命令字错" . "\n";
-                                            $error_msg = "命令字错";
-                                            break;
-                                        case 3:
-                                            echo "消息序号重复" . "\n";
-                                            $error_msg = "消息序号重复";
-                                            break;
-                                        case 4:
-                                            echo "消息长度错" . "\n";
-                                            $error_msg = "消息长度错";
-                                            break;
-                                        case 5:
-                                            echo "资费代码错" . "\n";
-                                            $error_msg = "资费代码错";
-                                            break;
-                                        case 6:
-                                            echo "超过最大信息长" . "\n";
-                                            $error_msg = "超过最大信息长";
-                                            break;
-                                        case 7:
-                                            echo "业务代码错" . "\n";
-                                            $error_msg = "业务代码错";
-                                            break;
-                                        case 8:
-                                            echo "流量控制错" . "\n";
-                                            $error_msg = "业务代码错";
-                                            break;
-                                        default:
-                                            echo "其他错误" . "\n";
-                                            $error_msg = "其他错误";
-                                            break;
+                                            case 0:
+                                                echo "发送成功" . "\n";
+                                                break;
+                                            case 1:
+                                                echo "消息结构错" . "\n";
+                                                $error_msg = "消息结构错";
+                                                break;
+                                            case 2:
+                                                echo "命令字错" . "\n";
+                                                $error_msg = "命令字错";
+                                                break;
+                                            case 3:
+                                                echo "消息序号重复" . "\n";
+                                                $error_msg = "消息序号重复";
+                                                break;
+                                            case 4:
+                                                echo "消息长度错" . "\n";
+                                                $error_msg = "消息长度错";
+                                                break;
+                                            case 5:
+                                                echo "资费代码错" . "\n";
+                                                $error_msg = "资费代码错";
+                                                break;
+                                            case 6:
+                                                echo "超过最大信息长" . "\n";
+                                                $error_msg = "超过最大信息长";
+                                                break;
+                                            case 7:
+                                                echo "业务代码错" . "\n";
+                                                $error_msg = "业务代码错";
+                                                break;
+                                            case 8:
+                                                echo "流量控制错" . "\n";
+                                                $error_msg = "业务代码错";
+                                                break;
+                                            default:
+                                                echo "其他错误" . "\n";
+                                                $error_msg = "其他错误";
+                                                break;
                                         }
+                                        $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                         if ($body['Result'] != 0) { //消息发送失败
                                             echo "发送失败" . "\n";
                                             $error_msg = "其他错误";
-                                        } else {
+                                            if ($sequence) {
+                                                $sequence           = json_decode($sequence, true);
+                                                $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
+                                                // $sequence['Msg_Id'] = $msgid;
 
+                                                $sequence['Stat'] = $body['Result'];
+                                                $sequence['receive_time'] = time(); //回执时间戳
+                                                $redis->rpush($redisMessageCodeDeliver, json_encode($sequence));
+                                                $redis->hdel($redisMessageCodeSequenceId,  $head['Sequence_Id']);
+                                            }
+                                        } else {
+                                            if ($sequence) {
+                                                $sequence           = json_decode($sequence, true);
+                                                $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
+                                                $sequence['Msg_Id'] = $msgid;
+                                                $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
+                                                $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
+                                            }
                                         }
                                     } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                                         $Result              = 0;
@@ -439,7 +461,7 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
 
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                                         $new_Total_Length = strlen($new_body) + 12;
-                                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id,$head['Sequence_Id']);
+                                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                         usleep(250);
                                         $receive = 2;
@@ -599,7 +621,7 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
                             }
                         }
                         //捕获异常
-                         catch (Exception $e) {
+                        catch (Exception $e) {
                             if ($send_status == 1) {
                                 $redis->push($redisMessageCodeSend, $redisMessageCodeSend);
                                 $redis->hset($redisMessageCodeSequenceId, $Sequence_Id);
@@ -632,7 +654,7 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
                                     'mobile'  => 15201926171,
                                     'content' => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
                                 ])); //易信行业通道
-                               
+
                                 exit();
                             } else {
                                 $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
@@ -674,7 +696,8 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
     }
 
     //16进制转2进制
-    function StrToBin($str) {
+    function StrToBin($str)
+    {
         //1.列出每个字符
         $arr = preg_split('/(?<!^)(?!$)/u', $str);
         //2.unpack字符
@@ -687,7 +710,8 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
         return join('', $arr);
     }
 
-    public function decodeString() {
+    public function decodeString()
+    {
         // echo strlen("³½'¹ ");
         $timestring = time();
         $num1       = substr($timestring, 0, 8);
@@ -709,29 +733,30 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
      * @param string $pdu
      * @return string
      */
-    function combination($num) {
+    function combination($num)
+    {
         $num     = intval($num);
         $num     = strval($num);
         $new_num = '';
         switch (strlen($num)) {
-        case 0:
-            $new_num = "000000";
-            break;
-        case 1:
-            $new_num = "00000" . $num;
-            break;
-        case 2:
-            $new_num = "0000" . $num;
-            break;
-        case 3:
-            $new_num = "000" . $num;
-            break;
-        case 4:
-            $new_num = "00" . $num;
-            break;
-        case 5:
-            $new_num = "0" . $num;
-            break;
+            case 0:
+                $new_num = "000000";
+                break;
+            case 1:
+                $new_num = "00000" . $num;
+                break;
+            case 2:
+                $new_num = "0000" . $num;
+                break;
+            case 3:
+                $new_num = "000" . $num;
+                break;
+            case 4:
+                $new_num = "00" . $num;
+                break;
+            case 5:
+                $new_num = "0" . $num;
+                break;
         }
         return $new_num;
     }
@@ -741,7 +766,8 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
      * @param string $pdu
      * @return string
      */
-    public function pduord($pdu) {
+    public function pduord($pdu)
+    {
         $ord_pdu = '';
         for ($i = 0; $i < strlen($pdu); $i++) {
             $ord_pdu .= sprintf("%02x", ord($pdu[$i])) . ' ';
@@ -760,7 +786,8 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
      * @param type $prefix 前缀，默认:&#
      * @return type
      */
-    function decode($str, $prefix = "&#") {
+    function decode($str, $prefix = "&#")
+    {
         $str = str_replace($prefix, "", $str);
         $a   = explode(";", $str);
         $utf = '';
@@ -779,7 +806,8 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
         return $utf;
     }
 
-    public function getSendCodeTask() {
+    public function getSendCodeTask()
+    {
         $task = Db::query("SELECT * FROM yx_user_send_code_task WHERE `send_status` = 1 ORDER BY id ASC LIMIT 1");
         if ($task) {
             return $task[0];
@@ -787,7 +815,8 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
         return [];
     }
 
-    private function getSendTask($id) {
+    private function getSendTask($id)
+    {
         $getSendTaskSql = sprintf("select * from yx_user_send_task where delete_time=0 and id = %d", $id);
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
@@ -797,7 +826,8 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
         return $sendTask[0];
     }
 
-    private function getSendTaskLog($task_no, $mobile) {
+    private function getSendTaskLog($task_no, $mobile)
+    {
         $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `task_no` = '" . $task_no . "' and `mobile` = '" . $mobile . "'";
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
@@ -807,7 +837,8 @@ class CmppBeiJingMiaoXinMarketing extends Pzlife {
         return $sendTask[0];
     }
 
-    private function getSendTaskLogByMsgid($msgid) {
+    private function getSendTaskLogByMsgid($msgid)
+    {
         $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `msgid` = '" . $msgid . "'";
         // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
