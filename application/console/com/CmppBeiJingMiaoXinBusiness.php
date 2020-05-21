@@ -198,6 +198,7 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                             break;
                         }
                         $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
+                        print_r($sequence);
                         if ($body['Result'] != 0) { //消息发送失败
                             echo "发送失败" . "\n";
                             $error_msg = "其他错误";
@@ -209,7 +210,7 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                                 $sequence['Stat'] = $body['Result'];
                                 $sequence['receive_time'] = time(); //回执时间戳
                                 $redis->rpush($redisMessageCodeDeliver, json_encode($sequence));
-                                $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
+                                $redis->hdel($redisMessageCodeSequenceId,  $head['Sequence_Id']);
                             }
                         } else {
                             if ($sequence) {
