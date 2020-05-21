@@ -24,7 +24,8 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
             'port'          => "7890", //短连接端口号   17890长连接端口号
             'Source_Addr'   => "1000uf", //企业id  企业代码
             'Shared_secret' => 'vf6f3xh8vd', //网关登录密码
-            'Service_Id'    => "X109728038", //业务代码
+            // 'Service_Id'    => "X109728038", //业务代码
+            'Service_Id'    => "", //业务代码
             'template_id'   => "", //模板id
             'Dest_Id'       => "10692313", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
@@ -54,13 +55,21 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
 
         ])); */
 
-       /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15201926171',
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15601607386',
             'mar_task_id' => '',
             // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
             'content'     => '【钰晰科技】您的验证码为2310。',
 
-        ])); */
+        ]));
+
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '17721160630 ',
+            'mar_task_id' => '',
+            // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
+            'content'     => '【钰晰科技】您的验证码为2310。',
+
+        ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
         $myfile   = fopen($log_path, 'a+');
@@ -147,15 +156,6 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                     } else if ($head['Command_Id'] == 0x80000004) {
                         $body = unpack("N2Msg_Id/CResult", $bodyData);
                         // print_r($body);
-                        $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
-                        if ($sequence) {
-                            $sequence           = json_decode($sequence, true);
-                            $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
-                            $sequence['Msg_Id'] = $msgid;
-                            $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
-                            $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
-                        }
-
                         switch ($body['Result']) {
                         case 0:
                             echo "发送成功" . "\n";
@@ -197,10 +197,28 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                             $error_msg = "其他错误";
                             break;
                         }
+                        $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                         if ($body['Result'] != 0) { //消息发送失败
                             echo "发送失败" . "\n";
                             $error_msg = "其他错误";
+                            if ($sequence) {
+                                $sequence           = json_decode($sequence, true);
+                                $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
+                                // $sequence['Msg_Id'] = $msgid;
+                               
+                                $sequence['Stat'] = $body['Result'];
+                                $sequence['receive_time'] = time(); //回执时间戳
+                                $redis->rpush($redisMessageCodeDeliver, json_encode($sequence));
+                                $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
+                            }
                         } else {
+                            if ($sequence) {
+                                $sequence           = json_decode($sequence, true);
+                                $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
+                                $sequence['Msg_Id'] = $msgid;
+                                $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
+                                $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
+                            }
                         }
                     } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                         $Result              = 0;
