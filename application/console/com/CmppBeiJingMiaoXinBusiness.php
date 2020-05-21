@@ -25,7 +25,7 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
             'Source_Addr'   => "1000uf", //企业id  企业代码
             'Shared_secret' => 'vf6f3xh8vd', //网关登录密码
             // 'Service_Id'    => "X109728038", //业务代码
-            'Service_Id'    => "", //业务代码
+            'Service_Id'    => "X109728038", //业务代码
             'template_id'   => "", //模板id
             'Dest_Id'       => "10692313", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
@@ -337,16 +337,7 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                                         }
                                     } else if ($head['Command_Id'] == 0x80000004) {
                                         $body = unpack("N2Msg_Id/CResult", $bodyData);
-                                        print_r($body);
-                                        $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
-                                        if ($sequence) {
-                                            $sequence           = json_decode($sequence, true);
-                                            $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
-                                            $sequence['Msg_Id'] = $msgid;
-                                            $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
-                                            $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
-                                        }
-
+                                        // print_r($body);
                                         switch ($body['Result']) {
                                         case 0:
                                             echo "发送成功" . "\n";
@@ -388,11 +379,29 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                                             $error_msg = "其他错误";
                                             break;
                                         }
+                                        $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
+                                        print_r($sequence);
                                         if ($body['Result'] != 0) { //消息发送失败
                                             echo "发送失败" . "\n";
                                             $error_msg = "其他错误";
+                                            if ($sequence) {
+                                                $sequence           = json_decode($sequence, true);
+                                                $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
+                                                // $sequence['Msg_Id'] = $msgid;
+                                               
+                                                $sequence['Stat'] = $body['Result'];
+                                                $sequence['receive_time'] = time(); //回执时间戳
+                                                $redis->rpush($redisMessageCodeDeliver, json_encode($sequence));
+                                                $redis->hdel($redisMessageCodeSequenceId,  $head['Sequence_Id']);
+                                            }
                                         } else {
-
+                                            if ($sequence) {
+                                                $sequence           = json_decode($sequence, true);
+                                                $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
+                                                $sequence['Msg_Id'] = $msgid;
+                                                $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
+                                                $redis->hset($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2'], json_encode($sequence));
+                                            }
                                         }
                                     } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
                                         $Result              = 0;
