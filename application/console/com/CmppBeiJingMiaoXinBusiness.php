@@ -25,7 +25,7 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
             'Source_Addr'   => "1000uf", //企业id  企业代码
             'Shared_secret' => 'vf6f3xh8vd', //网关登录密码
             // 'Service_Id'    => "X109728038", //业务代码
-            'Service_Id'    => "X109728038", //业务代码
+            'Service_Id'    => "", //业务代码
             'template_id'   => "", //模板id
             'Dest_Id'       => "10692313", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
