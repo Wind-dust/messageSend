@@ -582,52 +582,50 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
-     //书写定时营销任务日志并写入通道
-     public function createTimingMessageSendTaskLog()
-     {
-         $this->redis = Phpredis::getConn();
-         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-         // date_default_timezone_set('PRC');
-         // $send = $this->redis->rPush('index:meassage:marketing:sendtask', json_encode(['id' => 15924, 'send_time' => 0]));
-         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15823,'send_time' => 0]));
-         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15824,'send_time' => 0]));
-         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15825,'send_time' => 0]));
-         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15826,'send_time' => 0]));
+    //书写定时营销任务日志并写入通道
+    public function createTimingMessageSendTaskLog()
+    {
+        $this->redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        // date_default_timezone_set('PRC');
+        // $send = $this->redis->rPush('index:meassage:marketing:sendtask', json_encode(['id' => 15924, 'send_time' => 0]));
+        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15823,'send_time' => 0]));
+        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15824,'send_time' => 0]));
+        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15825,'send_time' => 0]));
+        // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15826,'send_time' => 0]));
         //  $send = $this->redis->rPush('index:meassage:marketingtiming:sendtask',json_encode(['id' => 34388,'send_time' => 1588903200]));
-         // echo time() -1576290017;die;
-         while (true) {
-             echo date('Y-m-d H:i:s');
-             echo "\n";
-             $j = 1;
- 
-             $rollback      = [];
-             $all_log       = [];
-             $true_log      = [];
-             $push_messages = [];
-             while (true) {
-                 $real_length = 1;
-                 $send        = $this->redis->lpop('index:meassage:marketingtiming:sendtask');
-                 // $send = 15753;
-                 if (empty($send)) {
-                     // print_r(date('Y-m-d H:i:s', time()));
-                     // echo "\n";
-                     // exit('taskId_is_null');
-                     sleep(1);
-                     break;
-                 }
-                 $real_send = json_decode($send, true);
-                 if ($real_send['send_time'] > time()) {
-                     $this->redis->rPush('index:meassage:marketingtiming:sendtask', json_encode($real_send));
-                     sleep(1);
+        // echo time() -1576290017;die;
+        while (true) {
+            echo date('Y-m-d H:i:s');
+            echo "\n";
+            $j = 1;
+
+            $rollback      = [];
+            $all_log       = [];
+            $true_log      = [];
+            $push_messages = [];
+            while (true) {
+                $real_length = 1;
+                $send        = $this->redis->lpop('index:meassage:marketingtiming:sendtask');
+                // $send = 15753;
+                if (empty($send)) {
+                    // print_r(date('Y-m-d H:i:s', time()));
+                    // echo "\n";
+                    // exit('taskId_is_null');
+                    sleep(1);
+                    break;
+                }
+                $real_send = json_decode($send, true);
+                if ($real_send['send_time'] > time()) {
+                    $this->redis->rPush('index:meassage:marketingtiming:sendtask', json_encode($real_send));
+                    sleep(1);
                     //  continue;
-                 }else{
+                } else {
                     $this->redis->rPush('index:meassage:marketing:sendtask', json_encode($real_send));
-                 }
-               
-             }
-            
-         }
-     }
+                }
+            }
+        }
+    }
     //  大批量扣量任务扣量
     public function createNoSendMessageSendTaskLog()
     {
@@ -745,155 +743,154 @@ class CmppCreateCodeTask extends Pzlife
         // exit();
         // echo time() -1574906657;die;
 
-        while(true){
+        while (true) {
             try {
-            $j = 1;
-            $rollback      = [];
-            $all_log       = [];
-            $true_log      = [];
-            $push_messages = [];
-            $send_task = [];
-            while (true) {
-                $real_length = 1;
-                $send        = $this->redis->lpop('index:meassage:multimediamessage:sendtask');
-                // $send = 15745;
-    
-                $sendTask = $this->getMultimediaSendTask($send);
-                if (empty($sendTask)) {
-                    break;
-                }
-                if ($sendTask['uid'] == 91 && (date("H", time()) >= 20 || date("H", time()) < 10)) {
-                    $this->redis->rPush('index:meassage:multimediamessage:buffersendtask', $send);
-                    continue;
-                }
-                $send_task[] = $send;
-                $mobilesend = [];
-                // print_r($sendTask);die;
-                $mobilesend = explode(',', $sendTask['mobile_content']);
-                // $send_length = mb_strlen($sendTask['task_content'], 'utf8');
-                $real_length = 1;
-                // if ($send_length > 70) {
-                //     $real_length = ceil($send_length / 67);
-                // }
-                $real_num = 0;
-                $real_num += $real_length * $sendTask['send_num'];
-                $yidong_channel_id   = 0;
-                $yidong_channel_id   = $sendTask['yidong_channel_id'];
-                $liantong_channel_id = 0;
-                $liantong_channel_id = $sendTask['liantong_channel_id'];
-                $dianxin_channel_id  = 0;
-                $dianxin_channel_id  = $sendTask['dianxin_channel_id'];
-                $send_content  = '';
-                // if (file_exists(realpath("") . '/tasklog/multimedia/' . $sendTask['task_no'] . ".txt")) {
-                //     continue;
-                // }
-                // $myfile = fopen(realpath("") . '/tasklog/multimedia/' . $sendTask['task_no'] . ".txt", "w");
-                // if (!empty($sendTask['content'])) {
-    
-                // }
-    
-                for ($i = 0; $i < count($mobilesend); $i++) {
-                    $send_log = [];
-                    if (checkMobile(trim($mobilesend[$i])) == true) {
-                        $prefix = substr(trim($mobilesend[$i]), 0, 7);
-                        $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
-                        $newres = array_shift($res);
-                        if ($newres) {
-                            if ($newres['source'] == 1) {
-                                $channel_id = $yidong_channel_id;
-                            } elseif ($newres['source'] == 2) {
-                                $channel_id = $liantong_channel_id;
-                            } elseif ($newres['source'] == 3) {
-                                $channel_id = $dianxin_channel_id;
-                            }
-                        }
-                        // if ($newres) {
-                        //     if ($newres['source'] == 2) { //米加联通营销
-                        //         $channel_id = 8;
-                        //     } else if ($newres['source'] == 1) { //蓝鲸
-                        //         $channel_id = 2;
-    
-                        //     } else if ($newres['source'] == 3) { //米加电信营销
-                        //         $channel_id = 7;
-                        //     }
-    
-                        // }
-                        // print_r($newres);
-                        $send_log = [
-                            'task_no'      => $sendTask['task_no'],
-                            'uid'          => $sendTask['uid'],
-                            'source'       => $sendTask['source'],
-                            'task_content' => $sendTask['title'],
-                            'mobile'       => $mobilesend[$i],
-                            'send_status'  => 2,
-                            'create_time'  => time(),
-                        ];
-                        $sendmessage = [
-                            'mobile'      => $mobilesend[$i],
-                            'title'       => $sendTask['title'],
-                            'mar_task_id' => $sendTask['id'],
-                            'content'     => $sendTask['task_content'],
-                            'channel_id'  => $channel_id,
-                        ];
-    
-                        // $txt = json_encode($send_log) . "\n";
-                        // fwrite($myfile, $txt);
-                        // $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
-                        $push_messages[] = $sendmessage;
-                             $true_log[]      = $send_log;
-                    } else {
-                        $send_log = [
-                            'task_no'        => $sendTask['task_no'],
-                            'uid'            => $sendTask['uid'],
-                            'title'          => $sendTask['title'],
-                            'content'        => $sendTask['title'],
-                            'mobile'         => $mobilesend[$i],
-                            'send_status'    => 4,
-                            'create_time'    => time(),
-                            'status_message' => 'DB:0101', //无效号码
-                            'real_message'   => 'DB:0101',
-                        ];
-                        $all_log[] = $send_log;
-                        // $txt = json_encode($send_log) . "\n";
-                        // fwrite($myfile, $txt);
+                $j = 1;
+                $rollback      = [];
+                $all_log       = [];
+                $true_log      = [];
+                $push_messages = [];
+                $send_task = [];
+                while (true) {
+                    $real_length = 1;
+                    $send        = $this->redis->lpop('index:meassage:multimediamessage:sendtask');
+                    // $send = 15745;
+
+                    $sendTask = $this->getMultimediaSendTask($send);
+                    if (empty($sendTask)) {
+                        break;
                     }
-                    
-                    $j++;
-                    if ($j > 100) {
-                        $j = 1;
-                        Db::startTrans();
-                        try {
-                            Db::table('yx_user_multimedia_message_log')->insertAll($true_log);
-                            if (!empty($all_log)) {
-                                Db::table('yx_user_multimedia_message_log')->insertAll($all_log);
-                            }
-                            Db::commit();
-                            foreach ($push_messages as $key => $value) {
-                                $send_channelid = $value['channel_id'];
-                                unset($value['channel_id']);
-                                $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
-                            }
-                        } catch (\Exception $e) {
-                            // $this->redis->rPush('index:meassage:business:sendtask', $send);
-                            if (!empty($rollback)) {
-                                foreach ($rollback as $key => $value) {
-                                    $this->redis->rPush('index:meassage:multimediamessage:sendtask', $value);
-                                    
+                    if ($sendTask['uid'] == 91 && (date("H", time()) >= 20 || date("H", time()) < 10)) {
+                        $this->redis->rPush('index:meassage:multimediamessage:buffersendtask', $send);
+                        continue;
+                    }
+                    $send_task[] = $send;
+                    $mobilesend = [];
+                    // print_r($sendTask);die;
+                    $mobilesend = explode(',', $sendTask['mobile_content']);
+                    // $send_length = mb_strlen($sendTask['task_content'], 'utf8');
+                    $real_length = 1;
+                    // if ($send_length > 70) {
+                    //     $real_length = ceil($send_length / 67);
+                    // }
+                    $real_num = 0;
+                    $real_num += $real_length * $sendTask['send_num'];
+                    $yidong_channel_id   = 0;
+                    $yidong_channel_id   = $sendTask['yidong_channel_id'];
+                    $liantong_channel_id = 0;
+                    $liantong_channel_id = $sendTask['liantong_channel_id'];
+                    $dianxin_channel_id  = 0;
+                    $dianxin_channel_id  = $sendTask['dianxin_channel_id'];
+                    $send_content  = '';
+                    // if (file_exists(realpath("") . '/tasklog/multimedia/' . $sendTask['task_no'] . ".txt")) {
+                    //     continue;
+                    // }
+                    // $myfile = fopen(realpath("") . '/tasklog/multimedia/' . $sendTask['task_no'] . ".txt", "w");
+                    // if (!empty($sendTask['content'])) {
+
+                    // }
+
+                    for ($i = 0; $i < count($mobilesend); $i++) {
+                        $send_log = [];
+                        if (checkMobile(trim($mobilesend[$i])) == true) {
+                            $prefix = substr(trim($mobilesend[$i]), 0, 7);
+                            $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                            $newres = array_shift($res);
+                            if ($newres) {
+                                if ($newres['source'] == 1) {
+                                    $channel_id = $yidong_channel_id;
+                                } elseif ($newres['source'] == 2) {
+                                    $channel_id = $liantong_channel_id;
+                                } elseif ($newres['source'] == 3) {
+                                    $channel_id = $dianxin_channel_id;
                                 }
                             }
-    
-                            Db::rollback();
-                            exception($e);
+                            // if ($newres) {
+                            //     if ($newres['source'] == 2) { //米加联通营销
+                            //         $channel_id = 8;
+                            //     } else if ($newres['source'] == 1) { //蓝鲸
+                            //         $channel_id = 2;
+
+                            //     } else if ($newres['source'] == 3) { //米加电信营销
+                            //         $channel_id = 7;
+                            //     }
+
+                            // }
+                            // print_r($newres);
+                            $send_log = [
+                                'task_no'      => $sendTask['task_no'],
+                                'uid'          => $sendTask['uid'],
+                                'source'       => $sendTask['source'],
+                                'task_content' => $sendTask['title'],
+                                'mobile'       => $mobilesend[$i],
+                                'send_status'  => 2,
+                                'create_time'  => time(),
+                            ];
+                            $sendmessage = [
+                                'mobile'      => $mobilesend[$i],
+                                'title'       => $sendTask['title'],
+                                'mar_task_id' => $sendTask['id'],
+                                'content'     => $sendTask['task_content'],
+                                'channel_id'  => $channel_id,
+                            ];
+
+                            // $txt = json_encode($send_log) . "\n";
+                            // fwrite($myfile, $txt);
+                            // $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
+                            $push_messages[] = $sendmessage;
+                            $true_log[]      = $send_log;
+                        } else {
+                            $send_log = [
+                                'task_no'        => $sendTask['task_no'],
+                                'uid'            => $sendTask['uid'],
+                                'title'          => $sendTask['title'],
+                                'content'        => $sendTask['title'],
+                                'mobile'         => $mobilesend[$i],
+                                'send_status'    => 4,
+                                'create_time'    => time(),
+                                'status_message' => 'DB:0101', //无效号码
+                                'real_message'   => 'DB:0101',
+                            ];
+                            $all_log[] = $send_log;
+                            // $txt = json_encode($send_log) . "\n";
+                            // fwrite($myfile, $txt);
                         }
-                        unset($all_log);
-                        unset($true_log);
-                        unset($push_messages);
-                        // echo time() . "\n";
-                        unset($rollback);
+
+                        $j++;
+                        if ($j > 100) {
+                            $j = 1;
+                            Db::startTrans();
+                            try {
+                                Db::table('yx_user_multimedia_message_log')->insertAll($true_log);
+                                if (!empty($all_log)) {
+                                    Db::table('yx_user_multimedia_message_log')->insertAll($all_log);
+                                }
+                                Db::commit();
+                                foreach ($push_messages as $key => $value) {
+                                    $send_channelid = $value['channel_id'];
+                                    unset($value['channel_id']);
+                                    $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                                }
+                            } catch (\Exception $e) {
+                                // $this->redis->rPush('index:meassage:business:sendtask', $send);
+                                if (!empty($rollback)) {
+                                    foreach ($rollback as $key => $value) {
+                                        $this->redis->rPush('index:meassage:multimediamessage:sendtask', $value);
+                                    }
+                                }
+
+                                Db::rollback();
+                                exception($e);
+                            }
+                            unset($all_log);
+                            unset($true_log);
+                            unset($push_messages);
+                            // echo time() . "\n";
+                            unset($rollback);
+                        }
                     }
-                }
-    
-              /*   Db::startTrans();
+
+                    /*   Db::startTrans();
                 try {
                     Db::table('yx_user_multimedia_message')->where('id', $sendTask['id'])->update(['real_num' => $real_num, 'send_status' => 3, 'log_path' => realpath("") . '/tasklog/multimedia/' . $sendTask['task_no'] . ".txt"]);
                     Db::commit();
@@ -907,43 +904,43 @@ class CmppCreateCodeTask extends Pzlife
                     exception($e);
                     Db::rollback();
                 } */
-                // foreach ($mobilesend as $key => $kvalue) {
-                //     if (in_array($channel_id, [2, 6, 7, 8])) {
-                //         // $getSendTaskSql = "select source,province_id,province from yx_number_source where `mobile` = '".$prefix."' LIMIT 1";
-                //     }
-                // }
-                // exit("SUCCESS");
-            }
-            
-            if (!empty($true_log)) {
-                Db::startTrans();
-                try {
-                    Db::table('yx_user_multimedia_message_log')->insertAll($true_log);
-                    if (!empty($all_log)) {
-                        Db::table('yx_user_multimedia_message_log')->insertAll($all_log);
-                    }
-                    Db::commit();
-                    foreach ($push_messages as $key => $value) {
-                        $send_channelid = $value['channel_id'];
-                        unset($value['channel_id']);
-                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
-                    }
-                } catch (\Exception $e) {
-                    // $this->redis->rPush('index:meassage:business:sendtask', $send);
-                    if (!empty($rollback)) {
-                        foreach ($rollback as $key => $value) {
-                            $this->redis->rPush('index:meassage:multimediamessage:sendtask', $value);
-                        }
-                    }
-                    Db::rollback();
-                    exception($e);
+                    // foreach ($mobilesend as $key => $kvalue) {
+                    //     if (in_array($channel_id, [2, 6, 7, 8])) {
+                    //         // $getSendTaskSql = "select source,province_id,province from yx_number_source where `mobile` = '".$prefix."' LIMIT 1";
+                    //     }
+                    // }
+                    // exit("SUCCESS");
                 }
-                unset($all_log);
-                unset($true_log);
-                unset($push_messages);
-                unset($rollback);
-            }
-            /* Db::startTrans();
+
+                if (!empty($true_log)) {
+                    Db::startTrans();
+                    try {
+                        Db::table('yx_user_multimedia_message_log')->insertAll($true_log);
+                        if (!empty($all_log)) {
+                            Db::table('yx_user_multimedia_message_log')->insertAll($all_log);
+                        }
+                        Db::commit();
+                        foreach ($push_messages as $key => $value) {
+                            $send_channelid = $value['channel_id'];
+                            unset($value['channel_id']);
+                            $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                        }
+                    } catch (\Exception $e) {
+                        // $this->redis->rPush('index:meassage:business:sendtask', $send);
+                        if (!empty($rollback)) {
+                            foreach ($rollback as $key => $value) {
+                                $this->redis->rPush('index:meassage:multimediamessage:sendtask', $value);
+                            }
+                        }
+                        Db::rollback();
+                        exception($e);
+                    }
+                    unset($all_log);
+                    unset($true_log);
+                    unset($push_messages);
+                    unset($rollback);
+                }
+                /* Db::startTrans();
             try {
                 Db::table('yx_user_multimedia_message')->where(['id',' in', join(',',$send_task)])->update(['send_status' => 3]);
                
@@ -959,16 +956,15 @@ class CmppCreateCodeTask extends Pzlife
                 Db::rollback();
                 exception($e);
             } */
-            sleep(1);
+                sleep(1);
             } catch (\Exception $th) {
                 //throw $th;
                 exception($th);
             }
-            
+
             sleep(10);
             $j = 1;
         }
-
     }
 
     //书写行业通知任务日志并写入通道
@@ -1018,7 +1014,7 @@ class CmppCreateCodeTask extends Pzlife
                             continue;
                         }
                     }
-                    
+
                     $rollback[]  = $send;
                     $mobilesend  = [];
                     $mobilesend  = explode(',', $sendTask['mobile_content']);
@@ -1049,7 +1045,7 @@ class CmppCreateCodeTask extends Pzlife
                                     // print_r($res);
                                     if ($res) {
                                         $newres = array_shift($res);
-                                       /*  if ($newres['source'] == 2 && $channel_id == 24) { //易信联通
+                                        /*  if ($newres['source'] == 2 && $channel_id == 24) { //易信联通
                                             $channel_id = 26;
                                         } else if ($newres['source'] == 1 && $channel_id == 24) { //移动易信
                                             $channel_id = 24;
@@ -1691,7 +1687,7 @@ class CmppCreateCodeTask extends Pzlife
                     // $redis->rpush($redisMessageCodeSend, $send_log);
                     // print_r($send_log);die;
                     $send_log = json_decode($send_log, true);
-    
+
                     //获取通道属性
                     if (!isset($send_log['mar_task_id']) || empty($send_log['mar_task_id'])) {
                         continue;
@@ -1751,10 +1747,10 @@ class CmppCreateCodeTask extends Pzlife
                             $request_url = "http://116.228.60.189:15901/rtreceive?";
                             $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . trim($stat) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
                         }
-    
+
                         print_r($request_url);
                         sendRequest($request_url);
-    
+
                         usleep(20000);
                     } else {
                         $stat = trim($send_log['Stat']);
@@ -1791,10 +1787,10 @@ class CmppCreateCodeTask extends Pzlife
                 }
             }
         } catch (\Exception $th) {
-             $redis->rpush($redisMessageCodeSend, $send_log);
-             exception($th);
+            $redis->rpush($redisMessageCodeSend, $send_log);
+            exception($th);
         }
-        
+
         // try {
         //     //code...
         // } catch (\Exception $e) {
@@ -3177,9 +3173,13 @@ class CmppCreateCodeTask extends Pzlife
                     if ($status_message == 'DELIVRD') {
                         $data['messageinfo'] = "发送成功";
                         $data['status_message'] = "SMS:1";
-                    }else{
+                    } else {
                         $data['messageinfo'] = "发送失败";
                         $data['status_message'] = "SMS:2";
+                    }
+                    if (strpos($send_log['status_message'], 'DB:0141') !== false || strpos($send_log['status_message'], 'MBBLACK') !== false || strpos($send_log['status_message'], 'BLACK') !== false) {
+                        $data['messageinfo'] = '黑名单';
+                        $data['status_message'] = 'SMS:4';
                     }
                     $receipt_data['yx_sfl_send_task_receipt'][] = $data;
                 } else {
@@ -3285,7 +3285,7 @@ class CmppCreateCodeTask extends Pzlife
             while (true) {
                 $channels = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `delete_time` = 0 ");
                 foreach ($channels as $key => $value) {
-                    if (in_array($value['id'],[83,84,86,87,88,94])) {
+                    if (in_array($value['id'], [83, 84, 86, 87, 88, 94])) {
                         continue;
                     }
                     $redisMessageUpRiver = 'index:message:code:upriver:' . $value['id'];
@@ -3332,7 +3332,6 @@ class CmppCreateCodeTask extends Pzlife
         } catch (\Exception $th) {
             exception($th);
         }
-        
     }
 
     public function updateUpRiver()
@@ -3651,7 +3650,7 @@ class CmppCreateCodeTask extends Pzlife
         'send_status' => 3,
         'send_time' => '1585709212',
         ))); */
-       
+
         while (true) {
             try {
                 $sendlog = $redis->lpop('index:meassage:multimediamessage:deliver:' . $channel_id);
@@ -3666,30 +3665,29 @@ class CmppCreateCodeTask extends Pzlife
                 if (empty($sendtasklog)) {
                     $task = Db::query("SELECT `id`,`create_time`,`update_time`,`source` FROM `yx_user_multimedia_message` WHERE `task_no` = '" . $send_log['task_no'] . "' ");
                     Db::startTrans();
-                   
-                        Db::table('yx_user_multimedia_message_log')->insert([
-                            'uid'            => $send_log['uid'],
-                            'task_no'        => $send_log['task_no'],
-                            'mobile'         => $send_log['mobile'],
-                            'send_status'    => $send_log['send_status'],
-                            'create_time'    => $task[0]['update_time'],
-                            'update_time'    => $send_log['send_time'],
-                            'real_message'   => $send_log['status_message'],
-                            'status_message' => $send_log['status_message'],
-                            'task_id'        => $task[0]['id'],
-                            'source'         => $task[0]['source'],
-                        ]);
-                        Db::commit();
-                   
-                        $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode($send_log));
-                  
+
+                    Db::table('yx_user_multimedia_message_log')->insert([
+                        'uid'            => $send_log['uid'],
+                        'task_no'        => $send_log['task_no'],
+                        'mobile'         => $send_log['mobile'],
+                        'send_status'    => $send_log['send_status'],
+                        'create_time'    => $task[0]['update_time'],
+                        'update_time'    => $send_log['send_time'],
+                        'real_message'   => $send_log['status_message'],
+                        'status_message' => $send_log['status_message'],
+                        'task_id'        => $task[0]['id'],
+                        'source'         => $task[0]['source'],
+                    ]);
+                    Db::commit();
+
+                    $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode($send_log));
                 } else {
                     if (!empty($sendtasklog[0]['real_message'])) {
                         continue;
                     }
                     Db::startTrans();
-                        Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'],  'status_message' => $send_log['status_message'], 'send_status' => $send_log['send_status'], 'update_time' => $send_log['send_time']]);
-                        Db::commit();
+                    Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'],  'status_message' => $send_log['status_message'], 'send_status' => $send_log['send_status'], 'update_time' => $send_log['send_time']]);
+                    Db::commit();
                     if (!empty($sendtasklog[0]['status_message'])) {
                         continue;
                     }
@@ -3712,13 +3710,12 @@ class CmppCreateCodeTask extends Pzlife
                     // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
                     'send_time'      => isset($send_log['send_time']) ? date('Y-m-d H:i:s', trim($send_log['send_time'])) : date('Y-m-d H:i:s', time()),
                 ])); //写入用户带处理日志
-    
+
             } catch (\Exception $th) {
                 Db::rollback();
                 $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode($send_log));
                 exception($th);
             }
-           
         }
     }
 
@@ -3786,7 +3783,7 @@ class CmppCreateCodeTask extends Pzlife
                 }
                 $sql .= " WHERE `uid` = '" . $real_fill_push['uid'] . "' AND `create_time` >= '" . $real_fill_push['start_time'] . "' AND  `create_time` <= '" . $real_fill_push['end_time'] . "'";
                 if (isset($real_fill_push['channel_id'])) {
-                    $sql.= " AND `channel_id` = ".$real_fill_push['channel_id'];
+                    $sql .= " AND `channel_id` = " . $real_fill_push['channel_id'];
                 }
                 $receipt_data = Db::query($sql);
                 if ($receipt_data) {
@@ -3822,7 +3819,7 @@ class CmppCreateCodeTask extends Pzlife
             $day_users                = [];
             $start_time               = strtotime(date('Y-m', time()));
             // $task_log                 = Db::query("SELECT * FROM yx_user_send_task_log WHERE `create_time` < " . time() . " AND `create_time` >= " . $start_time);
-            $code_task_log            = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `create_time` < " . time(). " AND `create_time` >= " . $start_time);
+            $code_task_log            = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `create_time` < " . time() . " AND `create_time` >= " . $start_time);
             // print_r(count($code_task_log));
             // die;
             foreach ($code_task_log as $key => $value) {
@@ -4154,7 +4151,7 @@ class CmppCreateCodeTask extends Pzlife
         // $start_time               = strtotime(date('Y-m', time()));
         $end_time               = strtotime("2020-05-01");
         $end_time               = time();
-        $task_log                 = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `create_time` <= '" . $end_time."' AND `create_time` >= ".$start_time);
+        $task_log                 = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `create_time` <= '" . $end_time . "' AND `create_time` >= " . $start_time);
         // print_r(count($task_log));
         // die;
         try {
@@ -4163,11 +4160,10 @@ class CmppCreateCodeTask extends Pzlife
                 // die;
                 if (empty($value['status_message']) && empty($value['real_message']) && $value['create_time'] + 259200 < time()) {
                     $value['status_message'] = 'DELIVRD';
-                    
-                }else {
+                } else {
                     $value['status_message'] = $value['status_message'];
                 }
-               
+
                 $send_length = mb_strlen($value['task_content'], 'utf8');
                 $num         = 1;
                 if ($send_length > 70) {
@@ -5163,7 +5159,7 @@ class CmppCreateCodeTask extends Pzlife
                     $mul_task = $this->redis->lpop($redisMessagemulSend);
                     if (!empty($mul_task)) {
                         $this->redis->rpush("index:meassage:multimediamessage:sendtask", $mul_task);
-                    }else{
+                    } else {
                         // $task = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE `uid` = 91 AND `id` >= 641731 AND `id` <= 643837 ");
                         // foreach ($task as $key => $value) {
                         //     Db::table('yx_user_send_code_task')->where('id',$value['id'])->update(['yidong_channel_id' => 9, 'liantong_channel_id' => 9, 'dianxin_channel_id' => 9]);
@@ -5174,8 +5170,6 @@ class CmppCreateCodeTask extends Pzlife
                 // Db::table('yx_user_send_code_task')->where('id',$task_id)->update(['yidong_channel_id' => 9, 'liantong_channel_id' => 9, 'dianxin_channel_id' => 9]);
                 $this->redis->rpush("index:meassage:business:sendtask", $task_id);
             }
-           
-
         } catch (\exception $e) {
             exception($e);
         }
@@ -5242,7 +5236,6 @@ class CmppCreateCodeTask extends Pzlife
             // }
         }
         exit;
-
     }
 
     public function receiptCodeTaskForSFL()
@@ -5255,28 +5248,29 @@ class CmppCreateCodeTask extends Pzlife
         $yestarday_receipt = Db::query("SELECT `real_message` FROM yx_send_code_task_receipt WHERE `task_id` IN (SELECT `id` FROM  yx_user_send_code_task WHERE `uid` = 91 AND `create_time` >= 1588680000 AND `create_time` <= 1588766400 )");
         $receive_num = count($yestarday_receipt);
         // print_r($receive_num);die;
-        $receipts['UNKNOWN'] = $yestarday_num-$receive_num;
+        $receipts['UNKNOWN'] = $yestarday_num - $receive_num;
         foreach ($yestarday_receipt as $key => $value) {
             if (isset($receipts[$value['real_message']])) {
-                $receipts[$value['real_message']] ++;
-            }else{
+                $receipts[$value['real_message']]++;
+            } else {
                 $receipts[$value['real_message']]  = 1;
             }
         }
         asort($receipts);
         $i = 0;
-        foreach($receipts as $key => $va){
-            $j = $i+ $va;
+        foreach ($receipts as $key => $va) {
+            $j = $i + $va;
             $new_receipts[$j] = $key;
             $i = $j;
         }
         // print_r($new_receipts);die;
         // echo $num;
         $start_time = strtotime("2020-05-06 20:00:00");
-       
-         $end_time   = strtotime("2020-05-07 20:00:00");;
+
+        $end_time   = strtotime("2020-05-07 20:00:00");;
         $mul_task   = Db::query("SELECT * FROM yx_user_send_code_task WHERE `uid` = 91 AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' ORDER BY id ASC ");
-        print_r(count($mul_task));die;
+        print_r(count($mul_task));
+        die;
         foreach ($mul_task as $key => $value) {
             $mobile_content = $value['mobile_content'];
             // $time = $value['update_time'];
@@ -5293,21 +5287,21 @@ class CmppCreateCodeTask extends Pzlife
                 $task_log = Db::query("SELECT `id`,`status_message` FROM yx_send_code_task_receipt WHERE `task_id` = '" . $value['id'] . "' AND `mobile` = '" . $mobile_data[$i] . "'");
                 $status_message = '';
                 $message_info = '';
-                $num = mt_rand(0,$yestarday_num);
+                $num = mt_rand(0, $yestarday_num);
                 // echo $num."\n";
-                foreach($new_receipts as $nkey => $rval){
+                foreach ($new_receipts as $nkey => $rval) {
                     if ($num <= $nkey) {
                         $status_message = $rval;
-                    break;
+                        break;
                     }
                 }
                 if ($status_message == 'UNKNOWN') {
                     continue;
-                }elseif ($status_message == 'DELIVRD') {
+                } elseif ($status_message == 'DELIVRD') {
                     $message_info = '发送成功';
-                }elseif ($status_message == 'DB:0141') {
+                } elseif ($status_message == 'DB:0141') {
                     $message_info = '黑名单';
-                }else{
+                } else {
                     $message_info = '发送失败';
                 }
                 if (empty($task_log)) {
@@ -5343,7 +5337,7 @@ class CmppCreateCodeTask extends Pzlife
                 } else {
                     Db::table('yx_send_code_task_receipt')->where('id', $task_log[0]['id'])->update(
                         [
-                            'create_time' => $time, 
+                            'create_time' => $time,
                             'status_message' => $status_message
                         ]
                     );
@@ -5412,14 +5406,14 @@ class CmppCreateCodeTask extends Pzlife
         $num = Db::query("SELECT * FROM yx_send_task_receipt LIMIT 50000 ");
         // $id_num = $num[0]['count(`id`)'];
         // print_r(count($num));die;
-        
+
         $del_ids = [];
         try {
 
             do {
                 $del_ids = [];
                 $num = Db::query("SELECT * FROM yx_send_task_receipt LIMIT 50000 ");
-                foreach($num as $key => $value){
+                foreach ($num as $key => $value) {
                     $task = Db::query("SELECT `task_no` FROM yx_user_send_task WHERE `id` = " . $value['task_id']);
                     if (!empty($task)) {
                         $task_log = Db::query("SELECT * FROM  yx_user_send_task_log WHERE `task_no` = '" . $task[0]['task_no'] . "'");
@@ -5434,7 +5428,7 @@ class CmppCreateCodeTask extends Pzlife
                                 $message_info = '发送失败';
                             }
                             if ($task_log[0]['uid'] == '91') {
-                                if (strpos($value['real_message'], 'DB:0141') !== false ){
+                                if (strpos($value['real_message'], 'DB:0141') !== false) {
                                     $message_info = '发送成功';
                                     $value['status_message'] = 'DELIVRD';
                                 }
@@ -5505,8 +5499,9 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
-    public function Bufa(){
-       /*  $send = [
+    public function Bufa()
+    {
+        /*  $send = [
             'mobile'      => 18721762967,
                                         'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
                                         'mar_task_id' => 659346,
@@ -5515,7 +5510,7 @@ class CmppCreateCodeTask extends Pzlife
         ]; */
 
         $this->redis = Phpredis::getConn();
-/*         $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode([
+        /*         $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode([
             'mobile'      => 13424037312,
                                         'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
                                         'mar_task_id' => 806902,
@@ -5551,15 +5546,15 @@ class CmppCreateCodeTask extends Pzlife
         $ids = [];
         foreach ($task_id as $key => $value) {
             // $ids = $value['id'];
-            if (!Db::query("SELECT `id` FROM yx_send_code_task_receipt WHERE `task_id` = ".$value['id'])) {
+            if (!Db::query("SELECT `id` FROM yx_send_code_task_receipt WHERE `task_id` = " . $value['id'])) {
                 if ($value['mobile_content'] != '13815879494') {
-                    $task_log = Db::query("SELECT `task_content`,`channel_id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '".$value['task_no']."' ");
+                    $task_log = Db::query("SELECT `task_content`,`channel_id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '" . $value['task_no'] . "' ");
                     $res = $this->redis->rpush('index:meassage:code:send' . ":" . $task_log[0]['channel_id'], json_encode([
-                        'mobile'      =>$value['mobile_content'],
-                                                    'title'       => $value['task_content'],
-                                                    'mar_task_id' => $value['id'],
-                                                    'content'     =>  $value['task_content'],
-                                                    'from'        => 'yx_user_send_code_task',
+                        'mobile'      => $value['mobile_content'],
+                        'title'       => $value['task_content'],
+                        'mar_task_id' => $value['id'],
+                        'content'     =>  $value['task_content'],
+                        'from'        => 'yx_user_send_code_task',
                     ])); //三体营销通道 
                 }
             }
@@ -5569,15 +5564,15 @@ class CmppCreateCodeTask extends Pzlife
         $ids = [];
         foreach ($task_id as $key => $value) {
             // $ids = $value['id'];
-            if (!Db::query("SELECT `id` FROM yx_send_code_task_receipt WHERE `task_id` = ".$value['id'])) {
+            if (!Db::query("SELECT `id` FROM yx_send_code_task_receipt WHERE `task_id` = " . $value['id'])) {
                 if ($value['mobile_content'] != '13815879494') {
-                    $task_log = Db::query("SELECT `task_content`,`channel_id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '".$value['task_no']."' ");
+                    $task_log = Db::query("SELECT `task_content`,`channel_id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '" . $value['task_no'] . "' ");
                     $res = $this->redis->rpush('index:meassage:code:send' . ":" . $task_log[0]['channel_id'], json_encode([
-                        'mobile'      =>$value['mobile_content'],
-                                                    'title'       => $value['task_content'],
-                                                    'mar_task_id' => $value['id'],
-                                                    'content'     =>  $value['task_content'],
-                                                    'from'        => 'yx_user_send_code_task',
+                        'mobile'      => $value['mobile_content'],
+                        'title'       => $value['task_content'],
+                        'mar_task_id' => $value['id'],
+                        'content'     =>  $value['task_content'],
+                        'from'        => 'yx_user_send_code_task',
                     ])); //三体营销通道 
                 }
             }
@@ -5586,11 +5581,12 @@ class CmppCreateCodeTask extends Pzlife
 
     /* SFL sftp 独立发送体系 */
     /* 短信模块 */
-    public function SendSflTask(){
+    public function SendSflTask()
+    {
         // $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-       /*  for ($i=1; $i < 31; $i++) { 
+        /*  for ($i=1; $i < 31; $i++) { 
             $this->redis->rpush('index:meassage:sflmessage:sendtask',$i);
         } */
         $ids = [];
@@ -5603,7 +5599,7 @@ class CmppCreateCodeTask extends Pzlife
             $ids[] = $task_id;
             $j++;
             if ($j > 100) {
-                $all_send_task = Db::query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (".join(',',$ids).") ");
+                $all_send_task = Db::query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (" . join(',', $ids) . ") ");
                 foreach ($all_send_task as $key => $value) {
                     if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                         continue;
@@ -5628,14 +5624,14 @@ class CmppCreateCodeTask extends Pzlife
                             }
 
                             //正常发送
-                           /*  $sendmessage = [
+                            /*  $sendmessage = [
                                 'mobile'      => $value['mobile'],
                                 'mar_task_id' => $value['id'],
                                 'content'     => $value['task_content'],
                                 'channel_id'  => $channel_id,
                                 'from'        => 'yx_sfl_send_task',
                             ]; */
-                            $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode( [
+                            $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode([
                                 'mseeage_id'      => $value['mseeage_id'],
                                 'template_id'      => $value['template_id'],
                                 'mobile'      => $value['mobile'],
@@ -5643,7 +5639,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'content'     => $value['task_content'],
                                 'from'        => 'yx_sfl_send_task',
                             ])); //三体营销通道
-                        }else{
+                        } else {
                             Db::table('yx_sfl_send_task_receipt')->insert([
                                 'mseeage_id'      => $value['mseeage_id'],
                                 'template_id'      => $value['template_id'],
@@ -5653,8 +5649,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'status_message' => 'SMS:2',
                             ]);
                         }
-                        
-                    }else{
+                    } else {
                         Db::table('yx_sfl_send_task_receipt')->insert([
                             'mseeage_id'      => $value['mseeage_id'],
                             'template_id'      => $value['template_id'],
@@ -5664,21 +5659,20 @@ class CmppCreateCodeTask extends Pzlife
                             'status_message' => 'SMS:2',
                         ]);
                     }
-                    
                 }
                 unset($ids);
                 // unset($all_send_task);
             }
         }
-       
-       
+
+
         if (!empty($ids)) {
-            $all_send_task = Db::query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (".join(',',$ids).") ");
+            $all_send_task = Db::query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (" . join(',', $ids) . ") ");
             foreach ($all_send_task as $key => $value) {
                 if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                     continue;
                 }
-                
+
                 if (checkMobile($value['mobile']) != false) {
                     $end_num = substr($value['mobile'], -6);
                     //按无效号码计算
@@ -5706,7 +5700,7 @@ class CmppCreateCodeTask extends Pzlife
                             // 'channel_id'  => $channel_id,
                             'from'        => 'yx_sfl_send_task',
                         ]; */
-                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode( [
+                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode([
                             'mseeage_id'      => $value['mseeage_id'],
                             'template_id'      => $value['template_id'],
                             'mobile'      => $value['mobile'],
@@ -5714,7 +5708,7 @@ class CmppCreateCodeTask extends Pzlife
                             'content'     => $value['task_content'],
                             'from'        => 'yx_sfl_send_task',
                         ])); //三体营销通道
-                    }else{
+                    } else {
                         Db::table('yx_sfl_send_task_receipt')->insert([
                             'mseeage_id'      => $value['mseeage_id'],
                             'template_id'      => $value['template_id'],
@@ -5724,8 +5718,7 @@ class CmppCreateCodeTask extends Pzlife
                             'status_message' => 'SMS:2',
                         ]);
                     }
-                   
-                }else{
+                } else {
                     Db::table('yx_sfl_send_task_receipt')->insert([
                         'mseeage_id'      => $value['mseeage_id'],
                         'template_id'      => $value['template_id'],
@@ -5735,16 +5728,16 @@ class CmppCreateCodeTask extends Pzlife
                         'status_message' => 'SMS:2',
                     ]);
                 }
-                
             }
         }
     }
 
-    public function SendSflTaskNew(){
+    public function SendSflTaskNew()
+    {
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-       /*  for ($i=1; $i < 31; $i++) { 
+        /*  for ($i=1; $i < 31; $i++) { 
             $this->redis->rpush('index:meassage:sflmessage:sendtask',$i);
         } */
         $ids = [];
@@ -5757,7 +5750,7 @@ class CmppCreateCodeTask extends Pzlife
             $ids[] = $task_id;
             $j++;
             if ($j > 100) {
-                $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (".join(',',$ids).") ");
+                $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (" . join(',', $ids) . ") ");
                 foreach ($all_send_task as $key => $value) {
                     if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                         continue;
@@ -5782,14 +5775,14 @@ class CmppCreateCodeTask extends Pzlife
                             }
 
                             //正常发送
-                           /*  $sendmessage = [
+                            /*  $sendmessage = [
                                 'mobile'      => $value['mobile'],
                                 'mar_task_id' => $value['id'],
                                 'content'     => $value['task_content'],
                                 'channel_id'  => $channel_id,
                                 'from'        => 'yx_sfl_send_task',
                             ]; */
-                            $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode( [
+                            $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode([
                                 'mseeage_id'      => $value['mseeage_id'],
                                 'template_id'      => $value['template_id'],
                                 'mobile'      => $value['mobile'],
@@ -5797,7 +5790,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'content'     => $value['task_content'],
                                 'from'        => 'yx_sfl_send_task',
                             ])); //三体营销通道
-                        }else{
+                        } else {
                             $mysql_connect->table('yx_sfl_send_task_receipt')->insert([
                                 'mseeage_id'      => $value['mseeage_id'],
                                 'template_id'      => $value['template_id'],
@@ -5807,8 +5800,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'status_message' => 'SMS:2',
                             ]);
                         }
-                        
-                    }else{
+                    } else {
                         $mysql_connect->table('yx_sfl_send_task_receipt')->insert([
                             'mseeage_id'      => $value['mseeage_id'],
                             'template_id'      => $value['template_id'],
@@ -5818,21 +5810,20 @@ class CmppCreateCodeTask extends Pzlife
                             'status_message' => 'SMS:2',
                         ]);
                     }
-                    
                 }
                 unset($ids);
                 // unset($all_send_task);
             }
         }
-       
-       
+
+
         if (!empty($ids)) {
-            $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (".join(',',$ids).") ");
+            $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (" . join(',', $ids) . ") ");
             foreach ($all_send_task as $key => $value) {
                 if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                     continue;
                 }
-                
+
                 if (checkMobile($value['mobile']) != false) {
                     $end_num = substr($value['mobile'], -6);
                     //按无效号码计算
@@ -5860,7 +5851,7 @@ class CmppCreateCodeTask extends Pzlife
                             // 'channel_id'  => $channel_id,
                             'from'        => 'yx_sfl_send_task',
                         ]; */
-                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode( [
+                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode([
                             'mseeage_id'      => $value['mseeage_id'],
                             'template_id'      => $value['template_id'],
                             'mobile'      => $value['mobile'],
@@ -5868,7 +5859,7 @@ class CmppCreateCodeTask extends Pzlife
                             'content'     => $value['task_content'],
                             'from'        => 'yx_sfl_send_task',
                         ])); //三体营销通道
-                    }else{
+                    } else {
                         $mysql_connect->table('yx_sfl_send_task_receipt')->insert([
                             'mseeage_id'      => $value['mseeage_id'],
                             'template_id'      => $value['template_id'],
@@ -5878,8 +5869,7 @@ class CmppCreateCodeTask extends Pzlife
                             'status_message' => 'SMS:2',
                         ]);
                     }
-                   
-                }else{
+                } else {
                     $mysql_connect->table('yx_sfl_send_task_receipt')->insert([
                         'mseeage_id'      => $value['mseeage_id'],
                         'template_id'      => $value['template_id'],
@@ -5889,17 +5879,17 @@ class CmppCreateCodeTask extends Pzlife
                         'status_message' => 'SMS:2',
                     ]);
                 }
-                
             }
         }
     }
 
     /* 彩信模块 */
-    public function SendSflMulTask(){
+    public function SendSflMulTask()
+    {
         $this->redis = Phpredis::getConn();
         // $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-      /*   for ($i=1; $i < 31; $i++) { 
+        /*   for ($i=1; $i < 31; $i++) { 
             $this->redis->rpush('index:meassage:sflmulmessage:sendtask',$i);
         } */
         $ids = [];
@@ -5913,7 +5903,7 @@ class CmppCreateCodeTask extends Pzlife
                 $ids[] = $task_id;
                 $j++;
                 if ($j > 100) {
-                    $all_send_task = Db::query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (".join(',',$ids).") ");
+                    $all_send_task = Db::query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (" . join(',', $ids) . ") ");
                     foreach ($all_send_task as $key => $value) {
                         if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                             continue;
@@ -5922,7 +5912,7 @@ class CmppCreateCodeTask extends Pzlife
                             $end_num = substr($value['mobile'], -6);
                             //按无效号码计算
                             if (!in_array($end_num, ['000000', '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999'])) {
-                                $num = mt_rand(0,100);
+                                $num = mt_rand(0, 100);
                                 if ($num >= 40) {
                                     $prefix = '';
                                     $prefix = substr(trim($value['mobile']), 0, 7);
@@ -5938,10 +5928,10 @@ class CmppCreateCodeTask extends Pzlife
                                             $channel_id = $value['dianxin_channel_id'];
                                         }
                                     }
-                                    $mul      = Db::query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '".$value['sfl_relation_id'] ."' LIMIT 1");
+                                    $mul      = Db::query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '" . $value['sfl_relation_id'] . "' LIMIT 1");
                                     // $content_data             = Db::query("select `id`,`content`,`num`,`image_path`,`image_type` from yx_user_multimedia_message_frame where delete_time=0 and `multimedia_message_id` = " . $sendTask['id'] . "  ORDER BY `num` ASC ");
-                                    
-                                    $fram     = Db::query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '".$mul[0]['id'] ."'");
+
+                                    $fram     = Db::query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '" . $mul[0]['id'] . "'");
                                     $variable = json_decode($value['variable'], true);
                                     foreach ($fram as $fkey => $fvalue) {
                                         if (!empty($fvalue['content'])) {
@@ -5950,21 +5940,21 @@ class CmppCreateCodeTask extends Pzlife
                                             }
                                         }
                                     }
-                                    
+
                                     /* $sendmessage = [
                                         'mobile'      => $value['mobile'],
                                         'title'       => $mul[0]['title'],
                                         'mar_task_id' => $value['id'],
                                         'content'     => $fram,
                                     ]; */
-                                    $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode( [
+                                    $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode([
                                         'mobile'      => $value['mobile'],
                                         'title'       => $mul[0]['title'],
                                         'mar_task_id' => $value['id'],
                                         'content'     => $fram,
                                     ])); //三体营销通道
                                     //正常发送
-                                }else{
+                                } else {
                                     Db::table('yx_sfl_send_multimediatask_receipt')->insert([
                                         'mseeage_id'      => $value['mseeage_id'],
                                         'template_id'      => $value['sfl_relation_id'],
@@ -5974,9 +5964,7 @@ class CmppCreateCodeTask extends Pzlife
                                         'status_message' => 'SMS:1',
                                     ]);
                                 }
-
-                               
-                            }else{
+                            } else {
                                 Db::table('yx_sfl_send_multimediatask_receipt')->insert([
                                     'mseeage_id'      => $value['mseeage_id'],
                                     'template_id'      => $value['sfl_relation_id'],
@@ -5986,8 +5974,7 @@ class CmppCreateCodeTask extends Pzlife
                                     'status_message' => 'SMS:2',
                                 ]);
                             }
-                            
-                        }else{
+                        } else {
                             Db::table('yx_sfl_send_multimediatask_receipt')->insert([
                                 'mseeage_id'      => $value['mseeage_id'],
                                 'template_id'      => $value['sfl_relation_id'],
@@ -5997,28 +5984,27 @@ class CmppCreateCodeTask extends Pzlife
                                 'status_message' => 'SMS:2',
                             ]);
                         }
-                        
                     }
                     unset($ids);
                     // unset($all_send_task);
                 }
             }
-           
-           
+
+
             if (!empty($ids)) {
-                $all_send_task =  Db::query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (".join(',',$ids).") ");
+                $all_send_task =  Db::query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (" . join(',', $ids) . ") ");
                 foreach ($all_send_task as $key => $value) {
-                     
-                   
+
+
                     if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                         continue;
                     }
-                    
+
                     if (checkMobile($value['mobile']) != false) {
                         $end_num = substr($value['mobile'], -6);
                         //按无效号码计算
                         if (!in_array($end_num, ['000000', '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999'])) {
-                            $num = mt_rand(0,100);
+                            $num = mt_rand(0, 100);
                             if ($num >= 40) {
                                 $prefix = '';
                                 $prefix = substr(trim($value['mobile']), 0, 7);
@@ -6034,10 +6020,10 @@ class CmppCreateCodeTask extends Pzlife
                                         $channel_id = $value['dianxin_channel_id'];
                                     }
                                 }
-                                $mul      = Db::query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '".$value['sfl_relation_id'] ."' LIMIT 1");
+                                $mul      = Db::query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '" . $value['sfl_relation_id'] . "' LIMIT 1");
                                 // $content_data             = Db::query("select `id`,`content`,`num`,`image_path`,`image_type` from yx_user_multimedia_message_frame where delete_time=0 and `multimedia_message_id` = " . $sendTask['id'] . "  ORDER BY `num` ASC ");
-                                
-                                $fram     =  Db::query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '".$mul[0]['id'] ."'");
+
+                                $fram     =  Db::query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '" . $mul[0]['id'] . "'");
                                 $variable = json_decode($value['variable'], true);
                                 foreach ($fram as $fkey => $fvalue) {
                                     if (!empty($fvalue['content'])) {
@@ -6046,20 +6032,20 @@ class CmppCreateCodeTask extends Pzlife
                                         }
                                     }
                                 }
-                                
+
                                 /* $sendmessage = [
                                     'mobile'      => $value['mobile'],
                                     'title'       => $mul[0]['title'],
                                     'mar_task_id' => $value['id'],
                                     'content'     => $fram,
                                 ]; */
-                                $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode( [
+                                $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode([
                                     'mobile'      => $value['mobile'],
                                     'title'       => $mul[0]['title'],
                                     'mar_task_id' => $value['id'],
                                     'content'     => $fram,
                                 ])); //三体营销通道
-                            }else{
+                            } else {
                                 Db::table('yx_sfl_send_multimediatask_receipt')->insert([
                                     'mseeage_id'      => $value['mseeage_id'],
                                     'template_id'      => $value['sfl_relation_id'],
@@ -6069,8 +6055,7 @@ class CmppCreateCodeTask extends Pzlife
                                     'status_message' => 'MMS:1',
                                 ]);
                             }
-                           
-                        }else{
+                        } else {
                             Db::table('yx_sfl_send_multimediatask_receipt')->insert([
                                 'mseeage_id'      => $value['mseeage_id'],
                                 'template_id'      => $value['sfl_relation_id'],
@@ -6080,8 +6065,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'status_message' => 'MMS:2',
                             ]);
                         }
-                       
-                    }else{
+                    } else {
                         Db::table('yx_sfl_send_multimediatask_receipt')->insert([
                             'mseeage_id'      => $value['mseeage_id'],
                             'template_id'      => $value['sfl_relation_id'],
@@ -6091,20 +6075,19 @@ class CmppCreateCodeTask extends Pzlife
                             'status_message' => 'MMS:2',
                         ]);
                     }
-                    
                 }
             }
         } catch (\Exception $th) {
             exception($th);
         }
-       
     }
 
-    public function SendSflMulTaskNew(){
+    public function SendSflMulTaskNew()
+    {
         $this->redis = Phpredis::getConn();
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-      /*   for ($i=1; $i < 31; $i++) { 
+        /*   for ($i=1; $i < 31; $i++) { 
             $this->redis->rpush('index:meassage:sflmulmessage:sendtask',$i);
         } */
         $ids = [];
@@ -6118,7 +6101,7 @@ class CmppCreateCodeTask extends Pzlife
                 $ids[] = $task_id;
                 $j++;
                 if ($j > 100) {
-                    $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (".join(',',$ids).") ");
+                    $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (" . join(',', $ids) . ") ");
                     foreach ($all_send_task as $key => $value) {
                         if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                             continue;
@@ -6141,10 +6124,10 @@ class CmppCreateCodeTask extends Pzlife
                                         $channel_id = $value['dianxin_channel_id'];
                                     }
                                 }
-                                $mul      = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '".$value['sfl_relation_id'] ."' LIMIT 1");
+                                $mul      = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '" . $value['sfl_relation_id'] . "' LIMIT 1");
                                 // $content_data             = Db::query("select `id`,`content`,`num`,`image_path`,`image_type` from yx_user_multimedia_message_frame where delete_time=0 and `multimedia_message_id` = " . $sendTask['id'] . "  ORDER BY `num` ASC ");
-                                
-                                $fram     = $mysql_connect->query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '".$mul[0]['id'] ."'");
+
+                                $fram     = $mysql_connect->query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '" . $mul[0]['id'] . "'");
                                 $variable = json_decode($value['variable'], true);
                                 foreach ($fram as $fkey => $fvalue) {
                                     if (!empty($fvalue['content'])) {
@@ -6153,22 +6136,22 @@ class CmppCreateCodeTask extends Pzlife
                                         }
                                     }
                                 }
-                                
+
                                 /* $sendmessage = [
                                     'mobile'      => $value['mobile'],
                                     'title'       => $mul[0]['title'],
                                     'mar_task_id' => $value['id'],
                                     'content'     => $fram,
                                 ]; */
-                                $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode( [
+                                $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode([
                                     'mobile'      => $value['mobile'],
                                     'title'       => $mul[0]['title'],
                                     'mar_task_id' => $value['id'],
                                     'content'     => $fram,
                                 ])); //三体营销通道
                                 //正常发送
-                               
-                            }else{
+
+                            } else {
                                 $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insert([
                                     'mseeage_id'      => $value['mseeage_id'],
                                     'template_id'      => $value['sfl_relation_id'],
@@ -6178,8 +6161,7 @@ class CmppCreateCodeTask extends Pzlife
                                     'status_message' => 'SMS:2',
                                 ]);
                             }
-                            
-                        }else{
+                        } else {
                             $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insert([
                                 'mseeage_id'      => $value['mseeage_id'],
                                 'template_id'      => $value['sfl_relation_id'],
@@ -6189,23 +6171,22 @@ class CmppCreateCodeTask extends Pzlife
                                 'status_message' => 'SMS:2',
                             ]);
                         }
-                        
                     }
                     unset($ids);
                     // unset($all_send_task);
                 }
             }
-           
-           
+
+
             if (!empty($ids)) {
-                $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (".join(',',$ids).") ");
+                $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (" . join(',', $ids) . ") ");
                 foreach ($all_send_task as $key => $value) {
-                     
-                   
+
+
                     if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                         continue;
                     }
-                    
+
                     if (checkMobile($value['mobile']) != false) {
                         $end_num = substr($value['mobile'], -6);
                         //按无效号码计算
@@ -6224,10 +6205,10 @@ class CmppCreateCodeTask extends Pzlife
                                     $channel_id = $value['dianxin_channel_id'];
                                 }
                             }
-                            $mul      = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '".$value['sfl_relation_id'] ."' LIMIT 1");
+                            $mul      = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '" . $value['sfl_relation_id'] . "' LIMIT 1");
                             // $content_data             = Db::query("select `id`,`content`,`num`,`image_path`,`image_type` from yx_user_multimedia_message_frame where delete_time=0 and `multimedia_message_id` = " . $sendTask['id'] . "  ORDER BY `num` ASC ");
-                            
-                            $fram     = $mysql_connect->query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '".$mul[0]['id'] ."'");
+
+                            $fram     = $mysql_connect->query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '" . $mul[0]['id'] . "'");
                             $variable = json_decode($value['variable'], true);
                             foreach ($fram as $fkey => $fvalue) {
                                 if (!empty($fvalue['content'])) {
@@ -6236,20 +6217,20 @@ class CmppCreateCodeTask extends Pzlife
                                     }
                                 }
                             }
-                            
+
                             /* $sendmessage = [
                                 'mobile'      => $value['mobile'],
                                 'title'       => $mul[0]['title'],
                                 'mar_task_id' => $value['id'],
                                 'content'     => $fram,
                             ]; */
-                            $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode( [
+                            $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode([
                                 'mobile'      => $value['mobile'],
                                 'title'       => $mul[0]['title'],
                                 'mar_task_id' => $value['id'],
                                 'content'     => $fram,
                             ])); //三体营销通道
-                        }else{
+                        } else {
                             $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insert([
                                 'mseeage_id'      => $value['mseeage_id'],
                                 'template_id'      => $value['sfl_relation_id'],
@@ -6259,8 +6240,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'status_message' => 'MMS:2',
                             ]);
                         }
-                       
-                    }else{
+                    } else {
                         $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insert([
                             'mseeage_id'      => $value['mseeage_id'],
                             'template_id'      => $value['sfl_relation_id'],
@@ -6270,18 +6250,17 @@ class CmppCreateCodeTask extends Pzlife
                             'status_message' => 'MMS:2',
                         ]);
                     }
-                    
                 }
             }
         } catch (\Exception $th) {
             exception($th);
         }
-       
     }
 
     /* 丝芙兰未知补推 */
-    public function SflUnknownReceipt(){
-        
+    public function SflUnknownReceipt()
+    {
+
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         while (true) {
@@ -6294,7 +6273,7 @@ class CmppCreateCodeTask extends Pzlife
                 }
                 $receipts_id = [];
                 // echo "SELECT `task_id` FROM yx_send_code_task_receipt WHERE `task_id` IN (".join(',',$ids).") GROUP BY `task_id`";die;
-                $task_receipt = Db::query("SELECT `task_id` FROM yx_send_code_task_receipt WHERE `task_id` IN (".join(',',$ids).") GROUP BY `task_id`");
+                $task_receipt = Db::query("SELECT `task_id` FROM yx_send_code_task_receipt WHERE `task_id` IN (" . join(',', $ids) . ") GROUP BY `task_id`");
                 foreach ($task_receipt as $key => $value) {
                     $receipts_id[] = $value['task_id'];
                 }
@@ -6303,13 +6282,13 @@ class CmppCreateCodeTask extends Pzlife
                     sleep(600);
                     continue;
                 }
-                echo "总数:".count($ids)."\n";
-                echo "已回:".count($receipts_id)."\n";
-                echo "未知:".count($unknow)."\n";
-                $unknow_task = Db::query("SELECT `id`,`task_no`,`mobile_content`,`create_time` FROM yx_user_send_code_task WHERE `id` IN (".join(',',$unknow).") ");
+                echo "总数:" . count($ids) . "\n";
+                echo "已回:" . count($receipts_id) . "\n";
+                echo "未知:" . count($unknow) . "\n";
+                $unknow_task = Db::query("SELECT `id`,`task_no`,`mobile_content`,`create_time` FROM yx_user_send_code_task WHERE `id` IN (" . join(',', $unknow) . ") ");
                 foreach ($unknow_task as $key => $value) {
                     $task_receipt_log = [];
-                    $receive_time = $value['create_time'] + 3600*72 - mt_rand(0,1800);
+                    $receive_time = $value['create_time'] + 3600 * 72 - mt_rand(0, 1800);
                     $task_receipt_log = [
                         'task_id' => $value['id'],
                         'mobile' => $value['mobile_content'],
@@ -6329,13 +6308,12 @@ class CmppCreateCodeTask extends Pzlife
             } catch (\Exception $th) {
                 exception($th);
             }
-           
         }
-      
     }
 
     /* 美田回执推送 */
-    public function MltyReceipt(){
+    public function MltyReceipt()
+    {
         $task_log = Db::query("SELECT `*` FROM yx_user_send_code_task_log WHERE `channel_id` = '61' AND `uid` = '47' AND `create_time` >= 1589864233 AND `create_time` <= 1589876607 ");
         foreach ($task_log as $key => $value) {
             $request_url = "http://116.228.60.189:15901/rtreceive?";
