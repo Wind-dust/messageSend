@@ -5586,11 +5586,11 @@ class CmppCreateCodeTask extends Pzlife
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        /*  for ($i=1; $i < 31; $i++) { 
-            $this->redis->rpush('index:meassage:sflmessage:sendtask',$i);
-        } */
+        for ($i = 12804; $i < 12813; $i++) {
+            $this->redis->rpush('index:meassage:sflmessage:sendtask', $i);
+        }
 
-        $deduct = 1; //1扣量,2不扣
+        $deduct = 2; //1扣量,2不扣
         $white_list = [
             13023216322,
             18616841500,
@@ -5873,6 +5873,7 @@ class CmppCreateCodeTask extends Pzlife
         /*  for ($i = 1; $i < 31; $i++) {
             $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $i);
         } */
+        /* 
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3673);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3674);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3675);
@@ -5880,7 +5881,7 @@ class CmppCreateCodeTask extends Pzlife
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3677);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3678);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3679);
-        $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3680);
+        $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3680); */
         $white_list = [
             13023216322,
             18616841500,
