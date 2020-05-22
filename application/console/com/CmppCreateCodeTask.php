@@ -5586,7 +5586,7 @@ class CmppCreateCodeTask extends Pzlife
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        for ($i = 12804; $i < 12813; $i++) {
+        for ($i = 96; $i < 12803; $i++) {
             $this->redis->rpush('index:meassage:sflmessage:sendtask', $i);
         }
 
