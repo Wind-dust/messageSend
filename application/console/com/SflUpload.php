@@ -12,8 +12,10 @@ use think\Db;
 use upload\Imageupload;
 use ZipArchive;
 
+header("Content-Type: text/html;charset=utf-8");
 class SflUpload extends Pzlife
 {
+
     private $redis;
     /**
      * 数据库连接
