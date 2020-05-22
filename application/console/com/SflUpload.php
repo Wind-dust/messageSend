@@ -892,7 +892,8 @@ class SflUpload extends Pzlife
                         $insertMMS = [];
                         $j         = 1;
                         for ($i = 0; $i < count($MMSmessage); $i++) {
-                            array_push($insertMMS, $MMSmessage[$i]);
+                            // array_push($insertMMS, $MMSmessage[$i]);
+                            $insertMMS[] = $MMSmessage[$i];
                             $j++;
                             if ($j > 100) {
                                 $mysql_connect->startTrans();
