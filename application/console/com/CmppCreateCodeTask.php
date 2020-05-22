@@ -5874,7 +5874,7 @@ class CmppCreateCodeTask extends Pzlife
         $this->redis = Phpredis::getConn();
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        for ($i = 1; $i < 3672; $i++) {
+        for ($i = 1; $i < 3673; $i++) {
             $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $i);
         }
 
@@ -6245,6 +6245,89 @@ class CmppCreateCodeTask extends Pzlife
                 Db::commit();
             } catch (\Exception $e) {
                 Db::rollback();
+                exception($e);
+            }
+        }
+    }
+
+    public function sflMulTaskReceipt()
+    {
+        $this->redis = Phpredis::getConn();
+        $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $mul_receipt_key = 'index:meassage:multimediamessage:deliver:94';
+        $j = 1;
+        $this->redis->rPush($mul_receipt_key,'{"mseeage_id":"2343307226","mobile":"15201926171","status_message":"DELIVRD","send_status":3,"send_time":1590125765}');
+        $this->redis->rPush($mul_receipt_key,'{"mseeage_id":"2313220642","mobile":"18684567784","status_message":"DELIVRD","send_status":3,"send_time":1590128152}');
+        $this->redis->rPush($mul_receipt_key,'{"mseeage_id":"2313221289","mobile":"13521448203","status_message":"DELIVRD","send_status":3,"send_time":1590128152}');
+        $commit_tobase = [];
+        $back = [];
+        while (true) {
+            $receipt = $this->redis->lpop($mul_receipt_key);
+            if (empty($receipt)) {
+                break;
+            }
+            $receipts = json_decode($receipt,true);
+            if (empty($receipts['mseeage_id'])) {
+                continue;
+            }
+            if (trim($receipts['mobile']) == '15201926171' || trim($receipts['mobile']) == '15821193682') {
+                continue;
+            }
+            $commit = [];
+            $mul_task = $mysql_connect->query("SELECT `id`,`sfl_relation_id` FROM yx_sfl_multimedia_message WHERE `mseeage_id` =  ".trim($receipts['mseeage_id']." LIMIT 1"));
+            $commit = [
+                'mseeage_id' => $receipts['mseeage_id'],
+                'mobile' => $receipts['mobile'],
+                'real_message' => $receipts['status_message'],
+                'task_id' => $mul_task[0]['id'],
+                'template_id' => $mul_task[0]['sfl_relation_id'],
+            ];
+            if ($receipts['status_message'] == 'DELIVRD') {
+               $commit['status_message'] = "MMS:1"; 
+               $commit['messageinfo'] = "发送成功"; 
+            }else{
+                $commit['status_message'] = "MMS:2"; 
+                $commit['messageinfo'] = "发送失败"; 
+            }
+            $commit_tobase[] = $commit;
+            $back[] = $receipt;
+            $j++;
+            if ($j > 100) {
+                $mysql_connect->startTrans();
+                try {
+                    $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insertAll($commit_tobase);
+                    $mysql_connect->commit();
+                    unset($commit_tobase);
+                    unset($back);
+                    $j = 1;
+                } catch (\Exception $e) {
+                    $mysql_connect->rollback();
+                    if (!empty($back)) {
+                        foreach ($back as $key => $value) {
+                            $this->redis->rPush($mul_receipt_key,$value);
+                        }
+                    }
+                    
+                    exception($e);
+                }
+            }
+        }
+        if (!empty($commit_tobase)) {
+            $mysql_connect->startTrans();
+            try {
+                $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insertAll($commit_tobase);
+                $mysql_connect->commit();
+                unset($commit_tobase);
+                unset($back);
+                $j = 1;
+            } catch (\Exception $e) {
+                $mysql_connect->rollback();
+                if (!empty($back)) {
+                    foreach ($back as $key => $value) {
+                        $this->redis->rPush($mul_receipt_key,$value);
+                    }
+                }
                 exception($e);
             }
         }
