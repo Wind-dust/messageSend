@@ -305,10 +305,10 @@ class SflUpload extends Pzlife
                             $sfl_model['title'] = $sfl_SMS_fram['title'];
                             $sfl_model['create_time'] = time();
                             unset($sfl_SMS_fram['title']);
-                            if ($mysql_connect->query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
+                            if (Db::query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
                                 continue;
                             }
-                            $sfl_multimedia_template_id = $mysql_connect->table('yx_sfl_multimedia_template')->insertGetId($sfl_model);
+                            $sfl_multimedia_template_id = Db::table('yx_sfl_multimedia_template')->insertGetId($sfl_model);
 
                             // print_r($sfl_SMS_fram);
                             foreach ($sfl_SMS_fram as $key => $value) {
@@ -316,7 +316,7 @@ class SflUpload extends Pzlife
                                 $value['sfl_multimedia_template_id'] = $sfl_multimedia_template_id;
                                 $value['sfl_model_id']               = $fvalue[3];
                                 $value['create_time']               = time();
-                                $mysql_connect->table('yx_sfl_multimedia_template_frame')->insert($value);
+                                Db::table('yx_sfl_multimedia_template_frame')->insert($value);
                             }
                         }
 
@@ -781,10 +781,10 @@ class SflUpload extends Pzlife
                             $sfl_model['title'] = $sfl_SMS_fram['title'];
                             $sfl_model['create_time'] = time();
                             unset($sfl_SMS_fram['title']);
-                            if ($mysql_connect->query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
+                            if (Db::query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
                                 continue;
                             }
-                            $sfl_multimedia_template_id = $mysql_connect->table('yx_sfl_multimedia_template')->insertGetId($sfl_model);
+                            $sfl_multimedia_template_id = Db::table('yx_sfl_multimedia_template')->insertGetId($sfl_model);
 
                             // print_r($sfl_SMS_fram);
                             foreach ($sfl_SMS_fram as $key => $value) {
@@ -898,12 +898,12 @@ class SflUpload extends Pzlife
                             $insertMMS[] = $MMSmessage[$i];
                             $j++;
                             if ($j > 100) {
-                                $mysql_connect->startTrans();
+                                Db::startTrans();
                                 try {
-                                    $mysql_connect->table('yx_sfl_multimedia_message')->insertAll($insertMMS);
+                                    Db::table('yx_sfl_multimedia_message')->insertAll($insertMMS);
                                     unset($insertMMS);
                                     $j = 1;
-                                    $mysql_connect->commit();
+                                    Db::commit();
                                 } catch (\Exception $e) {
                                     exception($e);
                                 }
@@ -912,11 +912,11 @@ class SflUpload extends Pzlife
                             }
                         }
                         if (!empty($insertMMS)) {
-                            $mysql_connect->startTrans();
+                            Db::startTrans();
                             try {
-                                $mysql_connect->table('yx_sfl_multimedia_message')->insertAll($insertMMS);
+                                Db::table('yx_sfl_multimedia_message')->insertAll($insertMMS);
                                 unset($insertMMS);
-                                $mysql_connect->commit();
+                                Db::commit();
                             } catch (\Exception $e) {
                                 exception($e);
                             }
@@ -1115,12 +1115,12 @@ class SflUpload extends Pzlife
                                     // print_r($content);die;
                                     $j++;
                                     if ($j > 100) {
-                                        $mysql_connect->startTrans();
+                                        Db::startTrans();
                                         try {
-                                            $mysql_connect->table('yx_sfl_send_task')->insertAll($SMSmessage);
+                                            Db::table('yx_sfl_send_task')->insertAll($SMSmessage);
                                             unset($SMSmessage);
                                             $j = 1;
-                                            $mysql_connect->commit();
+                                            Db::commit();
                                         } catch (\Exception $e) {
                                             exception($e);
                                         }
@@ -1151,11 +1151,11 @@ class SflUpload extends Pzlife
                             }
                         } */
                         if (!empty($SMSmessage)) {
-                            $mysql_connect->startTrans();
+                            Db::startTrans();
                             try {
-                                $mysql_connect->table('yx_sfl_send_task')->insertAll($SMSmessage);
+                                Db::table('yx_sfl_send_task')->insertAll($SMSmessage);
                                 unset($SMSmessage);
-                                $mysql_connect->commit();
+                                Db::commit();
                             } catch (\Exception $e) {
                                 exception($e);
                             }
