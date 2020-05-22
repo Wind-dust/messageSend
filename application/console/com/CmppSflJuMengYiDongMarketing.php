@@ -548,6 +548,7 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
                                     if ($i > $security_master) {
                                         $i = 0;
                                     }
+                                    exit;
                                     usleep(250);
                                     continue;
                                 } else { //单条短信
