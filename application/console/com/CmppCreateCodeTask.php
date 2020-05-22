@@ -5877,15 +5877,15 @@ class CmppCreateCodeTask extends Pzlife
         /*  for ($i = 1; $i < 31; $i++) {
             $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $i);
         } */
-        /* 
-        $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3673);
+
+        /*    $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3673);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3674);
-        $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3675);
+        $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3675); */
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3676);
-        $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3677);
+        /* $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3677);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3678);
-        $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3679);
-        $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3680); */
+        $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3679); */
+        $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3680);
         $white_list = [
             13023216322,
             18616841500,
