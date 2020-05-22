@@ -26,7 +26,7 @@ class CmppSflJuMengLianDianMarketing extends Pzlife {
             'Shared_secret' => '123456', //网关登录密码
             'Service_Id'    => "240666", //业务代码
             'template_id'   => "", //模板id
-            'Dest_Id'       => "1069440666", //短信接入码 短信端口号 服务代码
+            'Dest_Id'       => "1069240666", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
             'master_num'    => 500,
