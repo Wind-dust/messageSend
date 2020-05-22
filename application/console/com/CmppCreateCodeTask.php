@@ -5654,6 +5654,7 @@ class CmppCreateCodeTask extends Pzlife
                                     'mar_task_id' => $value['id'],
                                     'content'     => $value['task_content'],
                                     'from'        => 'yx_sfl_send_task',
+                                    'channel_id'        => $channel_id,
                                 ];
                                 $send_msg[] = $sendmessage;
                             } else {
@@ -5699,6 +5700,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'mar_task_id' => $value['id'],
                                 'content'     => $value['task_content'],
                                 'from'        => 'yx_sfl_send_task',
+                                'channel_id'        => $channel_id,
                             ];
                             $send_msg[] = $sendmessage;
                         }
