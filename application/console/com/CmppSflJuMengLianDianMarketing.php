@@ -22,9 +22,9 @@ class CmppSflJuMengLianDianMarketing extends Pzlife {
         return [
             'host'          => "47.106.127.182", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "440666", //企业id  企业代码
+            'Source_Addr'   => "240666", //企业id  企业代码
             'Shared_secret' => '123456', //网关登录密码
-            'Service_Id'    => "440666", //业务代码
+            'Service_Id'    => "240666", //业务代码
             'template_id'   => "", //模板id
             'Dest_Id'       => "1069440666", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
@@ -54,13 +54,20 @@ class CmppSflJuMengLianDianMarketing extends Pzlife {
 
         ])); */
 
-        /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
-            'content'     => '【钰晰科技】您的验证码为2310。',
+            'content'     => '【钰晰科技】短信对接调试MSGid。',
 
-        ])); */
+        ]));
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15201926171',
+            'mar_task_id' => '',
+            // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
+            'content'     => '【丝芙兰】尊贵的黑卡会员 燕双，祝您生日快乐！三重生日豪礼，伴您享受生日喜悦！一重奏:【丝芙兰门店明星礼包】二重奏: 【丝芙兰官网50元电子礼券】三重奏:生日月订单享受一次双倍积分礼遇。会员生日福利，明星热卖产品大放送！请于2020-06-22前至丝芙兰官网sephora.cn 、App、小程序或门店领取您的专属生日礼物！以上三重生日礼，皆不可与其他优惠叠加使用。/回T退订',
+
+        ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
         $myfile   = fopen($log_path, 'a+');
