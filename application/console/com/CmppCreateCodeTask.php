@@ -6024,11 +6024,14 @@ class CmppCreateCodeTask extends Pzlife
                     if (!empty($receipt)) {
                         $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insertAll($receipt);
                     }
-                    foreach ($send_msg as $skey => $svalue) {
-                        $channel_id = $svalue['channel_id'];
-                        unset($svalue['channel_id']);
-                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($svalue)); //三体营销通道
+                    if (!empty($send_msg)) {
+                        foreach ($send_msg as $skey => $svalue) {
+                            $channel_id = $svalue['channel_id'];
+                            unset($svalue['channel_id']);
+                            $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($svalue)); //三体营销通道
+                        }
                     }
+
                     unset($ids);
                     unset($receipt);
                     unset($send_msg);
@@ -6152,10 +6155,12 @@ class CmppCreateCodeTask extends Pzlife
                     // print_r($receipt);die;
                     $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insertAll($receipt);
                 }
-                foreach ($send_msg as $skey => $svalue) {
-                    $channel_id = $svalue['channel_id'];
-                    unset($svalue['channel_id']);
-                    $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($svalue)); //三体营销通道
+                if (!empty($send_msg)) {
+                    foreach ($send_msg as $skey => $svalue) {
+                        $channel_id = $svalue['channel_id'];
+                        unset($svalue['channel_id']);
+                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($svalue)); //三体营销通道
+                    }
                 }
                 unset($ids);
                 unset($receipt);
