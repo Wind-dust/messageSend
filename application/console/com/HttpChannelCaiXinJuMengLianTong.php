@@ -23,7 +23,7 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
             'send_api'    => 'http://47.106.127.182:27507/mms/mt', //下发地址
             'call_api'    => '', //上行地址
             'overage_api' => '', //余额地址
-            'receive_api' => 'http://114.55.11.126:8888/mmsStatusApi.aspx?action=query', //回执，报告
+            'receive_api' => '', //回执，报告
         ];
 
         //'account'    => 'yuxi',
@@ -97,10 +97,10 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
                             $real_send_content = '';
                             $vc                = '';
                             foreach ($send_data['content'] as $key => $value) {
-                                $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
+                                $real_send_content .= $vc . $value['num'] . '.txt|' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
                                 // $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode($value['content']);
                                 if (!empty($value['image_path'])) {
-                                    $real_send_content .= ',';
+                                    $real_send_content .= '.';
                                     $md5 = md5(Config::get('qiniu.domain') . '/' . $value['image_path']);
                                     if (isset($image_data[$md5])) {
                                         if ($value['image_type'] == 'jpg') {
@@ -135,10 +135,10 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
                             $real_send_content = '';
                             $vc                = '';
                             foreach ($send_data['content'] as $key => $value) {
-                                $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
+                                $real_send_content .= $vc . $value['num'] . '.txt|' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
                                 // $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode($value['content']);
                                 if (!empty($value['image_path'])) {
-                                    $real_send_content .= ',';
+                                    $real_send_content .= '.';
                                     /* if ($value['image_type'] == 'jpg') {
                                     $real_send_content .= 'jpg|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                     } elseif ($value['image_type'] == 'gif') {
@@ -205,14 +205,7 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
                                     }
                                     exit(); //关闭通道
                                 }
-                                /*  $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-                                if ($result['returnstatus'] == 'Success') { //成功
-                                $receive_id[$result['taskID']] = $send_taskid;
-                                $redis->hset('index:meassage:code:back_taskno:' . $content, $result['taskID'], $send_taskid);
-                                } elseif ($result['returnstatus'] == 'Faild') { //失败
-                                echo "error:" . $result['message'] . "\n";die;
-                                } */
-                                // print_r($result);
+
                                 unset($send_num[$send_taskid]);
                                 usleep(12500);
                             }
@@ -243,15 +236,15 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
                         // print_r($real_send);
                         $log_path = realpath("") . "/sign.log";
                         $myfile = fopen($log_path, 'w');
-                
+
                         foreach ($real_send as $key => $value) {
                             fwrite($myfile, $key . ":" . $value . "\n");
                         }
                         fclose($myfile);
                         $res    = sendRequest($user_info['send_api'], 'post', $real_send);
-                        
+
                         $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-                        print_r($result);
+                        print_r($res);
                         die;
                         // $result['code'] = 2;
                         if (isset($result[1])) {

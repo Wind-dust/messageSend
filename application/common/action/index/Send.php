@@ -1799,7 +1799,7 @@ return $result;
 
     public function chuangLanMmsSftpCallBack($code, $desc, $task_id, $phone)
     {
-        $task = DbSendMessage::getUserMultimediaMessage(['id' => $task_id], 'uid,task_no', true);
+        $task = DbSendMessage::getSflMultimediaMessage(['id' => $task_id], 'mseeage_id', true);
         if (!empty($task)) {
             $redisMessageCodeDeliver = 'index:meassage:multimediamessage:deliver:94'; //创蓝彩信回执通道
             $redis = Phpredis::getConn();
@@ -1812,8 +1812,7 @@ return $result;
                 $send_status = 4;
             }
             $send_task_log = [
-                'task_no'        => $task['task_no'],
-                'uid'            => $task['uid'],
+                'mseeage_id'        => $task['mseeage_id'],
                 'mobile'         => $phone,
                 'status_message' => $code,
                 'send_status'    => $send_status,
