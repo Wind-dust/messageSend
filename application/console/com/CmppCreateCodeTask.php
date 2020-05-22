@@ -5586,9 +5586,9 @@ class CmppCreateCodeTask extends Pzlife
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        for ($i = 96; $i < 12803; $i++) {
+        /* for ($i = 96; $i < 12803; $i++) {
             $this->redis->rpush('index:meassage:sflmessage:sendtask', $i);
-        }
+        } */
 
         $deduct = 2; //1扣量,2不扣
         $white_list = [
@@ -5874,9 +5874,9 @@ class CmppCreateCodeTask extends Pzlife
         $this->redis = Phpredis::getConn();
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        for ($i = 1; $i < 3673; $i++) {
+/*         for ($i = 1; $i < 3673; $i++) {
             $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $i);
-        }
+        } */
 
         /*    $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3673);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3674);
@@ -6250,16 +6250,13 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
-    public function sflMulTaskReceipt()
+    public function sflSftpMulTaskReceipt()
     {
         $this->redis = Phpredis::getConn();
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $mul_receipt_key = 'index:meassage:multimediamessage:deliver:94';
         $j = 1;
-        $this->redis->rPush($mul_receipt_key,'{"mseeage_id":"2343307226","mobile":"15201926171","status_message":"DELIVRD","send_status":3,"send_time":1590125765}');
-        $this->redis->rPush($mul_receipt_key,'{"mseeage_id":"2313220642","mobile":"18684567784","status_message":"DELIVRD","send_status":3,"send_time":1590128152}');
-        $this->redis->rPush($mul_receipt_key,'{"mseeage_id":"2313221289","mobile":"13521448203","status_message":"DELIVRD","send_status":3,"send_time":1590128152}');
         $commit_tobase = [];
         $back = [];
         while (true) {
@@ -6331,5 +6328,9 @@ class CmppCreateCodeTask extends Pzlife
                 exception($e);
             }
         }
+    }
+
+    public function sflSftpTaskReceipt(){
+
     }
 }
