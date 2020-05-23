@@ -6423,15 +6423,15 @@ class CmppCreateCodeTask extends Pzlife
             $commit = [
                 'mseeage_id' => $receipts['mseeage_id'],
                 'mobile' => $receipts['mobile'],
-                'real_message' => $receipts['status_message'],
+                'real_message' => $receipts['Stat'],
                 'task_id' => $receipts['mar_task_id'],
                 'template_id' => $receipts['template_id'],
             ];
-            $receipts['status_message'] = trim($receipts['status_message']);
-            if ($receipts['status_message'] == 'DELIVRD' || $receipts['status_message'] == 'MK:100D' || $receipts['status_message'] == 'DB:0141') {
+            $receipts['Stat'] = trim($receipts['Stat']);
+            if ($receipts['Stat'] == 'DELIVRD' || $receipts['Stat'] == 'MK:100D' || $receipts['Stat'] == 'DB:0141') {
                $commit['status_message'] = "SMS:1"; 
                $commit['messageinfo'] = "发送成功"; 
-            }elseif(strpos($receipts['status_message'],'BLACK')){
+            }elseif(strpos($receipts['Stat'],'BLACK')){
                 $commit['status_message'] = "SMS:4"; 
                $commit['messageinfo'] = "黑名单"; 
             }else{
