@@ -5648,6 +5648,7 @@ class CmppCreateCodeTask extends Pzlife
             if ($j > 100) {
                 $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (" . join(',', $ids) . ") ");
                 foreach ($all_send_task as $key => $value) {
+                    $sendmessage = [];
                     if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                         continue;
                     }
@@ -5784,6 +5785,7 @@ class CmppCreateCodeTask extends Pzlife
         if (!empty($ids)) {
             $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (" . join(',', $ids) . ") ");
             foreach ($all_send_task as $key => $value) {
+                $sendmessage = [];
                 if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                     continue;
                 }
