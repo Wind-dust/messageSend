@@ -5610,6 +5610,21 @@ class CmppCreateCodeTask extends Pzlife
             $this->redis->rpush('index:meassage:sflmessage:sendtask', $i);
         } */
 
+        $tody_time = strtotime(date("Ymd",time()));
+        try {
+            $mysql_connect->table('yx_sfl_send_task')->where([['create_time','>',$tody_time],['template_id', '=','100150821']])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84]);
+            $where = [];
+            $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
+            $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 87, 'dianxin_channel_id' => 88]);
+            
+        die;
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  ".$tody_time);
+            foreach ($sendid as $key => $value) {
+                $this->redis->rpush('index:meassage:sflmessage:sendtask', $value['id']);
+            }
+        } catch (\Exception $th) {
+            exception($th);
+        }
         $deduct = 2; //1扣量,2不扣
         $white_list = [
             13023216322,
