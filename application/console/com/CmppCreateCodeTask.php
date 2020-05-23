@@ -5615,7 +5615,7 @@ class CmppCreateCodeTask extends Pzlife
             // $mysql_connect->table('yx_sfl_send_task')->where([['create_time','>',$tody_time],['template_id', '=','100150821']])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84]);
             $where = [];
             $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
-            $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 87, 'dianxin_channel_id' => 88]);
+            $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);
             $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  ".$tody_time);
             foreach ($sendid as $key => $value) {
                 $this->redis->rpush('index:meassage:sflmessage:sendtask', $value['id']);
@@ -5710,10 +5710,18 @@ class CmppCreateCodeTask extends Pzlife
                             if ($res) {
                                 $newres = array_shift($res);
                                 if ($newres['source'] == 1) {
+                                    continue;
                                     $channel_id = $value['yidong_channel_id'];
                                 } elseif ($newres['source'] == 2) {
+                                    
+                                    if ($value['liantong_channel_id'] == 84) {
+                                        continue;
+                                    }
                                     $channel_id = $value['liantong_channel_id'];
                                 } elseif ($newres['source'] == 3) {
+                                    if ($value['dianxin_channel_id'] == 84) {
+                                        continue;
+                                    }
                                     $channel_id = $value['dianxin_channel_id'];
                                 }
                             }
@@ -5792,10 +5800,17 @@ class CmppCreateCodeTask extends Pzlife
                             if ($res) {
                                 $newres = array_shift($res);
                                 if ($newres['source'] == 1) {
+                                    continue;
                                     $channel_id = $value['yidong_channel_id'];
                                 } elseif ($newres['source'] == 2) {
+                                    if ($value['liantong_channel_id'] == 84) {
+                                        continue;
+                                    }
                                     $channel_id = $value['liantong_channel_id'];
                                 } elseif ($newres['source'] == 3) {
+                                    if ($value['dianxin_channel_id'] == 84) {
+                                        continue;
+                                    }
                                     $channel_id = $value['dianxin_channel_id'];
                                 }
                             }
