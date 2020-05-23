@@ -624,6 +624,10 @@ class SflUpload extends Pzlife
                             $son_path = '';
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
+                            // print_r($svalue);die;
+                            if (!strpos($svalue,date("Ymd"))) {
+                                continue;
+                            }
                             $file_info = explode('.', $svalue);
                             if ($file_info[1] == 'zip') { //需要解压
                                 //开始解压
@@ -766,35 +770,37 @@ class SflUpload extends Pzlife
                         [4] => "100088234_20200424155750.zip"
                         [5] => "2020-04-24 00:00:00"
                         ) */
+                        if (!empty($file_data)) {
+                            foreach ($file_data as $fkey => $fvalue) {
 
-                        foreach ($file_data as $fkey => $fvalue) {
-
-                            $sfl_model = [];
-                            $sfl_model = [
-                                'sfl_relation_id'    => $fvalue[0], //对应communication_channel_id 渠道id 关联target目标的唯一识别码
-                                'sfl_model_name'     => $fvalue[1], //communication_name 渠道名称
-                                'sfl_model_id'       => $fvalue[3], //模板id
-                                'sfl_model_filename' => $fvalue[4], //主题的名称 对应MMS模板的主题 图片以及内容的压缩文件
-                            ];
-                            $fram_key           = explode('.', $fvalue[4]);
-                            $sfl_SMS_fram       = $all_models[$fram_key[0]];
-                            $sfl_model['title'] = $sfl_SMS_fram['title'];
-                            $sfl_model['create_time'] = time();
-                            unset($sfl_SMS_fram['title']);
-                            if (Db::query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
-                                continue;
-                            }
-                            $sfl_multimedia_template_id = Db::table('yx_sfl_multimedia_template')->insertGetId($sfl_model);
-
-                            // print_r($sfl_SMS_fram);
-                            foreach ($sfl_SMS_fram as $key => $value) {
-                                // # code...
-                                $value['sfl_multimedia_template_id'] = $sfl_multimedia_template_id;
-                                $value['sfl_model_id']               = $fvalue[3];
-                                $value['create_time']               = time();
-                                Db::table('yx_sfl_multimedia_template_frame')->insert($value);
+                                $sfl_model = [];
+                                $sfl_model = [
+                                    'sfl_relation_id'    => $fvalue[0], //对应communication_channel_id 渠道id 关联target目标的唯一识别码
+                                    'sfl_model_name'     => $fvalue[1], //communication_name 渠道名称
+                                    'sfl_model_id'       => $fvalue[3], //模板id
+                                    'sfl_model_filename' => $fvalue[4], //主题的名称 对应MMS模板的主题 图片以及内容的压缩文件
+                                ];
+                                $fram_key           = explode('.', $fvalue[4]);
+                                $sfl_SMS_fram       = $all_models[$fram_key[0]];
+                                $sfl_model['title'] = $sfl_SMS_fram['title'];
+                                $sfl_model['create_time'] = time();
+                                unset($sfl_SMS_fram['title']);
+                                if (Db::query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
+                                    continue;
+                                }
+                                $sfl_multimedia_template_id = Db::table('yx_sfl_multimedia_template')->insertGetId($sfl_model);
+    
+                                // print_r($sfl_SMS_fram);
+                                foreach ($sfl_SMS_fram as $key => $value) {
+                                    // # code...
+                                    $value['sfl_multimedia_template_id'] = $sfl_multimedia_template_id;
+                                    $value['sfl_model_id']               = $fvalue[3];
+                                    $value['create_time']               = time();
+                                    Db::table('yx_sfl_multimedia_template_frame')->insert($value);
+                                }
                             }
                         }
+                       
                         // print_r($file_data);die;
                         //发送内容并 进行拼接
 
@@ -880,37 +886,43 @@ class SflUpload extends Pzlife
                         }
 
                         // print_r($model_check);
-                        foreach ($file_data as $key => $value) {
-                            // print_r($value[2]);
-                            // print_r($model_check[$value[0]]);
-
-                            // die;
-                            if ($value[2] != $model_check[$value[0]]) {
-                                //校验失败
-                                return false;
+                        if (!empty($file_data)) {
+                            foreach ($file_data as $key => $value) {
+                                // print_r($value[2]);
+                                // print_r($model_check[$value[0]]);
+    
+                                // die;
+                                if ($value[2] != $model_check[$value[0]]) {
+                                    //校验失败
+                                    return false;
+                                }
                             }
                         }
+                        
                         // continue;
                         $insertMMS = [];
                         $j         = 1;
-                        for ($i = 0; $i < count($MMSmessage); $i++) {
-                            // array_push($insertMMS, $MMSmessage[$i]);
-                            $insertMMS[] = $MMSmessage[$i];
-                            $j++;
-                            if ($j > 100) {
-                                Db::startTrans();
-                                try {
-                                    Db::table('yx_sfl_multimedia_message')->insertAll($insertMMS);
-                                    unset($insertMMS);
-                                    $j = 1;
-                                    Db::commit();
-                                } catch (\Exception $e) {
-                                    exception($e);
+                        if (!empty($MMSmessage)) {
+                            for ($i = 0; $i < count($MMSmessage); $i++) {
+                                // array_push($insertMMS, $MMSmessage[$i]);
+                                $insertMMS[] = $MMSmessage[$i];
+                                $j++;
+                                if ($j > 100) {
+                                    Db::startTrans();
+                                    try {
+                                        Db::table('yx_sfl_multimedia_message')->insertAll($insertMMS);
+                                        unset($insertMMS);
+                                        $j = 1;
+                                        Db::commit();
+                                    } catch (\Exception $e) {
+                                        exception($e);
+                                    }
+                                    // $this->redis->rPush('index:meassage:business:sendtask', $send);
+    
                                 }
-                                // $this->redis->rPush('index:meassage:business:sendtask', $send);
-
                             }
                         }
+                       
                         if (!empty($insertMMS)) {
                             Db::startTrans();
                             try {
@@ -933,6 +945,9 @@ class SflUpload extends Pzlife
                         foreach ($son_path_data as $skey => $svalue) {
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
+                            if (!strpos($svalue,date("Ymd"))) {
+                                continue;
+                            }
                             $file_info = explode('.', $svalue);
                             if ($file_info[1] == 'zip') { //需要解压
                                 if ($zip->open($son_path) === true) {
@@ -986,170 +1001,160 @@ class SflUpload extends Pzlife
                                 // print_r($son_path);die;
                             }
                         }
-                        foreach ($file_data as $fkey => $fvalue) {
-                            // print_r($fvalue);
-                            $tem                   = [];
-                            $tem['num']            = $fvalue[2];
-                            $tem['content']        = $fvalue[4];
-                            $SMS_model[$fvalue[0]] = $tem;
+                        if (!empty($file_data)) {
+                            foreach ($file_data as $fkey => $fvalue) {
+                                // print_r($fvalue);
+                                $tem                   = [];
+                                $tem['num']            = $fvalue[2];
+                                $tem['content']        = $fvalue[4];
+                                $SMS_model[$fvalue[0]] = $tem;
+                            }
                         }
                         // print_r($SMS_model);
                         // die;
                         // print_r($send_data);
-                        foreach ($send_data as $key => $value) {
-                            $txt = [];
-                            $txt = $this->readForTxtToDyadicArray($value); # code...
-                            if (!empty($txt)) {
-                                foreach ($txt as $tkey => $tvalue) {
-                                    if (isset($model_check[$tvalue[2]])) {
-                                        $model_check[$tvalue[2]]++;
-                                    } else {
-                                        $model_check[$tvalue[2]] = 1;
-                                    }
-                                    /*  $SMS_real_send               = [];
-                                    $SMS_real_send               = [];
-                                    $SMS_real_send['mseeage_id'] = $tvalue[0];
-                                    $SMS_real_send['mobile']     = $tvalue[3];
-                                    $SMS_real_send['free_trial'] = 1;
-                                    // $SMS_real_send['real_num'] = 1;
-                                    $SMS_real_send['send_num']     = 1;
-                                    $SMS_real_send['send_status']  = 1;
-                                    $SMS_real_send['template_id'] = $tvalue[2];
-                                    $SMS_real_send['create_time']  = time();
-                                    $content                       = $SMS_model[$tvalue[2]]['content'];
-                                    $content                       = str_replace('{FULL_NAME}', $tvalue[4], $content);
-                                    $content                       = str_replace('{RESERVED_FIELD_1}', $tvalue[7], $content);
-                                    $content                       = str_replace('{RESERVED_FIELD_2}', $tvalue[8], $content);
-                                    $content                       = str_replace('{RESERVED_FIELD_3}', $tvalue[9], $content);
-                                    $content                       = str_replace('{RESERVED_FIELD_4}', $tvalue[10], $content);
-                                    $content                       = str_replace('{RESERVED_FIELD_5}', $tvalue[11], $content);
-                                    $content                       = str_replace('{ACCOUNT_NUMBER}', $tvalue[1], $content);
-                                    $content                       = str_replace('{MOBILE}', $tvalue[3], $content);
-                                    $content                       = str_replace('{POINTS_AVAILABLE}', $tvalue[5], $content);
-                                    $content                       = str_replace('{TOTAL_POINTS}', $tvalue[6], $content);
-                                    if (strpos($content,'【丝芙兰】') !== false) {
-                                       
-                                    }else{
-                                        $content = '【丝芙兰】'.$content;
-                                    }
-                                    if (strpos($content,'回T退订') !== false) {
-                                       
-                                    }else{
-                                        $content = $content."/回T退订";
-                                    }
-                                    // print_r($content);die;
-                                    $send_length = mb_strlen($content, 'utf8');
-                                    $real_length = 1;
-                                    if ($send_length > 70) {
-                                        $real_length = ceil($send_length / 67);
-                                    }
-                                    $SMS_real_send['task_content'] = $content;
-                                    $SMS_real_send['real_num'] = $real_length;
-                                    $SMS_real_send['send_length'] = $send_length;
-                                    $SMSmessage[] = $SMS_real_send; */
-                                    // print_r($content);die;
-                                }
-                            }
-                        }
-
-                        foreach ($file_data as $key => $value) {
-                            // print_r($value[2]);
-                            // print_r($model_check[$value[0]]);
-
-                            // die;
-                            if ($value[2] != $model_check[$value[0]]) {
-                                //校验失败
-                                return  ['code' => 200, "error" => "校验失败"];
-                            }
-                        }
-                        $j = 1;
-                        foreach ($send_data as $key => $value) {
-                            $txt = [];
-                            $txt = $this->readForTxtToDyadicArray($value); # code...
-                            if (!empty($txt)) {
-                                foreach ($txt as $tkey => $tvalue) {
-                                    if (isset($model_check[$tvalue[2]])) {
-                                        $model_check[$tvalue[2]]++;
-                                    } else {
-                                        $model_check[$tvalue[2]] = 1;
-                                    }
-                                    $SMS_real_send               = [];
-                                    $SMS_real_send               = [];
-                                    $SMS_real_send['mseeage_id'] = $tvalue[0];
-                                    $SMS_real_send['mobile']     = $tvalue[3];
-                                    $SMS_real_send['free_trial'] = 1;
-                                    // $SMS_real_send['real_num'] = 1;
-                                    $SMS_real_send['send_num']     = 1;
-                                    $SMS_real_send['send_status']  = 1;
-                                    $SMS_real_send['template_id'] = $tvalue[2];
-                                    $SMS_real_send['create_time']  = time();
-                                    $content                       = $SMS_model[$tvalue[2]]['content'];
-                                    $content                       = str_replace('{FULL_NAME}', $tvalue[4], $content);
-                                    $content                       = str_replace('{RESERVED_FIELD_1}', $tvalue[7], $content);
-                                    $content                       = str_replace('{RESERVED_FIELD_2}', $tvalue[8], $content);
-                                    $content                       = str_replace('{RESERVED_FIELD_3}', $tvalue[9], $content);
-                                    $content                       = str_replace('{RESERVED_FIELD_4}', $tvalue[10], $content);
-                                    $content                       = str_replace('{RESERVED_FIELD_5}', $tvalue[11], $content);
-                                    $content                       = str_replace('{ACCOUNT_NUMBER}', $tvalue[1], $content);
-                                    $content                       = str_replace('{MOBILE}', $tvalue[3], $content);
-                                    $content                       = str_replace('{POINTS_AVAILABLE}', $tvalue[5], $content);
-                                    $content                       = str_replace('{TOTAL_POINTS}', $tvalue[6], $content);
-                                    if (strpos($content, '【丝芙兰】') !== false) {
-                                    } else {
-                                        $content = '【丝芙兰】' . $content;
-                                    }
-                                    if (strpos($content, '回T退订') !== false) {
-                                    } else {
-                                        $content = $content . "/回T退订";
-                                    }
-                                    // print_r($content);die;
-                                    $send_length = mb_strlen($content, 'utf8');
-                                    $real_length = 1;
-                                    if ($send_length > 70) {
-                                        $real_length = ceil($send_length / 67);
-                                    }
-                                    $SMS_real_send['task_content'] = $content;
-                                    $SMS_real_send['real_num'] = $real_length;
-                                    $SMS_real_send['send_length'] = $send_length;
-                                    $SMSmessage[] = $SMS_real_send;
-                                    // print_r($content);die;
-                                    $j++;
-                                    if ($j > 100) {
-                                        Db::startTrans();
-                                        try {
-                                            Db::table('yx_sfl_send_task')->insertAll($SMSmessage);
-                                            unset($SMSmessage);
-                                            $j = 1;
-                                            Db::commit();
-                                        } catch (\Exception $e) {
-                                            exception($e);
+                        if (!empty($send_data)) {
+                            foreach ($send_data as $key => $value) {
+                                $txt = [];
+                                $txt = $this->readForTxtToDyadicArray($value); # code...
+                                if (!empty($txt)) {
+                                    foreach ($txt as $tkey => $tvalue) {
+                                        if (isset($model_check[$tvalue[2]])) {
+                                            $model_check[$tvalue[2]]++;
+                                        } else {
+                                            $model_check[$tvalue[2]] = 1;
                                         }
-                                        // $this->redis->rPush('index:meassage:business:sendtask', $send);
+                                        /*  $SMS_real_send               = [];
+                                        $SMS_real_send               = [];
+                                        $SMS_real_send['mseeage_id'] = $tvalue[0];
+                                        $SMS_real_send['mobile']     = $tvalue[3];
+                                        $SMS_real_send['free_trial'] = 1;
+                                        // $SMS_real_send['real_num'] = 1;
+                                        $SMS_real_send['send_num']     = 1;
+                                        $SMS_real_send['send_status']  = 1;
+                                        $SMS_real_send['template_id'] = $tvalue[2];
+                                        $SMS_real_send['create_time']  = time();
+                                        $content                       = $SMS_model[$tvalue[2]]['content'];
+                                        $content                       = str_replace('{FULL_NAME}', $tvalue[4], $content);
+                                        $content                       = str_replace('{RESERVED_FIELD_1}', $tvalue[7], $content);
+                                        $content                       = str_replace('{RESERVED_FIELD_2}', $tvalue[8], $content);
+                                        $content                       = str_replace('{RESERVED_FIELD_3}', $tvalue[9], $content);
+                                        $content                       = str_replace('{RESERVED_FIELD_4}', $tvalue[10], $content);
+                                        $content                       = str_replace('{RESERVED_FIELD_5}', $tvalue[11], $content);
+                                        $content                       = str_replace('{ACCOUNT_NUMBER}', $tvalue[1], $content);
+                                        $content                       = str_replace('{MOBILE}', $tvalue[3], $content);
+                                        $content                       = str_replace('{POINTS_AVAILABLE}', $tvalue[5], $content);
+                                        $content                       = str_replace('{TOTAL_POINTS}', $tvalue[6], $content);
+                                        if (strpos($content,'【丝芙兰】') !== false) {
+                                           
+                                        }else{
+                                            $content = '【丝芙兰】'.$content;
+                                        }
+                                        if (strpos($content,'回T退订') !== false) {
+                                           
+                                        }else{
+                                            $content = $content."/回T退订";
+                                        }
+                                        // print_r($content);die;
+                                        $send_length = mb_strlen($content, 'utf8');
+                                        $real_length = 1;
+                                        if ($send_length > 70) {
+                                            $real_length = ceil($send_length / 67);
+                                        }
+                                        $SMS_real_send['task_content'] = $content;
+                                        $SMS_real_send['real_num'] = $real_length;
+                                        $SMS_real_send['send_length'] = $send_length;
+                                        $SMSmessage[] = $SMS_real_send; */
+                                        // print_r($content);die;
+                                    }
+                                }
+                            }
+    
 
+                        }
+                        if (!empty($file_data)) {
+                            foreach ($file_data as $key => $value) {
+                                // print_r($value[2]);
+                                // print_r($model_check[$value[0]]);
+    
+                                // die;
+                                if ($value[2] != $model_check[$value[0]]) {
+                                    //校验失败
+                                    return  ['code' => 200, "error" => "校验失败"];
+                                }
+                            }
+                        }
+                        if (!empty($send_data)) {
+                            $j = 1;
+                            foreach ($send_data as $key => $value) {
+                                $txt = [];
+                                $txt = $this->readForTxtToDyadicArray($value); # code...
+                                if (!empty($txt)) {
+                                    foreach ($txt as $tkey => $tvalue) {
+                                        if (isset($model_check[$tvalue[2]])) {
+                                            $model_check[$tvalue[2]]++;
+                                        } else {
+                                            $model_check[$tvalue[2]] = 1;
+                                        }
+                                        $SMS_real_send               = [];
+                                        $SMS_real_send               = [];
+                                        $SMS_real_send['mseeage_id'] = $tvalue[0];
+                                        $SMS_real_send['mobile']     = $tvalue[3];
+                                        $SMS_real_send['free_trial'] = 1;
+                                        // $SMS_real_send['real_num'] = 1;
+                                        $SMS_real_send['send_num']     = 1;
+                                        $SMS_real_send['send_status']  = 1;
+                                        $SMS_real_send['template_id'] = $tvalue[2];
+                                        $SMS_real_send['create_time']  = time();
+                                        $content                       = $SMS_model[$tvalue[2]]['content'];
+                                        $content                       = str_replace('{FULL_NAME}', $tvalue[4], $content);
+                                        $content                       = str_replace('{RESERVED_FIELD_1}', $tvalue[7], $content);
+                                        $content                       = str_replace('{RESERVED_FIELD_2}', $tvalue[8], $content);
+                                        $content                       = str_replace('{RESERVED_FIELD_3}', $tvalue[9], $content);
+                                        $content                       = str_replace('{RESERVED_FIELD_4}', $tvalue[10], $content);
+                                        $content                       = str_replace('{RESERVED_FIELD_5}', $tvalue[11], $content);
+                                        $content                       = str_replace('{ACCOUNT_NUMBER}', $tvalue[1], $content);
+                                        $content                       = str_replace('{MOBILE}', $tvalue[3], $content);
+                                        $content                       = str_replace('{POINTS_AVAILABLE}', $tvalue[5], $content);
+                                        $content                       = str_replace('{TOTAL_POINTS}', $tvalue[6], $content);
+                                        if (strpos($content, '【丝芙兰】') !== false) {
+                                        } else {
+                                            $content = '【丝芙兰】' . $content;
+                                        }
+                                        if (strpos($content, '回T退订') !== false) {
+                                        } else {
+                                            $content = $content . "/回T退订";
+                                        }
+                                        // print_r($content);die;
+                                        $send_length = mb_strlen($content, 'utf8');
+                                        $real_length = 1;
+                                        if ($send_length > 70) {
+                                            $real_length = ceil($send_length / 67);
+                                        }
+                                        $SMS_real_send['task_content'] = $content;
+                                        $SMS_real_send['real_num'] = $real_length;
+                                        $SMS_real_send['send_length'] = $send_length;
+                                        $SMSmessage[] = $SMS_real_send;
+                                        // print_r($content);die;
+                                        $j++;
+                                        if ($j > 100) {
+                                            Db::startTrans();
+                                            try {
+                                                Db::table('yx_sfl_send_task')->insertAll($SMSmessage);
+                                                unset($SMSmessage);
+                                                $j = 1;
+                                                Db::commit();
+                                            } catch (\Exception $e) {
+                                                exception($e);
+                                            }
+                                            // $this->redis->rPush('index:meassage:business:sendtask', $send);
+    
+                                        }
                                     }
                                 }
                             }
                         }
-                        /*   $insertSMS = [];
-                        $j         = 1;
-                        for ($i = 0; $i < count($SMSmessage); $i++) {
-                            array_push($insertSMS, $SMSmessage[$i]);
-                            $j++;
-                            if ($j > 100) {
-                                Db::startTrans();
-                                try {
-                                    Db::table('yx_sfl_send_task')->insertAll($insertSMS);
-                                    unset($insertSMS);
-                                    $j = 1;
-                                    Db::commit();
-
-                                } catch (\Exception $e) {
-                                    exception($e);
-                                }
-                                // $this->redis->rPush('index:meassage:business:sendtask', $send);
-
-                            }
-                        } */
+                        
                         if (!empty($SMSmessage)) {
                             Db::startTrans();
                             try {
