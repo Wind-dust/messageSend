@@ -5906,6 +5906,18 @@ class CmppCreateCodeTask extends Pzlife
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3678);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3679); */
         // $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3680);
+        $tody_time = strtotime(date("Ymd",time()));
+        try {
+            /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
+            $mysql_connect->table('yx_sfl_multimedia_message')->where('create_time','>',$tody_time)->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >  ".$tody_time);
+            foreach ($sendid as $key => $value) {
+                $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
+            }
+        } catch (\Exception $th) {
+            exception($th);
+        }
+        
         $white_list = [
             13023216322,
             18616841500,
