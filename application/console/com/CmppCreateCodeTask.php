@@ -1774,14 +1774,34 @@ class CmppCreateCodeTask extends Pzlife
                                 $message_info = '发送成功';
                             }
                         }
-                        $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
-                            'task_no'        => trim($task[0]['task_no']),
-                            'status_message' => $stat,
-                            'message_info'   => $message_info,
-                            'mobile'         => trim($send_log['mobile']),
-                            // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                            'send_time'      => isset($send_log['receive_time']) ? date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                        ])); //写入用户带处理日志
+                        if ($task[0]['uid'] == 130) {
+                            $send_len = 0;
+                            $s_num = 0;
+                            $send_len = mb_strlen($send_log['Stat']);
+                            if ($send_len > 70) {
+                                $s_num = ceil($send_len/67);
+                                for ($a=0; $a < $s_num; $a++) { 
+                                    $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
+                                        'task_no'        => trim($task[0]['task_no']),
+                                        'status_message' => $stat,
+                                        'message_info'   => $message_info,
+                                        'mobile'         => trim($send_log['mobile']),
+                                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                        'send_time'      => isset($send_log['receive_time']) ? date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                    ])); //写入用户带处理日志
+                                }
+                            }
+                        }else{
+                            $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
+                                'task_no'        => trim($task[0]['task_no']),
+                                'status_message' => $stat,
+                                'message_info'   => $message_info,
+                                'mobile'         => trim($send_log['mobile']),
+                                // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                'send_time'      => isset($send_log['receive_time']) ? date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                            ])); //写入用户带处理日志
+                        }
+                        
                     }
                     $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode($send_log)); //写入通道处理日志
                 }
