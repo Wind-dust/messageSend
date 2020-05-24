@@ -147,7 +147,7 @@ class CmppRongHeYiDongMarketing extends Pzlife
                         }
                         //通道断口处理
                         if ($body['Status'] != 0) {
-                            exit($error_msg);
+                            exit("其他错误，错误代码：【".$body['Result']."】\n");
                         }
                     } else if ($head['Command_Id'] == 0x80000004) {
                         $body = unpack("N2Msg_Id/CResult", $bodyData);
