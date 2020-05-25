@@ -3706,7 +3706,7 @@ class CmppCreateCodeTask extends Pzlife
                         continue;
                     }
                     Db::startTrans();
-                    Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'],  'status_message' => $send_log['status_message'], 'send_status' => $send_log['send_status'], 'update_time' => $send_log['send_time']]);
+                    Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'],  'send_status' => $send_log['send_status'], 'update_time' => $send_log['send_time']]);
                     Db::commit();
                     if (!empty($sendtasklog[0]['status_message'])) {
                         continue;
@@ -5623,7 +5623,7 @@ class CmppCreateCodeTask extends Pzlife
         } catch (\Exception $th) {
             exception($th);
         }
-        $deduct = 2; //1扣量,2不扣
+        $deduct = 1; //1扣量,2不扣
         $white_list = [
             13023216322,
             18616841500,
@@ -5632,7 +5632,8 @@ class CmppCreateCodeTask extends Pzlife
             15000773110,
             18121252120,
             13636311653,
-            13611664019
+            13611664019,
+            13472865840
         ];
         $ids = [];
         $j = 1;
@@ -5657,7 +5658,7 @@ class CmppCreateCodeTask extends Pzlife
                         //按无效号码计算
                         if ($deduct == 1) {
                             $num = mt_rand(0, 100);
-                            if ($num >= 40 || in_array(trim($value['mobile']), $white_list)) {
+                            if ($num >= 33 || in_array(trim($value['mobile']), $white_list)) {
                                 $prefix = '';
                                 $prefix = substr(trim($value['mobile']), 0, 7);
                                 $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
@@ -5696,7 +5697,7 @@ class CmppCreateCodeTask extends Pzlife
                                 $rece = [
                                     'task_id' => $value['id'],
                                     'mseeage_id'      => $value['mseeage_id'],
-                                    'template_id'      => $value['sfl_relation_id'],
+                                    'template_id'      => $value['template_id'],
                                     'mobile' => $value['mobile'],
                                     'messageinfo' => '发送成功',
                                     'status_message' => 'SMS:1',
@@ -5941,7 +5942,8 @@ class CmppCreateCodeTask extends Pzlife
             15000773110,
             18121252120,
             13636311653,
-            13611664019
+            13611664019,
+            13472865840
         ];
         $ids = [];
         $j = 1;
@@ -6466,4 +6468,8 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
     
+    public function json(){
+        $string = '{"task_no":"mul20051911590873903793","uid":91,"mobile":"13280988758","status_message":"ERROR:100:[\u4e0d\u6b63\u786e\u7684Token]","send_status":4,"send_time":1589860772}';
+        print_r(json_decode($string,true));
+    }
 }
