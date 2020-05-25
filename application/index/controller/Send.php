@@ -265,6 +265,76 @@ class Send extends MyController
     }
 
     /**
+     * @api              {post} / 短信任务接收接口（营销业务）（对外客户msg_id）
+     * @apiDescription   getSmsMarketingTaskMsgId
+     * @apiGroup         index_send
+     * @apiName          getSmsMarketingTaskMsgId
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {String} content 短信内容
+     * @apiParam (入参) {String} msg_id 客户msg_id
+     * @apiParam (入参) {String} signature_id 已报备签名ID
+     * @apiParam (入参) {String} [develop_no] 拓展号
+     * @apiParam (入参) {String} mobile 接收手机号码
+     * @apiParam (入参) {String} dstime 发送时间
+     * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:手机号提交手机号为空 / 3002:单批次手机号码为空 / 3003:dstime发送时间格式错误 / 3004:预约发送时间小于当前时间 / 3005:短信内容为空或者短信内容超出500字符 / 3006:签名长度为2~20个字 / 3007:task_name 短信标题不能为空 / 3008:该用户没有此项服务 / 3009:该用户已停用 / 3010:该签名未审核通过  / 3011:拓展码格式错误 / 3012:服务器错误
+     * @apiSampleRequest /index/send/getSmsMarketingTaskMsgId
+     * @author rzc
+     */
+    public function getSmsMarketingTaskMsgId()
+    {
+        $appid     = trim($this->request->post('appid')); //登录名
+        $appkey    = trim($this->request->post('appkey')); //登陆密码
+        $Content   = trim($this->request->post('content')); //短信内容
+        $msg_id = trim($this->request->post('msg_id')); //任务名称
+        $Mobile    = trim($this->request->post('mobile')); //接收手机号码
+        $Dstime    = trim($this->request->post('dstime')); //手机号
+        $develop_no  = trim($this->request->post('develop_no')); //拓展码号
+        $signature_id  = trim($this->request->post('signature_id')); //接收手机号码
+        $ip        = trim($this->request->ip());
+        $Mobiles   = explode(',', $Mobile);
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        // echo phpinfo();die;
+        if (empty($Mobiles)) {
+            return ['code' => '3001'];
+        }
+        if (count($Mobiles) < 1) {
+            return ['code' => '3002'];
+        }
+        if (strtotime($Dstime) == false && !empty($Dstime)) {
+            return ['code' => '3003'];
+        }
+        if (strtotime($Dstime) < time() && !empty($Dstime)) {
+            return ['code' => '3004'];
+        }
+        // if (empty($Content) || strlen($Content) > 600) {
+        //     return ['code' => '3005'];
+        // }
+        // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
+        if (empty($signature_id)) {
+            if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 20) {
+                return ['code' => '3006'];
+            }
+        }
+        if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
+            return ['code' => '3011'];
+        }
+        // print_r($task_name);die;
+        // if (empty($task_name)) {
+        //     return ['code' => '3007'];
+        // }
+        $task_name = '';
+        $result = $this->app->send->getSmsMarketingTask($appid, $appkey, $Content, $Mobiles, $Dstime, $ip, $task_name, $signature_id, $develop_no, $msg_id);
+        return $result;
+    }
+
+
+    /**
      * @api              {post} / 短信任务接收接口（行业）（对外客户）
      * @apiDescription   getSmsBuiness
      * @apiGroup         index_send
@@ -314,6 +384,61 @@ class Send extends MyController
             return ['code' => '3011'];
         }
         $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id, $develop_no);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 短信任务接收接口（行业）（对外客户msg_id）
+     * @apiDescription   getSmsBuinessMsgId
+     * @apiGroup         index_send
+     * @apiName          getSmsBuinessMsgId
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {String} signature_id 已报备签名ID
+     * @apiParam (入参) {String} [develop_no] 拓展号
+     * @apiParam (入参) {String} content 短信内容
+     * @apiParam (入参) {String} mobile 接收手机号码
+     * @apiParam (入参) {String} msg_id msg_id
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:短信内容为空或者短信内容超出500字符 / 3003:签名长度为2~20个字 / 3004:该账户已被停用 / 3006:该账户没有此项服务 / 3007:短信余额不足，请先充值 / 3008:签名ID错误 / 3009 :系统错误 / 3010:签名未审核通过 / 3011:develop_no(拓展码)错误
+     * @apiSampleRequest /index/send/getSmsBuinessMsgId
+     * @author rzc
+     */
+    public function getSmsBuinessMsgId()
+    {
+        $appid   = trim($this->request->post('appid')); //登录名
+        $appkey  = trim($this->request->post('appkey')); //登陆密码
+        $Content = trim($this->request->post('content')); //短信内容
+        $Mobile  = trim($this->request->post('mobile')); //接收手机号码
+        $develop_no  = trim($this->request->post('develop_no')); //拓展码号
+        $signature_id  = trim($this->request->post('signature_id')); //接收手机号码
+        $msg_id  = trim($this->request->post('msg_id')); //接收手机号码
+        $ip      = trim($this->request->ip());
+        $Mobiles = explode(',', $Mobile);
+
+        // print_r($Content);die;
+        // echo phpinfo();die;
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        // if (empty($Mobile) || checkMobile($Mobile) === false) {
+        //     return ['code'=>'3001'];
+        // }
+        if (empty($Content) || mb_strlen($Content) > 500) {
+            return ['code' => '3002'];
+        }
+        // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
+        if (empty($signature_id)) {
+            if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 20) {
+                return ['code' => '3003'];
+            }
+        }
+        if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
+            return ['code' => '3011'];
+        }
+        $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id, $develop_no,$msg_id);
         return $result;
     }
 

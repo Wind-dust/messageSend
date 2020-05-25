@@ -1664,15 +1664,16 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:' . $channel_id; //验证码发送任务rediskey
         $channel              = $this->getChannelinfo($channel_id);
-        /*                 $redis->rpush($redisMessageCodeSend, json_encode([
+     /*    $redis->rpush($redisMessageCodeSend, json_encode([
         'mobile' => '13564869264',
         'title' => '美丽田园营销短信',
         'mar_task_id' => '1599',
-        'content' => '【美丽田园】电商圣诞节活动将至，感恩回馈！.【美丽田园】',
+        'content' => '感谢您对于美丽田园的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价http://crmapp.beautyfarm.com.cn/questionNaire1/api/qnnaire/refct?id=534478，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142，回T退订【美丽田园】',
         'Msg_Id' => '',
         'Stat' => 'DELIVER',
         'Submit_time' => '191224164036',
         'Done_time' => '191224164236',
+        'from' => 'yx_user_send_code_task',
         ])); */
 
         // $request_url = 'http://116.228.60.189:15901/rtreceive?task_no=bus19123111560308152071&status_message=E:CHAN&mobile=18643198590&send_time=1912311333';
@@ -1695,7 +1696,7 @@ class CmppCreateCodeTask extends Pzlife
                     if (!empty($send_log['from']) && $send_log['from'] == 'yx_sfl_send_task') {
                         continue;
                     }
-                    $sql = "SELECT `task_no`,`uid` FROM ";
+                    $sql = "SELECT `send_msg_id`,`task_no`,`uid` FROM ";
                     if ($channel['business_id'] == 5) { //营销
                         if (isset($send_log['from'])) {
                             $sql .= " " . $send_log['from'] . " ";
@@ -1776,20 +1777,23 @@ class CmppCreateCodeTask extends Pzlife
                         }
                         if ($task[0]['uid'] == 130) {
                             $send_len = 0;
-                            $s_num = 0;
-                            $send_len = mb_strlen($send_log['Stat']);
+                            $send_len = mb_strlen($send_log['content']);
+                            $s_num = 1;
                             if ($send_len > 70) {
                                 $s_num = ceil($send_len/67);
-                                for ($a=0; $a < $s_num; $a++) { 
-                                    $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
-                                        'task_no'        => trim($task[0]['task_no']),
-                                        'status_message' => $stat,
-                                        'message_info'   => $message_info,
-                                        'mobile'         => trim($send_log['mobile']),
-                                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                                        'send_time'      => isset($send_log['receive_time']) ? date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                                    ])); //写入用户带处理日志
-                                }
+                            }
+                            for ($a=0; $a < $s_num; $a++) { 
+                                $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
+                                    'task_no'        => trim($task[0]['task_no']),
+                                    'status_message' => $stat,
+                                    'message_info'   => $message_info,
+                                    'mobile'         => trim($send_log['mobile']),
+                                    'msg_id'         => trim($task[0]['send_msg_id']),
+                                    // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                    'send_time'      => isset($send_log['receive_time']) ? date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                    'smsCount' => $s_num,
+                                    'smsIndex' => $a+1,
+                                ])); //写入用户带处理日志
                             }
                         }else{
                             $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
@@ -5633,7 +5637,30 @@ class CmppCreateCodeTask extends Pzlife
             18121252120,
             13636311653,
             13611664019,
-            13472865840
+            13472865840,
+            18013770122,
+            18800232095,
+            18521329177,
+            18501684687,
+            13918902911,
+            18521569417,
+            18217584060,
+            13816091848,
+            18621720742,
+            13817515864,
+            16621181441,
+            13701789119,
+            13818181256,
+            15800815262,
+            13916292097,
+            13917823241,
+            13585699417,
+            15800400970,
+            13801687321,
+            18621714497,
+            13764272451,
+            18019762207,
+            13162248755,
         ];
         $ids = [];
         $j = 1;
@@ -5910,9 +5937,9 @@ class CmppCreateCodeTask extends Pzlife
         $this->redis = Phpredis::getConn();
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-/*         for ($i = 1; $i < 3673; $i++) {
+        for ($i = 15048; $i < 15076; $i++) {
             $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $i);
-        } */
+        }
 
         /*    $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3673);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3674);
@@ -5922,17 +5949,17 @@ class CmppCreateCodeTask extends Pzlife
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3678);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3679); */
         // $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3680);
-        $tody_time = strtotime(date("Ymd",time()));
-        try {
-            /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
-            $mysql_connect->table('yx_sfl_multimedia_message')->where('create_time','>',$tody_time)->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >  ".$tody_time);
-            foreach ($sendid as $key => $value) {
-                $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
-            }
-        } catch (\Exception $th) {
-            exception($th);
-        }
+        // $tody_time = strtotime(date("Ymd",time()));
+        // try {
+        //     /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
+        //     $mysql_connect->table('yx_sfl_multimedia_message')->where('create_time','>',$tody_time)->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
+        //     $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >  ".$tody_time);
+        //     foreach ($sendid as $key => $value) {
+        //         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
+        //     }
+        // } catch (\Exception $th) {
+        //     exception($th);
+        // }
         
         $white_list = [
             13023216322,
@@ -5943,7 +5970,30 @@ class CmppCreateCodeTask extends Pzlife
             18121252120,
             13636311653,
             13611664019,
-            13472865840
+            13472865840,
+            18013770122,
+            18800232095,
+            18521329177,
+            18501684687,
+            13918902911,
+            18521569417,
+            18217584060,
+            13816091848,
+            18621720742,
+            13817515864,
+            16621181441,
+            13701789119,
+            13818181256,
+            15800815262,
+            13916292097,
+            13917823241,
+            13585699417,
+            15800400970,
+            13801687321,
+            18621714497,
+            13764272451,
+            18019762207,
+            13162248755,
         ];
         $ids = [];
         $j = 1;
@@ -6087,7 +6137,7 @@ class CmppCreateCodeTask extends Pzlife
                     // unset($all_send_task);
                 }
             }
-
+            print_r($ids);die;
 
             if (!empty($ids)) {
                 $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (" . join(',', $ids) . ") ");

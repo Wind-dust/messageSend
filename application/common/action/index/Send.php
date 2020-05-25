@@ -293,7 +293,7 @@ return $result;
         return 0;
     }
 
-    public function getSmsMarketingTask($Username, $Password, $Content, $Mobiles, $Dstime, $ip, $task_name, $signature_id = '', $develop_no = '')
+    public function getSmsMarketingTask($Username, $Password, $Content, $Mobiles, $Dstime, $ip, $task_name, $signature_id = '', $develop_no = '', $msg_id = '')
     {
         $Mobiles = array_unique(array_filter($Mobiles));
         // $Password = md5($Password);
@@ -366,7 +366,9 @@ return $result;
         if (!empty($Dstime)) {
             $data['appointment_time'] = strtotime($Dstime);
         }
-
+        if (!empty($msg_id)) {
+            $data['send_msg_id'] = $msg_id;
+        }
         Db::startTrans();
         try {
             DbAdministrator::modifyBalance($userEquities['id'], $real_num, 'dec');
@@ -387,7 +389,7 @@ return $result;
         return ['code' => '200', 'task_no' => $data['task_no']];
     }
 
-    public function getSmsBuiness($Username, $Password, $Content, $Mobiles, $ip, $signature_id = '', $develop_no = '')
+    public function getSmsBuiness($Username, $Password, $Content, $Mobiles, $ip, $signature_id = '', $develop_no = '', $msg_id = '')
     {
         $this->redis = Phpredis::getConn();
         // print_r($this->redis);
@@ -501,6 +503,9 @@ return $result;
                     $data['dianxin_channel_id'] = 61;
                 }
             }
+        }
+        if (!empty($msg_id)) {
+            $data['send_msg_id'] = $msg_id;
         }
         Db::startTrans();
         try {
