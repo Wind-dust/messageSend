@@ -976,7 +976,7 @@ return $result;
         }
     }
 
-    public function submitBatchCustomBusiness($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '')
+    public function submitBatchCustomBusiness($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '', $msg_id = '')
     {
         $this->redis = Phpredis::getConn();
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
@@ -1064,6 +1064,9 @@ return $result;
                 'send_length'       => mb_strlen($value),
                 'send_num'       => count($send_data_mobile[$key]),
             ];
+            if (!empty($msg_id)) {
+                $send_task['send_msg_id'] = $msg_id;
+            }
             if (mb_strlen($value) > 70) {
                 $real_num += ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
                 $send_task['real_num'] =  ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
@@ -1089,7 +1092,9 @@ return $result;
                     } else {
                         // array_push($task_no, $free_taskno);
                         $send_task['free_trial'] = 2;
-                        $send_task['channel_id'] = 22;
+                        $send_task['yidong_channel_id'] = 60;
+                        $send_task['liantong_channel_id'] = 62;
+                        $send_task['dianxin_channel_id'] = 61;
                         $free_taskno[] = $task_no;
                         // array_push($free_trial, $send_task);
                     }
@@ -1097,7 +1102,9 @@ return $result;
                     if (!empty($value)) {
                         $free_taskno[] = $task_no;
                         $send_task['free_trial'] = 2;
-                        $send_task['channel_id'] = 22;
+                        $send_task['yidong_channel_id'] = 60;
+                        $send_task['liantong_channel_id'] = 62;
+                        $send_task['dianxin_channel_id'] = 61;
                         // array_push($free_trial, $send_task);
                     }
                 }
@@ -1133,6 +1140,9 @@ return $result;
                 }
             }
             Db::commit();
+            if (!empty($msg_id)) {
+                return ['code' => '200','msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
+            }
             return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
         } catch (\Exception $e) {
             Db::rollback();
@@ -1185,7 +1195,7 @@ return $result;
         return $output;
     }
 
-    public function submitBatchCustomMarketing($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '')
+    public function submitBatchCustomMarketing($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '', $msg_id = '')
     {
         $this->redis = Phpredis::getConn();
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
@@ -1273,6 +1283,9 @@ return $result;
                 'send_length'       => mb_strlen($value),
                 'send_num'       => count($send_data_mobile[$key]),
             ];
+            if (!empty($msg_id)) {
+                $send_task['send_msg_id'] = $msg_id;
+            }
             if (mb_strlen($value) > 70) {
                 $real_num += ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
                 $send_task['real_num'] =  ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
@@ -1297,7 +1310,9 @@ return $result;
                     } else {
                         // array_push($task_no, $free_taskno);
                         $send_task['free_trial'] = 2;
-                        $send_task['channel_id'] = 17;
+                        $data['yidong_channel_id'] = 18;
+                $data['liantong_channel_id'] = 19;
+                $data['dianxin_channel_id'] = 19;
                         $free_taskno[] = $task_no;
                         // array_push($free_trial, $send_task);
                     }
@@ -1305,7 +1320,9 @@ return $result;
                     if (!empty($value)) {
                         $free_taskno[] = $task_no;
                         $send_task['free_trial'] = 2;
-                        $send_task['channel_id'] = 17;
+                        $data['yidong_channel_id'] = 18;
+                        $data['liantong_channel_id'] = 19;
+                        $data['dianxin_channel_id'] = 19;
                         // array_push($free_trial, $send_task);
                     }
                 }
@@ -1339,6 +1356,9 @@ return $result;
                 }
             }
             Db::commit();
+            if (!empty($msg_id)) {
+                return ['code' => '200','msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
+            }
             return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
         } catch (\Exception $e) {
             Db::rollback();
