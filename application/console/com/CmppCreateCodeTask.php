@@ -3684,10 +3684,10 @@ class CmppCreateCodeTask extends Pzlife
                     continue;
                 }
                 $send_log    = json_decode($sendlog, true);
-                $sendtasklog = Db::query("SELECT `id`,`create_time`,`real_message`,`status_message` FROM `yx_user_multimedia_message_log` WHERE `task_no` = '" . $send_log['task_no'] . "' AND `mobile` = '" . $send_log['mobile'] . "' ");
+                $sendtasklog = Db::query("SELECT `id`,`create_time`,`uid`,`real_message`,`status_message` FROM `yx_user_multimedia_message_log` WHERE `task_no` = '" . $send_log['task_no'] . "' AND `mobile` = '" . $send_log['mobile'] . "' ");
                 // die;
+                    $task = Db::query("SELECT `id`,`create_time`,`update_time`,`source`,`send_msg_id` FROM `yx_user_multimedia_message` WHERE `task_no` = '" . $send_log['task_no'] . "' ");
                 if (empty($sendtasklog)) {
-                    $task = Db::query("SELECT `id`,`create_time`,`update_time`,`source` FROM `yx_user_multimedia_message` WHERE `task_no` = '" . $send_log['task_no'] . "' ");
                     Db::startTrans();
 
                     Db::table('yx_user_multimedia_message_log')->insert([
@@ -3726,14 +3726,29 @@ class CmppCreateCodeTask extends Pzlife
                 } else {
                     $message_info = '发送失败';
                 }
-                $redis->rpush('index:meassage:code:user:mulreceive:' . $send_log['uid'], json_encode([
-                    'task_no'        => $send_log['task_no'],
-                    'status_message' => trim($send_log['status_message']),
-                    'message_info'   => $message_info,
-                    'mobile'         => trim($send_log['mobile']),
-                    // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                    'send_time'      => isset($send_log['send_time']) ? date('Y-m-d H:i:s', trim($send_log['send_time'])) : date('Y-m-d H:i:s', time()),
-                ])); //写入用户带处理日志
+                if ($task[0]['uid'] == 131) {
+                    $redis->rpush('index:meassage:code:user:mulreceive:' . $send_log['uid'], json_encode([
+                        'task_no'        => $send_log['task_no'],
+                        'status_message' => trim($send_log['status_message']),
+                        'msg_id'         => trim($task[0]['send_msg_id']),
+                        'message_info'   => $message_info,
+                        'mobile'         => trim($send_log['mobile']),
+                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        'send_time'      => isset($send_log['send_time']) ? date('Y-m-d H:i:s', trim($send_log['send_time'])) : date('Y-m-d H:i:s', time()),
+                        'smsCount' => 1,
+                                    'smsIndex' => 1,
+                    ])); //写入用户带处理日志
+                }else{
+                    $redis->rpush('index:meassage:code:user:mulreceive:' . $send_log['uid'], json_encode([
+                        'task_no'        => $send_log['task_no'],
+                        'status_message' => trim($send_log['status_message']),
+                        'message_info'   => $message_info,
+                        'mobile'         => trim($send_log['mobile']),
+                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        'send_time'      => isset($send_log['send_time']) ? date('Y-m-d H:i:s', trim($send_log['send_time'])) : date('Y-m-d H:i:s', time()),
+                    ])); //写入用户带处理日志
+                }
+                
 
             } catch (\Exception $th) {
                 Db::rollback();
