@@ -375,6 +375,9 @@ return $result;
             $id = DbAdministrator::addUserSendTask($data);
 
             Db::commit();
+            if (!empty($msg_id)) {
+                return ['code' => '200', 'task_no' => $data['task_no'],'msg_id' => $msg_id];
+            }
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
             // exception($e);
@@ -514,6 +517,9 @@ return $result;
             Db::commit();
             if ($data['free_trial'] == 2) {
                 $res = $this->redis->rpush("index:meassage:business:sendtask", $bId);
+            }
+            if (!empty($msg_id)) {
+                return ['code' => '200', 'task_no' => $data['task_no'],'msg_id' => $msg_id];
             }
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
