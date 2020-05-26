@@ -603,6 +603,7 @@ class SflUpload extends Pzlife
     public function sflZip()
     {
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
+        $mysql_connect->query("set names utf8mb4");
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $this->upload = new Imageupload();
         $zip          = new ZipArchive();
@@ -791,10 +792,10 @@ class SflUpload extends Pzlife
                                 $sfl_model['title'] = $sfl_SMS_fram['title'];
                                 $sfl_model['create_time'] = time();
                                 unset($sfl_SMS_fram['title']);
-                                if (Db::query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
+                                if ($mysql_connect->query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
                                     continue;
                                 }
-                                $sfl_multimedia_template_id = Db::table('yx_sfl_multimedia_template')->insertGetId($sfl_model);
+                                $sfl_multimedia_template_id = $mysql_connect->table('yx_sfl_multimedia_template')->insertGetId($sfl_model);
     
                                 // print_r($sfl_SMS_fram);
                                 foreach ($sfl_SMS_fram as $key => $value) {
@@ -802,7 +803,7 @@ class SflUpload extends Pzlife
                                     $value['sfl_multimedia_template_id'] = $sfl_multimedia_template_id;
                                     $value['sfl_model_id']               = $fvalue[3];
                                     $value['create_time']               = time();
-                                    Db::table('yx_sfl_multimedia_template_frame')->insert($value);
+                                    $mysql_connect->table('yx_sfl_multimedia_template_frame')->insert($value);
                                 }
                             }
                         }
@@ -914,12 +915,12 @@ class SflUpload extends Pzlife
                                 $insertMMS[] = $MMSmessage[$i];
                                 $j++;
                                 if ($j > 100) {
-                                    Db::startTrans();
+                                    $mysql_connect->startTrans();
                                     try {
-                                        Db::table('yx_sfl_multimedia_message')->insertAll($insertMMS);
+                                        $mysql_connect->table('yx_sfl_multimedia_message')->insertAll($insertMMS);
                                         unset($insertMMS);
                                         $j = 1;
-                                        Db::commit();
+                                        $mysql_connect->commit();
                                     } catch (\Exception $e) {
                                         exception($e);
                                     }
@@ -930,11 +931,11 @@ class SflUpload extends Pzlife
                         }
                        
                         if (!empty($insertMMS)) {
-                            Db::startTrans();
+                            $mysql_connect->startTrans();
                             try {
-                                Db::table('yx_sfl_multimedia_message')->insertAll($insertMMS);
+                                $mysql_connect->table('yx_sfl_multimedia_message')->insertAll($insertMMS);
                                 unset($insertMMS);
-                                Db::commit();
+                                $mysql_connect->commit();
                             } catch (\Exception $e) {
                                 exception($e);
                             }
@@ -1144,12 +1145,12 @@ class SflUpload extends Pzlife
                                         // print_r($content);die;
                                         $j++;
                                         if ($j > 100) {
-                                            Db::startTrans();
+                                            $mysql_connect->startTrans();
                                             try {
-                                                Db::table('yx_sfl_send_task')->insertAll($SMSmessage);
+                                                $mysql_connect->table('yx_sfl_send_task')->insertAll($SMSmessage);
                                                 unset($SMSmessage);
                                                 $j = 1;
-                                                Db::commit();
+                                                $mysql_connect->commit();
                                             } catch (\Exception $e) {
                                                 exception($e);
                                             }
@@ -1162,11 +1163,11 @@ class SflUpload extends Pzlife
                         }
                         
                         if (!empty($SMSmessage)) {
-                            Db::startTrans();
+                            $mysql_connect->startTrans();
                             try {
-                                Db::table('yx_sfl_send_task')->insertAll($SMSmessage);
+                                $mysql_connect->table('yx_sfl_send_task')->insertAll($SMSmessage);
                                 unset($SMSmessage);
-                                Db::commit();
+                                $mysql_connect->commit();
                             } catch (\Exception $e) {
                                 exception($e);
                             }
@@ -1929,7 +1930,7 @@ class SflUpload extends Pzlife
         try {
             $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
             ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >= '1590163200' AND `create_time` <= '1590249600' AND `mobile` NOT IN (15201926171,15821193682) ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >= '1590249600' AND `create_time` <= '1590336000' AND `mobile` NOT IN (15201926171,15821193682) ");
             $ids = [];
             foreach ($mul_task_ids as $key => $value) {
                 $ids[] = $value['id'];
@@ -2047,7 +2048,7 @@ class SflUpload extends Pzlife
                     $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                 }
             }
-            $objWriter->save('imp_mobile_status_report_mms_1_20200523.xlsx');
+            $objWriter->save('imp_mobile_status_report_mms_1_20200524.xlsx');
         } catch (\Exception $th) {
             exception($th);
         }
@@ -2061,7 +2062,7 @@ class SflUpload extends Pzlife
             // print_r(realpath("../"). "\yt_area_mobile.csv");die;
     
           
-        $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >= '1590163200' AND `create_time` <= '1590249600' AND `mobile` NOT IN (15201926171,15821193682) ");
+        $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >= '1590249600' AND `create_time` <= '1590336000' AND `mobile` NOT IN (15201926171,15821193682) ");
         $ids = [];
         foreach ($mul_task_ids as $key => $value) {
             // $ids[] = $value['id'];
@@ -2186,7 +2187,7 @@ class SflUpload extends Pzlife
             $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
             // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
         }
-        $outputFileName = "receive_sms_1_20200522.xlsx";
+        $outputFileName = "receive_sms_1_20200524.xlsx";
         $i              = 0;
         foreach ($receive_alls as $key => $orderdata) {
             //行
@@ -2199,7 +2200,7 @@ class SflUpload extends Pzlife
                 $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             }
         }
-        $objWriter->save('imp_mobile_status_report_sms_1_20200522.xlsx');
+        $objWriter->save('imp_mobile_status_report_sms_1_20200524.xlsx');
     }
 
 }
