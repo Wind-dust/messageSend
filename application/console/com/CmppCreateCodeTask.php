@@ -5623,6 +5623,7 @@ class CmppCreateCodeTask extends Pzlife
     public function SendSflTask()
     {
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
+        $mysql_connect->query("set names utf8mb4");
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         /* for ($i = 96; $i < 12803; $i++) {
@@ -5643,6 +5644,7 @@ class CmppCreateCodeTask extends Pzlife
             exception($th);
         }
         $deduct = 1; //1扣量,2不扣
+        $rate = 50;
         $white_list = [
             13023216322,
             18616841500,
@@ -5689,6 +5691,7 @@ class CmppCreateCodeTask extends Pzlife
             $ids[] = $task_id;
             $j++;
             if ($j > 100) {
+                $all_send_task = [];
                 $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (" . join(',', $ids) . ") ");
                 foreach ($all_send_task as $key => $value) {
                     $sendmessage = [];
@@ -5700,7 +5703,7 @@ class CmppCreateCodeTask extends Pzlife
                         //按无效号码计算
                         if ($deduct == 1) {
                             $num = mt_rand(0, 100);
-                            if ($num >= 33 || in_array(trim($value['mobile']), $white_list)) {
+                            if ($num >= $rate || in_array(trim($value['mobile']), $white_list)) {
                                 $prefix = '';
                                 $prefix = substr(trim($value['mobile']), 0, 7);
                                 $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
@@ -5818,6 +5821,7 @@ class CmppCreateCodeTask extends Pzlife
 
 
         if (!empty($ids)) {
+            $all_send_task = [];
             $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (" . join(',', $ids) . ") ");
             foreach ($all_send_task as $key => $value) {
                 $sendmessage = [];
@@ -5829,7 +5833,7 @@ class CmppCreateCodeTask extends Pzlife
                     //按无效号码计算
                     if ($deduct == 1) { //扣量
                         $num = mt_rand(0, 100);
-                        if ($num >= 40 || in_array(trim($value['mobile']), $white_list)) {
+                        if ($num >= $rate || in_array(trim($value['mobile']), $white_list)) {
                             $prefix = '';
                             $prefix = substr(trim($value['mobile']), 0, 7);
                             $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
@@ -5951,10 +5955,11 @@ class CmppCreateCodeTask extends Pzlife
     {
         $this->redis = Phpredis::getConn();
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
+        $mysql_connect->query("set names utf8mb4");
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        for ($i = 15048; $i < 15076; $i++) {
+      /*   for ($i = 15048; $i < 15076; $i++) {
             $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $i);
-        }
+        } */
 
         /*    $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3673);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3674);
@@ -5964,17 +5969,6 @@ class CmppCreateCodeTask extends Pzlife
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3678);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3679); */
         // $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3680);
-        // $tody_time = strtotime(date("Ymd",time()));
-        // try {
-        //     /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
-        //     $mysql_connect->table('yx_sfl_multimedia_message')->where('create_time','>',$tody_time)->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
-        //     $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >  ".$tody_time);
-        //     foreach ($sendid as $key => $value) {
-        //         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
-        //     }
-        // } catch (\Exception $th) {
-        //     exception($th);
-        // }
         
         $white_list = [
             13023216322,
@@ -6010,11 +6004,30 @@ class CmppCreateCodeTask extends Pzlife
             18019762207,
             13162248755,
         ];
+        $tody_time = strtotime(date("Ymd",time()));
+        try {
+            /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
+            $mysql_connect->table('yx_sfl_multimedia_message')->where('create_time','>',$tody_time)->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >  ".$tody_time );
+            foreach ($sendid as $key => $value) {
+                $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
+            }
+        } catch (\Exception $th) {
+            exception($th);
+        }
         $ids = [];
         $j = 1;
         $receipt = [];
         $send_msg = [];
-        $deduct = 2; //1扣量,2不扣
+        $deduct = 1; //1扣量,2不扣
+        $rate = 25;
+     /*    $all_task = 
+        while (true) {
+            $task_id = $this->redis->lpop('index:meassage:sflmulmessage:sendtask');
+            if (empty($task_id)) {
+                break;
+            }
+        } */
         try {
             while (true) {
                 $task_id = $this->redis->lpop('index:meassage:sflmulmessage:sendtask');
@@ -6024,6 +6037,7 @@ class CmppCreateCodeTask extends Pzlife
                 $ids[] = $task_id;
                 $j++;
                 if ($j > 100) {
+                    $all_send_task = [];
                     $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (" . join(',', $ids) . ") ");
                     foreach ($all_send_task as $key => $value) {
                         if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
@@ -6034,7 +6048,7 @@ class CmppCreateCodeTask extends Pzlife
                             if ($deduct  == 1) {
                                 //按无效号码计算
                                 $num = mt_rand(0, 100);
-                                if ($num >= 40 || in_array(trim($value['mobile']), $white_list)) {
+                                if ($num >= $rate || in_array(trim($value['mobile']), $white_list)) {
                                     $prefix = '';
                                     $prefix = substr(trim($value['mobile']), 0, 7);
                                     $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
@@ -6152,7 +6166,6 @@ class CmppCreateCodeTask extends Pzlife
                     // unset($all_send_task);
                 }
             }
-            print_r($ids);die;
 
             if (!empty($ids)) {
                 $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (" . join(',', $ids) . ") ");
@@ -6164,7 +6177,7 @@ class CmppCreateCodeTask extends Pzlife
                         //按无效号码计算
                         if ($deduct  == 1) {
                             $num = mt_rand(0, 100);
-                            if ($num >= 40 || in_array(trim($value['mobile']), $white_list)) {
+                            if ($num >= $rate || in_array(trim($value['mobile']), $white_list)) {
                                 $prefix = '';
                                 $prefix = substr(trim($value['mobile']), 0, 7);
                                 $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
@@ -6368,6 +6381,7 @@ class CmppCreateCodeTask extends Pzlife
     {
         $this->redis = Phpredis::getConn();
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
+        $mysql_connect->query("set names utf8mb4");
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $mul_receipt_key = 'index:meassage:multimediamessage:deliver:94';
         $j = 1;
@@ -6447,6 +6461,7 @@ class CmppCreateCodeTask extends Pzlife
     public function sflSftpTaskReceipt($content){
         $this->redis = Phpredis::getConn();
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
+        $mysql_connect->query("set names utf8mb4");
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $task_receipt_key = 'index:meassage:code:new:deliver:'.$content;
         $j = 1;
