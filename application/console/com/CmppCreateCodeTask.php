@@ -1775,7 +1775,7 @@ class CmppCreateCodeTask extends Pzlife
                                 $message_info = '发送成功';
                             }
                         }
-                        if (in_array($task[0]['uid'],[130,134])) {
+                        if (in_array($task[0]['uid'],[130,134,135])) {
                             $send_len = 0;
                             $send_len = mb_strlen($send_log['content']);
                             $s_num = 1;

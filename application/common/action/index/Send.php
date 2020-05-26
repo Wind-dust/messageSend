@@ -491,7 +491,14 @@ return $result;
                 // $data['yidong_channel_id'] = 9;
                 // $data['liantong_channel_id'] = 9;
                 // $data['dianxin_channel_id'] = 9;
-            } else {
+            } elseif ($user['id'] == 130 || $user['id'] == 134 || $user['id'] == 135) {
+                $data['yidong_channel_id'] = 85;
+                $data['liantong_channel_id'] = 85;
+                $data['dianxin_channel_id'] = 85;
+                // $data['yidong_channel_id'] = 9;
+                // $data['liantong_channel_id'] = 9;
+                // $data['dianxin_channel_id'] = 9;
+            }else {
                 if (strpos($Content, '亲爱的美田会员') !== false) {
                     $data['yidong_channel_id'] = 22;
                     $data['liantong_channel_id'] = 22;
@@ -1027,7 +1034,9 @@ return $result;
                         $real_text = str_replace("{{var" . $i . "}}", $replace_data[$i - 1], $real_text); //内容
                     }
                 }
-
+                if (checkMobile($send_text[1]) == false) {
+                    continue;
+                }
                 if (in_array($real_text, $send_data)) {
                     $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
                 } else {
@@ -1036,6 +1045,9 @@ return $result;
                 }
             } else {
                 $real_text = $send_text[0];
+                if (checkMobile($send_text[1]) == false) {
+                    continue;
+                }
                 if (in_array($real_text, $send_data)) {
                     $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
                 } else {
@@ -1044,7 +1056,9 @@ return $result;
                 }
             }
         }
-
+        if (empty($send_data_mobile)) {
+            return ['code' => '3005'];
+        }
         $free_taskno = [];
         $trial = []; //需审核
         //组合任务包
@@ -1053,6 +1067,9 @@ return $result;
         $all_task_no = [];
         $task_no_mobile = [];
         foreach ($send_data as $key => $value) {
+            if (empty($send_data_mobile[$key])) {
+                continue;
+            }
             $send_task = [];
             $task_no = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
             $send_task = [
@@ -1092,9 +1109,16 @@ return $result;
                     } else {
                         // array_push($task_no, $free_taskno);
                         $send_task['free_trial'] = 2;
-                        $send_task['yidong_channel_id'] = 60;
-                        $send_task['liantong_channel_id'] = 62;
-                        $send_task['dianxin_channel_id'] = 61;
+                        if (in_array($user['id'],[130,134,135])) {
+                            $send_task['yidong_channel_id'] = 85;
+                            $send_task['liantong_channel_id'] = 85;
+                            $send_task['dianxin_channel_id'] = 85;
+                        }else{
+                            $send_task['yidong_channel_id'] = 60;
+                            $send_task['liantong_channel_id'] = 62;
+                            $send_task['dianxin_channel_id'] = 61;
+
+                        }
                         $free_taskno[] = $task_no;
                         // array_push($free_trial, $send_task);
                     }
@@ -1246,7 +1270,9 @@ return $result;
                         $real_text = str_replace("{{var" . $i . "}}", $replace_data[$i - 1], $real_text); //内容
                     }
                 }
-
+                if (checkMobile($send_text[1]) == false) {
+                    continue;
+                }
                 if (in_array($real_text, $send_data)) {
                     $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
                 } else {
@@ -1254,6 +1280,9 @@ return $result;
                     $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
                 }
             } else {
+                if (checkMobile($send_text[1]) == false) {
+                    continue;
+                }
                 $real_text = $send_text[0];
                 if (in_array($real_text, $send_data)) {
                     $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
@@ -1264,6 +1293,7 @@ return $result;
             }
         }
 
+        // print_r($send_data_mobile);die;
         $free_taskno = [];
         $trial = []; //需审核
         //组合任务包
@@ -1271,9 +1301,15 @@ return $result;
 
         $all_task_no = [];
         $task_no_mobile = [];
+        if (empty($send_data_mobile)) {
+            return ['code' => '3005'];
+        }
         foreach ($send_data as $key => $value) {
             $send_task = [];
             $task_no = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+            if (empty($send_data_mobile[$key])) {
+                continue;
+            }
             $send_task = [
                 'task_no' => $task_no,
                 'uid'     => $user['id'],

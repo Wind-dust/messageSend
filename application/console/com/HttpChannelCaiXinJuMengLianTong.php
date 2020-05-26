@@ -97,29 +97,29 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
                             $real_send_content = '';
                             $vc                = '';
                             foreach ($send_data['content'] as $key => $value) {
-                                $real_send_content .= $vc . $value['num'] . '.txt|' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
-                                // $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode($value['content']);
+                                $real_send_content .= $vc . $value['num'] . '.txt,' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
+                                // $real_send_content .= $vc . $value['num'] . ',txt,' . base64_encode($value['content']);
                                 if (!empty($value['image_path'])) {
                                     $real_send_content .= '.';
                                     $md5 = md5(Config::get('qiniu.domain') . '/' . $value['image_path']);
                                     if (isset($image_data[$md5])) {
                                         if ($value['image_type'] == 'jpg') {
-                                            // $real_send_content .= 'jpg|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
-                                            $real_send_content .= 'jpg|' . $image_data[$md5];
+                                            // $real_send_content .= 'jpg,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                            $real_send_content .= 'jpg,' . $image_data[$md5];
                                         } elseif ($value['image_type'] == 'gif') {
-                                            $real_send_content .= 'gif|' . $image_data[$md5];
-                                            // $real_send_content .= 'gif|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                            $real_send_content .= 'gif,' . $image_data[$md5];
+                                            // $real_send_content .= 'gif,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                         }
                                     } else {
                                         $imagebase        = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                         $image_data[$md5] = $imagebase;
                                         // $frame['content'] =$imagebase;
                                         if ($value['image_type'] == 'jpg') {
-                                            // $real_send_content .= 'jpg|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
-                                            $real_send_content .= 'jpg|' . $image_data[$md5];
+                                            // $real_send_content .= 'jpg,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                            $real_send_content .= 'jpg,' . $image_data[$md5];
                                         } elseif ($value['image_type'] == 'gif') {
-                                            $real_send_content .= 'gif|' . $image_data[$md5];
-                                            // $real_send_content .= 'gif|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                            $real_send_content .= 'gif,' . $image_data[$md5];
+                                            // $real_send_content .= 'gif,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                         }
                                     }
                                 }
@@ -135,34 +135,34 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
                             $real_send_content = '';
                             $vc                = '';
                             foreach ($send_data['content'] as $key => $value) {
-                                $real_send_content .= $vc . $value['num'] . '.txt|' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
-                                // $real_send_content .= $vc . $value['num'] . ',txt|' . base64_encode($value['content']);
+                                $real_send_content .= $vc . $value['num'] . '.txt,' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
+                                // $real_send_content .= $vc . $value['num'] . ',txt,' . base64_encode($value['content']);
                                 if (!empty($value['image_path'])) {
                                     $real_send_content .= '.';
                                     /* if ($value['image_type'] == 'jpg') {
-                                    $real_send_content .= 'jpg|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                    $real_send_content .= 'jpg,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                     } elseif ($value['image_type'] == 'gif') {
-                                    $real_send_content .= 'gif|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                    $real_send_content .= 'gif,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                     } */
                                     $md5 = md5(Config::get('qiniu.domain') . '/' . $value['image_path']);
                                     if (isset($image_data[$md5])) {
                                         if ($value['image_type'] == 'jpg') {
-                                            // $real_send_content .= 'jpg|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
-                                            $real_send_content .= 'jpg|' . $image_data[$md5];
+                                            // $real_send_content .= 'jpg,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                            $real_send_content .= 'jpg,' . $image_data[$md5];
                                         } elseif ($value['image_type'] == 'gif') {
-                                            $real_send_content .= 'gif|' . $image_data[$md5];
-                                            // $real_send_content .= 'gif|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                            $real_send_content .= 'gif,' . $image_data[$md5];
+                                            // $real_send_content .= 'gif,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                         }
                                     } else {
                                         $imagebase        = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                         $image_data[$md5] = $imagebase;
                                         // $frame['content'] =$imagebase;
                                         if ($value['image_type'] == 'jpg') {
-                                            // $real_send_content .= 'jpg|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
-                                            $real_send_content .= 'jpg|' . $image_data[$md5];
+                                            // $real_send_content .= 'jpg,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                            $real_send_content .= 'jpg,' . $image_data[$md5];
                                         } elseif ($value['image_type'] == 'gif') {
-                                            $real_send_content .= 'gif|' . $image_data[$md5];
-                                            // $real_send_content .= 'gif|' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                            $real_send_content .= 'gif,' . $image_data[$md5];
+                                            // $real_send_content .= 'gif,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                         }
                                     }
                                 }
