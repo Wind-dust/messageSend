@@ -5626,10 +5626,10 @@ class CmppCreateCodeTask extends Pzlife
         $mysql_connect->query("set names utf8mb4");
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        /* for ($i = 96; $i < 12803; $i++) {
+        for ($i = 90620; $i < 90692; $i++) {
             $this->redis->rpush('index:meassage:sflmessage:sendtask', $i);
-        } */
-        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90624);
+        }
+        /* $this->redis->rpush('index:meassage:sflmessage:sendtask', 90624);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 90625);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 90633);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 90645);
@@ -5637,7 +5637,7 @@ class CmppCreateCodeTask extends Pzlife
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 90667);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 90669);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 90672);
-        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90679);
+        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90679); */
         /* $this->redis->rpush('index:meassage:sflmessage:sendtask', 73728);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73735);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73740);
