@@ -5626,9 +5626,9 @@ class CmppCreateCodeTask extends Pzlife
         $mysql_connect->query("set names utf8mb4");
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        for ($i = 90620; $i < 90692; $i++) {
+        /* for ($i = 90620; $i < 90692; $i++) {
             $this->redis->rpush('index:meassage:sflmessage:sendtask', $i);
-        }
+        } */
         /* $this->redis->rpush('index:meassage:sflmessage:sendtask', 90624);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 90625);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 90633);

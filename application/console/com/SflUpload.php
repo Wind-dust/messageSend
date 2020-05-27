@@ -1966,7 +1966,7 @@ class SflUpload extends Pzlife
         try {
             $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
             ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >= '1590336000' AND `create_time` <= '1590422400' AND `mobile` NOT IN (15201926171,15821193682) AND `sfl_relation_id` <> '100180028' ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >= '1590422400' AND `create_time` <= '1590508800' AND `mobile` NOT IN (15201926171,15821193682) AND `sfl_relation_id` <> '100180028' ");
             $ids = [];
             foreach ($mul_task_ids as $key => $value) {
                 $ids[] = $value['id'];
@@ -2084,7 +2084,7 @@ class SflUpload extends Pzlife
                     $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                 }
             }
-            $objWriter->save('imp_mobile_status_report_mms_1_20200525.xlsx');
+            $objWriter->save('imp_mobile_status_report_mms_1_20200526.xlsx');
         } catch (\Exception $th) {
             exception($th);
         }
@@ -2098,7 +2098,7 @@ class SflUpload extends Pzlife
             // print_r(realpath("../"). "\yt_area_mobile.csv");die;
     
           
-        $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >= '1590336000' AND `create_time` <= '1590422400' AND `mobile` NOT IN (15201926171,15821193682) ");
+        $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >= '1590422400' AND `create_time` <= '1590508800' AND `mobile` NOT IN (15201926171,15821193682) ");
         $ids = [];
         foreach ($mul_task_ids as $key => $value) {
             // $ids[] = $value['id'];
@@ -2236,7 +2236,7 @@ class SflUpload extends Pzlife
                 $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             }
         }
-        $objWriter->save('imp_mobile_status_report_sms_1_20200525.xlsx');
+        $objWriter->save('imp_mobile_status_report_sms_1_20200526.xlsx');
     }
 
 }

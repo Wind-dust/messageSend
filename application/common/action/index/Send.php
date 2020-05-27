@@ -297,7 +297,7 @@ return $result;
     {
         $Mobiles = array_unique(array_filter($Mobiles));
         // $Password = md5($Password);
-        $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,pid,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -352,6 +352,12 @@ return $result;
             }
             $data['develop_no'] = $develop_no;
         }
+        if ($user['pid'] == 137) {
+            $develop_no_mes = Dbuser::getUserDevelopCode(['business_id' => 5, 'uid' => $user['id']], 'id,uid,business_id,source,develop_no', true);
+            if (!empty($develop_no_mes)) {
+                $data['develop_no'] = $develop_no_mes['develop_no'];
+            }
+        }
         $data['uid']          = $user['id'];
         $data['source']       = $ip;
         $data['task_content'] = $Content;
@@ -398,7 +404,7 @@ return $result;
         // print_r($this->redis);
         // die;
         $Mobiles = array_unique(array_filter($Mobiles));
-        $user    = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial,pid', true);
+        $user    = DbUser::getUserOne(['appid' => $Username], 'id,pid,appkey,user_type,user_status,reservation_service,free_trial,pid', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -466,6 +472,12 @@ return $result;
                 return ['code' => '3011'];
             }
             $data['develop_no'] = $develop_no;
+        }
+        if ($user['pid'] == 137) {
+            $develop_no_mes = Dbuser::getUserDevelopCode(['business_id' => 6, 'uid' => $user['id']], 'id,uid,business_id,source,develop_no', true);
+            if (!empty($develop_no_mes)) {
+                $data['develop_no'] = $develop_no_mes['develop_no'];
+            }
         }
         $data['uid']          = $user['id'];
         $data['source']       = $ip;
@@ -986,7 +998,7 @@ return $result;
     public function submitBatchCustomBusiness($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '', $msg_id = '')
     {
         $this->redis = Phpredis::getConn();
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -998,9 +1010,11 @@ return $result;
             return ['code' => '3002'];
         }
         if (!empty($template_id)) {
-            $template =  DbSendMessage::getUserModel(['template_id' => $template_id], '*', true);
-            if ($template['status'] != 3) {
-                return ['code' => '3003'];
+            if (!empty($template_id)) {
+                $template =  DbSendMessage::getUserModel(['template_id' => $template_id,'uid' => $user['id']], '*', true);
+                if (empty($template) || $template['status'] != 3) {
+                    return ['code' => '3003'];
+                }
             }
         }
         if (!empty($signature_id)) {
@@ -1010,6 +1024,13 @@ return $result;
             }
             if ($signature['status'] != 2) {
                 return ['code' => '3010'];
+            }
+        }
+        $develop_no = '';
+        if ($user['pid'] == 137) {
+            $develop_no_mes = Dbuser::getUserDevelopCode(['business_id' => 6, 'uid' => $user['id']], 'id,uid,business_id,source,develop_no', true);
+            if (!empty($develop_no_mes)) {
+                $develop_no = $develop_no_mes['develop_no'];
             }
         }
         $connect_data = explode(';', $connect);
@@ -1080,6 +1101,7 @@ return $result;
                 'task_no' => $task_no,
                 'uid'     => $user['id'],
                 'task_content' => $value,
+                'develop_no' => $develop_no,
                 'mobile_content' => join(',', $send_data_mobile[$key]),
                 'source'         => $ip,
                 'send_length'       => mb_strlen($value),
@@ -1233,7 +1255,7 @@ return $result;
     public function submitBatchCustomMarketing($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '', $msg_id = '')
     {
         $this->redis = Phpredis::getConn();
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,marketing_free_trial', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,appkey,user_type,user_status,reservation_service,marketing_free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -1245,8 +1267,8 @@ return $result;
             return ['code' => '3002'];
         }
         if (!empty($template_id)) {
-            $template =  DbSendMessage::getUserModel(['template_id' => $template_id], '*', true);
-            if ($template['status'] != 3) {
+            $template =  DbSendMessage::getUserModel(['template_id' => $template_id,'uid' => $user['id']], '*', true);
+            if (empty($template) || $template['status'] != 3) {
                 return ['code' => '3003'];
             }
         }
@@ -1258,6 +1280,13 @@ return $result;
             }
             if ($signature['status'] != 2) {
                 return ['code' => '3010'];
+            }
+        }
+        $develop_no  = '';
+        if ($user['pid'] == 137) {
+            $develop_no_mes = Dbuser::getUserDevelopCode(['business_id' => 6, 'uid' => $user['id']], 'id,uid,business_id,source,develop_no', true);
+            if (!empty($develop_no_mes)) {
+                $develop_no = $develop_no_mes['develop_no'];
             }
         }
         $connect_data = explode(';', $connect);
@@ -1330,6 +1359,7 @@ return $result;
                 'task_no' => $task_no,
                 'uid'     => $user['id'],
                 'task_content' => $value,
+                'develop_no' => $develop_no,
                 'mobile_content' => join(',', $send_data_mobile[$key]),
                 'source'         => $ip,
                 'send_length'       => mb_strlen($value),

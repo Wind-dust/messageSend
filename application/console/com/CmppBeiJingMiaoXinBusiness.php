@@ -53,22 +53,23 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
         'content'     => '您的验证码是：8791【美丽田园】',
 
         ])); */
-
+/* 
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
             'content'     => '【丝芙兰】尊贵的黑卡会员 杨蕾，祝您生日快乐！三重生日豪礼，伴您享受生日喜悦！一重奏:【丝芙兰门店明星礼包】二重奏: 【丝芙兰官网50元电子礼券】三重奏:生日月订单享受一次双倍积分礼遇。会员生日福利，明星热卖产品大放送！请于2020-05-20前至丝芙兰官网sephora.cn 、App、小程序或门店领取您的专属生日礼物！以上三重生日礼，皆不可与其他优惠叠加使用。/回T退订',
 
-        ]));
+        ])); */
 
-        /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '17721160630 ',
             'mar_task_id' => '',
+            'develop_code' => '3453',
             // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
-            'content'     => '【钰晰科技】您的验证码为2310。',
+            'content'     => '【钰晰科技】您的验证码为2310。回复QX则取消此次登录验证',
 
-        ])); */
+        ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
         $myfile   = fopen($log_path, 'a+');
@@ -225,6 +226,8 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                         $body                = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
                         $Registered_Delivery = trim($body['Registered_Delivery']);
                         print_r($body);
+                        echo "\n";
+                        echo "通道码号:".$body['Dest_Id'];
                         if ($Registered_Delivery == 0) { //上行
                             // if ($mesage) { //
 
@@ -297,7 +300,6 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                 }
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
                     while (true) {
-                        $receipt_data = [];
                         echo $Sequence_Id . "\n";
                         try {
                             $receive = 1;
@@ -378,7 +380,7 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                                             break;
                                         }
                                         $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
-                                        print_r($sequence);
+                                        // print_r($sequence);
                                         if ($body['Result'] != 0) { //消息发送失败
                                             echo "发送失败" . "\n";
                                             $error_msg = "其他错误";
