@@ -1241,6 +1241,7 @@ return $result;
         }
         if (!empty($signature_id)) {
             $signature =  DbSendMessage::getUserSignature(['uid' => $user['id'], 'signature_id' => $signature_id], '*', true);
+            
             if (empty($signature)) {
                 return ['code' => '3008'];
             }
@@ -1346,9 +1347,9 @@ return $result;
                     } else {
                         // array_push($task_no, $free_taskno);
                         $send_task['free_trial'] = 2;
-                        $data['yidong_channel_id'] = 18;
-                $data['liantong_channel_id'] = 19;
-                $data['dianxin_channel_id'] = 19;
+                        $send_task['yidong_channel_id'] = 18;
+                $send_task['liantong_channel_id'] = 19;
+                $send_task['dianxin_channel_id'] = 19;
                         $free_taskno[] = $task_no;
                         // array_push($free_trial, $send_task);
                     }
@@ -1356,9 +1357,9 @@ return $result;
                     if (!empty($value)) {
                         $free_taskno[] = $task_no;
                         $send_task['free_trial'] = 2;
-                        $data['yidong_channel_id'] = 18;
-                        $data['liantong_channel_id'] = 19;
-                        $data['dianxin_channel_id'] = 19;
+                        $send_task['yidong_channel_id'] = 18;
+                        $send_task['liantong_channel_id'] = 19;
+                        $send_task['dianxin_channel_id'] = 19;
                         // array_push($free_trial, $send_task);
                     }
                 }
