@@ -5629,9 +5629,15 @@ class CmppCreateCodeTask extends Pzlife
         /* for ($i = 96; $i < 12803; $i++) {
             $this->redis->rpush('index:meassage:sflmessage:sendtask', $i);
         } */
-        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90692);
-        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90693);
-        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90694);
+        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90624);
+        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90625);
+        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90633);
+        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90645);
+        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90655);
+        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90667);
+        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90669);
+        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90672);
+        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90679);
         /* $this->redis->rpush('index:meassage:sflmessage:sendtask', 73728);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73735);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73740);
