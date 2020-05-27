@@ -410,7 +410,11 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                                         $Registered_Delivery = trim($body['Registered_Delivery']);
                                         print_r($body);
                                         echo "\n";
-                                        echo "通道码号:".$body['Dest_Id'];
+                                        // echo "通道码号:".$body['Dest_Id'];
+                                        $develop_len = strlen($Dest_Id);
+                                        $receive_develop_no = mb_substr(trim($body['Dest_Id']),$develop_len);
+                                        echo "拓展码:".$receive_develop_no;
+                                        echo "\n";
                                         if ($Registered_Delivery == 0) { //上行
                                             // if ($mesage) { //
 
