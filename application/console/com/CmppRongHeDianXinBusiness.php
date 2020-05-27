@@ -353,12 +353,11 @@ class CmppRongHeDianXinBusiness extends Pzlife
                                         $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
                                         $Registered_Delivery = trim($body['Registered_Delivery']);
                                         print_r($body);
+                                        $develop_len = strlen($Dest_Id);
+                                        $receive_develop_no = mb_substr(trim($body['Dest_Id']),$develop_len);
+                                        // echo "拓展码:".$receive_develop_no;
+                                        // echo "\n";  
                                         if ($Registered_Delivery == 0) { //上行
-                                            // if ($mesage) { //
-
-                                            // }else{
-
-                                            // }
                                             if ($body['Msg_Fmt'] == 15) {
                                                 $body['Msg_Content'] = mb_convert_encoding($body['Msg_Content'], 'UTF-8', 'GBK');
                                             } elseif ($body['Msg_Fmt'] == 0) { //ASCII进制码
@@ -371,15 +370,17 @@ class CmppRongHeDianXinBusiness extends Pzlife
                                             }
                                             $up_message = [];
                                             $up_message = [
-                                                'mobile' => trim($body['Src_terminal_Id']),
+                                                'mobile'       => trim($body['Src_terminal_Id']),
                                                 'message_info' => trim($body['Msg_Content']),
+                                                'develop_code' => $receive_develop_no,
                                             ];
                                             $redis->rpush($redisMessageUpRiver, json_encode($up_message));
-                                        } elseif ($Registered_Delivery == 1) { //回执报告
+                                        }  elseif ($Registered_Delivery == 1) { //回执报告
 
                                             $stalen = $body['Msg_Length'] - 20 - 8 - 21 - 4;
                                             if (strlen($body['Msg_Content']) < 60) {
                                                 $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat", $body['Msg_Content']);
+                                                $Result = 1;
                                             } else {
                                                 $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence", $body['Msg_Content']);
                                             }
@@ -396,6 +397,7 @@ class CmppRongHeDianXinBusiness extends Pzlife
                                                 $mesage['receive_time'] = time(); //回执时间戳
                                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                                             } else { //不在记录中的回执存入缓存，
+                                                $Result = 9;
                                                 $mesage['Stat']        = isset($Msg_Content['Stat']) ? $Msg_Content['Stat'] : 'UNKNOWN';
                                                 $mesage['Submit_time'] = trim(isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis', time()));
                                                 $mesage['Done_time']   = trim(isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis', time()));

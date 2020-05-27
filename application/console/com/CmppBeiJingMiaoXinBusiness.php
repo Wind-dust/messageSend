@@ -53,21 +53,21 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
         'content'     => '您的验证码是：8791【美丽田园】',
 
         ])); */
-/* 
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15201926171',
-            'mar_task_id' => '',
-            // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
-            'content'     => '【丝芙兰】尊贵的黑卡会员 杨蕾，祝您生日快乐！三重生日豪礼，伴您享受生日喜悦！一重奏:【丝芙兰门店明星礼包】二重奏: 【丝芙兰官网50元电子礼券】三重奏:生日月订单享受一次双倍积分礼遇。会员生日福利，明星热卖产品大放送！请于2020-05-20前至丝芙兰官网sephora.cn 、App、小程序或门店领取您的专属生日礼物！以上三重生日礼，皆不可与其他优惠叠加使用。/回T退订',
+/*
+$send = $redis->rPush($redisMessageCodeSend, json_encode([
+'mobile'      => '15201926171',
+'mar_task_id' => '',
+// 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
+'content'     => '【丝芙兰】尊贵的黑卡会员 杨蕾，祝您生日快乐！三重生日豪礼，伴您享受生日喜悦！一重奏:【丝芙兰门店明星礼包】二重奏: 【丝芙兰官网50元电子礼券】三重奏:生日月订单享受一次双倍积分礼遇。会员生日福利，明星热卖产品大放送！请于2020-05-20前至丝芙兰官网sephora.cn 、App、小程序或门店领取您的专属生日礼物！以上三重生日礼，皆不可与其他优惠叠加使用。/回T退订',
 
-        ])); */
+])); */
 
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '17721160630 ',
-            'mar_task_id' => '',
+            'mobile'       => '17721160630 ',
+            'mar_task_id'  => '',
             'develop_code' => '3453',
             // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
-            'content'     => '【钰晰科技】您的验证码为2310。回复QX则取消此次登录验证',
+            'content'      => '【钰晰科技】您的验证码为2310。回复QX则取消此次登录验证',
 
         ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -202,14 +202,14 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                             echo "发送失败" . "\n";
                             $error_msg = "其他错误";
                             if ($sequence) {
-                                $sequence           = json_decode($sequence, true);
-                                $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
+                                $sequence = json_decode($sequence, true);
+                                $msgid    = $body['Msg_Id1'] . $body['Msg_Id2'];
                                 // $sequence['Msg_Id'] = $msgid;
-                               
-                                $sequence['Stat'] = $body['Result'];
+
+                                $sequence['Stat']         = $body['Result'];
                                 $sequence['receive_time'] = time(); //回执时间戳
                                 $redis->rpush($redisMessageCodeDeliver, json_encode($sequence));
-                                $redis->hdel($redisMessageCodeSequenceId,  $head['Sequence_Id']);
+                                $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
                             }
                         } else {
                             if ($sequence) {
@@ -227,13 +227,11 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                         $Registered_Delivery = trim($body['Registered_Delivery']);
                         print_r($body);
                         echo "\n";
-                        echo "通道码号:".$body['Dest_Id'];
+                        $develop_len        = strlen($Dest_Id);
+                        $receive_develop_no = mb_substr(trim($body['Dest_Id']), $develop_len);
+                        // echo "拓展码:".$receive_develop_no;
+                        // echo "\n";
                         if ($Registered_Delivery == 0) { //上行
-                            // if ($mesage) { //
-
-                            // }else{
-
-                            // }
                             if ($body['Msg_Fmt'] == 15) {
                                 $body['Msg_Content'] = mb_convert_encoding($body['Msg_Content'], 'UTF-8', 'GBK');
                             } elseif ($body['Msg_Fmt'] == 0) { //ASCII进制码
@@ -248,6 +246,7 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                             $up_message = [
                                 'mobile'       => trim($body['Src_terminal_Id']),
                                 'message_info' => trim($body['Msg_Content']),
+                                'develop_code' => $receive_develop_no,
                             ];
                             $redis->rpush($redisMessageUpRiver, json_encode($up_message));
                         } elseif ($Registered_Delivery == 1) { //回执报告
@@ -286,7 +285,7 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
 
                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                         $new_Total_Length = strlen($new_body) + 12;
-                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id,$head['Sequence_Id']);
+                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                         usleep(250);
                         $receive = 2;
@@ -385,14 +384,14 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                                             echo "发送失败" . "\n";
                                             $error_msg = "其他错误";
                                             if ($sequence) {
-                                                $sequence           = json_decode($sequence, true);
-                                                $msgid              = $body['Msg_Id1'] . $body['Msg_Id2'];
+                                                $sequence = json_decode($sequence, true);
+                                                $msgid    = $body['Msg_Id1'] . $body['Msg_Id2'];
                                                 // $sequence['Msg_Id'] = $msgid;
-                                               
-                                                $sequence['Stat'] = $body['Result'];
+
+                                                $sequence['Stat']         = $body['Result'];
                                                 $sequence['receive_time'] = time(); //回执时间戳
                                                 $redis->rpush($redisMessageCodeDeliver, json_encode($sequence));
-                                                $redis->hdel($redisMessageCodeSequenceId,  $head['Sequence_Id']);
+                                                $redis->hdel($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                             }
                                         } else {
                                             if ($sequence) {
@@ -411,10 +410,10 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                                         print_r($body);
                                         echo "\n";
                                         // echo "通道码号:".$body['Dest_Id'];
-                                        $develop_len = strlen($Dest_Id);
-                                        $receive_develop_no = mb_substr(trim($body['Dest_Id']),$develop_len);
-                                        echo "拓展码:".$receive_develop_no;
-                                        echo "\n";
+                                        $develop_len        = strlen($Dest_Id);
+                                        $receive_develop_no = mb_substr(trim($body['Dest_Id']), $develop_len);
+                                        // echo "拓展码:".$receive_develop_no;
+                                        // echo "\n";
                                         if ($Registered_Delivery == 0) { //上行
                                             // if ($mesage) { //
 
@@ -435,6 +434,7 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                                             $up_message = [
                                                 'mobile'       => trim($body['Src_terminal_Id']),
                                                 'message_info' => trim($body['Msg_Content']),
+                                                'develop_code' => $receive_develop_no,
                                             ];
                                             $redis->rpush($redisMessageUpRiver, json_encode($up_message));
                                         } elseif ($Registered_Delivery == 1) { //回执报告
@@ -473,7 +473,7 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
 
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
                                         $new_Total_Length = strlen($new_body) + 12;
-                                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id,$head['Sequence_Id']);
+                                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                         usleep(250);
                                         $receive = 2;
@@ -490,9 +490,9 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                             }
                             //在发送
                             /* if (!empty($receipt_data)) {
-                                foreach ($receipt_data as $key => $value) {
-                                    socket_write($socket, $value['new_headData'] . $value['new_body'], $value['new_Total_Length']);
-                                }
+                            foreach ($receipt_data as $key => $value) {
+                            socket_write($socket, $value['new_headData'] . $value['new_body'], $value['new_Total_Length']);
+                            }
                             } */
                             $send = $redis->lPop($redisMessageCodeSend);
                             if (!empty($send)) { //正式使用从缓存中读取数据并且有待发送数据
@@ -666,7 +666,7 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                                     'mobile'  => 15201926171,
                                     'content' => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
                                 ])); //易信行业通道
-                               
+
                                 exit();
                             } else {
                                 $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
