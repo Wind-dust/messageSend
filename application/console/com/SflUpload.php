@@ -1602,20 +1602,45 @@ class SflUpload extends Pzlife
                             } elseif ($file_info[1] == 'txt') { //获取模板信息
                                 $file_data = $this->readForTxtToDyadicArray($son_path); //关联关系
                                 // print_r($son_path);die;
+                                if (!empty($file_data)) {
+                                    foreach ($file_data as $fkey => $fvalue) {
+                                        // print_r($fvalue);
+                                        $tem                   = [];
+                                        $tem['num']            = $fvalue[2];
+                                        $tem['content']        = $fvalue[4];
+                                        $SMS_model[$fvalue[0]] = $tem;
+                                    }
+                                }
                             }
                         }
-                        if (!empty($file_data)) {
-                            foreach ($file_data as $fkey => $fvalue) {
-                                // print_r($fvalue);
-                                $tem                   = [];
-                                $tem['num']            = $fvalue[2];
-                                $tem['content']        = $fvalue[4];
-                                $SMS_model[$fvalue[0]] = $tem;
-                            }
-                        }
+                       
                         // print_r($SMS_model);
                         // die;
                         // print_r($send_data);
+                       /*  if (!empty($SMS_model)) {
+                            foreach ($SMS_model as $key => $value) {
+                                if (!empty($send_data)) {
+                                    foreach ($send_data as $skey => $svalue) {
+                                        $txt = [];
+                                        $txt = $this->readForTxtToDyadicArray($svalue); # code...
+                                        if (!empty($txt)) {
+                                            foreach ($txt as $tkey => $tvalue) {
+                                                // print_r($tvalue);die;
+                                                if ($tvalue[2] == $key) {
+                                                    if (isset($model_check[$tvalue[2]])) {
+                                                        $model_check[$tvalue[2]]++;
+                                                    } else {
+                                                        $model_check[$tvalue[2]] = 1;
+                                                    }
+                                                }
+                                               
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        print_r($SMS_model);die; */
                         if (!empty($send_data)) {
                             foreach ($send_data as $key => $value) {
                                 $txt = [];
@@ -1675,18 +1700,18 @@ class SflUpload extends Pzlife
     
 
                         }
+                        /* 
                         if (!empty($file_data)) {
-                            foreach ($file_data as $key => $value) {
-                                // print_r($value[2]);
-                                // print_r($model_check[$value[0]]);
+                            foreach ($SMS_model as $key => $value) {
+                                // print_r($value);die;
     
                                 // die;
-                                if ($value[2] != $model_check[$value[0]]) {
+                                if ($value['num'] != $model_check[$key]) {
                                     //校验失败
                                     return  ['code' => 200, "error" => "校验失败"];
                                 }
                             }
-                        }
+                        } */
                         if (!empty($send_data)) {
                             $j = 1;
                             foreach ($send_data as $key => $value) {
