@@ -1699,16 +1699,7 @@ class SflUpload extends Pzlife
                                         } else {
                                             $model_check[$tvalue[2]] = 1;
                                         }
-                                        if ($tvalue[3] == "") {
-                                           
-                                            if (isset($err_task_num['The Mobile IS NULL'])) {
-                                                $err_task_num['The Mobile IS NULL']  += 1;
-                                            }else{
-                                                $err_task_num['The Mobile IS NULL']  = 1;
-                                            }
-                                            continue;
-                                           
-                                        }
+                                      
                                         $SMS_real_send               = [];
                                         $SMS_real_send               = [];
                                         $SMS_real_send['mseeage_id'] = $tvalue[0];
@@ -1747,6 +1738,16 @@ class SflUpload extends Pzlife
                                         $SMS_real_send['task_content'] = $content;
                                         $SMS_real_send['real_num'] = $real_length;
                                         $SMS_real_send['send_length'] = $send_length;
+                                        if ($tvalue[3] == "") {
+                                           
+                                            if (isset($err_task_num['The Mobile IS NULL'])) {
+                                                $err_task_num['The Mobile IS NULL']  += 1;
+                                            }else{
+                                                $err_task_num['The Mobile IS NULL']  = 1;
+                                            }
+                                            continue;
+                                           
+                                        }
                                         $SMSmessage[] = $SMS_real_send;
                                         // print_r($content);die;
                                         $j++;
