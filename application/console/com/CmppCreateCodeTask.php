@@ -5629,15 +5629,15 @@ class CmppCreateCodeTask extends Pzlife
         /* for ($i = 96; $i < 12803; $i++) {
             $this->redis->rpush('index:meassage:sflmessage:sendtask', $i);
         } */
-        $this->redis->rpush('index:meassage:sflmessage:sendtask', 73708);
-        $this->redis->rpush('index:meassage:sflmessage:sendtask', 73714);
-        $this->redis->rpush('index:meassage:sflmessage:sendtask', 73725);
-        $this->redis->rpush('index:meassage:sflmessage:sendtask', 73728);
+        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90692);
+        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90693);
+        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90694);
+        /* $this->redis->rpush('index:meassage:sflmessage:sendtask', 73728);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73735);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73740);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73754);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73755);
-        $this->redis->rpush('index:meassage:sflmessage:sendtask', 73764);
+        $this->redis->rpush('index:meassage:sflmessage:sendtask', 73764); */
         $tody_time = strtotime(date("Ymd",time()));
         // try {
         //     $mysql_connect->table('yx_sfl_send_task')->where([['create_time','>',$tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84]);
