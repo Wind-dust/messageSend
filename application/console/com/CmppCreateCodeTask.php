@@ -484,6 +484,7 @@ class CmppCreateCodeTask extends Pzlife
                             'mobile'       => $mobilesend[$i],
                             'channel_id'   => $channel_id,
                             'send_length'  => $send_length,
+                            'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no']: 1,
                             'send_status'  => 2,
                             'create_time'  => time(),
                         ];
@@ -507,6 +508,7 @@ class CmppCreateCodeTask extends Pzlife
                             'uid'            => $sendTask['uid'],
                             'task_content'   => $sendTask['task_content'],
                             'mobile'         => $mobilesend[$i],
+                            'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
                             'send_status'    => 4,
                             'create_time'    => time(),
                             'send_length'    => $send_length,
@@ -974,7 +976,7 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:business:sendtask';
-        // for ($i = 643386; $i < 643416; $i++) {
+        // for ($i = 795487; $i < 795495; $i++) {
         // $this->redis->rPush('index:meassage:business:sendtask', $i);
         // }
         // $this->redis->rPush('index:meassage:business:sendtask',643377);
@@ -1071,6 +1073,7 @@ class CmppCreateCodeTask extends Pzlife
                                         'mobile'       => $mobilesend[$i],
                                         'send_status'  => 2,
                                         'channel_id'   => $channel_id,
+                                        'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no']: 1,
                                         'send_length'  => $send_length,
                                         'create_time'  => time(),
                                     ];
@@ -1097,6 +1100,7 @@ class CmppCreateCodeTask extends Pzlife
                                         'source'         => $sendTask['source'],
                                         'mobile'         => $mobilesend[$i],
                                         'send_length'    => $send_length,
+                                        'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no']: 1,
                                         'send_status'    => 4,
                                         'create_time'    => time(),
                                         'status_message' => 'DB:0101', //无效号码
@@ -1128,6 +1132,7 @@ class CmppCreateCodeTask extends Pzlife
                                     'mobile'       => $mobilesend[$i],
                                     'send_status'  => 2,
                                     'channel_id'   => $channel_id,
+                                    'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no']: 1,
                                     'send_length'  => $send_length,
                                     'create_time'  => time(),
                                 ];
@@ -1155,6 +1160,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'source'         => $sendTask['source'],
                                 'mobile'         => $mobilesend[$i],
                                 'send_length'    => $send_length,
+                                'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no']: 1,
                                 'send_status'    => 4,
                                 'create_time'    => time(),
                                 'status_message' => 'DB:0101', //无效号码
@@ -3301,10 +3307,11 @@ class CmppCreateCodeTask extends Pzlife
     public function getUpRiver()
     {
         $redis = Phpredis::getConn();
-        /*  $redis->rpush('index:message:code:upriver:22', json_encode([
-        'mobile' => 15201926171,
+         $redis->rpush('index:message:code:upriver:22', json_encode([
+        'mobile' => 13817346471,
         'message_info' => 'QX',
-        ])); */
+        'develop_code' => '3435',
+        ]));
         try {
             while (true) {
                 $channels = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `delete_time` = 0 ");
@@ -3321,6 +3328,49 @@ class CmppCreateCodeTask extends Pzlife
                         $business_id          = 0;
                         $encodemessageupriver = json_decode($messageupriver, true);
                         $sql                  = '';
+                        if (!empty($encodemessageupriver['develop_code']) && strlen($encodemessageupriver['develop_code']) <= 6) {
+                            $message = Db::query("SELECT  `uid`,`id`,`task_no` FROM yx_user_send_task_log WHERE `mobile` = '".$encodemessageupriver['mobile']."' AND  `develop_no` = ".$encodemessageupriver['develop_code']." AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ");
+                            if (!empty($message)) {
+                                //上行入库
+                                
+                                Db::table('yx_user_upriver')->insert(['mobile' => $encodemessageupriver['mobile'], 'uid' => $message[0]['uid'], 'task_no' => $message[0]['task_no'], 'message_info' => $encodemessageupriver['message_info'], 'create_time' => time(), 'business_id' => 5]);
+                                //上行写入用户调用位置
+                                $user = Db::query("SELECT `need_upriver_api`,`pid` FROM `yx_users` WHERE `id` = " . $message[0]['uid']);
+                                if ($user && $user[0]['need_upriver_api'] == 2) {
+                                    if ($user[0]['pid'] == 137) {
+                                        $msg_id = Db::query("SELECT `send_msg_id` FROM yx_user_send_task WHERE `task_no` = '".$message[0]['task_no']."'");
+                                        if ($user && $user[0]['need_upriver_api'] == 2) {
+                                            $redis->rpush("index:message:upriver:" . $message[0]['uid'], json_encode(['mobile' => $encodemessageupriver['mobile'], 'message_info' => $encodemessageupriver['message_info'], 
+                                            'msg_id' => $msg_id[0]['send_msg_id'], 'business_id' => $business_id, 'get_time' => date('Y-m-d H:i:s', time())]));
+                                        }
+                                        continue;
+                                    }else{
+                                        $redis->rpush("index:message:upriver:" . $message[0]['uid'], json_encode(['mobile' => $encodemessageupriver['mobile'], 'message_info' => $encodemessageupriver['message_info'], 'business_id' => 5, 'get_time' => date('Y-m-d H:i:s', time())]));
+                                        continue;
+                                    }
+                                }
+                            }else{
+                                $message = Db::query("SELECT  `uid`,`id`,`task_no` FROM yx_user_send_code_task_log WHERE `mobile` = '".$encodemessageupriver['mobile']."' AND  `develop_no` = ".$encodemessageupriver['develop_code']." AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ");
+                                if (!empty($message)) {
+                                    //上行入库
+                                    Db::table('yx_user_upriver')->insert(['mobile' => $encodemessageupriver['mobile'], 'uid' => $message[0]['uid'], 'task_no' => $message[0]['task_no'], 'message_info' => $encodemessageupriver['message_info'], 'create_time' => time(), 'business_id' => 6]);
+                                    //上行写入用户调用位置
+                                    
+                                    $user = Db::query("SELECT `need_upriver_api`,`pid` FROM `yx_users` WHERE `id` = " . $message[0]['uid']);
+                                    if ($user && $user[0]['need_upriver_api'] == 2) {
+                                        if ($user[0]['pid'] == 137 ) {
+                                            $msg_id = Db::query("SELECT `send_msg_id` FROM yx_user_send_code_task WHERE `task_no` = '".$message[0]['task_no']."'");
+                                            
+                                            $redis->rpush("index:message:upriver:" . $message[0]['uid'], json_encode(['mobile' => $encodemessageupriver['mobile'], 'message_info' => $encodemessageupriver['message_info'],'msg_id' => $msg_id[0]['send_msg_id'], 'business_id' => 6, 'get_time' => date('Y-m-d H:i:s', time())]));
+                                        }else{
+                                            $redis->rpush("index:message:upriver:" . $message[0]['uid'], json_encode(['mobile' => $encodemessageupriver['mobile'], 'message_info' => $encodemessageupriver['message_info'], 'business_id' => 6, 'get_time' => date('Y-m-d H:i:s', time())]));
+                                        }
+                                       
+                                    }
+                                    continue;
+                                }
+                            }
+                        }
                         $sql                  = "SELECT `uid`,`id`,`task_no` FROM ";
                         if ($value['business_id'] == 5) { //营销
                             $sql .= " yx_user_send_task_log  WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'";
