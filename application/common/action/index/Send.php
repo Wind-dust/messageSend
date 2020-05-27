@@ -1044,7 +1044,11 @@ return $result;
                     $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
                 }
             } else {
-                $real_text = $send_text[0];
+                if (!empty($signature_id)) {
+                    $real_text = $signature['title'] .  $send_text[0];
+                }else{
+                    $real_text = $send_text[0];
+                }
                 if (checkMobile($send_text[1]) == false) {
                     continue;
                 }
@@ -1284,7 +1288,11 @@ return $result;
                 if (checkMobile($send_text[1]) == false) {
                     continue;
                 }
-                $real_text = $send_text[0];
+                if (!empty($signature_id)) {
+                    $real_text = $signature['title'] .  $send_text[0];
+                }else{
+                    $real_text = $send_text[0];
+                }
                 if (in_array($real_text, $send_data)) {
                     $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
                 } else {
