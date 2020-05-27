@@ -1233,7 +1233,7 @@ return $result;
     public function submitBatchCustomMarketing($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '', $msg_id = '')
     {
         $this->redis = Phpredis::getConn();
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,marketing_free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -1346,7 +1346,7 @@ return $result;
                 $send_task['real_num'] =  count($send_data_mobile[$key]);
             }
             $send_task['free_trial'] = 1;
-            if ($user['free_trial'] == 2) {
+            if ($user['marketing_free_trial'] == 2) {
                 //短信内容分词
                 $search_analyze = $this->search_analyze($value);
                 $search_result = json_decode($search_analyze, true);
