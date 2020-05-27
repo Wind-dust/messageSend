@@ -409,6 +409,8 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                                         $body                = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
                                         $Registered_Delivery = trim($body['Registered_Delivery']);
                                         print_r($body);
+                                        echo "\n";
+                                        echo "通道码号:".$body['Dest_Id'];
                                         if ($Registered_Delivery == 0) { //上行
                                             // if ($mesage) { //
 
