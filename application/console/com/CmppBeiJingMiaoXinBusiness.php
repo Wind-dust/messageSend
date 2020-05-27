@@ -300,9 +300,9 @@ class CmppBeiJingMiaoXinBusiness extends Pzlife {
                 }
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
                     while (true) {
+                        $receive = 1;
                         echo $Sequence_Id . "\n";
                         try {
-                            $receive = 1;
                             //先接收
                             while (true) {
                                 $headData = socket_read($socket, 12);
