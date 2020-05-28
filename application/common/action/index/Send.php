@@ -1299,10 +1299,10 @@ return $result;
         $send_data = [];
         $send_data_mobile = [];
         foreach ($connect_data as $key => $data) {
-            
             $send_text = explode(':', $data);
             if (!empty($template)) {
                 $replace_data = explode(',', $send_text[0]);
+                
                 $real_text = $template['content'];
                 if (!empty($signature)) {
                     $real_text = $signature['title'] . $template['content'];
@@ -1313,9 +1313,10 @@ return $result;
                         return ['code' => '3005']; //未获取到变量内容
                     }
                     for ($i = 1; $i <= $template['variable_len']; $i++) {
+                        
                         // $var_num = $i + 1;
                         // $real_text = str_replace("{{var" . $i . "}}", base64_decode($replace_data[$i - 1]), $real_text); //内容
-                        $real_text = str_replace("{{var" . $i . "}}", urlencode($replace_data[$i - 1]), $real_text); //内容
+                        $real_text = str_replace("{{var" . $i . "}}", urldecode($replace_data[$i - 1]), $real_text); //内容
                     }
                 }
                 if (checkMobile($send_text[1]) == false) {
