@@ -624,6 +624,7 @@ class SflUpload extends Pzlife
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
+                    continue;
                     $send_data = [];
                     if ($son_path_data !== false) {
 
@@ -948,11 +949,15 @@ class SflUpload extends Pzlife
                     $SMS_model = [];
                     $SMSmessage = [];
                     $model_check = [];
+                    $err_task_num = [];
                     if ($son_path_data !== false) {
                         foreach ($son_path_data as $skey => $svalue) {
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
                             if (!strpos($svalue,date("Ymd"))) {
+                                continue;
+                            }
+                            if (strpos($svalue,'20200528100907')) {
                                 continue;
                             }
                             $file_info = explode('.', $svalue);
@@ -1091,6 +1096,7 @@ class SflUpload extends Pzlife
                                 }
                             }
                         }
+                        // print_r($send_data);die;
                         if (!empty($send_data)) {
                             $j = 1;
                             foreach ($send_data as $key => $value) {
@@ -1141,6 +1147,16 @@ class SflUpload extends Pzlife
                                         $SMS_real_send['task_content'] = $content;
                                         $SMS_real_send['real_num'] = $real_length;
                                         $SMS_real_send['send_length'] = $send_length;
+                                        if ($tvalue[3] == "") {
+                                           
+                                            if (isset($err_task_num['The Mobile IS NULL'])) {
+                                                $err_task_num['The Mobile IS NULL']  += 1;
+                                            }else{
+                                                $err_task_num['The Mobile IS NULL']  = 1;
+                                            }
+                                            continue;
+                                           
+                                        }
                                         $SMSmessage[] = $SMS_real_send;
                                         // print_r($content);die;
                                         $j++;
@@ -1601,7 +1617,6 @@ class SflUpload extends Pzlife
                                 }
                             } elseif ($file_info[1] == 'txt') { //获取模板信息
                                 $file_data = $this->readForTxtToDyadicArray($son_path); //关联关系
-                                // print_r($son_path);die;
                                 if (!empty($file_data)) {
                                     foreach ($file_data as $fkey => $fvalue) {
                                         // print_r($fvalue);
@@ -1712,6 +1727,7 @@ class SflUpload extends Pzlife
                                 }
                             }
                         } */
+                        
                         if (!empty($send_data)) {
                             $j = 1;
                             foreach ($send_data as $key => $value) {
@@ -1842,8 +1858,11 @@ class SflUpload extends Pzlife
             $cellVal = trim(fgets($file));
             if (!empty($cellVal)) {
                 // $cellVal = trim($cellVal, '"');
-                $cellVal = str_replace('"', '', $cellVal);
-                $value   = explode(',', $cellVal);
+                $value   = explode('",', $cellVal);
+                // $cellVal = str_replace('"', '', $cellVal);
+                foreach ($value as $key => $svalue) {
+                    $value[$key] =  str_replace('"', '', $svalue);
+                }
                 array_push($data, $value);
             }
         }
