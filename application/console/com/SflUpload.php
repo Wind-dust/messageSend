@@ -624,6 +624,7 @@ class SflUpload extends Pzlife
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
+                    $err_task_num = [];
                     continue;
                     $send_data = [];
                     if ($son_path_data !== false) {
@@ -887,6 +888,16 @@ class SflUpload extends Pzlife
                                         } */
                                         $MMS_real_send['variable'] = json_encode($variable);
                                         // print_r($MMS_real_send);die;
+                                        if ($tvalue[3] == "") {
+                                           
+                                            if (isset($err_task_num['The Mobile IS NULL'])) {
+                                                $err_task_num['The Mobile IS NULL']  += 1;
+                                            }else{
+                                                $err_task_num['The Mobile IS NULL']  = 1;
+                                            }
+                                            continue;
+                                           
+                                        }
                                         $MMSmessage[] = $MMS_real_send;
                                     }
                                 }
