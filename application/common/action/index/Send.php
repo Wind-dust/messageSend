@@ -1431,7 +1431,7 @@ return $result;
         if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3004'];
         }
-        print_r($trial);die;
+        // print_r($trial);die;
         Db::startTrans();
         try {
             $save = DbAdministrator::saveUserSendTask($trial);
