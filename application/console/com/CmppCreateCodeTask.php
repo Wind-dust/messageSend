@@ -5677,7 +5677,7 @@ class CmppCreateCodeTask extends Pzlife
         $mysql_connect->query("set names utf8mb4");
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        /* for ($i = 90620; $i < 90692; $i++) {
+        /* for ($i = 90696; $i < 90719; $i++) {
             $this->redis->rpush('index:meassage:sflmessage:sendtask', $i);
         } */
         /* $this->redis->rpush('index:meassage:sflmessage:sendtask', 90624);
@@ -5689,7 +5689,7 @@ class CmppCreateCodeTask extends Pzlife
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 90669);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 90672);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 90679); */
-        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90719);
+        $this->redis->rpush('index:meassage:sflmessage:sendtask', 90695);
         /* $this->redis->rpush('index:meassage:sflmessage:sendtask', 73735);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73740);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73754);
@@ -5701,7 +5701,7 @@ class CmppCreateCodeTask extends Pzlife
         //     /* $where = [];
         //     $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
         //     $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-        //     $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `id` > 73781 AND `create_time` >  ".$tody_time ); 
+        //     $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `id` > 90719 AND `create_time` >  ".$tody_time ); 
         //     foreach ($sendid as $key => $value) {
         //         $this->redis->rpush('index:meassage:sflmessage:sendtask', $value['id']);
         //     }
@@ -6084,8 +6084,8 @@ class CmppCreateCodeTask extends Pzlife
         $j = 1;
         $receipt = [];
         $send_msg = [];
-        $deduct = 2; //1扣量,2不扣
-        $rate = 25;
+        $deduct = 1; //1扣量,2不扣
+        $rate = 30;
      /*    $all_task = 
         while (true) {
             $task_id = $this->redis->lpop('index:meassage:sflmulmessage:sendtask');
