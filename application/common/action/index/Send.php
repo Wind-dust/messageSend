@@ -1054,7 +1054,8 @@ return $result;
                     }
                     for ($i = 1; $i <= $template['variable_len']; $i++) {
                         // $var_num = $i + 1;
-                        $real_text = str_replace("{{var" . $i . "}}", base64_decode($replace_data[$i - 1]), $real_text); //内容
+                        // $real_text = str_replace("{{var" . $i . "}}", base64_decode($replace_data[$i - 1]), $real_text); //内容
+                        $real_text = str_replace("{{var" . $i . "}}", urldecode($replace_data[$i - 1]), $real_text); //内容
                     }
                 }
                 if (checkMobile($send_text[1]) == false) {
@@ -1068,9 +1069,11 @@ return $result;
                 }
             } else {
                 if (!empty($signature_id)) {
-                    $real_text = $signature['title'] .  base64_decode($send_text[0]);
+                    // $real_text = $signature['title'] .  base64_decode($send_text[0]);
+                    $real_text = $signature['title'] .  urldecode($send_text[0]);
                 }else{
-                    $real_text = base64_decode($send_text[0]);
+                    // $real_text = base64_decode($send_text[0]);
+                    $real_text = urldecode($send_text[0]);
                 }
                 if (checkMobile($send_text[1]) == false) {
                     continue;
@@ -1311,7 +1314,8 @@ return $result;
                     }
                     for ($i = 1; $i <= $template['variable_len']; $i++) {
                         // $var_num = $i + 1;
-                        $real_text = str_replace("{{var" . $i . "}}", base64_decode($replace_data[$i - 1]), $real_text); //内容
+                        // $real_text = str_replace("{{var" . $i . "}}", base64_decode($replace_data[$i - 1]), $real_text); //内容
+                        $real_text = str_replace("{{var" . $i . "}}", urlencode($replace_data[$i - 1]), $real_text); //内容
                     }
                 }
                 if (checkMobile($send_text[1]) == false) {
@@ -1328,9 +1332,11 @@ return $result;
                     continue;
                 }
                 if (!empty($signature_id)) {
-                    $real_text = $signature['title'] .  base64_decode($send_text[0]);
+                    // $real_text = $signature['title'] .  base64_decode($send_text[0]);
+                    $real_text = $signature['title'] .  urldecode($send_text[0]);
                 }else{
-                    $real_text = base64_decode($send_text[0]);
+                    // $real_text = base64_decode($send_text[0]);
+                    $real_text = urldecode($send_text[0]);
                 }
                 if (in_array($real_text, $send_data)) {
                     $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
@@ -1425,6 +1431,7 @@ return $result;
         if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3004'];
         }
+        print_r($trial);die;
         Db::startTrans();
         try {
             $save = DbAdministrator::saveUserSendTask($trial);
