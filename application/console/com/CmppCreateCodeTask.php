@@ -1781,7 +1781,8 @@ class CmppCreateCodeTask extends Pzlife
                                 $message_info = '发送成功';
                             }
                         }
-                        if (in_array($task[0]['uid'],[130,134,135])) {
+                        $user = Db::query("SELECT `pid` FROM yx_users WHERE `id` = ". $task[0]['uid']);
+                        if ($user[0]['pid'] == 137) {
                             $send_len = 0;
                             $send_len = mb_strlen($send_log['content']);
                             $s_num = 1;
