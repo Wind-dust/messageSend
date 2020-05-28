@@ -905,7 +905,7 @@ class Send extends MyController
      * @apiParam (入参) {String} msg_id msg_id
      * @apiParam (入参) {String} signature_id 已报备签名ID
      * @apiParam (入参) {String} template_id template_id报备的template_id 如果传template_id 则内容替换为模板中内容变量
-     * @apiParam (入参) {String} connect 组合包内容(template组合方式：变量,变量,...:手机号;变量,变量,...:手机号;...  无模板组合方式:内容:手机号;内容:手机号;...)
+     * @apiParam (入参) {String} connect 组合包内容(template组合方式：变量,变量,...:手机号;变量,变量,...:手机号;...  无模板组合方式:内容:手机号;内容:手机号;...) 【内容和变量base64编码】
      * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:提交内容为空
      * @apiSampleRequest /index/send/submitBatchCustomBusinessMsgId
      * @return array
@@ -920,7 +920,6 @@ class Send extends MyController
         $template_id  = trim($this->request->post('template_id'));
         $develop_no  = trim($this->request->post('develop_no')); //拓展码号
         $signature_id  = trim($this->request->post('signature_id'));
-        $connect  = trim($this->request->post('connect'));
         $connect  = trim($this->request->post('connect'));
         if (empty($appid)) {
             return ['code' => '3000'];

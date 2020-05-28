@@ -227,7 +227,7 @@ class Upload extends MyController
                     $mobile   = $sheet->getCell($cellName)->getValue();
                     $cellName = PHPExcel_Cell::stringFromColumnIndex(1) . $i;
                     $connect = $sheet->getCell($cellName)->getValue();
-                    $send_data[] = $connect . ":" . $mobile;
+                    $send_data[] = base64_encode($connect) . ":" . $mobile;
                 }
             } elseif ($type == 'xlsx') {
                 $type = 'Excel2007';
@@ -239,7 +239,7 @@ class Upload extends MyController
                 for ($i = 1; $i <= $highestRow; $i++) {
                     $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
                     $connect = $objPHPExcel->getActiveSheet()->getCell("B" . $i)->getValue();
-                    $send_data[] = $connect . ":" . $mobile;
+                    $send_data[] = base64_encode($connect)  . ":" . $mobile;
                 }
             } elseif ($type == 'xls') {
                 $type = 'Excel5';
@@ -252,7 +252,7 @@ class Upload extends MyController
                 for ($i = 1; $i <= $highestRow; $i++) {
                     $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
                     $connect = $objPHPExcel->getActiveSheet()->getCell("B" . $i)->getValue();
-                    $send_data[] = $connect . ":" . $mobile;
+                    $send_data[] = base64_encode($connect) . ":" . $mobile;
                 }
             }
             if (empty($send_data)) {
@@ -319,7 +319,7 @@ class Upload extends MyController
                         $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
                         $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
                         if (!empty($cellVal)) {
-                            $text .= $cor . $cellVal;
+                            $text .= $cor .base64_encode($cellVal);
                             $cor = ',';
                         }
                     }
@@ -354,7 +354,7 @@ class Upload extends MyController
                         $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
 
                         if (!empty($cellVal)) {
-                            $text .= $cor . $cellVal;
+                            $text .= $cor . base64_encode($cellVal);
                             $cor = ',';
                         }
                     }
@@ -382,7 +382,7 @@ class Upload extends MyController
                         $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
                         $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
                         if (!empty($cellVal)) {
-                            $text .= $cor . $cellVal;
+                            $text .= $cor . base64_encode($cellVal);
                             $cor = ',';
                         }
                     }

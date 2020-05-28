@@ -997,6 +997,8 @@ return $result;
 
     public function submitBatchCustomBusiness($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '', $msg_id = '')
     {
+        // $connect = str_replace('&amp;','&',$connect);
+
         $this->redis = Phpredis::getConn();
         $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
@@ -1052,7 +1054,7 @@ return $result;
                     }
                     for ($i = 1; $i <= $template['variable_len']; $i++) {
                         // $var_num = $i + 1;
-                        $real_text = str_replace("{{var" . $i . "}}", $replace_data[$i - 1], $real_text); //内容
+                        $real_text = str_replace("{{var" . $i . "}}", base64_decode($replace_data[$i - 1]), $real_text); //内容
                     }
                 }
                 if (checkMobile($send_text[1]) == false) {
@@ -1066,9 +1068,9 @@ return $result;
                 }
             } else {
                 if (!empty($signature_id)) {
-                    $real_text = $signature['title'] .  $send_text[0];
+                    $real_text = $signature['title'] .  base64_decode($send_text[0]);
                 }else{
-                    $real_text = $send_text[0];
+                    $real_text = base64_decode($send_text[0]);
                 }
                 if (checkMobile($send_text[1]) == false) {
                     continue;
@@ -1294,6 +1296,7 @@ return $result;
         $send_data = [];
         $send_data_mobile = [];
         foreach ($connect_data as $key => $data) {
+            
             $send_text = explode(':', $data);
             if (!empty($template)) {
                 $replace_data = explode(',', $send_text[0]);
@@ -1308,7 +1311,7 @@ return $result;
                     }
                     for ($i = 1; $i <= $template['variable_len']; $i++) {
                         // $var_num = $i + 1;
-                        $real_text = str_replace("{{var" . $i . "}}", $replace_data[$i - 1], $real_text); //内容
+                        $real_text = str_replace("{{var" . $i . "}}", base64_decode($replace_data[$i - 1]), $real_text); //内容
                     }
                 }
                 if (checkMobile($send_text[1]) == false) {
@@ -1325,9 +1328,9 @@ return $result;
                     continue;
                 }
                 if (!empty($signature_id)) {
-                    $real_text = $signature['title'] .  $send_text[0];
+                    $real_text = $signature['title'] .  base64_decode($send_text[0]);
                 }else{
-                    $real_text = $send_text[0];
+                    $real_text = base64_decode($send_text[0]);
                 }
                 if (in_array($real_text, $send_data)) {
                     $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
@@ -1337,7 +1340,6 @@ return $result;
                 }
             }
         }
-
         // print_r($send_data_mobile);die;
         $free_taskno = [];
         $trial = []; //需审核
