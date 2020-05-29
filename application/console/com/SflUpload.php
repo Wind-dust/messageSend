@@ -955,7 +955,6 @@ class SflUpload extends Pzlife
                         // die;
                     }
                 } elseif ($value == 'SMS') {
-                    continue;
                     $send_data = [];
                     $SMS_model = [];
                     $SMSmessage = [];

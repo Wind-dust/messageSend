@@ -5710,6 +5710,7 @@ class CmppCreateCodeTask extends Pzlife
         } catch (\Exception $th) {
             exception($th);
         }
+       
         $deduct = 1; //1扣量,2不扣
         $rate = 40;
         $white_list = [
@@ -6036,7 +6037,19 @@ class CmppCreateCodeTask extends Pzlife
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3678);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3679); */
         // $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3680);
-        
+        $bir = [];
+        $all_path = realpath("./") . "/0529.txt";
+        $file = fopen($all_path, "r");
+        // $data = array();
+        while (!feof($file)) {
+            $cellVal = trim(fgets($file));
+            $cellVal = str_replace('"', '', $cellVal);
+            if (!empty($cellVal)) {
+                array_push($bir, $cellVal);
+            }
+        }
+        // return $data;
+        // print_r($data);die;
         $white_list = [
             13023216322,
             18616841500,
@@ -6071,6 +6084,57 @@ class CmppCreateCodeTask extends Pzlife
             18019762207,
             13162248755,
         ];
+        
+        $fault = [
+            13520501357,
+            13718220299,
+            15101566520,
+            13488831042,
+            13488826562,
+            15001288584,
+            18701221128,
+            18810228910,
+            13581969946,
+            13426293530,
+            13691433078,
+            15801539016,
+            15010254528,
+            13810004721,
+            13681797319,
+            13910956649,
+            13671055396,
+            13911023936,
+            18691105065,
+            15501991878,
+            18800150354,
+            13488685506,
+            18810545927,
+            15801430798,
+            13601256897,
+            13501135333,
+            15201279300,
+            18620854966,
+            13810850630,
+            13995562626,
+            13800997707,
+            13611280616,
+            13917449788,
+            13808829129,
+            13683320261,
+            13426373539,
+            13718612012,
+            13699102097,
+            15810374600,
+            13811133528,
+            13911667822,
+            15273116323,
+            18621714497,
+            13811275299,
+            18571710598,
+            13971022283,
+            13871164645,
+            13581809553,
+            13213032008];
         $tody_time = strtotime(date("Ymd",time()));
         try {
             /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
@@ -6119,7 +6183,10 @@ class CmppCreateCodeTask extends Pzlife
                                 //按无效号码计算
                                 $num = mt_rand(0, 100);
                                 if ($value['sfl_relation_id'] == '100180028') {
-                                    if ($num >= 40 || in_array(trim($value['mobile']), $white_list)) {
+                                    if (in_array(trim($value['mobile']), $fault) || in_array(trim($value['mobile']),$bir)) {
+                                        continue;
+                                    }
+                                    if ($num >= 40 ) {
                                         $prefix = '';
                                         $prefix = substr(trim($value['mobile']), 0, 7);
                                         $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
@@ -6170,6 +6237,9 @@ class CmppCreateCodeTask extends Pzlife
                                         $receipt[] = $rece;
                                     }
                                 }else{
+                                    if (in_array(trim($value['mobile']), $fault) || in_array(trim($value['mobile']),$bir)) {
+                                        continue;
+                                    }
                                     if ($num >= $rate || in_array(trim($value['mobile']), $white_list)) {
                                         $prefix = '';
                                         $prefix = substr(trim($value['mobile']), 0, 7);
