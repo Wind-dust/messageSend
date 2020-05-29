@@ -102,6 +102,40 @@ class HttpChannelCaiXinSFTPChuangLan extends Pzlife
         'mobile' => '13476024461',
         'content' =>'【鼎业装饰】鼎礼相祝！跨年巨惠！定单送欧派智能晾衣架一套。选欧派产品可秒杀欧派智能马桶999元一个。终极预存大礼，来店给你个超大的惊喜！！！大到超乎您想象！一年只有这一次！电话3236788回T退订',
         ])); */
+        $white_list = [
+            13023216322,
+            18616841500,
+            15021417314,
+            15921904656,
+            15000773110,
+            18121252120,
+            13636311653,
+            13611664019,
+            13472865840,
+            18013770122,
+            18800232095,
+            18521329177,
+            18501684687,
+            13918902911,
+            18521569417,
+            18217584060,
+            13816091848,
+            18621720742,
+            13817515864,
+            16621181441,
+            13701789119,
+            13818181256,
+            15800815262,
+            13916292097,
+            13917823241,
+            13585699417,
+            15800400970,
+            13801687321,
+            18621714497,
+            13764272451,
+            18019762207,
+            13162248755,
+        ];
         try {
             ini_set('user_agent', 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; GreenBrowser)');
             while (true) {
@@ -128,6 +162,9 @@ class HttpChannelCaiXinSFTPChuangLan extends Pzlife
                             $send_title[$send_data['mar_task_id']] = $send_data['title'];
                             //处理内容
                             $real_send_content = [];
+                            if (in_array($send_data['mobile'],$white_list)) {
+                                continue;
+                            }
                             foreach ($send_data['content'] as $key => $value) {
                                 // print_r($value);die;
                                 $frame = [];
@@ -275,7 +312,7 @@ class HttpChannelCaiXinSFTPChuangLan extends Pzlife
                                     exit(); //关闭通道
                                 }
                                 unset($send_num[$send_taskid]);
-                                usleep(12500);
+                                usleep(10000);
                             }
                             $send_times = 1;
                         }
@@ -386,7 +423,7 @@ class HttpChannelCaiXinSFTPChuangLan extends Pzlife
                         //     echo "error:" . $result['message'] . "\n";die;
                         // }
                         unset($send_num[$send_taskid]);
-                        usleep(12500);
+                        usleep(1000);
                     }
                 }
                 // $receive_id = [
