@@ -116,7 +116,7 @@ class HttpChannelCaiXinSFTPChuangLan extends Pzlife
                 // if (date('H') >= 18 || date('H') < 8) {
                 //     exit("8点前,18点后通道关闭");
                 // }
-
+                $send_times = 1;
                 do {
                     $send = $redis->lPop($redisMessageCodeSend);
                     // $redis->rpush($redisMessageCodeSend, $send);
@@ -236,10 +236,10 @@ class HttpChannelCaiXinSFTPChuangLan extends Pzlife
                             $send_content[$send_data['mar_task_id']] = json_encode($real_send_content);
                         }
                         $send_num[$send_data['mar_task_id']][] = $send_data['mobile'];
-                        foreach ($send_num as $send_taskid => $num) {
-                            $new_num = array_unique($num);
-                            if (count($new_num) >= 500) { //超出500条做一次提交
-                                //单条测试
+                        $send_times++;
+                        if ( $send_times> 500) {
+                            foreach ($send_num as $send_taskid => $num) {
+                                $new_num = array_unique($num);
                                 $real_send_content = [];
                                 $real_send = [];
                                 $time = time();
@@ -256,7 +256,6 @@ class HttpChannelCaiXinSFTPChuangLan extends Pzlife
                                     'ext_id'   => $send_taskid,
                                     'sign'   => $sign,
                                 ];
-
                                 $res = sendRequest($user_info['send_api'], 'post', $real_send);
                                 $result = json_decode($res, true);
                                 // $result['code'] = 2;
@@ -269,24 +268,68 @@ class HttpChannelCaiXinSFTPChuangLan extends Pzlife
                                         }
                                     }
                                     print_r($result);
-                                    $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
+                                    $redis->rpush('index:meassage:code:send' . ":" . 85, json_encode([
                                         'mobile'      => 15201926171,
-                                        'content'     => $res
+                                        'content'     => '【钰晰科技】创蓝彩信通道出现异常'
                                     ])); //三体营销通道
                                     exit(); //关闭通道
                                 }
-                                /*  $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-                                    if ($result['returnstatus'] == 'Success') { //成功
-                                        $receive_id[$result['taskID']] = $send_taskid;
-                                        $redis->hset('index:meassage:code:back_taskno:' . $content, $result['taskID'], $send_taskid);
-                                    } elseif ($result['returnstatus'] == 'Faild') { //失败
-                                        echo "error:" . $result['message'] . "\n";die;
-                                    } */
-                                // print_r($result);
                                 unset($send_num[$send_taskid]);
                                 usleep(12500);
                             }
+                            $send_times = 1;
                         }
+                        // foreach ($send_num as $send_taskid => $num) {
+                        //     $new_num = array_unique($num);
+                        //     if (count($new_num) >= 500) { //超出500条做一次提交
+                        //         //单条测试
+                        //         $real_send_content = [];
+                        //         $real_send = [];
+                        //         $time = time();
+                        //         $sign = '';
+                        //         $sign = "account=" . $user_info['account']  . "ext_id=" . $send_taskid . "msg=" . $send_content[$send_taskid] . "phones=" . join(',', $new_num) . "timestamp=" . $time . "title=" . $send_title[$send_taskid] . "url=" . $user_info['call_back'] . "key=" . $user_info['key'];
+                        //         $sign = md5($sign);
+                        //         $real_send = [
+                        //             'account'    => $user_info['account'],
+                        //             'timestamp' => $time,
+                        //             'url' => $user_info['call_back'],
+                        //             'phones'    => join(',', $new_num),
+                        //             'title'     => $send_title[$send_taskid],
+                        //             'msg'   => $send_content[$send_taskid],
+                        //             'ext_id'   => $send_taskid,
+                        //             'sign'   => $sign,
+                        //         ];
+
+                        //       /*   $res = sendRequest($user_info['send_api'], 'post', $real_send);
+                        //         $result = json_decode($res, true);
+                        //         // $result['code'] = 2;
+                        //         if ($result['code'] == 1) { //提交成功
+                        //             unset($roallback[$send_taskid]);
+                        //         } else {
+                        //             foreach ($roallback as $key => $value) {
+                        //                 foreach ($value as $ne => $val) {
+                        //                     $redis->rpush($redisMessageCodeSend, $val);
+                        //                 }
+                        //             }
+                        //             print_r($result);
+                        //             $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
+                        //                 'mobile'      => 15201926171,
+                        //                 'content'     => $res
+                        //             ])); //三体营销通道
+                        //             exit(); //关闭通道
+                        //         } */
+                        //         /*  $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+                        //             if ($result['returnstatus'] == 'Success') { //成功
+                        //                 $receive_id[$result['taskID']] = $send_taskid;
+                        //                 $redis->hset('index:meassage:code:back_taskno:' . $content, $result['taskID'], $send_taskid);
+                        //             } elseif ($result['returnstatus'] == 'Faild') { //失败
+                        //                 echo "error:" . $result['message'] . "\n";die;
+                        //             } */
+                        //         // print_r($result);
+                        //         unset($send_num[$send_taskid]);
+                        //         usleep(12500);
+                        //     }
+                        // }
                     }
                 } while ($send);
                 //剩下的号码再做提交
@@ -373,7 +416,7 @@ class HttpChannelCaiXinSFTPChuangLan extends Pzlife
             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
             fwrite($myfile, $th . "\n");
             fclose($myfile);
-            $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
+            $redis->rpush('index:meassage:code:send' . ":" . 85, json_encode([
                 'mobile'      => 15201926171,
                 'content'     => "【钰晰科技】创蓝彩信通道出现异常"
             ])); //三体营销通道
