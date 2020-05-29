@@ -1441,13 +1441,14 @@ return $result;
 
                     DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
                     //免审
-                    $free_ids = DbAdministrator::getUserSendCodeTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
+                    $free_ids = DbAdministrator::getUserSendTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
                     foreach ($free_ids as $key => $value) {
                         $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' =>$value['id'],'send_time' => 0]));
                     }
                 }
             }
             Db::commit();
+            
             if (!empty($msg_id)) {
                 return ['code' => '200','msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
             }
