@@ -624,6 +624,7 @@ class SflUpload extends Pzlife
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
+                    continue;
                     $err_task_num = [];
                     $send_data = [];
                     if ($son_path_data !== false) {
@@ -967,7 +968,7 @@ class SflUpload extends Pzlife
                             if (!strpos($svalue,date("Ymd"))) {
                                 continue;
                             }
-                            if (strpos($svalue,'20200528100907')) {
+                            if (strpos($svalue,'20200529100927')) {
                                 continue;
                             }
                             $file_info = explode('.', $svalue);
@@ -1034,62 +1035,32 @@ class SflUpload extends Pzlife
                         }
                         // print_r($SMS_model);
                         // die;
-                        // print_r($send_data);
+                        // print_r($send_data);die;
                         if (!empty($send_data)) {
                             foreach ($send_data as $key => $value) {
                                 $txt = [];
-                                $txt = $this->readForTxtToDyadicArray($value); # code...
-                                if (!empty($txt)) {
-                                    foreach ($txt as $tkey => $tvalue) {
+                                // $txt = $this->readForTxtToDyadicArray($value);
+                                 $file = fopen($value, "r");
+                                $data = array();
+                                while (!feof($file)) {
+                                    $cellVal = trim(fgets($file));
+                                    if (!empty($cellVal)) {
+                                        // $cellVal = trim($cellVal, '"');
+                                        $tvalue   = explode('",', $cellVal);
+                                        // $cellVal = str_replace('"', '', $cellVal);
+                                        foreach ($tvalue as $key => $svalue) {
+                                            $tvalue[$key] =  str_replace('"', '', $svalue);
+                                        }
+                                        // array_push($data, $value);
+                                        // print_r($tvalue);die;
                                         if (isset($model_check[$tvalue[2]])) {
                                             $model_check[$tvalue[2]]++;
                                         } else {
                                             $model_check[$tvalue[2]] = 1;
                                         }
-                                        /*  $SMS_real_send               = [];
-                                        $SMS_real_send               = [];
-                                        $SMS_real_send['mseeage_id'] = $tvalue[0];
-                                        $SMS_real_send['mobile']     = $tvalue[3];
-                                        $SMS_real_send['free_trial'] = 1;
-                                        // $SMS_real_send['real_num'] = 1;
-                                        $SMS_real_send['send_num']     = 1;
-                                        $SMS_real_send['send_status']  = 1;
-                                        $SMS_real_send['template_id'] = $tvalue[2];
-                                        $SMS_real_send['create_time']  = time();
-                                        $content                       = $SMS_model[$tvalue[2]]['content'];
-                                        $content                       = str_replace('{FULL_NAME}', $tvalue[4], $content);
-                                        $content                       = str_replace('{RESERVED_FIELD_1}', $tvalue[7], $content);
-                                        $content                       = str_replace('{RESERVED_FIELD_2}', $tvalue[8], $content);
-                                        $content                       = str_replace('{RESERVED_FIELD_3}', $tvalue[9], $content);
-                                        $content                       = str_replace('{RESERVED_FIELD_4}', $tvalue[10], $content);
-                                        $content                       = str_replace('{RESERVED_FIELD_5}', $tvalue[11], $content);
-                                        $content                       = str_replace('{ACCOUNT_NUMBER}', $tvalue[1], $content);
-                                        $content                       = str_replace('{MOBILE}', $tvalue[3], $content);
-                                        $content                       = str_replace('{POINTS_AVAILABLE}', $tvalue[5], $content);
-                                        $content                       = str_replace('{TOTAL_POINTS}', $tvalue[6], $content);
-                                        if (strpos($content,'【丝芙兰】') !== false) {
-                                           
-                                        }else{
-                                            $content = '【丝芙兰】'.$content;
-                                        }
-                                        if (strpos($content,'回T退订') !== false) {
-                                           
-                                        }else{
-                                            $content = $content."/回T退订";
-                                        }
-                                        // print_r($content);die;
-                                        $send_length = mb_strlen($content, 'utf8');
-                                        $real_length = 1;
-                                        if ($send_length > 70) {
-                                            $real_length = ceil($send_length / 67);
-                                        }
-                                        $SMS_real_send['task_content'] = $content;
-                                        $SMS_real_send['real_num'] = $real_length;
-                                        $SMS_real_send['send_length'] = $send_length;
-                                        $SMSmessage[] = $SMS_real_send; */
-                                        // print_r($content);die;
                                     }
                                 }
+                               
                             }
     
 
@@ -1111,9 +1082,20 @@ class SflUpload extends Pzlife
                             $j = 1;
                             foreach ($send_data as $key => $value) {
                                 $txt = [];
-                                $txt = $this->readForTxtToDyadicArray($value); # code...
-                                if (!empty($txt)) {
-                                    foreach ($txt as $tkey => $tvalue) {
+                                // $txt = $this->readForTxtToDyadicArray($value); 
+                                $file = fopen($value, "r");
+                                $data = array();
+                                while (!feof($file)) {
+                                    $cellVal = trim(fgets($file));
+                                    if (!empty($cellVal)) {
+                                        // $cellVal = trim($cellVal, '"');
+                                        $tvalue   = explode('",', $cellVal);
+                                        // $cellVal = str_replace('"', '', $cellVal);
+                                        foreach ($tvalue as $key => $svalue) {
+                                            $tvalue[$key] =  str_replace('"', '', $svalue);
+                                        }
+                                        // array_push($data, $value);
+                                        // print_r($tvalue);die;
                                         if (isset($model_check[$tvalue[2]])) {
                                             $model_check[$tvalue[2]]++;
                                         } else {
@@ -1185,6 +1167,11 @@ class SflUpload extends Pzlife
                                         }
                                     }
                                 }
+                               /*  if (!empty($txt)) {
+                                    foreach ($txt as $tkey => $tvalue) {
+                                       
+                                    }
+                                } */
                             }
                         }
                         
