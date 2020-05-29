@@ -1443,7 +1443,7 @@ return $result;
                     //免审
                     $free_ids = DbAdministrator::getUserSendCodeTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
                     foreach ($free_ids as $key => $value) {
-                        $res = $this->redis->rpush("index:meassage:marketing:sendtask", $value['id']);
+                        $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' =>$value['id'],'send_time' => 0]));
                     }
                 }
             }
