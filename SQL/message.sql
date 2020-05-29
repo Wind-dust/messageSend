@@ -1199,3 +1199,18 @@ CREATE TABLE `yx_country_code` (
   KEY `abbreviation` (`abbreviation`) USING BTREE,
   KEY `country_code` (`country_code`) USING BTREE
 )  ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='国际号码区号';
+
+DROP TABLE IF EXISTS `yx_sftp_upriver`;
+CREATE TABLE `yx_sftp_upriver` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `from` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NOT NULL DEFAULT '' COMMENT '来源',
+  `mobile` char(11) NOT NULL DEFAULT '' COMMENT '手机号',
+  `type` varchar(11)  CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NOT NULL DEFAULT '' COMMENT '类型',
+  `message_info` varchar(255) NOT NULL DEFAULT '' COMMENT '上行回复信息',
+  `receive_time`  datetime NOT NULL DEFAULT   '1970-01-01 00:00:00' COMMENT '更新时间',
+  `source_name` varchar(10) NOT NULL DEFAULT '' COMMENT '备注',
+  `city` varchar(20) NOT NULL DEFAULT '' COMMENT '区域名',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1841 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='用户短信上行';
