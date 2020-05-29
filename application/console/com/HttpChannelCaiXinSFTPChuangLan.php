@@ -312,7 +312,7 @@ class HttpChannelCaiXinSFTPChuangLan extends Pzlife
                                     exit(); //关闭通道
                                 }
                                 unset($send_num[$send_taskid]);
-                                usleep(10000);
+                                usleep(5000);
                             }
                             $send_times = 1;
                         }
