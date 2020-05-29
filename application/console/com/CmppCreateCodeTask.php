@@ -6919,6 +6919,7 @@ class CmppCreateCodeTask extends Pzlife
                         // print_r($res);
                         $upriver = [];
                         $upriver = [
+                            'mobile' => $mobile,
                             'from' => 'sfl',
                             'type' => 'SMS',
                             'message_info' => $encodemessageupriver['message_info'],
