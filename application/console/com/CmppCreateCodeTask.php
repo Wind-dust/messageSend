@@ -6919,11 +6919,12 @@ class CmppCreateCodeTask extends Pzlife
                         // print_r($res);
                         $upriver = [];
                         $upriver = [
-                            'mobile' => $mobile,
                             'from' => 'sfl',
+                            'mobile' => $mobile,
                             'type' => 'SMS',
                             'message_info' => $encodemessageupriver['message_info'],
                         ];
+                        $upriver['receive_time'] =date('Y-m-d H:i:s',time()-mt_rand(0,36000));
                         if ($res) {
                             $newres = array_shift($res);
                             $upriver['source_name'] =$newres['source_name'];
@@ -6933,7 +6934,6 @@ class CmppCreateCodeTask extends Pzlife
                             $upriver['source_name'] ='未知';
                             $upriver['city'] ='未知';
                         }
-                        $upriver['receive_time'] =date('Y-m-d H:i:s',time()-mt_rand(0,36000));
                         $upriver['create_time'] =time();
                         $all_upriver[] = $upriver;
                         $i++;
