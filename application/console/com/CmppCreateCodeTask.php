@@ -5677,9 +5677,9 @@ class CmppCreateCodeTask extends Pzlife
         $mysql_connect->query("set names utf8mb4");
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        for ($i = 90696; $i < 90719; $i++) {
+       /*  for ($i = 90696; $i < 90719; $i++) {
             $this->redis->rpush('index:meassage:sflmessage:sendtask', $i);
-        }
+        } */
         /* $this->redis->rpush('index:meassage:sflmessage:sendtask', 90624);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 90625);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 90633);
@@ -5698,19 +5698,19 @@ class CmppCreateCodeTask extends Pzlife
        
         // $tody_time = 1590645600;
         $tody_time = strtotime(date("Ymd",time()));
-        // try {
-        //     $mysql_connect->table('yx_sfl_send_task')->where([['create_time','>',$tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84]);
-        //     /* $where = [];
-        //     $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
-        //     $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-        //     $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$tody_time ); 
-        //     foreach ($sendid as $key => $value) {
-        //         $this->redis->rpush('index:meassage:sflmessage:sendtask', $value['id']);
-        //     }
-        // } catch (\Exception $th) {
-        //     exception($th);
-        // }
-        $deduct = 2; //1扣量,2不扣
+        try {
+            $mysql_connect->table('yx_sfl_send_task')->where([['create_time','>',$tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84]);
+            /* $where = [];
+            $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
+            $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$tody_time ); 
+            foreach ($sendid as $key => $value) {
+                $this->redis->rpush('index:meassage:sflmessage:sendtask', $value['id']);
+            }
+        } catch (\Exception $th) {
+            exception($th);
+        }
+        $deduct = 1; //1扣量,2不扣
         $rate = 40;
         $white_list = [
             13023216322,
@@ -6075,10 +6075,7 @@ class CmppCreateCodeTask extends Pzlife
         try {
             /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
             $mysql_connect->table('yx_sfl_multimedia_message')->where('create_time','>',$tody_time)->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >  ".$tody_time );
-            foreach ($sendid as $key => $value) {
-                $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
-            }
+           
         } catch (\Exception $th) {
             exception($th);
         }
@@ -6096,6 +6093,12 @@ class CmppCreateCodeTask extends Pzlife
             }
         } */
         try {
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >  ".$tody_time );
+            // $white_send = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `` `create_time` >  ".$tody_time );
+            foreach ($sendid as $key => $value) {
+                $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
+            }
+
             while (true) {
                 $task_id = $this->redis->lpop('index:meassage:sflmulmessage:sendtask');
                 if (empty($task_id)) {
@@ -6115,56 +6118,110 @@ class CmppCreateCodeTask extends Pzlife
                             if ($deduct  == 1) {
                                 //按无效号码计算
                                 $num = mt_rand(0, 100);
-                                if ($num >= $rate || in_array(trim($value['mobile']), $white_list)) {
-                                    $prefix = '';
-                                    $prefix = substr(trim($value['mobile']), 0, 7);
-                                    $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
-                                    // print_r($res);
-                                    if ($res) {
-                                        $newres = array_shift($res);
-                                        if ($newres['source'] == 1) {
-                                            $channel_id = $value['yidong_channel_id'];
-                                        } elseif ($newres['source'] == 2) {
-                                            $channel_id = $value['liantong_channel_id'];
-                                        } elseif ($newres['source'] == 3) {
-                                            $channel_id = $value['dianxin_channel_id'];
-                                        }
-                                    }
-                                    $mul      = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '" . $value['sfl_relation_id'] . "' LIMIT 1");
-                                    // $content_data             = $mysql_connect->query("select `id`,`content`,`num`,`image_path`,`image_type` from yx_user_multimedia_message_frame where delete_time=0 and `multimedia_message_id` = " . $sendTask['id'] . "  ORDER BY `num` ASC ");
-
-                                    $fram     = $mysql_connect->query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '" . $mul[0]['id'] . "'");
-                                    $variable = json_decode($value['variable'], true);
-                                    foreach ($fram as $fkey => $fvalue) {
-                                        if (!empty($fvalue['content'])) {
-                                            foreach ($variable as $vkey => $val) {
-                                                $fram[$fkey]['content'] = str_replace($vkey, $val, $fram[$fkey]['content']);
+                                if ($value['sfl_relation_id'] == '100180028') {
+                                    if ($num >= 40 || in_array(trim($value['mobile']), $white_list)) {
+                                        $prefix = '';
+                                        $prefix = substr(trim($value['mobile']), 0, 7);
+                                        $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                                        // print_r($res);
+                                        if ($res) {
+                                            $newres = array_shift($res);
+                                            if ($newres['source'] == 1) {
+                                                $channel_id = $value['yidong_channel_id'];
+                                            } elseif ($newres['source'] == 2) {
+                                                $channel_id = $value['liantong_channel_id'];
+                                            } elseif ($newres['source'] == 3) {
+                                                $channel_id = $value['dianxin_channel_id'];
                                             }
                                         }
+                                        $mul      = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '" . $value['sfl_relation_id'] . "' LIMIT 1");
+                                        // $content_data             = $mysql_connect->query("select `id`,`content`,`num`,`image_path`,`image_type` from yx_user_multimedia_message_frame where delete_time=0 and `multimedia_message_id` = " . $sendTask['id'] . "  ORDER BY `num` ASC ");
+    
+                                        $fram     = $mysql_connect->query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '" . $mul[0]['id'] . "'");
+                                        $variable = json_decode($value['variable'], true);
+                                        foreach ($fram as $fkey => $fvalue) {
+                                            if (!empty($fvalue['content'])) {
+                                                foreach ($variable as $vkey => $val) {
+                                                    $fram[$fkey]['content'] = str_replace($vkey, $val, $fram[$fkey]['content']);
+                                                }
+                                            }
+                                        }
+    
+                                        $sendmessage = [
+                                            'mobile'      => $value['mobile'],
+                                            'title'       => $mul[0]['title'],
+                                            'mar_task_id' => $value['id'],
+                                            'content'     => $fram,
+                                            'channel_id'     => $channel_id,
+                                        ];
+                                        $send_msg[] = $sendmessage;
+                                        // $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode()); //三体营销通道
+                                        //正常发送
+                                    } else {
+                                        $rece = [];
+                                        $rece = [
+                                            'task_id' => $value['id'],
+                                            'mseeage_id'      => $value['mseeage_id'],
+                                            'template_id'      => $value['sfl_relation_id'],
+                                            'mobile' => $value['mobile'],
+                                            'messageinfo' => '发送成功',
+                                            'status_message' => 'MMS:1',
+                                        ];
+                                        $receipt[] = $rece;
                                     }
-
-                                    $sendmessage = [
-                                        'mobile'      => $value['mobile'],
-                                        'title'       => $mul[0]['title'],
-                                        'mar_task_id' => $value['id'],
-                                        'content'     => $fram,
-                                        'channel_id'     => $channel_id,
-                                    ];
-                                    $send_msg[] = $sendmessage;
-                                    // $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode()); //三体营销通道
-                                    //正常发送
-                                } else {
-                                    $rece = [];
-                                    $rece = [
-                                        'task_id' => $value['id'],
-                                        'mseeage_id'      => $value['mseeage_id'],
-                                        'template_id'      => $value['sfl_relation_id'],
-                                        'mobile' => $value['mobile'],
-                                        'messageinfo' => '发送成功',
-                                        'status_message' => 'MMS:1',
-                                    ];
-                                    $receipt[] = $rece;
+                                }else{
+                                    if ($num >= $rate || in_array(trim($value['mobile']), $white_list)) {
+                                        $prefix = '';
+                                        $prefix = substr(trim($value['mobile']), 0, 7);
+                                        $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                                        // print_r($res);
+                                        if ($res) {
+                                            $newres = array_shift($res);
+                                            if ($newres['source'] == 1) {
+                                                $channel_id = $value['yidong_channel_id'];
+                                            } elseif ($newres['source'] == 2) {
+                                                $channel_id = $value['liantong_channel_id'];
+                                            } elseif ($newres['source'] == 3) {
+                                                $channel_id = $value['dianxin_channel_id'];
+                                            }
+                                        }
+                                        $mul      = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '" . $value['sfl_relation_id'] . "' LIMIT 1");
+                                        // $content_data             = $mysql_connect->query("select `id`,`content`,`num`,`image_path`,`image_type` from yx_user_multimedia_message_frame where delete_time=0 and `multimedia_message_id` = " . $sendTask['id'] . "  ORDER BY `num` ASC ");
+    
+                                        $fram     = $mysql_connect->query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '" . $mul[0]['id'] . "'");
+                                        $variable = json_decode($value['variable'], true);
+                                        foreach ($fram as $fkey => $fvalue) {
+                                            if (!empty($fvalue['content'])) {
+                                                foreach ($variable as $vkey => $val) {
+                                                    $fram[$fkey]['content'] = str_replace($vkey, $val, $fram[$fkey]['content']);
+                                                }
+                                            }
+                                        }
+    
+                                        $sendmessage = [
+                                            'mobile'      => $value['mobile'],
+                                            'title'       => $mul[0]['title'],
+                                            'mar_task_id' => $value['id'],
+                                            'content'     => $fram,
+                                            'channel_id'     => $channel_id,
+                                        ];
+                                        $send_msg[] = $sendmessage;
+                                        // $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode()); //三体营销通道
+                                        //正常发送
+                                    } else {
+                                        $rece = [];
+                                        $rece = [
+                                            'task_id' => $value['id'],
+                                            'mseeage_id'      => $value['mseeage_id'],
+                                            'template_id'      => $value['sfl_relation_id'],
+                                            'mobile' => $value['mobile'],
+                                            'messageinfo' => '发送成功',
+                                            'status_message' => 'MMS:1',
+                                        ];
+                                        $receipt[] = $rece;
+                                    }
                                 }
+                                
                             } else {
                                 $prefix = '';
                                 $prefix = substr(trim($value['mobile']), 0, 7);
@@ -6244,7 +6301,110 @@ class CmppCreateCodeTask extends Pzlife
                         //按无效号码计算
                         if ($deduct  == 1) {
                             $num = mt_rand(0, 100);
-                            if ($num >= $rate || in_array(trim($value['mobile']), $white_list)) {
+                            if ($value['sfl_relation_id'] == '100180028') {
+                                if ($num >= 40 || in_array(trim($value['mobile']), $white_list)) {
+                                    $prefix = '';
+                                    $prefix = substr(trim($value['mobile']), 0, 7);
+                                    $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                                    // print_r($res);
+                                    if ($res) {
+                                        $newres = array_shift($res);
+                                        if ($newres['source'] == 1) {
+                                            $channel_id = $value['yidong_channel_id'];
+                                        } elseif ($newres['source'] == 2) {
+                                            $channel_id = $value['liantong_channel_id'];
+                                        } elseif ($newres['source'] == 3) {
+                                            $channel_id = $value['dianxin_channel_id'];
+                                        }
+                                    }
+                                    $mul      = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '" . $value['sfl_relation_id'] . "' LIMIT 1");
+                                    // $content_data             = $mysql_connect->query("select `id`,`content`,`num`,`image_path`,`image_type` from yx_user_multimedia_message_frame where delete_time=0 and `multimedia_message_id` = " . $sendTask['id'] . "  ORDER BY `num` ASC ");
+
+                                    $fram     = $mysql_connect->query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '" . $mul[0]['id'] . "'");
+                                    $variable = json_decode($value['variable'], true);
+                                    foreach ($fram as $fkey => $fvalue) {
+                                        if (!empty($fvalue['content'])) {
+                                            foreach ($variable as $vkey => $val) {
+                                                $fram[$fkey]['content'] = str_replace($vkey, $val, $fram[$fkey]['content']);
+                                            }
+                                        }
+                                    }
+
+                                    $sendmessage = [
+                                        'mobile'      => $value['mobile'],
+                                        'title'       => $mul[0]['title'],
+                                        'mar_task_id' => $value['id'],
+                                        'content'     => $fram,
+                                        'channel_id'     => $channel_id,
+                                    ];
+                                    $send_msg[] = $sendmessage;
+                                    // $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode()); //三体营销通道
+                                    //正常发送
+                                } else {
+                                    $rece = [];
+                                    $rece = [
+                                        'task_id' => $value['id'],
+                                        'mseeage_id'      => $value['mseeage_id'],
+                                        'template_id'      => $value['sfl_relation_id'],
+                                        'mobile' => $value['mobile'],
+                                        'messageinfo' => '发送成功',
+                                        'status_message' => 'MMS:1',
+                                    ];
+                                    $receipt[] = $rece;
+                                }
+                            }else{
+                                if ($num >= $rate || in_array(trim($value['mobile']), $white_list)) {
+                                    $prefix = '';
+                                    $prefix = substr(trim($value['mobile']), 0, 7);
+                                    $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                                    // print_r($res);
+                                    if ($res) {
+                                        $newres = array_shift($res);
+                                        if ($newres['source'] == 1) {
+                                            $channel_id = $value['yidong_channel_id'];
+                                        } elseif ($newres['source'] == 2) {
+                                            $channel_id = $value['liantong_channel_id'];
+                                        } elseif ($newres['source'] == 3) {
+                                            $channel_id = $value['dianxin_channel_id'];
+                                        }
+                                    }
+                                    $mul      = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_template WHERE `sfl_relation_id` = '" . $value['sfl_relation_id'] . "' LIMIT 1");
+                                    // $content_data             = $mysql_connect->query("select `id`,`content`,`num`,`image_path`,`image_type` from yx_user_multimedia_message_frame where delete_time=0 and `multimedia_message_id` = " . $sendTask['id'] . "  ORDER BY `num` ASC ");
+
+                                    $fram     = $mysql_connect->query("SELECT `id`,`content`,`num`,`image_path`,`image_type` FROM yx_sfl_multimedia_template_frame WHERE `sfl_multimedia_template_id` = '" . $mul[0]['id'] . "'");
+                                    $variable = json_decode($value['variable'], true);
+                                    foreach ($fram as $fkey => $fvalue) {
+                                        if (!empty($fvalue['content'])) {
+                                            foreach ($variable as $vkey => $val) {
+                                                $fram[$fkey]['content'] = str_replace($vkey, $val, $fram[$fkey]['content']);
+                                            }
+                                        }
+                                    }
+
+                                    $sendmessage = [
+                                        'mobile'      => $value['mobile'],
+                                        'title'       => $mul[0]['title'],
+                                        'mar_task_id' => $value['id'],
+                                        'content'     => $fram,
+                                        'channel_id'     => $channel_id,
+                                    ];
+                                    $send_msg[] = $sendmessage;
+                                    // $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode()); //三体营销通道
+                                    //正常发送
+                                } else {
+                                    $rece = [];
+                                    $rece = [
+                                        'task_id' => $value['id'],
+                                        'mseeage_id'      => $value['mseeage_id'],
+                                        'template_id'      => $value['sfl_relation_id'],
+                                        'mobile' => $value['mobile'],
+                                        'messageinfo' => '发送成功',
+                                        'status_message' => 'MMS:1',
+                                    ];
+                                    $receipt[] = $rece;
+                                }
+                            }
+                          /*   if ($num >= $rate || in_array(trim($value['mobile']), $white_list)) {
                                 $prefix = '';
                                 $prefix = substr(trim($value['mobile']), 0, 7);
                                 $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
@@ -6293,7 +6453,7 @@ class CmppCreateCodeTask extends Pzlife
                                     'status_message' => 'SMS:1',
                                 ];
                                 $receipt[] = $rece;
-                            }
+                            } */
                         } else {
                             $prefix = '';
                             $prefix = substr(trim($value['mobile']), 0, 7);
