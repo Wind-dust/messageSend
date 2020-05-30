@@ -5269,8 +5269,8 @@ class CmppCreateCodeTask extends Pzlife
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $this->redis = Phpredis::getConn();
-        $start_time = strtotime('2020-05-22 20:00:00');
-        $end_time   = strtotime("2020-05-23 20:00:00");
+        $start_time = strtotime('2020-05-23 20:00:00');
+        $end_time   = strtotime("2020-05-29 20:00:00");
         $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "') AND `status_message` = '' ");
         // echo "SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' " ;die;
         // echo count($mul_task);die;
@@ -5698,19 +5698,19 @@ class CmppCreateCodeTask extends Pzlife
        
         // $tody_time = 1590645600;
         $tody_time = strtotime(date("Ymd",time()));
-        try {
-            $mysql_connect->table('yx_sfl_send_task')->where([['create_time','>',$tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84]);
-            /* $where = [];
-            $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
-            $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$tody_time ); 
-            foreach ($sendid as $key => $value) {
-                $this->redis->rpush('index:meassage:sflmessage:sendtask', $value['id']);
-            }
-        } catch (\Exception $th) {
-            exception($th);
-        }
-       
+        $tody_time = 1590746400;
+        // try {
+        //     $mysql_connect->table('yx_sfl_send_task')->where([['create_time','>',$tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84]);
+        //     /* $where = [];
+        //     $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
+        //     $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
+        //     /* $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$tody_time ); 
+        //     foreach ($sendid as $key => $value) {
+        //         $this->redis->rpush('index:meassage:sflmessage:sendtask', $value['id']);
+        //     } */
+        // } catch (\Exception $th) {
+        //     exception($th);
+        // }
         $deduct = 1; //1扣量,2不扣
         $rate = 40;
         $white_list = [
@@ -5751,6 +5751,226 @@ class CmppCreateCodeTask extends Pzlife
         $j = 1;
         $receipt = [];
         $send_msg = [];
+        // echo "SELECT `*` FROM yx_sfl_send_task WHERE `templat_id` = '100180395' AND  `create_time` >  '".$tody_time ."' AND `mobile`  IN (".join(',',$white_list).")";die;
+        try {
+            //不扣
+  /*           $black_task_for_white_list = $mysql_connect->query("SELECT `*` FROM yx_sfl_send_task WHERE `template_id` = '100180395' AND  `create_time` >  '".$tody_time ."' AND `mobile`  IN (".join(',',$white_list).")");
+            // print_r($black_task_for_white_list);die;
+            if (!empty($black_task_for_white_list)) {
+                foreach ($black_task_for_white_list as $key => $value) {
+                    $sendmessage = [];
+                    if (checkMobile($value['mobile']) != false) {
+                        $end_num = substr($value['mobile'], -6);
+                        $prefix = '';
+                                $prefix = substr(trim($value['mobile']), 0, 7);
+                                $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                                // print_r($res);
+                                if ($res) {
+                                    $newres = array_shift($res);
+                                    if ($newres['source'] == 1) {
+                                        $channel_id = $value['yidong_channel_id'];
+                                    } elseif ($newres['source'] == 2) {
+                                        $channel_id = $value['liantong_channel_id'];
+                                    } elseif ($newres['source'] == 3) {
+                                        $channel_id = $value['dianxin_channel_id'];
+                                    }
+                                }
+                                $sendmessage = [
+                                    'mseeage_id'      => $value['mseeage_id'],
+                                    'template_id'      => $value['template_id'],
+                                    'mobile'      => $value['mobile'],
+                                    'mar_task_id' => $value['id'],
+                                    'content'     => $value['task_content'],
+                                    'from'        => 'yx_sfl_send_task',
+                                    'channel_id'        => $channel_id,
+                                ];
+                                $send_msg[] = $sendmessage;
+                        //按无效号码计算
+                        // $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode()); //三体营销通道
+                    } else {
+                        $rece = [];
+                        $rece = [
+                            'mseeage_id'      => $value['mseeage_id'],
+                            'template_id'      => $value['template_id'],
+                            'task_id' => $value['id'],
+                            'mobile' => $value['mobile'],
+                            'messageinfo' => '发送失败',
+                            'status_message' => 'SMS:2',
+                        ];
+                        $receipt[] = $rece;
+                        // $mysql_connect->table('yx_sfl_send_task_receipt')->insert();
+                    }
+                }
+            }
+           
+            $white_task_for_white_list = $mysql_connect->query("SELECT `*` FROM yx_sfl_send_task WHERE `template_id` = '100180396' AND  `create_time` >  '".$tody_time ."' AND `mobile`  IN (".join(',',$white_list).")");
+            if (!empty($white_task_for_white_list)) {
+                foreach ($white_task_for_white_list as $key => $value) {
+                    $sendmessage = [];
+                    if (checkMobile($value['mobile']) != false) {
+                        $end_num = substr($value['mobile'], -6);
+                        $prefix = '';
+                                $prefix = substr(trim($value['mobile']), 0, 7);
+                                $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                                // print_r($res);
+                                if ($res) {
+                                    $newres = array_shift($res);
+                                    if ($newres['source'] == 1) {
+                                        $channel_id = $value['yidong_channel_id'];
+                                    } elseif ($newres['source'] == 2) {
+                                        $channel_id = $value['liantong_channel_id'];
+                                    } elseif ($newres['source'] == 3) {
+                                        $channel_id = $value['dianxin_channel_id'];
+                                    }
+                                }
+                                $sendmessage = [
+                                    'mseeage_id'      => $value['mseeage_id'],
+                                    'template_id'      => $value['template_id'],
+                                    'mobile'      => $value['mobile'],
+                                    'mar_task_id' => $value['id'],
+                                    'content'     => $value['task_content'],
+                                    'from'        => 'yx_sfl_send_task',
+                                    'channel_id'        => $channel_id,
+                                ];
+                                $send_msg[] = $sendmessage;
+                        //按无效号码计算
+                        // $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode()); //三体营销通道
+                    } else {
+                        $rece = [];
+                        $rece = [
+                            'mseeage_id'      => $value['mseeage_id'],
+                            'template_id'      => $value['template_id'],
+                            'task_id' => $value['id'],
+                            'mobile' => $value['mobile'],
+                            'messageinfo' => '发送失败',
+                            'status_message' => 'SMS:2',
+                        ];
+                        $receipt[] = $rece;
+                        // $mysql_connect->table('yx_sfl_send_task_receipt')->insert();
+                    }
+                }
+            }
+            */
+
+            //扣量总体内容
+
+            $black_task_for_notwhite_list_id =  $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100180396' AND  `create_time` >  '".$tody_time ."' AND `mobile` NOT IN (".join(',',$white_list).")");
+            $black_task_for_notwhite_list_ids = [];
+            foreach($black_task_for_notwhite_list_id as $key => $value){
+                $black_task_for_notwhite_list_ids[] = $value['id'];
+            }
+            //不发送
+            $no_send_black_task_for_notwhite_list_id = array_rand($black_task_for_notwhite_list_ids,1600000);
+            //发送
+            // $send_black_task_for_notwhite_list_id = array_diff_assoc($black_task_for_notwhite_list_ids,$no_send_black_task_for_notwhite_list_id);
+            // echo count($send_black_task_for_notwhite_list_id);die;
+            $myfile = fopen("20200530_100180396.txt", "w");
+           /*  for ($i = 0; $i < count($data2); $i++) {
+                $txt = $data2[$i] . "\n";
+                fwrite($myfile, $txt);
+            } */
+            $send_black_task_for_notwhite_list_id = [];
+            foreach ($black_task_for_notwhite_list_ids as $key => $value) {
+                if (!in_array($key,$no_send_black_task_for_notwhite_list_id)) {
+                    $send_black_task_for_notwhite_list_id[] = $value;
+                    $mobile_task =  $mysql_connect->query("SELECT `mobile` FROM yx_sfl_send_task WHERE `id`  = ".$value);
+                    fwrite($myfile,$mobile_task[0]['mobile']."\n");
+                }
+            }
+            fclose($myfile);
+            echo count($send_black_task_for_notwhite_list_id);die;
+            $j = 1;
+            $no_send_ids = [];
+            for ($i=0; $i < count($no_send_black_task_for_notwhite_list_id); $i++) { 
+                $no_send_ids[] = $no_send_black_task_for_notwhite_list_id[$i];
+                $j++;
+                if ($j > 100) {
+                    $no_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (" . join(',', $no_send_ids) . ") ");
+                    foreach($no_send_task as $key => $value){
+                        $rece = [];
+                        $rece = [
+                            'task_id' => $value['id'],
+                            'mseeage_id'      => $value['mseeage_id'],
+                            'template_id'      => $value['template_id'],
+                            'mobile' => $value['mobile'],
+                            'messageinfo' => '发送成功',
+                            'status_message' => 'SMS:1',
+                        ];
+                        $receipt[] = $rece;
+                    }
+                    if (!empty($receipt)) {
+                        $mysql_connect->table('yx_sfl_send_task_receipt')->insertAll($receipt);
+                    }
+                    $receipt = [];
+                    $no_send_ids = [];
+                    $j = 1;
+                    $no_send_ids = [];
+                }
+            }
+            if (!empty($receipt)) {
+                $mysql_connect->table('yx_sfl_send_task_receipt')->insertAll($receipt);
+            }
+            $receipt = [];
+            $no_send_ids = [];
+
+            $send_ids = [];
+            $j = 1;
+            for($i=0; $i < count($send_black_task_for_notwhite_list_id); $i++) { 
+                $send_ids[] = $send_black_task_for_notwhite_list_id[$i];
+                $j++;
+                if ($j > 100) {
+                    $send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (" . join(',', $send_ids) . ") ");
+
+                    $prefix = '';
+                    $prefix = substr(trim($value['mobile']), 0, 7);
+                    $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                    // print_r($res);
+                    if ($res) {
+                        $newres = array_shift($res);
+                        if ($newres['source'] == 1) {
+                            $channel_id = $value['yidong_channel_id'];
+                        } elseif ($newres['source'] == 2) {
+                            $channel_id = $value['liantong_channel_id'];
+                        } elseif ($newres['source'] == 3) {
+                            $channel_id = $value['dianxin_channel_id'];
+                        }
+                    }
+
+                    //正常发送
+                    /*  $sendmessage = [
+                            'mobile'      => $value['mobile'],
+                            'mar_task_id' => $value['id'],
+                            'content'     => $value['task_content'],
+                            'channel_id'  => $channel_id,
+                            'from'        => 'yx_sfl_send_task',
+                        ]; */
+                    $sendmessage = [
+                        'mseeage_id'      => $value['mseeage_id'],
+                        'template_id'      => $value['template_id'],
+                        'mobile'      => $value['mobile'],
+                        'mar_task_id' => $value['id'],
+                        'content'     => $value['task_content'],
+                        'from'        => 'yx_sfl_send_task',
+                        'channel_id'        => $channel_id,
+                    ];
+                    $send_msg[] = $sendmessage;
+                    $receipt = [];
+                    $no_send_ids = [];
+                    $j = 1;
+                    $send_task = [];
+                }
+            }
+
+            $white_task_for_notwhite_list_id =  $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100180395' AND  `create_time` >  '".$tody_time ."' AND `mobile` NOT IN (".join(',',$white_list).")");
+            $white_task_for_notwhite_list_ids = [];
+            foreach($white_task_for_notwhite_list_id as $key => $value){
+                $white_task_for_notwhite_list_ids[] = $value['id'];
+            }
+
+        } catch (\Exception $th) {
+            exception($th);
+        }
+        die;
         while (true) {
             $task_id = $this->redis->lpop('index:meassage:sflmessage:sendtask');
             if (empty($task_id)) {
