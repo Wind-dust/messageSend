@@ -438,7 +438,7 @@ class CmppJuMengYiDongMarketing extends Pzlife
                                         $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                         $receive = 2;
-                                        usleep(30);
+                                        usleep(15);
                                     } else if ($head['Command_Id'] == 0x00000008) {
                                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                                     } else if ($head['Command_Id'] == 0x80000008) {
@@ -571,7 +571,7 @@ class CmppJuMengYiDongMarketing extends Pzlife
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
 
                                     $send_status = 2;
-                                    usleep(160);
+                                    usleep(100);
                                 }
                             } else { //心跳
                                 $Command_Id  = 0x00000008; //保持连接
@@ -603,7 +603,7 @@ class CmppJuMengYiDongMarketing extends Pzlife
                             fwrite($myfile, $e . "\n");
                             fclose($myfile);
                             //  exception($e);
-                            sleep(20);
+                            sleep(100);
                             //重新创建连接
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                             if (socket_connect($socket, $host, $port) == false) {
