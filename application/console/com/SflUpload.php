@@ -1980,9 +1980,23 @@ class SflUpload extends Pzlife
 
     public function sflSftpMulTaskReceiptForExcel(){
         try {
+            $path  = realpath("./") . "/052901.txt";
+            $file  = fopen($path, "r");
+            $data1 = array();
+            $i     = 0;
+            // $phone = '';
+            // $j     = '';
+            $mobile_data = [];
+            while (!feof($file)) {
+                $mobile_data[] = trim(fgets($file));
+                // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
+                // // print_r($phone);die;
+                // $j = ',';
+                $i++;
+            }
             $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
             ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >= '1590508800' AND `create_time` <= '1590595200' AND `mobile` NOT IN (15201926171,15821193682) AND `sfl_relation_id` <> '100180028' ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  1590681600 AND   `create_time` <  1590768000 AND `sfl_relation_id` = '100180028'");
             $ids = [];
             foreach ($mul_task_ids as $key => $value) {
                 $ids[] = $value['id'];
@@ -2023,7 +2037,20 @@ class SflUpload extends Pzlife
                 $receipts = $mysql_connect->query("SELECT * FROM yx_sfl_send_multimediatask_receipt WHERE `task_id` = ".$value);
                 $task = $mysql_connect->query("SELECT * FROM yx_sfl_multimedia_message WHERE `id` = ".$value);
                 $receive_all = [];
-                if (!empty($receipts)) {
+                $receive_all = [
+                    'MESSAGE_ID' => $task[0]['mseeage_id'],
+                    'COMMUNICATION_CHANNEL_ID' => $task[0]['sfl_relation_id'],
+                    'MOBILE' => $task[0]['mobile'],
+                    'STATUS' => 'MMS:1',
+                    'real_message' => '',
+                    'SENDING_TIME' => date('Y-m-d H:i:s',1590726600+ceil($key/1700)),
+                ];
+               
+                if (in_array($task[0]['mobile'],$mobile_data)) {
+                    $receive_all['STATUS'] = 'MMS:2';
+                }
+                $receive_alls[] = $receive_all;
+                /* if (!empty($receipts)) {
                    $num = count($receipts);
                   
                     $receive_all = [
@@ -2031,6 +2058,7 @@ class SflUpload extends Pzlife
                         'COMMUNICATION_CHANNEL_ID' => $receipts[$num-1]['template_id'],
                         'MOBILE' => $receipts[$num-1]['mobile'],
                         'STATUS' => $receipts[$num-1]['status_message'],
+                        'real_message' => $receipts[0]['real_message'],
                         'SENDING_TIME' => date('Y-m-d H:i:s',$task[0]['create_time']),
                     ];
                     $receive_alls[] = $receive_all;
@@ -2041,10 +2069,11 @@ class SflUpload extends Pzlife
                         'COMMUNICATION_CHANNEL_ID' => $task[0]['sfl_relation_id'],
                         'MOBILE' => $task[0]['mobile'],
                         'STATUS' => 'MMS:1',
+                        'real_message' => '',
                         'SENDING_TIME' => date('Y-m-d H:i:s',$task[0]['create_time']),
                     ];
                     $receive_alls[] = $receive_all;
-                }
+                } */
             }
             // 导出
             $objExcel = new PHPExcel();
@@ -2071,6 +2100,7 @@ class SflUpload extends Pzlife
                 array('MOBILE', 'MOBILE'),
                 array('STATUS', 'STATUS'),
                 array('SENDING_TIME', 'SENDING_TIME'),
+                array('real_message', 'real_message'),
             );
     
             foreach ($CellList as $i => $Cell) {
@@ -2100,7 +2130,7 @@ class SflUpload extends Pzlife
                     $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                 }
             }
-            $objWriter->save('imp_mobile_status_report_mms_1_20200527.xlsx');
+            $objWriter->save('imp_mobile_status_report_mms_2_20200529.xlsx');
         } catch (\Exception $th) {
             exception($th);
         }
@@ -2114,7 +2144,7 @@ class SflUpload extends Pzlife
             // print_r(realpath("../"). "\yt_area_mobile.csv");die;
     
           
-        $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >= '1590508800' AND `create_time` <= '1590595200' AND `mobile` NOT IN (15201926171,15821193682) ");
+        $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1590681600 AND   `create_time` <  1590728400 AND `task_content` NOT LIKE '%test%' ");
         $ids = [];
         foreach ($mul_task_ids as $key => $value) {
             // $ids[] = $value['id'];
@@ -2177,14 +2207,18 @@ class SflUpload extends Pzlife
             }
             if (!empty($receipts)) {
                $num = count($receipts);
-              
+                
                 $receive_all = [
                     'MESSAGE_ID' => $task[0]['mseeage_id'],
                     'COMMUNICATION_CHANNEL_ID' => $receipts[0]['template_id'],
                     'MOBILE' => $receipts[0]['mobile'],
                     'STATUS' => $receipts[0]['status_message'],
+                    'real_message' => $receipts[0]['real_message'],
                     'SENDING_TIME' => date('Y-m-d H:i:s',$task[0]['create_time']),
                 ];
+               /*  if (in_array(trim($receipts[0]['real_message']),['UNDELIV','MK:100D','MK1:100C','REJECTD','EXPIRED','NOROUTE','ID:0076'])) {
+                    $receive_all['STATUS'] = 'SMS:1';
+                } */
                 $receive_alls[] = $receive_all;
                 // $mysql_connect->table('yx_sfl_send_task_receipt')->where('id',$task[0]['id'])->update(['mseeage_id' => $task[0]['mseeage_id']]);
             }else{
@@ -2194,6 +2228,7 @@ class SflUpload extends Pzlife
                     'COMMUNICATION_CHANNEL_ID' => $task[0]['template_id'],
                     'MOBILE' => $task[0]['mobile'],
                     'STATUS' => 'SMS:1',
+                    'real_message' => '',
                     'SENDING_TIME' => date('Y-m-d H:i:s',$task[0]['create_time']),
                 ];
                 $receive_alls[] = $receive_all;
@@ -2226,6 +2261,7 @@ class SflUpload extends Pzlife
             array('MOBILE', 'MOBILE'),
             array('STATUS', 'STATUS'),
             array('SENDING_TIME', 'SENDING_TIME'),
+            array('real_message', 'real_message'),
         );
 
         foreach ($CellList as $i => $Cell) {
@@ -2255,7 +2291,7 @@ class SflUpload extends Pzlife
                 $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             }
         }
-        $objWriter->save('imp_mobile_status_report_sms_1_20200527.xlsx');
+        $objWriter->save('imp_mobile_status_report_sms_1_20200529.xlsx');
     }
 
 
