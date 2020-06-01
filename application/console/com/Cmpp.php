@@ -21,7 +21,8 @@ define('CMPP_CANCEL_RESP', 0x80000007); // 删除短信应答
 define('CMPP_ACTIVE_TEST', 0x00000008); // 激活测试
 define('CMPP_ACTIVE_TEST_RESP', 0x80000008); // 激活测试应答
 
-class Cmpp extends Pzlife {
+class Cmpp extends Pzlife
+{
     protected $_normal_service_id   = "";
     protected $_template_service_id = "";
     protected $_msg_src             = "";
@@ -54,14 +55,16 @@ class Cmpp extends Pzlife {
      */
     protected $_responseData = NULL;
 
-    public function __construct() {
+    public function __construct()
+    {
 
         $this->_socket           = NULL;
         $this->_sequence_number  = 1;
         $this->_message_sequence = rand(1, 255);
     }
 
-    protected function _log($message) {
+    protected function _log($message)
+    {
         printf("%s\n", $message);
     }
     /**
@@ -69,7 +72,8 @@ class Cmpp extends Pzlife {
      * @param string $pdu
      * @return string
      */
-    public static function pduord($pdu) {
+    public static function pduord($pdu)
+    {
         $ord_pdu = '';
         for ($i = 0; $i < strlen($pdu); $i++) {
             $ord_pdu .= sprintf("%02x", ord($pdu[$i])) . ' ';
@@ -86,7 +90,8 @@ class Cmpp extends Pzlife {
     // template_service_id  template_service_id as  Service_Id 业务标识，是数字、字母和符号的组合。
     //$msg_src as  msg_src信息内容来源（SP_Id，SP的企业代码）
     //$serv_addr as Src_Id  源号码
-    public function Start($host, $port, $username, $password, $normal_service_id, $template_service_id, $msg_src, $serv_addr) {
+    public function Start($host, $port, $username, $password, $normal_service_id, $template_service_id, $msg_src, $serv_addr)
+    {
         $this->_normal_service_id   = $normal_service_id;
         $this->_template_service_id = $template_service_id;
         $this->_serv_addr           = $serv_addr;
@@ -106,7 +111,8 @@ class Cmpp extends Pzlife {
 
         return $status;
     }
-    public function End() {
+    public function End()
+    {
         if (!$this->_socket) {
             // not connected
             return;
@@ -121,7 +127,8 @@ class Cmpp extends Pzlife {
         return $status;
     }
 
-    protected function _SendPDU($command_id, $pdu, $requestd) {
+    protected function _SendPDU($command_id, $pdu, $requestd)
+    {
         $length = strlen($pdu) + 12;
         $header = pack("NNN", $length, $command_id, $this->_sequence_number);
         $this->_log("Sending PDU, len == $length");
@@ -138,7 +145,8 @@ class Cmpp extends Pzlife {
         $this->_sequence_number = $this->_sequence_number + 1;
         return $status;
     }
-    protected function _ExpectPDU($our_sequence_number, $requestd = NULL) {
+    protected function _ExpectPDU($our_sequence_number, $requestd = NULL)
+    {
         do {
             $this->_log("Trying to read PDU.");
             if (feof($this->_socket)) {
@@ -162,27 +170,26 @@ class Cmpp extends Pzlife {
 
             $data = NULL;
             switch ($command_id) {
-            case CMPP_CONNECT:
-                $this->_log("Got CMPP_CONNECT_RESP.");
-                $data = $this->_CMPP_CONNECT_RESP($pdu, $requestd);
-                break;
-            case CMPP_SUBMIT:
-                $this->_log("Got CMPP_SUBMIT_RESP.");
-                $data = $this->_CMPP_SUBMIT_RESP($pdu, $requestd);
-                break;
-            case CMPP_TERMINATE:
-                $this->_log("Got CMPP_TERMINATE_RESP.");
-                break;
-            case CMPP_ACTIVE_TEST:
-                $this->_log("Got CMPP_ACTIVE_TEST.");
-                break;
-            default:
-                $this->_log("Got unknown CMPP pdu.");
-                break;
+                case CMPP_CONNECT:
+                    $this->_log("Got CMPP_CONNECT_RESP.");
+                    $data = $this->_CMPP_CONNECT_RESP($pdu, $requestd);
+                    break;
+                case CMPP_SUBMIT:
+                    $this->_log("Got CMPP_SUBMIT_RESP.");
+                    $data = $this->_CMPP_SUBMIT_RESP($pdu, $requestd);
+                    break;
+                case CMPP_TERMINATE:
+                    $this->_log("Got CMPP_TERMINATE_RESP.");
+                    break;
+                case CMPP_ACTIVE_TEST:
+                    $this->_log("Got CMPP_ACTIVE_TEST.");
+                    break;
+                default:
+                    $this->_log("Got unknown CMPP pdu.");
+                    break;
             }
 
             $this->_log("Received PDU: " . self::pduord(pack('N', $elength) . $stream));
-
         } while ($sequence_number != $our_sequence_number);
 
         $this->_responseData = $data;
@@ -190,7 +197,8 @@ class Cmpp extends Pzlife {
 
         return $command_status;
     }
-    protected function _CMPP_CONNECT($Source_Addr, $Shared_Secret, $Version = 0x20) {
+    protected function _CMPP_CONNECT($Source_Addr, $Shared_Secret, $Version = 0x20)
+    {
         $data = array();
         // 源地址，此处为SP_Id，即SP的企业代码。
         $data['Source_Addr']         = $Source_Addr;
@@ -216,7 +224,8 @@ class Cmpp extends Pzlife {
         return $this->_SendPDU(CMPP_CONNECT, $pdu, $data);
     }
 
-    protected function _CMPP_CONNECT_RESP($pdu, $requestd) {
+    protected function _CMPP_CONNECT_RESP($pdu, $requestd)
+    {
         $format = "CStatus/a16AuthenticatorISMG/CVersion";
         $data   = unpack($format, $pdu);
 
@@ -229,7 +238,6 @@ class Cmpp extends Pzlife {
         $status = intval($data['Status']);
         if (strcasecmp('0', $status)) {
             return self::cmppConnectRespStatusError($status);
-
         } elseif (0 == strlen($data['AuthenticatorISMG'])) {
             return 'ISMG认证码为空';
         }
@@ -242,14 +250,16 @@ class Cmpp extends Pzlife {
         return $data;
     }
 
-    protected function _CMPP_TERMINATE() {
+    protected function _CMPP_TERMINATE()
+    {
         $data = "";
         $pdu  = "";
         $this->_log("CMPP_TERMINATE PDU: " . self::pduord($pdu));
         return $this->_SendPDU(CMPP_TERMINATE, $pdu, $data);
     }
 
-    public static function cmppConnectRespStatusError($status) {
+    public static function cmppConnectRespStatusError($status)
+    {
         $errors = array(
             0 => '正确',
             1 => '消息结构错',
@@ -269,30 +279,40 @@ class Cmpp extends Pzlife {
         }
     }
 
-    protected function _CMPP_SUBMIT($data) {
+    protected function _CMPP_SUBMIT($data)
+    {
         $Dest_terminal_Id_len = 21 * $data['DestUsr_tl'];
         $Msg_Content_len      = strlen($data['Msg_Content']);
 
         //$format = "N2CCCCa10CC21CCCa6a2a6a17a17a21Ca{$Dest_terminal_Id_len}Ca{$Msg_Content_len}a8";
         //$format = "a8CCCCa10Ca32CCCCa6a2a6a17a17a21Ca32CCa140a20";
         $format = "a8CCCCa10Ca32CCCCa6a2a6a17a17a21Ca32CCa{$Msg_Content_len}a20";
-        $pdu    = pack($format
-            , $data['Msg_Id']
-            , $data['Pk_total'], $data['Pk_number'], $data['Registered_Delivery'], $data['Msg_level']
-            , $data['Service_Id']
-            , $data['Fee_UserType']
-            , $data['Fee_terminal_Id'], $data['Fee_terminal_Type']
-            , $data['TP_pId'], $data['TP_udhi'], $data['Msg_Fmt']
-            , $data['Msg_src']
-            , $data['FeeType']
-            , $data['FeeCode']
-            , $data['ValId_Time'], $data['At_Time']
-            , $data['Src_Id']
-            , $data['DestUsr_tl']
-            , $data['Dest_terminal_Id'], $data['Dest_terminal_Type']
-            , $data['Msg_Length']
-            , $data['Msg_Content']
-            , $data['Reserve']
+        $pdu    = pack(
+            $format,
+            $data['Msg_Id'],
+            $data['Pk_total'],
+            $data['Pk_number'],
+            $data['Registered_Delivery'],
+            $data['Msg_level'],
+            $data['Service_Id'],
+            $data['Fee_UserType'],
+            $data['Fee_terminal_Id'],
+            $data['Fee_terminal_Type'],
+            $data['TP_pId'],
+            $data['TP_udhi'],
+            $data['Msg_Fmt'],
+            $data['Msg_src'],
+            $data['FeeType'],
+            $data['FeeCode'],
+            $data['ValId_Time'],
+            $data['At_Time'],
+            $data['Src_Id'],
+            $data['DestUsr_tl'],
+            $data['Dest_terminal_Id'],
+            $data['Dest_terminal_Type'],
+            $data['Msg_Length'],
+            $data['Msg_Content'],
+            $data['Reserve']
         );
 
         $this->_log("CMPP_SUBMIT PDU: " . self::pduord($pdu));
@@ -302,7 +322,8 @@ class Cmpp extends Pzlife {
         return $this->_SendPDU(CMPP_SUBMIT, $pdu, $data);
     }
 
-    protected function _CMPP_SUBMIT_RESP($pdu, $requestd) {
+    protected function _CMPP_SUBMIT_RESP($pdu, $requestd)
+    {
         $format = "N2Msg_Id/NResult";
         //$format = "C8Msg_Id/CResult";
         $data = unpack($format, $pdu);
@@ -319,7 +340,8 @@ class Cmpp extends Pzlife {
         return $data;
     }
 
-    public static function cmppSubmitRespResultError($result) {
+    public static function cmppSubmitRespResultError($result)
+    {
         $errors = array(
             0 => '正确',
             1 => '消息结构错',
@@ -343,8 +365,9 @@ class Cmpp extends Pzlife {
         }
     }
 
-    public function SendSms($mobile, $context, $text_encoding = 'UTF-8') {
-        $data = Array();
+    public function SendSms($mobile, $context, $text_encoding = 'UTF-8')
+    {
+        $data = array();
 
         $data['Msg_Id']              = 0;
         $data['Registered_Delivery'] = 0;
@@ -400,8 +423,9 @@ class Cmpp extends Pzlife {
         }
     }
 
-    public function SendSmsT($mobile, $strKey, $param, $text_encoding = 'UTF-8') {
-        $data = Array();
+    public function SendSmsT($mobile, $strKey, $param, $text_encoding = 'UTF-8')
+    {
+        $data = array();
 
         $data['Msg_Id']              = 0;
         $data['Pk_total']            = 1;
@@ -425,7 +449,10 @@ class Cmpp extends Pzlife {
         $data['Dest_terminal_Id']    = $mobile;
         $data['Dest_terminal_Type']  = 0;
 
-        if (!is_array($param)) {$this->_log("Your params none!");return;}
+        if (!is_array($param)) {
+            $this->_log("Your params none!");
+            return;
+        }
 
         $context = "<cmppTemplate><template>{$strKey}</template>";
         for ($i = 0; $i < count($param); $i++) {
@@ -440,10 +467,10 @@ class Cmpp extends Pzlife {
 
         $status = $this->_CMPP_SUBMIT($data);
         $this->_log($status);
-
     }
 
-    public function Active() {
+    public function Active()
+    {
         $data = "";
         $this->_SendPDU(CMPP_ACTIVE_TEST, "", $data);
     }
@@ -454,7 +481,8 @@ class Cmpp extends Pzlife {
 
     //每秒最大发送条数
 
-    function sendtest($content) {
+    function sendtest($content)
+    {
         //发送链接请求
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
@@ -483,7 +511,8 @@ class Cmpp extends Pzlife {
         $Total_Length = strlen($bodyData) + 12;
         $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
         if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
-            echo 'fail to write' . socket_strerror(socket_last_error());die; //通道连接失败
+            echo 'fail to write' . socket_strerror(socket_last_error());
+            die; //通道连接失败
         }
 
         $redisMessageCodeSend = Config::get('rediskey.message.redisMessageCodeSend');
@@ -495,25 +524,33 @@ class Cmpp extends Pzlife {
         }
         do {
             $i    = 1;
-           
-           
-                do {
-                    $send = $this->redis->lPop($redisMessageCodeSend);
-                    if ($send) {
-                        $send   = json_decode($send, true);
-                        $mobile = $send['mobile'];
-                        $code   = $send['code'];
-                        $code   = mb_convert_encoding($code, 'GBK', 'UTF-8');
-                        $i++;
-                    }
-                    
-                    echo $i . "\n";
-                } while ($i <= $security_master);
-                $time = 1;
-            
+
+
+            do {
+                $send = $this->redis->lPop($redisMessageCodeSend);
+                if ($send) {
+                    $send   = json_decode($send, true);
+                    $mobile = $send['mobile'];
+                    $code   = $send['code'];
+                    $code   = mb_convert_encoding($code, 'GBK', 'UTF-8');
+                    $i++;
+                }
+
+                echo $i . "\n";
+            } while ($i <= $security_master);
+            $time = 1;
+
             sleep($time);
         } while (true);
-
     }
 
+    public function numberDetection()
+    {
+        $secret_id = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
+        $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
+        $api = 'https://api.yunzhandata.com/api/ deadnumber/v1.0/detect?sig=';
+        $ts = time();
+        $sig = sha1($secret_id . $secret_key . $ts);
+        echo $sig;
+    }
 }
