@@ -382,7 +382,7 @@ return $result;
 
             Db::commit();
             if (!empty($msg_id)) {
-                return ['code' => '200', 'task_no' => $data['task_no'],'msg_id' => $msg_id];
+                return ['code' => '200', 'task_no' => $data['task_no'], 'msg_id' => $msg_id];
             }
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
@@ -508,16 +508,19 @@ return $result;
                     $data['yidong_channel_id'] = 60;
                     $data['liantong_channel_id'] = 62;
                     $data['dianxin_channel_id'] = 61;
-                }else{
+                } elseif ($user['id'] == 134) {
+                    $data['yidong_channel_id'] = 95;
+                    $data['liantong_channel_id'] = 95;
+                    $data['dianxin_channel_id'] = 95;
+                } else {
                     $data['yidong_channel_id'] = 85;
                     $data['liantong_channel_id'] = 85;
                     $data['dianxin_channel_id'] = 85;
-
                 }
                 // $data['yidong_channel_id'] = 9;
                 // $data['liantong_channel_id'] = 9;
                 // $data['dianxin_channel_id'] = 9;
-            }else {
+            } else {
                 if (strpos($Content, '亲爱的美田会员') !== false) {
                     $data['yidong_channel_id'] = 22;
                     $data['liantong_channel_id'] = 22;
@@ -545,7 +548,7 @@ return $result;
                 $res = $this->redis->rpush("index:meassage:business:sendtask", $bId);
             }
             if (!empty($msg_id)) {
-                return ['code' => '200', 'task_no' => $data['task_no'],'msg_id' => $msg_id];
+                return ['code' => '200', 'task_no' => $data['task_no'], 'msg_id' => $msg_id];
             }
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
@@ -753,7 +756,7 @@ return $result;
     // function dbc2Sbc($str){
     //     return preg_replace('/[\x{0020}\x{0020}-\x{7e}]/ue','($unicode=char2Unicode(\'\0\')) == 0x0020 ? unicode2Char（0x3000） : (($code=$unicode+0xfee0) > 256 ? unicode2Char($code) : chr($code))', $str);
     // }
-    public function getSmsMultimediaMessageTask($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title, $signature_id = '',$msg_id = '')
+    public function getSmsMultimediaMessageTask($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title, $signature_id = '', $msg_id = '')
     {
         $this->redis = Phpredis::getConn();
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial,mul_free_trial', true);
@@ -901,7 +904,7 @@ return $result;
                 $this->redis->rpush("index:meassage:multimediamessage:sendtask", $bId);
             }
             if (!empty($msg_id)) {
-                return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no'],'msg_id' => $msg_id];
+                return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no'], 'msg_id' => $msg_id];
             }
             return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no']];
         } catch (\Exception $e) {
@@ -1020,7 +1023,7 @@ return $result;
         }
         if (!empty($template_id)) {
             if (!empty($template_id)) {
-                $template =  DbSendMessage::getUserModel(['template_id' => $template_id,'uid' => $user['id']], '*', true);
+                $template =  DbSendMessage::getUserModel(['template_id' => $template_id, 'uid' => $user['id']], '*', true);
                 if (empty($template) || $template['status'] != 3) {
                     return ['code' => '3003'];
                 }
@@ -1078,7 +1081,7 @@ return $result;
                 if (!empty($signature_id)) {
                     // $real_text = $signature['title'] .  base64_decode($send_text[0]);
                     $real_text = $signature['title'] .  urldecode($send_text[0]);
-                }else{
+                } else {
                     // $real_text = base64_decode($send_text[0]);
                     $real_text = urldecode($send_text[0]);
                 }
@@ -1151,11 +1154,14 @@ return $result;
                             $send_task['yidong_channel_id'] = 85;
                             $send_task['liantong_channel_id'] = 85;
                             $send_task['dianxin_channel_id'] = 85;
-                        }else{
+                        } elseif ($user['id'] == 134) {
+                            $data['yidong_channel_id'] = 95;
+                            $data['liantong_channel_id'] = 95;
+                            $data['dianxin_channel_id'] = 95;
+                        } else {
                             $send_task['yidong_channel_id'] = 60;
                             $send_task['liantong_channel_id'] = 62;
                             $send_task['dianxin_channel_id'] = 61;
-
                         }
                         $free_taskno[] = $task_no;
                         // array_push($free_trial, $send_task);
@@ -1168,11 +1174,14 @@ return $result;
                             $send_task['yidong_channel_id'] = 85;
                             $send_task['liantong_channel_id'] = 85;
                             $send_task['dianxin_channel_id'] = 85;
-                        }else{
+                        } elseif ($user['id'] == 134) {
+                            $data['yidong_channel_id'] = 95;
+                            $data['liantong_channel_id'] = 95;
+                            $data['dianxin_channel_id'] = 95;
+                        } else {
                             $send_task['yidong_channel_id'] = 60;
                             $send_task['liantong_channel_id'] = 62;
                             $send_task['dianxin_channel_id'] = 61;
-
                         }
                         // array_push($free_trial, $send_task);
                     }
@@ -1210,7 +1219,7 @@ return $result;
             }
             Db::commit();
             if (!empty($msg_id)) {
-                return ['code' => '200','msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
+                return ['code' => '200', 'msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
             }
             return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
         } catch (\Exception $e) {
@@ -1279,14 +1288,14 @@ return $result;
             return ['code' => '3002'];
         }
         if (!empty($template_id)) {
-            $template =  DbSendMessage::getUserModel(['template_id' => $template_id,'uid' => $user['id']], '*', true);
+            $template =  DbSendMessage::getUserModel(['template_id' => $template_id, 'uid' => $user['id']], '*', true);
             if (empty($template) || $template['status'] != 3) {
                 return ['code' => '3003'];
             }
         }
         if (!empty($signature_id)) {
             $signature =  DbSendMessage::getUserSignature(['uid' => $user['id'], 'signature_id' => $signature_id], '*', true);
-            
+
             if (empty($signature)) {
                 return ['code' => '3008'];
             }
@@ -1309,7 +1318,7 @@ return $result;
             $send_text = explode(':', $data);
             if (!empty($template)) {
                 $replace_data = explode(',', $send_text[0]);
-                
+
                 $real_text = $template['content'];
                 if (!empty($signature)) {
                     $real_text = $signature['title'] . $template['content'];
@@ -1320,7 +1329,7 @@ return $result;
                         return ['code' => '3005']; //未获取到变量内容
                     }
                     for ($i = 1; $i <= $template['variable_len']; $i++) {
-                        
+
                         // $var_num = $i + 1;
                         // $real_text = str_replace("{{var" . $i . "}}", base64_decode($replace_data[$i - 1]), $real_text); //内容
                         $real_text = str_replace("{{var" . $i . "}}", urldecode($replace_data[$i - 1]), $real_text); //内容
@@ -1342,7 +1351,7 @@ return $result;
                 if (!empty($signature_id)) {
                     // $real_text = $signature['title'] .  base64_decode($send_text[0]);
                     $real_text = $signature['title'] .  urldecode($send_text[0]);
-                }else{
+                } else {
                     // $real_text = base64_decode($send_text[0]);
                     $real_text = urldecode($send_text[0]);
                 }
@@ -1412,7 +1421,7 @@ return $result;
                             $send_task['yidong_channel_id'] = 73;
                             $send_task['liantong_channel_id'] = 75;
                             $send_task['dianxin_channel_id'] = 76;
-                        }else{
+                        } else {
                             $send_task['yidong_channel_id'] = 18;
                             $send_task['liantong_channel_id'] = 19;
                             $send_task['dianxin_channel_id'] = 19;
@@ -1428,7 +1437,7 @@ return $result;
                             $send_task['yidong_channel_id'] = 73;
                             $send_task['liantong_channel_id'] = 75;
                             $send_task['dianxin_channel_id'] = 76;
-                        }else{
+                        } else {
                             $send_task['yidong_channel_id'] = 18;
                             $send_task['liantong_channel_id'] = 19;
                             $send_task['dianxin_channel_id'] = 19;
@@ -1462,14 +1471,14 @@ return $result;
                     //免审
                     $free_ids = DbAdministrator::getUserSendTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
                     foreach ($free_ids as $key => $value) {
-                        $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' =>$value['id'],'send_time' => 0]));
+                        $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0]));
                     }
                 }
             }
             Db::commit();
-            
+
             if (!empty($msg_id)) {
-                return ['code' => '200','msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
+                return ['code' => '200', 'msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
             }
             return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
         } catch (\Exception $e) {
