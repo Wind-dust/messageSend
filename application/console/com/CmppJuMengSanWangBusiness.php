@@ -78,7 +78,7 @@ class CmppJuMengSanWangBusiness extends Pzlife
             'mar_task_id' => '',
             'content'     => '【美丽田园】尊敬的顾客您好！即日起非会员只需支付212元即可尊享指定护理一折体验，每月前20位体验顾客加赠精美化妆包1个，10/22-12/31日我和万象城有个约会，万象城全体员工恭候您的体验，竭诚为您的皮肤保驾护航！详询：021-54700816 回T退订',
         ])); */
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'content'     => '【施华洛世奇】亲爱的孙仁杰，欢迎加入施华洛世奇。我们由衷的欢迎您加入我们的会员大家庭。您可享受更多会员权益与优惠，详见：Swarovski.com/club。退订回T',
@@ -87,7 +87,7 @@ class CmppJuMengSanWangBusiness extends Pzlife
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'content'     => '【施华洛世奇】亲爱的ZhangNvshi，施华洛世奇在此祝您生日快乐！在这个特殊而闪耀的日子里，Swarovski Club为您献上专属85折礼券。您可在2020-09-22前凭此短信前往施华洛世奇线下门店(机场店除外)使用，具体请详见：Swarovski.com/club。退订回T',
-        ]));
+        ])); */
 
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/85.log";
