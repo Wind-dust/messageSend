@@ -81,12 +81,12 @@ class CmppJuMengSanWangBusiness extends Pzlife
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
-            'content'     => '亲爱的孙仁杰，欢迎加入施华洛世奇。我们由衷的欢迎您加入我们的会员大家庭。您可享受更多会员权益与优惠，详见：Swarovski.com/club。退订回T',
+            'content'     => '【施华洛世奇】亲爱的孙仁杰，欢迎加入施华洛世奇。我们由衷的欢迎您加入我们的会员大家庭。您可享受更多会员权益与优惠，详见：Swarovski.com/club。退订回T',
         ]));
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
-            'content'     => '亲爱的ZhangNvshi，施华洛世奇在此祝您生日快乐！在这个特殊而闪耀的日子里，Swarovski Club为您献上专属85折礼券。您可在2020-09-22前凭此短信前往施华洛世奇线下门店(机场店除外)使用，具体请详见：Swarovski.com/club。退订回T',
+            'content'     => '【施华洛世奇】亲爱的ZhangNvshi，施华洛世奇在此祝您生日快乐！在这个特殊而闪耀的日子里，Swarovski Club为您献上专属85折礼券。您可在2020-09-22前凭此短信前往施华洛世奇线下门店(机场店除外)使用，具体请详见：Swarovski.com/club。退订回T',
         ]));
 
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
