@@ -134,7 +134,7 @@ class User extends CommonIndex
         $user_equies = DbAdministrator::getUserEquities(['uid' => $uid], 'id,business_id,num_balance,agency_price', false);
         if (!empty($user_equies)) {
             foreach ($user_equies as $key => $value) {
-                $user_equies[$key]['business_name'] = DbAdministrator::getBusiness(['id' => $value['business_id'], 'title', true])['title'];
+                $user_equies[$key]['business_name'] = DbAdministrator::getBusiness(['id' => $value['business_id']], 'title', true)['title'];
             }
         } else {
             $user_equies = [];
