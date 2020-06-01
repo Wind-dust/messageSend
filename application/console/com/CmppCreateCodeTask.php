@@ -5712,7 +5712,7 @@ class CmppCreateCodeTask extends Pzlife
             exception($th);
         }
         $deduct = 1; //1扣量,2不扣
-        $rate = 40;
+        $rate = 50;
         $white_list = [
             13023216322,
             18616841500,
