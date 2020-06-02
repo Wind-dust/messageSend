@@ -1214,3 +1214,18 @@ CREATE TABLE `yx_sftp_upriver` (
   `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='用户短信上行';
+
+
+DROP TABLE IF EXISTS `yx_mobile`;
+CREATE TABLE `yx_mobile` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `mobile` char(11) NOT NULL DEFAULT '' COMMENT '手机号',
+  `check_status` tinyint(3) NOT NULL DEFAULT 1 COMMENT '核验状态 1 未核验',
+  `check_result` tinyint(3) NOT NULL DEFAULT 1 COMMENT '核验结果 1 空号 2 疑似 3 非空号',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `mobile` (`mobile`) USING BTREE,
+  KEY `check_result` (`check_result`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='空号库';

@@ -211,4 +211,70 @@ class LocalScript extends Pzlife
         // print_r($data);
         return $data;
     }
+
+    public function hadMobile(){
+        ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
+        $max_id = Db::query("SELECT `id` FROM yx_send_task_receipt ORDER BY `id` DESC limit 1 ");
+        // print_r($max_id);
+        
+        $mobile_data = [];
+        $ALL_NUM = Db::query("SELECT `mobile`,`real_message` FROM yx_send_task_receipt WHERE (`real_message` LIKE '%MK%' OR `real_message` LIKE '%MI%' OR `real_message` LIKE '%MN%' OR `real_message` LIKE '%MO%'  OR `real_message` LIKE '%UNDELI%') GROUP BY `mobile`,`real_message` ");
+       /*  $max_num = $max_id[0]['id'];
+        for ($i=0; $i < $max_num; $i++) { 
+            $receipts = Db::query('SELECT ');
+        } */
+        $i = 1;
+        foreach ($ALL_NUM as $key => $value) {
+            // print_r($value['mobile']);die;
+            // $mobile = [];
+            // $mobile = [
+            //     'mobile' => $value['mobile'],
+            //     'update_time' => time(),
+            //     'create_time' => time(),
+            // ];
+            $mobile_data[] = $value['mobile'];
+           
+        }
+        $ALL_NUM = Db::query("SELECT `mobile`,`real_message` FROM yx_send_code_task_receipt WHERE (`real_message` LIKE '%MK%' OR `real_message` LIKE '%MI%' OR `real_message` LIKE '%MN%' OR `real_message` LIKE '%MO%'  OR `real_message` LIKE '%UNDELI%') GROUP BY `mobile`,`real_message` ");
+       /*  $max_num = $max_id[0]['id'];
+        for ($i=0; $i < $max_num; $i++) { 
+            $receipts = Db::query('SELECT ');
+        } */
+        
+        foreach ($ALL_NUM as $key => $value) {
+            // print_r($value['mobile']);die;
+            // $mobile = [];
+            // $mobile = [
+            //     'mobile' => $value['mobile'],
+            //     'update_time' => time(),
+            //     'create_time' => time(),
+            // ];
+            $mobile_data[] = $value['mobile'];
+           
+        }
+        $mobile_data = array_unique($mobile_data);
+        // echo count($mobile_data);
+        $i = 1;
+        $insert_mobile = [];
+        foreach ($mobile_data as $key => $value) {
+            $mobile = [];
+            $mobile = [
+                'mobile' => $value,
+                'update_time' => time(),
+                'create_time' => time(),
+            ];
+            $insert_mobile[] = $mobile;
+            $i++;
+            if ($i > 100) {
+                Db::table('yx_mobile')->insertAll($insert_mobile);
+                $insert_mobile = [];
+                $i = 1;
+            }
+        }
+        if (!empty($insert_mobile)) {
+            Db::table('yx_mobile')->insertAll($insert_mobile);
+        }
+
+    }
+
 }

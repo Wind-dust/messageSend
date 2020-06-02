@@ -5710,7 +5710,7 @@ class CmppCreateCodeTask extends Pzlife
             exception($th);
         }
         $deduct = 1; //1扣量,2不扣
-        $rate = 50;
+        $rate = 40;
         $white_list = [
             13023216322,
             18616841500,
@@ -6176,7 +6176,7 @@ class CmppCreateCodeTask extends Pzlife
         $receipt = [];
         $send_msg = [];
         $deduct = 1; //1扣量,2不扣
-        $rate = 50;
+        $rate = 40;
         /*    $all_task = 
         while (true) {
             $task_id = $this->redis->lpop('index:meassage:sflmulmessage:sendtask');

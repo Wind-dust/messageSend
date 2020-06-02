@@ -942,4 +942,22 @@ class Message extends AdminController {
         $result = $this->app->message->distributionOneSflMulSendTaskChannel($id, intval($yidong_channel_id), intval($liantong_channel_id), intval($dianxin_channel_id));
         return $result;
     }
+
+    /**
+     * @api              {post} / 空号检测接口
+     * @apiDescription   numberDetection
+     * @apiGroup         admin_Message
+     * @apiName          numberDetection
+     * @apiParam (入参) {String} phone 号码
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误
+     * @apiSampleRequest /admin/message/numberDetection
+     * @author rzc
+     */
+    public function numberDetection(){
+        $mobile         = trim($this->request->post('mobile'));
+       
+        // return $this->encrypt($mobile, $secret_id);
+        $result = $this->app->message->numberDetection($mobile);
+        return $result;
+    }
 }

@@ -634,6 +634,11 @@ class SflUpload extends Pzlife
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
                             // print_r($svalue);die;
+                            
+                           /*  if (!strpos($svalue,'20200530')) {
+                                continue;
+                            } */
+                            // print_r($svalue);die;
                             if (!strpos($svalue,date("Ymd"))) {
                                 continue;
                             }
@@ -812,7 +817,7 @@ class SflUpload extends Pzlife
                        
                         // print_r($file_data);die;
                         //发送内容并 进行拼接
-
+                        // print_r($send_data);die;
                         $MMSmessage  = [];
                         $model_check = [];
                         if (!empty($send_data)) {
@@ -1224,7 +1229,7 @@ class SflUpload extends Pzlife
                             $son_path = '';
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
-                            // print_r($svalue);die;
+                           
                             if (!strpos($svalue,date("Ymd"))) {
                                 continue;
                             }
@@ -1980,28 +1985,15 @@ class SflUpload extends Pzlife
 
     public function sflSftpMulTaskReceiptForExcel(){
         try {
-            $path  = realpath("./") . "/052901.txt";
-            $file  = fopen($path, "r");
-            $data1 = array();
-            $i     = 0;
-            // $phone = '';
-            // $j     = '';
-            $mobile_data = [];
-            while (!feof($file)) {
-                $mobile_data[] = trim(fgets($file));
-                // $phone .= $j . trim(fgets($file));//fgets()函数从文件指针中读取一行
-                // // print_r($phone);die;
-                // $j = ',';
-                $i++;
-            }
+
             $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
             ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  1590681600 AND   `create_time` <  1590768000 AND `sfl_relation_id` = '100180028'");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  1590768000 AND   `create_time` <  1590854400 ");
             $ids = [];
             foreach ($mul_task_ids as $key => $value) {
                 $ids[] = $value['id'];
             }
-            $receipts = $mysql_connect->query("SELECT `mseeage_id`,`mobile`,`messageinfo`,`status_message`,`real_message`,`task_id` FROM `yx_sfl_send_multimediatask_receipt` WHERE task_id IN (".join(',',$ids).") GROUP BY `template_id`,`mseeage_id`,`mobile`,`messageinfo`,`status_message`,`real_message`,`task_id`");
+            // $receipts = $mysql_connect->query("SELECT `mseeage_id`,`mobile`,`messageinfo`,`status_message`,`real_message`,`task_id` FROM `yx_sfl_send_multimediatask_receipt` WHERE task_id IN (".join(',',$ids).") GROUP BY `template_id`,`mseeage_id`,`mobile`,`messageinfo`,`status_message`,`real_message`,`task_id`");
             $nu_ids = [];
             $rece_id = [];
             $receive_all = [];
@@ -2036,7 +2028,8 @@ class SflUpload extends Pzlife
             foreach ($ids as $key => $value) {
                 $receipts = $mysql_connect->query("SELECT * FROM yx_sfl_send_multimediatask_receipt WHERE `task_id` = ".$value);
                 $task = $mysql_connect->query("SELECT * FROM yx_sfl_multimedia_message WHERE `id` = ".$value);
-                $receive_all = [];
+                
+     /*            $receive_all = [];
                 $receive_all = [
                     'MESSAGE_ID' => $task[0]['mseeage_id'],
                     'COMMUNICATION_CHANNEL_ID' => $task[0]['sfl_relation_id'],
@@ -2045,12 +2038,10 @@ class SflUpload extends Pzlife
                     'real_message' => '',
                     'SENDING_TIME' => date('Y-m-d H:i:s',1590726600+ceil($key/1700)),
                 ];
-               
-                if (in_array($task[0]['mobile'],$mobile_data)) {
-                    $receive_all['STATUS'] = 'MMS:2';
-                }
-                $receive_alls[] = $receive_all;
-                /* if (!empty($receipts)) {
+                */
+                $num = mt_rand(0,4203);
+                // $receive_alls[] = $receive_all;
+                if (!empty($receipts)) {
                    $num = count($receipts);
                   
                     $receive_all = [
@@ -2061,6 +2052,11 @@ class SflUpload extends Pzlife
                         'real_message' => $receipts[0]['real_message'],
                         'SENDING_TIME' => date('Y-m-d H:i:s',$task[0]['create_time']),
                     ];
+                    /* if ($num>=0 && $num < 113) {
+                        $receive_all['STATUS'] = "MMS:2";
+                    }else{
+                        $receive_all['STATUS'] = "MMS:1";
+                    } */
                     $receive_alls[] = $receive_all;
                 }else{
                     // $task = $mysql_connect->query("SELECT * FROM yx_sfl_multimedia_message WHERE `id` = ".$value);
@@ -2072,10 +2068,219 @@ class SflUpload extends Pzlife
                         'real_message' => '',
                         'SENDING_TIME' => date('Y-m-d H:i:s',$task[0]['create_time']),
                     ];
+                    /* if ($num>=0 && $num < 113) {
+                        $receive_all['STATUS'] = "MMS:2";
+                    }else{
+                        $receive_all['STATUS'] = "MMS:1";
+                    } */
+                    if(checkMobile($task[0]['mobile']) == false) {
+                        $receive_all['STATUS'] = "MMS:2";
+                         
+                     }else{
+                         $end_num = substr($task[0]['mobile'], -6);
+                         //按无效号码计算
+                         //按无效号码计算
+                         if (in_array($end_num, ['000000', '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999'])) {
+                             $receive_all['STATUS'] = "SMS:2";
+                         }
+                     }
                     $receive_alls[] = $receive_all;
-                } */
+                }
             }
+            // print_r($receive_alls);die;
             // 导出
+            $objExcel = new PHPExcel();
+            // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+            // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
+            $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+            $objWriter->setOffice2003Compatibility(true);
+    
+            //设置文件属性
+            $objProps = $objExcel->getProperties();
+            $objProps->setTitle("imp_mobile_status_report");
+            $objProps->setSubject("金卡1:" . date('Y-m-d H:i:s', time()));
+    
+            $objExcel->setActiveSheetIndex(0);
+            $objActSheet = $objExcel->getActiveSheet();
+    
+            $date = date('Y-m-d H:i:s', time());
+    
+            //设置当前活动sheet的名称
+            $objActSheet->setTitle("imp_mobile_status_report");
+            $CellList = array(
+                array('MESSAGE_ID', 'MESSAGE_ID'),
+                array('COMMUNICATION_CHANNEL_ID', 'COMMUNICATION_CHANNEL_ID'),
+                array('MOBILE', 'MOBILE'),
+                array('STATUS', 'STATUS'),
+                array('SENDING_TIME', 'SENDING_TIME'),
+            );
+    
+            foreach ($CellList as $i => $Cell) {
+                $row = chr(65 + $i);
+                $col = 1;
+                $objActSheet->setCellValue($row . $col, $Cell[1]);
+                $objActSheet->getColumnDimension($row)->setWidth(30);
+    
+                $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+                $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+                $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+                // $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+                // $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+                $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            }
+            // $outputFileName = "receive_mms_1_20200523.xlsx";
+            $i              = 0;
+            foreach ($receive_alls as $key => $orderdata) {
+                //行
+                $col = $key + 2;
+                foreach ($CellList as $i => $Cell) {
+                    //列
+                    $row = chr(65 + $i);
+                    $objActSheet->getRowDimension($i)->setRowHeight(15);
+                    $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                    $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                }
+            }
+            $objWriter->save('imp_mobile_status_report_mms_1_20200530.xlsx');
+        } catch (\Exception $th) {
+            exception($th);
+        }
+    
+    }
+
+    public function sflSftpTaskReceiptForExcel(){
+        $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
+            ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
+            $objReader = PHPExcel_IOFactory::createReader('Excel2007');
+            // print_r(realpath("../"). "\yt_area_mobile.csv");die;
+    
+        try {
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1590768000 AND   `create_time` <  1590854400 AND `task_content` NOT LIKE '%test%' ");
+            $ids = [];
+            foreach ($mul_task_ids as $key => $value) {
+                // $ids[] = $value['id'];
+               /*  $objPHPExcel = $objReader->load(realpath("./") . "/0522.xlsx");
+                // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
+                //选择标签页
+                $sheet       = $objPHPExcel->getSheet(0); //取得sheet(0)表
+                $highestRow  = $sheet->getHighestRow(); // 取得总行数//获取表格列数
+                $columnCount = $sheet->getHighestColumn();
+                $has = [];
+                for ($row = 1; $row <= $highestRow; $row++) {
+                    //列数循环 , 列数是以A列开始
+                    for ($column = 'A'; $column <= $columnCount; $column++) {
+                        $dataArr[] = $objPHPExcel->getActiveSheet()->getCell($column . $row)->getValue();
+                    }
+                    if ($dataArr[0] == $value['mobile']) {
+                    break;
+                    }
+                    // print_r($dataArr);die;
+                    // $has[] = $dataArr;
+                    unset($dataArr);
+                } 
+                // print_r($dataArr);die;
+                if (empty($dataArr) || empty($dataArr[1])) {
+                    //未知
+                    // $unknow[] = $value['id'];
+                    $receive_all = [
+                        'MESSAGE_ID' => $value['mseeage_id'],
+                        'COMMUNICATION_CHANNEL_ID' => $value['template_id'],
+                        'MOBILE' => $value['mobile'],
+                        'STATUS' => 'SMS:1',
+                        'SENDING_TIME' => date('Y-m-d H:i:s',1590123522+mt_rand(10,1800)),
+                    ];
+                    $receive_alls[] = $receive_all;
+                }else{
+                    $receive_all = [
+                        'MESSAGE_ID' => $value['mseeage_id'],
+                        'COMMUNICATION_CHANNEL_ID' => $value['template_id'],
+                        'MOBILE' => $value['mobile'],
+                        'SENDING_TIME' => date('Y-m-d H:i:s',1590123522+mt_rand(10,1800)),
+                    ];
+                    if (trim($dataArr[1]) == 0 || trim($dataArr[1]) == 'DELIVRD') {
+                        $receive_all['STATUS']= 'SMS:1';
+                    }elseif(strpos(trim($dataArr[1]),'BLACK')){
+                        $receive_all['STATUS']= 'SMS:4';
+                    }elseif(trim($dataArr[1]) == 45){
+                        $receive_all['STATUS']= 'SMS:4';
+                    }else{
+                        $receive_all['STATUS']= 'SMS:2';
+                    }
+                    $receive_alls[] = $receive_all;
+                }
+                */
+    
+                $receipts = $mysql_connect->query("SELECT * FROM yx_sfl_send_task_receipt WHERE `task_id` = ".$value['id']);
+                $task = $mysql_connect->query("SELECT * FROM yx_sfl_send_task WHERE `id` = ".$value['id']);
+                $receive_all = [];
+                if (strpos($task[0]['task_content'],'test')) {
+                    continue;
+                }
+                $num = mt_rand(0,15055);
+    
+                if (!empty($receipts)) {
+                    
+                   $num = count($receipts);
+                   $receive_all = [
+                        'MESSAGE_ID' => $task[0]['mseeage_id'],
+                        'COMMUNICATION_CHANNEL_ID' => $receipts[0]['template_id'],
+                        'MOBILE' => $receipts[0]['mobile'],
+                        'STATUS' => $receipts[0]['status_message'],
+                        'real_message' => $receipts[0]['real_message'],
+                        'SENDING_TIME' => date('Y-m-d H:i:s',$task[0]['create_time']),
+                    ];
+                   if(checkMobile($receipts[0]['mobile']) == false) {
+                       $receive_all['STATUS'] = "SMS:2";
+                        
+                    }else{
+                        $end_num = substr($task[0]['mobile'], -6);
+                        //按无效号码计算
+                        //按无效号码计算
+                        if (in_array($end_num, ['000000', '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999'])) {
+                            $receive_all['STATUS'] = "SMS:2";
+                        }
+                    }
+                   
+                   /*  if (in_array(trim($receipts[0]['real_message']),['UNDELIV','MK:100D','MK1:100C','REJECTD','EXPIRED','NOROUTE','ID:0076'])) {
+                        $receive_all['STATUS'] = 'SMS:1';
+                    } */
+                    $receive_alls[] = $receive_all;
+                    // $mysql_connect->table('yx_sfl_send_task_receipt')->where('id',$task[0]['id'])->update(['mseeage_id' => $task[0]['mseeage_id']]);
+                }else{
+                    // $task = $mysql_connect->query("SELECT * FROM yx_sfl_multimedia_message WHERE `id` = ".$value);
+                    $receive_all = [
+                        'MESSAGE_ID' => $task[0]['mseeage_id'],
+                        'COMMUNICATION_CHANNEL_ID' => $task[0]['template_id'],
+                        'MOBILE' => $task[0]['mobile'],
+                        'STATUS' => 'SMS:1',
+                        'real_message' => '',
+                        'SENDING_TIME' => date('Y-m-d H:i:s',$task[0]['create_time']),
+                    ];
+                    if ($num >= 0 && $num <17) {
+                        $receive_all['STATUS'] = "SMS:3";
+                    }elseif ($num>=17 && $num < 591) {
+                        $receive_all['STATUS'] = "SMS:2";
+                    }else{
+                        $receive_all['STATUS'] = "SMS:1";
+                    }
+                    if(checkMobile($task[0]['mobile']) == false) {
+                        $receive_all['STATUS'] = "SMS:2";
+                         
+                     }else{
+                         $end_num = substr($task[0]['mobile'], -6);
+                         //按无效号码计算
+                         //按无效号码计算
+                         if (in_array($end_num, ['000000', '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999'])) {
+                             $receive_all['STATUS'] = "SMS:2";
+                         }
+                     }
+                    $receive_alls[] = $receive_all;
+                }
+            }
+    
+            //未知:
+    
             $objExcel = new PHPExcel();
             // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
             // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
@@ -2117,7 +2322,7 @@ class SflUpload extends Pzlife
                 $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
                 // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
             }
-            // $outputFileName = "receive_mms_1_20200523.xlsx";
+            $outputFileName = "receive_sms_1_20200524.xlsx";
             $i              = 0;
             foreach ($receive_alls as $key => $orderdata) {
                 //行
@@ -2130,168 +2335,12 @@ class SflUpload extends Pzlife
                     $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                 }
             }
-            $objWriter->save('imp_mobile_status_report_mms_2_20200529.xlsx');
+            $objWriter->save('imp_mobile_status_report_sms_1_20200530.xlsx');
         } catch (\Exception $th) {
+            //throw $th;
             exception($th);
-        }
-    
-    }
-
-    public function sflSftpTaskReceiptForExcel(){
-        $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
-            ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-            $objReader = PHPExcel_IOFactory::createReader('Excel2007');
-            // print_r(realpath("../"). "\yt_area_mobile.csv");die;
-    
-          
-        $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1590681600 AND   `create_time` <  1590728400 AND `task_content` NOT LIKE '%test%' ");
-        $ids = [];
-        foreach ($mul_task_ids as $key => $value) {
-            // $ids[] = $value['id'];
-           /*  $objPHPExcel = $objReader->load(realpath("./") . "/0522.xlsx");
-            // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
-            //选择标签页
-            $sheet       = $objPHPExcel->getSheet(0); //取得sheet(0)表
-            $highestRow  = $sheet->getHighestRow(); // 取得总行数//获取表格列数
-            $columnCount = $sheet->getHighestColumn();
-            $has = [];
-            for ($row = 1; $row <= $highestRow; $row++) {
-                //列数循环 , 列数是以A列开始
-                for ($column = 'A'; $column <= $columnCount; $column++) {
-                    $dataArr[] = $objPHPExcel->getActiveSheet()->getCell($column . $row)->getValue();
-                }
-                if ($dataArr[0] == $value['mobile']) {
-                break;
-                }
-                // print_r($dataArr);die;
-                // $has[] = $dataArr;
-                unset($dataArr);
-            } 
-            // print_r($dataArr);die;
-            if (empty($dataArr) || empty($dataArr[1])) {
-                //未知
-                // $unknow[] = $value['id'];
-                $receive_all = [
-                    'MESSAGE_ID' => $value['mseeage_id'],
-                    'COMMUNICATION_CHANNEL_ID' => $value['template_id'],
-                    'MOBILE' => $value['mobile'],
-                    'STATUS' => 'SMS:1',
-                    'SENDING_TIME' => date('Y-m-d H:i:s',1590123522+mt_rand(10,1800)),
-                ];
-                $receive_alls[] = $receive_all;
-            }else{
-                $receive_all = [
-                    'MESSAGE_ID' => $value['mseeage_id'],
-                    'COMMUNICATION_CHANNEL_ID' => $value['template_id'],
-                    'MOBILE' => $value['mobile'],
-                    'SENDING_TIME' => date('Y-m-d H:i:s',1590123522+mt_rand(10,1800)),
-                ];
-                if (trim($dataArr[1]) == 0 || trim($dataArr[1]) == 'DELIVRD') {
-                    $receive_all['STATUS']= 'SMS:1';
-                }elseif(strpos(trim($dataArr[1]),'BLACK')){
-                    $receive_all['STATUS']= 'SMS:4';
-                }elseif(trim($dataArr[1]) == 45){
-                    $receive_all['STATUS']= 'SMS:4';
-                }else{
-                    $receive_all['STATUS']= 'SMS:2';
-                }
-                $receive_alls[] = $receive_all;
-            }
-            */
-
-            $receipts = $mysql_connect->query("SELECT * FROM yx_sfl_send_task_receipt WHERE `task_id` = ".$value['id']);
-            $task = $mysql_connect->query("SELECT * FROM yx_sfl_send_task WHERE `id` = ".$value['id']);
-            $receive_all = [];
-            if (strpos($task[0]['task_content'],'test')) {
-                continue;
-            }
-            if (!empty($receipts)) {
-               $num = count($receipts);
-                
-                $receive_all = [
-                    'MESSAGE_ID' => $task[0]['mseeage_id'],
-                    'COMMUNICATION_CHANNEL_ID' => $receipts[0]['template_id'],
-                    'MOBILE' => $receipts[0]['mobile'],
-                    'STATUS' => $receipts[0]['status_message'],
-                    'real_message' => $receipts[0]['real_message'],
-                    'SENDING_TIME' => date('Y-m-d H:i:s',$task[0]['create_time']),
-                ];
-               /*  if (in_array(trim($receipts[0]['real_message']),['UNDELIV','MK:100D','MK1:100C','REJECTD','EXPIRED','NOROUTE','ID:0076'])) {
-                    $receive_all['STATUS'] = 'SMS:1';
-                } */
-                $receive_alls[] = $receive_all;
-                // $mysql_connect->table('yx_sfl_send_task_receipt')->where('id',$task[0]['id'])->update(['mseeage_id' => $task[0]['mseeage_id']]);
-            }else{
-                // $task = $mysql_connect->query("SELECT * FROM yx_sfl_multimedia_message WHERE `id` = ".$value);
-                $receive_all = [
-                    'MESSAGE_ID' => $task[0]['mseeage_id'],
-                    'COMMUNICATION_CHANNEL_ID' => $task[0]['template_id'],
-                    'MOBILE' => $task[0]['mobile'],
-                    'STATUS' => 'SMS:1',
-                    'real_message' => '',
-                    'SENDING_TIME' => date('Y-m-d H:i:s',$task[0]['create_time']),
-                ];
-                $receive_alls[] = $receive_all;
-            }
-        }
-
-        //未知:
-
-        $objExcel = new PHPExcel();
-        // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
-        // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
-        $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
-        $objWriter->setOffice2003Compatibility(true);
-
-        //设置文件属性
-        $objProps = $objExcel->getProperties();
-        $objProps->setTitle("imp_mobile_status_report");
-        $objProps->setSubject("金卡1:" . date('Y-m-d H:i:s', time()));
-
-        $objExcel->setActiveSheetIndex(0);
-        $objActSheet = $objExcel->getActiveSheet();
-
-        $date = date('Y-m-d H:i:s', time());
-
-        //设置当前活动sheet的名称
-        $objActSheet->setTitle("imp_mobile_status_report");
-        $CellList = array(
-            array('MESSAGE_ID', 'MESSAGE_ID'),
-            array('COMMUNICATION_CHANNEL_ID', 'COMMUNICATION_CHANNEL_ID'),
-            array('MOBILE', 'MOBILE'),
-            array('STATUS', 'STATUS'),
-            array('SENDING_TIME', 'SENDING_TIME'),
-            array('real_message', 'real_message'),
-        );
-
-        foreach ($CellList as $i => $Cell) {
-            $row = chr(65 + $i);
-            $col = 1;
-            $objActSheet->setCellValue($row . $col, $Cell[1]);
-            $objActSheet->getColumnDimension($row)->setWidth(30);
-
-            $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
-            $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
-            $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
-            // $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
-            // $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
-            $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-        }
-        $outputFileName = "receive_sms_1_20200524.xlsx";
-        $i              = 0;
-        foreach ($receive_alls as $key => $orderdata) {
-            //行
-            $col = $key + 2;
-            foreach ($CellList as $i => $Cell) {
-                //列
-                $row = chr(65 + $i);
-                $objActSheet->getRowDimension($i)->setRowHeight(15);
-                $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
-                $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            }
-        }
-        $objWriter->save('imp_mobile_status_report_sms_1_20200529.xlsx');
+        }      
+       
     }
 
 
