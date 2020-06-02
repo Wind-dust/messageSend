@@ -6185,7 +6185,7 @@ class CmppCreateCodeTask extends Pzlife
             }
         } */
         try {
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >  " . $tody_time);
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` = 100180389 AND  `create_time` >  " . $tody_time );
             // $white_send = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `` `create_time` >  ".$tody_time );
             foreach ($sendid as $key => $value) {
                 $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
