@@ -5267,8 +5267,8 @@ class CmppCreateCodeTask extends Pzlife
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $this->redis = Phpredis::getConn();
-        $start_time = strtotime('2020-05-23 20:00:00');
-        $end_time   = strtotime("2020-05-29 20:00:00");
+        $start_time = strtotime('2020-05-29 20:00:00');
+        $end_time   = strtotime("2020-06-01 20:00:00");
         $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "') AND `status_message` = '' ");
         // echo "SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' " ;die;
         // echo count($mul_task);die;
@@ -6185,7 +6185,7 @@ class CmppCreateCodeTask extends Pzlife
             }
         } */
         try {
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` = 100180389 AND  `create_time` >  " . $tody_time );
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time );
             // $white_send = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `` `create_time` >  ".$tody_time );
             foreach ($sendid as $key => $value) {
                 $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
