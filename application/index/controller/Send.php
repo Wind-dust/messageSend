@@ -567,6 +567,7 @@ class Send extends MyController
         $pageNum = trim($this->request->post('pagenum')); //登陆密码
         $page    = is_numeric($page) ? $page : 1;
         $pageNum = is_numeric($pageNum) ? $pageNum : 10;
+        $ip      = trim($this->request->ip());
         if (empty($appid)) {
             return ['code' => '3000'];
         }

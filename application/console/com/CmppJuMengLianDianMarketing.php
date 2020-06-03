@@ -581,7 +581,6 @@ class CmppJuMengLianDianMarketing extends Pzlife
                                     socket_write($socket, $headData, $Total_Length);
                                 }
                                 sleep(1);
-                                sleep(1);
                             }
 
                             ++$i;

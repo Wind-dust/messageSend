@@ -409,7 +409,7 @@ class HttpChannelCaiXinSFTPChuangLan extends Pzlife
                             print_r($result);
                             $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
                                 'mobile'      => 15201926171,
-                                'content'     => $res
+                                'content'     => '【钰晰科技】'.$res
                             ])); //三体营销通道
                             exit(); //关闭通道
                         }
@@ -448,7 +448,7 @@ class HttpChannelCaiXinSFTPChuangLan extends Pzlife
                 }
             }
 
-            $log_path = realpath("") . "/error/59.log";
+            $log_path = realpath("") . "/error/95.log";
             $myfile = fopen($log_path, 'a+');
             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
             fwrite($myfile, $th . "\n");

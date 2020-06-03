@@ -297,7 +297,7 @@ return $result;
     {
         $Mobiles = array_unique(array_filter($Mobiles));
         // $Password = md5($Password);
-        $user = DbUser::getUserOne(['appid' => $Username], 'id,pid,appkey,user_type,user_status,reservation_service,free_trial', true);
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,pid,appkey,user_type,user_status,reservation_service,free_trial,marketing_free_credit', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -404,7 +404,7 @@ return $result;
         // print_r($this->redis);
         // die;
         $Mobiles = array_unique(array_filter($Mobiles));
-        $user    = DbUser::getUserOne(['appid' => $Username], 'id,pid,appkey,user_type,user_status,reservation_service,free_trial,pid', true);
+        $user    = DbUser::getUserOne(['appid' => $Username], 'id,pid,appkey,user_type,user_status,reservation_service,free_trial,pid,business_deduct', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -490,8 +490,17 @@ return $result;
         $data['send_length']    = mb_strlen($Content);
         $data['free_trial']     = 1;
         $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
-        if ($user['free_trial'] == 2) {
+        if ($user['free_trial'] == 2){
             $data['free_trial'] = 2;
+            if ($user['business_deduct'] > 0) {
+                if ($real_num >= $user['business_deduct'] ) {
+                    $data['free_trial'] = 1;
+                }
+            }
+           
+        }
+        if ($data['free_trial'] == 2) {
+            // $data['free_trial'] = 2;
             if ($user['pid'] == 10) {
                 $data['yidong_channel_id'] = 60;
                 $data['liantong_channel_id'] = 62;
@@ -545,7 +554,7 @@ return $result;
             $bId = DbAdministrator::addUserSendCodeTask($data); //
             Db::commit();
             if ($data['free_trial'] == 2) {
-                $res = $this->redis->rpush("index:meassage:business:sendtask", $bId);
+                $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id'=>$bId,'deduct' => $user['business_deduct']]));
             }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'task_no' => $data['task_no'], 'msg_id' => $msg_id];
@@ -759,7 +768,7 @@ return $result;
     public function getSmsMultimediaMessageTask($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title, $signature_id = '', $msg_id = '')
     {
         $this->redis = Phpredis::getConn();
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial,mul_free_trial', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial,mul_free_trial,multimedia_deduct', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -901,7 +910,7 @@ return $result;
             }
             Db::commit();
             if ($free_trial == 2) {
-                $this->redis->rpush("index:meassage:multimediamessage:sendtask", $bId);
+                $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id'=>$bId,'deduct' => $user['multimedia_deduct']]));
             }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no'], 'msg_id' => $msg_id];
@@ -1010,7 +1019,7 @@ return $result;
         // $connect = str_replace('&amp;','&',$connect);
 
         $this->redis = Phpredis::getConn();
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,appkey,user_type,user_status,reservation_service,free_trial', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,appkey,user_type,user_status,reservation_service,free_trial,business_deduct', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -1049,6 +1058,7 @@ return $result;
         $connect_data = array_filter($connect_data);
         $send_data = [];
         $send_data_mobile = [];
+        $submit_num = count($connect_data);
         foreach ($connect_data as $key => $data) {
             $send_text = explode(':', $data);
             if (!empty($template)) {
@@ -1155,9 +1165,9 @@ return $result;
                             $send_task['liantong_channel_id'] = 85;
                             $send_task['dianxin_channel_id'] = 85;
                         } elseif ($user['id'] == 134) {
-                            $data['yidong_channel_id'] = 95;
-                            $data['liantong_channel_id'] = 95;
-                            $data['dianxin_channel_id'] = 95;
+                            $send_task['yidong_channel_id'] = 95;
+                            $send_task['liantong_channel_id'] = 95;
+                            $send_task['dianxin_channel_id'] = 95;
                         } else {
                             $send_task['yidong_channel_id'] = 60;
                             $send_task['liantong_channel_id'] = 62;
@@ -1215,7 +1225,7 @@ return $result;
                     //免审
                     $free_ids = DbAdministrator::getUserSendCodeTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
                     foreach ($free_ids as $key => $value) {
-                        $res = $this->redis->rpush("index:meassage:business:sendtask", $value['id']);
+                        $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id'=>$value['id'],'deduct' => $user['business_deduct']]));
                     }
                 }
             }
@@ -1278,7 +1288,7 @@ return $result;
     public function submitBatchCustomMarketing($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '', $msg_id = '')
     {
         $this->redis = Phpredis::getConn();
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,appkey,user_type,user_status,reservation_service,marketing_free_trial', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,appkey,user_type,user_status,reservation_service,marketing_free_trial,market_deduct', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -1473,7 +1483,7 @@ return $result;
                     //免审
                     $free_ids = DbAdministrator::getUserSendTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
                     foreach ($free_ids as $key => $value) {
-                        $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0]));
+                        $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0, 'deduct' => $user['market_deduct']]));
                     }
                 }
             }

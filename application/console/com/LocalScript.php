@@ -277,4 +277,94 @@ class LocalScript extends Pzlife
 
     }
 
+    /**
+    * @param string $string 需要解密的字符串
+    * @param string $key 密钥
+    * @return string
+    */
+    public static function decrypt($string, $key)
+    {
+
+        // 对接java，服务商做的AES加密通过SHA1PRNG算法（只要password一样，每次生成的数组都是一样的），Java的加密源码翻译php如下：
+        $key = substr(openssl_digest(openssl_digest($key, 'sha1', true), 'sha1', true), 0, 16);
+
+        $decrypted = openssl_decrypt(hex2bin($string), 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
+
+        return $decrypted;
+    }
+
+    public function mobileCheckTest(){
+        $secret_id = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
+        $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
+        $api = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
+        $ts =date("YmdHis",time());
+        $sig = sha1($secret_id . $secret_key . $ts);
+        // echo $sig;
+        $mobile = '15201926171';
+        // return $this->encrypt($mobile, $secret_id);
+        $en_mobile = $this->encrypt($mobile, $secret_id);
+        // echo $en_mobile;
+        $api = $api.$sig."&sid=" .$secret_id."&skey=" .$secret_key."&ts=".$ts;
+        // $check_mobile = $this->decrypt('6C38881649F7003B910582D1095DA821',$secret_id);
+        // print_r($check_mobile);die;
+        $data = [];
+        $mobiles = Db::query("SELECT `mobile` FROM  yx_mobile limit 500");
+        $check_mobile = [];
+        foreach ($mobiles as $key => $value) {
+            $check_mobile[] = $this->encrypt($value['mobile'], $secret_id);
+        }
+        $data = [
+            // 'sig' => $sig,
+            // 'sid' => $secret_id,
+            // 'skey' => $secret_key,
+            // 'ts' => $ts,
+            'mobiles' => $check_mobile
+        ];
+        // print_r($data);die;
+        $headers = [
+            'Authorization:'.base64_encode($secret_id.':'.$ts),'Content-Type:application/json'
+        ];
+        // echo base64_decode('MDZGREM0QTcxRjVFMUZERTRDMDYxREJBNjUzREQyQTU6MTU5MTAwNzE5Ng==');
+        print_r($api);
+        echo "\n";
+        print_r($headers);
+        echo "\n";
+        print_r($data);
+        $result = $this->sendRequest2($api,'post',$data,$headers);
+        // print_r(json_decode($data),true);
+        // print_r($data);
+        $result = json_decode($result,true);
+        print_r($result);
+        if ($result['code'] == 0) {//接口请求成功
+            $mobiles = $result['mobiles'];
+            foreach ($mobiles as $key => $value) {
+                $mobile = $this->decrypt($value['mobile'],$secret_id);
+                $check_result = $value['mobileStatus'];
+                $check_status = 2;
+                if ($check_result == 2) {
+                    Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
+                    Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
+                    Db::table('yx_real_mobile')->insert([
+                        'mobile' => $mobile,
+                        'check_result' => 3, 
+                        'check_status' => $check_status,
+                        'update_time' => time(),
+                        'create_time' => time()
+                    ]);
+                }else{
+                    Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
+                    Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
+                    Db::table('yx_mobile')->insert([
+                        'mobile' => $mobile,
+                        'check_result' => $check_result, 
+                        'check_status' => $check_status,
+                        'update_time' => time(),
+                        'create_time' => time()
+                    ]);
+                }
+               
+            }
+        }
+    }
+
 }

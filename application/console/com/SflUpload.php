@@ -1232,16 +1232,16 @@ class SflUpload extends Pzlife {
                         foreach ($son_path_data as $skey => $svalue) {
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
-                            /* if (!strpos($svalue,date("Ymd"))) {
+                            if (!strpos($svalue,date("Ymd"))) {
                             continue;
                             }
                             if (strpos($svalue,'20200529100927')) {
                             continue;
-                            } */
-                            // '2020060321'
-                            if (!strpos($svalue, '2020060321')) {
-                                continue;
                             }
+                            // '2020060321'
+                            /* if (!strpos($svalue, '2020060321')) {
+                                continue;
+                            } */
                             $file_info = explode('.', $svalue);
                             if ($file_info[1] == 'zip') { //需要解压
                                 if ($zip->open($son_path) === true) {
