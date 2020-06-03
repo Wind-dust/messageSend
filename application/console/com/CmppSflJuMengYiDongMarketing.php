@@ -61,7 +61,7 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
             'content'     => '【钰晰科技】您的验证码为2310。',
 
         ])); */
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+       /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
@@ -74,7 +74,7 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
             // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
             'content'     => '【丝芙兰】尊贵的黑卡会员 燕双，祝您生日快乐！三重生日豪礼，伴您享受生日喜悦！一重奏:【丝芙兰门店明星礼包】二重奏: 【丝芙兰官网50元电子礼券】三重奏:生日月订单享受一次双倍积分礼遇。会员生日福利，明星热卖产品大放送！请于2020-06-22前至丝芙兰官网sephora.cn 、App、小程序或门店领取您的专属生日礼物！以上三重生日礼，皆不可与其他优惠叠加使用。/回T退订',
 
-        ]));
+        ])); */
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
         $myfile   = fopen($log_path, 'a+');
@@ -282,7 +282,7 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
                         $new_Total_Length = strlen($new_body) + 12;
                         $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id,$head['Sequence_Id']);
                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
-                        usleep(250);
+                        usleep(10);
                         $receive = 2;
                     } else if ($head['Command_Id'] == 0x00000008) {
                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构
@@ -455,7 +455,7 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
                                         $new_Total_Length = strlen($new_body) + 12;
                                         $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id,$head['Sequence_Id']);
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
-                                        usleep(250);
+                                        usleep(10);
                                         $receive = 2;
                                     } else if ($head['Command_Id'] == 0x00000008) {
                                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构
@@ -536,7 +536,7 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
                                         $headData                    = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                         $send_data['my_submit_time'] = time(); //发送时间戳
                                         $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, json_encode($send_data));
-                                        usleep(250);
+                                        usleep(130);
                                         socket_write($socket, $headData . $bodyData, $Total_Length);
                                         $send_status = 2;
                                         ++$i;
@@ -548,7 +548,7 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
                                     if ($i > $security_master) {
                                         $i = 0;
                                     }
-                                    usleep(250);
+                                    usleep(130);
                                     continue;
                                 } else { //单条短信
 
@@ -594,7 +594,7 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
 
                                     $send_status = 2;
-                                    usleep(250);
+                                    usleep(130);
                                 }
                             } else { //心跳
                                 $Command_Id   = 0x00000008; //保持连接
