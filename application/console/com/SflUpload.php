@@ -787,6 +787,7 @@ class SflUpload extends Pzlife {
                 }
         }
         // die;
+        $send_task = [];
         while (true) {
             $white_task = $redis->lpop('sftp:sfl:marketing:deductsendtask');
             if (empty($white_task)) {
