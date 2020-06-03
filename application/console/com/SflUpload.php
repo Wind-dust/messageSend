@@ -8,27 +8,25 @@ use Config;
 use CURLFile;
 use Env;
 use Exception;
-use think\Db;
-use upload\Imageupload;
 use PHPExcel;
 use PHPExcel_Cell;
 use PHPExcel_IOFactory;
 use PHPExcel_Style_Alignment;
 use PHPExcel_Style_Fill;
 use PHPExcel_Writer_Excel2007;
+use think\Db;
+use upload\Imageupload;
 use ZipArchive;
 
 header("Content-Type: text/html;charset=utf-8");
-class SflUpload extends Pzlife
-{
+class SflUpload extends Pzlife {
 
     private $redis;
     /**
      * 数据库连接
      *
      */
-    public function dbConnect($databasename)
-    {
+    public function dbConnect($databasename) {
         if ($databasename == 'old') {
             return Db::connect(Config::get('database.db_config'));
         } else {
@@ -39,13 +37,11 @@ class SflUpload extends Pzlife
     /**
      * ftp 测试
      */
-    public function ftpConfig()
-    {
+    public function ftpConfig() {
         return ['host' => '127.0.0.1', 'port' => '8007', 'user' => '', 'password' => ''];
     }
 
-    public function testFtp()
-    {
+    public function testFtp() {
         $ftp_config = $this->ftpConfig();
         $ftp        = ftp_connect($ftp_config['host'], $ftp_config['port']);
         if (!$ftp) {
@@ -104,8 +100,7 @@ class SflUpload extends Pzlife
         }
     }
 
-    public function fileCheck()
-    {
+    public function fileCheck() {
         // $path = 'D:\Dev\Dev.Data\www\messageSend\uploads\SFL\MMS\100088234_20200424155750.zip';
         // echo md5_file($path);
         // 25c9bf2d94b4106dff22399dd41e7321
@@ -115,12 +110,11 @@ class SflUpload extends Pzlife
     }
 
     //文件夹解压并上传彩信模板
-    public function unZip()
-    {
-        $redis = Phpredis::getConn();
+    public function unZip() {
+        $redis         = Phpredis::getConn();
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-        $zip          = new ZipArchive();
+        $zip       = new ZipArchive();
         $path      = realpath("") . "/uploads/SFL/";
         $path_data = $this->getDirContent($path);
         if ($path_data == false) {
@@ -131,10 +125,10 @@ class SflUpload extends Pzlife
         }
 
         //队列名称
-        $mms_send_had_file = "sftp:mms:sfl:hadsendfile"; //sftp彩信丝芙兰已发送
+        $mms_send_had_file  = "sftp:mms:sfl:hadsendfile"; //sftp彩信丝芙兰已发送
         $mms_send_have_file = "sftp:mms:sfl:havesendfile"; //sftp彩信丝芙兰待发送
-        $sms_send_model = "sftp:sms:sfl:model"; //sftp短信模板
-        $sms_send_had_file = "sftp:sms:sfl:hadsendfile"; //sftp短信丝芙兰已发送
+        $sms_send_model     = "sftp:sms:sfl:model"; //sftp短信模板
+        $sms_send_had_file  = "sftp:sms:sfl:hadsendfile"; //sftp短信丝芙兰已发送
         $sms_send_have_file = "sftp:sms:sfl:havesendfile"; //sftp短信丝芙兰待发送
         try {
             foreach ($path_data as $key => $value) {
@@ -157,37 +151,37 @@ class SflUpload extends Pzlife
                                 //开始解压
                                 if ($zip->open($son_path) === true) {
                                     $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0]; //解压目录
-                                    $count = $zip->numFiles;
+                                    $count  = $zip->numFiles;
                                     // $results = [];
                                     $files_name = [];
                                     for ($i = 0; $i < $count; $i++) {
-                                        $entry = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
+                                        $entry         = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
                                         $entry['name'] = rtrim(str_replace('\\', '/', $entry['name']), '/');
-                                        $encoding = mb_detect_encoding($entry['name'], array('Shift_JIS', 'EUC_JP', 'EUC_KR', 'KOI8-R', 'ASCII', 'GB2312', 'GBK', 'BIG5', 'UTF-8'));
-                                        $filename = iconv($encoding, 'UTF-8', $entry['name']);
-                                        $filename = $filename ?: $entry['name'];
-                                        $size = $entry['size'];
-                                        $comp_size = $entry['comp_size'];
-                                        $mtime = $entry['mtime'];
-                                        $crc = $entry['crc'];
-                                        $is_dir = ($crc == 0);
+                                        $encoding      = mb_detect_encoding($entry['name'], array('Shift_JIS', 'EUC_JP', 'EUC_KR', 'KOI8-R', 'ASCII', 'GB2312', 'GBK', 'BIG5', 'UTF-8'));
+                                        $filename      = iconv($encoding, 'UTF-8', $entry['name']);
+                                        $filename      = $filename ?: $entry['name'];
+                                        $size          = $entry['size'];
+                                        $comp_size     = $entry['comp_size'];
+                                        $mtime         = $entry['mtime'];
+                                        $crc           = $entry['crc'];
+                                        $is_dir        = ($crc == 0);
                                         // $path = '/' . $filename;
 
                                         $_names = explode('/', $filename);
-                                        $_idx = count($_names) - 1;
+                                        $_idx   = count($_names) - 1;
 
                                         $name = $_names[$_idx];
                                         if (empty($name)) {
                                             continue;
                                         }
                                         $files_name[] = $name;
-                                        $index = $i;
+                                        $index        = $i;
                                         //$data = $zip->getFromIndex($i);
                                         $entry = compact('name', 'path', 'size', 'comp_size', 'mtime', 'crc', 'index', 'is_dir');
                                         // $results[] = $entry;
                                     }
                                     // print_r($files_name);die;
-                                    $mcw    = $zip->extractTo($unpath, $files_name); //解压到$route这个目录中
+                                    $mcw = $zip->extractTo($unpath, $files_name); //解压到$route这个目录中
                                     // // $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
                                     $zip->close();
                                     //解压完成
@@ -244,7 +238,7 @@ class SflUpload extends Pzlife
                                             // print_r($fram['content']);
 
                                             // die;
-                                            $fram_model[]    = $fram;
+                                            $fram_model[] = $fram;
                                             // array_push($fram, $fram_model);
                                         } else if ($uvalue == '2.jpg' || $uvalue == '2.gif') {
                                             $data = [
@@ -263,9 +257,9 @@ class SflUpload extends Pzlife
                                                 // array_push($fram, $fram_model);
                                             }
                                         } else if ($uvalue == '2.txt') {
-                                            $txt             = $this->readForTxtToArray($son_dir_path);
-                                            $fram['num']     = 4;
-                                            $fram['name']    = "第四帧";
+                                            $txt          = $this->readForTxtToArray($son_dir_path);
+                                            $fram['num']  = 4;
+                                            $fram['name'] = "第四帧";
 
                                             $fram['content'] = join('\n', $txt);
                                             $fram_model[]    = $fram;
@@ -306,9 +300,9 @@ class SflUpload extends Pzlife
                                 'sfl_model_id'       => $fvalue[3], //模板id
                                 'sfl_model_filename' => $fvalue[4], //主题的名称 对应MMS模板的主题 图片以及内容的压缩文件
                             ];
-                            $fram_key           = explode('.', $fvalue[4]);
-                            $sfl_SMS_fram       = $all_models[$fram_key[0]];
-                            $sfl_model['title'] = $sfl_SMS_fram['title'];
+                            $fram_key                 = explode('.', $fvalue[4]);
+                            $sfl_SMS_fram             = $all_models[$fram_key[0]];
+                            $sfl_model['title']       = $sfl_SMS_fram['title'];
                             $sfl_model['create_time'] = time();
                             unset($sfl_SMS_fram['title']);
                             if (Db::query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
@@ -321,7 +315,7 @@ class SflUpload extends Pzlife
                                 // # code...
                                 $value['sfl_multimedia_template_id'] = $sfl_multimedia_template_id;
                                 $value['sfl_model_id']               = $fvalue[3];
-                                $value['create_time']               = time();
+                                $value['create_time']                = time();
                                 Db::table('yx_sfl_multimedia_template_frame')->insert($value);
                             }
                         }
@@ -345,9 +339,9 @@ class SflUpload extends Pzlife
                         // die;
                     }
                 } elseif ($value == 'SMS') {
-                    $send_data = [];
-                    $SMS_model = [];
-                    $SMSmessage = [];
+                    $send_data   = [];
+                    $SMS_model   = [];
+                    $SMSmessage  = [];
                     $model_check = [];
                     if ($son_path_data !== false) {
                         foreach ($son_path_data as $skey => $svalue) {
@@ -357,37 +351,37 @@ class SflUpload extends Pzlife
                             if ($file_info[1] == 'zip') { //需要解压
                                 if ($zip->open($son_path) === true) {
                                     $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0];
-                                    $count = $zip->numFiles;
+                                    $count  = $zip->numFiles;
                                     // $results = [];
                                     $files_name = [];
                                     for ($i = 0; $i < $count; $i++) {
-                                        $entry = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
+                                        $entry         = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
                                         $entry['name'] = rtrim(str_replace('\\', '/', $entry['name']), '/');
-                                        $encoding = mb_detect_encoding($entry['name'], array('Shift_JIS', 'EUC_JP', 'EUC_KR', 'KOI8-R', 'ASCII', 'GB2312', 'GBK', 'BIG5', 'UTF-8'));
-                                        $filename = iconv($encoding, 'UTF-8', $entry['name']);
-                                        $filename = $filename ?: $entry['name'];
-                                        $size = $entry['size'];
-                                        $comp_size = $entry['comp_size'];
-                                        $mtime = $entry['mtime'];
-                                        $crc = $entry['crc'];
-                                        $is_dir = ($crc == 0);
+                                        $encoding      = mb_detect_encoding($entry['name'], array('Shift_JIS', 'EUC_JP', 'EUC_KR', 'KOI8-R', 'ASCII', 'GB2312', 'GBK', 'BIG5', 'UTF-8'));
+                                        $filename      = iconv($encoding, 'UTF-8', $entry['name']);
+                                        $filename      = $filename ?: $entry['name'];
+                                        $size          = $entry['size'];
+                                        $comp_size     = $entry['comp_size'];
+                                        $mtime         = $entry['mtime'];
+                                        $crc           = $entry['crc'];
+                                        $is_dir        = ($crc == 0);
                                         // $path = '/' . $filename;
 
                                         $_names = explode('/', $filename);
-                                        $_idx = count($_names) - 1;
+                                        $_idx   = count($_names) - 1;
 
                                         $name = $_names[$_idx];
                                         if (empty($name)) {
                                             continue;
                                         }
                                         $files_name[] = $name;
-                                        $index = $i;
+                                        $index        = $i;
                                         //$data = $zip->getFromIndex($i);
                                         $entry = compact('name', 'path', 'size', 'comp_size', 'mtime', 'crc', 'index', 'is_dir');
                                         // $results[] = $entry;
                                     }
                                     // print_r($files_name);die;
-                                    $mcw    = $zip->extractTo($unpath, $files_name); //解压到$route这个目录中
+                                    $mcw = $zip->extractTo($unpath, $files_name); //解压到$route这个目录中
                                     // $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
                                     $zip->close();
                                     //解压完成
@@ -409,9 +403,9 @@ class SflUpload extends Pzlife
 
                         foreach ($file_data as $fkey => $fvalue) {
                             // print_r($fvalue);
-                            $tem                   = [];
-                            $tem['num']            = $fvalue[2];
-                            $tem['content']        = $fvalue[4];
+                            $tem            = [];
+                            $tem['num']     = $fvalue[2];
+                            $tem['content'] = $fvalue[4];
                             // $SMS_model[$fvalue[0]] = $tem;
                             if ($redis->hget($sms_send_model, $fvalue[0])) {
                                 continue;
@@ -437,12 +431,11 @@ class SflUpload extends Pzlife
 
     /* sftp 彩信任务拼接 */
 
-    public function sftpSflMms()
-    {
-        $mms_send_had_file = "sftp:mms:sfl:hadsendfile"; //sftp彩信丝芙兰已发送
+    public function sftpSflMms() {
+        $mms_send_had_file  = "sftp:mms:sfl:hadsendfile"; //sftp彩信丝芙兰已发送
         $mms_send_have_file = "sftp:mms:sfl:havesendfile"; //sftp彩信丝芙兰待发送
-        $mms_send_task = "sftp:mms:sfl:sendtask";
-        $redis = Phpredis::getConn();
+        $mms_send_task      = "sftp:mms:sfl:sendtask";
+        $redis              = Phpredis::getConn();
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $file_data = $redis->hgetall($mms_send_have_file);
         // print_r($file_data);
@@ -494,7 +487,7 @@ class SflUpload extends Pzlife
                         ];
 
                         $MMS_real_send['sfl_relation_id'] = $value[2];
-                        $MMS_real_send['variable'] = $variable;
+                        $MMS_real_send['variable']        = $variable;
                         // print_r($MMS_real_send);die;
                         $redis->Hset($mms_send_task, json_encode($MMS_real_send), 1);
                     }
@@ -510,14 +503,13 @@ class SflUpload extends Pzlife
 
     /* 短信任务拼接 */
 
-    public function sftpSflSms()
-    {
+    public function sftpSflSms() {
 
-        $sms_send_model = "sftp:sms:sfl:model"; //sftp短信模板
-        $sms_send_had_file = "sftp:sms:sfl:hadsendfile"; //sftp短信丝芙兰已发送
+        $sms_send_model     = "sftp:sms:sfl:model"; //sftp短信模板
+        $sms_send_had_file  = "sftp:sms:sfl:hadsendfile"; //sftp短信丝芙兰已发送
         $sms_send_have_file = "sftp:sms:sfl:havesendfile"; //sftp短信丝芙兰待发送
-        $sms_send_task = "sftp:sms:sfl:sendtask";
-        $redis = Phpredis::getConn();
+        $sms_send_task      = "sftp:sms:sfl:sendtask";
+        $redis              = Phpredis::getConn();
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $file_data = $redis->hgetall($sms_send_have_file);
         // print_r($file_data);
@@ -545,28 +537,28 @@ class SflUpload extends Pzlife
                         if (empty($model)) {
                             exit("The Sms Model Is Not Null");
                         }
-                        $model = json_decode($model, true);
+                        $model                       = json_decode($model, true);
                         $SMS_real_send               = [];
                         $SMS_real_send               = [];
                         $SMS_real_send['mseeage_id'] = $value[0];
                         $SMS_real_send['mobile']     = $value[3];
                         $SMS_real_send['free_trial'] = 1;
                         // $SMS_real_send['real_num'] = 1;
-                        $SMS_real_send['send_num']     = 1;
-                        $SMS_real_send['send_status']  = 1;
+                        $SMS_real_send['send_num']    = 1;
+                        $SMS_real_send['send_status'] = 1;
                         $SMS_real_send['template_id'] = $value[2];
-                        $SMS_real_send['create_time']  = time();
-                        $content                       = $model['content'];
-                        $content                       = str_replace('{FULL_NAME}', $value[4], $content);
-                        $content                       = str_replace('{RESERVED_FIELD_1}', $value[7], $content);
-                        $content                       = str_replace('{RESERVED_FIELD_2}', $value[8], $content);
-                        $content                       = str_replace('{RESERVED_FIELD_3}', $value[9], $content);
-                        $content                       = str_replace('{RESERVED_FIELD_4}', $value[10], $content);
-                        $content                       = str_replace('{RESERVED_FIELD_5}', $value[11], $content);
-                        $content                       = str_replace('{ACCOUNT_NUMBER}', $value[1], $content);
-                        $content                       = str_replace('{MOBILE}', $value[3], $content);
-                        $content                       = str_replace('{POINTS_AVAILABLE}', $value[5], $content);
-                        $content                       = str_replace('{TOTAL_POINTS}', $value[6], $content);
+                        $SMS_real_send['create_time'] = time();
+                        $content                      = $model['content'];
+                        $content                      = str_replace('{FULL_NAME}', $value[4], $content);
+                        $content                      = str_replace('{RESERVED_FIELD_1}', $value[7], $content);
+                        $content                      = str_replace('{RESERVED_FIELD_2}', $value[8], $content);
+                        $content                      = str_replace('{RESERVED_FIELD_3}', $value[9], $content);
+                        $content                      = str_replace('{RESERVED_FIELD_4}', $value[10], $content);
+                        $content                      = str_replace('{RESERVED_FIELD_5}', $value[11], $content);
+                        $content                      = str_replace('{ACCOUNT_NUMBER}', $value[1], $content);
+                        $content                      = str_replace('{MOBILE}', $value[3], $content);
+                        $content                      = str_replace('{POINTS_AVAILABLE}', $value[5], $content);
+                        $content                      = str_replace('{TOTAL_POINTS}', $value[6], $content);
                         if (strpos($content, '【丝芙兰】') !== false) {
                         } else {
                             $content = '【丝芙兰】' . $content;
@@ -582,8 +574,8 @@ class SflUpload extends Pzlife
                             $real_length = ceil($send_length / 67);
                         }
                         $SMS_real_send['task_content'] = $content;
-                        $SMS_real_send['real_num'] = $real_length;
-                        $SMS_real_send['send_length'] = $send_length;
+                        $SMS_real_send['real_num']     = $real_length;
+                        $SMS_real_send['send_length']  = $send_length;
                         $redis->Hset($sms_send_task, json_encode($SMS_real_send), 1);
                     }
                 }
@@ -599,22 +591,286 @@ class SflUpload extends Pzlife
     /* sftp 彩信任务入库 */
 
     /* sftp 短信任务入库 */
+    public function sftpSflSendTaskToBase() {
+        $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
+        $mysql_connect->query("set names utf8mb4");
+        ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
+        $redis = Phpredis::getConn();
+        //白名单入库
+        /* if (in_array($tvalue[3],$white_list)) {
+        $redis->rpush('sftp:sfl:marketing:whitesendtask',json_encode($SMS_real_send));
+        }else{
+        $redis->rpush('sftp:sfl:marketing:sendtask',json_encode($SMS_real_send));
+        } */
+        $send_task = [];
+        $task_id   = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task  ORDER BY `id` DESC limit 1 ");
+        $this_id   = $task_id[0]['id'];
+        // print_r($this_id);
+        // die;
+        $i = 1;
+        while (true) {
+            $white_task = $redis->lpop('sftp:sfl:marketing:whitesendtask');
+            if (empty($white_task)) {
+                break;
+            }
+            $white_task = json_decode($white_task, true);
+            // print_r($white_task);die;
+            $this_id++;
+            $white_task['id'] = $this_id;
+            $send_task[]      = $white_task;
 
-    public function sflZip()
-    {
+            $i++;
+            if ($i > 100) {
+                $mysql_connect->startTrans();
+                try {
+                    $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
+                    unset($send_task);
+                    $i = 1;
+                    $mysql_connect->commit();
+                } catch (\Exception $e) {
+                    exception($e);
+                }
+            }
+        }
+        if (!empty($send_task)) {
+            try {
+                $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
+                unset($send_task);
+                $i = 1;
+                $mysql_connect->commit();
+            } catch (\Exception $e) {
+                exception($e);
+            }
+        }
+        // die;
+        // print_r($this_id);
+        // die;
+        $task_receipt_all = [];
+
+        while (true) {
+            $white_task = $redis->lpop('sftp:sfl:marketing:errorsendtask');
+            if (empty($white_task)) {
+                break;
+            }
+            $white_task = json_decode($white_task, true);
+            // print_r($white_task);die;
+            $this_id++;
+            $white_task['id'] = $this_id;
+            $send_task[]      = $white_task;
+            $task_receipt     = [];
+            $task_receipt     = [
+                'mseeage_id'     => $white_task['mseeage_id'],
+                'mobile'         => $white_task['mobile'],
+                'status_message' => 'SMS:2',
+                'messageinfo'    => '发送失败',
+                'task_id'        => $white_task['id'],
+                'template_id'    => $white_task['template_id'],
+            ];
+            $task_receipt_all[] = $task_receipt;
+            $i++;
+            if ($i > 100) {
+                $mysql_connect->startTrans();
+                try {
+                    $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
+                    $mysql_connect->table('yx_sfl_send_task_receipt')->insertAll($task_receipt_all);
+                    unset($send_task);
+                    unset($task_receipt_all);
+                    $i = 1;
+                    $mysql_connect->commit();
+                } catch (\Exception $e) {
+                    exception($e);
+                }
+            }
+        }
+        if (!empty($send_task)) {
+            try {
+                $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
+                $mysql_connect->table('yx_sfl_send_task_receipt')->insertAll($task_receipt_all);
+                unset($send_task);
+                unset($task_receipt_all);
+                $i = 1;
+                $mysql_connect->commit();
+            } catch (\Exception $e) {
+                exception($e);
+            }
+        }
+        $deduct = ceil(2000000 / 3383176 * 10);
+
+        /* 扣量 */
+        // $all_num = [0,1,2,3,4];
+        // $deduct_key = array_rand($all_num,3);
+        // print_r($deduct_key);die;
+        $deduct_nums = 5;
+        while (true) {
+            $white_task = $redis->lpop('sftp:sfl:marketing:sendtask');
+            if (empty($white_task)) {
+                break;
+            }
+            $i++;
+            $white_task = json_decode($white_task, true);
+            // print_r($white_task);die;
+            $this_id++;
+            $white_task['id'] = $this_id;
+            $send_task[]      = $white_task;
+            $white_task = $redis->rpush('sftp:sfl:marketing:deductsendtask', json_encode($white_task));
+            if ($i > 5) {
+                $all_num    = [0, 1, 2, 3, 4];
+                $deduct_key = array_rand($all_num, 3);
+                foreach ($send_task as $key => $value) {
+                    if (in_array($key, $deduct_key)) {
+                        continue;
+                    }
+                    $prefix = '';
+                    $prefix = substr(trim($value['mobile']), 0, 7);
+                    $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                    // print_r($res);
+                    if ($res) {
+                        $newres = array_shift($res);
+                        if ($newres['source'] == 1) {
+                            $channel_id = 83;
+                        } elseif ($newres['source'] == 2) {
+                            $channel_id = 84;
+                        } elseif ($newres['source'] == 3) {
+                            $channel_id = 84;
+                        }
+                    } else {
+                        $channel_id = 83;
+                    }
+                    $sendmessage = [
+                        'mseeage_id'  => $value['mseeage_id'],
+                        'template_id' => $value['template_id'],
+                        'mobile'      => $value['mobile'],
+                        'mar_task_id' => $value['id'],
+                        'content'     => $value['task_content'],
+                        'from'        => 'yx_sfl_send_task',
+                    ];
+                    $redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($sendmessage)); //三体营销
+                }
+                $i = 1;
+                unset($send_task);
+            }
+            
+
+        }
+        if (!empty($send_task)){
+            $all_num    = [0, 1, 2, 3, 4];
+                $deduct_key = array_rand($all_num, 3);
+                foreach ($send_task as $key => $value) {
+                    if (in_array($key, $deduct_key)) {
+                        continue;
+                    }
+                    $prefix = '';
+                    $prefix = substr(trim($value['mobile']), 0, 7);
+                    $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                    // print_r($res);
+                    if ($res) {
+                        $newres = array_shift($res);
+                        if ($newres['source'] == 1) {
+                            $channel_id = 83;
+                        } elseif ($newres['source'] == 2) {
+                            $channel_id = 84;
+                        } elseif ($newres['source'] == 3) {
+                            $channel_id = 84;
+                        }
+                    } else {
+                        $channel_id = 83;
+                    }
+                    $sendmessage = [
+                        'mseeage_id'  => $value['mseeage_id'],
+                        'template_id' => $value['template_id'],
+                        'mobile'      => $value['mobile'],
+                        'mar_task_id' => $value['id'],
+                        'content'     => $value['task_content'],
+                        'from'        => 'yx_sfl_send_task',
+                    ];
+                    $redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($sendmessage)); //三体营销
+                }
+        }
+        // die;
+        while (true) {
+            $white_task = $redis->lpop('sftp:sfl:marketing:deductsendtask');
+            if (empty($white_task)) {
+                break;
+            }
+            $white_task = json_decode($white_task, true);
+            $white_task['yidong_channel_id'] = 83;
+            $white_task['liantong_channel_id'] = 83;
+            $white_task['dianxin_channel_id'] = 84;
+            $send_task[]      = $white_task;
+            $i++;
+            if ($i > 100) {
+                $mysql_connect->startTrans();
+                try {
+                    $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
+                    unset($send_task);
+                    $i = 1;
+                    $mysql_connect->commit();
+                } catch (\Exception $e) {
+                    exception($e);
+                }
+            }
+        }
+        if (!empty($send_task)) {
+            try {
+                $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
+                unset($send_task);
+                $i = 1;
+                $mysql_connect->commit();
+            } catch (\Exception $e) {
+                exception($e);
+            }
+        }
+
+    }
+
+    public function sflZip() {
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $mysql_connect->query("set names utf8mb4");
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $this->upload = new Imageupload();
         $zip          = new ZipArchive();
-
-        $path      = realpath("") . "/uploads/SFL/";
-        $path_data = $this->getDirContent($path);
+        $redis        = Phpredis::getConn();
+        $path         = realpath("") . "/uploads/SFL/";
+        $path_data    = $this->getDirContent($path);
         // print_r($path_data);
         if ($path_data == false) {
             exit("This Dir IS null");
         }
         $all_models = [];
+        $white_list = [
+            13023216322,
+            18616841500,
+            15021417314,
+            15921904656,
+            15000773110,
+            18121252120,
+            13636311653,
+            13611664019,
+            13472865840,
+            18013770122,
+            18800232095,
+            18521329177,
+            18501684687,
+            13918902911,
+            18521569417,
+            18217584060,
+            13816091848,
+            18621720742,
+            13817515864,
+            16621181441,
+            13701789119,
+            13818181256,
+            15800815262,
+            13916292097,
+            13917823241,
+            13585699417,
+            15800400970,
+            13801687321,
+            18621714497,
+            13764272451,
+            18019762207,
+            13162248755,
+        ];
         try {
             foreach ($path_data as $key => $value) {
                 //进入二级目录 MMS 或者 SMS 等
@@ -626,7 +882,7 @@ class SflUpload extends Pzlife
                 if ($value == 'MMS') {
                     // continue;
                     $err_task_num = [];
-                    $send_data = [];
+                    $send_data    = [];
                     if ($son_path_data !== false) {
 
                         foreach ($son_path_data as $skey => $svalue) {
@@ -634,12 +890,12 @@ class SflUpload extends Pzlife
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
                             // print_r($svalue);die;
-                            
-                           /*  if (!strpos($svalue,'20200530')) {
-                                continue;
+
+                            /*  if (!strpos($svalue,'20200530')) {
+                            continue;
                             } */
                             // print_r($svalue);die;
-                            if (!strpos($svalue,date("Ymd"))) {
+                            if (!strpos($svalue, date("Ymd"))) {
                                 continue;
                             }
                             $file_info = explode('.', $svalue);
@@ -647,37 +903,37 @@ class SflUpload extends Pzlife
                                 //开始解压
                                 if ($zip->open($son_path) === true) {
                                     $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0]; //解压目录
-                                    $count = $zip->numFiles;
+                                    $count  = $zip->numFiles;
                                     // $results = [];
                                     $files_name = [];
                                     for ($i = 0; $i < $count; $i++) {
-                                        $entry = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
+                                        $entry         = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
                                         $entry['name'] = rtrim(str_replace('\\', '/', $entry['name']), '/');
-                                        $encoding = mb_detect_encoding($entry['name'], array('Shift_JIS', 'EUC_JP', 'EUC_KR', 'KOI8-R', 'ASCII', 'GB2312', 'GBK', 'BIG5', 'UTF-8'));
-                                        $filename = iconv($encoding, 'UTF-8', $entry['name']);
-                                        $filename = $filename ?: $entry['name'];
-                                        $size = $entry['size'];
-                                        $comp_size = $entry['comp_size'];
-                                        $mtime = $entry['mtime'];
-                                        $crc = $entry['crc'];
-                                        $is_dir = ($crc == 0);
+                                        $encoding      = mb_detect_encoding($entry['name'], array('Shift_JIS', 'EUC_JP', 'EUC_KR', 'KOI8-R', 'ASCII', 'GB2312', 'GBK', 'BIG5', 'UTF-8'));
+                                        $filename      = iconv($encoding, 'UTF-8', $entry['name']);
+                                        $filename      = $filename ?: $entry['name'];
+                                        $size          = $entry['size'];
+                                        $comp_size     = $entry['comp_size'];
+                                        $mtime         = $entry['mtime'];
+                                        $crc           = $entry['crc'];
+                                        $is_dir        = ($crc == 0);
                                         // $path = '/' . $filename;
 
                                         $_names = explode('/', $filename);
-                                        $_idx = count($_names) - 1;
+                                        $_idx   = count($_names) - 1;
 
                                         $name = $_names[$_idx];
                                         if (empty($name)) {
                                             continue;
                                         }
                                         $files_name[] = $name;
-                                        $index = $i;
+                                        $index        = $i;
                                         //$data = $zip->getFromIndex($i);
                                         $entry = compact('name', 'path', 'size', 'comp_size', 'mtime', 'crc', 'index', 'is_dir');
                                         // $results[] = $entry;
                                     }
                                     // print_r($files_name);die;
-                                    $mcw    = $zip->extractTo($unpath, $files_name); //解压到$route这个目录中
+                                    $mcw = $zip->extractTo($unpath, $files_name); //解压到$route这个目录中
                                     // // $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
                                     $zip->close();
                                     //解压完成
@@ -732,7 +988,7 @@ class SflUpload extends Pzlife
                                             // print_r($fram['content']);
 
                                             // die;
-                                            $fram_model[]    = $fram;
+                                            $fram_model[] = $fram;
                                             // array_push($fram, $fram_model);
                                         } else if ($uvalue == '2.jpg' || $uvalue == '2.gif') {
                                             $data = [
@@ -751,9 +1007,9 @@ class SflUpload extends Pzlife
                                                 // array_push($fram, $fram_model);
                                             }
                                         } else if ($uvalue == '2.txt') {
-                                            $txt             = $this->readForTxtToArray($son_dir_path);
-                                            $fram['num']     = 4;
-                                            $fram['name']    = "第四帧";
+                                            $txt          = $this->readForTxtToArray($son_dir_path);
+                                            $fram['num']  = 4;
+                                            $fram['name'] = "第四帧";
 
                                             $fram['content'] = join('\n', $txt);
                                             $fram_model[]    = $fram;
@@ -794,27 +1050,27 @@ class SflUpload extends Pzlife
                                     'sfl_model_id'       => $fvalue[3], //模板id
                                     'sfl_model_filename' => $fvalue[4], //主题的名称 对应MMS模板的主题 图片以及内容的压缩文件
                                 ];
-                                $fram_key           = explode('.', $fvalue[4]);
-                                $sfl_SMS_fram       = $all_models[$fram_key[0]];
-                                $sfl_model['title'] = $sfl_SMS_fram['title'];
+                                $fram_key                 = explode('.', $fvalue[4]);
+                                $sfl_SMS_fram             = $all_models[$fram_key[0]];
+                                $sfl_model['title']       = $sfl_SMS_fram['title'];
                                 $sfl_model['create_time'] = time();
                                 unset($sfl_SMS_fram['title']);
                                 if ($mysql_connect->query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
                                     continue;
                                 }
                                 $sfl_multimedia_template_id = $mysql_connect->table('yx_sfl_multimedia_template')->insertGetId($sfl_model);
-    
+
                                 // print_r($sfl_SMS_fram);
                                 foreach ($sfl_SMS_fram as $key => $value) {
                                     // # code...
                                     $value['sfl_multimedia_template_id'] = $sfl_multimedia_template_id;
                                     $value['sfl_model_id']               = $fvalue[3];
-                                    $value['create_time']               = time();
+                                    $value['create_time']                = time();
                                     $mysql_connect->table('yx_sfl_multimedia_template_frame')->insert($value);
                                 }
                             }
                         }
-                       
+
                         // print_r($file_data);die;
                         //发送内容并 进行拼接
                         // print_r($send_data);die;
@@ -893,16 +1149,20 @@ class SflUpload extends Pzlife
                                         } */
                                         $MMS_real_send['variable'] = json_encode($variable);
                                         // print_r($MMS_real_send);die;
-                                        if ($tvalue[3] == "") {
-                                           
-                                            if (isset($err_task_num['The Mobile IS NULL'])) {
-                                                $err_task_num['The Mobile IS NULL']  += 1;
-                                            }else{
-                                                $err_task_num['The Mobile IS NULL']  = 1;
-                                            }
+                                        if (checkMobile($tvalue[3]) == false) {
                                             continue;
-                                           
+
                                         }
+                                        /*  if ($tvalue[3] == "") {
+
+                                        if (isset($err_task_num['The Mobile IS NULL'])) {
+                                        $err_task_num['The Mobile IS NULL']  += 1;
+                                        }else{
+                                        $err_task_num['The Mobile IS NULL']  = 1;
+                                        }
+                                        continue;
+
+                                        } */
                                         $MMSmessage[] = $MMS_real_send;
                                     }
                                 }
@@ -914,7 +1174,7 @@ class SflUpload extends Pzlife
                             foreach ($file_data as $key => $value) {
                                 // print_r($value[2]);
                                 // print_r($model_check[$value[0]]);
-    
+
                                 // die;
                                 if ($value[2] != $model_check[$value[0]]) {
                                     //校验失败
@@ -922,13 +1182,15 @@ class SflUpload extends Pzlife
                                 }
                             }
                         }
-                        
+
                         // continue;
                         $insertMMS = [];
                         $j         = 1;
                         if (!empty($MMSmessage)) {
                             for ($i = 0; $i < count($MMSmessage); $i++) {
                                 // array_push($insertMMS, $MMSmessage[$i]);
+                                //写入redis
+                                //插入数据库
                                 $insertMMS[] = $MMSmessage[$i];
                                 $j++;
                                 if ($j > 100) {
@@ -942,11 +1204,11 @@ class SflUpload extends Pzlife
                                         exception($e);
                                     }
                                     // $this->redis->rPush('index:meassage:business:sendtask', $send);
-    
+
                                 }
                             }
                         }
-                       
+
                         if (!empty($insertMMS)) {
                             $mysql_connect->startTrans();
                             try {
@@ -961,56 +1223,60 @@ class SflUpload extends Pzlife
                         // die;
                     }
                 } elseif ($value == 'SMS') {
-                    $send_data = [];
-                    $SMS_model = [];
-                    $SMSmessage = [];
-                    $model_check = [];
+                    $send_data    = [];
+                    $SMS_model    = [];
+                    $SMSmessage   = [];
+                    $model_check  = [];
                     $err_task_num = [];
                     if ($son_path_data !== false) {
                         foreach ($son_path_data as $skey => $svalue) {
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
-                            if (!strpos($svalue,date("Ymd"))) {
-                                continue;
+                            /* if (!strpos($svalue,date("Ymd"))) {
+                            continue;
                             }
                             if (strpos($svalue,'20200529100927')) {
+                            continue;
+                            } */
+                            // '2020060321'
+                            if (!strpos($svalue, '2020060321')) {
                                 continue;
                             }
                             $file_info = explode('.', $svalue);
                             if ($file_info[1] == 'zip') { //需要解压
                                 if ($zip->open($son_path) === true) {
                                     $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0];
-                                    $count = $zip->numFiles;
+                                    $count  = $zip->numFiles;
                                     // $results = [];
                                     $files_name = [];
                                     for ($i = 0; $i < $count; $i++) {
-                                        $entry = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
+                                        $entry         = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
                                         $entry['name'] = rtrim(str_replace('\\', '/', $entry['name']), '/');
-                                        $encoding = mb_detect_encoding($entry['name'], array('Shift_JIS', 'EUC_JP', 'EUC_KR', 'KOI8-R', 'ASCII', 'GB2312', 'GBK', 'BIG5', 'UTF-8'));
-                                        $filename = iconv($encoding, 'UTF-8', $entry['name']);
-                                        $filename = $filename ?: $entry['name'];
-                                        $size = $entry['size'];
-                                        $comp_size = $entry['comp_size'];
-                                        $mtime = $entry['mtime'];
-                                        $crc = $entry['crc'];
-                                        $is_dir = ($crc == 0);
+                                        $encoding      = mb_detect_encoding($entry['name'], array('Shift_JIS', 'EUC_JP', 'EUC_KR', 'KOI8-R', 'ASCII', 'GB2312', 'GBK', 'BIG5', 'UTF-8'));
+                                        $filename      = iconv($encoding, 'UTF-8', $entry['name']);
+                                        $filename      = $filename ?: $entry['name'];
+                                        $size          = $entry['size'];
+                                        $comp_size     = $entry['comp_size'];
+                                        $mtime         = $entry['mtime'];
+                                        $crc           = $entry['crc'];
+                                        $is_dir        = ($crc == 0);
                                         // $path = '/' . $filename;
 
                                         $_names = explode('/', $filename);
-                                        $_idx = count($_names) - 1;
+                                        $_idx   = count($_names) - 1;
 
                                         $name = $_names[$_idx];
                                         if (empty($name)) {
                                             continue;
                                         }
                                         $files_name[] = $name;
-                                        $index = $i;
+                                        $index        = $i;
                                         //$data = $zip->getFromIndex($i);
                                         $entry = compact('name', 'path', 'size', 'comp_size', 'mtime', 'crc', 'index', 'is_dir');
                                         // $results[] = $entry;
                                     }
                                     // print_r($files_name);die;
-                                    $mcw    = $zip->extractTo($unpath, $files_name); //解压到$route这个目录中
+                                    $mcw = $zip->extractTo($unpath, $files_name); //解压到$route这个目录中
                                     // $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
                                     $zip->close();
                                     //解压完成
@@ -1045,16 +1311,16 @@ class SflUpload extends Pzlife
                             foreach ($send_data as $key => $value) {
                                 $txt = [];
                                 // $txt = $this->readForTxtToDyadicArray($value);
-                                 $file = fopen($value, "r");
+                                $file = fopen($value, "r");
                                 $data = array();
                                 while (!feof($file)) {
                                     $cellVal = trim(fgets($file));
                                     if (!empty($cellVal)) {
                                         // $cellVal = trim($cellVal, '"');
-                                        $tvalue   = explode('",', $cellVal);
+                                        $tvalue = explode('",', $cellVal);
                                         // $cellVal = str_replace('"', '', $cellVal);
                                         foreach ($tvalue as $key => $svalue) {
-                                            $tvalue[$key] =  str_replace('"', '', $svalue);
+                                            $tvalue[$key] = str_replace('"', '', $svalue);
                                         }
                                         // array_push($data, $value);
                                         // print_r($tvalue);die;
@@ -1065,20 +1331,19 @@ class SflUpload extends Pzlife
                                         }
                                     }
                                 }
-                               
+
                             }
-    
 
                         }
                         if (!empty($file_data)) {
                             foreach ($file_data as $key => $value) {
                                 // print_r($value[2]);
                                 // print_r($model_check[$value[0]]);
-    
+
                                 // die;
                                 if ($value[2] != $model_check[$value[0]]) {
                                     //校验失败
-                                    return  ['code' => 200, "error" => "校验失败"];
+                                    return ['code' => 200, "error" => "校验失败"];
                                 }
                             }
                         }
@@ -1087,17 +1352,17 @@ class SflUpload extends Pzlife
                             $j = 1;
                             foreach ($send_data as $key => $value) {
                                 $txt = [];
-                                // $txt = $this->readForTxtToDyadicArray($value); 
+                                // $txt = $this->readForTxtToDyadicArray($value);
                                 $file = fopen($value, "r");
                                 $data = array();
                                 while (!feof($file)) {
                                     $cellVal = trim(fgets($file));
                                     if (!empty($cellVal)) {
                                         // $cellVal = trim($cellVal, '"');
-                                        $tvalue   = explode('",', $cellVal);
+                                        $tvalue = explode('",', $cellVal);
                                         // $cellVal = str_replace('"', '', $cellVal);
                                         foreach ($tvalue as $key => $svalue) {
-                                            $tvalue[$key] =  str_replace('"', '', $svalue);
+                                            $tvalue[$key] = str_replace('"', '', $svalue);
                                         }
                                         // array_push($data, $value);
                                         // print_r($tvalue);die;
@@ -1112,21 +1377,21 @@ class SflUpload extends Pzlife
                                         $SMS_real_send['mobile']     = $tvalue[3];
                                         $SMS_real_send['free_trial'] = 1;
                                         // $SMS_real_send['real_num'] = 1;
-                                        $SMS_real_send['send_num']     = 1;
-                                        $SMS_real_send['send_status']  = 1;
+                                        $SMS_real_send['send_num']    = 1;
+                                        $SMS_real_send['send_status'] = 1;
                                         $SMS_real_send['template_id'] = $tvalue[2];
-                                        $SMS_real_send['create_time']  = time();
-                                        $content                       = $SMS_model[$tvalue[2]]['content'];
-                                        $content                       = str_replace('{FULL_NAME}', $tvalue[4], $content);
-                                        $content                       = str_replace('{RESERVED_FIELD_1}', $tvalue[7], $content);
-                                        $content                       = str_replace('{RESERVED_FIELD_2}', $tvalue[8], $content);
-                                        $content                       = str_replace('{RESERVED_FIELD_3}', $tvalue[9], $content);
-                                        $content                       = str_replace('{RESERVED_FIELD_4}', $tvalue[10], $content);
-                                        $content                       = str_replace('{RESERVED_FIELD_5}', $tvalue[11], $content);
-                                        $content                       = str_replace('{ACCOUNT_NUMBER}', $tvalue[1], $content);
-                                        $content                       = str_replace('{MOBILE}', $tvalue[3], $content);
-                                        $content                       = str_replace('{POINTS_AVAILABLE}', $tvalue[5], $content);
-                                        $content                       = str_replace('{TOTAL_POINTS}', $tvalue[6], $content);
+                                        $SMS_real_send['create_time'] = time();
+                                        $content                      = $SMS_model[$tvalue[2]]['content'];
+                                        $content                      = str_replace('{FULL_NAME}', $tvalue[4], $content);
+                                        $content                      = str_replace('{RESERVED_FIELD_1}', $tvalue[7], $content);
+                                        $content                      = str_replace('{RESERVED_FIELD_2}', $tvalue[8], $content);
+                                        $content                      = str_replace('{RESERVED_FIELD_3}', $tvalue[9], $content);
+                                        $content                      = str_replace('{RESERVED_FIELD_4}', $tvalue[10], $content);
+                                        $content                      = str_replace('{RESERVED_FIELD_5}', $tvalue[11], $content);
+                                        $content                      = str_replace('{ACCOUNT_NUMBER}', $tvalue[1], $content);
+                                        $content                      = str_replace('{MOBILE}', $tvalue[3], $content);
+                                        $content                      = str_replace('{POINTS_AVAILABLE}', $tvalue[5], $content);
+                                        $content                      = str_replace('{TOTAL_POINTS}', $tvalue[6], $content);
                                         if (strpos($content, '【丝芙兰】') !== false) {
                                         } else {
                                             $content = '【丝芙兰】' . $content;
@@ -1142,44 +1407,62 @@ class SflUpload extends Pzlife
                                             $real_length = ceil($send_length / 67);
                                         }
                                         $SMS_real_send['task_content'] = $content;
-                                        $SMS_real_send['real_num'] = $real_length;
-                                        $SMS_real_send['send_length'] = $send_length;
-                                        if ($tvalue[3] == "") {
-                                           
-                                            if (isset($err_task_num['The Mobile IS NULL'])) {
-                                                $err_task_num['The Mobile IS NULL']  += 1;
-                                            }else{
-                                                $err_task_num['The Mobile IS NULL']  = 1;
-                                            }
+                                        $SMS_real_send['real_num']     = $real_length;
+                                        $SMS_real_send['send_length']  = $send_length;
+                                        if (checkMobile($tvalue[3]) == false) {
                                             continue;
-                                           
+
                                         }
-                                        $SMSmessage[] = $SMS_real_send;
-                                        // print_r($content);die;
-                                        $j++;
-                                        if ($j > 100) {
-                                            $mysql_connect->startTrans();
-                                            try {
-                                                $mysql_connect->table('yx_sfl_send_task')->insertAll($SMSmessage);
-                                                unset($SMSmessage);
-                                                $j = 1;
-                                                $mysql_connect->commit();
-                                            } catch (\Exception $e) {
-                                                exception($e);
+                                        if (strlen($tvalue[3]) > 11) {
+                                            continue;
+                                        }
+                                        /*   if ($tvalue[3] == "") {
+
+                                        if (isset($err_task_num['The Mobile IS NULL'])) {
+                                        $err_task_num['The Mobile IS NULL']  += 1;
+                                        }else{
+                                        $err_task_num['The Mobile IS NULL']  = 1;
+                                        }
+                                        continue;
+
+                                        } */
+                                        if (in_array($tvalue[3], $white_list)) {
+                                            $redis->rpush('sftp:sfl:marketing:whitesendtask', json_encode($SMS_real_send));
+                                        } else {
+                                            if (strpos($tvalue[3], '000000') !== false || strpos($tvalue[3], '111111') || strpos($tvalue[3], '222222') || strpos($tvalue[3], '333333') || strpos($tvalue[3], '444444') || strpos($tvalue[3], '555555') || strpos($tvalue[3], '666666') || strpos($tvalue[3], '777777') || strpos($tvalue[3], '888888') || strpos($tvalue[3], '999999')) {
+                                                $redis->rpush('sftp:sfl:marketing:errorsendtask', json_encode($SMS_real_send));
+
+                                            } else {
+                                                $redis->rpush('sftp:sfl:marketing:sendtask', json_encode($SMS_real_send));
+
                                             }
-                                            // $this->redis->rPush('index:meassage:business:sendtask', $send);
-    
                                         }
+                                        /* $SMSmessage[] = $SMS_real_send;
+                                    // print_r($content);die;
+                                    $j++;
+                                    if ($j > 100) {
+                                    $mysql_connect->startTrans();
+                                    try {
+                                    $mysql_connect->table('yx_sfl_send_task')->insertAll($SMSmessage);
+                                    unset($SMSmessage);
+                                    $j = 1;
+                                    $mysql_connect->commit();
+                                    } catch (\Exception $e) {
+                                    exception($e);
+                                    }
+                                    // $this->redis->rPush('index:meassage:business:sendtask', $send);
+
+                                    } */
                                     }
                                 }
-                               /*  if (!empty($txt)) {
-                                    foreach ($txt as $tkey => $tvalue) {
-                                       
-                                    }
-                                } */
+                                /*  if (!empty($txt)) {
+                            foreach ($txt as $tkey => $tvalue) {
+
+                            }
+                            } */
                             }
                         }
-                        
+
                         if (!empty($SMSmessage)) {
                             $mysql_connect->startTrans();
                             try {
@@ -1199,7 +1482,7 @@ class SflUpload extends Pzlife
         }
     }
 
-    public function SFLSftpTest(){
+    public function SFLSftpTest() {
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $mysql_connect->query("set names utf8mb4");
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
@@ -1229,8 +1512,8 @@ class SflUpload extends Pzlife
                             $son_path = '';
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
-                           
-                            if (!strpos($svalue,date("Ymd"))) {
+
+                            if (!strpos($svalue, date("Ymd"))) {
                                 continue;
                             }
                             $file_info = explode('.', $svalue);
@@ -1238,37 +1521,37 @@ class SflUpload extends Pzlife
                                 //开始解压
                                 if ($zip->open($son_path) === true) {
                                     $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0]; //解压目录
-                                    $count = $zip->numFiles;
+                                    $count  = $zip->numFiles;
                                     // $results = [];
                                     $files_name = [];
                                     for ($i = 0; $i < $count; $i++) {
-                                        $entry = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
+                                        $entry         = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
                                         $entry['name'] = rtrim(str_replace('\\', '/', $entry['name']), '/');
-                                        $encoding = mb_detect_encoding($entry['name'], array('Shift_JIS', 'EUC_JP', 'EUC_KR', 'KOI8-R', 'ASCII', 'GB2312', 'GBK', 'BIG5', 'UTF-8'));
-                                        $filename = iconv($encoding, 'UTF-8', $entry['name']);
-                                        $filename = $filename ?: $entry['name'];
-                                        $size = $entry['size'];
-                                        $comp_size = $entry['comp_size'];
-                                        $mtime = $entry['mtime'];
-                                        $crc = $entry['crc'];
-                                        $is_dir = ($crc == 0);
+                                        $encoding      = mb_detect_encoding($entry['name'], array('Shift_JIS', 'EUC_JP', 'EUC_KR', 'KOI8-R', 'ASCII', 'GB2312', 'GBK', 'BIG5', 'UTF-8'));
+                                        $filename      = iconv($encoding, 'UTF-8', $entry['name']);
+                                        $filename      = $filename ?: $entry['name'];
+                                        $size          = $entry['size'];
+                                        $comp_size     = $entry['comp_size'];
+                                        $mtime         = $entry['mtime'];
+                                        $crc           = $entry['crc'];
+                                        $is_dir        = ($crc == 0);
                                         // $path = '/' . $filename;
 
                                         $_names = explode('/', $filename);
-                                        $_idx = count($_names) - 1;
+                                        $_idx   = count($_names) - 1;
 
                                         $name = $_names[$_idx];
                                         if (empty($name)) {
                                             continue;
                                         }
                                         $files_name[] = $name;
-                                        $index = $i;
+                                        $index        = $i;
                                         //$data = $zip->getFromIndex($i);
                                         $entry = compact('name', 'path', 'size', 'comp_size', 'mtime', 'crc', 'index', 'is_dir');
                                         // $results[] = $entry;
                                     }
                                     // print_r($files_name);die;
-                                    $mcw    = $zip->extractTo($unpath, $files_name); //解压到$route这个目录中
+                                    $mcw = $zip->extractTo($unpath, $files_name); //解压到$route这个目录中
                                     // // $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
                                     $zip->close();
                                     //解压完成
@@ -1323,7 +1606,7 @@ class SflUpload extends Pzlife
                                             // print_r($fram['content']);
 
                                             // die;
-                                            $fram_model[]    = $fram;
+                                            $fram_model[] = $fram;
                                             // array_push($fram, $fram_model);
                                         } else if ($uvalue == '2.jpg' || $uvalue == '2.gif') {
                                             $data = [
@@ -1342,9 +1625,9 @@ class SflUpload extends Pzlife
                                                 // array_push($fram, $fram_model);
                                             }
                                         } else if ($uvalue == '2.txt') {
-                                            $txt             = $this->readForTxtToArray($son_dir_path);
-                                            $fram['num']     = 4;
-                                            $fram['name']    = "第四帧";
+                                            $txt          = $this->readForTxtToArray($son_dir_path);
+                                            $fram['num']  = 4;
+                                            $fram['name'] = "第四帧";
 
                                             $fram['content'] = join('\n', $txt);
                                             $fram_model[]    = $fram;
@@ -1385,32 +1668,32 @@ class SflUpload extends Pzlife
                                     'sfl_model_id'       => $fvalue[3], //模板id
                                     'sfl_model_filename' => $fvalue[4], //主题的名称 对应MMS模板的主题 图片以及内容的压缩文件
                                 ];
-                                $fram_key           = explode('.', $fvalue[4]);
-                                $sfl_SMS_fram       = $all_models[$fram_key[0]];
-                                $sfl_model['title'] = $sfl_SMS_fram['title'];
+                                $fram_key                 = explode('.', $fvalue[4]);
+                                $sfl_SMS_fram             = $all_models[$fram_key[0]];
+                                $sfl_model['title']       = $sfl_SMS_fram['title'];
                                 $sfl_model['create_time'] = time();
                                 unset($sfl_SMS_fram['title']);
                                 if ($mysql_connect->query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
                                     continue;
                                 }
                                 $sfl_multimedia_template_id = $mysql_connect->table('yx_sfl_multimedia_template')->insertGetId($sfl_model);
-    
+
                                 // print_r($sfl_SMS_fram);
                                 foreach ($sfl_SMS_fram as $key => $value) {
                                     // # code...
                                     $value['sfl_multimedia_template_id'] = $sfl_multimedia_template_id;
                                     $value['sfl_model_id']               = $fvalue[3];
-                                    $value['create_time']               = time();
+                                    $value['create_time']                = time();
                                     $mysql_connect->table('yx_sfl_multimedia_template_frame')->insert($value);
                                 }
                             }
                         }
-                       
+
                         // print_r($file_data);die;
                         //发送内容并 进行拼接
 
-                        $MMSmessage  = [];
-                        $model_check = [];
+                        $MMSmessage   = [];
+                        $model_check  = [];
                         $err_task_num = [];
                         if (!empty($send_data)) {
                             foreach ($send_data as $key => $value) {
@@ -1420,13 +1703,13 @@ class SflUpload extends Pzlife
                                 if (!empty($txt)) {
                                     // print_r($txt);die;
                                     foreach ($txt as $tkey => $tvalue) {
-                                       
+
                                         // print_r($tvalue);
                                         $MMS_real_send = [];
 
-                                        $MMS_real_send['mseeage_id']   = $tvalue[0];
-                                        $MMS_real_send['mobile']       = $tvalue[3];
-                                       
+                                        $MMS_real_send['mseeage_id'] = $tvalue[0];
+                                        $MMS_real_send['mobile']     = $tvalue[3];
+
                                         $MMS_real_send['free_trial']   = 1;
                                         $MMS_real_send['real_num']     = 1;
                                         $MMS_real_send['send_num']     = 1;
@@ -1489,14 +1772,14 @@ class SflUpload extends Pzlife
                                         $MMS_real_send['variable'] = json_encode($variable);
                                         // print_r($MMS_real_send);die;
                                         if ($tvalue[3] == "") {
-                                           
+
                                             if (isset($err_task_num['The Mobile IS NULL'])) {
-                                                $err_task_num['The Mobile IS NULL']  += 1;
-                                            }else{
-                                                $err_task_num['The Mobile IS NULL']  = 1;
+                                                $err_task_num['The Mobile IS NULL'] += 1;
+                                            } else {
+                                                $err_task_num['The Mobile IS NULL'] = 1;
                                             }
                                             continue;
-                                           
+
                                         }
                                         $MMSmessage[] = $MMS_real_send;
                                     }
@@ -1509,7 +1792,7 @@ class SflUpload extends Pzlife
                             foreach ($file_data as $key => $value) {
                                 // print_r($value[2]);
                                 // print_r($model_check[$value[0]]);
-    
+
                                 // die;
                                 if ($value[2] != $model_check[$value[0]]) {
                                     //校验失败
@@ -1517,7 +1800,7 @@ class SflUpload extends Pzlife
                                 }
                             }
                         }
-                        
+
                         // continue;
                         // print_r($MMSmessage);die;
                         $insertMMS = [];
@@ -1538,11 +1821,11 @@ class SflUpload extends Pzlife
                                         exception($e);
                                     }
                                     // $this->redis->rPush('index:meassage:business:sendtask', $send);
-    
+
                                 }
                             }
                         }
-                       
+
                         if (!empty($insertMMS)) {
                             $mysql_connect->startTrans();
                             try {
@@ -1557,53 +1840,53 @@ class SflUpload extends Pzlife
                         // die;
                     }
                 } elseif ($value == 'SMSTest') {
-                    $send_data = [];
-                    $SMS_model = [];
-                    $SMSmessage = [];
-                    $model_check = [];
+                    $send_data    = [];
+                    $SMS_model    = [];
+                    $SMSmessage   = [];
+                    $model_check  = [];
                     $err_task_num = [];
                     if ($son_path_data !== false) {
                         foreach ($son_path_data as $skey => $svalue) {
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
-                            if (!strpos($svalue,date("Ymd"))) {
+                            if (!strpos($svalue, date("Ymd"))) {
                                 continue;
                             }
                             $file_info = explode('.', $svalue);
                             if ($file_info[1] == 'zip') { //需要解压
                                 if ($zip->open($son_path) === true) {
                                     $unpath = $path . 'UnZip' . "/" . $value . "/" . $file_info[0];
-                                    $count = $zip->numFiles;
+                                    $count  = $zip->numFiles;
                                     // $results = [];
                                     $files_name = [];
                                     for ($i = 0; $i < $count; $i++) {
-                                        $entry = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
+                                        $entry         = $zip->statIndex($i, ZipArchive::FL_ENC_RAW);
                                         $entry['name'] = rtrim(str_replace('\\', '/', $entry['name']), '/');
-                                        $encoding = mb_detect_encoding($entry['name'], array('Shift_JIS', 'EUC_JP', 'EUC_KR', 'KOI8-R', 'ASCII', 'GB2312', 'GBK', 'BIG5', 'UTF-8'));
-                                        $filename = iconv($encoding, 'UTF-8', $entry['name']);
-                                        $filename = $filename ?: $entry['name'];
-                                        $size = $entry['size'];
-                                        $comp_size = $entry['comp_size'];
-                                        $mtime = $entry['mtime'];
-                                        $crc = $entry['crc'];
-                                        $is_dir = ($crc == 0);
+                                        $encoding      = mb_detect_encoding($entry['name'], array('Shift_JIS', 'EUC_JP', 'EUC_KR', 'KOI8-R', 'ASCII', 'GB2312', 'GBK', 'BIG5', 'UTF-8'));
+                                        $filename      = iconv($encoding, 'UTF-8', $entry['name']);
+                                        $filename      = $filename ?: $entry['name'];
+                                        $size          = $entry['size'];
+                                        $comp_size     = $entry['comp_size'];
+                                        $mtime         = $entry['mtime'];
+                                        $crc           = $entry['crc'];
+                                        $is_dir        = ($crc == 0);
                                         // $path = '/' . $filename;
 
                                         $_names = explode('/', $filename);
-                                        $_idx = count($_names) - 1;
+                                        $_idx   = count($_names) - 1;
 
                                         $name = $_names[$_idx];
                                         if (empty($name)) {
                                             continue;
                                         }
                                         $files_name[] = $name;
-                                        $index = $i;
+                                        $index        = $i;
                                         //$data = $zip->getFromIndex($i);
                                         $entry = compact('name', 'path', 'size', 'comp_size', 'mtime', 'crc', 'index', 'is_dir');
                                         // $results[] = $entry;
                                     }
                                     // print_r($files_name);die;
-                                    $mcw    = $zip->extractTo($unpath, $files_name); //解压到$route这个目录中
+                                    $mcw = $zip->extractTo($unpath, $files_name); //解压到$route这个目录中
                                     // $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
                                     $zip->close();
                                     //解压完成
@@ -1630,32 +1913,32 @@ class SflUpload extends Pzlife
                                 }
                             }
                         }
-                       
+
                         // print_r($SMS_model);
                         // die;
                         // print_r($send_data);
-                       /*  if (!empty($SMS_model)) {
-                            foreach ($SMS_model as $key => $value) {
-                                if (!empty($send_data)) {
-                                    foreach ($send_data as $skey => $svalue) {
-                                        $txt = [];
-                                        $txt = $this->readForTxtToDyadicArray($svalue); # code...
-                                        if (!empty($txt)) {
-                                            foreach ($txt as $tkey => $tvalue) {
-                                                // print_r($tvalue);die;
-                                                if ($tvalue[2] == $key) {
-                                                    if (isset($model_check[$tvalue[2]])) {
-                                                        $model_check[$tvalue[2]]++;
-                                                    } else {
-                                                        $model_check[$tvalue[2]] = 1;
-                                                    }
-                                                }
-                                               
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                        /*  if (!empty($SMS_model)) {
+                        foreach ($SMS_model as $key => $value) {
+                        if (!empty($send_data)) {
+                        foreach ($send_data as $skey => $svalue) {
+                        $txt = [];
+                        $txt = $this->readForTxtToDyadicArray($svalue); # code...
+                        if (!empty($txt)) {
+                        foreach ($txt as $tkey => $tvalue) {
+                        // print_r($tvalue);die;
+                        if ($tvalue[2] == $key) {
+                        if (isset($model_check[$tvalue[2]])) {
+                        $model_check[$tvalue[2]]++;
+                        } else {
+                        $model_check[$tvalue[2]] = 1;
+                        }
+                        }
+
+                        }
+                        }
+                        }
+                        }
+                        }
                         }
                         print_r($SMS_model);die; */
                         if (!empty($send_data)) {
@@ -1691,20 +1974,20 @@ class SflUpload extends Pzlife
                                         $content                       = str_replace('{POINTS_AVAILABLE}', $tvalue[5], $content);
                                         $content                       = str_replace('{TOTAL_POINTS}', $tvalue[6], $content);
                                         if (strpos($content,'【丝芙兰】') !== false) {
-                                           
+
                                         }else{
-                                            $content = '【丝芙兰】'.$content;
+                                        $content = '【丝芙兰】'.$content;
                                         }
                                         if (strpos($content,'回T退订') !== false) {
-                                           
+
                                         }else{
-                                            $content = $content."/回T退订";
+                                        $content = $content."/回T退订";
                                         }
                                         // print_r($content);die;
                                         $send_length = mb_strlen($content, 'utf8');
                                         $real_length = 1;
                                         if ($send_length > 70) {
-                                            $real_length = ceil($send_length / 67);
+                                        $real_length = ceil($send_length / 67);
                                         }
                                         $SMS_real_send['task_content'] = $content;
                                         $SMS_real_send['real_num'] = $real_length;
@@ -1714,22 +1997,21 @@ class SflUpload extends Pzlife
                                     }
                                 }
                             }
-    
 
                         }
-                        /* 
+                        /*
                         if (!empty($file_data)) {
-                            foreach ($SMS_model as $key => $value) {
-                                // print_r($value);die;
-    
-                                // die;
-                                if ($value['num'] != $model_check[$key]) {
-                                    //校验失败
-                                    return  ['code' => 200, "error" => "校验失败"];
-                                }
-                            }
+                        foreach ($SMS_model as $key => $value) {
+                        // print_r($value);die;
+
+                        // die;
+                        if ($value['num'] != $model_check[$key]) {
+                        //校验失败
+                        return  ['code' => 200, "error" => "校验失败"];
+                        }
+                        }
                         } */
-                        
+
                         if (!empty($send_data)) {
                             $j = 1;
                             foreach ($send_data as $key => $value) {
@@ -1742,28 +2024,28 @@ class SflUpload extends Pzlife
                                         } else {
                                             $model_check[$tvalue[2]] = 1;
                                         }
-                                      
+
                                         $SMS_real_send               = [];
                                         $SMS_real_send               = [];
                                         $SMS_real_send['mseeage_id'] = $tvalue[0];
                                         $SMS_real_send['mobile']     = $tvalue[3];
                                         $SMS_real_send['free_trial'] = 1;
                                         // $SMS_real_send['real_num'] = 1;
-                                        $SMS_real_send['send_num']     = 1;
-                                        $SMS_real_send['send_status']  = 1;
+                                        $SMS_real_send['send_num']    = 1;
+                                        $SMS_real_send['send_status'] = 1;
                                         $SMS_real_send['template_id'] = $tvalue[2];
-                                        $SMS_real_send['create_time']  = time();
-                                        $content                       = $SMS_model[$tvalue[2]]['content'];
-                                        $content                       = str_replace('{FULL_NAME}', $tvalue[4], $content);
-                                        $content                       = str_replace('{RESERVED_FIELD_1}', $tvalue[7], $content);
-                                        $content                       = str_replace('{RESERVED_FIELD_2}', $tvalue[8], $content);
-                                        $content                       = str_replace('{RESERVED_FIELD_3}', $tvalue[9], $content);
-                                        $content                       = str_replace('{RESERVED_FIELD_4}', $tvalue[10], $content);
+                                        $SMS_real_send['create_time'] = time();
+                                        $content                      = $SMS_model[$tvalue[2]]['content'];
+                                        $content                      = str_replace('{FULL_NAME}', $tvalue[4], $content);
+                                        $content                      = str_replace('{RESERVED_FIELD_1}', $tvalue[7], $content);
+                                        $content                      = str_replace('{RESERVED_FIELD_2}', $tvalue[8], $content);
+                                        $content                      = str_replace('{RESERVED_FIELD_3}', $tvalue[9], $content);
+                                        $content                      = str_replace('{RESERVED_FIELD_4}', $tvalue[10], $content);
                                         // $content                       = str_replace('{RESERVED_FIELD_5}', $tvalue[11], $content);
-                                        $content                       = str_replace('{ACCOUNT_NUMBER}', $tvalue[1], $content);
-                                        $content                       = str_replace('{MOBILE}', $tvalue[3], $content);
-                                        $content                       = str_replace('{POINTS_AVAILABLE}', $tvalue[5], $content);
-                                        $content                       = str_replace('{TOTAL_POINTS}', $tvalue[6], $content);
+                                        $content = str_replace('{ACCOUNT_NUMBER}', $tvalue[1], $content);
+                                        $content = str_replace('{MOBILE}', $tvalue[3], $content);
+                                        $content = str_replace('{POINTS_AVAILABLE}', $tvalue[5], $content);
+                                        $content = str_replace('{TOTAL_POINTS}', $tvalue[6], $content);
                                         if (strpos($content, '【丝芙兰】') !== false) {
                                         } else {
                                             $content = '【丝芙兰】' . $content;
@@ -1779,17 +2061,17 @@ class SflUpload extends Pzlife
                                             $real_length = ceil($send_length / 67);
                                         }
                                         $SMS_real_send['task_content'] = $content;
-                                        $SMS_real_send['real_num'] = $real_length;
-                                        $SMS_real_send['send_length'] = $send_length;
+                                        $SMS_real_send['real_num']     = $real_length;
+                                        $SMS_real_send['send_length']  = $send_length;
                                         if ($tvalue[3] == "") {
-                                           
+
                                             if (isset($err_task_num['The Mobile IS NULL'])) {
-                                                $err_task_num['The Mobile IS NULL']  += 1;
-                                            }else{
-                                                $err_task_num['The Mobile IS NULL']  = 1;
+                                                $err_task_num['The Mobile IS NULL'] += 1;
+                                            } else {
+                                                $err_task_num['The Mobile IS NULL'] = 1;
                                             }
                                             continue;
-                                           
+
                                         }
                                         $SMSmessage[] = $SMS_real_send;
                                         // print_r($content);die;
@@ -1805,7 +2087,7 @@ class SflUpload extends Pzlife
                                                 exception($e);
                                             }
                                             // $this->redis->rPush('index:meassage:business:sendtask', $send);
-    
+
                                         }
                                     }
                                 }
@@ -1830,8 +2112,7 @@ class SflUpload extends Pzlife
         }
     }
 
-    public function uploadFileToBase($data)
-    {
+    public function uploadFileToBase($data) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HEADER, false);
         //启用时会发送一个常规的POST请求，类型为：application/x-www-form-urlencoded，就像表单提交的一样。
@@ -1847,8 +2128,7 @@ class SflUpload extends Pzlife
     }
 
     //读文件输出成二维数组
-    function readForTxtToDyadicArray($path)
-    {
+    function readForTxtToDyadicArray($path) {
         // $path = realpath("./") . "/191111.txt";
         if (!is_file($path)) {
             return false;
@@ -1860,10 +2140,10 @@ class SflUpload extends Pzlife
             $cellVal = trim(fgets($file));
             if (!empty($cellVal)) {
                 // $cellVal = trim($cellVal, '"');
-                $value   = explode('",', $cellVal);
+                $value = explode('",', $cellVal);
                 // $cellVal = str_replace('"', '', $cellVal);
                 foreach ($value as $key => $svalue) {
-                    $value[$key] =  str_replace('"', '', $svalue);
+                    $value[$key] = str_replace('"', '', $svalue);
                 }
                 array_push($data, $value);
             }
@@ -1872,8 +2152,7 @@ class SflUpload extends Pzlife
     }
 
     //读文件输出成一维数组
-    function readForTxtToArray($path)
-    {
+    function readForTxtToArray($path) {
         if (!is_file($path)) {
             return false;
         }
@@ -1890,8 +2169,7 @@ class SflUpload extends Pzlife
         return $data;
     }
 
-    function getDirContent($path)
-    {
+    function getDirContent($path) {
         if (!is_dir($path)) {
             return false;
         }
@@ -1916,8 +2194,7 @@ class SflUpload extends Pzlife
         return $arr;
     }
 
-    public function sftpForSfl()
-    {
+    public function sftpForSfl() {
         try {
             // $sftp = new SFTPConnection("localhost", 8080);
             // $sftp = new SFTPConnection("esftp.sephora.com.cn", 20981);
@@ -1946,16 +2223,16 @@ class SflUpload extends Pzlife
             // $remote_directory = "/root/club776/";
             $remote_directory_host = "/CN-SMSDATA/";
             //判断远程目录是否存在
-            $address = $sftp->dirExits($remote_directory_host);
+            $address               = $sftp->dirExits($remote_directory_host);
             $remote_directory_data = [];
             if ($address) {
                 $this_directory = '';
                 $this_directory = $remote_directory_host;
-                $address_son = $sftp->scanFileSystem($this_directory);
+                $address_son    = $sftp->scanFileSystem($this_directory);
                 if (!empty($address_son)) {
                     foreach ($address_son as $key => $value) {
                         $son_directory = $this_directory . '/' . $value . "/";
-                        $sms            = $sftp->scanFileSystem($son_directory);
+                        $sms           = $sftp->scanFileSystem($son_directory);
                         foreach ($sms as $key => $svalue) {
                             //下载远程文件
                             if (!empty($env)) {
@@ -1982,108 +2259,107 @@ class SflUpload extends Pzlife
         }
     }
 
-
-    public function sflSftpMulTaskReceiptForExcel(){
+    public function sflSftpMulTaskReceiptForExcel() {
         try {
 
             $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
             ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
             $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  1590768000 AND   `create_time` <  1590854400 ");
-            $ids = [];
+            $ids          = [];
             foreach ($mul_task_ids as $key => $value) {
                 $ids[] = $value['id'];
             }
             // $receipts = $mysql_connect->query("SELECT `mseeage_id`,`mobile`,`messageinfo`,`status_message`,`real_message`,`task_id` FROM `yx_sfl_send_multimediatask_receipt` WHERE task_id IN (".join(',',$ids).") GROUP BY `template_id`,`mseeage_id`,`mobile`,`messageinfo`,`status_message`,`real_message`,`task_id`");
-            $nu_ids = [];
-            $rece_id = [];
-            $receive_all = [];
+            $nu_ids       = [];
+            $rece_id      = [];
+            $receive_all  = [];
             $receive_alls = [];
-            $success_num = 0;
-            $default_num = 0;
-          /*   foreach ($receipts as $key => $value) {
-                $rece_id[] = $value['task_id'];
-                $receive_all = [];
-                $receive_all = [
-                    'MESSAGE_ID' => $value['mseeage_id'],
-                    'COMMUNICATION_CHANNEL_ID' => $value['template_id'],
-                    'MOBILE' => $value['mobile'],
-                    'STATUS' => $value['status_message'],
-                    'SENDING_TIME' => date('Y-m-d H:i:s',1590123522+mt_rand(10,1800)),
-                ];
-                if (trim($value['real_message']) == 'DELIVRD') {
-                    $success_num++;
-                }else{
-                    $default_num++;
-                }
-                $receive_alls[] = $receive_all;
+            $success_num  = 0;
+            $default_num  = 0;
+            /*   foreach ($receipts as $key => $value) {
+            $rece_id[] = $value['task_id'];
+            $receive_all = [];
+            $receive_all = [
+            'MESSAGE_ID' => $value['mseeage_id'],
+            'COMMUNICATION_CHANNEL_ID' => $value['template_id'],
+            'MOBILE' => $value['mobile'],
+            'STATUS' => $value['status_message'],
+            'SENDING_TIME' => date('Y-m-d H:i:s',1590123522+mt_rand(10,1800)),
+            ];
+            if (trim($value['real_message']) == 'DELIVRD') {
+            $success_num++;
+            }else{
+            $default_num++;
+            }
+            $receive_alls[] = $receive_all;
             } */
-            
+
             // echo count($receive_alls);die;
             // $unknow = array_diff($ids, $rece_id);
-            
+
             // echo $default_num;die;
             // echo count($unknow);die;
             // $all_success = 3348;
             $unknow = [];
             foreach ($ids as $key => $value) {
-                $receipts = $mysql_connect->query("SELECT * FROM yx_sfl_send_multimediatask_receipt WHERE `task_id` = ".$value);
-                $task = $mysql_connect->query("SELECT * FROM yx_sfl_multimedia_message WHERE `id` = ".$value);
-                
-     /*            $receive_all = [];
+                $receipts = $mysql_connect->query("SELECT * FROM yx_sfl_send_multimediatask_receipt WHERE `task_id` = " . $value);
+                $task     = $mysql_connect->query("SELECT * FROM yx_sfl_multimedia_message WHERE `id` = " . $value);
+
+                /*            $receive_all = [];
                 $receive_all = [
-                    'MESSAGE_ID' => $task[0]['mseeage_id'],
-                    'COMMUNICATION_CHANNEL_ID' => $task[0]['sfl_relation_id'],
-                    'MOBILE' => $task[0]['mobile'],
-                    'STATUS' => 'MMS:1',
-                    'real_message' => '',
-                    'SENDING_TIME' => date('Y-m-d H:i:s',1590726600+ceil($key/1700)),
+                'MESSAGE_ID' => $task[0]['mseeage_id'],
+                'COMMUNICATION_CHANNEL_ID' => $task[0]['sfl_relation_id'],
+                'MOBILE' => $task[0]['mobile'],
+                'STATUS' => 'MMS:1',
+                'real_message' => '',
+                'SENDING_TIME' => date('Y-m-d H:i:s',1590726600+ceil($key/1700)),
                 ];
-                */
-                $num = mt_rand(0,4203);
+                 */
+                $num = mt_rand(0, 4203);
                 // $receive_alls[] = $receive_all;
                 if (!empty($receipts)) {
-                   $num = count($receipts);
-                  
+                    $num = count($receipts);
+
                     $receive_all = [
-                        'MESSAGE_ID' => $receipts[$num-1]['mseeage_id'],
-                        'COMMUNICATION_CHANNEL_ID' => $receipts[$num-1]['template_id'],
-                        'MOBILE' => $receipts[$num-1]['mobile'],
-                        'STATUS' => $receipts[$num-1]['status_message'],
-                        'real_message' => $receipts[0]['real_message'],
-                        'SENDING_TIME' => date('Y-m-d H:i:s',$task[0]['create_time']),
+                        'MESSAGE_ID'               => $receipts[$num - 1]['mseeage_id'],
+                        'COMMUNICATION_CHANNEL_ID' => $receipts[$num - 1]['template_id'],
+                        'MOBILE'                   => $receipts[$num - 1]['mobile'],
+                        'STATUS'                   => $receipts[$num - 1]['status_message'],
+                        'real_message'             => $receipts[0]['real_message'],
+                        'SENDING_TIME'             => date('Y-m-d H:i:s', $task[0]['create_time']),
                     ];
                     /* if ($num>=0 && $num < 113) {
-                        $receive_all['STATUS'] = "MMS:2";
+                    $receive_all['STATUS'] = "MMS:2";
                     }else{
-                        $receive_all['STATUS'] = "MMS:1";
+                    $receive_all['STATUS'] = "MMS:1";
                     } */
                     $receive_alls[] = $receive_all;
-                }else{
+                } else {
                     // $task = $mysql_connect->query("SELECT * FROM yx_sfl_multimedia_message WHERE `id` = ".$value);
                     $receive_all = [
-                        'MESSAGE_ID' => $task[0]['mseeage_id'],
+                        'MESSAGE_ID'               => $task[0]['mseeage_id'],
                         'COMMUNICATION_CHANNEL_ID' => $task[0]['sfl_relation_id'],
-                        'MOBILE' => $task[0]['mobile'],
-                        'STATUS' => 'MMS:1',
-                        'real_message' => '',
-                        'SENDING_TIME' => date('Y-m-d H:i:s',$task[0]['create_time']),
+                        'MOBILE'                   => $task[0]['mobile'],
+                        'STATUS'                   => 'MMS:1',
+                        'real_message'             => '',
+                        'SENDING_TIME'             => date('Y-m-d H:i:s', $task[0]['create_time']),
                     ];
                     /* if ($num>=0 && $num < 113) {
-                        $receive_all['STATUS'] = "MMS:2";
+                    $receive_all['STATUS'] = "MMS:2";
                     }else{
-                        $receive_all['STATUS'] = "MMS:1";
+                    $receive_all['STATUS'] = "MMS:1";
                     } */
-                    if(checkMobile($task[0]['mobile']) == false) {
+                    if (checkMobile($task[0]['mobile']) == false) {
                         $receive_all['STATUS'] = "MMS:2";
-                         
-                     }else{
-                         $end_num = substr($task[0]['mobile'], -6);
-                         //按无效号码计算
-                         //按无效号码计算
-                         if (in_array($end_num, ['000000', '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999'])) {
-                             $receive_all['STATUS'] = "SMS:2";
-                         }
-                     }
+
+                    } else {
+                        $end_num = substr($task[0]['mobile'], -6);
+                        //按无效号码计算
+                        //按无效号码计算
+                        if (in_array($end_num, ['000000', '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999'])) {
+                            $receive_all['STATUS'] = "SMS:2";
+                        }
+                    }
                     $receive_alls[] = $receive_all;
                 }
             }
@@ -2094,17 +2370,17 @@ class SflUpload extends Pzlife
             // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
             $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
             $objWriter->setOffice2003Compatibility(true);
-    
+
             //设置文件属性
             $objProps = $objExcel->getProperties();
             $objProps->setTitle("imp_mobile_status_report");
             $objProps->setSubject("金卡1:" . date('Y-m-d H:i:s', time()));
-    
+
             $objExcel->setActiveSheetIndex(0);
             $objActSheet = $objExcel->getActiveSheet();
-    
+
             $date = date('Y-m-d H:i:s', time());
-    
+
             //设置当前活动sheet的名称
             $objActSheet->setTitle("imp_mobile_status_report");
             $CellList = array(
@@ -2114,13 +2390,13 @@ class SflUpload extends Pzlife
                 array('STATUS', 'STATUS'),
                 array('SENDING_TIME', 'SENDING_TIME'),
             );
-    
+
             foreach ($CellList as $i => $Cell) {
                 $row = chr(65 + $i);
                 $col = 1;
                 $objActSheet->setCellValue($row . $col, $Cell[1]);
                 $objActSheet->getColumnDimension($row)->setWidth(30);
-    
+
                 $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
                 $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
                 $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
@@ -2130,7 +2406,7 @@ class SflUpload extends Pzlife
                 // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
             }
             // $outputFileName = "receive_mms_1_20200523.xlsx";
-            $i              = 0;
+            $i = 0;
             foreach ($receive_alls as $key => $orderdata) {
                 //行
                 $col = $key + 2;
@@ -2146,21 +2422,21 @@ class SflUpload extends Pzlife
         } catch (\Exception $th) {
             exception($th);
         }
-    
+
     }
 
-    public function sflSftpTaskReceiptForExcel(){
+    public function sflSftpTaskReceiptForExcel() {
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
-            ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-            $objReader = PHPExcel_IOFactory::createReader('Excel2007');
-            // print_r(realpath("../"). "\yt_area_mobile.csv");die;
-    
+        ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
+        $objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        // print_r(realpath("../"). "\yt_area_mobile.csv");die;
+
         try {
             $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1590768000 AND   `create_time` <  1590854400 AND `task_content` NOT LIKE '%test%' ");
-            $ids = [];
+            $ids          = [];
             foreach ($mul_task_ids as $key => $value) {
                 // $ids[] = $value['id'];
-               /*  $objPHPExcel = $objReader->load(realpath("./") . "/0522.xlsx");
+                /*  $objPHPExcel = $objReader->load(realpath("./") . "/0522.xlsx");
                 // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
                 //选择标签页
                 $sheet       = $objPHPExcel->getSheet(0); //取得sheet(0)表
@@ -2168,72 +2444,72 @@ class SflUpload extends Pzlife
                 $columnCount = $sheet->getHighestColumn();
                 $has = [];
                 for ($row = 1; $row <= $highestRow; $row++) {
-                    //列数循环 , 列数是以A列开始
-                    for ($column = 'A'; $column <= $columnCount; $column++) {
-                        $dataArr[] = $objPHPExcel->getActiveSheet()->getCell($column . $row)->getValue();
-                    }
-                    if ($dataArr[0] == $value['mobile']) {
-                    break;
-                    }
-                    // print_r($dataArr);die;
-                    // $has[] = $dataArr;
-                    unset($dataArr);
-                } 
+                //列数循环 , 列数是以A列开始
+                for ($column = 'A'; $column <= $columnCount; $column++) {
+                $dataArr[] = $objPHPExcel->getActiveSheet()->getCell($column . $row)->getValue();
+                }
+                if ($dataArr[0] == $value['mobile']) {
+                break;
+                }
+                // print_r($dataArr);die;
+                // $has[] = $dataArr;
+                unset($dataArr);
+                }
                 // print_r($dataArr);die;
                 if (empty($dataArr) || empty($dataArr[1])) {
-                    //未知
-                    // $unknow[] = $value['id'];
-                    $receive_all = [
-                        'MESSAGE_ID' => $value['mseeage_id'],
-                        'COMMUNICATION_CHANNEL_ID' => $value['template_id'],
-                        'MOBILE' => $value['mobile'],
-                        'STATUS' => 'SMS:1',
-                        'SENDING_TIME' => date('Y-m-d H:i:s',1590123522+mt_rand(10,1800)),
-                    ];
-                    $receive_alls[] = $receive_all;
+                //未知
+                // $unknow[] = $value['id'];
+                $receive_all = [
+                'MESSAGE_ID' => $value['mseeage_id'],
+                'COMMUNICATION_CHANNEL_ID' => $value['template_id'],
+                'MOBILE' => $value['mobile'],
+                'STATUS' => 'SMS:1',
+                'SENDING_TIME' => date('Y-m-d H:i:s',1590123522+mt_rand(10,1800)),
+                ];
+                $receive_alls[] = $receive_all;
                 }else{
-                    $receive_all = [
-                        'MESSAGE_ID' => $value['mseeage_id'],
-                        'COMMUNICATION_CHANNEL_ID' => $value['template_id'],
-                        'MOBILE' => $value['mobile'],
-                        'SENDING_TIME' => date('Y-m-d H:i:s',1590123522+mt_rand(10,1800)),
-                    ];
-                    if (trim($dataArr[1]) == 0 || trim($dataArr[1]) == 'DELIVRD') {
-                        $receive_all['STATUS']= 'SMS:1';
-                    }elseif(strpos(trim($dataArr[1]),'BLACK')){
-                        $receive_all['STATUS']= 'SMS:4';
-                    }elseif(trim($dataArr[1]) == 45){
-                        $receive_all['STATUS']= 'SMS:4';
-                    }else{
-                        $receive_all['STATUS']= 'SMS:2';
-                    }
-                    $receive_alls[] = $receive_all;
+                $receive_all = [
+                'MESSAGE_ID' => $value['mseeage_id'],
+                'COMMUNICATION_CHANNEL_ID' => $value['template_id'],
+                'MOBILE' => $value['mobile'],
+                'SENDING_TIME' => date('Y-m-d H:i:s',1590123522+mt_rand(10,1800)),
+                ];
+                if (trim($dataArr[1]) == 0 || trim($dataArr[1]) == 'DELIVRD') {
+                $receive_all['STATUS']= 'SMS:1';
+                }elseif(strpos(trim($dataArr[1]),'BLACK')){
+                $receive_all['STATUS']= 'SMS:4';
+                }elseif(trim($dataArr[1]) == 45){
+                $receive_all['STATUS']= 'SMS:4';
+                }else{
+                $receive_all['STATUS']= 'SMS:2';
                 }
-                */
-    
-                $receipts = $mysql_connect->query("SELECT * FROM yx_sfl_send_task_receipt WHERE `task_id` = ".$value['id']);
-                $task = $mysql_connect->query("SELECT * FROM yx_sfl_send_task WHERE `id` = ".$value['id']);
+                $receive_alls[] = $receive_all;
+                }
+                 */
+
+                $receipts    = $mysql_connect->query("SELECT * FROM yx_sfl_send_task_receipt WHERE `task_id` = " . $value['id']);
+                $task        = $mysql_connect->query("SELECT * FROM yx_sfl_send_task WHERE `id` = " . $value['id']);
                 $receive_all = [];
-                if (strpos($task[0]['task_content'],'test')) {
+                if (strpos($task[0]['task_content'], 'test')) {
                     continue;
                 }
-                $num = mt_rand(0,15055);
-    
+                $num = mt_rand(0, 15055);
+
                 if (!empty($receipts)) {
-                    
-                   $num = count($receipts);
-                   $receive_all = [
-                        'MESSAGE_ID' => $task[0]['mseeage_id'],
+
+                    $num         = count($receipts);
+                    $receive_all = [
+                        'MESSAGE_ID'               => $task[0]['mseeage_id'],
                         'COMMUNICATION_CHANNEL_ID' => $receipts[0]['template_id'],
-                        'MOBILE' => $receipts[0]['mobile'],
-                        'STATUS' => $receipts[0]['status_message'],
-                        'real_message' => $receipts[0]['real_message'],
-                        'SENDING_TIME' => date('Y-m-d H:i:s',$task[0]['create_time']),
+                        'MOBILE'                   => $receipts[0]['mobile'],
+                        'STATUS'                   => $receipts[0]['status_message'],
+                        'real_message'             => $receipts[0]['real_message'],
+                        'SENDING_TIME'             => date('Y-m-d H:i:s', $task[0]['create_time']),
                     ];
-                   if(checkMobile($receipts[0]['mobile']) == false) {
-                       $receive_all['STATUS'] = "SMS:2";
-                        
-                    }else{
+                    if (checkMobile($receipts[0]['mobile']) == false) {
+                        $receive_all['STATUS'] = "SMS:2";
+
+                    } else {
                         $end_num = substr($task[0]['mobile'], -6);
                         //按无效号码计算
                         //按无效号码计算
@@ -2241,62 +2517,62 @@ class SflUpload extends Pzlife
                             $receive_all['STATUS'] = "SMS:2";
                         }
                     }
-                   
-                   /*  if (in_array(trim($receipts[0]['real_message']),['UNDELIV','MK:100D','MK1:100C','REJECTD','EXPIRED','NOROUTE','ID:0076'])) {
-                        $receive_all['STATUS'] = 'SMS:1';
+
+                    /*  if (in_array(trim($receipts[0]['real_message']),['UNDELIV','MK:100D','MK1:100C','REJECTD','EXPIRED','NOROUTE','ID:0076'])) {
+                    $receive_all['STATUS'] = 'SMS:1';
                     } */
                     $receive_alls[] = $receive_all;
                     // $mysql_connect->table('yx_sfl_send_task_receipt')->where('id',$task[0]['id'])->update(['mseeage_id' => $task[0]['mseeage_id']]);
-                }else{
+                } else {
                     // $task = $mysql_connect->query("SELECT * FROM yx_sfl_multimedia_message WHERE `id` = ".$value);
                     $receive_all = [
-                        'MESSAGE_ID' => $task[0]['mseeage_id'],
+                        'MESSAGE_ID'               => $task[0]['mseeage_id'],
                         'COMMUNICATION_CHANNEL_ID' => $task[0]['template_id'],
-                        'MOBILE' => $task[0]['mobile'],
-                        'STATUS' => 'SMS:1',
-                        'real_message' => '',
-                        'SENDING_TIME' => date('Y-m-d H:i:s',$task[0]['create_time']),
+                        'MOBILE'                   => $task[0]['mobile'],
+                        'STATUS'                   => 'SMS:1',
+                        'real_message'             => '',
+                        'SENDING_TIME'             => date('Y-m-d H:i:s', $task[0]['create_time']),
                     ];
-                    if ($num >= 0 && $num <17) {
+                    if ($num >= 0 && $num < 17) {
                         $receive_all['STATUS'] = "SMS:3";
-                    }elseif ($num>=17 && $num < 591) {
+                    } elseif ($num >= 17 && $num < 591) {
                         $receive_all['STATUS'] = "SMS:2";
-                    }else{
+                    } else {
                         $receive_all['STATUS'] = "SMS:1";
                     }
-                    if(checkMobile($task[0]['mobile']) == false) {
+                    if (checkMobile($task[0]['mobile']) == false) {
                         $receive_all['STATUS'] = "SMS:2";
-                         
-                     }else{
-                         $end_num = substr($task[0]['mobile'], -6);
-                         //按无效号码计算
-                         //按无效号码计算
-                         if (in_array($end_num, ['000000', '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999'])) {
-                             $receive_all['STATUS'] = "SMS:2";
-                         }
-                     }
+
+                    } else {
+                        $end_num = substr($task[0]['mobile'], -6);
+                        //按无效号码计算
+                        //按无效号码计算
+                        if (in_array($end_num, ['000000', '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999'])) {
+                            $receive_all['STATUS'] = "SMS:2";
+                        }
+                    }
                     $receive_alls[] = $receive_all;
                 }
             }
-    
+
             //未知:
-    
+
             $objExcel = new PHPExcel();
             // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
             // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
             $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
             $objWriter->setOffice2003Compatibility(true);
-    
+
             //设置文件属性
             $objProps = $objExcel->getProperties();
             $objProps->setTitle("imp_mobile_status_report");
             $objProps->setSubject("金卡1:" . date('Y-m-d H:i:s', time()));
-    
+
             $objExcel->setActiveSheetIndex(0);
             $objActSheet = $objExcel->getActiveSheet();
-    
+
             $date = date('Y-m-d H:i:s', time());
-    
+
             //设置当前活动sheet的名称
             $objActSheet->setTitle("imp_mobile_status_report");
             $CellList = array(
@@ -2307,13 +2583,13 @@ class SflUpload extends Pzlife
                 array('SENDING_TIME', 'SENDING_TIME'),
                 array('real_message', 'real_message'),
             );
-    
+
             foreach ($CellList as $i => $Cell) {
                 $row = chr(65 + $i);
                 $col = 1;
                 $objActSheet->setCellValue($row . $col, $Cell[1]);
                 $objActSheet->getColumnDimension($row)->setWidth(30);
-    
+
                 $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
                 $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
                 $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
@@ -2339,29 +2615,24 @@ class SflUpload extends Pzlife
         } catch (\Exception $th) {
             //throw $th;
             exception($th);
-        }      
-       
+        }
+
     }
-
-
 
 }
 
-class SFTPConnection
-{
+class SFTPConnection {
     private $connection;
     private $sftp;
 
-    public function __construct($host, $port = 22)
-    {
+    public function __construct($host, $port = 22) {
         $this->connection = ssh2_connect($host, $port);
         if (!$this->connection) {
             throw new Exception("Could not connect to $host on port $port.");
         }
     }
 
-    public function login($username, $password)
-    {
+    public function login($username, $password) {
         if (!ssh2_auth_password($this->connection, $username, $password)) {
             throw new Exception("Could not authenticate with username $username " .
                 "and password $password.");
@@ -2373,8 +2644,7 @@ class SFTPConnection
         }
     }
 
-    public function uploadFile($local_file, $remote_file)
-    {
+    public function uploadFile($local_file, $remote_file) {
         $sftp   = $this->sftp;
         $stream = fopen("ssh2.sftp://$sftp$remote_file", 'w');
 
@@ -2398,8 +2668,7 @@ class SFTPConnection
      * @param $local_file
      * @param $remote_file
      */
-    public function downFile($local_file, $remote_file)
-    {
+    public function downFile($local_file, $remote_file) {
         ssh2_scp_recv($this->connection, $remote_file, $local_file);
     }
 
@@ -2408,8 +2677,7 @@ class SFTPConnection
      * @param string $dir  目录名称
      * @return bool
      */
-    public function dirExits($dir)
-    {
+    public function dirExits($dir) {
         return file_exists("ssh2.sftp://$this->sftp" . $dir);
     }
 
@@ -2432,8 +2700,7 @@ class SFTPConnection
      * $dir 示例：/var/file/image
      * @return bool
      */
-    public function rename($old_dir, $new_dir)
-    {
+    public function rename($old_dir, $new_dir) {
         $is_true = ssh2_sftp_rename($this->sftp, $old_dir, $new_dir);
         return $is_true;
     }
@@ -2444,8 +2711,7 @@ class SFTPConnection
      * $dir 示例：/var/file/image/404NotFound.png
      * @return bool
      */
-    public function delFile($dir)
-    {
+    public function delFile($dir) {
         $is_true = ssh2_sftp_unlink($this->sftp, $dir);
         return $is_true;
     }
@@ -2455,8 +2721,7 @@ class SFTPConnection
      * @param string $remote_file 文件路径 例：/var/file/image
      * @return array
      */
-    public function scanFileSystem($remote_file)
-    {
+    public function scanFileSystem($remote_file) {
         $sftp      = $this->sftp;
         $dir       = "ssh2.sftp://$sftp$remote_file";
         $tempArray = array();
@@ -2475,12 +2740,10 @@ class SFTPConnection
         return $tempArray;
     }
 }
-class Sftp
-{
+class Sftp {
     private $connection;
     private $sftp;
-    public function __construct($params)
-    {
+    public function __construct($params) {
         $host             = $params['host']; //地址
         $port             = $params['port']; //端口
         $this->connection = ssh2_connect($host, $port);
@@ -2498,15 +2761,14 @@ class Sftp
      * @param string $pri_key  私钥
      * @throws Exception]
      */
-    public function login($login_type, $username, $password = null, $pub_key = null, $pri_key = null)
-    {
+    public function login($login_type, $username, $password = null, $pub_key = null, $pri_key = null) {
         switch ($login_type) {
-            case 'username': //通过用户名密码登录
-                $login_result = ssh2_auth_password($this->connection, $username, $password);
-                break;
-            case 'pub_key': //公钥私钥登录
-                $login_result = ssh2_auth_pubkey_file($this->connection, $username, $pub_key, $pri_key);
-                break;
+        case 'username': //通过用户名密码登录
+            $login_result = ssh2_auth_password($this->connection, $username, $password);
+            break;
+        case 'pub_key': //公钥私钥登录
+            $login_result = ssh2_auth_pubkey_file($this->connection, $username, $pub_key, $pri_key);
+            break;
         }
         if (!$login_result) {
             throw new Exception("身份验证失败");
@@ -2526,8 +2788,7 @@ class Sftp
      * @param string $remote_file  远程文件
      * @throws Exception
      */
-    public function uploadFile($local_file, $remote_file)
-    {
+    public function uploadFile($local_file, $remote_file) {
         $is_true = ssh2_scp_send($this->connection, $local_file, $remote_file, 0777);
         return $is_true;
     }
