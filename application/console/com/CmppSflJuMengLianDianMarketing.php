@@ -529,7 +529,7 @@ class CmppSflJuMengLianDianMarketing extends Pzlife {
                                         $headData                    = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                         $send_data['my_submit_time'] = time(); //发送时间戳
                                         $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, json_encode($send_data));
-                                        usleep(5);
+                                        // usleep(5);
                                         socket_write($socket, $headData . $bodyData, $Total_Length);
                                         $send_status = 2;
                                         ++$i;
@@ -541,7 +541,7 @@ class CmppSflJuMengLianDianMarketing extends Pzlife {
                                     if ($i > $security_master) {
                                         $i = 0;
                                     }
-                                    usleep(5);
+                                    // usleep(5);
                                     continue;
                                 } else { //单条短信
 
