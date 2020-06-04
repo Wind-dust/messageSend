@@ -375,6 +375,26 @@ return $result;
         if (!empty($msg_id)) {
             $data['send_msg_id'] = $msg_id;
         }
+        if ($user['free_trial'] == 2){
+            $data['free_trial'] = 2;
+            if ($user['marketing_free_credit'] > 0) {
+                if ($real_num >= $user['marketing_free_credit'] ) {
+                    $data['free_trial'] = 1;
+                }
+            }
+           
+        }
+        if ($data['free_trial'] == 2) {
+            // $data['free_trial'] = 2;
+            
+                    $data['yidong_channel_id'] = 18;
+                    $data['liantong_channel_id'] = 19;
+                    $data['dianxin_channel_id'] = 19;
+            
+        }
+        if (!empty($msg_id)) {
+            $data['send_msg_id'] = $msg_id;
+        }
         Db::startTrans();
         try {
             DbAdministrator::modifyBalance($userEquities['id'], $real_num, 'dec');
