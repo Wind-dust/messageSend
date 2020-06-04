@@ -824,7 +824,9 @@ class SflUpload extends Pzlife {
 
     }
 
-    public function sflZip() {
+    /* save_type 入库方式 */
+
+    public function sflZip($save_type) {
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $mysql_connect->query("set names utf8mb4");
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
@@ -1236,9 +1238,9 @@ class SflUpload extends Pzlife {
                             if (!strpos($svalue,date("Ymd"))) {
                             continue;
                             }
-                            if (strpos($svalue,'20200529100927')) {
+                            /* if (strpos($svalue,'20200529100927')) {
                             continue;
-                            }
+                            } */
                             // '2020060321'
                             /* if (!strpos($svalue, '2020060321')) {
                                 continue;
@@ -1427,33 +1429,38 @@ class SflUpload extends Pzlife {
                                         continue;
 
                                         } */
-                                        if (in_array($tvalue[3], $white_list)) {
-                                            $redis->rpush('sftp:sfl:marketing:whitesendtask', json_encode($SMS_real_send));
-                                        } else {
-                                            if (strpos($tvalue[3], '000000') !== false || strpos($tvalue[3], '111111') || strpos($tvalue[3], '222222') || strpos($tvalue[3], '333333') || strpos($tvalue[3], '444444') || strpos($tvalue[3], '555555') || strpos($tvalue[3], '666666') || strpos($tvalue[3], '777777') || strpos($tvalue[3], '888888') || strpos($tvalue[3], '999999')) {
-                                                $redis->rpush('sftp:sfl:marketing:errorsendtask', json_encode($SMS_real_send));
-
+                                        if ($save_type == 'redis') {
+                                            if (in_array($tvalue[3], $white_list)) {
+                                                $redis->rpush('sftp:sfl:marketing:whitesendtask', json_encode($SMS_real_send));
                                             } else {
-                                                $redis->rpush('sftp:sfl:marketing:sendtask', json_encode($SMS_real_send));
+                                                if (strpos($tvalue[3], '000000') !== false || strpos($tvalue[3], '111111') || strpos($tvalue[3], '222222') || strpos($tvalue[3], '333333') || strpos($tvalue[3], '444444') || strpos($tvalue[3], '555555') || strpos($tvalue[3], '666666') || strpos($tvalue[3], '777777') || strpos($tvalue[3], '888888') || strpos($tvalue[3], '999999')) {
+                                                    $redis->rpush('sftp:sfl:marketing:errorsendtask', json_encode($SMS_real_send));
+    
+                                                } else {
+                                                    $redis->rpush('sftp:sfl:marketing:sendtask', json_encode($SMS_real_send));
+    
+                                                }
+                                            }
+                                        }else{
+                                            $SMSmessage[] = $SMS_real_send;
+                                    // print_r($content);die;
+                                            $j++;
+                                            if ($j > 100) {
+                                            $mysql_connect->startTrans();
+                                            try {
+                                                $mysql_connect->table('yx_sfl_send_task')->insertAll($SMSmessage);
+                                                unset($SMSmessage);
+                                                $j = 1;
+                                                $mysql_connect->commit();
+                                            } catch (\Exception $e) {
+                                                exception($e);
+                                            }
+                                            // $this->redis->rPush('index:meassage:business:sendtask', $send);
 
                                             }
                                         }
-                                        /* $SMSmessage[] = $SMS_real_send;
-                                    // print_r($content);die;
-                                    $j++;
-                                    if ($j > 100) {
-                                    $mysql_connect->startTrans();
-                                    try {
-                                    $mysql_connect->table('yx_sfl_send_task')->insertAll($SMSmessage);
-                                    unset($SMSmessage);
-                                    $j = 1;
-                                    $mysql_connect->commit();
-                                    } catch (\Exception $e) {
-                                    exception($e);
-                                    }
-                                    // $this->redis->rPush('index:meassage:business:sendtask', $send);
-
-                                    } */
+                                        
+                                        
                                     }
                                 }
                                 /*  if (!empty($txt)) {
