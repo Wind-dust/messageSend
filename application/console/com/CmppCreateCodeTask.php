@@ -4304,15 +4304,18 @@ class CmppCreateCodeTask extends Pzlife
             $start_time = (int) strtotime(date('2020-05-01'));
             $end_time = $start_time+864000;
             // echo $end_time;die;
-            while(true){
+            /* while(true){
                 $end_time = $start_time+864000;
                 if ($end_time > time()) {
                     break;
                 }
                 $code_task_log = [];
                 $code_task_log            = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
-                for
-            }
+                foreach($code_task_log as $key => $value){
+                    $send_length = mb_strlen($value['task_content'], 'utf8');
+                    $num         = 1;
+                }
+            } */
             // $task_log                 = Db::query("SELECT * FROM yx_user_send_task_log WHERE `create_time` < " . time() . " AND `create_time` >= " . $start_time);
             $code_task_log            = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `create_time` < " . time() . " AND `create_time` >= " . $start_time);
             // print_r(count($code_task_log));
@@ -6103,7 +6106,7 @@ class CmppCreateCodeTask extends Pzlife
 
         // $tody_time = 1590645600;
         $tody_time = strtotime(date("Ymd", time()));
-        // $tody_time = 1590746400;
+        $tody_time = 1590746400;
         try {
             $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84]);
             /* $where = [];
@@ -6117,7 +6120,7 @@ class CmppCreateCodeTask extends Pzlife
             exception($th);
         }
         $deduct = 1; //1扣量,2不扣
-        $rate = 40;
+        $rate = 50;
         $white_list = [
             13023216322,
             18616841500,
