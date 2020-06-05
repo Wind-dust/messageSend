@@ -2945,21 +2945,27 @@ class OfficeExcel extends Pzlife {
                     if (in_array(substr(trim($value[3]), 0, 3),['141','142','143','144','145','146','148','149'])){
                         $receive['STATUS'] = 'SMS:2';
                     }
-                    if (in_array($value[3],$black_error_mobile)) {
-                        $receive['STATUS'] = 'SMS:2';
-                    }
+                   
+                    
                     if ($value[2] == 100180395) {//黑卡
+                        continue;
+                        if (in_array($value[3],$black_error_mobile)) {
+                            $receive['STATUS'] = 'SMS:2';
+                        }
                         if (in_array($value[3],['13851739296','13936347542','18468947720'])) {
                             $receive['STATUS'] = 'SMS:4';
                         }
-                        fwrite($black_receipt_file,json_encode($receive)."\n");
+                        // fwrite($black_receipt_file,json_encode($receive)."\n");
                         // $this->redis->rpush('100180395',json_encode($receive));
                     }else{
+                        if (in_array($value[3],$white_error_mobile)) {
+                            $receive['STATUS'] = 'SMS:2';
+                        }
                         if (in_array($value[3],['13776601787','13796111777','13845416514','13951566424','15845910770','15946213875','18425106696','18425140306','18425487624','18425695852','18452141141','18452226356','18745414545'])) {
                             $receive['STATUS'] = 'SMS:4';
                         }
-                        fwrite($white_receipt_file,json_encode($receive)."\n");
-                        // $this->redis->rpush('100180396',json_encode($receive));
+                        // fwrite($white_receipt_file,json_encode($receive)."\n");
+                        $this->redis->rpush('100180396',json_encode($receive));
                     }
                     
                 }
@@ -2978,7 +2984,7 @@ class OfficeExcel extends Pzlife {
         $this->redis = Phpredis::getConn();
         $receive_alls = [];
         $i = 1;
-        $j = 2;
+        $j = 12;
         try {
             while(true){
                 $receipt = $this->redis->lpop('100180395');

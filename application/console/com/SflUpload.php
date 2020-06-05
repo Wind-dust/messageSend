@@ -2273,7 +2273,7 @@ class SflUpload extends Pzlife {
 
             $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
             ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  1590854400 AND   `create_time` <  1590940800 ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  1591113600 AND   `create_time` <  1591200000 ");
             $ids          = [];
             foreach ($mul_task_ids as $key => $value) {
                 $ids[] = $value['id'];
@@ -2368,7 +2368,7 @@ class SflUpload extends Pzlife {
                         //按无效号码计算
                         //按无效号码计算
                         if (in_array($end_num, ['000000', '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999'])) {
-                            $receive_all['STATUS'] = "SMS:2";
+                            $receive_all['STATUS'] = "MMS:2";
                         }
                     }
                     $receive_alls[] = $receive_all;
@@ -2430,7 +2430,7 @@ class SflUpload extends Pzlife {
                     $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                 }
             }
-            $objWriter->save('imp_mobile_status_report_mms_1_20200531.xlsx');
+            $objWriter->save('imp_mobile_status_report_mms_1_20200603.xlsx');
         } catch (\Exception $th) {
             exception($th);
         }
@@ -2444,7 +2444,7 @@ class SflUpload extends Pzlife {
         // print_r(realpath("../"). "\yt_area_mobile.csv");die;
 
         try {
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1590854400 AND   `create_time` <  1590940800 AND `task_content` NOT LIKE '%test%' ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591113600 AND   `create_time` <  1591200000 AND `task_content` NOT LIKE '%test%' ");
             $ids          = [];
             foreach ($mul_task_ids as $key => $value) {
                 // $ids[] = $value['id'];
@@ -2610,7 +2610,7 @@ class SflUpload extends Pzlife {
                 $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
                 // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
             }
-            $outputFileName = "receive_sms_1_20200524.xlsx";
+            $outputFileName = "receive_sms_2_20200524.xlsx";
             $i              = 0;
             foreach ($receive_alls as $key => $orderdata) {
                 //行
@@ -2623,7 +2623,7 @@ class SflUpload extends Pzlife {
                     $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                 }
             }
-            $objWriter->save('imp_mobile_status_report_sms_1_20200531.xlsx');
+            $objWriter->save('imp_mobile_status_report_sms_1_20200603.xlsx');
         } catch (\Exception $th) {
             //throw $th;
             exception($th);
