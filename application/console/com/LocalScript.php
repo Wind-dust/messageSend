@@ -346,7 +346,6 @@ class LocalScript extends Pzlife
             $mobile_data[] = $value['mobile'];
         }
         $mobile_data = array_unique($mobile_data);
-        echo count($mobile_data);die;
         $i = 1;
         $insert_mobile = [];
         foreach ($mobile_data as $key => $value) {
