@@ -6112,7 +6112,8 @@ class CmppCreateCodeTask extends Pzlife
             /* $where = [];
             $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
             $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` <> '100180528' AND `create_time` >  " . $tody_time);
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100180528' AND `create_time` >  " . $tody_time);
+            // echo "SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100180528' AND `create_time` >  " . $tody_time;die;
             foreach ($sendid as $key => $value) {
                 $this->redis->rpush('index:meassage:sflmessage:sendtask', $value['id']);
             }
@@ -6120,7 +6121,7 @@ class CmppCreateCodeTask extends Pzlife
             exception($th);
         }
         $deduct = 1; //1扣量,2不扣
-        $rate = 50;
+        $rate = 20;
         $white_list = [
             13023216322,
             18616841500,
@@ -7393,7 +7394,7 @@ class CmppCreateCodeTask extends Pzlife
                             'type' => 'SMS',
                             'message_info' => $encodemessageupriver['message_info'],
                         ];
-                        $upriver['receive_time'] = date('Y-m-d H:i:s', time() - mt_rand(0, 36000));
+                        $upriver['receive_time'] = date('Y-m-d H:i:s', time());
                         if ($res) {
                             $newres = array_shift($res);
                             $upriver['source_name'] = $newres['source_name'];

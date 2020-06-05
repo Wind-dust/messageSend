@@ -2811,4 +2811,256 @@ class OfficeExcel extends Pzlife {
         }
        
     }
+
+    public function sflErrorExport(){
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $model_path = realpath("./uploads/SFL/UnZip/SMS/Communication_targets_SMS_1_20200529140223") . "/Communication_targets_SMS_1_20200529140223.txt";
+        $file       = fopen($model_path, "r");
+
+        // $error_path = realpath("./")."/_error.txt";
+        // $error_file = fopen($error_path, "w");
+        $receive_alls = [];
+        while (!feof($file)) {
+            $cellVal = trim(fgets($file));
+            if (!empty($cellVal)) {
+                $value = explode('",', $cellVal);
+                // $cellVal = str_replace('"', '', $cellVal);
+                foreach ($value as $key => $svalue) {
+                    $value[$key] = str_replace('"', '', $svalue);
+                }
+                if (checkMobile($value[3]) == false || strlen($value[3]) > 11) {
+                    $receive = [];
+                    $receive = [
+                        'MESSAGE_ID'=>$value[0],
+                        'COMMUNICATION_CHANNEL_ID'=>$value[2],
+                        'MOBILE'=>$value[3],
+                        'STATUS' => '',
+                        'SENDING_TIME'=>'',
+                    ];
+                    $receive_alls[] = $receive;
+                }
+            }
+        }
+        fclose($file);
+
+        $name = "receive_mms_error_20200530.xlsx";
+        $this->derivedTables($receive_alls,$name);
+    }
+
+    public function SflErrorMobile(){
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $this->redis = Phpredis::getConn();
+        
+        // $phone = '';
+        // $j     = '';
+        // $SMS_model = [];
+        // $error_path = realpath("./")."/error.txt";
+        // $error_file = fopen($error_path, "w");
+        //黑卡
+        $black_error_path = realpath("./")."/100180395.txt";
+        $black_error_file       = fopen($black_error_path, "r");
+        $black_error_mobile = [];
+        $receive_alls = [];
+        while (!feof($black_error_file)) {
+            $cellVal = trim(fgets($black_error_file));
+            if (!empty($cellVal)) {
+                $black_error_mobile[] = $cellVal;
+            }
+        }
+
+        $white_error_path = realpath("./")."/100180396.txt";
+        $white_error_file       = fopen($white_error_path, "r");
+        $white_error_mobile = [];
+        while (!feof($white_error_file)) {
+            $cellVal = trim(fgets($white_error_file));
+            if (!empty($cellVal)) {
+                $white_error_mobile[] = $cellVal;
+            }
+        }
+
+        //黑卡写入文件地址
+        $black_receipt_path = realpath("./")."/100180395_receipt.txt";
+        $black_receipt_file       = fopen($black_receipt_path, "w");
+        
+        $white_receipt_path = realpath("./")."/100180396_receipt.txt";
+        $white_receipt_file       = fopen($white_receipt_path, "w");
+        // echo count($black_error_mobile);die;
+        $start_time = 1590804000;
+        $i = 1;
+        $model_path = realpath("./uploads/SFL/UnZip/SMS/Communication_targets_SMS_1_20200529140223") . "/Communication_targets_SMS_1_20200529140223.txt";
+        $file       = fopen($model_path, "r");
+        while (!feof($file)) {
+            $cellVal = trim(fgets($file));
+            if (!empty($cellVal)) {
+                $value = explode('",', $cellVal);
+                // $cellVal = str_replace('"', '', $cellVal);
+                foreach ($value as $key => $svalue) {
+                    $value[$key] = str_replace('"', '', $svalue);
+                }
+                if (checkMobile($value[3]) == false || strlen($value[3]) > 11) {
+                    continue;
+                }
+                
+                $receive = [];
+                $receive = [
+                    'MESSAGE_ID'=>$value[0],
+                    'COMMUNICATION_CHANNEL_ID'=>$value[2],
+                    'MOBILE'=>$value[3],
+                    'SENDING_TIME'=>date('Y-m-d H:i:s',$start_time+ceil($i/1700)),
+                ];
+                if (strpos($value[3],'000000') !== false || strpos($value[3],'111111') !== false || strpos($value[3],'222222') !== false || strpos($value[3],'333333') !== false || strpos($value[3],'444444') !== false || strpos($value[3],'555555') !== false || strpos($value[3],'666666') !== false || strpos($value[3],'777777') !== false || strpos($value[3],'888888') !== false || strpos($value[3],'999999') !== false) {
+                    //固定失败
+                    // print_r($value[3]);die;
+                    // fwrite($error_file,$value[3]."\n");
+                    $receive['STATUS'] = 'SMS:2';
+                }else{
+                    $receive['STATUS'] = 'SMS:1';
+                    if (in_array(substr(trim($value[3]), 0, 3),['141','142','143','144','145','146','148','149'])){
+                        $receive['STATUS'] = 'SMS:2';
+                    }
+                    if (in_array($value[3],$black_error_mobile)) {
+                        $receive['STATUS'] = 'SMS:2';
+                    }
+                    if ($value[2] == 100180395) {//黑卡
+                        if (in_array($value[3],['13851739296','13936347542','18468947720'])) {
+                            $receive['STATUS'] = 'SMS:4';
+                        }
+                        fwrite($black_receipt_file,json_encode($receive)."\n");
+                        // $this->redis->rpush('100180395',json_encode($receive));
+                    }else{
+                        if (in_array($value[3],['13776601787','13796111777','13845416514','13951566424','15845910770','15946213875','18425106696','18425140306','18425487624','18425695852','18452141141','18452226356','18745414545'])) {
+                            $receive['STATUS'] = 'SMS:4';
+                        }
+                        fwrite($white_receipt_file,json_encode($receive)."\n");
+                        // $this->redis->rpush('100180396',json_encode($receive));
+                    }
+                    
+                }
+                // print_r($receive);die;
+                $i++;
+            }
+        }
+        fclose($file);
+        fclose($black_receipt_file);
+        fclose($white_receipt_file);
+        // fclose($error_file);
+    }
+
+    public function export(){
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $this->redis = Phpredis::getConn();
+        $receive_alls = [];
+        $i = 1;
+        $j = 2;
+        try {
+            while(true){
+                $receipt = $this->redis->lpop('100180395');
+                if (empty($receipt)) {
+                break;
+                }
+                
+                $receive_alls[] = json_decode($receipt,true);
+                $i++;
+                if ($i > 200000) {
+                    $name = "receive_mms_".$j."_20200530.xlsx";
+                    $this->derivedTables($receive_alls,$name);
+                    $j++;
+                    $receive_alls = [];
+                    $i = 1;
+                }
+            }
+            if (!empty($receive_alls)) {
+                $name = "receive_mms_".$j."_20200530.xlsx";
+                $this->derivedTables($receive_alls,$name);
+                $j++;
+                $receive_alls = [];
+                $i = 1;
+            }
+            while(true){
+                $receipt = $this->redis->lpop('100180396');
+                if (empty($receipt)) {
+                break;
+                }
+                $receive_alls[] = json_decode($receipt,true);
+                $i++;
+                if ($i > 200000) {
+                    $name = "receive_mms_".$j."_20200530.xlsx";
+                    $this->derivedTables($receive_alls,$name);
+                    $j++;
+                    $receive_alls = [];
+                    $i = 1;
+                }
+            }
+            if (!empty($receive_alls)) {
+                $name = "receive_mms_".$j."_20200530.xlsx";
+                $this->derivedTables($receive_alls,$name);
+                $j++;
+                $receive_alls = [];
+                $i = 1;
+            }
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
+        }
+
+    }
+
+    public function derivedTables($receive_alls,$name){
+        $objExcel = new PHPExcel();
+        // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+        // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
+        $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+        $objWriter->setOffice2003Compatibility(true);
+
+        //设置文件属性
+        $objProps = $objExcel->getProperties();
+        $objProps->setTitle("imp_mobile_status_report");
+        $objProps->setSubject("金卡1:" . date('Y-m-d H:i:s', time()));
+
+        $objExcel->setActiveSheetIndex(0);
+        $objActSheet = $objExcel->getActiveSheet();
+
+        $date = date('Y-m-d H:i:s', time());
+
+        //设置当前活动sheet的名称
+        $objActSheet->setTitle("imp_mobile_status_report");
+        $CellList = array(
+            array('MESSAGE_ID', 'MESSAGE_ID'),
+            array('COMMUNICATION_CHANNEL_ID', 'COMMUNICATION_CHANNEL_ID'),
+            array('MOBILE', 'MOBILE'),
+            array('STATUS', 'STATUS'),
+            array('SENDING_TIME', 'SENDING_TIME'),
+        );
+
+        foreach ($CellList as $i => $Cell) {
+            $row = chr(65 + $i);
+            $col = 1;
+            $objActSheet->setCellValue($row . $col, $Cell[1]);
+            $objActSheet->getColumnDimension($row)->setWidth(30);
+
+            $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+            $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+            $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+            // $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+            // $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+            $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        }
+        // $outputFileName = "receive_mms_1_20200523.xlsx";
+        $i = 0;
+        foreach ($receive_alls as $key => $orderdata) {
+            //行
+            $col = $key + 2;
+            foreach ($CellList as $i => $Cell) {
+                //列
+                $row = chr(65 + $i);
+                $objActSheet->getRowDimension($i)->setRowHeight(15);
+                $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            }
+        }
+        //imp_mobile_status_report_mms_1_20200531.xlsx
+        $objWriter->save($name);
+        return 1;
+    }
 }
