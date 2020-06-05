@@ -283,7 +283,7 @@ class LocalScript extends Pzlife
         // print_r($max_id);
         
         $mobile_data = [];
-        $ALL_NUM = Db::query("SELECT `mobile`,`real_message` FROM yx_send_task_receipt WHERE `real_message` = 'DELIVRD' GROUP BY `mobile`,`real_message` ");
+        $ALL_NUM = Db::query("SELECT `mobile`,`real_message` FROM yx_send_task_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`real_message` ");
        /*  $max_num = $max_id[0]['id'];
         for ($i=0; $i < $max_num; $i++) { 
             $receipts = Db::query('SELECT ');
@@ -300,7 +300,30 @@ class LocalScript extends Pzlife
             $mobile_data[] = $value['mobile'];
            
         }
-        $ALL_NUM = Db::query("SELECT `mobile`,`real_message` FROM yx_send_code_task_receipt WHERE `real_message` = 'DELIVRD' GROUP BY `mobile`,`real_message` ");
+
+        $mobile_data = array_unique($mobile_data);
+        $i = 1;
+        $insert_mobile = [];
+        foreach ($mobile_data as $key => $value) {
+            $mobile = [];
+            $mobile = [
+                'mobile' => $value,
+                'update_time' => time(),
+                'create_time' => time(),
+            ];
+            $insert_mobile[] = $mobile;
+            $i++;
+            if ($i > 100) {
+                Db::table('yx_real_mobile')->insertAll($insert_mobile);
+                $insert_mobile = [];
+                $i = 1;
+            }
+        }
+        if (!empty($insert_mobile)) {
+            Db::table('yx_real_mobile')->insertAll($insert_mobile);
+        }
+        $mobile_data = [];
+        $ALL_NUM = Db::query("SELECT `mobile`,`real_message` FROM yx_send_code_task_receipt WHERE `real_message` = 'DELIVRD'  OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`real_message` ");
        /*  $max_num = $max_id[0]['id'];
         for ($i=0; $i < $max_num; $i++) { 
             $receipts = Db::query('SELECT ');
@@ -317,30 +340,160 @@ class LocalScript extends Pzlife
             $mobile_data[] = $value['mobile'];
            
         }
-
+        $mobile_data = array_unique($mobile_data);
+        $i = 1;
+        $insert_mobile = [];
+        foreach ($mobile_data as $key => $value) {
+            $mobile = [];
+            $mobile = [
+                'mobile' => $value,
+                'update_time' => time(),
+                'create_time' => time(),
+            ];
+            $insert_mobile[] = $mobile;
+            $i++;
+            if ($i > 100) {
+                Db::table('yx_real_mobile')->insertAll($insert_mobile);
+                $insert_mobile = [];
+                $i = 1;
+            }
+        }
+        if (!empty($insert_mobile)) {
+            Db::table('yx_real_mobile')->insertAll($insert_mobile);
+        }
+        $mobile_data = [];
         $ALL_NUM = Db::query("SELECT `mobile`,`real_message` FROM yx_user_send_code_task_log WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`real_message` ");
         foreach ($ALL_NUM as $key => $value) {
             $mobile_data[] = $value['mobile'];
         }
+        $mobile_data = array_unique($mobile_data);
+        $i = 1;
+        $insert_mobile = [];
+        foreach ($mobile_data as $key => $value) {
+            $mobile = [];
+            $mobile = [
+                'mobile' => $value,
+                'update_time' => time(),
+                'create_time' => time(),
+            ];
+            $insert_mobile[] = $mobile;
+            $i++;
+            if ($i > 100) {
+                Db::table('yx_real_mobile')->insertAll($insert_mobile);
+                $insert_mobile = [];
+                $i = 1;
+            }
+        }
+        if (!empty($insert_mobile)) {
+            Db::table('yx_real_mobile')->insertAll($insert_mobile);
+        }
+        $mobile_data = [];
         $ALL_NUM = Db::query("SELECT `mobile_content`,`real_message` FROM yx_user_send_game_task WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile_content`,`real_message` ");
         foreach ($ALL_NUM as $key => $value) {
             $mobile_data[] = $value['mobile_content'];
         }
+        $mobile_data = array_unique($mobile_data);
+        $i = 1;
+        $insert_mobile = [];
+        foreach ($mobile_data as $key => $value) {
+            $mobile = [];
+            $mobile = [
+                'mobile' => $value,
+                'update_time' => time(),
+                'create_time' => time(),
+            ];
+            $insert_mobile[] = $mobile;
+            $i++;
+            if ($i > 100) {
+                Db::table('yx_real_mobile')->insertAll($insert_mobile);
+                $insert_mobile = [];
+                $i = 1;
+            }
+        }
+        if (!empty($insert_mobile)) {
+            Db::table('yx_real_mobile')->insertAll($insert_mobile);
+        }
+        $mobile_data = [];
         $ALL_NUM = Db::query("SELECT `mobile`,`real_message` FROM yx_user_send_task_log WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`real_message` ");
         foreach ($ALL_NUM as $key => $value) {
             $mobile_data[] = $value['mobile'];
         }
+        $mobile_data = array_unique($mobile_data);
+        $i = 1;
+        $insert_mobile = [];
+        foreach ($mobile_data as $key => $value) {
+            $mobile = [];
+            $mobile = [
+                'mobile' => $value,
+                'update_time' => time(),
+                'create_time' => time(),
+            ];
+            $insert_mobile[] = $mobile;
+            $i++;
+            if ($i > 100) {
+                Db::table('yx_real_mobile')->insertAll($insert_mobile);
+                $insert_mobile = [];
+                $i = 1;
+            }
+        }
+        if (!empty($insert_mobile)) {
+            Db::table('yx_real_mobile')->insertAll($insert_mobile);
+        }
+        $mobile_data = [];
         $ALL_NUM = Db::query("SELECT `mobile`,`real_message` FROM yx_user_multimedia_message_log WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`real_message` ");
         foreach ($ALL_NUM as $key => $value) {
             $mobile_data[] = $value['mobile'];
         }
-
+        $mobile_data = array_unique($mobile_data);
+        $i = 1;
+        $insert_mobile = [];
+        foreach ($mobile_data as $key => $value) {
+            $mobile = [];
+            $mobile = [
+                'mobile' => $value,
+                'update_time' => time(),
+                'create_time' => time(),
+            ];
+            $insert_mobile[] = $mobile;
+            $i++;
+            if ($i > 100) {
+                Db::table('yx_real_mobile')->insertAll($insert_mobile);
+                $insert_mobile = [];
+                $i = 1;
+            }
+        }
+        if (!empty($insert_mobile)) {
+            Db::table('yx_real_mobile')->insertAll($insert_mobile);
+        }
+        $mobile_data = [];
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $mysql_connect->query("set names utf8mb4");
         $ALL_NUM = $mysql_connect->query("SELECT `mobile`,`real_message` FROM yx_sfl_send_task_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`real_message` ");
         foreach ($ALL_NUM as $key => $value) {
             $mobile_data[] = $value['mobile'];
         }
+        $mobile_data = array_unique($mobile_data);
+        $i = 1;
+        $insert_mobile = [];
+        foreach ($mobile_data as $key => $value) {
+            $mobile = [];
+            $mobile = [
+                'mobile' => $value,
+                'update_time' => time(),
+                'create_time' => time(),
+            ];
+            $insert_mobile[] = $mobile;
+            $i++;
+            if ($i > 100) {
+                Db::table('yx_real_mobile')->insertAll($insert_mobile);
+                $insert_mobile = [];
+                $i = 1;
+            }
+        }
+        if (!empty($insert_mobile)) {
+            Db::table('yx_real_mobile')->insertAll($insert_mobile);
+        }
+        $mobile_data = [];
         $ALL_NUM = $mysql_connect->query("SELECT `mobile`,`real_message` FROM yx_sfl_send_multimediatask_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`real_message` ");
         foreach ($ALL_NUM as $key => $value) {
             $mobile_data[] = $value['mobile'];
