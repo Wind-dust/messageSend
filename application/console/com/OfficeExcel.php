@@ -2819,6 +2819,8 @@ class OfficeExcel extends Pzlife {
 
         // $error_path = realpath("./")."/_error.txt";
         // $error_file = fopen($error_path, "w");
+        $black = 0;
+        $white = 0;
         $receive_alls = [];
         while (!feof($file)) {
             $cellVal = trim(fgets($file));
@@ -2838,11 +2840,36 @@ class OfficeExcel extends Pzlife {
                         'SENDING_TIME'=>'',
                     ];
                     $receive_alls[] = $receive;
+                }else{
+                    $receive = [
+                        'MESSAGE_ID'=>$value[0],
+                        'COMMUNICATION_CHANNEL_ID'=>$value[2],
+                        'MOBILE'=>$value[3],
+                        'STATUS' => '',
+                        'SENDING_TIME'=>'2020-05-20 10:00:01',
+                    ];
+                    if (strpos($value[3],'000000') !== false || strpos($value[3],'111111') !== false || strpos($value[3],'222222') !== false || strpos($value[3],'333333') !== false || strpos($value[3],'444444') !== false || strpos($value[3],'555555') !== false || strpos($value[3],'666666') !== false || strpos($value[3],'777777') !== false || strpos($value[3],'888888') !== false || strpos($value[3],'999999') !== false) {
+                        //固定失败
+                        // print_r($value[3]);die;
+                        // fwrite($error_file,$value[3]."\n");
+                        $receive['STATUS'] = 'SMS:2';
+                        $receive_alls[] = $receive;
+                    }
+                   
+                   /*  if ($value[2] == '100180395') {
+                        $black++;
+                    }else{
+                        $white++;
+                    } */
                 }
+                
             }
         }
         fclose($file);
-
+       /*  echo "黑卡号码数:".$black;
+        echo "\n";
+        echo "白卡号码数:".$white;
+        die; */
         $name = "receive_mms_error_20200530.xlsx";
         $this->derivedTables($receive_alls,$name);
     }

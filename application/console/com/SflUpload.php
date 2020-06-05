@@ -1521,9 +1521,9 @@ class SflUpload extends Pzlife {
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
 
-                            if (!strpos($svalue, date("Ymd"))) {
-                                continue;
-                            }
+                            // if (!strpos($svalue, date("Ymd"))) {
+                            //     continue;
+                            // }
                             $file_info = explode('.', $svalue);
                             if ($file_info[1] == 'zip') { //需要解压
                                 //开始解压
@@ -1848,6 +1848,7 @@ class SflUpload extends Pzlife {
                         // die;
                     }
                 } elseif ($value == 'SMSTest') {
+                    continue;
                     $send_data    = [];
                     $SMS_model    = [];
                     $SMSmessage   = [];
