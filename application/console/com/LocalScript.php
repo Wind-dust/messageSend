@@ -279,7 +279,7 @@ class LocalScript extends Pzlife
 
     public function getRealNumber(){
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
-        $max_id = Db::query("SELECT `id` FROM yx_send_task_receipt ORDER BY `id` DESC limit 1 ");
+        // $max_id = Db::query("SELECT `id` FROM yx_send_task_receipt ORDER BY `id` DESC limit 1 ");
         // print_r($max_id);
         
         $mobile_data = [];
