@@ -6313,7 +6313,7 @@ class CmppCreateCodeTask extends Pzlife
                         } else {
                             if ($deduct == 1) {
                                 $num = mt_rand(0, 100);
-                                if ($num >= $rate || in_array(trim($value['mobile']), $white_list)) {
+                                if ($num >= $rate || in_array(trim($value['mobile']), $white_list) || !strpos($value['task_content'],'生日')) {
                                     $prefix = '';
                                     $prefix = substr(trim($value['mobile']), 0, 7);
                                     $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
@@ -6751,14 +6751,14 @@ class CmppCreateCodeTask extends Pzlife
                                 ];
                                 $receipt[] = $rece;
                             } else {
-                                if ($deduct  == 1 || in_array(trim($value['mobile']), $white_list)) {
+                                if ($deduct  == 1 ) {
                                     //按无效号码计算
                                     $num = mt_rand(0, 100);
                                     if ($value['sfl_relation_id'] == '100180028') {
                                         if (in_array(trim($value['mobile']), $fault) || in_array(trim($value['mobile']), $bir)) {
                                             continue;
                                         }
-                                        if ($num >= 40) {
+                                        if ($num >= 40 || in_array(trim($value['mobile']), $white_list) || $value['sfl_relation_id'] != '100180389') {
                                             $prefix = '';
                                             $prefix = substr(trim($value['mobile']), 0, 7);
                                             $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
@@ -6812,7 +6812,7 @@ class CmppCreateCodeTask extends Pzlife
                                         if (in_array(trim($value['mobile']), $fault) || in_array(trim($value['mobile']), $bir)) {
                                             continue;
                                         }
-                                        if ($num >= $rate || in_array(trim($value['mobile']), $white_list)) {
+                                        if ($num >= $rate || in_array(trim($value['mobile']), $white_list) ||  $value['sfl_relation_id'] != '100180389') {
                                             $prefix = '';
                                             $prefix = substr(trim($value['mobile']), 0, 7);
                                             $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
