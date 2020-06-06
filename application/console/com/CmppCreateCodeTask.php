@@ -807,8 +807,8 @@ class CmppCreateCodeTask extends Pzlife
                     $real_length = 1;
                     $send        = $this->redis->lpop('index:meassage:multimediamessage:sendtask');
                     // $send = 15745;
-
-                    $sendTask = $this->getMultimediaSendTask($send);
+                    $real_send = json_decode($send, true);
+                    $sendTask = $this->getMultimediaSendTask($real_send['id']);
                     if (empty($sendTask)) {
                         break;
                     }
