@@ -792,7 +792,7 @@ class CmppCreateCodeTask extends Pzlife
         $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_multimedia_message WHERE  `id` > 86376 AND `id` < 89718 ");
         foreach($task_id as $key => $value){
             
-                $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id'=>$value['id'],'deduct' => 0]));
+                $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id'=>$value['id'],'deduct' => 0]));
             
            
         }
