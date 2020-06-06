@@ -1020,9 +1020,19 @@ class CmppCreateCodeTask extends Pzlife
     public function pushBusinessMessageSendTask(){
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
+        /* 
+                                    1321785 1322036
+                                    */
+
+        // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
+        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_code_task WHERE  `id` >= 1321785 AND `id` <= 1322036 ");
         foreach($task_id as $key => $value){
-            $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id'=>$value['id'],'deduct' => 40]));
+            if ($value['uid'] == 91) {
+                // $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id'=>$value['id'],'deduct' => 50]));
+            }else{
+                $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id'=>$value['id'],'deduct' => 0]));
+            }
+           
         }
     }
 
@@ -1196,8 +1206,28 @@ class CmppCreateCodeTask extends Pzlife
                                     // fwrite($myfile, $txt);
                                     $push_messages[] = $sendmessage;
                                     $true_log[]      = $send_log;
+
+                                    /* 
+                                    1321785 1322036
+                                    */
+
                                 }else{
                                     if ($num <= $real_send['deduct'] * 100) {
+
+                                        /* 
+                                          'task_no'        => $sendTask['task_no'],
+                                            'uid'            => $sendTask['uid'],
+                                            // 'title'          => $sendTask['task_name'],
+                                            'task_content'   => $sendTask['task_content'],
+                                            'source'         => $sendTask['source'],
+                                            'mobile'         => $mobilesend[$i],
+                                            'send_length'    => $send_length,
+                                            'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
+                                            'send_status'    => 4,
+                                            'create_time'    => time(),
+                                            'status_message' => 'DB:0101', //无效号码
+                                            'real_message'   => 'DB:0101',
+                                             */
                                         $send_log = [
                                             'task_no'        => $sendTask['task_no'],
                                             'uid'            => $sendTask['uid'],
@@ -1412,6 +1442,8 @@ class CmppCreateCodeTask extends Pzlife
                         $j++;
                         if ($j > 100) {
                             $j = 1;
+                            print_r($true_log);
+                            print_r($all_log);
                             Db::startTrans();
                             try {
                                 Db::table('yx_user_send_code_task_log')->insertAll($true_log);
