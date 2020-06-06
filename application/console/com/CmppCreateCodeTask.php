@@ -1027,10 +1027,10 @@ class CmppCreateCodeTask extends Pzlife
                                     */
 
         // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_code_task WHERE  `id` >= 1321785 AND `id` <= 1322036 ");
+        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_code_task WHERE  `id` >= 1321785 limit 69");
         foreach($task_id as $key => $value){
             if ($value['uid'] == 91) {
-                // $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id'=>$value['id'],'deduct' => 50]));
+                $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id'=>$value['id'],'deduct' => 50]));
             }else{
                 $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id'=>$value['id'],'deduct' => 0]));
             }
@@ -1461,11 +1461,14 @@ class CmppCreateCodeTask extends Pzlife
                                     Db::table('yx_user_send_code_task_log')->insertAll($all_log);
                                 }
                                 Db::commit();
-                                foreach ($push_messages as $key => $value) {
-                                    $send_channelid = $value['channel_id'];
-                                    unset($value['channel_id']);
-                                    $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                                if (!empty($push_messages)) {
+                                    foreach ($push_messages as $key => $value) {
+                                        $send_channelid = $value['channel_id'];
+                                        unset($value['channel_id']);
+                                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                                    }
                                 }
+                                
                             } catch (\Exception $e) {
                                 // $this->redis->rPush('index:meassage:business:sendtask', $send);
                                 if (!empty($rollback)) {
@@ -1496,11 +1499,14 @@ class CmppCreateCodeTask extends Pzlife
                             Db::table('yx_user_send_code_task_log')->insertAll($all_log);
                         }
                         Db::commit();
-                        foreach ($push_messages as $key => $value) {
-                            $send_channelid = $value['channel_id'];
-                            unset($value['channel_id']);
-                            $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                        if (!empty($push_messages)) {
+                            foreach ($push_messages as $key => $value) {
+                                $send_channelid = $value['channel_id'];
+                                unset($value['channel_id']);
+                                $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                            }
                         }
+                        
                     } catch (\Exception $e) {
                         // $this->redis->rPush('index:meassage:business:sendtask', $send);
                         if (!empty($rollback)) {
