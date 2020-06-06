@@ -582,6 +582,7 @@ class CmppCreateCodeTask extends Pzlife
                                     $send_log = [
                                         'task_no'      => $sendTask['task_no'],
                                         'uid'          => $sendTask['uid'],
+                                        'source'       => $sendTask['source'],
                                         'task_content' => $sendTask['task_content'],
                                         'mobile'       => $mobilesend[$i],
                                         'channel_id'   => $channel_id,
@@ -628,6 +629,7 @@ class CmppCreateCodeTask extends Pzlife
                             $send_log = [
                                 'task_no'      => $sendTask['task_no'],
                                 'uid'          => $sendTask['uid'],
+                                'source'       => $sendTask['source'],
                                 'task_content' => $sendTask['task_content'],
                                 'mobile'       => $mobilesend[$i],
                                 'channel_id'   => $channel_id,
@@ -1184,6 +1186,7 @@ class CmppCreateCodeTask extends Pzlife
                                     $send_log = [
                                         'task_no'      => $sendTask['task_no'],
                                         'uid'          => $sendTask['uid'],
+                                        'source'       => $sendTask['source'],
                                         'task_content' => $sendTask['task_content'],
                                         'mobile'       => $mobilesend[$i],
                                         'channel_id'   => $channel_id,
@@ -1271,6 +1274,7 @@ class CmppCreateCodeTask extends Pzlife
                                         $send_log = [
                                             'task_no'      => $sendTask['task_no'],
                                             'uid'          => $sendTask['uid'],
+                                            'source'       => $sendTask['source'],
                                             'task_content' => $sendTask['task_content'],
                                             'mobile'       => $mobilesend[$i],
                                             'channel_id'   => $channel_id,
@@ -1442,10 +1446,13 @@ class CmppCreateCodeTask extends Pzlife
                         $j++;
                         if ($j > 100) {
                             $j = 1;
-                            print_r($true_log);
-                            print_r($all_log);
+                            // print_r($true_log);
+                            // print_r($all_log);
                             Db::startTrans();
                             try {
+                                /* foreach($true_log as $tkey => $tvalue){
+                                    Db::table('yx_user_send_code_task_log')->insert($tvalue);
+                                } */
                                 Db::table('yx_user_send_code_task_log')->insertAll($true_log);
                                 if (!empty($all_log)) {
                                     Db::table('yx_user_send_code_task_log')->insertAll($all_log);
