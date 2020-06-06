@@ -1453,7 +1453,10 @@ class CmppCreateCodeTask extends Pzlife
                                 /* foreach($true_log as $tkey => $tvalue){
                                     Db::table('yx_user_send_code_task_log')->insert($tvalue);
                                 } */
-                                Db::table('yx_user_send_code_task_log')->insertAll($true_log);
+                                if (!empty($true_log)) {
+                                    Db::table('yx_user_send_code_task_log')->insertAll($true_log);
+
+                                }
                                 if (!empty($all_log)) {
                                     Db::table('yx_user_send_code_task_log')->insertAll($all_log);
                                 }
@@ -1485,7 +1488,10 @@ class CmppCreateCodeTask extends Pzlife
                 if (!empty($true_log)) {
                     Db::startTrans();
                     try {
-                        Db::table('yx_user_send_code_task_log')->insertAll($true_log);
+                        if (!empty($true_log)) {
+                            Db::table('yx_user_send_code_task_log')->insertAll($true_log);
+
+                        }
                         if (!empty($all_log)) {
                             Db::table('yx_user_send_code_task_log')->insertAll($all_log);
                         }
@@ -5741,6 +5747,7 @@ class CmppCreateCodeTask extends Pzlife
         try {
             while (true) {
                 $task_id = $this->redis->lpop($redisMessageMarketingSend);
+                $task_id = json_decode($task_id,true);
                 if (empty($task_id)) {
                     // exit('OVER');
                     $mul_task = $this->redis->lpop($redisMessagemulSend);
@@ -5755,7 +5762,8 @@ class CmppCreateCodeTask extends Pzlife
                     }
                 }
                 // Db::table('yx_user_send_code_task')->where('id',$task_id)->update(['yidong_channel_id' => 9, 'liantong_channel_id' => 9, 'dianxin_channel_id' => 9]);
-                $this->redis->rpush("index:meassage:business:sendtask", $task_id);
+                $task_id['deduct'] = 50; 
+                $this->redis->rpush("index:meassage:business:sendtask", json_encode($task_id));
             }
         } catch (\exception $e) {
             exception($e);
