@@ -781,6 +781,23 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
    
+    public function pushMultimediaMessageSendTask(){
+        $this->redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        /* 
+                                    1321785 1322036
+                                    */
+
+        // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
+        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_multimedia_message WHERE  `id` >= 86376 AND `id` < 89718 ");
+        foreach($task_id as $key => $value){
+            
+                $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id'=>$value['id'],'deduct' => 0]));
+            
+           
+        }
+    }
+
     //书写彩信任务日志并写入通道
     public function createMultimediaMessageSendTaskLog()
     {
