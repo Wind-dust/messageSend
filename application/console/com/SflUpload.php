@@ -2631,6 +2631,10 @@ class SflUpload extends Pzlife {
 
     }
 
+    public function sflSftpUpRiverForExcel(){
+        
+    }
+
 }
 
 class SFTPConnection {
