@@ -430,8 +430,8 @@ class Upload extends MyController
         if ($fileType[0] != 'image') {
             return ['3001']; //上传的不是图片
         }
-        if ($fileInfo['size'] > 1024 * 1024 * 2) {
-            return [ 'code' => '3002']; //上传图片不能超过2M
+        if ($fileInfo['size'] > 1024 * 80) {
+            return [ 'code' => '3002']; //上传图片不能超过80KB
         }
         $result = $this->app->upload->uploadFile($appid, $appkey, $fileInfo);
         // $this->apiLog($apiName, [$conId, $image], $result['code'], $conId);
