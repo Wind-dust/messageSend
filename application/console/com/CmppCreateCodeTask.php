@@ -1213,6 +1213,9 @@ class CmppCreateCodeTask extends Pzlife
                         break;
                     }
                     $real_send = json_decode($send, true);
+                    if (!isset($real_send['id'])) {
+                        continue;
+                    }
                     $sendTask = $this->getSendCodeTask($real_send['id']);
                     if (empty($sendTask)) {
                         // echo 'taskId_is_null' . "\n";
