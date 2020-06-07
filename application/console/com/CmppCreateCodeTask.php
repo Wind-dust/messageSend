@@ -512,9 +512,22 @@ class CmppCreateCodeTask extends Pzlife
                                     }
                  
                                 }
+                                /* $send_log = [
+                                    'task_no'      => $sendTask['task_no'],
+                                    'uid'          => $sendTask['uid'],
+                                    'source'       => $sendTask['source'],
+                                    'task_content' => $sendTask['task_content'],
+                                    'mobile'       => $mobilesend[$i],
+                                    'channel_id'   => $channel_id,
+                                    'send_length'  => $send_length,
+                                    'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
+                                    'send_status'  => 2,
+                                    'create_time'  => time(),
+                                ]; */
                                 $send_log = [
                                     'task_no'      => $sendTask['task_no'],
                                     'uid'          => $sendTask['uid'],
+                                    'source'       => $sendTask['source'],
                                     'task_content' => $sendTask['task_content'],
                                     'mobile'       => $mobilesend[$i],
                                     'channel_id'   => $channel_id,
@@ -539,6 +552,7 @@ class CmppCreateCodeTask extends Pzlife
                                 $true_log[]      = $send_log;
                             }else{
                                 if ($num <= $real_send['deduct'] * 100) {
+
                                     $send_log = [
                                         'task_no'        => $sendTask['task_no'],
                                         'uid'            => $sendTask['uid'],
@@ -546,10 +560,10 @@ class CmppCreateCodeTask extends Pzlife
                                         'task_content'   => $sendTask['task_content'],
                                         'source'         => $sendTask['source'],
                                         'mobile'         => $mobilesend[$i],
-                                        'send_length'    => $send_length,
                                         'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
                                         'send_status'    => 4,
                                         'create_time'    => time(),
+                                        'send_length'    => $send_length,
                                         'status_message' => 'DELIVRD', //无效号码
                                         'real_message'   => 'DEDUCT:1',
                                     ];
@@ -930,16 +944,21 @@ class CmppCreateCodeTask extends Pzlife
                             $j = 1;
                             Db::startTrans();
                             try {
-                                Db::table('yx_user_multimedia_message_log')->insertAll($true_log);
+                                if (!empty($true_log)) {
+                                    Db::table('yx_user_multimedia_message_log')->insertAll($true_log);
+                                }
                                 if (!empty($all_log)) {
                                     Db::table('yx_user_multimedia_message_log')->insertAll($all_log);
                                 }
                                 Db::commit();
-                                foreach ($push_messages as $key => $value) {
-                                    $send_channelid = $value['channel_id'];
-                                    unset($value['channel_id']);
-                                    $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                                if (!empty($push_messages)) {
+                                    foreach ($push_messages as $key => $value) {
+                                        $send_channelid = $value['channel_id'];
+                                        unset($value['channel_id']);
+                                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                                    }
                                 }
+                               
                             } catch (\Exception $e) {
                                 // $this->redis->rPush('index:meassage:business:sendtask', $send);
                                 if (!empty($rollback)) {
@@ -981,18 +1000,22 @@ class CmppCreateCodeTask extends Pzlife
                     // exit("SUCCESS");
                 }
 
-                if (!empty($true_log)) {
+               
                     Db::startTrans();
                     try {
-                        Db::table('yx_user_multimedia_message_log')->insertAll($true_log);
+                        if (!empty($true_log)) {
+                            Db::table('yx_user_multimedia_message_log')->insertAll($true_log);
+                        }
                         if (!empty($all_log)) {
                             Db::table('yx_user_multimedia_message_log')->insertAll($all_log);
                         }
                         Db::commit();
-                        foreach ($push_messages as $key => $value) {
-                            $send_channelid = $value['channel_id'];
-                            unset($value['channel_id']);
-                            $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                        if (!empty($push_messages)) {
+                            foreach ($push_messages as $key => $value) {
+                                $send_channelid = $value['channel_id'];
+                                unset($value['channel_id']);
+                                $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                            }
                         }
                     } catch (\Exception $e) {
                         // $this->redis->rPush('index:meassage:business:sendtask', $send);
@@ -1008,7 +1031,7 @@ class CmppCreateCodeTask extends Pzlife
                     unset($true_log);
                     unset($push_messages);
                     unset($rollback);
-                }
+                
                 /* Db::startTrans();
             try {
                 Db::table('yx_user_multimedia_message')->where(['id',' in', join(',',$send_task)])->update(['send_status' => 3]);
