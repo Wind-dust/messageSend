@@ -803,12 +803,9 @@ class CmppCreateCodeTask extends Pzlife
                                     */
 
         // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_multimedia_message WHERE  `id` > 86376 AND `id` < 89718 ");
+        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_multimedia_message WHERE  `id` > 86376  ");
         foreach($task_id as $key => $value){
-            
-                $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id'=>$value['id'],'deduct' => 0]));
-            
-           
+            $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id'=>$value['id'],'deduct' => 50]));
         }
     }
 
@@ -876,52 +873,157 @@ class CmppCreateCodeTask extends Pzlife
                     for ($i = 0; $i < count($mobilesend); $i++) {
                         $send_log = [];
                         if (checkMobile(trim($mobilesend[$i])) == true) {
-                            $prefix = substr(trim($mobilesend[$i]), 0, 7);
-                            $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
-                            $newres = array_shift($res);
-                            if ($newres) {
-                                if ($newres['source'] == 1) {
-                                    $channel_id = $yidong_channel_id;
-                                } elseif ($newres['source'] == 2) {
-                                    $channel_id = $liantong_channel_id;
-                                } elseif ($newres['source'] == 3) {
-                                    $channel_id = $dianxin_channel_id;
+                            $whitelist = Db::query("SELECT `id` FROM yx_whitelist WHERE `mobile` = ".$mobilesend[$i]);
+                            if (isset($real_send['deduct']) && $real_send['deduct'] > 0  && empty($whitelist)) {
+                                $num = 0;
+                                $num = mt_rand(0,10000);
+                                if ($this->mobileCheck($mobilesend[$i]) == true) {//空号
+                                    
+                                    $prefix = substr(trim($mobilesend[$i]), 0, 7);
+                                    $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                                    $newres = array_shift($res);
+                                    if ($newres) {
+                                        if ($newres['source'] == 1) {
+                                            $channel_id = $yidong_channel_id;
+                                        } elseif ($newres['source'] == 2) {
+                                            $channel_id = $liantong_channel_id;
+                                        } elseif ($newres['source'] == 3) {
+                                            $channel_id = $dianxin_channel_id;
+                                        }
+                    
+                                    }
+                                    $send_log = [
+                                        'task_no'      => $sendTask['task_no'],
+                                        'uid'          => $sendTask['uid'],
+                                        'source'       => $sendTask['source'],
+                                        'task_content' => $sendTask['title'],
+                                        'mobile'       => $mobilesend[$i],
+                                        'channel_id'   => $channel_id,
+                                        'send_status'  => 2,
+                                        'create_time'  => time(),
+                                    ];
+                                    $sendmessage = [
+                                        'mobile'      => $mobilesend[$i],
+                                        'mar_task_id' => $sendTask['id'],
+                                        'content'     => $sendTask['task_content'],
+                                        'channel_id'  => $channel_id,
+                                        'from'        => 'yx_user_send_code_task',
+                                    ];
+                                    if (!empty($sendTask['develop_no'])) {
+                                        $sendmessage['develop_code'] = $sendTask['develop_no'];
+                                    }
+            
+                                    // fwrite($myfile, $txt);
+                                    $push_messages[] = $sendmessage;
+                                    $true_log[]      = $send_log;
+
+                                    /* 
+                                    1321785 1322036
+                                    */
+
+                                }else{
+                                    if ($num <= $real_send['deduct'] * 100) {
+
+                                        $send_log = [
+                                            'task_no'        => $sendTask['task_no'],
+                                            'uid'            => $sendTask['uid'],
+                                            'title'          => $sendTask['title'],
+                                            'content'        => $sendTask['title'],
+                                            'mobile'         => $mobilesend[$i],
+                                            'send_status'    => 4,
+                                            'create_time'    => time(),
+                                            'status_message' => 'DELIVRD', 
+                                            'real_message'   => 'DEDUCT:1',
+                                        ];
+                                        $all_log[] = $send_log;
+                                        $this->redis->rpush('index:message:code:deduct:deliver',json_encode([
+                                            'task_no' => $sendTask['task_no'],
+                                            'mar_task_id' => $sendTask['id'],
+                                            'uid'            => $sendTask['uid'],
+                                            'msg_id'            => $sendTask['send_msg_id'],
+                                            'Stat' => 'DELIVRD',
+                                            'mobile' =>  $mobilesend[$i],
+                                            'content'   => $sendTask['task_content'],
+                                            'from'   => 'yx_user_multimedia_message',
+                                            'Submit_time'   => time(),
+                                        ]));
+                                    }else{
+                                        $prefix = substr(trim($mobilesend[$i]), 0, 7);
+                                        $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                                        $newres = array_shift($res);
+                                        if ($newres) {
+                                            if ($newres['source'] == 1) {
+                                                $channel_id = $yidong_channel_id;
+                                            } elseif ($newres['source'] == 2) {
+                                                $channel_id = $liantong_channel_id;
+                                            } elseif ($newres['source'] == 3) {
+                                                $channel_id = $dianxin_channel_id;
+                                            }
+                         
+                                        }
+                                        $send_log = [
+                                            'task_no'      => $sendTask['task_no'],
+                                            'uid'          => $sendTask['uid'],
+                                            'source'       => $sendTask['source'],
+                                            'task_content' => $sendTask['title'],
+                                            'mobile'       => $mobilesend[$i],
+                                            'channel_id'   => $channel_id,
+                                            'send_status'  => 2,
+                                            'create_time'  => time(),
+                                        ];
+                                        $sendmessage = [
+                                            'mobile'      => $mobilesend[$i],
+                                            'title'       => $sendTask['title'],
+                                            'mar_task_id' => $sendTask['id'],
+                                            'content'     => $sendTask['task_content'],
+                                            'channel_id'  => $channel_id,
+                                        ];
+                                        if (!empty($sendTask['develop_no'])) {
+                                            $sendmessage['develop_code'] = $sendTask['develop_no'];
+                                        }
+                
+                                        // fwrite($myfile, $txt);
+                                        $push_messages[] = $sendmessage;
+                                        $true_log[]      = $send_log;
+                                    }
                                 }
+
+                            }else{
+                                $prefix = substr(trim($mobilesend[$i]), 0, 7);
+                                $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                                $newres = array_shift($res);
+                                if ($newres) {
+                                    if ($newres['source'] == 1) {
+                                        $channel_id = $yidong_channel_id;
+                                    } elseif ($newres['source'] == 2) {
+                                        $channel_id = $liantong_channel_id;
+                                    } elseif ($newres['source'] == 3) {
+                                        $channel_id = $dianxin_channel_id;
+                                    }
+                                }
+                                $send_log = [
+                                    'task_no'      => $sendTask['task_no'],
+                                    'uid'          => $sendTask['uid'],
+                                    'source'       => $sendTask['source'],
+                                    'task_content' => $sendTask['title'],
+                                    'mobile'       => $mobilesend[$i],
+                                    'send_status'  => 2,
+                                    'create_time'  => time(),
+                                ];
+                                $sendmessage = [
+                                    'mobile'      => $mobilesend[$i],
+                                    'title'       => $sendTask['title'],
+                                    'mar_task_id' => $sendTask['id'],
+                                    'content'     => $sendTask['task_content'],
+                                    'channel_id'  => $channel_id,
+                                ];
+    
+                                // $txt = json_encode($send_log) . "\n";
+                                // fwrite($myfile, $txt);
+                                // $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
+                                $push_messages[] = $sendmessage;
+                                $true_log[]      = $send_log;
                             }
-                            // if ($newres) {
-                            //     if ($newres['source'] == 2) { //米加联通营销
-                            //         $channel_id = 8;
-                            //     } else if ($newres['source'] == 1) { //蓝鲸
-                            //         $channel_id = 2;
-
-                            //     } else if ($newres['source'] == 3) { //米加电信营销
-                            //         $channel_id = 7;
-                            //     }
-
-                            // }
-                            // print_r($newres);
-                            $send_log = [
-                                'task_no'      => $sendTask['task_no'],
-                                'uid'          => $sendTask['uid'],
-                                'source'       => $sendTask['source'],
-                                'task_content' => $sendTask['title'],
-                                'mobile'       => $mobilesend[$i],
-                                'send_status'  => 2,
-                                'create_time'  => time(),
-                            ];
-                            $sendmessage = [
-                                'mobile'      => $mobilesend[$i],
-                                'title'       => $sendTask['title'],
-                                'mar_task_id' => $sendTask['id'],
-                                'content'     => $sendTask['task_content'],
-                                'channel_id'  => $channel_id,
-                            ];
-
-                            // $txt = json_encode($send_log) . "\n";
-                            // fwrite($myfile, $txt);
-                            // $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
-                            $push_messages[] = $sendmessage;
-                            $true_log[]      = $send_log;
                         } else {
                             $send_log = [
                                 'task_no'        => $sendTask['task_no'],
