@@ -40,6 +40,7 @@ return [
     'httpchannelsix'                   => $commandPath . 'HttpChannelSix',
     'httpchannelKeMengtushu'           => $commandPath . 'HttpChannelKeMengTuShu',
     'httpchannelkemengzhuangxiu'       => $commandPath . 'HttpChannelKeMengZhuangXiu',
+    'httpchannelcaixinshanghailianlu'       => $commandPath . 'HttpChannelCaiXinShangHaiLianLu',
     'httpchannelcaixinhuaxingtongxun'  => $commandPath . 'HttpChannelCaiXinHuaxingtongxun',
     'httpchannelcaixinhangzhoumaiyuan' => $commandPath . 'HttpChannelCaiXinHangZhouMaiYuan',
     'httpchannelcaixinchuanglan' => $commandPath . 'HttpChannelCaiXinChuangLan',

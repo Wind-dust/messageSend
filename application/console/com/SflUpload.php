@@ -2632,7 +2632,80 @@ class SflUpload extends Pzlife {
     }
 
     public function sflSftpUpRiverForExcel(){
-        
+        ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
+        $receive_alls = [];
+        $upriver = Db::query("SELECT `mobile`,`message_info`,`create_time` FROM yx_user_upriver WHERE `uid` = '92' AND `create_time` <=1590854400 ");
+        foreach ($upriver as $key => $value) {
+            $source = Db::query("SELECT `name` FROM yx_number_segment WHERE `mobile` =  ".mb_substr($value['mobile'],0,3));
+            $receive_all = [];
+            $receive_all = [
+                'MOBILE' => $value['mobile'],
+                'TYPE' => 'SMS',
+                'CONTENT' => $value['message_info'],
+                'receive_time' => date('Y-m-d H:i:s',$value['create_time']),
+                'CITY' => '',
+                'CHANNEL' => $source[0]['name'],
+            ];
+            $receive_alls[] = $receive_all;
+            // print_r($receive_all);die;
+            // $upriver[0]['CHANNEL']
+
+        }
+        $objExcel = new PHPExcel();
+        // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+        // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
+        $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+        $objWriter->setOffice2003Compatibility(true);
+
+        //设置文件属性
+        $objProps = $objExcel->getProperties();
+        $objProps->setTitle("imp_mobile_status_report");
+        $objProps->setSubject("金卡1:" . date('Y-m-d H:i:s', time()));
+
+        $objExcel->setActiveSheetIndex(0);
+        $objActSheet = $objExcel->getActiveSheet();
+
+        $date = date('Y-m-d H:i:s', time());
+
+        //设置当前活动sheet的名称
+        $objActSheet->setTitle("imp_mobile_status_report");
+        $CellList = array(
+            array('MOBILE', 'MOBILE'),
+            array('TYPE', 'TYPE'),
+            array('CONTENT', 'CONTENT'),
+            array('receive_time', 'receive_time'),
+            array('CITY', 'CITY'),
+            array('CHANNEL', 'CHANNEL'),
+        );
+
+        foreach ($CellList as $i => $Cell) {
+            $row = chr(65 + $i);
+            $col = 1;
+            $objActSheet->setCellValue($row . $col, $Cell[1]);
+            $objActSheet->getColumnDimension($row)->setWidth(30);
+
+            $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+            $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+            $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+            // $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+            // $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+            $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        }
+        // $outputFileName = "receive_sms_2_20200524.xlsx";
+        $i              = 0;
+        foreach ($receive_alls as $key => $orderdata) {
+            //行
+            $col = $key + 2;
+            foreach ($CellList as $i => $Cell) {
+                //列
+                $row = chr(65 + $i);
+                $objActSheet->getRowDimension($i)->setRowHeight(15);
+                $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            }
+        }
+        $objWriter->save('imp_mobile_feedback_sms_2_20200530.xlsx');
     }
 
 }
