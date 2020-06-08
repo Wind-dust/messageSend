@@ -474,7 +474,7 @@ class Administrator extends CommonIndex
             return ['code' => '3005'];
         }
 
-        $user = DbUser::getUserInfo(['id' => $uids[0]], 'id,reservation_service,user_status', true);
+        $user = DbUser::getUserInfo(['id' => $uids[0]], 'id,reservation_service,user_status,market_deduct', true);
         if ($user['user_status'] != 2) {
             return ['code' => '3006'];
         }
@@ -496,7 +496,7 @@ class Administrator extends CommonIndex
             foreach ($real_usertask as $real => $usertask) {
                 // $res = $this->redis->rpush("index:meassage:marketing:sendtask",$usertask['id']); 
                 if (isset($usertask['appointment_time']) && $usertask['appointment_time'] > 0) {
-                    $res = $this->redis->rpush("index:meassage:marketingtiming:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => $usertask['appointment_time']])); //定时
+                    $res = $this->redis->rpush("index:meassage:marketingtiming:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => $usertask['appointment_time'],'deduct' => $user['market_deduct']])); //定时
                 } else {
                     $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => 0])); //非定时
                 }

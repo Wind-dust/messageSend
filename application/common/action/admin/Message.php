@@ -127,7 +127,7 @@ class Message extends CommonIndex {
             return ['code' => '3005'];
         }
 
-        $user = DbUser::getUserInfo(['id' => $uids[0]], 'id,reservation_service,user_status', true);
+        $user = DbUser::getUserInfo(['id' => $uids[0]], 'id,reservation_service,user_status,multimedia_deduct', true);
         if ($user['user_status'] != 2) {
             return ['code' => '3006'];
         }
@@ -148,7 +148,7 @@ class Message extends CommonIndex {
             }
             if ($free_trial == 2) {
                 foreach ($real_usertask as $real => $usertask) {
-                    $res = $this->redis->rpush("index:meassage:multimediamessage:sendtask", $usertask['id']);
+                    $res = $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' =>$usertask['id'],'deduct' => $user['multimedia_deduct']]));
                 }
             }
 
