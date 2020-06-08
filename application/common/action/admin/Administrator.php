@@ -383,20 +383,20 @@ class Administrator extends CommonIndex
                 $user_ids[$value['uid']][] = $value['id'];
             }
 
-            if (array_key_exists($value['uid'],$billing)) {
+            if (array_key_exists($value['uid'], $billing)) {
                 $billing[$value['uid']] += $value['real_num'];
-            }else{
+            } else {
                 $billing[$value['uid']] = $value['real_num'];
             }
         }
-        
+
         $where_equitise = [
-            ['uid', 'IN', join(',',$uids)],['business_id', '=', 5]
+            ['uid', 'IN', join(',', $uids)], ['business_id', '=', 5]
         ];
 
-        
+
         $user_equities = DbAdministrator::getUserEquities($where_equitise, 'id,uid,num_balance', false);
-        
+
 
 
         Db::startTrans();
@@ -496,9 +496,9 @@ class Administrator extends CommonIndex
             foreach ($real_usertask as $real => $usertask) {
                 // $res = $this->redis->rpush("index:meassage:marketing:sendtask",$usertask['id']); 
                 if (isset($usertask['appointment_time']) && $usertask['appointment_time'] > 0) {
-                    $res = $this->redis->rpush("index:meassage:marketingtiming:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => $usertask['appointment_time']]));//定时
-                }else{
-                    $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $usertask['id'],'send_time' => 0]));//非定时
+                    $res = $this->redis->rpush("index:meassage:marketingtiming:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => $usertask['appointment_time']])); //定时
+                } else {
+                    $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => 0])); //非定时
                 }
                 // marketing
             }
@@ -610,17 +610,17 @@ class Administrator extends CommonIndex
                 $user_ids[$value['uid']][] = $value['id'];
             }
 
-            if (array_key_exists($value['uid'],$billing)) {
+            if (array_key_exists($value['uid'], $billing)) {
                 $billing[$value['uid']] += $value['real_num'];
-            }else{
+            } else {
                 $billing[$value['uid']] = $value['real_num'];
             }
         }
         $where_equitise = [
-            ['uid', 'IN', join(',',$uids)],['business_id', '=', 6]
+            ['uid', 'IN', join(',', $uids)], ['business_id', '=', 6]
         ];
 
-        
+
         $user_equities = DbAdministrator::getUserEquities($where_equitise, 'id,uid,num_balance', false);
         Db::startTrans();
         try {
@@ -641,7 +641,7 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function distributionCodeTaskChannel($effective_id = [],$yidong_channel_id, $liantong_channel_id, $dianxin_channel_id,  $business_id)
+    public function distributionCodeTaskChannel($effective_id = [], $yidong_channel_id, $liantong_channel_id, $dianxin_channel_id,  $business_id)
     {
         $channel = DbAdministrator::getSmsSendingChannel(['id' => $yidong_channel_id], 'id,title,channel_price', true);
         if (empty($channel)) {
@@ -684,7 +684,7 @@ class Administrator extends CommonIndex
                 // }
             }
         }
-        
+
         // die;
         // print_r($uids);die;
         if (count($uids) > 1) {
@@ -698,12 +698,12 @@ class Administrator extends CommonIndex
             return ['code' => '3005'];
         }
 
-        $user = DbUser::getUserInfo(['id' => $uids[0]], 'id,reservation_service,user_status', true);
+        $user = DbUser::getUserInfo(['id' => $uids[0]], 'id,reservation_service,user_status,business_deduct', true);
         if ($user['user_status'] != 2) {
             return ['code' => '3006'];
         }
         // print_r($num);die;
-       /*  if ($num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
+        /*  if ($num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3007'];
         } */
         $free_trial = 2;
@@ -718,7 +718,7 @@ class Administrator extends CommonIndex
                 DbAdministrator::editUserSendCodeTask(['free_trial' => $free_trial,  'yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id], $value['id']);
             }
             foreach ($real_usertask as $real => $usertask) {
-                $res = $this->redis->rpush("index:meassage:business:sendtask", $usertask['id']);
+                $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $usertask['id'], 'deduct' => $user['business_deduct']]));
             }
             Db::commit();
             return ['code' => '200'];
@@ -729,7 +729,8 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function thirdPartyMMSTemplateReport($channel_id,$template_id){
+    public function thirdPartyMMSTemplateReport($channel_id, $template_id)
+    {
         $template =  DbSendMessage::getUserMultimediaTemplate(['template_id' => $template_id], '*', true);
         if ($template['status'] != 2 || empty($template)) {
             return ['code' => '3003', 'msg' => '模板未审核通过或者该模板不存在'];
@@ -747,9 +748,9 @@ class Administrator extends CommonIndex
             $data = [];
             $data['id'] = '200401';
             $data['pwd']  = 'zd1403';
-            $data['subject']= bin2hex($template['title']);
+            $data['subject'] = bin2hex($template['title']);
             // $subject  = $template['title'];
-           /*  $desubject = hex2bin($subject);
+            /*  $desubject = hex2bin($subject);
             echo $subject."\n";
             echo $desubject."\n";
             die; */
@@ -757,28 +758,31 @@ class Administrator extends CommonIndex
             $tvdata = [];
             $pdata = [];
             $pvdata = [];
-           
+
             foreach ($multimedia_message_frame as $key => $value) {
                 if (!empty($value['content'])) {
-                    $tdata[] = 'tt'.$value['num'].'=txt';
-                    $tvdata[] = 'tv'.$value['num'].'='.bin2hex($value['content']);
-                    $data['tt'.$value['num']] = 'txt';
-                    $data['tv'.$value['num']] = bin2hex($value['content']);
+                    $tdata[] = 'tt' . $value['num'] . '=txt';
+                    $tvdata[] = 'tv' . $value['num'] . '=' . bin2hex($value['content']);
+                    $data['tt' . $value['num']] = 'txt';
+                    $data['tv' . $value['num']] = bin2hex($value['content']);
                 }
                 if (!empty($value['image_path'])) {
-                    $pdata[] = 'pt'.$value['num'].'='.$value['image_type'];
-                    $pvdata[] = 'pv'.$value['num'].'='.bin2hex($value['image_path']);
-                    $data['pt'.$value['num']] = $value['image_type'];
-                    $data['pv'.$value['num']] = bin2hex(file_get_contents($value['image_path']));
+                    $pdata[] = 'pt' . $value['num'] . '=' . $value['image_type'];
+                    $pvdata[] = 'pv' . $value['num'] . '=' . bin2hex($value['image_path']);
+                    $data['pt' . $value['num']] = $value['image_type'];
+                    $data['pv' . $value['num']] = bin2hex(file_get_contents($value['image_path']));
                 }
             }
-            print_r($data);die;
+            print_r($data);
+            die;
             $result = sendRequest($report_api, 'post', $data);
-            print_r($result);die;
+            print_r($result);
+            die;
         }
     }
 
-    public function sflThirdPartyMMSTemplateReport($channel_id,$sfl_relation_id){
+    public function sflThirdPartyMMSTemplateReport($channel_id, $sfl_relation_id)
+    {
         $mul      = DbSendMessage::getSflMultimediaTemplate(['sfl_relation_id' => $sfl_relation_id], '*', true);
         $fram     = DbSendMessage::getSflMultimediaTemplateFrame(['sfl_multimedia_template_id' => $mul['id'], 'sfl_model_id' => $mul['sfl_model_id']], '*', false);
         $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id], 'id,title,business_id,channel_price', true);
@@ -786,7 +790,6 @@ class Administrator extends CommonIndex
             return ['code' => '3002'];
         }
         if ($channel_id == 99) {
-
         }
         $account = 'C4786051';
         $title = $mul['title'];
