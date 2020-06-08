@@ -1344,10 +1344,10 @@ class SflUpload extends Pzlife {
                                 // print_r($model_check[$value[0]]);
 
                                 // die;
-                                if ($value[2] != $model_check[$value[0]]) {
+                                /* if ($value[2] != $model_check[$value[0]]) {
                                     //校验失败
                                     return ['code' => 200, "error" => "校验失败"];
-                                }
+                                } */
                             }
                         }
                         // print_r($send_data);die;
@@ -2273,7 +2273,7 @@ class SflUpload extends Pzlife {
 
             $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
             ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  1591113600 AND   `create_time` <  1591200000 ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  1591459200 AND   `create_time` <  1591545600 ");
             $ids          = [];
             foreach ($mul_task_ids as $key => $value) {
                 $ids[] = $value['id'];
@@ -2335,7 +2335,7 @@ class SflUpload extends Pzlife {
                         'MOBILE'                   => $receipts[$num - 1]['mobile'],
                         'STATUS'                   => $receipts[$num - 1]['status_message'],
                         'real_message'             => $receipts[0]['real_message'],
-                        'SENDING_TIME'             => date('Y-m-d H:i:s', $task[0]['create_time']),
+                        'SENDING_TIME'             => date('Y-m-d H:i:s', 1591502702),
                     ];
                     $num = mt_rand(0, 5378);
                     /* if ($num>=0 && $num < 113) {
@@ -2352,7 +2352,7 @@ class SflUpload extends Pzlife {
                         'MOBILE'                   => $task[0]['mobile'],
                         'STATUS'                   => 'MMS:1',
                         'real_message'             => '',
-                        'SENDING_TIME'             => date('Y-m-d H:i:s', $task[0]['create_time']),
+                        'SENDING_TIME'             => date('Y-m-d H:i:s', 1591502702),
                     ];
                     $num = mt_rand(0, 5378);
                     if ($num>=0 && $num < 144) {
@@ -2430,7 +2430,7 @@ class SflUpload extends Pzlife {
                     $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                 }
             }
-            $objWriter->save('imp_mobile_status_report_mms_1_20200603.xlsx');
+            $objWriter->save('imp_mobile_status_report_mms_1_20200607.xlsx');
         } catch (\Exception $th) {
             exception($th);
         }
@@ -2444,8 +2444,10 @@ class SflUpload extends Pzlife {
         // print_r(realpath("../"). "\yt_area_mobile.csv");die;
 
         try {
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591113600 AND   `create_time` <  1591200000 AND `task_content` NOT LIKE '%test%' ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591200000 AND   `create_time` <  1591286400 AND `task_content` NOT LIKE '%test%' ");
             $ids          = [];
+            $i = 1;
+            $j = 1;
             foreach ($mul_task_ids as $key => $value) {
                 // $ids[] = $value['id'];
                 /*  $objPHPExcel = $objReader->load(realpath("./") . "/0522.xlsx");
@@ -2534,6 +2536,7 @@ class SflUpload extends Pzlife {
                     $receive_all['STATUS'] = 'SMS:1';
                     } */
                     $receive_alls[] = $receive_all;
+                    $i++;
                     // $mysql_connect->table('yx_sfl_send_task_receipt')->where('id',$task[0]['id'])->update(['mseeage_id' => $task[0]['mseeage_id']]);
                 } else {
                     // $task = $mysql_connect->query("SELECT * FROM yx_sfl_multimedia_message WHERE `id` = ".$value);
@@ -2564,66 +2567,24 @@ class SflUpload extends Pzlife {
                         }
                     }
                     $receive_alls[] = $receive_all;
+                    $i++;
+                    
+
+                }
+                if ($i > 200000) {
+                    $name = "receive_sms_".$j."_".date('Ymd',1591200000).".xlsx";
+                    $this->derivedTables($receive_alls,$name);
+                    $j++;
+                    $receive_alls = [];
+                    $i = 1;
                 }
             }
-
-            //未知:
-
-            $objExcel = new PHPExcel();
-            // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
-            // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
-            $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
-            $objWriter->setOffice2003Compatibility(true);
-
-            //设置文件属性
-            $objProps = $objExcel->getProperties();
-            $objProps->setTitle("imp_mobile_status_report");
-            $objProps->setSubject("金卡1:" . date('Y-m-d H:i:s', time()));
-
-            $objExcel->setActiveSheetIndex(0);
-            $objActSheet = $objExcel->getActiveSheet();
-
-            $date = date('Y-m-d H:i:s', time());
-
-            //设置当前活动sheet的名称
-            $objActSheet->setTitle("imp_mobile_status_report");
-            $CellList = array(
-                array('MESSAGE_ID', 'MESSAGE_ID'),
-                array('COMMUNICATION_CHANNEL_ID', 'COMMUNICATION_CHANNEL_ID'),
-                array('MOBILE', 'MOBILE'),
-                array('STATUS', 'STATUS'),
-                array('SENDING_TIME', 'SENDING_TIME'),
-                array('real_message', 'real_message'),
-            );
-
-            foreach ($CellList as $i => $Cell) {
-                $row = chr(65 + $i);
-                $col = 1;
-                $objActSheet->setCellValue($row . $col, $Cell[1]);
-                $objActSheet->getColumnDimension($row)->setWidth(30);
-
-                $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
-                $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
-                $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
-                // $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
-                // $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
-                $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-                // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            if (!empty($receive_alls)) {
+                $name = "receive_sms_".$j."_".date('Ymd',1591200000).".xlsx";
+                $this->derivedTables($receive_alls,$name);
+                   
             }
-            $outputFileName = "receive_sms_2_20200524.xlsx";
-            $i              = 0;
-            foreach ($receive_alls as $key => $orderdata) {
-                //行
-                $col = $key + 2;
-                foreach ($CellList as $i => $Cell) {
-                    //列
-                    $row = chr(65 + $i);
-                    $objActSheet->getRowDimension($i)->setRowHeight(15);
-                    $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
-                    $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                }
-            }
-            $objWriter->save('imp_mobile_status_report_sms_1_20200603.xlsx');
+         
         } catch (\Exception $th) {
             //throw $th;
             exception($th);
@@ -2706,6 +2667,65 @@ class SflUpload extends Pzlife {
             }
         }
         $objWriter->save('imp_mobile_feedback_sms_2_20200530.xlsx');
+    }
+
+    public function derivedTables($receive_alls,$name){
+        $objExcel = new PHPExcel();
+        // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+        // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
+        $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+        $objWriter->setOffice2003Compatibility(true);
+
+        //设置文件属性
+        $objProps = $objExcel->getProperties();
+        $objProps->setTitle("imp_mobile_status_report");
+        $objProps->setSubject("金卡1:" . date('Y-m-d H:i:s', time()));
+
+        $objExcel->setActiveSheetIndex(0);
+        $objActSheet = $objExcel->getActiveSheet();
+
+        $date = date('Y-m-d H:i:s', time());
+
+        //设置当前活动sheet的名称
+        $objActSheet->setTitle("imp_mobile_status_report");
+        $CellList = array(
+            array('MESSAGE_ID', 'MESSAGE_ID'),
+            array('COMMUNICATION_CHANNEL_ID', 'COMMUNICATION_CHANNEL_ID'),
+            array('MOBILE', 'MOBILE'),
+            array('STATUS', 'STATUS'),
+            array('SENDING_TIME', 'SENDING_TIME'),
+        );
+
+        foreach ($CellList as $i => $Cell) {
+            $row = chr(65 + $i);
+            $col = 1;
+            $objActSheet->setCellValue($row . $col, $Cell[1]);
+            $objActSheet->getColumnDimension($row)->setWidth(30);
+
+            $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+            $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+            $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+            // $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+            // $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+            $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        }
+        // $outputFileName = "receive_mms_1_20200523.xlsx";
+        $i = 0;
+        foreach ($receive_alls as $key => $orderdata) {
+            //行
+            $col = $key + 2;
+            foreach ($CellList as $i => $Cell) {
+                //列
+                $row = chr(65 + $i);
+                $objActSheet->getRowDimension($i)->setRowHeight(15);
+                $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            }
+        }
+        //imp_mobile_status_report_mms_1_20200531.xlsx
+        $objWriter->save($name);
+        return 1;
     }
 
 }
