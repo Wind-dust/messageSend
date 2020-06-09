@@ -1513,6 +1513,7 @@ class SflUpload extends Pzlife {
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMSTest') {
+                    continue;
                     $send_data = [];
                     if ($son_path_data !== false) {
 
@@ -1848,7 +1849,7 @@ class SflUpload extends Pzlife {
                         // die;
                     }
                 } elseif ($value == 'SMSTest') {
-                    continue;
+                    // continue;
                     $send_data    = [];
                     $SMS_model    = [];
                     $SMSmessage   = [];
