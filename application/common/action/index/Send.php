@@ -386,10 +386,9 @@ return $result;
         }
         if ($data['free_trial'] == 2) {
             // $data['free_trial'] = 2;
-            
-                    $data['yidong_channel_id'] = 18;
-                    $data['liantong_channel_id'] = 19;
-                    $data['dianxin_channel_id'] = 19;
+            $data['yidong_channel_id'] = 18;
+            $data['liantong_channel_id'] = 19;
+            $data['dianxin_channel_id'] = 19;
             
         }
         if (!empty($msg_id)) {
