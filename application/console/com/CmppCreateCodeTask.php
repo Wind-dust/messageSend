@@ -7359,7 +7359,7 @@ class CmppCreateCodeTask extends Pzlife
                             // print_r($rva);
                             $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insert($rva);
                         } */
-                        // $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insertAll($receipt);
+                        $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insertAll($receipt);
                     }
                     if (!empty($send_msg)) {
                         foreach ($send_msg as $skey => $svalue) {
@@ -7650,7 +7650,7 @@ class CmppCreateCodeTask extends Pzlife
                 }
                 if (!empty($receipt)) {
                     // print_r($receipt);die;
-                    // $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insertAll($receipt);
+                    $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insertAll($receipt);
                 }
                 if (!empty($send_msg)) {
                     foreach ($send_msg as $skey => $svalue) {
