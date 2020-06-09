@@ -522,9 +522,9 @@ return $result;
         if ($data['free_trial'] == 2) {
             // $data['free_trial'] = 2;
             if ($user['pid'] == 10) {
-                $data['yidong_channel_id'] = 85;
-                $data['liantong_channel_id'] = 85;
-                $data['dianxin_channel_id'] = 85;
+                $data['yidong_channel_id'] = 60;
+                $data['liantong_channel_id'] = 62;
+                $data['dianxin_channel_id'] = 61;
             } elseif ($user['id'] == 91) {
                 $data['yidong_channel_id'] = 83;
                 $data['liantong_channel_id'] = 84;
@@ -534,17 +534,17 @@ return $result;
                 // $data['dianxin_channel_id'] = 9;
             } elseif ($user['pid'] == 137) {
                 if ($user['id'] == 133) {
-                    $data['yidong_channel_id'] = 85;
-                    $data['liantong_channel_id'] = 85;
-                    $data['dianxin_channel_id'] = 85;
+                    $data['yidong_channel_id'] = 60;
+                    $data['liantong_channel_id'] = 62;
+                    $data['dianxin_channel_id'] = 61;
                 } elseif ($user['id'] == 134) {
                     $data['yidong_channel_id'] = 95;
                     $data['liantong_channel_id'] = 95;
                     $data['dianxin_channel_id'] = 95;
                 } else {
-                    $data['yidong_channel_id'] = 85;
-                    $data['liantong_channel_id'] = 85;
-                    $data['dianxin_channel_id'] = 85;
+                    $data['yidong_channel_id'] = 60;
+                    $data['liantong_channel_id'] = 62;
+                    $data['dianxin_channel_id'] = 61;
                 }
                 // $data['yidong_channel_id'] = 9;
                 // $data['liantong_channel_id'] = 9;
@@ -559,9 +559,9 @@ return $result;
                     $data['liantong_channel_id'] = 84;
                     $data['dianxin_channel_id'] = 84;
                 } else {
-                    $data['yidong_channel_id'] = 85;
-                    $data['liantong_channel_id'] = 85;
-                    $data['dianxin_channel_id'] = 85;
+                    $data['yidong_channel_id'] = 60;
+                    $data['liantong_channel_id'] = 62;
+                    $data['dianxin_channel_id'] = 61;
                 }
             }
         }
