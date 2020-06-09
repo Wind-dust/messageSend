@@ -4440,7 +4440,7 @@ class CmppCreateCodeTask extends Pzlife
             $day_users                = [];
             // $start_time               = strtotime('-10 days');
             // print_r($start_time);die;
-            $start_time = (int) strtotime(date('2020-05-01'));
+            $start_time = (int) strtotime(date('2020-06-01'));
             // $end_time = $start_time + 86400;
             // echo $end_time;die;
             while(true){
