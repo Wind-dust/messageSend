@@ -531,6 +531,13 @@ return $result;
                 // $data['yidong_channel_id'] = 9;
                 // $data['liantong_channel_id'] = 9;
                 // $data['dianxin_channel_id'] = 9;
+            }elseif ($user['id'] == 110) {//快递
+                $data['yidong_channel_id'] = 85;
+                $data['liantong_channel_id'] = 85;
+                $data['dianxin_channel_id'] = 85;
+                // $data['yidong_channel_id'] = 9;
+                // $data['liantong_channel_id'] = 9;
+                // $data['dianxin_channel_id'] = 9;
             } elseif ($user['pid'] == 137) {
                 if ($user['id'] == 133) {
                     $data['yidong_channel_id'] = 60;
