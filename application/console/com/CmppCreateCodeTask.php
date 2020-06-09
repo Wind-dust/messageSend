@@ -7100,6 +7100,9 @@ class CmppCreateCodeTask extends Pzlife
             }
         } */
         try {
+            $receipt_id = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_multimediatask_receipt ORDER BY `id` DESC LIMIT 1  " )[0]['id'];
+            // $receipt_id = 190697;
+            // print_r($receipt_id);die;
             $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time);
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time;die;
             // $white_send = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `` `create_time` >  ".$tody_time );
@@ -7127,6 +7130,7 @@ class CmppCreateCodeTask extends Pzlife
                             if (in_array($end_num, ['000000', '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999'])) {
                                 $rece = [];
                                 $rece = [
+                                    'id' => $receipt_id,
                                     'mseeage_id'      => $value['mseeage_id'],
                                     'template_id'      => $value['sfl_relation_id'],
                                     'task_id' => $value['id'],
@@ -7135,6 +7139,7 @@ class CmppCreateCodeTask extends Pzlife
                                     'status_message' => 'MMS:2',
                                 ];
                                 $receipt[] = $rece;
+                                $receipt_id++;
                             } else {
                                 if ($deduct  == 1) {
                                     //按无效号码计算
@@ -7184,6 +7189,7 @@ class CmppCreateCodeTask extends Pzlife
                                         } else {
                                             $rece = [];
                                             $rece = [
+                                                'id' => $receipt_id,
                                                 'task_id' => $value['id'],
                                                 'mseeage_id'      => $value['mseeage_id'],
                                                 'template_id'      => $value['sfl_relation_id'],
@@ -7192,6 +7198,7 @@ class CmppCreateCodeTask extends Pzlife
                                                 'status_message' => 'MMS:1',
                                             ];
                                             $receipt[] = $rece;
+                                            $receipt_id++;
                                         }
                                     } else {
                                         if (in_array(trim($value['mobile']), $fault) || in_array(trim($value['mobile']), $bir)) {
@@ -7238,6 +7245,7 @@ class CmppCreateCodeTask extends Pzlife
                                         } else {
                                             $rece = [];
                                             $rece = [
+                                                'id' => $receipt_id,
                                                 'task_id' => $value['id'],
                                                 'mseeage_id'      => $value['mseeage_id'],
                                                 'template_id'      => $value['sfl_relation_id'],
@@ -7246,6 +7254,7 @@ class CmppCreateCodeTask extends Pzlife
                                                 'status_message' => 'MMS:1',
                                             ];
                                             $receipt[] = $rece;
+                                            $receipt_id++; 
                                         }
                                     }
                                 } else {
@@ -7289,6 +7298,7 @@ class CmppCreateCodeTask extends Pzlife
                         } else {
                             $rece = [];
                             $rece = [
+                                'id' => $receipt_id,
                                 'mseeage_id'      => $value['mseeage_id'],
                                 'template_id'      => $value['sfl_relation_id'],
                                 'task_id' => $value['id'],
@@ -7296,17 +7306,19 @@ class CmppCreateCodeTask extends Pzlife
                                 'messageinfo' => '发送失败',
                                 'status_message' => 'MMS:2',
                             ];
+                            
                             $receipt[] = $rece;
+                            $receipt_id++;
                             // $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insert();
                         }
                     }
                     if (!empty($receipt)) {
                         // print_r($receipt);
-                        foreach($receipt as $rkey => $rva){
-                            print_r($rva);
+                      /*   foreach($receipt as $rkey => $rva){
+                            // print_r($rva);
                             $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insert($rva);
-                        }
-                        // $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insertAll($receipt);
+                        } */
+                        $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insertAll($receipt);
                     }
                     if (!empty($send_msg)) {
                         foreach ($send_msg as $skey => $svalue) {
@@ -7336,6 +7348,7 @@ class CmppCreateCodeTask extends Pzlife
                         if (in_array($end_num, ['000000', '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999'])) {
                             $rece = [];
                             $rece = [
+                                'id' => $receipt_id,
                                 'mseeage_id'      => $value['mseeage_id'],
                                 'template_id'      => $value['sfl_relation_id'],
                                 'task_id' => $value['id'],
@@ -7389,6 +7402,7 @@ class CmppCreateCodeTask extends Pzlife
                                     } else {
                                         $rece = [];
                                         $rece = [
+                                            'id' => $receipt_id,
                                             'task_id' => $value['id'],
                                             'mseeage_id'      => $value['mseeage_id'],
                                             'template_id'      => $value['sfl_relation_id'],
@@ -7440,6 +7454,7 @@ class CmppCreateCodeTask extends Pzlife
                                     } else {
                                         $rece = [];
                                         $rece = [
+                                            'id' => $receipt_id,
                                             'task_id' => $value['id'],
                                             'mseeage_id'      => $value['mseeage_id'],
                                             'template_id'      => $value['sfl_relation_id'],
@@ -7541,6 +7556,7 @@ class CmppCreateCodeTask extends Pzlife
                     } else {
                         $rece = [];
                         $rece = [
+                            'id' => $receipt_id,
                             'mseeage_id'      => $value['mseeage_id'],
                             'template_id'      => $value['sfl_relation_id'],
                             'task_id' => $value['id'],
