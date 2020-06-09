@@ -514,7 +514,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                         $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                         $send_data['my_submit_time'] = time(); //发送时间戳
                                         $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, json_encode($send_data));
-                                        usleep(300);
+                                        usleep(5);
                                         socket_write($socket, $headData . $bodyData, $Total_Length);
                                         $send_status = 2;
                                         ++$i;
@@ -526,6 +526,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                     if ($i > $security_master) {
                                         $i    = 0;
                                     }
+                                    usleep(50);
                                     continue;
                                 } else { //单条短信
 
@@ -571,14 +572,14 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
 
                                     $send_status = 2;
-                                    usleep(300);
+                                    usleep(150);
                                 }
                             } else { //心跳
                                 $Command_Id  = 0x00000008; //保持连接
                                 $Total_Length = 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                 if ( $receive != 2) {
-                                    socket_write($socket, $headData, $Total_Length);
+                                    // socket_write($socket, $headData, $Total_Length);
                                 }
                                 sleep(1);
                             }
