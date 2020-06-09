@@ -5304,65 +5304,66 @@ class CmppCreateCodeTask extends Pzlife
                 $day_businessSettlement   = [];
                 $day_users                = [];
                 $code_task_log = [];
-                $code_task_log            = Db::query("SELECT * FROM yx_user_send_task_log WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
+                $code_task_log            = Db::query("SELECT `id` FROM yx_user_send_task_log WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
                 foreach($code_task_log as $key => $value){
-                    $send_length = mb_strlen($value['task_content'], 'utf8');
+                    $task_log = Db::query("SELECT `*` FROM yx_user_send_task_log WHERE `id` = " . $value['id']);
+                    $send_length = mb_strlen($task_log[0]['task_content'], 'utf8');
                     $num         = 1;
-                    if (empty($value['status_message']) && empty($value['real_message'])) {
-                        $task = Db::query("SELECT id FROM yx_user_send_task WHERE `task_no` = '" . $value['task_no'] . "' LIMIT 1 ");
+                    if (empty($task_log[0]['status_message']) && empty($task_log[0]['real_message'])) {
+                        $task = Db::query("SELECT id FROM yx_user_send_task WHERE `task_no` = '" . $task_log[0]['task_no'] . "' LIMIT 1 ");
                         if (empty($task)) {
                             continue;
                         }
-                        $receipt = Db::query("SELECT `status_message` FROM yx_send_task_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $value['mobile'] . "' LIMIT 1 ");
+                        $receipt = Db::query("SELECT `status_message` FROM yx_send_task_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $task_log[0]['mobile'] . "' LIMIT 1 ");
                         if (empty($receipt)) {
-                            if ($value['create_time'] + 259200 < time()) {
-                                $value['status_message'] = 'DELIVRD';
+                            if ($task_log[0]['create_time'] + 259200 < time()) {
+                                $task_log[0]['status_message'] = 'DELIVRD';
                             }
                         } else {
-                            $value['status_message'] = $receipt[0]['status_message'];
+                            $task_log[0]['status_message'] = $receipt[0]['status_message'];
                         }
                     }
                     $num         = 1;
                     if ($send_length > 70) {
                         $num = ceil($send_length / 67);
                     }
-                    $day   = date('Ymd', $value['create_time']);
+                    $day   = date('Ymd', $task_log[0]['create_time']);
                     if (!array_key_exists($day, $day_users)) {
                         $day_users[$day] = [];
                     }
-                    if (in_array($value['uid'], $day_users[$day])) {
-                        $day_businessSettlement[$day][$value['uid']]['num'] += $num;
-                        $day_businessSettlement[$day][$value['uid']]['mobile_num'] += 1;
-                        if ($value['status_message'] == 'DELIVRD') {
-                            if (isset($day_businessSettlement[$day][$value['uid']]['success'])) {
-                                $day_businessSettlement[$day][$value['uid']]['success'] += $num;
+                    if (in_array($task_log[0]['uid'], $day_users[$day])) {
+                        $day_businessSettlement[$day][$task_log[0]['uid']]['num'] += $num;
+                        $day_businessSettlement[$day][$task_log[0]['uid']]['mobile_num'] += 1;
+                        if ($task_log[0]['status_message'] == 'DELIVRD') {
+                            if (isset($day_businessSettlement[$day][$task_log[0]['uid']]['success'])) {
+                                $day_businessSettlement[$day][$task_log[0]['uid']]['success'] += $num;
                             } else {
-                                $day_businessSettlement[$day][$value['uid']]['success'] = $num;
+                                $day_businessSettlement[$day][$task_log[0]['uid']]['success'] = $num;
                             }
-                        } elseif (empty($value['status_message'])) {
-                            if (isset($day_businessSettlement[$day][$value['uid']]['unknown'])) {
-                                $day_businessSettlement[$day][$value['uid']]['unknown'] += $num;
+                        } elseif (empty($task_log[0]['status_message'])) {
+                            if (isset($day_businessSettlement[$day][$task_log[0]['uid']]['unknown'])) {
+                                $day_businessSettlement[$day][$task_log[0]['uid']]['unknown'] += $num;
                             } else {
-                                $day_businessSettlement[$day][$value['uid']]['unknown'] = $num;
+                                $day_businessSettlement[$day][$task_log[0]['uid']]['unknown'] = $num;
                             }
                         } else {
-                            if (isset($day_businessSettlement[$day][$value['uid']]['default'])) {
-                                $day_businessSettlement[$day][$value['uid']]['default'] += $num;
+                            if (isset($day_businessSettlement[$day][$task_log[0]['uid']]['default'])) {
+                                $day_businessSettlement[$day][$task_log[0]['uid']]['default'] += $num;
                             } else {
-                                $day_businessSettlement[$day][$value['uid']]['default'] = $num;
+                                $day_businessSettlement[$day][$task_log[0]['uid']]['default'] = $num;
                             }
                             // $day_businessSettlement[$day][$value['uid']]['default'] = $num;
                         }
                     } else {
-                        $day_users[$day][]                                         = $value['uid'];
-                        $day_businessSettlement[$day][$value['uid']]['num']        = $num;
-                        $day_businessSettlement[$day][$value['uid']]['mobile_num'] = 1;
-                        if ($value['status_message'] == 'DELIVRD') {
-                            $day_businessSettlement[$day][$value['uid']]['success'] = $num;
-                        } elseif ($value['status_message'] == '') {
-                            $day_businessSettlement[$day][$value['uid']]['unknown'] = $num;
+                        $day_users[$day][]                                         = $task_log[0]['uid'];
+                        $day_businessSettlement[$day][$task_log[0]['uid']]['num']        = $num;
+                        $day_businessSettlement[$day][$task_log[0]['uid']]['mobile_num'] = 1;
+                        if ($task_log[0]['status_message'] == 'DELIVRD') {
+                            $day_businessSettlement[$day][$task_log[0]['uid']]['success'] = $num;
+                        } elseif ($task_log[0]['status_message'] == '') {
+                            $day_businessSettlement[$day][$task_log[0]['uid']]['unknown'] = $num;
                         } else {
-                            $value[$day][$value['uid']]['default'] = $num;
+                            $day_businessSettlement[$day][$task_log[0]['uid']]['default'] = $num;
                         }
                     }
                 }
