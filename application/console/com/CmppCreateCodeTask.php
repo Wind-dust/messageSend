@@ -6151,6 +6151,9 @@ class CmppCreateCodeTask extends Pzlife
             while (true) {
                 $task_id = $this->redis->lpop($redisMessageMarketingSend);
                 $task_id = json_decode($task_id, true);
+                if ($task_id['id'] <=92926 ) {
+                    $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode($task_id));
+                }
                 if (empty($task_id)) {
                     // exit('OVER');
                     $mul_task = $this->redis->lpop($redisMessagemulSend);

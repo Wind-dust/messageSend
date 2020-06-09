@@ -2444,7 +2444,7 @@ class SflUpload extends Pzlife {
         // print_r(realpath("../"). "\yt_area_mobile.csv");die;
 
         try {
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591200000 AND   `create_time` <  1591286400 AND `task_content` NOT LIKE '%test%' ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591286400 AND   `create_time` <  1591372800 AND `task_content` NOT LIKE '%test%' ");
             $ids          = [];
             $i = 1;
             $j = 1;
@@ -2572,7 +2572,7 @@ class SflUpload extends Pzlife {
 
                 }
                 if ($i > 200000) {
-                    $name = "receive_sms_".$j."_".date('Ymd',1591200000).".xlsx";
+                    $name = "receive_sms_".$j."_".date('Ymd',1591286400).".xlsx";
                     $this->derivedTables($receive_alls,$name);
                     $j++;
                     $receive_alls = [];
@@ -2580,7 +2580,7 @@ class SflUpload extends Pzlife {
                 }
             }
             if (!empty($receive_alls)) {
-                $name = "receive_sms_".$j."_".date('Ymd',1591200000).".xlsx";
+                $name = "receive_sms_".$j."_".date('Ymd',1591286400).".xlsx";
                 $this->derivedTables($receive_alls,$name);
                    
             }
