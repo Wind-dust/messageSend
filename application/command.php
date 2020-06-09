@@ -87,6 +87,7 @@ return [
     'httpchannelcaixinsftpchuanglan'         => $commandPath . 'HttpChannelCaiXinSFTPChuangLan', //丝芙兰sftp创蓝彩信
     'httpchannelcaixinjumengliantong'         => $commandPath . 'HttpChannelCaiXinJuMengLianTong', //聚梦联通sftp彩信
     'cmppbeijingmiaoxinbusiness'         => $commandPath . 'CmppBeiJingMiaoXinBusiness', //北京秒信行业
+    'Cmppmiaoxinsanwangbusiness'         => $commandPath . 'CmppMiaoXinSanWangBusiness', //北京秒信三网行业
     'cmppbeijingmiaoxinmarketing'         => $commandPath . 'CmppBeiJingMiaoXinMarketing', //北京秒信会员营销
     'cmppbishangyidongbusiness'         => $commandPath . 'CmppBiShangYiDongBusiness', //比上移动行业
     'serversocketshuhe'                => $commandPath . 'ServerSocketShuHe',
