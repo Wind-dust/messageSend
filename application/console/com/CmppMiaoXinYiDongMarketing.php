@@ -9,7 +9,7 @@ use Env;
 use Exception;
 use think\Db;
 
-class CmppMiaoXinYiDongBusiness extends Pzlife
+class CmppMiaoXinYiDongMarketing extends Pzlife
 {
 
     // protected $redis;
@@ -19,7 +19,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
         $this->redis = Phpredis::getConn();
         //        $this->connect = Db::connect(Config::get('database.db_config'));
     }
-    //秒信移动行业
+    //秒信移动营销
     public function content($content)
     {
         // print_r($content);die;
@@ -43,14 +43,14 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
         return [
             'host'          => "120.133.40.140", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "1000z1", //企业id  企业代码
-            'Shared_secret' => 'i045r9sjv4', //网关登录密码
-            'Service_Id'    => "X109813039", //业务代码
+            'Source_Addr'   => "1000z2", //企业id  企业代码
+            'Shared_secret' => 'neqw1w7mki', //网关登录密码
+            'Service_Id'    => "X109814037", //业务代码
             'template_id'   => "", //模板id
-            'Dest_Id'       => "10692313", //短信接入码 短信端口号 服务代码
+            'Dest_Id'       => "", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
-            'master_num'    => 300,
+            'master_num'    => 500,
         ];
     }
 
@@ -60,7 +60,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
         $redis = Phpredis::getConn();
         date_default_timezone_set('PRC');
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $content                    = 99;
+        $content                    = 102;
         $redisMessageCodeSend       = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
         $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:' . $content; //行业通知SequenceId
         $redisMessageCodeMsgId      = 'index:meassage:code:msg:id:' . $content; //行业通知SequenceId
