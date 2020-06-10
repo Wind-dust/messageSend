@@ -297,7 +297,7 @@ return $result;
     {
         $Mobiles = array_unique(array_filter($Mobiles));
         // $Password = md5($Password);
-        $user = DbUser::getUserOne(['appid' => $Username], 'id,pid,appkey,user_type,user_status,reservation_service,free_trial,marketing_free_credit', true);
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,pid,appkey,user_type,user_status,reservation_service,free_trial,marketing_free_credit,market_deduct', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -406,6 +406,7 @@ return $result;
             if (!empty($msg_id)) {
                 return ['code' => '200', 'task_no' => $data['task_no'], 'msg_id' => $msg_id];
             }
+            $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $id, 'send_time' => 0, 'deduct' => $user['market_deduct']]));
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
             // exception($e);
@@ -1052,6 +1053,7 @@ return $result;
         if (empty($user)) {
             return ['code' => '3000'];
         }
+        // print_r($user);die;
         if ($appkey != $user['appkey']) {
             return ['code' => '3000'];
         }
@@ -1189,11 +1191,11 @@ return $result;
                     } else {
                         // array_push($task_no, $free_taskno);
                         $send_task['free_trial'] = 2;
-                        if ($user['pid'] == 137) {
+                        if ($user['pid'] == 137|| $user['id'] == 110) {
                             $send_task['yidong_channel_id'] = 85;
                             $send_task['liantong_channel_id'] = 85;
                             $send_task['dianxin_channel_id'] = 85;
-                        } elseif ($user['id'] == 134) {
+                        } elseif ($user['id'] == 134 ) {
                             $send_task['yidong_channel_id'] = 95;
                             $send_task['liantong_channel_id'] = 95;
                             $send_task['dianxin_channel_id'] = 95;
@@ -1220,9 +1222,16 @@ return $result;
                                 $send_task['dianxin_channel_id'] = 85;
                             }
                         } else {
-                            $send_task['yidong_channel_id'] = 60;
-                            $send_task['liantong_channel_id'] = 62;
-                            $send_task['dianxin_channel_id'] = 61;
+                            if ($user['id'] == 110) {
+                                $send_task['yidong_channel_id'] = 85;
+                                $send_task['liantong_channel_id'] = 85;
+                                $send_task['dianxin_channel_id'] = 85;
+                            }else{
+                                $send_task['yidong_channel_id'] = 60;
+                                $send_task['liantong_channel_id'] = 62;
+                                $send_task['dianxin_channel_id'] = 61;
+
+                            }
                         }
                         // array_push($free_trial, $send_task);
                     }
