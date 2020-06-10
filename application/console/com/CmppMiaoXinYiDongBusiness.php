@@ -579,7 +579,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                 $Total_Length = 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                 if ( $receive != 2) {
-                                    // socket_write($socket, $headData, $Total_Length);
+                                    socket_write($socket, $headData, $Total_Length);
                                 }
                                 sleep(1);
                             }
