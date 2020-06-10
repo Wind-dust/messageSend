@@ -320,7 +320,7 @@ return $result;
             }
         }
 
-        if (!empty($signature)) {
+        if (!empty($signature_id)) {
             $signature =  DbSendMessage::getUserSignature(['uid' => $user['id'], 'signature_id' => $signature_id], '*', true);
             if (empty($signature)) {
                 return ['code' => '3008'];
@@ -331,7 +331,7 @@ return $result;
             $Content = $signature['title'] . $Content;
         }
 
-        // print_r($effective_mobile);die;
+        // print_r($signature);die;
         if (empty($effective_mobile)) {
             return ['code' => '3010', 'msg' => '有效手机号为空'];
         }
@@ -383,6 +383,9 @@ return $result;
                 }
             }
            
+        }
+        if ($real_num > 100) {
+            $data['free_trial'] = 1;
         }
         if ($data['free_trial'] == 2) {
             // $data['free_trial'] = 2;
