@@ -441,6 +441,13 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                         $receive = 2;
                                     } else if ($head['Command_Id'] == 0x00000008) {
                                         echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                                        $callback_Command_Id = 0x80000008;
+
+                                        $new_body         =  pack("C", 0);
+                                        $new_Total_Length = strlen($new_body) + 12;
+                                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
+                                        socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                                        $receive = 2;
                                     } else if ($head['Command_Id'] == 0x80000008) {
                                         echo "激活测试应答" . "\n"; //激活测试,无消息体结构
                                     } else {
@@ -597,10 +604,10 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                 $redis->hset($redisMessageCodeSequenceId, $Sequence_Id);
                             }
                             socket_close($socket);
-                            $redis->rpush('index:meassage:code:send' . ":" . 85, json_encode([
-                                'mobile'      => 15201926171,
-                                'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
-                            ])); //易信行业通道
+                            // $redis->rpush('index:meassage:code:send' . ":" . 85, json_encode([
+                            //     'mobile'      => 15201926171,
+                            //     'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
+                            // ])); //易信行业通道
                             $log_path = realpath("") . "/error/".$content.".log";
                             $myfile = fopen($log_path, 'a+');
                             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
