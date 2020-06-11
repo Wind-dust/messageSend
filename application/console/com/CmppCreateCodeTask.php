@@ -6865,15 +6865,23 @@ class CmppCreateCodeTask extends Pzlife
 
     public function Bufa()
     {
-        /*  $send = [
-            'mobile'      => 18721762967,
-                                        'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
-                                        'mar_task_id' => 659346,
-                                        'content'     => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
-                                        'from'        => 'yx_user_send_code_task',
-        ]; */
-
+        
         $this->redis = Phpredis::getConn();
+         $send = [
+            'mobile'      => 13278700191,
+                                        'title'       => '【优裹徒】您的包裹圆通-YT4576952683005已签收！感谢使用优裹徒，期待再次为您服务！',
+                                        'mar_task_id' => 1429378,
+                                        'content'     => '【优裹徒】您的包裹圆通-YT4576952683005已签收！感谢使用优裹徒，期待再次为您服务！',
+                                        'from'        => 'yx_user_send_code_task',
+        ];
+        $res = $this->redis->rpush('index:meassage:code:send' . ":" . 85, json_encode([
+            'mobile'      => 13278700191,
+                                        'title'       => '【优裹徒】快递员13678779299提醒您，请凭567241到D座28号格取件，免费存放24小时',
+                                        'mar_task_id' => 1429378,
+                                        'content'     => '【优裹徒】快递员13678779299提醒您，请凭567241到D座28号格取件，免费存放24小时',
+                                        'from'        => 'yx_user_send_code_task',
+        ])); 
+
         /*         $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode([
             'mobile'      => 13424037312,
                                         'title'       => '【丝芙兰】您的【邀请有礼】优惠券已经到账，即日起至2020-06-07前往丝芙兰门店或官网、APP、小程序任意购买，即可获赠价值59元丝芙兰毛孔细致嫩肤泥膜一份。限量5万份，赠完即止。【限时美礼，与友同享】/回T退订',
@@ -6906,7 +6914,7 @@ class CmppCreateCodeTask extends Pzlife
                                         'from'        => 'yx_user_send_code_task',
         ])); //三体营销通道 */
 
-        $task_id =  Db::query("SELECT `id`,mobile_content,`task_content`,`task_no` FROM `messagesend`.`yx_user_send_code_task` WHERE `uid` = '91' AND  `create_time` >= 1589889600 AND  `create_time` <= 1589976000 AND `task_content` LIKE '%您的【邀请有礼】优惠券已经到账%'");
+        /* $task_id =  Db::query("SELECT `id`,mobile_content,`task_content`,`task_no` FROM `messagesend`.`yx_user_send_code_task` WHERE `uid` = '91' AND  `create_time` >= 1589889600 AND  `create_time` <= 1589976000 AND `task_content` LIKE '%您的【邀请有礼】优惠券已经到账%'");
         $ids = [];
         foreach ($task_id as $key => $value) {
             // $ids = $value['id'];
@@ -6922,7 +6930,7 @@ class CmppCreateCodeTask extends Pzlife
                     ])); //三体营销通道 
                 }
             }
-        }
+        } */
 
         /*  $task_id =  Db::query("SELECT `id`,mobile_content,`task_content`,`task_no` FROM `messagesend`.`yx_user_send_code_task` WHERE `uid` = '91' AND `create_time` >= '1589803200' AND `create_time` <= '1589880600' AND `task_content` LIKE '%感谢您成功推荐一位好友加入丝芙兰大家庭%'");
         $ids = [];
