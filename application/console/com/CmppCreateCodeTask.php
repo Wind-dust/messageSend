@@ -6955,7 +6955,7 @@ class CmppCreateCodeTask extends Pzlife
         }
         $all_id =Db::query("SELECT `id` FROM `messagesend`.`yx_user_send_code_task` WHERE `uid` = '110' AND `create_time` >= 1591804800 AND `create_time` <= 1591857000 ");
         foreach($all_id as $key => $value){
-            $all_ids[] = $value['task_id'];
+            $all_ids[] = $value['id'];
         }
         $unknow_id = array_diff($all_ids,$task_ids);
         print_r($unknow_id);
