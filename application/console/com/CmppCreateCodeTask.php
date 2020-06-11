@@ -6958,7 +6958,7 @@ class CmppCreateCodeTask extends Pzlife
             $all_ids[] = $value['id'];
         }
         $unknow_id = array_diff($all_ids,$task_ids);
-        print_r($unknow_id);
+        print_r(count($unknow_id));
         $nuknow_ids = Db::query("SELECT `id`,`task_no` FROM `messagesend`.`yx_user_send_code_task` WHERE `id` IN (".join(',',$unknow_id).") ");
         foreach($nuknow_ids as $key => $value){
             // $all_ids[] = $value['task_id'];
