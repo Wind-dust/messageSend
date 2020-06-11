@@ -6959,15 +6959,15 @@ class CmppCreateCodeTask extends Pzlife
         }
         $unknow_id = array_diff($all_ids,$task_ids);
         // print_r(count($unknow_id));
-        $nuknow_ids = Db::query("SELECT `id`,`task_no` FROM `messagesend`.`yx_user_send_code_task` WHERE `id` IN (".join(',',$unknow_id).") ");
+        $nuknow_ids = Db::query("SELECT `id`,`task_no`,`task_content`,`mobile_content` FROM `messagesend`.`yx_user_send_code_task` WHERE `id` IN (".join(',',$unknow_id).") ");
         foreach($nuknow_ids as $key => $value){
             // $all_ids[] = $value['task_id'];
-            $task_log = Db::query("SELECT `task_content`,`channel_id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '" . $value['task_no'] . "' ");
-            $res = $this->redis->rpush('index:meassage:code:send' . ":" . $task_log[0]['channel_id'], json_encode([
-                'mobile'      => $value[0]['mobile_content'],
-                'title'       => $value[0]['task_content'],
+            // $task_log = Db::query("SELECT `task_content`,`channel_id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '" . $value['task_no'] . "' ");
+            $res = $this->redis->rpush('index:meassage:code:send' . ":85" , json_encode([
+                'mobile'      => $value['mobile_content'],
+                'title'       => $value['task_content'],
                 'mar_task_id' => $value['id'],
-                'content'     =>  $task_log[0]['task_content'],
+                'content'     =>  $value['task_content'],
                 'from'        => 'yx_user_send_code_task',
             ]));
         }
