@@ -1073,6 +1073,254 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
+    public function deDuctTest(){
+        $sendTask = $this->getSendTask(126267);
+        $mobile_result = $this-> mobilesFiltrate($sendTask['mobile_content'], $sendTask['uid'],10);
+        print_r($mobile_result);die;
+    }
+
+    public function mobilesFiltrate($mobile,$uid,$deduct){
+        $error_mobile = [];//错号或者黑名单
+        $real_send_mobile = []; //实际发送号码
+        $deduct_mobile = []; //扣量号码
+        $true_mobile = []; //实号号码
+        $yidong_mobile = []; //移动分区号码
+        $liantong_mobile = []; //联通分区号码
+        $dianxin_mobile = []; //电信分区号码
+        $host_city_mobile = []; //省会城市号码包含深圳
+        $cool_city_mobile = []; //二线城市号码
+        $mobile_data = explode(',',$mobile);
+        // echo count($mobile_data);die;
+        //白名单
+        $white_mobile = Db::query("SELECT `mobile` FROM `yx_whitelist` WHERE mobile IN (".$mobile.") ");
+        // print_r("SELECT `mobile` FROM `yx_whitelist` WHERE mobile IN (".$mobile.") ");
+        if (!empty($white_mobile)) {
+            foreach($white_mobile as $key => $value){
+                $real_send_mobile[] = $value['mobile'];
+            }
+        }
+        //黑名单
+        $black_mobile = Db::query("SELECT `mobile` FROM `yx_blacklist` WHERE mobile IN (".$mobile.") ");
+        // print_r("SELECT `mobile` FROM `yx_whitelist` WHERE mobile IN (".$mobile.") ");
+        if (!empty($black_mobile)) {
+            foreach($black_mobile as $key => $value){
+                $error_mobile[] = $value['mobile'];
+            }
+        }
+        //去除黑名单后实际有效号码
+        $real_send_mobile = array_diff($mobile_data,$error_mobile);
+        //扣量
+        if ($deduct > 0) {
+            //热门城市ID 
+            $province = Db::query("SELECT `id` FROM yx_areas WHERE `level` = 1 ");
+            $citys_id = [];
+            foreach($province as $key => $value){
+                $city = Db::query("SELECT `id` FROM yx_areas WHERE `pid` =  ".$value['id'] ." LIMIT 1");
+                $citys_id[] = $city[0]['id'];
+            }
+            $citys_id[] = 2100;
+            // $cityname =  Db::query("SELECT `id`,`area_name` FROM yx_areas WHERE `id` IN  (".join(',',$citys_id) .")");
+            // print_r($cityname);die;
+            //过空号
+            //去除黑名单和白名单
+            $remaining_mobile = array_diff($real_send_mobile,$white_mobile);
+            //白名单发送
+            foreach($white_mobile as $key => $value){
+                $prefix = substr(trim($value), 0, 7);
+                $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                $newres = array_shift($res);
+                if ($newres) {
+                    if ($newres['source'] == 1) {//移动
+                        // $channel_id = $yidong_channel_id;
+                        $yidong_mobile[] = $value; 
+                    } elseif ($newres['source'] == 2) { //联通
+                        // $channel_id = $liantong_channel_id;
+                        $liantong_mobile[] = $value; 
+                    } elseif ($newres['source'] == 3) { //电信
+                        // $channel_id = $dianxin_channel_id;
+                        $dianxin_mobile[] = $value; 
+                    }
+                }else{
+                    $yidong_mobile[] = $value; 
+                }
+            }
+            
+            //实号
+            $entity_mobile = Db::query("SELECT `mobile` FROM `yx_real_mobile` WHERE mobile IN (".join(',',$remaining_mobile).") ");
+            //去除实号
+            $entity_mobiles = [];//实号即能扣量号码
+            if (!empty($entity_mobile)) {
+                foreach($entity_mobile as $key => $value){
+                    $entity_mobiles[] = $value['mobile'];
+                    
+                }
+            }
+            //未知或者空号
+            $vacant  = array_diff($remaining_mobile,$entity_mobiles);
+            //空号检测
+            // print_r($vacant);
+            foreach($vacant as $key => $value){
+                $result = Db::query("SELECT `mobile`,`check_status`,`check_result`,`update_time` FROM  yx_mobile WHERE `mobile` = '" . $value . "'  ORDER BY `id` DESC LIMIT 1 ");
+                $check_result = true; //空号
+                $check_result = false; //空号
+                if (!empty($result)) {
+                    if ($result[0]['check_status'] == 1 || date('Ymd', time()) > date('Ymd', $result[0]['update_time'])) { //未检测
+                        // $check_result = $this->checkMobileApi($value);
+                    } 
+                }else{
+                    // $check_result = $this->checkMobileApi($value);
+                }
+                $prefix = substr(trim($value), 0, 7);
+                    $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                    $newres = array_shift($res);
+                if ($check_result == true) { //检测结果为空号
+                    // $real_send_mobile[] = $value;
+                    
+                    if ($newres) {
+                        if ($newres['source'] == 1) {//移动
+                            // $channel_id = $yidong_channel_id;
+                            $yidong_mobile[] = $value; 
+                        } elseif ($newres['source'] == 2) { //联通
+                            // $channel_id = $liantong_channel_id;
+                            $liantong_mobile[] = $value; 
+                        } elseif ($newres['source'] == 3) { //电信
+                            // $channel_id = $dianxin_channel_id;
+                            $dianxin_mobile[] = $value; 
+                        }
+                    }else{
+                        $yidong_mobile[] = $value; 
+                    }
+                }else{
+                    $true_mobile[] = $value;
+                    // print_r($);
+                    $mobile_info = [];
+                    $mobile_info = [
+                        'mobile' => $value,
+                        'source' => $newres['source'],
+                    ];
+                    if (in_array($newres['city_id'],$citys_id)) {
+                        //热门城市号码
+                      
+                        $host_city_mobile[] = $mobile_info;
+                    }else{
+                        //冷门城市号码
+                        $cool_city_mobile[] = $mobile_info;
+                    }
+                    //归属地查询 
+                }
+            }
+            // print_r($host_city_mobile);
+            // print_r($cool_city_mobile);
+            
+            //计算实际占比和扣量占比
+            $proportion = bcdiv( count($cool_city_mobile),count($real_send_mobile),2);
+            // print_r($proportion); 
+            if ($proportion * 100 > $deduct) {
+                //扣除部分
+                $section = $proportion * 100;
+                $section_data = [];
+                $j = 1;
+                for ($i=0; $i < count($cool_city_mobile); $i++) { 
+                    $section_data[] = $cool_city_mobile[$i];
+                    $j++;
+                    if ($j> $section) {
+                        $deduct_key = array_rand($section_data,$deduct);
+                        foreach ($section_data as $key => $value) {
+                            if (in_array($key, $deduct_key)) {
+                                $deduct_mobile[] = $value['mobile'];
+                            }else{
+                                if ($value['source'] == 1) {//移动
+                                    // $channel_id = $yidong_channel_id;
+                                    $yidong_mobile[] = $value['mobile'];
+                                } elseif ($value['source'] == 2) { //联通
+                                    // $channel_id = $liantong_channel_id;
+                                    $liantong_mobile[] = $value['mobile'];
+                                } elseif ($value['source'] == 3) { //电信
+                                    // $channel_id = $dianxin_channel_id;
+                                    $dianxin_mobile[] = $value['mobile'];
+                                }else{
+                                    $yidong_mobile[] = $value['mobile'];
+                                }
+                            }
+                        }
+                        $section_data = [];
+                        $j = 1;
+                    }
+                }
+                if (!empty($section_data)) {
+                    $deduct_key = array_rand($section_data,$deduct);
+                        foreach ($section_data as $key => $value) {
+                            if (in_array($key, $deduct_key)) {
+                                $deduct_mobile[] = $value['mobile'];
+                            }else{
+                                if ($value['source'] == 1) {//移动
+                                    // $channel_id = $yidong_channel_id;
+                                    $yidong_mobile[] = $value['mobile'];
+                                } elseif ($value['source'] == 2) { //联通
+                                    // $channel_id = $liantong_channel_id;
+                                    $liantong_mobile[] = $value['mobile'];
+                                } elseif ($value['source'] == 3) { //电信
+                                    // $channel_id = $dianxin_channel_id;
+                                    $dianxin_mobile[] = $value['mobile'];
+                                }else{
+                                    $yidong_mobile[] = $value['mobile'];
+                                }
+                            }
+                        }
+                }
+
+                //不扣部分
+                foreach ($host_city_mobile as $key => $value) {
+                    if ($value['source'] == 1) {//移动
+                        // $channel_id = $yidong_channel_id;
+                        $yidong_mobile[] = $value['mobile'];
+                    } elseif ($value['source'] == 2) { //联通
+                        // $channel_id = $liantong_channel_id;
+                        $liantong_mobile[] = $value['mobile'];
+                    } elseif ($value['source'] == 3) { //电信
+                        // $channel_id = $dianxin_channel_id;
+                        $dianxin_mobile[] = $value['mobile'];
+                    }else{
+                        $yidong_mobile[] = $value['mobile'];
+                    }
+                }
+
+            }elseif ($proportion * 100 == $deduct){
+                foreach ($cool_city_mobile as $key => $value) {
+                    $deduct_mobile[] = $value['mobile'];
+                }
+            } else{
+               
+            }
+            echo count($error_mobile) + count($yidong_mobile)+ count($liantong_mobile)+ count($dianxin_mobile)+ count($deduct_mobile);
+            die;
+            return ['error_mobile' => $error_mobile, 'yidong_mobile' => $yidong_mobile,'liantong_mobile' => $liantong_mobile, 'dianxin_mobile' => $dianxin_mobile, 'deduct_mobile' => $deduct_mobile];
+        }else{
+            foreach($real_send_mobile as $key => $value){
+                $prefix = substr(trim($value), 0, 7);
+                $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                $newres = array_shift($res);
+                if ($newres) {
+                    if ($newres['source'] == 1) {//移动
+                        // $channel_id = $yidong_channel_id;
+                        $yidong_mobile[] = $value; 
+                    } elseif ($newres['source'] == 2) { //联通
+                        // $channel_id = $liantong_channel_id;
+                        $liantong_mobile[] = $value; 
+                    } elseif ($newres['source'] == 3) { //电信
+                        // $channel_id = $dianxin_channel_id;
+                        $dianxin_mobile[] = $value; 
+                    }
+                }else{
+                    $yidong_mobile[] = $value; 
+                }
+            }
+           
+            return ['error_mobile' => $error_mobile, 'yidong_mobile' => $yidong_mobile,'liantong_mobile' => $liantong_mobile, 'dianxin_mobile' => $dianxin_mobile, 'deduct_mobile' => $deduct_mobile];
+        }
+
+    }
+
     //书写行业通知任务日志并写入通道
     public function createBusinessMessageSendTaskLog($type = '')
     {
@@ -1571,12 +1819,13 @@ class CmppCreateCodeTask extends Pzlife
             if (empty($mobile)) {
                 return true;
             }
-            /* 先查空号库 */
+            /* 先查实号库 */
             $result = Db::query("SELECT `mobile` FROM  yx_real_mobile WHERE `mobile` = '" . $mobile . "' AND `check_result` = 1  ORDER BY `id` DESC LIMIT 1 ");
             if (!empty($result)) {
                 return false;
             }
             // return true;
+            /* 再查空号库 */
             $result = Db::query("SELECT `mobile`,`check_status`,`check_result`,`update_time` FROM  yx_mobile WHERE `mobile` = '" . $mobile . "'  ORDER BY `id` DESC LIMIT 1 ");
             if (!empty($result)) {
                 if ($result[0]['check_status'] == 1 || date('Ymd', time()) > date('Ymd', $result[0]['update_time'])) { //未检测
@@ -4446,6 +4695,119 @@ class CmppCreateCodeTask extends Pzlife
             while(true){
                 $end_time = $start_time+86400;
                 if ($end_time > time()) {
+                    // break;
+                    $end_time = time();
+                    $day_businessSettlement   = [];
+                    $day_users                = [];
+                    $code_task_log = [];
+                    $code_task_log            = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
+                    foreach($code_task_log as $key => $value){
+                        $send_length = mb_strlen($value['task_content'], 'utf8');
+                        $num         = 1;
+                        if (empty($value['status_message']) && empty($value['real_message'])) {
+                            $task = Db::query("SELECT id FROM yx_user_send_code_task WHERE `task_no` = '" . $value['task_no'] . "' LIMIT 1 ");
+                            if (empty($task)) {
+                                continue;
+                            }
+                            $receipt = Db::query("SELECT `status_message` FROM yx_send_code_task_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $value['mobile'] . "' LIMIT 1 ");
+                            if (empty($receipt)) {
+                                if ($value['create_time'] + 259200 < time()) {
+                                    $value['status_message'] = 'DELIVRD';
+                                }
+                            } else {
+                                $value['status_message'] = $receipt[0]['status_message'];
+                            }
+                        }
+                        if ($send_length > 70) {
+                            $num = ceil($send_length / 67);
+                        }
+                        $day   = date('Ymd', $value['create_time']);
+                        if (!array_key_exists($day, $day_users)) {
+                            $day_users[$day] = [];
+                        }
+                        if (in_array($value['uid'], $day_users[$day])) {
+                            $day_businessSettlement[$day][$value['uid']]['num'] += $num;
+                            $day_businessSettlement[$day][$value['uid']]['mobile_num'] += 1;
+                            if ($value['status_message'] == 'DELIVRD') {
+                                if (isset($day_businessSettlement[$day][$value['uid']]['success'])) {
+                                    $day_businessSettlement[$day][$value['uid']]['success'] += $num;
+                                } else {
+                                    $day_businessSettlement[$day][$value['uid']]['success'] = $num;
+                                }
+                            } elseif (empty($value['status_message'])) {
+                                if (isset($day_businessSettlement[$day][$value['uid']]['unknown'])) {
+                                    $day_businessSettlement[$day][$value['uid']]['unknown'] += $num;
+                                } else {
+                                    $day_businessSettlement[$day][$value['uid']]['unknown'] = $num;
+                                }
+                            } else {
+                                if (isset($day_businessSettlement[$day][$value['uid']]['default'])) {
+                                    $day_businessSettlement[$day][$value['uid']]['default'] += $num;
+                                } else {
+                                    $day_businessSettlement[$day][$value['uid']]['default'] = $num;
+                                }
+                                // $day_businessSettlement[$day][$value['uid']]['default'] = $num;
+                            }
+                        } else {
+                            $day_users[$day][]                                         = $value['uid'];
+                            $day_businessSettlement[$day][$value['uid']]['num']        = $num;
+                            $day_businessSettlement[$day][$value['uid']]['mobile_num'] = 1;
+                            if ($value['status_message'] == 'DELIVRD') {
+                                $day_businessSettlement[$day][$value['uid']]['success'] = $num;
+                            } elseif ($value['status_message'] == '') {
+                                $day_businessSettlement[$day][$value['uid']]['unknown'] = $num;
+                            } else {
+                                $value[$day][$value['uid']]['default'] = $num;
+                            }
+                        }
+                    }
+                    Db::startTrans();
+                    try {
+                        foreach ($day_businessSettlement as $dkey => $d_value) {
+                            foreach ($d_value as $key => $value) {
+                                $success = isset($value['success']) ? $value['success'] : 0;
+                                $num     = isset($value['num']) ? $value['num'] : 0;
+                                if ($key == 47 && $dkey == 20200122) {
+                                    $num = $num + 5784;
+                                }
+                                if ($key == 47 && $dkey == 20200125) {
+                                    $num = $num + 289;
+                                }
+                                $day_user_settlement = [];
+                                $day_user_settlement = [
+                                    'timekey'     => $dkey,
+                                    'uid'         => $key,
+                                    'success'     => $success,
+                                    'unknown'     => isset($value['unknown']) ? $value['unknown'] : 0,
+                                    'default'     => isset($value['default']) ? $value['default'] : 0,
+                                    'num'         => $num,
+                                    'ratio'       => $success / $num * 100,
+                                    'mobile_num'  => $value['mobile_num'],
+                                    'business_id' => '6',
+                                    'create_time' => time(),
+                                    'update_time' => time(),
+                                ];
+                                $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 6 AND `timekey` = ' . $dkey . ' AND `uid` = ' . $key);
+                                if ($has) {
+                                    Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                                        'success'     => $success,
+                                        'unknown'     => isset($value['unknown']) ? $value['unknown'] : 0,
+                                        'default'     => isset($value['default']) ? $value['default'] : 0,
+                                        'num'         => $num,
+                                        'mobile_num'  => $value['mobile_num'],
+                                        'ratio'       => $success / $num * 100,
+                                        'update_time' => time(),
+                                    ]);
+                                } else {
+                                    Db::table('yx_statistics_day')->insert($day_user_settlement);
+                                }
+                            }
+                        }
+                        Db::commit();
+                    } catch (\Exception $e) {
+                        Db::rollback();
+                        exception($e);
+                    }
                     break;
                 }
                 $day_businessSettlement   = [];
