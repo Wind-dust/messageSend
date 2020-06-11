@@ -743,7 +743,8 @@ class Administrator extends CommonIndex
         if ($channel['business_id'] != 8) {
             return ['code' => '3004', '非彩信通道不能使用此接口'];
         }
-        if ($channel_id == 58) {
+        //创蓝
+        if ($channel_id == 59) {
             $report_api = 'http://mms.mms-sender.cn:8080/mmsServer/sendMms';
             $data = [];
             $data['id'] = '200401';
@@ -778,6 +779,8 @@ class Administrator extends CommonIndex
             $result = sendRequest($report_api, 'post', $data);
             print_r($result);
             die;
+        }elseif ($channel_id == 100){
+
         }
     }
 
@@ -800,5 +803,81 @@ class Administrator extends CommonIndex
         }
         // C4786051
         // 38gHTjrzh
+    }
+
+    public function addDeductWord($business_id, $uid = 0, $word){
+        if (!empty($uid)) {
+            $user =  DbUser::getUserInfo(['id' => $uid], 'id,reservation_service,user_status,business_deduct', true);
+            if (empty($user)) {
+                return ['code' => '3003', 'msg' => '该用户不存在'];
+            }
+            $word = DbAdministrator::getUserDeductWord(['word' => $word, 'business_id' => $business_id],'*',true);
+            if (!empty($word)) {
+                if ($word['uid'] == $uid) {
+                    return ['code' => '3004', 'msg' => '该用户已设置敏感词'];
+                }
+                if ($word['uid'] == 0) {
+                    return ['code' => '3005', 'msg' => '已添加过全局关键词'];
+                }
+            }
+            $data = [];
+            $data = [
+                'word' => $word,
+                'business_id' => $business_id,
+            ];
+            if (!empty($uid)) {
+                $data['uid'] = $uid;
+            }
+            Db::startTrans();
+            try {
+                // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
+                DbAdministrator::addUserDeductWord($data);
+                Db::commit();
+                return ['code' => '200'];
+            } catch (\Exception $e) {
+                Db::rollback();
+                exception($e);
+                return ['code' => '3009']; //修改失败
+            }
+
+        }
+    }
+
+    public function getDeductWord($business_id, $page, $pageNum){
+        $offset = ($page - 1) * $pageNum;
+        $result = DbAdministrator::getUserDeductWord(['business_id' => $business_id],'*',false,'',$page.','.$offset);
+        $total = DbAdministrator::countUserDeductWord(['business_id' => $business_id]);
+        return ['code' => '200', 'total' => $total,'result' => $result];
+    }
+
+    public function updateDeductWord($id,$business_id, $uid, $word){
+        $word = DbAdministrator::getUserDeductWord(['id' => $id],'*',true);
+            if (empty($word)) {
+               return ['code' => '3003','msg' => '该记录不存在'];
+            }
+            $data = [];
+          if ($business_id) {
+              $data['business_id'] = $business_id;
+          }
+          if ($uid) {
+            $data['uid'] = $uid;
+        }
+        if ($word) {
+            $data['word'] = $word;
+        }
+        if (!empty($data)) {
+            Db::startTrans();
+            try {
+                // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
+                DbAdministrator::editUserDeductWord($data,$id);
+                Db::commit();
+                return ['code' => '200'];
+            } catch (\Exception $e) {
+                Db::rollback();
+                exception($e);
+                return ['code' => '3009']; //修改失败
+            }
+        }
+        return ['code' => '3004','msg' =>'没有需要修改的类目'];
     }
 }

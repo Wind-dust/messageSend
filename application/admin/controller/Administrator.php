@@ -779,4 +779,106 @@ class Administrator extends AdminController
         $result = $this->app->administrator->sflThirdPartyMMSTemplateReport($channel_id,$sfl_relation_id);
         return $result;
     }
+
+    /**
+     * @api              {post} / 添加扣量过滤关键词
+     * @apiDescription   addDeductWord
+     * @apiGroup         admin_Administrator
+     * @apiName          addDeductWord
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} word 关键词
+     * @apiParam (入参) {String} uid 用户ID 不传用户id为全局变过滤
+     * @apiParam (入参) {String} business_id 服务id
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:channel_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /admin/administrator/addDeductWord
+     * @return array
+     * @author rzc
+     */
+    public function addDeductWord(){
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $uid = trim($this->request->post('uid'));
+        $word = trim($this->request->post('word'));
+        $business_id = trim($this->request->post('business_id'));
+        if (empty($uid) || intval($uid) < 1 || !is_numeric($uid)) {
+            return ['code' => '3001', 'msg' => 'uid为空'];
+        }
+        if (empty($business_id) || intval($business_id) < 1 || !is_numeric($business_id)) {
+            return ['code' => '3002', 'msg' => 'business_id 为空'];
+        }
+        if (empty($word)) {
+            return ['code' => '3003', 'msg' => '关键词不能为空'];
+        }
+        $result = $this->app->administrator->addDeductWord($business_id, $uid, $word);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 添加扣量过滤关键词
+     * @apiDescription   getDeductWord
+     * @apiGroup         admin_Administrator
+     * @apiName          getDeductWord
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} page 页码 默认1
+     * @apiParam (入参) {String} pageNum 条数 默认10
+     * @apiParam (入参) {String} business_id 服务id
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:channel_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /admin/administrator/getDeductWord
+     * @return array
+     * @author rzc
+     */
+    public function getDeductWord(){
+        $business_id = trim($this->request->post('business_id'));
+        if (empty($business_id) || intval($business_id) < 1 || !is_numeric($business_id)) {
+            return ['code' => '3001', 'msg' => 'business_id为空'];
+        }
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        $result = $this->app->administrator->getDeductWord($business_id, $page, $pageNum);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 修改扣量过滤关键词
+     * @apiDescription   updateDeductWord
+     * @apiGroup         admin_Administrator
+     * @apiName          updateDeductWord
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id id
+     * @apiParam (入参) {String} word 关键词
+     * @apiParam (入参) {String} business_id 服务id
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:channel_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /admin/administrator/updateDeductWord
+     * @return array
+     * @author rzc
+     */
+    public function updateDeductWord(){
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id = trim($this->request->post('id'));
+        $uid = trim($this->request->post('uid'));
+        $word = trim($this->request->post('word'));
+        $business_id = trim($this->request->post('business_id'));
+        if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
+            return ['code' => '3001', 'msg' => 'id为空'];
+        }
+        /* if (empty($business_id) || intval($business_id) < 1 || !is_numeric($business_id)) {
+            return ['code' => '3002', 'msg' => 'business_id 为空'];
+        }
+        if (empty($word)) {
+            return ['code' => '3003', 'msg' => '关键词不能为空'];
+        } */
+        $result = $this->app->administrator->updateDeductWord($id,$business_id, $uid, $word);
+        return $result;
+    }
 }

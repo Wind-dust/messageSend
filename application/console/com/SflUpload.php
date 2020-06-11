@@ -2445,7 +2445,7 @@ class SflUpload extends Pzlife {
         // print_r(realpath("../"). "\yt_area_mobile.csv");die;
 
         try {
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591372800 AND   `create_time` <  1591545600 AND `task_content` NOT LIKE '%test%' ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591200000 AND   `create_time` <  1591286400 AND `task_content` NOT LIKE '%test%' ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591286400 AND   `create_time` <  1591372800 AND `task_content` NOT LIKE '%test%' ";die;
             $ids          = [];
             $i = 1;
@@ -2520,7 +2520,7 @@ class SflUpload extends Pzlife {
                         'MOBILE'                   => $receipts[0]['mobile'],
                         'STATUS'                   => $receipts[0]['status_message'],
                         'real_message'             => $receipts[0]['real_message'],
-                        'SENDING_TIME'             => date('Y-m-d H:i:s', $task[0]['create_time']),
+                        'SENDING_TIME'             => date('Y-m-d H:i:s', 1591245000+ceil($key/7300)),
                     ];
                     if (checkMobile($receipts[0]['mobile']) == false) {
                         $receive_all['STATUS'] = "SMS:2";
@@ -2548,15 +2548,15 @@ class SflUpload extends Pzlife {
                         'MOBILE'                   => $task[0]['mobile'],
                         'STATUS'                   => 'SMS:1',
                         'real_message'             => '',
-                        'SENDING_TIME'             => date('Y-m-d H:i:s', $task[0]['create_time']),
+                        'SENDING_TIME'             => date('Y-m-d H:i:s', 1591245000+ceil($key/7300)),
                     ];
-                    if ($num >= 0 && $num < 17) {
+                   /*  if ($num >= 0 && $num < 17) {
                         $receive_all['STATUS'] = "SMS:3";
                     } elseif ($num >= 17 && $num < 591) {
                         $receive_all['STATUS'] = "SMS:2";
                     } else {
                         $receive_all['STATUS'] = "SMS:1";
-                    }
+                    } */
                     if (checkMobile($task[0]['mobile']) == false) {
                         $receive_all['STATUS'] = "SMS:2";
 
@@ -2573,8 +2573,9 @@ class SflUpload extends Pzlife {
                     
 
                 }
+                
                 if ($i > 200000) {
-                    $name = "receive_sms_".$j."_".date('Ymd',1591372800).".xlsx";
+                    $name = "imp_mobile_status_report_sms_".$j."_".date('Ymd',1591200000).".xlsx";
                     $this->derivedTables($receive_alls,$name);
                     $j++;
                     $receive_alls = [];
@@ -2582,7 +2583,7 @@ class SflUpload extends Pzlife {
                 }
             }
             if (!empty($receive_alls)) {
-                $name = "receive_sms_".$j."_".date('Ymd',1591372800).".xlsx";
+                $name = "imp_mobile_status_report_sms_".$j."_".date('Ymd',1591200000).".xlsx";
                 $this->derivedTables($receive_alls,$name);
                    
             }
@@ -2696,6 +2697,7 @@ class SflUpload extends Pzlife {
             array('MOBILE', 'MOBILE'),
             array('STATUS', 'STATUS'),
             array('SENDING_TIME', 'SENDING_TIME'),
+            array('real_message', 'real_message')
         );
 
         foreach ($CellList as $i => $Cell) {

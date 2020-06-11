@@ -17,6 +17,7 @@ use app\common\model\UserSendCodeTask;
 use app\common\model\UserSendTaskLog;
 use app\common\model\UserSendCodeTaskLog;
 use app\common\model\ThirdPartyMmsTemplateReport;
+use app\common\model\UserDeductWord;
 use think\Db;
 
 class DbAdministrator
@@ -392,4 +393,29 @@ class DbAdministrator
     {
         return ThirdPartyMmsTemplateReport::where($where)->count();
     }
+
+    public function getUserDeductWord($where, $field, $row = false, $orderBy = '', $limit = '')
+    {
+        $obj = UserDeductWord::field($field)->where($where);
+        return $this->getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function addUserDeductWord($data)
+    {
+        $UserDeductWord = new UserDeductWord;
+        $UserDeductWord->save($data);
+        return $UserDeductWord->id;
+    }
+
+    public function editUserDeductWord($data, $id)
+    {
+        $UserDeductWord = new UserDeductWord;
+        return $UserDeductWord->save($data, ['id' => $id]);
+    }
+
+    public function countUserDeductWord($where)
+    {
+        return UserDeductWord::where($where)->count();
+    }
+
 }

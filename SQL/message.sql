@@ -1253,3 +1253,37 @@ ALTER TABLE `messagesend`.`yx_users`
 ADD COLUMN `business_free_credit` int(10) NOT NULL DEFAULT '0' COMMENT '行业免审额度',
 ADD COLUMN `marketing_free_credit` int(10) NOT NULL DEFAULT '0' COMMENT '营销免审额度',
 ADD COLUMN `multimeda_free_credit` int(10) NOT NULL DEFAULT '0' COMMENT '彩信免审额度';
+
+
+DROP TABLE IF EXISTS `yx_deduct_word`;
+CREATE TABLE `yx_deduct_word` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `business_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '业务服务id',
+  `word` varchar(50) NOT NULL DEFAULT '' COMMENT '关键词',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `word` (`word`) USING BTREE,
+  KEY `uid` (`uid`) USING BTREE,
+  KEY `business_id` (`business_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='扣量过滤关键词';
+
+DROP TABLE IF EXISTS `yx_mobile_times`;
+CREATE TABLE `yx_mobile_times` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `mobile` char(11) NOT NULL DEFAULT '' COMMENT '手机号',
+  `day_times` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '号码发送天/次',
+  `max_times` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '号码单日最大次数',
+  `all_times` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '号码总发送次数',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `mobile` (`mobile`,`uid`) USING BTREE,
+  KEY `day_times` (`day_times`) USING BTREE,
+  KEY `max_times` (`max_times`) USING BTREE,
+  KEY `all_times` (`all_times`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='号码出现频次';
