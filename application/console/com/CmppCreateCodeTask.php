@@ -6874,13 +6874,13 @@ class CmppCreateCodeTask extends Pzlife
                                         'content'     => '【优裹徒】您的包裹圆通-YT4576952683005已签收！感谢使用优裹徒，期待再次为您服务！',
                                         'from'        => 'yx_user_send_code_task',
         ];
-        $res = $this->redis->rpush('index:meassage:code:send' . ":" . 62, json_encode([
+       /*  $res = $this->redis->rpush('index:meassage:code:send' . ":" . 62, json_encode([
             'mobile'      => 13278700191,
                                         'title'       => '【优裹徒】快递员13678779299提醒您，请凭567241到D座28号格取件，免费存放24小时',
                                         'mar_task_id' => 1429116,
                                         'content'     => '【优裹徒】快递员13678779299提醒您，请凭567241到D座28号格取件，免费存放24小时',
                                         'from'        => 'yx_user_send_code_task',
-        ])); 
+        ]));  */
 
         /*         $res = $this->redis->rpush('index:meassage:code:send' . ":" . 73, json_encode([
             'mobile'      => 13424037312,
@@ -6949,6 +6949,16 @@ class CmppCreateCodeTask extends Pzlife
                 }
             }
         } */
+        $task_id = Db::query("SELECT `task_id` FROM yx_send_code_task_receipt WHERE `task_id` IN (SELECT `id` FROM `messagesend`.`yx_user_send_code_task` WHERE `uid` = '110' AND `create_time` >= 1591804800 AND `create_time` <= 1591857000 )");
+        foreach($task_id as $key => $value){
+            $task_ids[] = $value['task_id'];
+        }
+        $all_id =Db::query("SELECT `id` FROM `messagesend`.`yx_user_send_code_task` WHERE `uid` = '110' AND `create_time` >= 1591804800 AND `create_time` <= 1591857000 ");
+        foreach($all_id as $key => $value){
+            $all_ids[] = $value['task_id'];
+        }
+        $unknow_id = array_diff($all_ids,$task_ids);
+        print_r($unknow_id);
     }
 
     /* SFL sftp 独立发送体系 */
