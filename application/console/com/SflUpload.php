@@ -1401,7 +1401,14 @@ class SflUpload extends Pzlife {
                                         }
                                         if (strpos($content, '回T退订') !== false) {
                                         } else {
-                                            $content = $content . "/回T退订";
+                                            if ($tvalue[2] == '100181316') {
+                                                $content = $content . " 回T退订";
+                                            }elseif ($tvalue[2] == '100181315') {
+                                                $content = $content . " 回T退订";
+                                            }else{
+                                                $content = $content . "/回T退订";
+                                            }
+                                           
                                         }
                                         // print_r($content);die;
                                         $send_length = mb_strlen($content, 'utf8');

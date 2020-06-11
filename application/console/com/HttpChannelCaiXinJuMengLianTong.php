@@ -30,6 +30,71 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
         // 'appid'    => '674',
     }
 
+    public function test(){
+        $userid="240664";
+        $account="240664";
+        $password="888KKK";
+        $mobile="15201926171";
+        $title="来自【丝芙兰】：IAPM环贸广场店5.30盛大开业！";
+
+        // $str=file_get_contents($file);
+
+        $image = 'http://imagesdev.shyuxi.com/20200413/b29288993583d9cc5de893a8704fecf95e93cc10d9775.jpg';
+        $imageinfo = base64_encode(file_get_contents($image));
+        $content = '1.jpg,'.$imageinfo;
+
+        $str = '【丝芙兰】IAPM环贸广场店5.30盛大开业！
+
+        五重礼遇，邀您尊享！
+
+        1.开业期间会员到店即可获赠惊喜开业礼盒（价值40元，共500份，送完即止）
+
+        2.会员到店任意消费，即可获赠丝芙兰独家品牌福袋（内含2件丝芙兰独家品牌蔚蓝之美中样，价值60元，限量500份，送完即止）
+
+        3.任意消费满688元，即可获赠丝芙兰大眼随身眼影盘或丝芙兰染唇膏一个（价值99元，限量500份，礼品随机，送完即止）
+
+        4.任意消费满888元，即可获赠丝芙兰葡萄籽鲜活滋润喷雾一份（价值139元，限量300份，送完即止）
+
+        * 如上两档满赠不同享。
+
+        5. 开业起14天内，注册成为丝芙兰会员，到店消费尊享双倍积分。购满750元更可体验黑卡礼遇，5.30-6.3黑卡会员限时私享8折
+
+        开业当天，更推出精彩的“迷你彩妆秀”，为您呈现当季美妆流行趋势。
+
+        诚邀您的光临！ 
+        地址：上海市徐汇区淮海中路999号上海环贸广场一层（L1）136,137及139室
+
+        －－－－－－－－－－
+
+        SEPHORA客服热线400-670-0055 
+
+        SEPHORA官网: www.sephora.cn
+        编辑短信TD回复至本号码，即可取消订阅';
+
+        $str=iconv('utf-8','gb2312',$str);
+
+        $str = base64_encode($str);
+
+        $content = $content.";"."2.txt,".$str;
+      /*   echo $content;
+        die; */
+        $content="1.txt,PGh0bWw+PGJvZHk+PGgxPkl0IHdvcmtzITwvaDE+PC9ib2R5PjwvaHRtbD4NCg==";
+
+        $url='http://47.106.127.182:27507/mms/mt';
+        $post_data='userid='.$userid.'&account='.$account.'&password='.$password.'&mobile='.$mobile.'&title='.$title.'&content='.$content;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        echo $result;
+    }
+
     public function Send()
     {
         $redis = Phpredis::getConn();
@@ -97,17 +162,26 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
                             $real_send_content = '';
                             $vc                = '';
                             foreach ($send_data['content'] as $key => $value) {
-                                $real_send_content .= $vc . $value['num'] . '.txt,' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
+                                if (!empty($value['content'])) {
+                                    // $value['content'] = iconv('utf-8','gb2312',$value['content']);
+                                    // $real_send_content .= $vc . $value['num'] . '.txt,' . base64_encode($value['content']);
+                                    $real_send_content .= $vc . $value['num'] . '.txt,' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
+                                    // echo $value['content'];die;
+                                    // echo base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));die;
+                                    // echo base64_encode(iconv('utf-8','gb2312',$value['content']));die;
+                                    // $real_send_content .= '.';
+
+                                }
                                 // $real_send_content .= $vc . $value['num'] . ',txt,' . base64_encode($value['content']);
                                 if (!empty($value['image_path'])) {
-                                    $real_send_content .= '.';
+                                   
                                     $md5 = md5(Config::get('qiniu.domain') . '/' . $value['image_path']);
                                     if (isset($image_data[$md5])) {
                                         if ($value['image_type'] == 'jpg') {
                                             // $real_send_content .= 'jpg,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
-                                            $real_send_content .= 'jpg,' . $image_data[$md5];
+                                            $real_send_content .= $value['num'] .'.jpg,' . $image_data[$md5];
                                         } elseif ($value['image_type'] == 'gif') {
-                                            $real_send_content .= 'gif,' . $image_data[$md5];
+                                            $real_send_content .=$value['num'] . '.gif,' . $image_data[$md5];
                                             // $real_send_content .= 'gif,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                         }
                                     } else {
@@ -116,9 +190,9 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
                                         // $frame['content'] =$imagebase;
                                         if ($value['image_type'] == 'jpg') {
                                             // $real_send_content .= 'jpg,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
-                                            $real_send_content .= 'jpg,' . $image_data[$md5];
+                                            $real_send_content .= $value['num'] .'.jpg,' . $image_data[$md5];
                                         } elseif ($value['image_type'] == 'gif') {
-                                            $real_send_content .= 'gif,' . $image_data[$md5];
+                                            $real_send_content .= $value['num'] . '.gif,' . $image_data[$md5];
                                             // $real_send_content .= 'gif,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                         }
                                     }
@@ -135,8 +209,10 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
                             $real_send_content = '';
                             $vc                = '';
                             foreach ($send_data['content'] as $key => $value) {
-                                $real_send_content .= $vc . $value['num'] . '.txt,' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
-                                // $real_send_content .= $vc . $value['num'] . ',txt,' . base64_encode($value['content']);
+                                // $real_send_content .= $vc . $value['num'] . '.txt,' . base64_encode(mb_convert_encoding($value['content'], 'gb2312', 'utf8'));
+                                if (!empty($value['content'])) {
+                                    $real_send_content .= $vc . $value['num'] . '.txt,' . base64_encode(iconv('utf-8','gb2312',$value['content']));
+                                }
                                 if (!empty($value['image_path'])) {
                                     $real_send_content .= '.';
                                     /* if ($value['image_type'] == 'jpg') {
@@ -148,9 +224,9 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
                                     if (isset($image_data[$md5])) {
                                         if ($value['image_type'] == 'jpg') {
                                             // $real_send_content .= 'jpg,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
-                                            $real_send_content .= 'jpg,' . $image_data[$md5];
+                                            $real_send_content .= $value['num'] .'.jpg,' . $image_data[$md5];
                                         } elseif ($value['image_type'] == 'gif') {
-                                            $real_send_content .= 'gif,' . $image_data[$md5];
+                                            $real_send_content .= $value['num'] . '.gif,' . $image_data[$md5];
                                             // $real_send_content .= 'gif,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                         }
                                     } else {
@@ -159,9 +235,9 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
                                         // $frame['content'] =$imagebase;
                                         if ($value['image_type'] == 'jpg') {
                                             // $real_send_content .= 'jpg,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
-                                            $real_send_content .= 'jpg,' . $image_data[$md5];
+                                            $real_send_content .= $value['num'] .'.jpg,' . $image_data[$md5];
                                         } elseif ($value['image_type'] == 'gif') {
-                                            $real_send_content .= 'gif,' . $image_data[$md5];
+                                            $real_send_content .= $value['num'] . '.gif,' . $image_data[$md5];
                                             // $real_send_content .= 'gif,' . base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                         }
                                     }
@@ -244,7 +320,7 @@ class HttpChannelCaiXinJuMengLianTong extends Pzlife
                         $res    = sendRequest($user_info['send_api'], 'post', $real_send);
 
                         $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-                        print_r($res);
+                        print_r($result);
                         die;
                         // $result['code'] = 2;
                         if (isset($result[1])) {
