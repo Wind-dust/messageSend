@@ -6969,26 +6969,6 @@ class CmppCreateCodeTask extends Pzlife
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73754);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73755);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73764); */
-
-        // $tody_time = 1590645600;
-        $tody_time = strtotime(date("Ymd", time()));
-        // $tody_time = 1591264800;
-        try {
-            $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84]);
-            /* $where = [];
-            $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
-            $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` <> '100180594' AND `create_time` >  " . $tody_time);
-            // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100180594' AND `create_time` > 1591330358 ");
-            // echo "SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100180528' AND `create_time` >  " . $tody_time;die;
-            foreach ($sendid as $key => $value) {
-                $this->redis->rpush('index:meassage:sflmessage:sendtask', $value['id']);
-            }
-        } catch (\Exception $th) {
-            exception($th);
-        }
-        $deduct = 1; //1扣量,2不扣
-        $rate = 55;
         $white_list = [
             13023216322,
             18616841500,
@@ -7023,6 +7003,27 @@ class CmppCreateCodeTask extends Pzlife
             18019762207,
             13162248755,
         ];
+        // echo "SELECT * FROM yx_sfl_send_task WHERE `mobile` IN (".join(',',$white_list).") ";die;
+        // $tody_time = 1590645600;
+        $tody_time = strtotime(date("Ymd", time()));
+        // $tody_time = 1591264800;
+        try {
+            $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84]);
+            /* $where = [];
+            $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
+            $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` <> '100180594' AND `create_time` >  " . $tody_time);
+            // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100180594' AND `create_time` > 1591330358 ");
+            // echo "SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100180528' AND `create_time` >  " . $tody_time;die;
+            foreach ($sendid as $key => $value) {
+                $this->redis->rpush('index:meassage:sflmessage:sendtask', $value['id']);
+            }
+        } catch (\Exception $th) {
+            exception($th);
+        }
+        $deduct = 1; //1扣量,2不扣
+        $rate = 55;
+        
         $ids = [];
         $j = 1;
         $receipt = [];
@@ -7059,8 +7060,10 @@ class CmppCreateCodeTask extends Pzlife
                             $receipt[] = $rece;
                         } else {
                             if ($deduct == 1) {
+                                $rate = $rate;
                                 $num = mt_rand(0, 100);
-                                if ($num >= $rate || in_array(trim($value['mobile']), $white_list) || !strpos($value['task_content'], '生日')) {
+                                if ( strpos($value['task_content'], '生日') !== false) {//生日不扣
+                                    // print_r($value['task_content']);die;
                                     $prefix = '';
                                     $prefix = substr(trim($value['mobile']), 0, 7);
                                     $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
@@ -7094,18 +7097,74 @@ class CmppCreateCodeTask extends Pzlife
                                         'channel_id'        => $channel_id,
                                     ];
                                     $send_msg[] = $sendmessage;
-                                } else {
-                                    $rece = [];
-                                    $rece = [
-                                        'task_id' => $value['id'],
-                                        'mseeage_id'      => $value['mseeage_id'],
-                                        'template_id'      => $value['template_id'],
-                                        'mobile' => $value['mobile'],
-                                        'messageinfo' => '发送成功',
-                                        'status_message' => 'SMS:1',
-                                    ];
-                                    $receipt[] = $rece;
+                                }else{
+                                    //
+                                    // echo "不含生日";
+                                    // print_r($value['task_content']);die;
+                                    if ($value['template_id'] == '100181315') {
+                                        if (in_array(trim($value['mobile']), $white_list)){
+                                            continue;
+                                        }
+                                        $rate = 60;
+                                      
+                                    }elseif ($value['template_id'] == '100181316'){
+                                        if (in_array(trim($value['mobile']), $white_list)){
+                                            continue;
+                                        }
+                                        $rate = 40;
+                                        
+                                    }
+                                    if ($num >= $rate || in_array(trim($value['mobile']), $white_list) ) {
+                                        $prefix = '';
+                                        $prefix = substr(trim($value['mobile']), 0, 7);
+                                        $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                                        // print_r($res);
+                                        if ($res) {
+                                            $newres = array_shift($res);
+                                            if ($newres['source'] == 1) {
+                                                $channel_id = $value['yidong_channel_id'];
+                                            } elseif ($newres['source'] == 2) {
+                                                $channel_id = $value['liantong_channel_id'];
+                                            } elseif ($newres['source'] == 3) {
+                                                $channel_id = $value['dianxin_channel_id'];
+                                            }
+                                        }
+    
+                                        //正常发送
+                                        /*  $sendmessage = [
+                                                'mobile'      => $value['mobile'],
+                                                'mar_task_id' => $value['id'],
+                                                'content'     => $value['task_content'],
+                                                'channel_id'  => $channel_id,
+                                                'from'        => 'yx_sfl_send_task',
+                                            ]; */
+                                        $sendmessage = [
+                                            'mseeage_id'      => $value['mseeage_id'],
+                                            'template_id'      => $value['template_id'],
+                                            'mobile'      => $value['mobile'],
+                                            'mar_task_id' => $value['id'],
+                                            'content'     => $value['task_content'],
+                                            'from'        => 'yx_sfl_send_task',
+                                            'channel_id'        => $channel_id,
+                                        ];
+                                        $send_msg[] = $sendmessage;
+                                    } else {
+                                        $rece = [];
+                                        $rece = [
+                                            'task_id' => $value['id'],
+                                            'mseeage_id'      => $value['mseeage_id'],
+                                            'template_id'      => $value['template_id'],
+                                            'mobile' => $value['mobile'],
+                                            'messageinfo' => '发送成功',
+                                            'status_message' => 'SMS:1',
+                                        ];
+                                        $receipt[] = $rece;
+                                    }
+
                                 }
+                               
+                                
+
                             } else {
                                 $prefix = '';
                                 $prefix = substr(trim($value['mobile']), 0, 7);
@@ -7206,6 +7265,17 @@ class CmppCreateCodeTask extends Pzlife
                     } else {
                         if ($deduct == 1) { //扣量
                             $num = mt_rand(0, 100);
+                            if ($value['template_id'] == '100181315') {
+                                if (in_array(trim($value['mobile']), $white_list)){
+                                    continue;
+                                }
+                                $rate = 60;
+                            }elseif ($value['template_id'] == '100181316'){
+                                if (in_array(trim($value['mobile']), $white_list)){
+                                    continue;
+                                }
+                                $rate = 40;
+                            }
                             if ($num >= $rate || in_array(trim($value['mobile']), $white_list)) {
                                 $prefix = '';
                                 $prefix = substr(trim($value['mobile']), 0, 7);
@@ -8042,7 +8112,7 @@ class CmppCreateCodeTask extends Pzlife
         $mysql_connect->query("set names utf8mb4");
         $oppen_shop = [];
         $bir = [];
-        /*         $this->redis->rpush("index:meassage:code:send:94",'{"mobile":"13621111651","title":"\u6765\u81ea\u3010\u4e1d\u8299\u5170\u3011\uff1aIAPM\u73af\u8d38\u5e7f\u573a\u5e975.30\u76db\u5927\u5f00\u4e1a\uff01","mar_task_id":70307,"content":[{"id":24,"content":null,"num":1,"image_path":"20200525\/993b12e0d2a0fff8c6547527de1a40a15ecb6bf27c90d.gif","image_type":""},{"id":25,"content":"\u3010\u4e1d\u8299\u5170\u3011IAPM\u73af\u8d38\u5e7f\u573a\u5e975.30\u76db\u5927\u5f00\u4e1a\uff01\n\n\u4e94\u91cd\u793c\u9047\uff0c\u9080\u60a8\u5c0a\u4eab\uff01\n\n1.\u5f00\u4e1a\u671f\u95f4\u4f1a\u5458\u5230\u5e97\u5373\u53ef\u83b7\u8d60\u60ca\u559c\u5f00\u4e1a\u793c\u76d2\uff08\u4ef7\u503c40\u5143\uff0c\u5171500\u4efd\uff0c\u9001\u5b8c\u5373\u6b62\uff09\n\n2.\u4f1a\u5458\u5230\u5e97\u4efb\u610f\u6d88\u8d39\uff0c\u5373\u53ef\u83b7\u8d60\u4e1d\u8299\u5170\u72ec\u5bb6\u54c1\u724c\u798f\u888b\uff08\u5185\u542b2\u4ef6\u4e1d\u8299\u5170\u72ec\u5bb6\u54c1\u724c\u851a\u84dd\u4e4b\u7f8e\u4e2d\u6837\uff0c\u4ef7\u503c60\u5143\uff0c\u9650\u91cf500\u4efd\uff0c\u9001\u5b8c\u5373\u6b62\uff09\n\n3.\u4efb\u610f\u6d88\u8d39\u6ee1688\u5143\uff0c\u5373\u53ef\u83b7\u8d60\u4e1d\u8299\u5170\u5927\u773c\u968f\u8eab\u773c\u5f71\u76d8\u6216\u4e1d\u8299\u5170\u67d3\u5507\u818f\u4e00\u4e2a\uff08\u4ef7\u503c99\u5143\uff0c\u9650\u91cf500\u4efd\uff0c\u793c\u54c1\u968f\u673a\uff0c\u9001\u5b8c\u5373\u6b62\uff09\n\n4.\u4efb\u610f\u6d88\u8d39\u6ee1888\u5143\uff0c\u5373\u53ef\u83b7\u8d60\u4e1d\u8299\u5170\u8461\u8404\u7c7d\u9c9c\u6d3b\u6ecb\u6da6\u55b7\u96fe\u4e00\u4efd\uff08\u4ef7\u503c139\u5143\uff0c\u9650\u91cf300\u4efd\uff0c\u9001\u5b8c\u5373\u6b62\uff09\n\n* \u5982\u4e0a\u4e24\u6863\u6ee1\u8d60\u4e0d\u540c\u4eab\u3002\n\n5. \u5f00\u4e1a\u8d7714\u5929\u5185\uff0c\u6ce8\u518c\u6210\u4e3a\u4e1d\u8299\u5170\u4f1a\u5458\uff0c\u5230\u5e97\u6d88\u8d39\u5c0a\u4eab\u53cc\u500d\u79ef\u5206\u3002\u8d2d\u6ee1750\u5143\u66f4\u53ef\u4f53\u9a8c\u9ed1\u5361\u793c\u9047\uff0c5.30-6.3\u9ed1\u5361\u4f1a\u5458\u9650\u65f6\u79c1\u4eab8\u6298\n\n\u5f00\u4e1a\u5f53\u5929\uff0c\u66f4\u63a8\u51fa\u7cbe\u5f69\u7684\u201c\u8ff7\u4f60\u5f69\u5986\u79c0\u201d\uff0c\u4e3a\u60a8\u5448\u73b0\u5f53\u5b63\u7f8e\u5986\u6d41\u884c\u8d8b\u52bf\u3002\n\n\u8bda\u9080\u60a8\u7684\u5149\u4e34\uff01 \n\u5730\u5740\uff1a\u4e0a\u6d77\u5e02\u5f90\u6c47\u533a\u6dee\u6d77\u4e2d\u8def999\u53f7\u4e0a\u6d77\u73af\u8d38\u5e7f\u573a\u4e00\u5c42\uff08L1\uff09136,137\u53ca139\u5ba4\n\n\uff0d\uff0d\uff0d\uff0d\uff0d\uff0d\uff0d\uff0d\uff0d\uff0d\n\nSEPHORA\u5ba2\u670d\u70ed\u7ebf400-670-0055 \n\nSEPHORA\u5b98\u7f51: www.sephora.cn\n\u7f16\u8f91\u77ed\u4fe1TD\u56de\u590d\u81f3\u672c\u53f7\u7801\uff0c\u5373\u53ef\u53d6\u6d88\u8ba2\u9605","num":2,"image_path":"","image_type":""}]}'); */
+                $this->redis->rpush("index:meassage:code:send:94",'{"mobile":"15811252512","title":"\u6765\u81ea\u3010\u4e1d\u8299\u5170\u3011\uff1a\u795d\u60a8\u751f\u65e5\u5feb\u4e50\uff01\u5feb\u6765\u9886\u53d6\u4e09\u91cd\u751f\u65e5\u8c6a\u793c\uff0c\u4eab\u53d7\u751f\u65e5\u559c\u60a6\uff01","mar_task_id":215551,"content":[{"id":26,"content":null,"num":1,"image_path":"20200522\/36281dfe70ba464f5987fc0073025a105ec761bd5fdf8.jpg","image_type":""},{"id":27,"content":"\u3010\u4e1d\u8299\u5170\u3011\u795d\u60a8\u751f\u65e5\u5feb\u4e50\uff01\u5feb\u6765\u9886\u53d6\u4e09\u91cd\u751f\u65e5\u8c6a\u793c\uff0c\u4eab\u53d7\u751f\u65e5\u559c\u60a6\uff01\r\n\r\n\u5c0a\u8d35\u7684\u91d1\u5361\u4f1a\u5458\u674e\u654f\uff0c\r\n\r\n\u4e13\u5c5e\u5ba0\u7231\uff0c\u4e0d\u8d1f\u671f\u5f85\uff0c\u4e1d\u8299\u5170\u4e3a\u60a8\u4e0a\u6f14 \u201c\u751f\u65e5\u5c0a\u4eab\u793c\u201d\u4e09\u91cd\u594f\uff0c\u53ea\u4e3a\u6700\u7279\u522b\u7684\u60a8\u3002\r\n\r\n\u4e00\u91cd\u594f:\u3010\u4ef7\u503c320\u5143\u751f\u65e5\u793c\u76d2\u3011\u56db\u5927\u54c1\u724c\u793c\u7269\u4efb\u9009\u5176\u4e00\uff08\u4e24\u4e24\u3001\u6b27\u7f07\u4e3d\u3001\u851a\u84dd\u4e4b\u7f8e\u3001\u739b\u4e3d\u9edb\u4f73\uff09\u3002\r\n","num":2,"image_path":"","image_type":""},{"id":28,"content":null,"num":3,"image_path":"20200522\/86c75c26b9f32b45559807db9dc2adc25ec761e4486aa.jpg","image_type":""},{"id":29,"content":"\u4e8c\u91cd\u594f: \u3010\u4e1d\u8299\u5170100\u5143\u7535\u5b50\u5238\u3011\u6d88\u8d39\u6ee1101\u5143\u53ef\u7528\u3002\r\n\u4e09\u91cd\u594f:\u751f\u65e5\u6708\u8ba2\u5355\u4eab\u53d7\u4e00\u6b21\u53cc\u500d\u79ef\u5206\u793c\u9047\u3002\u751f\u65e5\u5927\u653e\u201c\u4ef7\u201d\uff0c\u7279\u6743\u6765\u88ad\uff0c\u4e0d\u5bb9\u9519\u8fc7\u3002\r\n\r\n\u8bf7\u4e8e2020-07-11\u524d\u4e1d\u8299\u5170\u95e8\u5e97\u548c\u5b98\u7f51 sephora.cn\u3001APP\u3001\u5c0f\u7a0b\u5e8f\u9886\u53d6\u5e76\u4f7f\u7528\u60a8\u7684\u4e13\u5c5e\u793c\u7269\u54e6\uff01\r\n\r\n\u4ee5\u4e0a\u4e09\u91cd\u751f\u65e5\u793c\uff0c\u7686\u4e0d\u4e0e\u5176\u4ed6\u4f18\u60e0\u53e0\u52a0\u4f7f\u7528\u3002\r\n\r\n\uff0d\uff0d\uff0d\uff0d\uff0d\uff0d\uff0d\uff0d\uff0d\uff0d\r\nSEPHORA\u5ba2\u670d\u70ed\u7ebf400-670-0055\r\nSEPHORA\u5b98\u7f51\uff1a www.sephora.cn\r\n\u7f16\u8f91\u77ed\u4fe1TD\u56de\u590d\u81f3\u672c\u53f7\u7801\uff0c\u5373\u53ef\u53d6\u6d88\u8d60\u9605\u3010SEPHORA\u3011\r\n","num":4,"image_path":"","image_type":""}]}');
         $all = [];
         try {
             while (true) {
@@ -8052,8 +8122,8 @@ class CmppCreateCodeTask extends Pzlife
                 }
                 $all[] = $mul_task;
                 $mul_send_task = json_decode($mul_task, true);
-                // print_r($mul_send_task);die;
-                // print_r($mul_task);
+                print_r($mul_send_task);die;
+                print_r($mul_task);
                 if (!strpos('IAPM环贸广场店', $mul_send_task['title'])) {
                     $oppen_shop[] = $mul_send_task['mobile'];
                 } else {
