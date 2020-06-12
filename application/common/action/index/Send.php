@@ -2059,6 +2059,9 @@ return $result;
         if (count($mobile_data) > $userEquities['num_balance']) {
             return ['code' => '3002'];
         }
+        if (count($mobile_data) > 2000) {
+            return ['code' => '3003'];
+        }
         /* 实号数据库查询 */
         $entity_mobile = Db::query("SELECT `mobile` FROM `yx_real_mobile` WHERE mobile IN (".join(',',$mobile_data).") GROUP BY `mobile` ");
         $entity_mobiles = [];
