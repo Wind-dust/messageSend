@@ -1212,15 +1212,11 @@ return $result;
                         $free_taskno[] = $task_no;
                         $send_task['free_trial'] = 2;
                         if ($user['pid'] == 137) {
-                            if ($user['id'] == 134) {
-                                $data['yidong_channel_id'] = 85;
-                                $data['liantong_channel_id'] = 85;
-                                $data['dianxin_channel_id'] = 85;
-                            } else {
+                          
                                 $send_task['yidong_channel_id'] = 85;
                                 $send_task['liantong_channel_id'] = 85;
                                 $send_task['dianxin_channel_id'] = 85;
-                            }
+                           
                         } else {
                             if ($user['id'] == 110) {
                                 $send_task['yidong_channel_id'] = 85;
@@ -2182,6 +2178,8 @@ return $result;
                     ];
                     $check_mobile_result[] = $chech_mobile;
                 }
+            }else{
+                return ['code' => '3004'];
             }
         }
         // $en_mobile = $this->encrypt($mobile, $secret_id);

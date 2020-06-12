@@ -1258,13 +1258,13 @@ class Send extends MyController
     /**
      * @api              {post} / 空号检测接口
      * @apiDescription   numberDetection
-     * @apiGroup         admin_Message
+     * @apiGroup         index_send
      * @apiName          numberDetection
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
      * @apiParam (入参) {String} phone 号码, 多个号码用半角,隔开
      * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误
-     * @apiSampleRequest /admin/message/numberDetection
+     * @apiSampleRequest /index/send/numberDetection
      * @author rzc
      */
     public function numberDetection(){
