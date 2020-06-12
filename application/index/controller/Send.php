@@ -1255,5 +1255,31 @@ class Send extends MyController
         }
     }
     
-    
+    /**
+     * @api              {post} / 空号检测接口
+     * @apiDescription   numberDetection
+     * @apiGroup         admin_Message
+     * @apiName          numberDetection
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {String} phone 号码, 多个号码用半角,隔开
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误
+     * @apiSampleRequest /admin/message/numberDetection
+     * @author rzc
+     */
+    public function numberDetection(){
+        $mobile         = trim($this->request->post('mobile'));
+       
+        $appid   = trim($this->request->post('appid')); //登录名
+        $appkey  = trim($this->request->post('appkey')); //登陆密码
+        // return $this->encrypt($mobile, $secret_id);
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        $result = $this->app->send->numberDetection($appid, $appkey,$mobile);
+        return $result;
+    }
 }
