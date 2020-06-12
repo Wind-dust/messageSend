@@ -297,7 +297,7 @@ return $result;
     {
         $Mobiles = array_unique(array_filter($Mobiles));
         // $Password = md5($Password);
-        $user = DbUser::getUserOne(['appid' => $Username], 'id,pid,appkey,user_type,user_status,reservation_service,free_trial,marketing_free_credit,market_deduct', true);
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,pid,appkey,user_type,user_status,reservation_service,marketing_free_trial,marketing_free_credit,market_deduct', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -375,7 +375,7 @@ return $result;
         if (!empty($msg_id)) {
             $data['send_msg_id'] = $msg_id;
         }
-        if ($user['free_trial'] == 2){
+        if ($user['marketing_free_trial'] == 2){
             $data['free_trial'] = 2;
             if ($user['marketing_free_credit'] > 0) {
                 if ($real_num >= $user['marketing_free_credit'] ) {
