@@ -561,9 +561,9 @@ return $result;
                 // $data['dianxin_channel_id'] = 9;
             } else {
                 if (strpos($Content, '亲爱的美田会员') !== false) {
-                    $data['yidong_channel_id'] = 22;
-                    $data['liantong_channel_id'] = 22;
-                    $data['dianxin_channel_id'] = 22;
+                    $data['yidong_channel_id'] = 18;
+                    $data['liantong_channel_id'] = 19;
+                    $data['dianxin_channel_id'] = 19;
                 } elseif (strpos($Content, '问卷') !== false) {
                     $data['yidong_channel_id'] = 18;
                     $data['liantong_channel_id'] = 19;
