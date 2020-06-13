@@ -7931,7 +7931,7 @@ class CmppCreateCodeTask extends Pzlife
             exception($th);
         }
         $deduct = 1; //1扣量,2不扣
-        $rate = 60;
+        $rate = 65;
         
         $ids = [];
         $j = 1;
@@ -8360,7 +8360,7 @@ class CmppCreateCodeTask extends Pzlife
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3678);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3679); */
         // $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3680);
-        $bir = [];
+       /*  $bir = [];
         $all_path = realpath("./") . "/0529.txt";
         $file = fopen($all_path, "r");
         // $data = array();
@@ -8370,7 +8370,7 @@ class CmppCreateCodeTask extends Pzlife
             if (!empty($cellVal)) {
                 array_push($bir, $cellVal);
             }
-        }
+        } */
         // return $data;
         // print_r($data);die;
         $white_list = [
@@ -8471,7 +8471,7 @@ class CmppCreateCodeTask extends Pzlife
         $receipt = [];
         $send_msg = [];
         $deduct = 1; //1扣量,2不扣
-        $rate = 40;
+        $rate = 50;
         /*    $all_task = 
         while (true) {
             $task_id = $this->redis->lpop('index:meassage:sflmulmessage:sendtask');
