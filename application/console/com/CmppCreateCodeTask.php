@@ -5450,7 +5450,7 @@ class CmppCreateCodeTask extends Pzlife
                 } else {
                     $message_info = '发送失败';
                 }
-                $user = Db::query("SELECT `pid` FROM yx_users WHERE `id` = " . $send_log[0]['uid']);
+                $user = Db::query("SELECT `pid` FROM yx_users WHERE `id` = " . $send_log['uid']);
                 if ($user[0]['pid'] == 137) {
                     $redis->rpush('index:meassage:code:user:mulreceive:' . $send_log['uid'], json_encode([
                         'task_no'        => $send_log['task_no'],
