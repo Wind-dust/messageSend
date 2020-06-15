@@ -883,7 +883,7 @@ class SflUpload extends Pzlife {
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
-                    // continue;
+                    continue;
                     $err_task_num = [];
                     $send_data    = [];
                     if ($son_path_data !== false) {
@@ -1238,9 +1238,9 @@ class SflUpload extends Pzlife {
                             if (!strpos($svalue,date("Ymd"))) {
                             continue;
                             }
-                            /* if (strpos($svalue,'20200529100927')) {
+                            if (strpos($svalue,'2020061510') !== false) {
                             continue;
-                            } */
+                            }
                             // '2020060321'
                             /* if (!strpos($svalue, '2020060321')) {
                                 continue;
@@ -2281,7 +2281,7 @@ class SflUpload extends Pzlife {
 
             $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
             ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  1591459200 AND   `create_time` <  1591545600 ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  1591718400 AND   `create_time` <  1591804800 ");
             $ids          = [];
             foreach ($mul_task_ids as $key => $value) {
                 $ids[] = $value['id'];
@@ -2343,7 +2343,7 @@ class SflUpload extends Pzlife {
                         'MOBILE'                   => $receipts[$num - 1]['mobile'],
                         'STATUS'                   => $receipts[$num - 1]['status_message'],
                         'real_message'             => $receipts[0]['real_message'],
-                        'SENDING_TIME'             => date('Y-m-d H:i:s', 1591502702),
+                        'SENDING_TIME'             => date('Y-m-d H:i:s', 1591845494),
                     ];
                     $num = mt_rand(0, 5378);
                     /* if ($num>=0 && $num < 113) {
@@ -2360,7 +2360,7 @@ class SflUpload extends Pzlife {
                         'MOBILE'                   => $task[0]['mobile'],
                         'STATUS'                   => 'MMS:1',
                         'real_message'             => '',
-                        'SENDING_TIME'             => date('Y-m-d H:i:s', 1591502702),
+                        'SENDING_TIME'             => date('Y-m-d H:i:s', 1591845494),
                     ];
                     $num = mt_rand(0, 5378);
                     if ($num>=0 && $num < 144) {
@@ -2438,7 +2438,7 @@ class SflUpload extends Pzlife {
                     $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                 }
             }
-            $objWriter->save('imp_mobile_status_report_mms_1_20200607.xlsx');
+            $objWriter->save('imp_mobile_status_report_mms_1_20200612.xlsx');
         } catch (\Exception $th) {
             exception($th);
         }
@@ -2452,11 +2452,12 @@ class SflUpload extends Pzlife {
         // print_r(realpath("../"). "\yt_area_mobile.csv");die;
 
         try {
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591200000 AND   `create_time` <  1591286400 AND `task_content` NOT LIKE '%test%' ");
+            // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591891200 AND   `create_time` <  1591977600 AND `task_content` NOT LIKE '%test%' ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100180528' AND `task_content` NOT LIKE '%test%' ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591286400 AND   `create_time` <  1591372800 AND `task_content` NOT LIKE '%test%' ";die;
             $ids          = [];
             $i = 1;
-            $j = 1;
+            $j = 2;
             foreach ($mul_task_ids as $key => $value) {
                 // $ids[] = $value['id'];
                 /*  $objPHPExcel = $objReader->load(realpath("./") . "/0522.xlsx");
@@ -2527,7 +2528,7 @@ class SflUpload extends Pzlife {
                         'MOBILE'                   => $receipts[0]['mobile'],
                         'STATUS'                   => $receipts[0]['status_message'],
                         'real_message'             => $receipts[0]['real_message'],
-                        'SENDING_TIME'             => date('Y-m-d H:i:s', 1591245000+ceil($key/7300)),
+                        'SENDING_TIME'             => date('Y-m-d H:i:s', 1591322400+ceil($key/7300)),
                     ];
                     if (checkMobile($receipts[0]['mobile']) == false) {
                         $receive_all['STATUS'] = "SMS:2";
@@ -2555,7 +2556,7 @@ class SflUpload extends Pzlife {
                         'MOBILE'                   => $task[0]['mobile'],
                         'STATUS'                   => 'SMS:1',
                         'real_message'             => '',
-                        'SENDING_TIME'             => date('Y-m-d H:i:s', 1591245000+ceil($key/7300)),
+                        'SENDING_TIME'             => date('Y-m-d H:i:s', 1591322400+ceil($key/7300)),
                     ];
                    /*  if ($num >= 0 && $num < 17) {
                         $receive_all['STATUS'] = "SMS:3";
@@ -2582,7 +2583,7 @@ class SflUpload extends Pzlife {
                 }
                 
                 if ($i > 200000) {
-                    $name = "imp_mobile_status_report_sms_".$j."_".date('Ymd',1591200000).".xlsx";
+                    $name = "imp_mobile_status_report_sms_".$j."_".date('Ymd',1591286400).".xlsx";
                     $this->derivedTables($receive_alls,$name);
                     $j++;
                     $receive_alls = [];
@@ -2590,7 +2591,7 @@ class SflUpload extends Pzlife {
                 }
             }
             if (!empty($receive_alls)) {
-                $name = "imp_mobile_status_report_sms_".$j."_".date('Ymd',1591200000).".xlsx";
+                $name = "imp_mobile_status_report_sms_".$j."_".date('Ymd',1591286400).".xlsx";
                 $this->derivedTables($receive_alls,$name);
                    
             }
@@ -2639,7 +2640,7 @@ class SflUpload extends Pzlife {
         $date = date('Y-m-d H:i:s', time());
 
         //设置当前活动sheet的名称
-        $objActSheet->setTitle("imp_mobile_status_report");
+        $objActSheet->setTitle("imp_mobile_feedback");
         $CellList = array(
             array('MOBILE', 'MOBILE'),
             array('TYPE', 'TYPE'),

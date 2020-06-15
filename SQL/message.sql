@@ -1287,3 +1287,39 @@ CREATE TABLE `yx_mobile_times` (
   KEY `max_times` (`max_times`) USING BTREE,
   KEY `all_times` (`all_times`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='号码出现频次';
+
+DROP TABLE IF EXISTS `yx_user_template_multimedia_message`;
+CREATE TABLE `yx_user_template_multimedia_message` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `template_id` char(23) NOT NULL DEFAULT '' COMMENT '短信模板id',
+  `content` text COMMENT '提交内容',
+  `real_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '实际数量',
+  `send_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发送数量',
+  `free_trial` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '1:需要审核;2:审核通过;3:审核不通过',
+  `send_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '1：待发送,2:发送中;3:成功;4:失败',
+  `yidong_channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '移动通道ID',
+  `liantong_channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '联通通道id',
+  `dianxin_channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '电信通道id',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `template_id` (`template_id`) USING BTREE,
+  KEY `update_time` (`update_time`) USING BTREE,
+  KEY `create_time` (`create_time`) USING BTREE,
+  KEY `delete_time` (`delete_time`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=15077 DEFAULT CHARSET=utf8mb4 COMMENT='模板彩信记录表';
+
+DROP TABLE IF EXISTS `yx_user_multimedia_template_third_report`;
+CREATE TABLE `yx_user_multimedia_template_third_report` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `template_id` char(23) NOT NULL DEFAULT '' COMMENT '彩信信模板id',
+  `channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '报备通道id',
+  `third_template_id` char(23) NOT NULL DEFAULT '' COMMENT '彩信信模板id',
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '状态:1,提交申请;2,审核通过3,审核不通过;',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `template_id` (`template_id`,`third_template_id`,`channel_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COMMENT='第三方彩信模板报备表';
