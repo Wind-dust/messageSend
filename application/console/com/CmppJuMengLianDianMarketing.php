@@ -591,7 +591,7 @@ class CmppJuMengLianDianMarketing extends Pzlife
                         }
                         //捕获异常
                         catch (Exception $e) {
-                            if ($send_status == 1) {
+                            if (!empty($send_status) && $send_status == 1 ) {
                                 $redis->push($redisMessageCodeSend, $redisMessageCodeSend);
                                 $redis->hset($redisMessageCodeSequenceId, $Sequence_Id);
                             }
