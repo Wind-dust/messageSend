@@ -81,8 +81,8 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
             $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
-            // 'content'     => '【丝芙兰】尊贵的黑卡会员 杨蕾，祝您生日快乐！三重生日豪礼，伴您享受生日喜悦！一重奏:【丝芙兰门店明星礼包】二重奏: 【丝芙兰官网50元电子礼券】三重奏:生日月订单享受一次双倍积分礼遇。会员生日福利，明星热卖产品大放送！请于2020-05-20前至丝芙兰官网sephora.cn 、App、小程序或门店领取您的专属生日礼物！以上三重生日礼，皆不可与其他优惠叠加使用。/回T退订',
-            'content'     => '【钰晰科技】您本次登录的验证码为0518，回复QX取消本次登录',
+            // 'content'     => '【沙驰服饰】“衬”现在，全身心去爱。沙驰衬衫节👔礼献父亲节，充值赠好礼，全场VIP折上8折起，快来表达你对爸爸👨的爱吧😄。退订回T',
+            'content'     => '【钰晰科技】😄您本次登录的验证码为0518，回复QX取消本次登录',
         ]));
 
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -118,7 +118,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
         fclose($myfile);
 
         if (socket_connect($socket, $host, $port) == false) {
-            echo 'connect fail massege:' . socket_strerror(socket_last_error());
+            // echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
             socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
@@ -135,13 +135,13 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
             $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
             // ;
             if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
-                echo 'write_verify fail massege:' . socket_strerror(socket_last_error());
+                // echo 'write_verify fail massege:' . socket_strerror(socket_last_error());
             } else {
                 sleep(1);
                 $verify_status = 5; //默认失败
                 // $headData = socket_read($socket, 12);
-                echo $Sequence_Id . "\n";
-                echo "认证连接中..." . "\n";
+                // echo $Sequence_Id . "\n";
+                // echo "认证连接中..." . "\n";
                 $headData = socket_read($socket, 12);
                 if ($headData != false) {
                     $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
@@ -186,47 +186,47 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
 
                         switch ($body['Result']) {
                             case 0:
-                                echo "发送成功" . "\n";
+                                // echo "发送成功" . "\n";
                                 break;
                             case 1:
-                                echo "消息结构错" . "\n";
+                                // echo "消息结构错" . "\n";
                                 $error_msg = "消息结构错";
                                 break;
                             case 2:
-                                echo "命令字错" . "\n";
+                                // echo "命令字错" . "\n";
                                 $error_msg = "命令字错";
                                 break;
                             case 3:
-                                echo "消息序号重复" . "\n";
+                                // echo "消息序号重复" . "\n";
                                 $error_msg = "消息序号重复";
                                 break;
                             case 4:
-                                echo "消息长度错" . "\n";
+                                // echo "消息长度错" . "\n";
                                 $error_msg = "消息长度错";
                                 break;
                             case 5:
-                                echo "资费代码错" . "\n";
+                                // echo "资费代码错" . "\n";
                                 $error_msg = "资费代码错";
                                 break;
                             case 6:
-                                echo "超过最大信息长" . "\n";
+                                // echo "超过最大信息长" . "\n";
                                 $error_msg = "超过最大信息长";
                                 break;
                             case 7:
-                                echo "业务代码错" . "\n";
+                                // echo "业务代码错" . "\n";
                                 $error_msg = "业务代码错";
                                 break;
                             case 8:
-                                echo "流量控制错" . "\n";
+                                // echo "流量控制错" . "\n";
                                 $error_msg = "业务代码错";
                                 break;
                             default:
-                                echo "其他错误" . "\n";
+                                // echo "其他错误" . "\n";
                                 $error_msg = "其他错误";
                                 break;
                         }
                         if ($body['Result'] != 0) { //消息发送失败
-                            echo "发送失败" . "\n";
+                            // echo "发送失败" . "\n";
                             $error_msg = "其他错误";
                         } else {
                         }
@@ -269,7 +269,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                         $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                     } else if ($head['Command_Id'] == 0x00000008) {
-                        // echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                        // // echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                         $callback_Command_Id = 0x80000008;
 
                         $new_body         =  pack("C", 0);
@@ -278,15 +278,15 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                         $receive = 2;
                     } else if ($head['Command_Id'] == 0x80000008) {
-                        // echo "激活测试应答" . "\n"; //激活测试,无消息体结构
+                        // // echo "激活测试应答" . "\n"; //激活测试,无消息体结构
                     } else {
-                        // echo "未声明head['Command_Id']:" . $head['Command_Id'];
+                        // // echo "未声明head['Command_Id']:" . $head['Command_Id'];
                     }
                 }
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
                     while (true) {
 
-                        echo $Sequence_Id . "\n";
+                        // echo $Sequence_Id . "\n";
                         try {
                             $receive = 1;
                             //先接收
@@ -335,47 +335,47 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
 
                                         switch ($body['Result']) {
                                             case 0:
-                                                echo "发送成功" . "\n";
+                                                // echo "发送成功" . "\n";
                                                 break;
                                             case 1:
-                                                echo "消息结构错" . "\n";
+                                                // echo "消息结构错" . "\n";
                                                 $error_msg = "消息结构错";
                                                 break;
                                             case 2:
-                                                echo "命令字错" . "\n";
+                                                // echo "命令字错" . "\n";
                                                 $error_msg = "命令字错";
                                                 break;
                                             case 3:
-                                                echo "消息序号重复" . "\n";
+                                                // echo "消息序号重复" . "\n";
                                                 $error_msg = "消息序号重复";
                                                 break;
                                             case 4:
-                                                echo "消息长度错" . "\n";
+                                                // echo "消息长度错" . "\n";
                                                 $error_msg = "消息长度错";
                                                 break;
                                             case 5:
-                                                echo "资费代码错" . "\n";
+                                                // echo "资费代码错" . "\n";
                                                 $error_msg = "资费代码错";
                                                 break;
                                             case 6:
-                                                echo "超过最大信息长" . "\n";
+                                                // echo "超过最大信息长" . "\n";
                                                 $error_msg = "超过最大信息长";
                                                 break;
                                             case 7:
-                                                echo "业务代码错" . "\n";
+                                                // echo "业务代码错" . "\n";
                                                 $error_msg = "业务代码错";
                                                 break;
                                             case 8:
-                                                echo "流量控制错" . "\n";
+                                                // echo "流量控制错" . "\n";
                                                 $error_msg = "业务代码错";
                                                 break;
                                             default:
-                                                echo "其他错误" . "\n";
+                                                // echo "其他错误" . "\n";
                                                 $error_msg = "其他错误";
                                                 break;
                                         }
                                         if ($body['Result'] != 0) { //消息发送失败
-                                            echo "发送失败" . "\n";
+                                            // echo "发送失败" . "\n";
                                             $error_msg = "其他错误";
                                         } else {
                                         }
@@ -387,8 +387,8 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                         // print_r($body);
                                         $develop_len = strlen($Dest_Id);
                                         $receive_develop_no = mb_substr(trim($body['Dest_Id']),$develop_len);
-                                        // echo "拓展码:".$receive_develop_no;
-                                        // echo "\n";  
+                                        // // echo "拓展码:".$receive_develop_no;
+                                        // // echo "\n";  
                                         if ($Registered_Delivery == 0) { //上行
                                             if ($body['Msg_Fmt'] == 15) {
                                                 $body['Msg_Content'] = mb_convert_encoding($body['Msg_Content'], 'UTF-8', 'GBK');
@@ -447,7 +447,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                         $receive = 2;
                                     } else if ($head['Command_Id'] == 0x00000008) {
-                                        // echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                                        // // echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                                         $callback_Command_Id = 0x80000008;
 
                                         $new_body         =  pack("C", 0);
@@ -456,9 +456,9 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                         $receive = 2;
                                     } else if ($head['Command_Id'] == 0x80000008) {
-                                        // echo "激活测试应答" . "\n"; //激活测试,无消息体结构
+                                        // // echo "激活测试应答" . "\n"; //激活测试,无消息体结构
                                     } else {
-                                        // echo "未声明head['Command_Id']:" . $head['Command_Id'];
+                                        // // echo "未声明head['Command_Id']:" . $head['Command_Id'];
                                     }
                                 } else {
                                     break;
@@ -480,7 +480,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                 $code = $send_data['content']; //带签名
                                 $uer_num    = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
                                 $timestring = time();
-                                echo "发送时间：" . date("Y-m-d H:i:s", time()) . "\n";
+                                // echo "发送时间：" . date("Y-m-d H:i:s", time()) . "\n";
                                 $num1 = substr($timestring, 0, 8);
                                 $num2 = substr($timestring, 8) . $this->combination($i);
                                 // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
@@ -649,7 +649,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                 // socket_write($socket, $headData . $bodyData, $Total_Length);
                                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
-                                    // echo 'write_verify fail massege:' . socket_strerror(socket_last_error());
+                                    // // echo 'write_verify fail massege:' . socket_strerror(socket_last_error());
                                     $myfile = fopen($log_path, 'a+');
                                     fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                                     fwrite($myfile,  "通道延迟5秒后写入socket失败，请联系通道方检查原因\n");
@@ -704,16 +704,16 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
 
     public function decodeString()
     {
-        // echo strlen("³½'¹ ");
+        // // echo strlen("³½'¹ ");
         $timestring = time();
         $num1       = substr($timestring, 0, 8);
         $num2       = substr($timestring, 8) . $this->combination(rand(1, 240));
-        echo $num1;
-        echo "\n";
-        echo $num2;
+        // echo $num1;
+        // echo "\n";
+        // echo $num2;
 
         $a = pack("N", $num1) . pack("N", $num2);
-        echo $a . "\n";
+        // echo $a . "\n";
         // print_r(unpack("N2Msg_Id", $a));
 
         die;
