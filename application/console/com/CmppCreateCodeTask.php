@@ -358,6 +358,10 @@ class CmppCreateCodeTask extends Pzlife
                     $real_send['deduct'] = 0;
                 }
                 $real_send['deduct'] = isset($real_send['deduct']) ? $real_send['deduct'] : 0;
+                $mobile_result = [];
+                $yidong_mobile = [];
+                $liantong_mobile = [];
+                $dianxin_mobile = [];
                 $mobile_result = $this-> mobilesFiltrate($sendTask['mobile_content'], $sendTask['uid'],$real_send['deduct'] );
                 /*  return ['error_mobile' => $error_mobile, 'yidong_mobile' => $yidong_mobile,'liantong_mobile' => $liantong_mobile, 'dianxin_mobile' => $dianxin_mobile, 'deduct_mobile' => $deduct_mobile]; */
                 /* 实际发送号码 */
