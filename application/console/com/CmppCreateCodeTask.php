@@ -300,7 +300,7 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        // $send = $this->redis->rPush('index:meassage:marketing:sendtask', json_encode(['id' => 161044, 'send_time' => 0,'deduct' => 0]));
+        $send = $this->redis->rPush('index:meassage:marketing:sendtask', json_encode(['id' => 167053, 'send_time' => 0,'deduct' => 0]));
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15823,'send_time' => 0]));
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15824,'send_time' => 0]));
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15825,'send_time' => 0]));
@@ -3512,7 +3512,7 @@ class CmppCreateCodeTask extends Pzlife
                 $data = [
                     'task_id'        => $deduct['mar_task_id'],
                     'mobile'         => $deduct['mobile'],
-                    'real_message'   => 'DEDUCT:1',
+                    'real_message'   => $deduct['Stat'],
                     'status_message' => $deduct['Stat'],
                     'create_time'    => $deduct['Submit_time'],
                 ];
@@ -8444,9 +8444,9 @@ class CmppCreateCodeTask extends Pzlife
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $mysql_connect->query("set names utf8mb4");
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        /*   for ($i = 261193; $i < 261219; $i++) {
+          for ($i = 261219; $i < 261271; $i++) {
             $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $i);
-        } */
+        }
         // die;
         /*    $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3673);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3674);
@@ -8582,9 +8582,9 @@ class CmppCreateCodeTask extends Pzlife
             $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time);
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time;die;
             // $white_send = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `` `create_time` >  ".$tody_time );
-            foreach ($sendid as $key => $value) {
+            /* foreach ($sendid as $key => $value) {
                 $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
-            }
+            } */
 
             while (true) {
                 $task_id = $this->redis->lpop('index:meassage:sflmulmessage:sendtask');
