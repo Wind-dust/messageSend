@@ -8444,10 +8444,10 @@ class CmppCreateCodeTask extends Pzlife
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $mysql_connect->query("set names utf8mb4");
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-          for ($i = 261193; $i < 261218; $i++) {
+          for ($i = 261193; $i < 261219; $i++) {
             $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $i);
         }
-        die;
+        // die;
         /*    $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3673);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3674);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3675); */
@@ -8582,10 +8582,10 @@ class CmppCreateCodeTask extends Pzlife
             $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time);
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time;die;
             // $white_send = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `` `create_time` >  ".$tody_time );
-            foreach ($sendid as $key => $value) {
+           /*  foreach ($sendid as $key => $value) {
                 $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
             }
-
+ */
             while (true) {
                 $task_id = $this->redis->lpop('index:meassage:sflmulmessage:sendtask');
                 if (empty($task_id)) {
