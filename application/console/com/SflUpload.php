@@ -632,6 +632,7 @@ class SflUpload extends Pzlife {
                 }
             }
         }
+        
         if (!empty($send_task)) {
             try {
                 $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
@@ -642,7 +643,7 @@ class SflUpload extends Pzlife {
                 exception($e);
             }
         }
-        // die;
+        die;
         // print_r($this_id);
         // die;
         $task_receipt_all = [];

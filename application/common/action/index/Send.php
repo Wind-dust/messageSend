@@ -1675,13 +1675,11 @@ return $result;
         if (empty($user_equities)) {
             return ['code' => '3002'];
         }
-        if (!empty($template_id)) {
             $template =  DbSendMessage::getUserMultimediaTemplate(['template_id' => $template_id], '*', true);
-            if ($template['status'] != 2 || empty($template)) {
+            if (empty($template) ||$template['status'] != 2 ) {
                 return ['code' => '3003'];
             }
-            $template['multimedia_frame'] = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $template['id']], '*', false, ['num' => 'asc']);
-        }
+            $template['multimedia_frame'] = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $template['id']], 'num,name,content,image_path,image_type,variable_len', false, ['num' => 'asc']);
         if (!empty($signature_id)) {
             $signature =  DbSendMessage::getUserSignature(['uid' => $user['uid'], 'signature_id' => $signature_id], '*', true);
             if (empty($signature)) {
@@ -1695,86 +1693,51 @@ return $result;
         $connect_data = array_filter($connect_data);
         // $send_data = [];
         $send_data_mobile = [];
-
+       
         //有模板目前只支持有模板进行提交
         $MMS_data = [];
+        // 变量,变量:手机号;变量,变量:手机号;变量:手机号;
         foreach ($connect_data as $key => $data) {
-            $send_text = explode('!', $data);
-
-            if (!empty($template)) {
-                $replace_data = explode('^', $send_text[0]); //帧
-                //做变量替换
-                $son_MMS_data = [];
+            
+            $send_text = explode(':', $data);
+            
+            if (checkMobile($send_text[1]) == false || strlen($send_text[1]) != 11) {
+                continue;
+            }
+            $son_MMS_data = [];
                 $son_MMS_data = [
                     'title' => $template['title']
                 ];
-                foreach ($replace_data as $key => $value) {
-                    $the_frame = explode(':', $value);
-                    foreach ($template['multimedia_frame'] as $mf => $mula) {
-                        if ($mula['num'] == $the_frame[0]) {
-                            //有变量
-                            if ($mula['variable_len'] > 0) {
-                                if (empty($the_frame[1])) {
-                                    return ['code' => '3005']; //未获取到变量内容
-                                }
-                                $the_var = explode(',', $the_frame[1]);
-                                for ($i = 0; $i < $mula['variable_len']; $i++) {
-                                    $var_num = $i + 1;
-                                    $mula['content'] = str_replace("{{var" . $var_num . "}}", $the_var[$i], $mula['content']); //内容
-                                }
-                            }
-                        }
-                        $the_mula['content'] = $mula['content'];
-                        $the_mula['num'] = $mula['num'];
-                        $the_mula['name'] = $mula['name'];
-                        $the_mula['image_path'] = $mula['image_path'];
-                        $the_mula['image_type'] = $mula['image_type'];
-                        $son_MMS_data['multimedia_frame'][] = $the_mula;
+                $the_frame = explode(',', $send_text[0]);
+                foreach ($template['multimedia_frame'] as $mf => $mula) {
+                    for ($i = 0; $i < count($the_frame); $i++) {
+                        $var_num = $i + 1;
+                        $mula['content'] = str_replace("{{var" . $var_num . "}}", $the_frame[$i], $mula['content']); //内容
                     }
+                    $the_mula['content'] = $mula['content'];
+                    $the_mula['num'] = $mula['num'];
+                    $the_mula['name'] = $mula['name'];
+                    $the_mula['image_path'] = $mula['image_path'];
+                    $the_mula['image_type'] = $mula['image_type'];
+                    $son_MMS_data['multimedia_frame'][] = $the_mula;
                 }
-
                 if (in_array($son_MMS_data, $MMS_data)) {
-                    $send_data_mobile[array_search($son_MMS_data, $MMS_data)][] = $send_text[1];
+                    $send_data_mobile[array_search($son_MMS_data, $MMS_data)] = $data;
                 } else {
                     $MMS_data[] = $son_MMS_data;
-                    $send_data_mobile[array_search($son_MMS_data, $MMS_data)][] = $send_text[1];
+                    $send_data_mobile[array_search($son_MMS_data, $MMS_data)] = $data;
                 }
-            } else {
-                $son_MMS_data = $send_text[0];
-                if (in_array($son_MMS_data, $MMS_data)) {
-                    $send_data_mobile[array_search($son_MMS_data, $MMS_data)][] = $send_text[1];
-                } else {
-                    $MMS_data[] = $son_MMS_data;
-                    $send_data_mobile[array_search($son_MMS_data, $MMS_data)][] = $send_text[1];
-                }
-            }
         }
-
+       
         $free_taskno = [];
         $trial = []; //需审核
         //组合任务包
         $real_num = 0;
-        $max_length               = 102400; //最大字节长度
+        $max_length               = 81920; //最大字节长度80Kb
         $all_task_no = [];
         $task_no_mobile = [];
-        $beyond = '';
-        $a = '';
+        $beyond = [];
         foreach ($MMS_data as $key => $value) {
-            $send_task = [];
-            $task_no = 'mul' . date('ymdHis') . substr(uniqid('', true), 15, 8);
-            $send_task = [
-                'task_no' => $task_no,
-                'uid'     => $user['id'],
-                'title' => $value['title'],
-                'mobile_content' => join(',', $send_data_mobile[$key]),
-                'source'         => $ip,
-                'send_num'       => count($send_data_mobile[$key]),
-            ];
-
-            $real_num += count($send_data_mobile[$key]);
-
-            $send_task['free_trial'] = 1;
-
             $content_length = 0;
             foreach ($value['multimedia_frame'] as $ke => $mf) {
                 $frame = [];
@@ -1785,30 +1748,30 @@ return $result;
                     // $content_length+= strlen($value['content']);
                 }
                 $content_length += (strlen($frame['content']) / 8);
-                if (!isset($mf['image_path'])) {
-                    $frame['image_path'] = '';
-                } else {
+                if (!empty($mf['image_path'])) {
                     stream_context_set_default([
                         'ssl' => [
                             'verify_peer'      => false,
                             'verify_peer_name' => false,
                         ],
                     ]);
+                    
                     $head = get_headers($mf['image_path'], 1);
                     $content_length += $head['Content-Length'];
+                } else {
+                    $frame['image_path'] = '';
                 }
             }
             $send_task['multimedia_frame'] = $value['multimedia_frame'];
             // $content_length  = 102402;
             if ($content_length <= $max_length) {
-                array_push($trial, $send_task);
-                $all_task_no[] = $task_no;
-                $task_no_mobile[$key] = $send_data_mobile[$key];
             } else {
-                $beyond .=  $a . join(',', $send_data_mobile[$key]);
+                $beyond[] = $send_data_mobile[$key];
+               unset($send_data_mobile[$key]);
             }
-            $a = ',';
         }
+        
+       
         $task_as_mobile = [];
         foreach ($task_no_mobile as $key => $value) {
             $as_value = [];
@@ -1816,21 +1779,42 @@ return $result;
             $as_value['mobiles'] = $value;
             $task_as_mobile[] = $as_value;
         }
+        
+        $real_num = count($send_data_mobile);
         if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3004'];
         }
+        $send_task = [];
+        $task_no = 'mul' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+        $send_task = [
+            'task_no' => $task_no,
+            'template_id' => $template_id,
+            'uid'     => $user['id'],
+            'title' => $value['title'],
+            'submit_content' => join(';', $send_data_mobile),
+            'source'         => $ip,
+            'send_num'       => count($send_data_mobile),
+        ];
 
+        // print_r($template['multimedia_frame']);die;
+        $send_task['free_trial'] = 1;
         Db::startTrans();
         try {
             DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
-
-            Db::commit();
-            foreach ($trial as $tr => $tal) {
+            $bId = DbSendMessage::addUserMultimediaMessage($send_task); //添加后的商品id
+            if ($bId) {
+                foreach ($template['multimedia_frame'] as $key => $frame) {
+                    $frame['multimedia_message_id'] = $bId;
+                    $frame['image_path'] = filtraImage(Config::get('qiniu.domain'), $frame['image_path']);
+                    DbSendMessage::addUserMultimediaMessageFrame($frame); //添加后的商品id
+                }
+            }
+            /* foreach ($trial as $tr => $tal) {
                 $son = [];
                 $son = $tal['multimedia_frame'];
                 unset($tal['multimedia_frame']);
                 // print_r($tal);
-                $bId = DbSendMessage::addUserMultimediaMessage($tal); //添加后的商品id
+               
                 if ($bId) {
                     foreach ($son as $key => $frame) {
                         $frame['multimedia_message_id'] = $bId;
@@ -1839,12 +1823,12 @@ return $result;
                     }
                 }
             }
-
+            */
             Db::commit();
-            return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile, 'beyond' => explode(',', $beyond)];
+            return ['code' => '200', 'task_no' => $task_no, 'beyond' => join(';', $beyond)];
         } catch (\Exception $e) {
             Db::rollback();
-            // exception($e);
+            exception($e);
             return ['code' => '3009'];
         }
     }
