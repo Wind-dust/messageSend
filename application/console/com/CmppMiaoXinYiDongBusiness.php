@@ -486,8 +486,8 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                 $num2 = substr($timestring, 8) . $this->combination($i);
                                 // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
                                 // $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
-                                $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
-                                iconv("UTF-8","gbk",$code);
+                                // $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
+                                $code = iconv("UTF-8","UCS-2",$code);
                                 print_r($code);die;
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
                                 // $code = mb_convert_encoding($code, 'UTF-8', 'UCS-2');
