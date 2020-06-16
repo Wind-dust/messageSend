@@ -68,6 +68,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
         $redisMessageCodeDeliver = 'index:meassage:code:new:deliver:' . $content; //行业通知MsgId
         $redisMessageUnKownDeliver = 'index:meassage:code:unknow:deliver:' . $content; //行业通知MsgId
         $redisMessageUpRiver       = 'index:message:code:upriver:' . $content; //上行队列
+        print_r($redis);die;
         /*          $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15172413692',
             'mar_task_id' => '',
