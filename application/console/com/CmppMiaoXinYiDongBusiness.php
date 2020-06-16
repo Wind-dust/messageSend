@@ -613,7 +613,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                         //捕获异常
                         catch (Exception $e) {
                             if ($send_status == 1) {
-                                $redis->push($redisMessageCodeSend, $redisMessageCodeSend);
+                                $redis->rpush($redisMessageCodeSend, $redisMessageCodeSend);
                                 $redis->hset($redisMessageCodeSequenceId, $Sequence_Id);
                             }
                             socket_close($socket);
