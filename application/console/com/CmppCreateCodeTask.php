@@ -8445,9 +8445,9 @@ class CmppCreateCodeTask extends Pzlife
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $mysql_connect->query("set names utf8mb4");
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-          /* for ($i = 261219; $i < 261271; $i++) {
+          for ($i = 277491; $i < 277517; $i++) {
             $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $i);
-        } */
+        }
         // die;
         /*    $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3673);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3674);
@@ -8559,7 +8559,7 @@ class CmppCreateCodeTask extends Pzlife
         $tody_time = strtotime(date("Ymd", time()));
         try {
             /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
-            $mysql_connect->table('yx_sfl_multimedia_message')->where('create_time', '>', $tody_time)->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
+            // $mysql_connect->table('yx_sfl_multimedia_message')->where('create_time', '>', $tody_time)->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
         } catch (\Exception $th) {
             exception($th);
         }
@@ -8580,12 +8580,12 @@ class CmppCreateCodeTask extends Pzlife
             $receipt_id = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_multimediatask_receipt ORDER BY `id` DESC LIMIT 1  " )[0]['id'];
             $receipt_id++;
             // print_r($receipt_id);die;
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` = '100181549' AND `create_time` >  " . $tody_time);
+            // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` = '100181549' AND `create_time` >  " . $tody_time);
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time;die;
             // $white_send = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `` `create_time` >  ".$tody_time );
-            foreach ($sendid as $key => $value) {
+           /*  foreach ($sendid as $key => $value) {
                 $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
-            }
+            } */
 
             while (true) {
                 $task_id = $this->redis->lpop('index:meassage:sflmulmessage:sendtask');
