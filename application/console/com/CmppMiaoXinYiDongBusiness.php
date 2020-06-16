@@ -269,11 +269,18 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                         $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                     } else if ($head['Command_Id'] == 0x00000008) {
-                        echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                        // echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                        $callback_Command_Id = 0x80000008;
+
+                        $new_body         =  pack("C", 0);
+                        $new_Total_Length = strlen($new_body) + 12;
+                        $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
+                        socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                        $receive = 2;
                     } else if ($head['Command_Id'] == 0x80000008) {
-                        echo "激活测试应答" . "\n"; //激活测试,无消息体结构
+                        // echo "激活测试应答" . "\n"; //激活测试,无消息体结构
                     } else {
-                        echo "未声明head['Command_Id']:" . $head['Command_Id'];
+                        // echo "未声明head['Command_Id']:" . $head['Command_Id'];
                     }
                 }
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
@@ -440,7 +447,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                         $receive = 2;
                                     } else if ($head['Command_Id'] == 0x00000008) {
-                                        echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                                        // echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                                         $callback_Command_Id = 0x80000008;
 
                                         $new_body         =  pack("C", 0);
@@ -449,9 +456,9 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                         $receive = 2;
                                     } else if ($head['Command_Id'] == 0x80000008) {
-                                        echo "激活测试应答" . "\n"; //激活测试,无消息体结构
+                                        // echo "激活测试应答" . "\n"; //激活测试,无消息体结构
                                     } else {
-                                        echo "未声明head['Command_Id']:" . $head['Command_Id'];
+                                        // echo "未声明head['Command_Id']:" . $head['Command_Id'];
                                     }
                                 } else {
                                     break;
