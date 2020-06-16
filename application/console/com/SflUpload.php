@@ -1521,7 +1521,7 @@ class SflUpload extends Pzlife {
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMSTest') {
-                    continue;
+                    // continue;
                     $send_data = [];
                     if ($son_path_data !== false) {
 
@@ -1530,9 +1530,9 @@ class SflUpload extends Pzlife {
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
 
-                            // if (!strpos($svalue, date("Ymd"))) {
-                            //     continue;
-                            // }
+                            if (!strpos($svalue, date("Ymd"))) {
+                                continue;
+                            }
                             $file_info = explode('.', $svalue);
                             if ($file_info[1] == 'zip') { //需要解压
                                 //开始解压
