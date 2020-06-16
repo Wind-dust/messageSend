@@ -87,7 +87,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
         ]));
         $code = '【钰晰科技】😄您本次登录的验证码为0518，回复QX取消本次登录';
         // $code = mb_convert_encoding('【钰晰科技】😄您本次登录的验证码为0518，回复QX取消本次登录', 'UCS-2', 'UTF-8');
-        $code =iconv("UTF-8","UCS-2",$code);
+        $code =iconv("UTF-8","UCS-2//TRANSLIT",$code);
         // $code =iconv("UCS-2","UTF-8",$code);
         print_r($code);die;
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
