@@ -478,6 +478,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                 $txt_len  = 140;
                                 $max_len  = $txt_len - $txt_head;
                                 $code = $send_data['content']; //带签名
+                                print_r($code);die;
                                 $uer_num    = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
                                 $timestring = time();
                                 // echo "发送时间：" . date("Y-m-d H:i:s", time()) . "\n";
@@ -488,7 +489,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                 // iconv("UTF-8","gbk",$code);
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
                                 $code = mb_convert_encoding($code, 'UTF-8', 'UCS-2');
-                                print_r($code);die;
+                              
                                 if (strlen($code) > 140) {
                                     $pos          = 0;
                                     $num_messages = ceil(strlen($code) / $max_len);
