@@ -837,6 +837,7 @@ class Administrator extends CommonIndex
             ];
             $result = $this->sendRequest2($report_api,'post',$data,$headers);
             // $result = '{"msg":"成功","code":"T","data":{"mms_id":"60226","status":"R"}}';
+           
             if (!empty($result)) {
                 $result = json_decode($result,true);
                 if ($result['msg'] == '成功') {
@@ -944,7 +945,7 @@ class Administrator extends CommonIndex
             $res = sendRequest($report_api, 'post', $data);
             $result = json_decode($res, true);
             if (!empty($result)) {
-                if ($result['message'] == '成功') {
+                if ($result['message'] == '提交成功') {
                     $report_msg_id = $result['data']['templateId'];
                     $had_report = DbAdministrator::getUserMultimediaTemplateThirdReport(['channel_id'=> $channel_id,'template_id' => $template_id],'id',true);
                     if (!empty($had_report)) {
