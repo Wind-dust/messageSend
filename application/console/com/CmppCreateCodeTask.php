@@ -8444,10 +8444,10 @@ class CmppCreateCodeTask extends Pzlife
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $mysql_connect->query("set names utf8mb4");
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-          for ($i = 261193; $i < 15076; $i++) {
+          for ($i = 261193; $i < 261218; $i++) {
             $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $i);
         }
-
+        die;
         /*    $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3673);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3674);
         $this->redis->rpush('index:meassage:sflmulmessage:sendtask', 3675); */
