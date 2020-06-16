@@ -17,6 +17,7 @@ use app\common\model\UserSendCodeTask;
 use app\common\model\UserSendTaskLog;
 use app\common\model\UserSendCodeTaskLog;
 use app\common\model\ThirdPartyMmsTemplateReport;
+use app\common\model\UserMultimediaTemplateThirdReport;
 use app\common\model\UserDeductWord;
 use think\Db;
 
@@ -416,6 +417,30 @@ class DbAdministrator
     public function countUserDeductWord($where)
     {
         return UserDeductWord::where($where)->count();
+    }
+
+    public function getUserMultimediaTemplateThirdReport($where, $field, $row = false, $orderBy = '', $limit = '')
+    {
+        $obj = UserMultimediaTemplateThirdReport::field($field)->where($where);
+        return $this->getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function addUserMultimediaTemplateThirdReport($data)
+    {
+        $UserMultimediaTemplateThirdReport = new UserMultimediaTemplateThirdReport;
+        $UserMultimediaTemplateThirdReport->save($data);
+        return $UserMultimediaTemplateThirdReport->id;
+    }
+
+    public function editUserMultimediaTemplateThirdReport($data, $id)
+    {
+        $UserMultimediaTemplateThirdReport = new UserMultimediaTemplateThirdReport;
+        return $UserMultimediaTemplateThirdReport->save($data, ['id' => $id]);
+    }
+
+    public function countUserMultimediaTemplateThirdReport($where)
+    {
+        return UserMultimediaTemplateThirdReport::where($where)->count();
     }
 
 }

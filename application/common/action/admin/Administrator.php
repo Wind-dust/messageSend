@@ -736,6 +736,13 @@ class Administrator extends CommonIndex
             return ['code' => '3003', 'msg' => '模板未审核通过或者该模板不存在'];
         }
         $multimedia_message_frame = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $template['id']], 'num,name,content,image_path,image_type', false, ['num' => 'asc']);
+        $model_val = 0; //模板类型 0，普通彩信, 1 模板变量彩信
+        foreach ($multimedia_message_frame as $key => $value) {
+            if (strpos($value['content'], '{{var') != false) {
+                $model_val = 1;
+                break;
+            }
+        }
         $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id], 'id,title,business_id,channel_price', true);
         if (empty($channel)) {
             return ['code' => '3002'];
@@ -744,7 +751,7 @@ class Administrator extends CommonIndex
             return ['code' => '3004', '非彩信通道不能使用此接口'];
         }
         //创蓝
-        if ($channel_id == 59) {
+        if ($channel_id == 63) {
             $report_api = 'http://mms.mms-sender.cn:8080/mmsServer/sendMms';
             $data = [];
             $data['id'] = '200401';
@@ -779,8 +786,192 @@ class Administrator extends CommonIndex
             $result = sendRequest($report_api, 'post', $data);
             print_r($result);
             die;
-        }elseif ($channel_id == 100){
+        }elseif ($channel_id == 96){//联麓彩信批量通道
+            if ($model_val == 1) {
+                return ['code' => '3005','msg' => '该通道不支持模板变量报备'];
+            }
+            $appid = '350304';
+            $timestamp = time();
+            $time = microtime(true);
+            //结果：1541053888.5911
+            //在经过处理得到最终结果:
+            $lastTime = (int)($time * 1000);
+            $appkey = '50e075b4883e49d69c4d08a5b210537d';
+            $sign = md5($appkey.$appid.$lastTime.$appkey);
+            $report_api = 'http://47.110.199.86:8081/api/v2/mms/create?timestamp='.$lastTime.'&appid='.$appid.'&sign='.$sign;
+            $data = [];
+            $data['mms_title'] = $template['title'];
+            $data['mms_type'] = 'multipart/mixed';
+            $data['mmstemplate'] = 1;
+            
+            // print_r($multimedia_message_frame);die;
+            $mmsbody = [];
+            foreach ($multimedia_message_frame as $key => $value) {
+                # code...
+                $content_data = [];
+                if (!empty($value['content'])) {
+                    $content_data = [
+                        'content_data' => $value['content'],
+                        'content_type' => 'text/plain',
+                    ];
+                    $mmsbody[] = $content_data;
+                }
+                $content_data = [];
+                if (!empty($value['image_path'])) {
 
+                    $value['image_path']=filtraImage(Config::get('qiniu.domain'), $value['image_path']);
+                    $type = explode('.', $value['image_path']);
+
+                   
+                    $content_data = [
+                        'content_data' => base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path'])),
+                        'content_type' => 'image/'.$type[1],
+                    ];
+                    $mmsbody[] = $content_data;
+                }
+            }
+            $data['mmsbody'] = $mmsbody;
+            $headers = [];
+            $headers = [
+                'Content-Type:text/plain'
+            ];
+            $result = $this->sendRequest2($report_api,'post',$data,$headers);
+            // $result = '{"msg":"成功","code":"T","data":{"mms_id":"60226","status":"R"}}';
+            if (!empty($result)) {
+                $result = json_decode($result,true);
+                if ($result['msg'] == '成功') {
+                    $report_msg_id = $result['data']['mms_id'];
+                    $had_report = DbAdministrator::getUserMultimediaTemplateThirdReport(['channel_id'=> $channel_id,'template_id' => $template_id],'id',true);
+                    if (!empty($had_report)) {
+                        return ['code' => '3007','msg' => '该模板已在该通道报备过'];
+                    }
+                    $report_data = [];
+                    $report_data = [
+                        'channel_id'=> $channel_id,
+                        'template_id'=> $template_id,
+                        'third_template_id'=> $report_msg_id,
+                    ];
+                    Db::startTrans();
+                    try {
+                        DbAdministrator::addUserMultimediaTemplateThirdReport($report_data);
+                        Db::commit();
+                        return ['code' => '200'];
+                    } catch (\Exception $th) {
+                        exception($th);
+                        Db::rollback();
+                        return ['code' => '3009']; //修改失败
+                    }
+                }
+                return ['code' => '3006','msg' => '该通道报备失败'];
+            }else{
+                return ['code' => '3006','msg' => '该通道报备失败'];
+            }
+        }elseif ($channel_id == 59) {
+            $report_api = 'http://caixin.253.com/open/saveTemplate';
+            $data = [];
+           
+            $msg = [];
+            foreach ($multimedia_message_frame as $key => $value) {
+                $frame = [];
+                if (!empty($value['content'])) {
+                    $frame['frame'] = $value['num'];
+                    $frame['part'] = 1;
+                    $frame['type'] = 1;
+                    // $frame['content'] = $value['content'];
+                    // if (strpos($value['content'],'{{}}')) {}
+                    $value['content'] = str_replace('{{var1}}','{s1}',$value['content']);
+                    $value['content'] = str_replace('{{var2}}','{s2}',$value['content']);
+                    $value['content'] = str_replace('{{var3}}','{s3}',$value['content']);
+                    $value['content'] = str_replace('{{var4}}','{s4}',$value['content']);
+                    $value['content'] = str_replace('{{var5}}','{s5}',$value['content']);
+                    $value['content'] = str_replace('{{var6}}','{s6}',$value['content']);
+                    $value['content'] = str_replace('{{var7}}','{s7}',$value['content']);
+                    $value['content'] = str_replace('{{var8}}','{s8}',$value['content']);
+                    $value['content'] = str_replace('{{var9}}','{s9}',$value['content']);
+                    $value['content'] = str_replace('{{var10}}','{s10}',$value['content']);
+                    $frame['content'] = base64_encode($value['content']);
+                    $msg[] = $frame;
+                }
+
+                if (!empty($value['image_path'])) {
+                    $frame = [];
+                    $value['image_path']=filtraImage(Config::get('qiniu.domain'), $value['image_path']);
+                    $type = explode('.', $value['image_path']);
+
+                    $frame['frame'] = $value['num'];
+                    $frame['part'] = 1;
+                    if ($type[1] == 'jpg') {
+                        $frame['type'] = 2;
+                    } elseif ($type[1] == 'jpeg') {
+                        $frame['type'] = 2;
+                    } elseif ($type[1] == 'png') {
+                        $frame['type'] = 3;
+                    } elseif ($type[1] == 'gif') {
+                        $frame['type'] = 4;
+                    } elseif ($type[1] == 'gif') {
+                        $frame['type'] = 4;
+                    } elseif ($type[1] == 'wbmp') {
+                        $frame['type'] = 5;
+                    } elseif ($type[1] == 'bmp') {
+                        $frame['type'] = 5;
+                    } elseif ($type[1] == 'amr') {
+                        $frame['type'] = 6;
+                    } elseif ($type[1] == 'midi') {
+                        $frame['type'] = 7;
+                    }
+                    $imagebase = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                    $frame['content'] =$imagebase;
+                    // $frame['content'] = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                    $msg[] = $frame;
+                }
+            }
+            $msg = json_encode($msg);
+            $notifyUrl = '';
+            $remark = '';
+            $timestamp = time();
+            $data['account'] = 'C0120120';
+            $key = 'OdJugXUcv99bca';
+            $data['title'] = $template['title'];
+            // $sign = "account=" . $data['account']  . "msg=".$msg."notifyUrl=".$notifyUrl."remark=".$remark. "timestamp=" . $timestamp . "title=" .$data['title']. "key=" . $data['key'];
+            $sign = "account=" . $data['account']  . "msg=".$msg."remark=".$remark. "timestamp=" . $timestamp . "title=" .$data['title'];
+            $sign = hash_hmac('sha256',$sign,$key);
+            // print_r($sign);die;
+            $data['msg'] = $msg;
+            // $data['notifyUrl'] = $notifyUrl;
+            $data['remark'] = $remark;
+            $data['timestamp'] = $timestamp;
+            $data['sign'] = $sign;
+            $res = sendRequest($report_api, 'post', $data);
+            $result = json_decode($res, true);
+            if (!empty($result)) {
+                if ($result['message'] == '成功') {
+                    $report_msg_id = $result['data']['templateId'];
+                    $had_report = DbAdministrator::getUserMultimediaTemplateThirdReport(['channel_id'=> $channel_id,'template_id' => $template_id],'id',true);
+                    if (!empty($had_report)) {
+                        return ['code' => '3007','msg' => '该模板已在该通道报备过'];
+                    }
+                    $report_data = [];
+                    $report_data = [
+                        'channel_id'=> $channel_id,
+                        'template_id'=> $template_id,
+                        'third_template_id'=> $report_msg_id,
+                    ];
+                    Db::startTrans();
+                    try {
+                        DbAdministrator::addUserMultimediaTemplateThirdReport($report_data);
+                        Db::commit();
+                        return ['code' => '200'];
+                    } catch (\Exception $th) {
+                        exception($th);
+                        Db::rollback();
+                        return ['code' => '3009']; //修改失败
+                    }
+                }
+                return ['code' => '3006','msg' => '该通道报备失败'];
+            }else{
+                return ['code' => '3006','msg' => '该通道报备失败'];
+            }
+            
         }
     }
 
@@ -879,5 +1070,36 @@ class Administrator extends CommonIndex
             }
         }
         return ['code' => '3004','msg' =>'没有需要修改的类目'];
+    }
+
+    function sendRequest2($requestUrl, $method = 'get', $data = [],$headers)
+    {
+        $methonArr = ['get', 'post'];
+        if (!in_array(strtolower($method), $methonArr)) {
+            return [];
+        }
+        if ($method == 'post') {
+            if (!is_array($data) || empty($data)) {
+                return [];
+            }
+        }
+        $curl = curl_init(); // 初始化一个 cURL 对象
+        curl_setopt($curl, CURLOPT_URL, $requestUrl); // 设置你需要抓取的URL
+        curl_setopt($curl, CURLOPT_HEADER, 0); // 设置header 响应头是否输出
+        if ($method == 'post') {
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 60);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, base64_encode(json_encode($data)));
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($curl, CURLOPT_USERAGENT, 'Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400'); // 模拟用户使用的浏览器
+        }
+        // 设置cURL 参数，要求结果保存到字符串中还是输出到屏幕上。
+        // 1如果成功只将结果返回，不自动输出任何内容。如果失败返回FALSE
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        $res = curl_exec($curl); // 运行cURL，请求网页
+        curl_close($curl); // 关闭URL请求
+        return $res; // 显示获得的数据
     }
 }
