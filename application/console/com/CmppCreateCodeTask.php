@@ -310,13 +310,14 @@ class CmppCreateCodeTask extends Pzlife
         while (true) {
             echo date('Y-m-d H:i:s');
             echo "\n";
-            $j = 1;
 
-            $rollback      = [];
-            $all_log       = [];
-            $true_log      = [];
-            $push_messages = [];
             while (true) {
+                $j = 1;
+
+                $rollback      = [];
+                $all_log       = [];
+                $true_log      = [];
+                $push_messages = [];
                 $real_length = 1;
                 $send        = $this->redis->lpop('index:meassage:marketing:sendtask');
                 // $send = 15753;
