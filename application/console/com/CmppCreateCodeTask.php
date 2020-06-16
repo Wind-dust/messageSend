@@ -278,6 +278,20 @@ class CmppCreateCodeTask extends Pzlife
         return $sendTask[0];
     }
 
+    public function pushMarketingMessageSendTask()
+    {
+        $this->redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        /* 
+                                    1321785 1322036
+                                    */
+
+        // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
+        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_task WHERE  `id` = 160941  ");
+        foreach ($task_id as $key => $value) {
+            $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0,'deduct' => 10]));
+        }
+    }
 
     //书写普通营销任务日志并写入通道
     public function createMessageSendTaskLog()
@@ -984,7 +998,10 @@ class CmppCreateCodeTask extends Pzlife
                 //         unset($rollback);
                 //     }
                 // }
-               
+                unset($all_log);
+                unset($true_log);
+                unset($push_messages);
+                unset($rollback);
             }
             // if (!empty($true_log)) {
             //     Db::startTrans();
@@ -1014,10 +1031,7 @@ class CmppCreateCodeTask extends Pzlife
             //     unset($push_messages);
             //     unset($rollback);
             // }
-            unset($all_log);
-                unset($true_log);
-                unset($push_messages);
-                unset($rollback);
+            
             sleep(1);
         }
     }
@@ -1206,6 +1220,9 @@ class CmppCreateCodeTask extends Pzlife
                                         unset($value['channel_id']);
                                         $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
                                     }
+                                    $j = 1;
+                                    $push_messages = [];
+                                    $true_log = [];
                                 } catch (\Exception $e) {
                                     // $this->redis->rPush('index:meassage:business:sendtask', $send);
                                     if (!empty($rollback)) {
@@ -1217,9 +1234,6 @@ class CmppCreateCodeTask extends Pzlife
                                     Db::rollback();
                                     exception($e);
                                 }
-                                $j = 1;
-                                $push_messages = [];
-                                $true_log = [];
                             }
                         }
                     }
@@ -1261,7 +1275,10 @@ class CmppCreateCodeTask extends Pzlife
                                         $send_channelid = $value['channel_id'];
                                         unset($value['channel_id']);
                                         $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
-                                    }
+                                    } 
+                                    $j = 1;
+                                    $push_messages = [];
+                                    $true_log = [];
                                 } catch (\Exception $e) {
                                     // $this->redis->rPush('index:meassage:business:sendtask', $send);
                                     if (!empty($rollback)) {
@@ -1273,9 +1290,7 @@ class CmppCreateCodeTask extends Pzlife
                                     Db::rollback();
                                     exception($e);
                                 }
-                                $j = 1;
-                                $push_messages = [];
-                                $true_log = [];
+                               
                             }
                         }
                     }
@@ -1318,6 +1333,9 @@ class CmppCreateCodeTask extends Pzlife
                                         unset($value['channel_id']);
                                         $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
                                     }
+                                    $j = 1;
+                                    $push_messages = [];
+                                    $true_log = [];
                                 } catch (\Exception $e) {
                                     // $this->redis->rPush('index:meassage:business:sendtask', $send);
                                     if (!empty($rollback)) {
@@ -1329,9 +1347,7 @@ class CmppCreateCodeTask extends Pzlife
                                     Db::rollback();
                                     exception($e);
                                 }
-                                $j = 1;
-                                $push_messages = [];
-                                $true_log = [];
+                                
                             }
                         }
                     }
@@ -1346,6 +1362,9 @@ class CmppCreateCodeTask extends Pzlife
                                 unset($value['channel_id']);
                                 $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
                             }
+                            $j = 1;
+                            $push_messages = [];
+                            $true_log = [];
                         } catch (\Exception $e) {
                             // $this->redis->rPush('index:meassage:business:sendtask', $send);
                             if (!empty($rollback)) {
@@ -1357,9 +1376,7 @@ class CmppCreateCodeTask extends Pzlife
                             Db::rollback();
                             exception($e);
                         }
-                        $j = 1;
-                        $push_messages = [];
-                        $true_log = [];
+                       
                     }
 
                     /* 错号及扣量 */
@@ -1400,6 +1417,9 @@ class CmppCreateCodeTask extends Pzlife
                                 foreach ($push_messages as $key => $value) {
                                     $res = $this->redis->rpush('index:message:code:deduct:deliver', json_encode($value)); //三体营销通道
                                 }
+                                $j = 1;
+                                $push_messages = [];
+                                $all_log = [];
                             } catch (\Exception $e) {
                                 // $this->redis->rPush('index:meassage:business:sendtask', $send);
                                 if (!empty($rollback)) {
@@ -1411,9 +1431,7 @@ class CmppCreateCodeTask extends Pzlife
                                 Db::rollback();
                                 exception($e);
                             }
-                            $j = 1;
-                            $push_messages = [];
-                            $all_log = [];
+                            
                         }
                     }
                 }
@@ -1452,6 +1470,9 @@ class CmppCreateCodeTask extends Pzlife
                                 foreach ($push_messages as $key => $value) {
                                     $res = $this->redis->rpush('index:message:code:deduct:deliver', json_encode($value)); //三体营销通道
                                 }
+                                $j = 1;
+                                $push_messages = [];
+                                $all_log = [];
                             } catch (\Exception $e) {
                                 // $this->redis->rPush('index:meassage:business:sendtask', $send);
                                 if (!empty($rollback)) {
@@ -1463,9 +1484,7 @@ class CmppCreateCodeTask extends Pzlife
                                 Db::rollback();
                                 exception($e);
                             }
-                            $j = 1;
-                            $push_messages = [];
-                            $all_log = [];
+                            
                         }
                     }
                 }
@@ -1478,6 +1497,9 @@ class CmppCreateCodeTask extends Pzlife
                         foreach ($push_messages as $key => $value) {
                             $res = $this->redis->rpush('index:message:code:deduct:deliver', json_encode($value)); //三体营销通道
                         }
+                        $j = 1;
+                        $push_messages = [];
+                        $all_log = [];
                     } catch (\Exception $e) {
                         // $this->redis->rPush('index:meassage:business:sendtask', $send);
                         if (!empty($rollback)) {
@@ -1489,9 +1511,7 @@ class CmppCreateCodeTask extends Pzlife
                         Db::rollback();
                         exception($e);
                     }
-                    $j = 1;
-                    $push_messages = [];
-                    $all_log = [];
+                   
                 }
                     
                     // for ($i = 0; $i < count($mobilesend); $i++) {
