@@ -432,8 +432,9 @@ class CmppJuMengLianDianMarketing extends Pzlife
                                         }
                                         print_r($mesage);
                                         $callback_Command_Id = 0x80000005;
-                                        $new_Total_Length = strlen($new_body) + 12;
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
+                                        
+                                        $new_Total_Length = strlen($new_body) + 12;
                                         $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                         $receive = 2;
