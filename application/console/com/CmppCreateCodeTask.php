@@ -1900,6 +1900,7 @@ class CmppCreateCodeTask extends Pzlife
             $dianxin_mobile = []; //电信分区号码
             $host_city_mobile = []; //省会城市号码包含深圳
             $cool_city_mobile = []; //二线城市号码
+            $mobile = str_replace('&quot;','',$mobile);
             $mobile_data = explode(',',$mobile);
             // echo count($mobile_data);die;
             //白名单
