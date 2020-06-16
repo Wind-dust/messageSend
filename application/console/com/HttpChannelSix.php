@@ -79,7 +79,7 @@ class HttpChannelSix extends Pzlife {
                         if ($result[0] == 'success') { //成功
                             $receive_id[$send][] = $result[1];
                         } elseif ($result[0] == 'error') { //失败
-                            echo "error" . $result[1] . "\n";die;
+                            // echo "error" . $result[1] . "\n";die;
                         }
                         unset($send_num[$send]);
                         sleep(1);
@@ -109,7 +109,7 @@ class HttpChannelSix extends Pzlife {
                 if ($result[0] == 'success') { //成功
                     $receive_id[$result[1]] = $send;
                 } elseif ($result[0] == 'error') { //失败
-                    echo "error:" . $result[1] . "\n";die;
+                    // echo "error:" . $result[1] . "\n";die;
                 }
                 unset($send_num[$send]);
                 sleep(1);
@@ -129,7 +129,7 @@ class HttpChannelSix extends Pzlife {
                 $task_id      = $receive_id[$receive_info[0]];
                 $task         = $this->getSendTask($task_id);
                 if ($task == false) {
-                    echo "error task_id" . "\n";
+                    // echo "error task_id" . "\n";
                 }
                 $send_task_log = [];
                 if ($receive_info[2] == 'DELIVRD') {
@@ -160,7 +160,7 @@ class HttpChannelSix extends Pzlife {
         unset($send_num);
         unset($send_content);
         unset($receive_id);
-        echo "success";
+        // echo "success";
 
     }
 

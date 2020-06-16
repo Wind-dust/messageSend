@@ -487,7 +487,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                 $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
                                 // iconv("UTF-8","gbk",$code);
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
-                                // // print_r($code);die;
+                                print_r($code);die;
                                 if (strlen($code) > 140) {
                                     $pos          = 0;
                                     $num_messages = ceil(strlen($code) / $max_len);

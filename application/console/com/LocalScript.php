@@ -72,9 +72,9 @@ class LocalScript extends Pzlife
         foreach ($news as $n => $new) {
             $this->redis->Zadd($redisBatchgetMaterial, $n, json_encode($new));
         }
-        // print_r($WxBatchgetMaterial);die;
+        // // print_r($WxBatchgetMaterial);die;
         $redis_news = $this->redis->ZRANGE($redisBatchgetMaterial, 0, 10);
-        print_r($redis_news);
+        // print_r($redis_news);
         die;
     }
 
@@ -131,11 +131,11 @@ class LocalScript extends Pzlife
         $api = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
         $ts =date("YmdHis",time());
         $sig = sha1($secret_id . $secret_key . $ts);
-        // echo $sig;
+        // // echo $sig;
         $mobile = '15201926171';
         // return $this->encrypt($mobile, $secret_id);
         $en_mobile = $this->encrypt($mobile, $secret_id);
-        // echo $en_mobile;
+        // // echo $en_mobile;
         $api = $api.$sig."&sid=" .$secret_id."&skey=" .$secret_key."&ts=".$ts;
 
         $data = [];
@@ -151,15 +151,15 @@ class LocalScript extends Pzlife
         $headers = [
             'Authorization:'.base64_encode($secret_id.':'.$ts),'Content-Type:application/json'
         ];
-        // echo base64_decode('MDZGREM0QTcxRjVFMUZERTRDMDYxREJBNjUzREQyQTU6MTU5MTAwNzE5Ng==');
-        print_r($api);
-        echo "\n";
-        print_r($headers);
-        echo "\n";
-        print_r($data);
+        // // echo base64_decode('MDZGREM0QTcxRjVFMUZERTRDMDYxREJBNjUzREQyQTU6MTU5MTAwNzE5Ng==');
+        // print_r($api);
+        // echo "\n";
+        // print_r($headers);
+        // echo "\n";
+        // print_r($data);
         $data = $this->sendRequest2($api,'post',$data,$headers);
-        // print_r(json_decode($data),true);
-        print_r($data);
+        // // print_r(json_decode($data),true);
+        // print_r($data);
     }
 
     function sendRequest2($requestUrl, $method = 'get', $data = [],$headers)
@@ -208,14 +208,14 @@ class LocalScript extends Pzlife
         $data = openssl_encrypt($string, 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
 
         $data = strtoupper(bin2hex($data));
-        // print_r($data);
+        // // print_r($data);
         return $data;
     }
 
     public function hadMobile(){
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $max_id = Db::query("SELECT `id` FROM yx_send_task_receipt ORDER BY `id` DESC limit 1 ");
-        // print_r($max_id);
+        // // print_r($max_id);
         
         $mobile_data = [];
         $ALL_NUM = Db::query("SELECT `mobile`,`real_message` FROM yx_send_task_receipt WHERE (`real_message` LIKE '%MK%' OR `real_message` LIKE '%MI%' OR `real_message` LIKE '%MN%' OR `real_message` LIKE '%MO%'  OR `real_message` LIKE '%UNDELI%') GROUP BY `mobile`,`real_message` ");
@@ -225,7 +225,7 @@ class LocalScript extends Pzlife
         } */
         $i = 1;
         foreach ($ALL_NUM as $key => $value) {
-            // print_r($value['mobile']);die;
+            // // print_r($value['mobile']);die;
             // $mobile = [];
             // $mobile = [
             //     'mobile' => $value['mobile'],
@@ -242,7 +242,7 @@ class LocalScript extends Pzlife
         } */
         
         foreach ($ALL_NUM as $key => $value) {
-            // print_r($value['mobile']);die;
+            // // print_r($value['mobile']);die;
             // $mobile = [];
             // $mobile = [
             //     'mobile' => $value['mobile'],
@@ -253,7 +253,7 @@ class LocalScript extends Pzlife
            
         }
         $mobile_data = array_unique($mobile_data);
-        // echo count($mobile_data);
+        // // echo count($mobile_data);
         $i = 1;
         $insert_mobile = [];
         foreach ($mobile_data as $key => $value) {
@@ -280,7 +280,7 @@ class LocalScript extends Pzlife
     public function getRealNumber(){
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
         // $max_id = Db::query("SELECT `id` FROM yx_send_task_receipt ORDER BY `id` DESC limit 1 ");
-        // print_r($max_id);
+        // // print_r($max_id);
         
         $mobile_data = [];
         $ALL_NUM = Db::query("SELECT `mobile` FROM yx_send_task_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile` ");
@@ -290,7 +290,7 @@ class LocalScript extends Pzlife
         } */
         $i = 1;
         foreach ($ALL_NUM as $key => $value) {
-            // print_r($value['mobile']);die;
+            // // print_r($value['mobile']);die;
             // $mobile = [];
             // $mobile = [
             //     'mobile' => $value['mobile'],
@@ -328,9 +328,9 @@ class LocalScript extends Pzlife
         for ($i=0; $i < $max_num; $i++) { 
             $receipts = Db::query('SELECT ');
         } */
-        // echo count;
+        // // echo count;
         foreach ($ALL_NUM as $key => $value) {
-            // print_r($value['mobile']);die;
+            // // print_r($value['mobile']);die;
             // $mobile = [];
             // $mobile = [
             //     'mobile' => $value['mobile'],
@@ -543,14 +543,14 @@ class LocalScript extends Pzlife
         $api = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
         $ts =date("YmdHis",time());
         $sig = sha1($secret_id . $secret_key . $ts);
-        // echo $sig;
+        // // echo $sig;
         $mobile = '15201926171';
         // return $this->encrypt($mobile, $secret_id);
         $en_mobile = $this->encrypt($mobile, $secret_id);
-        // echo $en_mobile;
+        // // echo $en_mobile;
         $api = $api.$sig."&sid=" .$secret_id."&skey=" .$secret_key."&ts=".$ts;
         // $check_mobile = $this->decrypt('6C38881649F7003B910582D1095DA821',$secret_id);
-        // print_r($check_mobile);die;
+        // // print_r($check_mobile);die;
         $data = [];
         $mobiles = Db::query("SELECT `mobile` FROM  yx_mobile limit 500");
         $check_mobile = [];
@@ -564,21 +564,21 @@ class LocalScript extends Pzlife
             // 'ts' => $ts,
             'mobiles' => $check_mobile
         ];
-        // print_r($data);die;
+        // // print_r($data);die;
         $headers = [
             'Authorization:'.base64_encode($secret_id.':'.$ts),'Content-Type:application/json'
         ];
-        // echo base64_decode('MDZGREM0QTcxRjVFMUZERTRDMDYxREJBNjUzREQyQTU6MTU5MTAwNzE5Ng==');
-        print_r($api);
-        echo "\n";
-        print_r($headers);
-        echo "\n";
-        print_r($data);
-        $result = $this->sendRequest2($api,'post',$data,$headers);
-        // print_r(json_decode($data),true);
+        // // echo base64_decode('MDZGREM0QTcxRjVFMUZERTRDMDYxREJBNjUzREQyQTU6MTU5MTAwNzE5Ng==');
+        // print_r($api);
+        // echo "\n";
+        // print_r($headers);
+        // echo "\n";
         // print_r($data);
+        $result = $this->sendRequest2($api,'post',$data,$headers);
+        // // print_r(json_decode($data),true);
+        // // print_r($data);
         $result = json_decode($result,true);
-        print_r($result);
+        // print_r($result);
         if ($result['code'] == 0) {//接口请求成功
             $mobiles = $result['mobiles'];
             foreach ($mobiles as $key => $value) {
@@ -617,9 +617,9 @@ class LocalScript extends Pzlife
         $mobile = Db::query("SELECT `uid`,`task_no`,`mobile` FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) GROUP BY `uid`,`task_no`,`mobile`  ");
         $all_mobiles = [];
         foreach ($mobile as $key => $value) {
-            // print_r($value);die;
+            // // print_r($value);die;
             $time_key = mb_substr($value['task_no'],3,6);
-            // print_r($time_key);die;
+            // // print_r($time_key);die;
             if (isset($all_mobiles[$value['uid']][$value['mobile']])) {
                 if (in_array($time_key,$all_mobiles[$value['uid']][$value['mobile']]['date'])) {
                     $all_mobiles[$value['uid']][$value['mobile']]['day_times'][$time_key] ++;
@@ -631,9 +631,9 @@ class LocalScript extends Pzlife
                 $all_mobiles[$value['uid']][$value['mobile']]['date'][] = $time_key;
                 $all_mobiles[$value['uid']][$value['mobile']]['day_times'][$time_key] = 1;
             }
-        //    print_r($all_mobiles);die;
+        //    // print_r($all_mobiles);die;
         }
-        // print_r($all_mobiles);die;
+        // // print_r($all_mobiles);die;
         $mobile_times = [];
         foreach ($all_mobiles as $key => $value) {  
             foreach ($value as $ukey => $uvalue) {
@@ -645,7 +645,7 @@ class LocalScript extends Pzlife
                     'max_times' => max($uvalue['day_times']),
                     'all_times' => array_sum($uvalue['day_times']),
                 ];
-                // print_r($mobile_times);die;
+                // // print_r($mobile_times);die;
                 Db::table('yx_mobile_times')->where(['mobile' => $ukey,'uid' => $key])->delete();
                 Db::table('yx_mobile_times')->insert($mobile_times);
             }
