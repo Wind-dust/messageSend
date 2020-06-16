@@ -607,8 +607,8 @@ class CmppMiaoXinYiDongMarketing extends Pzlife
                         //捕获异常
                         catch (Exception $e) {
                             if ($send_status == 1) {
-                                $redis->push($redisMessageCodeSend, $redisMessageCodeSend);
-                                $redis->hset($redisMessageCodeSequenceId, $Sequence_Id);
+                                $redis->rpush($redisMessageCodeSend, $redisMessageCodeSend);
+                                $redis->hsdel($redisMessageCodeSequenceId, $Sequence_Id);
                             }
                             socket_close($socket);
                             $redis->rpush('index:meassage:code:send' . ":" . 85, json_encode([
