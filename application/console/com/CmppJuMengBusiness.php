@@ -239,8 +239,8 @@ class CmppJuMengBusiness extends Pzlife
                         $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
 
 
-                        print_r($body);
-                        print_r($Msg_Content);
+                        // print_r($body);
+                        // print_r($Msg_Content);
                         if ($mesage) {
                             $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                             // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
@@ -260,7 +260,7 @@ class CmppJuMengBusiness extends Pzlife
                             $mesage['receive_time'] = time(); //回执时间戳
                             $redis->rPush($redisMessageUnKownDeliver, json_encode($mesage));
                         }
-                        print_r($mesage);
+                        // print_r($mesage);
                         $callback_Command_Id = 0x80000005;
 
                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
@@ -315,7 +315,7 @@ class CmppJuMengBusiness extends Pzlife
                                         }
                                     } else if ($head['Command_Id'] == 0x80000004) {
                                         $body = unpack("N2Msg_Id/CResult", $bodyData);
-                                        print_r($body);
+                                        // print_r($body);
                                         $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                         if ($sequence) {
                                             $sequence           = json_decode($sequence, true);
@@ -376,7 +376,7 @@ class CmppJuMengBusiness extends Pzlife
                                         $contentlen = $head['Total_Length'] - 65 - 12;
                                         $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
                                         $Registered_Delivery = trim($body['Registered_Delivery']);
-                                        print_r($body);
+                                        // print_r($body);
                                         $develop_len = strlen($Dest_Id);
                                         $receive_develop_no = mb_substr(trim($body['Dest_Id']),$develop_len);
                                         // echo "拓展码:".$receive_develop_no;
@@ -407,7 +407,7 @@ class CmppJuMengBusiness extends Pzlife
                                             } else {
                                                 $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence", $body['Msg_Content']);
                                             }
-                                            print_r($Msg_Content);
+                                            // print_r($Msg_Content);
                                             $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                                             if ($mesage) {
                                                 $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
@@ -430,7 +430,7 @@ class CmppJuMengBusiness extends Pzlife
                                                 $redis->rPush($redisMessageUnKownDeliver, json_encode($mesage));
                                             }
                                         }
-                                        print_r($mesage);
+                                        // print_r($mesage);
                                         $callback_Command_Id = 0x80000005;
 
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
@@ -698,7 +698,7 @@ class CmppJuMengBusiness extends Pzlife
 
         $a = pack("N", $num1) . pack("N", $num2);
         echo $a . "\n";
-        print_r(unpack("N2Msg_Id", $a));
+        // print_r(unpack("N2Msg_Id", $a));
 
         die;
         $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/", "³f󿾧©¬DELIVRD1911071650191107165515201926171AG");

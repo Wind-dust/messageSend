@@ -79,7 +79,7 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife
 
         // $content = 0;
         $contdata = $this->content($content);
-        // print_r($contdata);die;
+        // // print_r($contdata);die;
         $host                 = $contdata['host']; //服务商ip
         $port                 = $contdata['port']; //短连接端口号   17890长连接端口号
         $Source_Addr          = $contdata['Source_Addr']; //企业id  企业代码
@@ -155,7 +155,7 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife
                         }
                     } else if ($head['Command_Id'] == 0x80000004) {
                         $body = unpack("N2Msg_Id/CResult", $bodyData);
-                        // print_r($body);
+                        // // print_r($body);
                         $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                         if ($sequence) {
                             $sequence           = json_decode($sequence, true);
@@ -231,8 +231,8 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife
                             $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                         } else { //不在记录中的回执存入缓存，
 
-                            print_r($body);
-                            print_r($Msg_Content);
+                            // print_r($body);
+                            // print_r($Msg_Content);
                             $mesage['Stat']        = $Msg_Content['Stat'];
                             $mesage['Submit_time'] = $Msg_Content['Submit_time'];
                             $mesage['Done_time']   = $Msg_Content['Done_time'];
@@ -300,7 +300,7 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife
                                         }
                                     } else if ($head['Command_Id'] == 0x80000004) {
                                         $body = unpack("N2Msg_Id/CResult", $bodyData);
-                                        // print_r($body);
+                                        // // print_r($body);
                                         $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                         if ($sequence) {
                                             $sequence           = json_decode($sequence, true);
@@ -361,7 +361,7 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife
                                         $contentlen = $head['Total_Length'] - 65 - 12;
                                         $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
                                         $Registered_Delivery = trim($body['Registered_Delivery']);
-                                        print_r($body);
+                                        // print_r($body);
                                         if ($Registered_Delivery == 0) { //上行
                                             // if ($mesage) { //
 
@@ -392,7 +392,7 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife
                                             } else {
                                                 $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence", $body['Msg_Content']);
                                             }
-                                            print_r($Msg_Content);
+                                            // print_r($Msg_Content);
                                             $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                                             if ($mesage) {
                                                 $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
@@ -455,7 +455,7 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife
                                 $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
                                 // iconv("UTF-8","gbk",$code);
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
-                                // print_r($code);die;
+                                // // print_r($code);die;
                                 if (strlen($code) > 140) {
                                     $pos          = 0;
                                     $num_messages = ceil(strlen($code) / $max_len);
@@ -756,7 +756,7 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife
     private function getSendTask($id)
     {
         $getSendTaskSql = sprintf("select * from yx_user_send_task where delete_time=0 and id = %d", $id);
-        // print_r($getUserSql);die;
+        // // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
         if (!$sendTask) {
             return [];
@@ -767,7 +767,7 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife
     private function getSendTaskLog($task_no, $mobile)
     {
         $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `task_no` = '" . $task_no . "' and `mobile` = '" . $mobile . "'";
-        // print_r($getUserSql);die;
+        // // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
         if (!$sendTask) {
             return [];
@@ -778,7 +778,7 @@ class CmppHaiNanShiXinYiDongMarketing extends Pzlife
     private function getSendTaskLogByMsgid($msgid)
     {
         $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `msgid` = '" . $msgid . "'";
-        // print_r($getUserSql);die;
+        // // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
         if (!$sendTask) {
             return [];

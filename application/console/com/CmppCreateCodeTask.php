@@ -287,9 +287,9 @@ class CmppCreateCodeTask extends Pzlife
                                     */
 
         // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_task WHERE  `id` = 160941  ");
+        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_task WHERE  `id` > 161056  ");
         foreach ($task_id as $key => $value) {
-            $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0,'deduct' => 10]));
+            $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0,'deduct' => 0]));
         }
     }
 
@@ -362,6 +362,8 @@ class CmppCreateCodeTask extends Pzlife
                 $yidong_mobile = [];
                 $liantong_mobile = [];
                 $dianxin_mobile = [];
+                $error_mobile = [];
+                $deduct_mobile = [];
                 $mobile_result = $this-> mobilesFiltrate($sendTask['mobile_content'], $sendTask['uid'],$real_send['deduct'] );
                 /*  return ['error_mobile' => $error_mobile, 'yidong_mobile' => $yidong_mobile,'liantong_mobile' => $liantong_mobile, 'dianxin_mobile' => $dianxin_mobile, 'deduct_mobile' => $deduct_mobile]; */
                 /* 实际发送号码 */
@@ -1198,6 +1200,12 @@ class CmppCreateCodeTask extends Pzlife
                         }
                         $sendTask['mobile_content'] = join(',',$sendTask['mobile_content']);
                     }
+                    $mobile_result = [];
+                    $yidong_mobile = [];
+                    $liantong_mobile = [];
+                    $dianxin_mobile = [];
+                    $error_mobile = [];
+                    $deduct_mobile = [];
                     $mobile_result = $this->mobilesFiltrate($sendTask['mobile_content'], $sendTask['uid'],$real_send['deduct'] );
                     
                     // print_r($sendTask['template_id']);die;

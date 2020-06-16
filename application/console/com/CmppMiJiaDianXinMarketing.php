@@ -58,18 +58,18 @@ class CmppMiJiaDianXinMarketing extends Pzlife
         // echo $redisMessageCodeSend;die;
         // do {
         //     $send = $redis ->lPop($redisMessageCodeSend);
-        //     print_r($send);
+        //     // print_r($send);
         // } while ($send);
         // // $send = $redis ->lPop($redisMessageCodeSend);
 
-        // print_r($send);die;
+        // // print_r($send);die;
         // $code   = '短信发送测试';
-        // print_r($redisMessageCodeSend);die;
+        // // print_r($redisMessageCodeSend);die;
         // echo $redisMessageCodeSend;die;
         // $send = $redis->lPop("index:meassage:code:send:1");
         // $send = $redis->rPush($redisMessageCodeSend,"15555555555:12:【品质生活】祝您生活愉快");
 
-        // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
+        // // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
         // $redis->rpush($redisMessageCodeSend,json_encode(['mobile' => $mobile,'code' => $code]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $contdata = $this->content($content);
@@ -159,7 +159,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife
                         }
                     } else if ($head['Command_Id'] == 0x80000004) {
                         $body = unpack("N2Msg_Id/CResult", $bodyData);
-                        // print_r($body);
+                        // // print_r($body);
                         $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                         if ($sequence) {
                             $sequence           = json_decode($sequence, true);
@@ -220,7 +220,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife
                         $contentlen = $head['Total_Length'] - 65 - 12;
                         $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
                         $Registered_Delivery = trim($body['Registered_Delivery']);
-                        print_r($body);
+                        // print_r($body);
                         if ($Registered_Delivery == 0) { //上行
                             // if ($mesage) { //
 
@@ -251,7 +251,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife
                             } else {
                                 $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence", $body['Msg_Content']);
                             }
-                            print_r($Msg_Content);
+                            // print_r($Msg_Content);
                             $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                             if ($mesage) {
                                 $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
@@ -333,7 +333,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife
                                         }
                                     } else if ($head['Command_Id'] == 0x80000004) {
                                         $body = unpack("N2Msg_Id/CResult", $bodyData);
-                                        // print_r($body);
+                                        // // print_r($body);
                                         $sequence = $redis->hget($redisMessageCodeSequenceId, $head['Sequence_Id']);
                                         if ($sequence) {
                                             $sequence           = json_decode($sequence, true);
@@ -400,8 +400,8 @@ class CmppMiJiaDianXinMarketing extends Pzlife
                                             $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence", $body['Msg_Content']);
                                         }
                                         $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
-                                        // print_r($body);
-                                        // print_r($Msg_Content);
+                                        // // print_r($body);
+                                        // // print_r($Msg_Content);
                                         if ($mesage) {
                                             $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                                             // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
@@ -462,7 +462,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife
                                 $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
                                 // iconv("UTF-8","gbk",$code);
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
-                                // print_r($code);die;
+                                // // print_r($code);die;
                                 if (strlen($code) > 140) {
                                     $pos          = 0;
                                     $num_messages = ceil(strlen($code) / $max_len);
@@ -668,7 +668,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife
     private function getSendTask($id)
     {
         $getSendTaskSql = sprintf("select * from yx_user_send_task where delete_time=0 and id = %d", $id);
-        // print_r($getUserSql);die;
+        // // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
         if (!$sendTask) {
             return [];
@@ -679,7 +679,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife
     private function getSendTaskLog($task_no, $mobile)
     {
         $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `task_no` = '" . $task_no . "' and `mobile` = '" . $mobile . "'";
-        // print_r($getUserSql);die;
+        // // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
         if (!$sendTask) {
             return [];
@@ -690,7 +690,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife
     private function getSendTaskLogByMsgid($msgid)
     {
         $getSendTaskSql = "select 'id' from yx_user_send_task_log where delete_time=0 and `msgid` = '" . $msgid . "'";
-        // print_r($getUserSql);die;
+        // // print_r($getUserSql);die;
         $sendTask = Db::query($getSendTaskSql);
         if (!$sendTask) {
             return [];
@@ -710,7 +710,7 @@ class CmppMiJiaDianXinMarketing extends Pzlife
 
         $a = pack("N", $num1) . pack("N", $num2);
         echo $a . "\n";
-        print_r(unpack("N2Msg_Id", $a));
+        // print_r(unpack("N2Msg_Id", $a));
 
         die;
         $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/", "³f󿾧©¬DELIVRD1911071650191107165515201926171AG");
