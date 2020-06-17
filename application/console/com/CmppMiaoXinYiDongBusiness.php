@@ -53,6 +53,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
             'master_num'    => 300,
         ];
     }
+    
 
     public function Send($content)
     {

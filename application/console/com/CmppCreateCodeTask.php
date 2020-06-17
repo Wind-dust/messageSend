@@ -388,7 +388,7 @@ class CmppCreateCodeTask extends Pzlife
                                         'uid'          => $sendTask['uid'],
                                         'source'       => $sendTask['source'],
                                         'task_content' => $sendTask['task_content'],
-                                        'mobile'       => $mobilesend[$i],
+                                        'mobile'       => $yidong_mobile[$i],
                                         'channel_id'   => $yidong_channel_id,
                                         'send_length'  => $send_length,
                                         'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
@@ -396,7 +396,7 @@ class CmppCreateCodeTask extends Pzlife
                                         'create_time'  => time(),
                                     ];
                         $sendmessage = [
-                                            'mobile'      => $mobilesend[$i],
+                                            'mobile'      => $yidong_mobile[$i],
                                             'mar_task_id' => $sendTask['id'],
                                             'content'     => $sendTask['task_content'],
                                             'channel_id'  => $yidong_channel_id,
@@ -445,7 +445,7 @@ class CmppCreateCodeTask extends Pzlife
                                         'uid'          => $sendTask['uid'],
                                         'source'       => $sendTask['source'],
                                         'task_content' => $sendTask['task_content'],
-                                        'mobile'       => $mobilesend[$i],
+                                        'mobile'       => $liantong_mobile[$i],
                                         'channel_id'   => $liantong_channel_id,
                                         'send_length'  => $send_length,
                                         'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
@@ -453,7 +453,7 @@ class CmppCreateCodeTask extends Pzlife
                                         'create_time'  => time(),
                                     ];
                         $sendmessage = [
-                                            'mobile'      => $mobilesend[$i],
+                                            'mobile'      => $liantong_mobile[$i],
                                             'mar_task_id' => $sendTask['id'],
                                             'content'     => $sendTask['task_content'],
                                             'channel_id'  => $liantong_channel_id,
@@ -502,7 +502,7 @@ class CmppCreateCodeTask extends Pzlife
                                         'uid'          => $sendTask['uid'],
                                         'source'       => $sendTask['source'],
                                         'task_content' => $sendTask['task_content'],
-                                        'mobile'       => $mobilesend[$i],
+                                        'mobile'       => $dianxin_mobile[$i],
                                         'channel_id'   => $dianxin_channel_id,
                                         'send_length'  => $send_length,
                                         'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
@@ -510,7 +510,7 @@ class CmppCreateCodeTask extends Pzlife
                                         'create_time'  => time(),
                                     ];
                         $sendmessage = [
-                                            'mobile'      => $mobilesend[$i],
+                                            'mobile'      => $dianxin_mobile[$i],
                                             'mar_task_id' => $sendTask['id'],
                                             'content'     => $sendTask['task_content'],
                                             'channel_id'  => $dianxin_channel_id,
@@ -590,7 +590,7 @@ class CmppCreateCodeTask extends Pzlife
                             // 'title'          => $sendTask['task_name'],
                             'task_content'   => $sendTask['task_content'],
                             'source'         => $sendTask['source'],
-                            'mobile'         => $mobilesend[$i],
+                            'mobile'         => $deduct_mobile[$i],
                             'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
                             'send_status'    => 4,
                             'create_time'    => time(),
@@ -605,7 +605,7 @@ class CmppCreateCodeTask extends Pzlife
                             'uid'            => $sendTask['uid'],
                             'msg_id'            => $sendTask['send_msg_id'],
                             'Stat' => 'DELIVRD',
-                            'mobile' =>  $mobilesend[$i],
+                            'mobile' =>  $deduct_mobile[$i],
                             'content'   => $sendTask['task_content'],
                             'from'   => 'yx_user_send_task',
                             'Submit_time'   => time(),
@@ -650,7 +650,7 @@ class CmppCreateCodeTask extends Pzlife
                             // 'title'          => $sendTask['task_name'],
                             'task_content'   => $sendTask['task_content'],
                             'source'         => $sendTask['source'],
-                            'mobile'         => $mobilesend[$i],
+                            'mobile'         => $error_mobile[$i],
                             'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
                             'send_status'    => 4,
                             'create_time'    => time(),
@@ -1116,7 +1116,7 @@ class CmppCreateCodeTask extends Pzlife
         // $this->redis->rPush('index:meassage:multimediamessage:sendtask', 22886);
         // exit();
         // echo time() -1574906657;die;
-        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' =>90303, 'deduct' => 10]));
+        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' =>90305, 'deduct' => 10]));
         while (true) {
             try {
                 $j = 1;
@@ -1226,6 +1226,7 @@ class CmppCreateCodeTask extends Pzlife
                     echo "联通:".count($liantong_mobile);
                     echo "电信:".count($dianxin_mobile);
                     die; */
+                   
                     $j = 1;
                     if (!empty($yidong_mobile)) {
                         for($i = 0; $i < count($yidong_mobile); $i++) {
@@ -1247,6 +1248,7 @@ class CmppCreateCodeTask extends Pzlife
                                                     'channel_id'  => $yidong_channel_id,
                                                     'from'        => 'yx_user_multimedia_message',
                                                 ];
+                                                print_r($yidong_mobile[$i]);die;
                                                 if (!empty($yidong_channel_template_id)) {
                                                     $sendmessage['template_id'] = $yidong_channel_template_id;
                                                     if (!empty($mobile_relation)) {
