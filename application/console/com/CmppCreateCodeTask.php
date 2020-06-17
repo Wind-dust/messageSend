@@ -308,8 +308,8 @@ class CmppCreateCodeTask extends Pzlife
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15827,'send_time' => 0]));
         // echo time() -1576290017;die;
         while (true) {
-            echo date('Y-m-d H:i:s');
-            echo "\n";
+            // echo date('Y-m-d H:i:s');
+            // echo "\n";
 
             while (true) {
                 $j = 1;
@@ -1116,7 +1116,7 @@ class CmppCreateCodeTask extends Pzlife
         // $this->redis->rPush('index:meassage:multimediamessage:sendtask', 22886);
         // exit();
         // echo time() -1574906657;die;
-        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' =>90305, 'deduct' => 10]));
+        // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' =>90305, 'deduct' => 10]));
         while (true) {
             try {
                 $j = 1;
