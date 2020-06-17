@@ -287,9 +287,10 @@ class CmppCreateCodeTask extends Pzlife
                                     */
 
         // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_task WHERE  `id` > 161056  ");
+        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_task WHERE  `id` > 167001  ");
         foreach ($task_id as $key => $value) {
             $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0,'deduct' => 0]));
+            // usleep(50000);
         }
     }
 
@@ -1904,12 +1905,20 @@ class CmppCreateCodeTask extends Pzlife
             $cool_city_mobile = []; //二线城市号码
             $mobile = str_replace('&quot;','',$mobile);
             $mobile_data = explode(',',$mobile);
+            
             foreach($mobile_data as $key => $value){
-                if (strlen($value) != 11) {
-                    $error_mobile[] = $value;
+                // print_r($value);die;
+                if (!is_numeric($value)) {
                     unset($mobile_data[$key]);
+                    continue;
+                }
+                if (checkMobile($value) == false) {
+                   
+                    $error_mobile[] = $value;
+                   
                 }
             }
+            $mobile = join(',',$mobile_data);
             // echo count($mobile_data);die;
             //白名单
             $white_mobiles = [];
