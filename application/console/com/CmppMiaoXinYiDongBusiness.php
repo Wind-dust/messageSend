@@ -525,11 +525,12 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                 $num1 = substr($timestring, 0, 8);
                                 $num2 = substr($timestring, 8) . $this->combination($i);
                                 // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
-                                // $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
-                                $code = mb_convert_encoding($code, 'UTF-16', 'UTF-8');
+                                $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
+                                // $code = mb_convert_encoding($code, 'UTF-16', 'UTF-8');
                                  // $code =iconv("UTF-8","UCS-2",$code);
                                 // $code =iconv("UCS-2","UTF-8",$code);
-                                // $buffer[]=bin2hex($code);
+                                $buffer[]=bin2hex($code);
+                                $send_code = strtoupper(join("",$buffer));
                                 // print_r(strtoupper(join("",$buffer)));die;
                                 // $code =iconv("UTF-8","UCS-2//TRANSLIT",$code);
                                 // iconv("UTF-8","gbk",$code);
@@ -565,7 +566,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                         $p_n      = 21 * $uer_num;
                                         $bodyData .= pack("a" . $p_n, $mobile);
                                         $udh     = pack("cccccc", 5, 0, 3, $Sequence_Id, $num_messages, $j + 1);
-                                        $newcode = $udh . substr($code, $j * $max_len, $max_len);
+                                        $newcode = $udh . substr($send_code, $j * $max_len, $max_len);
                                         $len     = strlen($newcode);
                                         $bodyData .= pack("C", $len);
                                         $bodyData .= pack("a" . $len, $newcode);
@@ -616,9 +617,9 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                     $bodyData .= pack("C", $uer_num);
                                     $p_n      = 21 * $uer_num;
                                     $bodyData .= pack("a" . $p_n, $mobile);
-                                    $len      = strlen($code);
+                                    $len      = strlen($send_code);
                                     $bodyData .= pack("C", $len);
-                                    $bodyData .= pack("a" . $len, $code);
+                                    $bodyData .= pack("a" . $len, $send_code);
                                     $bodyData .= pack("a8", '');
                                     $Command_Id = 0x00000004; // 短信发送
                                     $time = 0;
