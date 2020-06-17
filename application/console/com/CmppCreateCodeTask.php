@@ -300,7 +300,7 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
-        $send = $this->redis->rPush('index:meassage:marketing:sendtask', json_encode(['id' => 167053, 'send_time' => 0,'deduct' => 0]));
+        // $send = $this->redis->rPush('index:meassage:marketing:sendtask', json_encode(['id' => 167053, 'send_time' => 0,'deduct' => 0]));
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15823,'send_time' => 0]));
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15824,'send_time' => 0]));
         // $send = $this->redis->rPush('index:meassage:marketing:sendtask',json_encode(['id' => 15825,'send_time' => 0]));
@@ -1226,9 +1226,7 @@ class CmppCreateCodeTask extends Pzlife
                     echo "联通:".count($liantong_mobile);
                     echo "电信:".count($dianxin_mobile);
                     die; */
-                    print_r($mobile_relation);
-                    print_r($mobile_result);
-                    die;
+                   
                     $j = 1;
                     if (!empty($yidong_mobile)) {
                         for($i = 0; $i < count($yidong_mobile); $i++) {
