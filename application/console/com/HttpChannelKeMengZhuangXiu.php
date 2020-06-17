@@ -55,7 +55,7 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
         </returnsms>
         ';
         $XML = json_decode(json_encode(simplexml_load_string($XML, 'SimpleXMLElement', LIBXML_NOCDATA)), true); */
-        // // print_r_r($XML);die;
+        // // // print_r_r($XML);die;
         
         $content              = 11;
         $redisMessageCodeSend = 'index:meassage:code:send:' . $content; //验证码发送任务rediskey
@@ -124,9 +124,9 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
                                 $receive_id[$result['taskID']] = $send_taskid;
                                 $redis->hset('index:meassage:code:back_taskno:'.$content,$result['taskID'],$send_taskid);
                             } elseif ($result['returnstatus'] == 'Faild') { //失败
-                                echo "error:" . $result['message'] . "\n";die;
+                                // echo "error:" . $result['message'] . "\n";die;
                             }
-                            // // print_r_r($result);
+                            // // // print_r_r($result);
                             unset($send_num[$send_taskid]);
                             sleep(1);
                         }
@@ -152,16 +152,16 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
                         'mobile'   => join(',', $new_num),
                         'content'  => $send_content[$send_taskid],
                     ];
-                    // // print_r_r($real_send);
+                    // // // print_r_r($real_send);
                     $res    = sendRequest($user_info['send_api'], 'post', $real_send);
                     $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-                    // print_r_r($result);
+                    // // print_r_r($result);
                     // $result = explode(',', $res);
                     if ($result['returnstatus'] == 'Success') { //成功
                         $receive_id[$result['taskID']] = $send_taskid;
                         $redis->hset('index:meassage:code:back_taskno:'.$content,$result['taskID'],$send_taskid);
                     } elseif ($result['returnstatus'] == 'Faild') { //失败
-                        echo "error:" . $result['message'] . "\n";die;
+                        // echo "error:" . $result['message'] . "\n";die;
                     }
                     unset($send_num[$send]);
                     sleep(1);
@@ -170,7 +170,7 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
             // $receive_id = [
             //     '866214' => '15745'
             // ];
-            // // print_r_r($receive_id);
+            // // // print_r_r($receive_id);
             // die;
                 $receive      = sendRequest($user_info['receive_api'], 'post', ['userid' => $user_info['appid'], 'timestamp' => date('YmdHis',time()),'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time())))]);
                 if (empty($receive)) {
@@ -178,7 +178,7 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
                     continue;
                 }
                 $receive_data = json_decode(json_encode(simplexml_load_string($receive, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-                // // print_r_r($receive_data);
+                // // // print_r_r($receive_data);
                 // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
                 // $receive_data = explode(';', $receive);
                 
@@ -193,7 +193,7 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
                             $task_id      = $redis->hget('index:meassage:code:back_taskno:'.$content,$value['taskid']);
                             $task         = $this->getSendTask($task_id);
                             if ($task == false) {
-                                echo "error task_id" . "\n";
+                                // echo "error task_id" . "\n";
                             }
                             $send_task_log = [];
                             if ($value['errorcode'] == '10') {
@@ -209,7 +209,7 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
                                 'send_status'    => $send_status,
                                 'send_time'      => strtotime($value['receivetime']),
                             ];
-                            // print_r_r($send_task_log);
+                            // // print_r_r($send_task_log);
                             $redis->rpush($redisMessageCodeDeliver,json_encode($send_task_log));
                             // Db::startTrans();
                             // try {
@@ -224,13 +224,13 @@ class HttpChannelKeMengZhuangXiu extends Pzlife {
                        
                     }
                 }
-                // // print_r_r($receive_data);die;
+                // // // print_r_r($receive_data);die;
                 sleep(60);
            
             unset($send_num);
             unset($send_content);
             unset($receive_id);
-            echo "success";
+            // echo "success";
             sleep(60);
         }
        

@@ -54,7 +54,7 @@ class HttpChannelKeMengTuShu extends Pzlife {
         //     'content' =>'【已阅行知】新品大促！童书《DK幼儿艺术启蒙烧脑创意》原价68元，加官微shulixingzhi，直降25元！活动还有最后一天！！！退订回T', 
         // ]));
         // $task_id      = $redis->hget('index:meassage:code:back_taskno:'.$content,866213);
-        // print_r($task_id);die;
+        // // print_r($task_id);die;
         while (true) {
             $send_task            = [];
             $send_num             = [];
@@ -93,9 +93,9 @@ class HttpChannelKeMengTuShu extends Pzlife {
                                 $receive_id[$result['taskID']] = $send_taskid;
                                 $redis->hset('index:meassage:code:back_taskno:'.$content,$result['taskID'],$send_taskid);
                             } elseif ($result['returnstatus'] == 'Faild') { //失败
-                                echo "error:" . $result['message'] . "\n";die;
+                                // echo "error:" . $result['message'] . "\n";die;
                             }
-                            // print_r($result);
+                            // // print_r($result);
                             unset($send_num[$send_taskid]);
                             sleep(1);
                         }
@@ -121,16 +121,16 @@ class HttpChannelKeMengTuShu extends Pzlife {
                         'mobile'   => join(',', $new_num),
                         'content'  => $send_content[$send_taskid],
                     ];
-                    // print_r($real_send);
+                    // // print_r($real_send);
                     $res    = sendRequest($user_info['send_api'], 'post', $real_send);
                     $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-                    print_r($result);
+                    // print_r($result);
                     // $result = explode(',', $res);
                     if ($result['returnstatus'] == 'Success') { //成功
                         $receive_id[$result['taskID']] = $send_taskid;
                         $redis->hset('index:meassage:code:back_taskno:'.$content,$result['taskID'],$send_taskid);
                     } elseif ($result['returnstatus'] == 'Faild') { //失败
-                        echo "error:" . $result['message'] . "\n";die;
+                        // echo "error:" . $result['message'] . "\n";die;
                     }
                     unset($send_num[$send]);
                     sleep(1);
@@ -139,7 +139,7 @@ class HttpChannelKeMengTuShu extends Pzlife {
             // $receive_id = [
             //     '866213' => '15715'
             // ];
-            // print_r($receive_id);
+            // // print_r($receive_id);
             // die;
             do {
                 $receive      = sendRequest($user_info['receive_api'], 'post', ['userid' => $user_info['appid'], 'timestamp' => date('YmdHis',time()),'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time())))]);
@@ -148,7 +148,7 @@ class HttpChannelKeMengTuShu extends Pzlife {
                     continue;
                 }
                 $receive_data = json_decode(json_encode(simplexml_load_string($receive, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-                print_r($receive_data);
+                // print_r($receive_data);
                 // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
                 // $receive_data = explode(';', $receive);
                 if (isset($receive_data['statusbox'])) {
@@ -160,7 +160,7 @@ class HttpChannelKeMengTuShu extends Pzlife {
                         $task_id      = $redis->hget('index:meassage:code:back_taskno:'.$content,$value['taskid']);
                         $task         = $this->getSendTask($task_id);
                         if ($task == false) {
-                            echo "error task_id" . "\n";
+                            // echo "error task_id" . "\n";
                         }
                         $send_task_log = [];
                         if ($value['errorcode'] == '10') {
@@ -188,13 +188,13 @@ class HttpChannelKeMengTuShu extends Pzlife {
                         unset($send_status);
                     }
                 }
-                // print_r($receive_data);die;
+                // // print_r($receive_data);die;
                 sleep(60);
             } while ($receive);
             unset($send_num);
             unset($send_content);
             unset($receive_id);
-            echo "success";
+            // echo "success";
             sleep(60);
         }
        

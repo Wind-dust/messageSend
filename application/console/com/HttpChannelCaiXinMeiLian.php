@@ -91,7 +91,7 @@ class HttpChannelCaiXinMeiLian extends Pzlife
        
         $res = sendRequest($user_info['send_api'], 'post', $real_send);
         fclose($myfile);
-        print_r($res);
+        // print_r($res);
           die; */
 
         while (true) {
@@ -175,7 +175,7 @@ class HttpChannelCaiXinMeiLian extends Pzlife
                                         $redis->rpush($redisMessageCodeSend, $val);
                                     }
                                 }
-                                print_r($result);
+                                // print_r($result);
                                 $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
                                     'mobile'      => 15201926171,
                                     'content'     =>"【钰晰科技】美联软通彩信通道异常，错误信息：". $res
@@ -189,7 +189,7 @@ class HttpChannelCaiXinMeiLian extends Pzlife
                 }
             } while ($send);
             //剩下的号码再做提交
-            // print_r($send_num);die;
+            // // print_r($send_num);die;
             if (!empty($send_num)) {
                 foreach ($send_num as $send_taskid => $num) {
                     $new_num = array_unique($num);
@@ -222,14 +222,14 @@ class HttpChannelCaiXinMeiLian extends Pzlife
                                 ])); //三体营销通道
                                 exit(); //关闭通道
                     }
-                    // print_r($res);
+                    // // print_r($res);
 
                     // $result = explode(',', $res);
                     // if ($result['returnstatus'] == 'Success') { //成功
                     //     $receive_id[$result['taskID']] = $send_taskid;
                     //     $redis->hset('index:meassage:code:back_taskno:' . $content, $result['taskID'], $send_taskid);
                     // } elseif ($result['returnstatus'] == 'Faild') { //失败
-                    //     echo "error:" . $result['message'] . "\n";die;
+                    //     // echo "error:" . $result['message'] . "\n";die;
                     // }
                     unset($send_num[$send_taskid]);
                     usleep(5000);
@@ -255,7 +255,7 @@ class HttpChannelCaiXinMeiLian extends Pzlife
                     }
                     $task    = $this->getSendTask($task_id);
                     if ($task == false) {
-                        echo "error task_id" . "\n";
+                        // echo "error task_id" . "\n";
                     }
                     $send_task_log = [];
                     if ($real_receive[2] == 'DELIVRD') {
@@ -271,7 +271,7 @@ class HttpChannelCaiXinMeiLian extends Pzlife
                         'send_status'    => $send_status,
                         'send_time'      => strtotime($real_receive[3]),
                     ];
-                    // print_r($send_task_log);
+                    // // print_r($send_task_log);
                     $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
                     // Db::startTrans();
                     // try {
@@ -287,15 +287,15 @@ class HttpChannelCaiXinMeiLian extends Pzlife
             // $receive_id = [
             //     '866214' => '15745'
             // ];
-            // print_r($receive_id);
+            // // print_r($receive_id);
             // die;
 
-            // print_r($receive_data);die;
+            // // print_r($receive_data);die;
 
             unset($send_num);
             unset($send_content);
             unset($receive_id);
-            echo "success";
+            // echo "success";
         }
     }
 

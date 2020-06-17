@@ -44,7 +44,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
         $send_data['title'] = '【恭喜您已升级为SEPHORA黑卡会员，快来领取您的专属黑卡权益！】';
         // $send_data['title'] = '大金空调健康购惠州站';
         $send_data['mar_task_id'] = 107;
-        echo Config::get('qiniu.domain') . '/' . "20200408/f1a62696f90cb8560db0cd6351174bfd5e8d904c2a736.gif";
+        // echo Config::get('qiniu.domain') . '/' . "20200408/f1a62696f90cb8560db0cd6351174bfd5e8d904c2a736.gif";
         $real_send_content = [
             [
                 "frame" => 4,
@@ -68,7 +68,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
         // $sign = "account=" . $user_info['account'] . "timestamp=" . $time . "url=" . $user_info['call_back'] . "phones=15201926171" . "title=" . $send_data['title'] . "msg=" . json_encode($real_send_content) . "ext_id=" . $send_data['mar_task_id'] . "key=" . $user_info['key'];
         /*    $sign = "account=" . $user_info['account']  . "ext_id=" . $send_data['mar_task_id'] . "msg=" . json_encode($real_send_content) . "phones=15201926171" . "timestamp=" . $time . "title=" . $send_data['title'] . "url=" . $user_info['call_back'] . "key=" . $user_info['key'];
         $sign = md5($sign);
-        // print_r($sign);
+        // // print_r($sign);
         // die;
         $real_send = [
             'account'    => $user_info['account'],
@@ -90,7 +90,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
         fclose($myfile);
         $res = sendRequest($user_info['send_api'], 'post', $real_send);
         $result = json_decode($res, true);
-        print_r($result);
+        // print_r($result);
         die;
  */
         $content                 = 59;
@@ -129,7 +129,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                             //处理内容
                             $real_send_content = [];
                             foreach ($send_data['content'] as $key => $value) {
-                                // print_r($value);die;
+                                // // print_r($value);die;
                                 $frame = [];
                                 if (!empty($value['content'])) {
                                     $frame['frame'] = $value['num'];
@@ -187,7 +187,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                             //处理内容
                             $real_send_content = [];
                             foreach ($send_data['content'] as $key => $value) {
-                                // print_r($value);die;
+                                // // print_r($value);die;
                                 $frame = [];
                                 if (!empty($value['content'])) {
                                     $frame['frame'] = $value['num'];
@@ -272,7 +272,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                             $redis->rpush($redisMessageCodeSend, $val);
                                         }
                                     }
-                                    print_r($result);
+                                    // print_r($result);
                                     $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
                                         'mobile'      => 15201926171,
                                         'content'     => $res
@@ -284,9 +284,9 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                         $receive_id[$result['taskID']] = $send_taskid;
                                         $redis->hset('index:meassage:code:back_taskno:' . $content, $result['taskID'], $send_taskid);
                                     } elseif ($result['returnstatus'] == 'Faild') { //失败
-                                        echo "error:" . $result['message'] . "\n";die;
+                                        // echo "error:" . $result['message'] . "\n";die;
                                     } */
-                                // print_r($result);
+                                // // print_r($result);
                                 unset($send_num[$send_taskid]);
                                 usleep(12500);
                             }
@@ -295,8 +295,8 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                     }
                 } while ($send);
                 //剩下的号码再做提交
-                // print_r($send_content);
-                // print_r($send_num);die;
+                // // print_r($send_content);
+                // // print_r($send_num);die;
                 if (!empty($send_num)) {
                     foreach ($send_num as $send_taskid => $num) {
                         $new_num = array_unique($num);
@@ -321,7 +321,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                         ];
                         $res = sendRequest($user_info['send_api'], 'post', $real_send);
                         $result = json_decode($res, true);
-                        // print_r($result);
+                        // // print_r($result);
                         // $result['code'] = 2;
                         if ($result['code'] == 1) {
                             unset($roallback[$send_taskid]);
@@ -331,21 +331,21 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                     $redis->rpush($redisMessageCodeSend, $val);
                                 }
                             }
-                            print_r($result);
+                            // print_r($result);
                             $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
                                 'mobile'      => 15201926171,
                                 'content'     => $res
                             ])); //三体营销通道
                             exit(); //关闭通道
                         }
-                        // print_r($res);
+                        // // print_r($res);
     
                         // $result = explode(',', $res);
                         // if ($result['returnstatus'] == 'Success') { //成功
                         //     $receive_id[$result['taskID']] = $send_taskid;
                         //     $redis->hset('index:meassage:code:back_taskno:' . $content, $result['taskID'], $send_taskid);
                         // } elseif ($result['returnstatus'] == 'Faild') { //失败
-                        //     echo "error:" . $result['message'] . "\n";die;
+                        //     // echo "error:" . $result['message'] . "\n";die;
                         // }
                         unset($send_num[$send_taskid]);
                         usleep(12500);
@@ -354,16 +354,16 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                 // $receive_id = [
                 //     '866214' => '15745'
                 // ];
-                // print_r($receive_id);
+                // // print_r($receive_id);
                 // die;
     
-                // print_r($receive_data);die;
+                // // print_r($receive_data);die;
                 sleep(10);
     
                 unset($send_num);
                 unset($send_content);
                 unset($receive_id);
-                echo "success";
+                // echo "success";
             }
         } catch (\Exception $th) {
             //throw $th;

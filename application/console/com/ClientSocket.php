@@ -110,36 +110,36 @@ class ClientSocket extends Pzlife {
         $redisMessageCodeSequenceId = 'index:meassage:code:sequence:id:'.$content;//行业通知SequenceId
         $redisMessageCodeMsgId = 'index:meassage:code:msg:id:'.$content;//行业通知SequenceId
         $redisMessageCodeDeliver = 'index:meassage:code:deliver:'.$content;//行业通知MsgId
-        // echo $redisMessageCodeSend;
+        // // echo $redisMessageCodeSend;
         // $send = Phpredis::getConn()->lPop($redisMessageCodeSend);
         // print_r($send);die;
         // $code   = '短信发送测试';
         // print_r($redisMessageCodeSend);die;
-        // echo $redisMessageCodeSend;die;
+        // // echo $redisMessageCodeSend;die;
         // $send = $redis->lPop("index:meassage:code:send:1");
         // $send = $redis->rPush($redisMessageCodeSend,"15555555555:12:【品质生活】祝您生活愉快");
        
-        // echo $code;
+        // // echo $code;
         // die;
-        //  echo 0x80000008;
+        //  // echo 0x80000008;
         //  die;
         // print_r('3049152064' & 0x0fffffff );die;
         // $v = base_convert(time(), 10, 16)."\n";
         // $a = pack("a8",$v);
-        // echo $v."\n";
-        // echo $a."\n";
+        // // echo $v."\n";
+        // // echo $a."\n";
         // print_r( unpack("a8",$a));
-        // echo $v;
+        // // echo $v;
         // $str = "´&´'pӄELIVRD1911080943191108094315201926171Ȕ26";
         // $new = substr($str,0,8);
         // $new = base_convert($new, 16, 2);
-        // echo $new;die;
+        // // echo $new;die;
 
         // // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´&´'pӄELIVRD1911080943191108094315201926171Ȕ26");
         // $arr = unpack("N2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","´6h󿾧>gDELIVRD1911081338191108134415201926171&b");
         // $arr = unpack("I2Msg_Id/a7Stat/a10Submit_time/a10Done_time/","µ»'sDELIVRD1911111456191111150615201926171e韚");
         // print_r($arr['Msg_Id1'] & 0x0fffffff);die;
-        // // echo 0x00000010;
+        // // // echo 0x00000010;
         // die;
 
         // print_r(json_encode(['mobile' => $mobile,'code' => $code]));die;
@@ -159,13 +159,13 @@ class ClientSocket extends Pzlife {
         $master_num           = $contdata['master_num']; //通道最大提交量
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
-        // echo $security_master;die;
+        // // echo $security_master;die;
         // die;
         // $send = $this->redis->lPop($redisMessageCodeSend);
         // print_r($send);
         // die;
         if (socket_connect($socket, $host, $port) == false) {
-            // echo 'connect fail massege:' . socket_strerror(socket_last_error());
+            // // echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
             date_default_timezone_set('PRC');
             // socket_read($socket,3072);
@@ -176,7 +176,7 @@ class ClientSocket extends Pzlife {
             $i           = 1;
             $Sequence_Id = 1;
             do {
-                echo $i . "\n";
+                // echo $i . "\n";
                 $time                = 0;
                 $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
                 $Timestamp           = date('mdHis');
@@ -213,7 +213,7 @@ class ClientSocket extends Pzlife {
                         // $code   = '短信发送测试'; //带签名
                         // print_r($code);die;
                         $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
-                        echo strlen($code);die;
+                        // echo strlen($code);die;
                         // $Timestamp = date('mdHis');
                         $uer_num = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
                         // $Msg_Id = rand(1, 100);
@@ -316,7 +316,7 @@ class ClientSocket extends Pzlife {
                             $time = 1;
                             $i    = 0;
                         }
-                        // echo $Command_Id;die;
+                        // // echo $Command_Id;die;
                         // print_r(strlen($bodyData));die;
                         $redis->hset($redisMessageCodeSequenceId,$Sequence_Id,$senddata[0].":".$senddata[1].":".$senddata[2]);
                     } else {
@@ -330,14 +330,14 @@ class ClientSocket extends Pzlife {
                 $Total_Length = strlen($bodyData) + 12;
                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                 // if ($i == 2) {
-                // echo $headData.$bodyData."\n";
+                // // echo $headData.$bodyData."\n";
                 // }
-                // echo $headData.$bodyData;
-                // echo strlen($headData);die;
+                // // echo $headData.$bodyData;
+                // // echo strlen($headData);die;
                 if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) { //写入失败，还原发送信息并关闭端口
-                    echo 'fail to write' . socket_strerror(socket_last_error());
+                    // echo 'fail to write' . socket_strerror(socket_last_error());
                 } else {
-                    // echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
+                    // // echo 'client write success:' . PHP_EOL . print(bin2hex($headData . $bodyData) . "\n");
                     // if ($i == 2) {
                     //     die;
                     // }
@@ -348,14 +348,14 @@ class ClientSocket extends Pzlife {
                         // print_r($head);
                         $bodyData = socket_read($socket, $head['Total_Length'] - 12);
                         // print_r($bodyData);
-                        // echo "\n";
+                        // // echo "\n";
                         //错误处理机制
                         try
                         {
                             // $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                             // switch ($head['Command_Id'] & 0x0fffffff) {
                             // case 0x80000001:
-                            //     // echo "接收到连接应答"."\n";
+                            //     // // echo "接收到连接应答"."\n";
                             //     // $bodyData = socket_read($socket, $head['Total_Length'] - 12);
                                 
                             //     break;
@@ -367,11 +367,11 @@ class ClientSocket extends Pzlife {
                                 
                             //     break;
                             // case 0x00000008:
-                            //     echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                            //     // echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                             //     // $body = unpack("C",$bodyData);
                             //     break;
                             // default:
-                            //     echo "未声明head['Command_Id']:".$head['Command_Id'];
+                            //     // echo "未声明head['Command_Id']:".$head['Command_Id'];
                             //     break;
                             // }
                             if ($head['Command_Id'] == 0x80000001) {
@@ -379,26 +379,26 @@ class ClientSocket extends Pzlife {
                                 // print_r($body) ;
                                 switch ($body['Status']) {
                                 case 0:
-                                    echo "通道连接通过" . "\n";
+                                    // echo "通道连接通过" . "\n";
                                     break;
                                 case 1:
-                                    echo "消息结构错" . "\n";
+                                    // echo "消息结构错" . "\n";
                                     $error_msg = "消息结构错";
                                     break;
                                 case 2:
-                                    echo "非法源地址" . "\n";
+                                    // echo "非法源地址" . "\n";
                                     $error_msg = "非法源地址";
                                     break;
                                 case 3:
-                                    echo "认证错误" . "\n";
+                                    // echo "认证错误" . "\n";
                                     $error_msg = "认证错误";
                                     break;
                                 case 4:
-                                    echo "版本错误" . "\n";
+                                    // echo "版本错误" . "\n";
                                     $error_msg = "版本错误";
                                     break;
                                 default:
-                                    echo "其他错误" . "\n";
+                                    // echo "其他错误" . "\n";
                                     $error_msg = "其他错误";
                                     break;
                                 }
@@ -427,53 +427,53 @@ class ClientSocket extends Pzlife {
                                     $redis->hdel($redisMessageCodeSequenceId,$head['Sequence_Id']);
                                     $redis->hset($redisMessageCodeMsgId,$body['Msg_Id1'].$body['Msg_Id2'],$sequence);
                                 }
-                                // echo "get_CMPP_SUBMIT_RESP"."\n";
-                                // echo "提交的Sequence_Id:".$head['Sequence_Id'].",解析的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2']."\n";
+                                // // echo "get_CMPP_SUBMIT_RESP"."\n";
+                                // // echo "提交的Sequence_Id:".$head['Sequence_Id'].",解析的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2']."\n";
                                 // print_r($body);
                                 //状态为0 ，消息发送成功
                                 switch ($body['Result']) {
                                 case 0:
-                                    echo "发送成功" . "\n";
+                                    // echo "发送成功" . "\n";
                                     break;
                                 case 1:
-                                    echo "消息结构错" . "\n";
+                                    // echo "消息结构错" . "\n";
                                     $error_msg = "消息结构错";
                                     break;
                                 case 2:
-                                    echo "命令字错" . "\n";
+                                    // echo "命令字错" . "\n";
                                     $error_msg = "命令字错";
                                     break;
                                 case 3:
-                                    echo "消息序号重复" . "\n";
+                                    // echo "消息序号重复" . "\n";
                                     $error_msg = "消息序号重复";
                                     break;
                                 case 4:
-                                    echo "消息长度错" . "\n";
+                                    // echo "消息长度错" . "\n";
                                     $error_msg = "消息长度错";
                                     break;
                                 case 5:
-                                    echo "资费代码错" . "\n";
+                                    // echo "资费代码错" . "\n";
                                     $error_msg = "资费代码错";
                                     break;
                                 case 6:
-                                    echo "超过最大信息长" . "\n";
+                                    // echo "超过最大信息长" . "\n";
                                     $error_msg = "超过最大信息长";
                                     break;
                                 case 7:
-                                    echo "业务代码错" . "\n";
+                                    // echo "业务代码错" . "\n";
                                     $error_msg = "业务代码错";
                                     break;
                                 case 8:
-                                    echo "流量控制错" . "\n";
+                                    // echo "流量控制错" . "\n";
                                     $error_msg = "业务代码错";
                                     break;
                                 default:
-                                    echo "其他错误" . "\n";
+                                    // echo "其他错误" . "\n";
                                     $error_msg = "其他错误";
                                     break;
                                 }
                                 if ($body['Result'] != 0) { //消息发送失败
-                                    echo "发送失败" . "\n";
+                                    // echo "发送失败" . "\n";
                                     $error_msg = "其他错误";
                                 }else {
                                     // Db::startTrans();
@@ -505,8 +505,8 @@ class ClientSocket extends Pzlife {
                                     $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
                                 }
                                 print_r($Msg_Content);
-                                // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
-                                // echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
+                                // // echo "返回发送成功的Msg_Id:".$body['Msg_Id1'].$body['Msg_Id2'];
+                                // // echo "CMPP_DELIVER:" . base_convert($bodyData, 16, 2) . "\n";
                                 $callback_Command_Id = 0x80000005;
 
                                 $new_body         = pack("N", $body['Msg_Id1']). pack("N", $body['Msg_Id2']). pack("C", $Result);
@@ -514,11 +514,11 @@ class ClientSocket extends Pzlife {
                                 $new_headData     = pack("NNN", $Total_Length, $callback_Command_Id, $body['Msg_Id2']);
                                 // socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                             }else if ($head['Command_Id'] == 0x00000008) {
-                                echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                                // echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                             }else if ($head['Command_Id'] ==0x80000008) {
-                                echo "激活测试应答" . "\n"; //激活测试,无消息体结构
+                                // echo "激活测试应答" . "\n"; //激活测试,无消息体结构
                             }else {
-                                echo "未声明head['Command_Id']:".$head['Command_Id'];
+                                // echo "未声明head['Command_Id']:".$head['Command_Id'];
                                 // break;
                             }
                         }
@@ -574,10 +574,10 @@ class ClientSocket extends Pzlife {
             mysql_query($sql);
             } */
             // mysql_close();
-            //echo $Msg_Id."\n";
-            echo $data . "\n";
-            echo $msgidzz . "\n";
-            echo $Sequence_Id . "\n";
+            //// echo $Msg_Id."\n";
+            // echo $data . "\n";
+            // echo $msgidzz . "\n";
+            // echo $Sequence_Id . "\n";
             $this->cmppDeliverResp($msgidzz, $Msg_Idfu, $Sequence_Id);
         }
     }
@@ -597,16 +597,16 @@ class ClientSocket extends Pzlife {
     }
 
     public function decodeString(){
-        // echo strlen("³½'¹ ");
+        // // echo strlen("³½'¹ ");
         $timestring = time();
         $num1 = substr($timestring,0,8);
         $num2 = substr($timestring,8).$this->combination(rand(1,240));
-        echo $num1;
-        echo "\n";
-        echo $num2;
+        // echo $num1;
+        // echo "\n";
+        // echo $num2;
         
         $a = pack("N",$num1) . pack("N", $num2);
-        echo $a."\n";
+        // echo $a."\n";
         print_r(unpack("N2Msg_Id",$a));
        
         die;

@@ -87,9 +87,9 @@ class HttpChannelKeMeng extends Pzlife {
                         if ($result['returnstatus'] == 'success') { //成功
                             $receive_id[$result['taskID']] = $send;
                         } elseif ($result['returnstatus'] == 'Faild') { //失败
-                            echo "error:" . $result['message'] . "\n";die;
+                            // echo "error:" . $result['message'] . "\n";die;
                         }
-                        print_r($result);
+                        // print_r($result);
                         unset($send_num[$send]);
                         sleep(1);
                     }
@@ -115,15 +115,15 @@ class HttpChannelKeMeng extends Pzlife {
                     'mobile'   => join(',', $new_num),
                     'content'  => $send_content[$send],
                 ];
-                print_r($real_send);
+                // print_r($real_send);
                 $res    = sendRequest($user_info['send_api'], 'post', $real_send);
                 $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-                // print_r($res);die;
+                // // print_r($res);die;
                 // $result = explode(',', $res);
                 if ($result['returnstatus'] == 'success') { //成功
                     $receive_id[$result['taskID']] = $send;
                 } elseif ($result['returnstatus'] == 'Faild') { //失败
-                    echo "error:" . $result['message'] . "\n";die;
+                    // echo "error:" . $result['message'] . "\n";die;
                 }
                 unset($send_num[$send]);
                 sleep(1);
@@ -135,7 +135,7 @@ class HttpChannelKeMeng extends Pzlife {
         do {
             $receive      = sendRequest($user_info['receive_api'], 'post', ['userid' => $user_info['appid'], 'timestamp' => date('YmdHis',time()),'sign' => strtolower(md5($user_info['username'].$user_info['password'].date('YmdHis',time())))]);
             $receive_data = json_decode(json_encode(simplexml_load_string($receive, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-            print_r($receive_data);
+            // print_r($receive_data);
             // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
             // $receive_data = explode(';', $receive);
             foreach ($receive_data as $key => $value) {
@@ -144,7 +144,7 @@ class HttpChannelKeMeng extends Pzlife {
                 $task_id      = $receive_id[$receive_info[0]];
                 $task         = $this->getSendTask($task_id);
                 if ($task == false) {
-                    echo "error task_id" . "\n";
+                    // echo "error task_id" . "\n";
                 }
                 $send_task_log = [];
                 if ($receive_info[2] == 'DELIVRD') {
@@ -169,13 +169,13 @@ class HttpChannelKeMeng extends Pzlife {
                 unset($send_status);
             }
             
-            // print_r($receive_data);die;
+            // // print_r($receive_data);die;
             sleep(60);
         } while ($receive);
         unset($send_num);
         unset($send_content);
         unset($receive_id);
-        echo "success";
+        // echo "success";
 
     }
 
