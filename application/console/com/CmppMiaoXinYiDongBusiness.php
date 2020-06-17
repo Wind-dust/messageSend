@@ -80,13 +80,13 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
             'mar_task_id' => '',
             'content'     => '【美丽田园】尊敬的顾客您好！即日起非会员只需支付212元即可尊享指定护理一折体验，每月前20位体验顾客加赠精美化妆包1个，10/22-12/31日我和万象城有个约会，万象城全体员工恭候您的体验，竭诚为您的皮肤保驾护航！详询：021-54700816 回T退订',
         ])); */
-        /*     $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             // 'content'     => '【沙驰服饰】“衬”现在，全身心去爱。沙驰衬衫节👔礼献父亲节，充值赠好礼，全场VIP折上8折起，快来表达你对爸爸👨的爱吧😄。退订回T',
-            'content'     => '【钰晰科技】😄您本次登录的验证码为0518，回复QX取消本次登录',
-        ])); */
-        $code = '【钰晰科技】👔👨😄您本次登录的验证码为0518，回复QX取消本次登录';
+            'content'     => '【钰晰科技】👔👨😄😄您本次登录的验证码为0518，回复QX取消本次登录',
+        ]));
+        // $code = '【钰晰科技】👔👨😄您本次登录的验证码为0518，回复QX取消本次登录';
         // $code = mb_convert_encoding('【钰晰科技】😄您本次登录的验证码为0518，回复QX取消本次登录', 'UCS-2', 'UTF-8');
         // $code =iconv("UTF-8","UCS-2",$code);
         // $code =iconv("UCS-2","UTF-8",$code);
@@ -175,6 +175,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                 break;
                         }
                         //通道断口处理
+                        // echo "连接成功";
                         if ($body['Status'] != 0) {
                             exit($error_msg);
                         }
