@@ -86,7 +86,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
             // 'content'     => '【沙驰服饰】“衬”现在，全身心去爱。沙驰衬衫节👔礼献父亲节，充值赠好礼，全场VIP折上8折起，快来表达你对爸爸👨的爱吧😄。退订回T',
             'content'     => '【钰晰科技】😄您本次登录的验证码为0518，回复QX取消本次登录',
         ])); */
-        $code = '【钰晰科技】😄您本次登录的验证码为0518，回复QX取消本次登录';
+        $code = '【钰晰科技】👔👨😄您本次登录的验证码为0518，回复QX取消本次登录';
         // $code = mb_convert_encoding('【钰晰科技】😄您本次登录的验证码为0518，回复QX取消本次登录', 'UCS-2', 'UTF-8');
         // $code =iconv("UTF-8","UCS-2",$code);
         // $code =iconv("UCS-2","UTF-8",$code);
@@ -231,9 +231,11 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                 $error_msg = "其他错误";
                                 break;
                         }
+                        echo $error_msg . "\n";
                         if ($body['Result'] != 0) { //消息发送失败
                             // echo "发送失败" . "\n";
                             $error_msg = "其他错误";
+                           
                         } else {
                         }
                     } else if ($head['Command_Id'] == 0x00000005) { //收到短信下发应答,需回复应答，应答Command_Id = 0x80000005
