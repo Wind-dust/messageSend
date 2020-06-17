@@ -471,11 +471,13 @@ return $result;
 
         foreach ($Mobiles as $key => $value) {
             if (count($Mobiles) > 1 && !in_array($user['id'], [47, 49, 52, 51, 55])) {
-                if (checkMobile(($value))) {
+                if (checkMobile($value) != false) {
                     $effective_mobile[] = $value;
                 }
             } else {
-                $effective_mobile[] = $value;
+                if (checkMobile($value) != false) {
+                    $effective_mobile[] = $value;
+                }
             }
         }
         $send_num = count($effective_mobile);
