@@ -1202,13 +1202,13 @@ return $result;
                         // array_push($task_no, $free_taskno);
                         $send_task['free_trial'] = 2;
                         if ($user['pid'] == 137 || $user['id'] == 110) {
-                            $send_task['yidong_channel_id'] = 85;
-                            $send_task['liantong_channel_id'] = 85;
-                            $send_task['dianxin_channel_id'] = 85;
+                            $send_task['yidong_channel_id'] = 60;
+                            $send_task['liantong_channel_id'] = 62;
+                            $send_task['dianxin_channel_id'] = 61;
                         } elseif ($user['id'] == 134 ) {
-                            $send_task['yidong_channel_id'] = 85;
-                            $send_task['liantong_channel_id'] = 85;
-                            $send_task['dianxin_channel_id'] = 85;
+                            $send_task['yidong_channel_id'] = 60;
+                            $send_task['liantong_channel_id'] = 62;
+                            $send_task['dianxin_channel_id'] = 61;
                         } else {
                             $send_task['yidong_channel_id'] = 60;
                             $send_task['liantong_channel_id'] = 62;
@@ -1223,15 +1223,15 @@ return $result;
                         $send_task['free_trial'] = 2;
                         if ($user['pid'] == 137) {
                           
-                                $send_task['yidong_channel_id'] = 85;
-                                $send_task['liantong_channel_id'] = 85;
-                                $send_task['dianxin_channel_id'] = 85;
+                            $send_task['yidong_channel_id'] = 60;
+                            $send_task['liantong_channel_id'] = 62;
+                            $send_task['dianxin_channel_id'] = 61;
                            
                         } else {
                             if ($user['id'] == 110) {
-                                $send_task['yidong_channel_id'] = 85;
-                                $send_task['liantong_channel_id'] = 85;
-                                $send_task['dianxin_channel_id'] = 85;
+                                $send_task['yidong_channel_id'] = 60;
+                                $send_task['liantong_channel_id'] = 62;
+                                $send_task['dianxin_channel_id'] = 61;
                             }else{
                                 $send_task['yidong_channel_id'] = 60;
                                 $send_task['liantong_channel_id'] = 62;
