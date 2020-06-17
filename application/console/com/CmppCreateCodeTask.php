@@ -8586,7 +8586,7 @@ class CmppCreateCodeTask extends Pzlife
             $receipt_id = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_multimediatask_receipt ORDER BY `id` DESC LIMIT 1  " )[0]['id'];
             $receipt_id++;
             // print_r($receipt_id);die;
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` <> '100181549' AND `create_time` >  " . $tody_time);
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time);
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time;die;
             // $white_send = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `` `create_time` >  ".$tody_time );
             foreach ($sendid as $key => $value) {

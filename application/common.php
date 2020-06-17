@@ -20,6 +20,9 @@ function filtraImage($domain, $image)
  */
 function checkMobile($mobile)
 {
+    if (strlen($mobile) != 11) {
+        return false;
+    }
     if (!empty($mobile) && preg_match('/^1[3-9]{1}\d{9}$/', $mobile)) {
         return true;
     }

@@ -884,7 +884,7 @@ class SflUpload extends Pzlife {
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
-                    continue;
+                    // continue;
                     $err_task_num = [];
                     $send_data    = [];
                     if ($son_path_data !== false) {
@@ -1080,6 +1080,8 @@ class SflUpload extends Pzlife {
                         // print_r($send_data);die;
                         $MMSmessage  = [];
                         $model_check = [];
+                        
+                       
                         if (!empty($send_data)) {
                             foreach ($send_data as $key => $value) {
                                 $txt = [];
@@ -1172,7 +1174,7 @@ class SflUpload extends Pzlife {
                                 }
                             }
                         }
-
+                       
                         // print_r($model_check);
                         if (!empty($file_data)) {
                             foreach ($file_data as $key => $value) {
@@ -1212,7 +1214,6 @@ class SflUpload extends Pzlife {
                                 }
                             }
                         }
-
                         if (!empty($insertMMS)) {
                             $mysql_connect->startTrans();
                             try {
@@ -1223,8 +1224,7 @@ class SflUpload extends Pzlife {
                                 exception($e);
                             }
                         }
-                        // print_r($MMSmessage);
-                        // die;
+                        
                     }
                 } elseif ($value == 'SMS') {
                     $send_data    = [];
@@ -1239,9 +1239,9 @@ class SflUpload extends Pzlife {
                             if (!strpos($svalue,date("Ymd"))) {
                             continue;
                             }
-                            if (strpos($svalue,'2020061510') !== false) {
-                            continue;
-                            }
+                            // if (strpos($svalue,'2020061510') !== false) {
+                            // continue;
+                            // }
                             // '2020060321'
                             /* if (!strpos($svalue, '2020060321')) {
                                 continue;
