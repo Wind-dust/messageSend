@@ -3426,7 +3426,7 @@ class CmppCreateCodeTask extends Pzlife
                             $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . trim($stat) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
                         }
 
-                        print_r($request_url);
+                        // print_r($request_url);
                         sendRequest($request_url);
 
                         usleep(20000);
@@ -7170,7 +7170,7 @@ class CmppCreateCodeTask extends Pzlife
                         }
                     }
 
-                    print_r($all_status);
+                    // print_r($all_status);
                     foreach ($all_status as $all => $status) {
                         $redis->set('index:meassage:calculate:' . $all, json_encode($status));
                     }
