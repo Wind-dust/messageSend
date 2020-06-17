@@ -378,15 +378,16 @@ return $result;
         if ($user['marketing_free_trial'] == 2){
             $data['free_trial'] = 2;
             if ($user['marketing_free_credit'] > 0) {
-                if ($real_num >= $user['marketing_free_credit'] ) {
+                if (count($effective_mobile) >= $user['marketing_free_credit'] ) {
                     $data['free_trial'] = 1;
                 }
             }
            
         }
-        if ($real_num > 100) {
+       
+        /* if ($real_num > 100) {
             $data['free_trial'] = 1;
-        }
+        } */
         if ($data['free_trial'] == 2) {
             // $data['free_trial'] = 2;
             $data['yidong_channel_id'] = 18;
@@ -406,7 +407,9 @@ return $result;
             if (!empty($msg_id)) {
                 return ['code' => '200', 'task_no' => $data['task_no'], 'msg_id' => $msg_id];
             }
-            $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $id, 'send_time' => 0, 'deduct' => $user['market_deduct']]));
+            if ($data['free_trial'] == 2) {
+                $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $id, 'send_time' => 0, 'deduct' => $user['market_deduct']]));
+            }
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
             // exception($e);
