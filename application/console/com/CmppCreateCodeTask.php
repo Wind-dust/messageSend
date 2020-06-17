@@ -4953,7 +4953,9 @@ class CmppCreateCodeTask extends Pzlife
                         $status_message = 'DELIVRD';
                     }
                 }
-
+                if (checkMobile($send_log['mobile']) == false) {
+                    continue;
+                }
                 $data = [
                     'task_id'        => $send_log['mar_task_id'],
                     'mobile'         => $send_log['mobile'],
