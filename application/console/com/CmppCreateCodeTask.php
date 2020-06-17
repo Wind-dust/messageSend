@@ -1226,7 +1226,9 @@ class CmppCreateCodeTask extends Pzlife
                     echo "联通:".count($liantong_mobile);
                     echo "电信:".count($dianxin_mobile);
                     die; */
-                   
+                    print_r($mobile_relation);
+                    print_r($mobile_result);
+                    die;
                     $j = 1;
                     if (!empty($yidong_mobile)) {
                         for($i = 0; $i < count($yidong_mobile); $i++) {
@@ -1248,7 +1250,7 @@ class CmppCreateCodeTask extends Pzlife
                                                     'channel_id'  => $yidong_channel_id,
                                                     'from'        => 'yx_user_multimedia_message',
                                                 ];
-                                                print_r($yidong_mobile[$i]);die;
+                                                
                                                 if (!empty($yidong_channel_template_id)) {
                                                     $sendmessage['template_id'] = $yidong_channel_template_id;
                                                     if (!empty($mobile_relation)) {
@@ -1904,6 +1906,12 @@ class CmppCreateCodeTask extends Pzlife
             $cool_city_mobile = []; //二线城市号码
             $mobile = str_replace('&quot;','',$mobile);
             $mobile_data = explode(',',$mobile);
+            foreach($mobile_data as $key => $value){
+                if (strlen($value) != 11) {
+                    $error_mobile[] = $value;
+                    unset($mobile_data[$key]);
+                }
+            }
             // echo count($mobile_data);die;
             //白名单
             $white_mobiles = [];
@@ -1963,7 +1971,7 @@ class CmppCreateCodeTask extends Pzlife
                         $yidong_mobile[] = $value; 
                     }
                 }
-                
+               
                 //实号
                 $entity_mobile = Db::query("SELECT `mobile` FROM `yx_real_mobile` WHERE mobile IN (".join(',',$remaining_mobile).") GROUP BY `mobile` ");
                 // echo count($entity_mobile);die;
@@ -1992,7 +2000,7 @@ class CmppCreateCodeTask extends Pzlife
                         } */
                         $mobile_info = [];
                         $mobile_info = [
-                            'mobile' => $value,
+                            'mobile' => $value['mobile'],
                             'source' => $newres['source'],
                         ];
                         if (in_array($newres['city_id'],$citys_id)) {
@@ -2008,6 +2016,7 @@ class CmppCreateCodeTask extends Pzlife
                 //未知或者空号
                 $vacant  = array_diff($remaining_mobile,$entity_mobiles);
                 
+
                 //空号检测
                 // print_r($vacant);
                 foreach($vacant as $key => $value){
@@ -2060,9 +2069,6 @@ class CmppCreateCodeTask extends Pzlife
                         //归属地查询 
                     }
                 }
-                // print_r($host_city_mobile);
-                // print_r($cool_city_mobile);
-               
                 //计算实际占比和扣量占比
                 $proportion = bcdiv( count($cool_city_mobile),count($real_send_mobile),2);
                 // print_r($proportion); die;
@@ -2222,7 +2228,6 @@ class CmppCreateCodeTask extends Pzlife
                         // print_r($section_data);die;
                         $deduct_key = array_rand($section_data,ceil($host_proportion/$section));
                         // print_r($deduct_key);die;
-
                             foreach ($section_data as $key => $value) {
                                 if (is_array($deduct_key)) {
                                     if (in_array($key, $deduct_key)) {
