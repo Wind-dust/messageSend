@@ -54,6 +54,39 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
         ];
     }
     
+    function Ucs2Code($str,$encode="UTF-8"){
+
+        $jumpbit=strtoupper($encode)=='GB2312'?2:3;//跳转位数
+        
+        $strlen=strlen($str);//字符串长度
+        
+        $pos=0;//位置
+        
+        $buffer=array();
+        
+        for($pos=0;$pos<$strlen;){
+        
+        if(ord(substr($str,$pos,1))>=0xa1){//0xa1（161）汉字编码开始
+        
+        $tmpChar=substr($str,$pos,$jumpbit);
+        
+        $pos+=$jumpbit;
+        
+        }else{
+        
+        $tmpChar=substr($str,$pos,1);
+        
+        ++$pos;
+        
+        }
+        
+        $buffer[]=bin2hex(iconv("UTF-8","UCS-2",$tmpChar));
+        
+        }
+        
+        return strtoupper(join("",$buffer));
+        
+        }
 
     public function Send($content)
     {
@@ -87,10 +120,9 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
             'content'     => '【钰晰科技】👔👨😄😄您本次登录的验证码为0518，回复QX取消本次登录',
         ]));
         // $code = '【钰晰科技】👔👨😄您本次登录的验证码为0518，回复QX取消本次登录';
-        // $code = mb_convert_encoding('【钰晰科技】😄您本次登录的验证码为0518，回复QX取消本次登录', 'UCS-2', 'UTF-8');
-        // $code =iconv("UTF-8","UCS-2",$code);
-        // $code =iconv("UCS-2","UTF-8",$code);
-        // print_r($code);die;
+        
+        // $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
+       
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/".$content.".log";
         $myfile = fopen($log_path, 'a+');
@@ -477,7 +509,7 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
 
                             $send = $redis->lPop($redisMessageCodeSend);
                             if (!empty($send)) { //正式使用从缓存中读取数据并且有待发送数据
-
+                                $buffer = [];
                                 $send_status = 1;
                                 $send_data = [];
                                 $send_data = json_decode($send, true);
@@ -494,7 +526,11 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                 $num2 = substr($timestring, 8) . $this->combination($i);
                                 // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
                                 // $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
-                                $code = mb_convert_encoding($code, 'UTF-16BE', 'UTF-8');
+                                $code = mb_convert_encoding($code, 'UTF-16', 'UTF-8');
+                                 // $code =iconv("UTF-8","UCS-2",$code);
+                                // $code =iconv("UCS-2","UTF-8",$code);
+                                // $buffer[]=bin2hex($code);
+                                // print_r(strtoupper(join("",$buffer)));die;
                                 // $code =iconv("UTF-8","UCS-2//TRANSLIT",$code);
                                 // iconv("UTF-8","gbk",$code);
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
