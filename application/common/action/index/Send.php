@@ -534,32 +534,32 @@ return $result;
                 $data['liantong_channel_id'] = 62;
                 $data['dianxin_channel_id'] = 61;
             } elseif ($user['id'] == 91) {
-                $data['yidong_channel_id'] = 18;
-                $data['liantong_channel_id'] = 19;
-                $data['dianxin_channel_id'] = 19;
+                $data['yidong_channel_id'] = 60;
+                $data['liantong_channel_id'] = 62;
+                $data['dianxin_channel_id'] = 61;
                 // $data['yidong_channel_id'] = 9;
                 // $data['liantong_channel_id'] = 9;
                 // $data['dianxin_channel_id'] = 9;
             }elseif ($user['id'] == 110) {//快递
-                $data['yidong_channel_id'] = 85;
-                $data['liantong_channel_id'] = 85;
-                $data['dianxin_channel_id'] = 85;
+                $data['yidong_channel_id'] = 60;
+                $data['liantong_channel_id'] = 62;
+                $data['dianxin_channel_id'] = 61;
                 // $data['yidong_channel_id'] = 9;
                 // $data['liantong_channel_id'] = 9;
                 // $data['dianxin_channel_id'] = 9;
             } elseif ($user['pid'] == 137) {
                 if ($user['id'] == 133) {
-                    $data['yidong_channel_id'] = 85;
-                    $data['liantong_channel_id'] = 85;
-                    $data['dianxin_channel_id'] = 85;
+                    $data['yidong_channel_id'] = 60;
+                    $data['liantong_channel_id'] = 62;
+                    $data['dianxin_channel_id'] = 61;
                 } elseif ($user['id'] == 134) {
-                    $data['yidong_channel_id'] = 85;
-                    $data['liantong_channel_id'] = 85;
-                    $data['dianxin_channel_id'] = 85;
+                    $data['yidong_channel_id'] = 60;
+                    $data['liantong_channel_id'] = 62;
+                    $data['dianxin_channel_id'] = 61;
                 } else {
-                    $data['yidong_channel_id'] = 85;
-                    $data['liantong_channel_id'] = 85;
-                    $data['dianxin_channel_id'] = 85;
+                    $data['yidong_channel_id'] = 60;
+                    $data['liantong_channel_id'] = 62;
+                    $data['dianxin_channel_id'] = 61;
                 }
                 // $data['yidong_channel_id'] = 9;
                 // $data['liantong_channel_id'] = 9;
@@ -574,9 +574,9 @@ return $result;
                     $data['liantong_channel_id'] = 19;
                     $data['dianxin_channel_id'] = 19;
                 } else {
-                    $data['yidong_channel_id'] = 85;
-                    $data['liantong_channel_id'] = 85;
-                    $data['dianxin_channel_id'] = 85;
+                    $data['yidong_channel_id'] = 60;
+                    $data['liantong_channel_id'] = 62;
+                    $data['dianxin_channel_id'] = 61;
                 }
             }
         }
