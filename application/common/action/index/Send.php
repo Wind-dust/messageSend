@@ -1174,7 +1174,9 @@ return $result;
                 $send_task['real_num'] =  count($send_data_mobile[$key]);
             }
 
-            $send_task['free_trial'] = 1;
+            if (count($send_data_mobile[$key]) > 10) {
+                $user['free_trial'] = 1;
+            }
             if ($user['free_trial'] == 2) {
                 //短信内容分词
                 $search_analyze = $this->search_analyze($value);
@@ -1188,6 +1190,9 @@ return $result;
                     if (!empty($analyze_value)) {
                         // array_push($trial, $send_task);
                         $send_task['free_trial'] = 1;
+                        $send_task['yidong_channel_id'] = 0;
+                        $send_task['liantong_channel_id'] = 0;
+                        $send_task['dianxin_channel_id'] = 0;
                     } else {
                         // array_push($task_no, $free_taskno);
                         $send_task['free_trial'] = 2;
@@ -1232,6 +1237,11 @@ return $result;
                         // array_push($free_trial, $send_task);
                     }
                 }
+            }else{
+                $send_task['free_trial'] = 1;
+                $send_task['yidong_channel_id'] = 0;
+                $send_task['liantong_channel_id'] = 0;
+                $send_task['dianxin_channel_id'] = 0;
             }
             array_push($trial, $send_task);
             $all_task_no[] = $task_no;
@@ -1446,6 +1456,10 @@ return $result;
                 $real_num += count($send_data_mobile[$key]);
                 $send_task['real_num'] =  count($send_data_mobile[$key]);
             }
+            // echo count($send_data_mobile[$key]);die;
+            if (count($send_data_mobile[$key]) > 10) {
+                $user['marketing_free_trial'] = 1;
+            }
             $send_task['free_trial'] = 1;
             if ($user['marketing_free_trial'] == 2) {
                 //短信内容分词
@@ -1460,6 +1474,9 @@ return $result;
                     if (!empty($analyze_value)) {
                         // array_push($trial, $send_task);
                         $send_task['free_trial'] = 1;
+                        $send_task['yidong_channel_id'] = 0;
+                        $send_task['liantong_channel_id'] = 0;
+                        $send_task['dianxin_channel_id'] = 0;
                     } else {
                         // array_push($task_no, $free_taskno);
                         $send_task['free_trial'] = 2;
@@ -1491,6 +1508,11 @@ return $result;
                         // array_push($free_trial, $send_task);
                     }
                 }
+            }else{
+                $send_task['free_trial'] = 1;
+                $send_task['yidong_channel_id'] = 0;
+                $send_task['liantong_channel_id'] = 0;
+                $send_task['dianxin_channel_id'] = 0;
             }
             array_push($trial, $send_task);
             $all_task_no[] = $task_no;
