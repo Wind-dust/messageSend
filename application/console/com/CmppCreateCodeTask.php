@@ -1057,7 +1057,7 @@ class CmppCreateCodeTask extends Pzlife
         //  $send = $this->redis->rPush('index:meassage:marketingtiming:sendtask',json_encode(['id' => 34388,'send_time' => 1588903200]));
         // echo time() -1576290017;die;
         while (true) {
-            echo date('Y-m-d H:i:s');
+            // echo date('Y-m-d H:i:s');
             echo "\n";
             $j = 1;
 
@@ -3315,7 +3315,7 @@ class CmppCreateCodeTask extends Pzlife
                         $request_url = "http://116.228.60.189:15901/rtreceive?";
                         $request_url .= 'task_no=' . $task[0]['task_no'] . "&status_message=" . $send_log['Stat'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['Submit_time'];
                         sendRequest($request_url);
-                        print_r($request_url);
+                        // print_r($request_url);
                     }
                     if ($channel['business_id'] == 5) { //营销
                         Db::table('yx_user_send_task')->where('id', $task[0]['id'])->update(['real_message' => $send_log['Stat'], 'status_message' => $send_log['Stat']]);
@@ -3860,7 +3860,7 @@ class CmppCreateCodeTask extends Pzlife
                         $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . trim($send_log['Stat']) . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
                     }
 
-                    print_r($request_url);
+                    // print_r($request_url);
                     // sendRequest($request_url);
 
                     usleep(20000);
