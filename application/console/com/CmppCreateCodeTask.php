@@ -285,11 +285,10 @@ class CmppCreateCodeTask extends Pzlife
         /* 
                                     1321785 1322036
                                     */
-
         // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_task WHERE  `id` > 167001  ");
+        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_task WHERE  `id` >= 168180  ");
         foreach ($task_id as $key => $value) {
-            $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0,'deduct' => 0]));
+            $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0,'deduct' => 0.3]));
             // usleep(50000);
         }
     }
@@ -2794,7 +2793,7 @@ class CmppCreateCodeTask extends Pzlife
             } catch (\Exception $e) {
                 $this->redis->rpush('index:meassage:code:send' . ":" . 85, json_encode([
                     'mobile'  => 15201926171,
-                    'content' => "【钰晰科技】创建任务功能出现错误，请查看并解决！！！",
+                    'content' => "【钰晰科技】创建任务功能出现错误，请查看并解决！！！时间".date("Y-m-d H:i:s",time())
                 ])); //三体营销通道
                 exception($e);
             }
@@ -8027,14 +8026,14 @@ class CmppCreateCodeTask extends Pzlife
         ];
         // echo "SELECT * FROM yx_sfl_send_task WHERE `mobile` IN (".join(',',$white_list).") ";die;
         // $tody_time = 1590645600;
-        // $tody_time = strtotime(date("Ymd", time()));
-        $tody_time = 1592280000;
+        $tody_time = strtotime(date("Ymd", time()));
+        // $tody_time = 1592280000;
         try {
             $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84]);
             /* $where = [];
             $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
             $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100181606' AND `create_time` >  " . $tody_time);
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` <> '100181606' AND `create_time` >  " . $tody_time);
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100180594' AND `create_time` > 1591330358 ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100180528' AND `create_time` >  " . $tody_time;die;
             foreach ($sendid as $key => $value) {
