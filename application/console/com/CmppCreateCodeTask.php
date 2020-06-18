@@ -286,9 +286,9 @@ class CmppCreateCodeTask extends Pzlife
                                     1321785 1322036
                                     */
         // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_task WHERE  `id` >= 168180  ");
+        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_task WHERE  `id` >= 168502  ");
         foreach ($task_id as $key => $value) {
-            $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0,'deduct' => 0.3]));
+            $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0,'deduct' => 10]));
             // usleep(50000);
         }
     }
@@ -1874,7 +1874,7 @@ class CmppCreateCodeTask extends Pzlife
                                     */
 
         // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_code_task WHERE  `id` >= 1321785 limit 69");
+        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_code_task WHERE  `id` >= 168467 limit 69");
         foreach ($task_id as $key => $value) {
             if ($value['uid'] == 91) {
                 $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value['id'], 'deduct' => 50]));
@@ -8027,13 +8027,13 @@ class CmppCreateCodeTask extends Pzlife
         // echo "SELECT * FROM yx_sfl_send_task WHERE `mobile` IN (".join(',',$white_list).") ";die;
         // $tody_time = 1590645600;
         $tody_time = strtotime(date("Ymd", time()));
-        // $tody_time = 1592280000;
+        $tody_time = 1592478000;
         try {
-            // $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84]);
+            $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84]);
             /* $where = [];
             $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
             $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100181515' AND `create_time` >  '" . $tody_time ."' ORDER BY `id` DESC LIMIT 64374");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` IN ('100181602','100181603','100181604') AND `create_time` >  '" . $tody_time ."' ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100181593' AND `create_time` >  " . $tody_time;die;
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100180594' AND `create_time` > 1591330358 ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100180528' AND `create_time` >  " . $tody_time;die;
@@ -8044,7 +8044,7 @@ class CmppCreateCodeTask extends Pzlife
             exception($th);
         }
         // die;
-        $deduct = 1; //1扣量,2不扣
+        $deduct = 2; //1扣量,2不扣
         $rate = 50;
         
         $ids = [];
