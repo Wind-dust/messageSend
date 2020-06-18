@@ -902,6 +902,9 @@ class SflUpload extends Pzlife {
                             if (!strpos($svalue, date("Ymd"))) {
                                 continue;
                             }
+                             if (strpos($svalue,'2020061810') !== false) {
+                                continue;
+                            }
                             $file_info = explode('.', $svalue);
                             if ($file_info[1] == 'zip') { //需要解压
                                 //开始解压
@@ -1227,6 +1230,7 @@ class SflUpload extends Pzlife {
                         
                     }
                 } elseif ($value == 'SMS') {
+                    continue;
                     $send_data    = [];
                     $SMS_model    = [];
                     $SMSmessage   = [];
