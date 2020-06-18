@@ -8043,6 +8043,7 @@ class CmppCreateCodeTask extends Pzlife
         } catch (\Exception $th) {
             exception($th);
         }
+        die;
         $deduct = 1; //1扣量,2不扣
         $rate = 50;
         
