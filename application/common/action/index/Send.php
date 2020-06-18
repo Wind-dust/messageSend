@@ -580,6 +580,10 @@ return $result;
                 }
             }
         }
+        if ($data['free_trial'] == 1) {
+            $to = '2947784567@qq.com';
+            $subject = '有新的营销短信需要审核';
+        }
         if (!empty($msg_id)) {
             $data['send_msg_id'] = $msg_id;
         }
