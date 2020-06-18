@@ -56,6 +56,21 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
 
     public function Send($content)
     {
+         $code = '【沙驰服饰】“衬”现在，全身心去爱。沙驰衬衫节👔礼献父亲节，充值赠好礼，全场VIP折上8折起，快来表达你对爸爸👨的爱吧😄。退订回T';
+        // $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
+        $code = utf8_encode($code);
+        echo $code;
+        echo "\n";
+       
+        $code = iconv("UTF-8","UCS-2",$code);
+        echo "UTF-8转UCS-2后编码:\n";
+        echo $code;
+        echo "\n";
+        // $code = mb_convert_encoding($code, 'UTF-8', 'UCS-2');
+        $code = iconv('UCS-2', 'UTF-8', $code);
+        $code = utf8_decode($code);
+        echo "UCS-2反转UTF-8后编码:".$code;
+        die;
         // $this->clientSocketInit();
         $redis = Phpredis::getConn();
         date_default_timezone_set('PRC');
@@ -82,9 +97,9 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             // 'content'     => '【沙驰服饰】“衬”现在，全身心去爱。沙驰衬衫节👔礼献父亲节，充值赠好礼，全场VIP折上8折起，快来表达你对爸爸👨的爱吧😄。退订回T',
-            'content'     => '【钰晰科技】😄您本次登录的验证码为0518，回复QX取消本次登录',
+            'content'     => '【钰晰科技】😄您本次登录的验证码为0518👨，👔回复QX取消本次登录',
         ]));
-
+       
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/".$content.".log";
         $myfile = fopen($log_path, 'a+');
@@ -478,13 +493,15 @@ class CmppMiaoXinYiDongBusiness extends Pzlife
                                 $txt_len  = 140;
                                 $max_len  = $txt_len - $txt_head;
                                 $code = $send_data['content']; //带签名
+                                $code = utf8_encode($code);
                                 $uer_num    = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
                                 $timestring = time();
                                 // echo "发送时间：" . date("Y-m-d H:i:s", time()) . "\n";
                                 $num1 = substr($timestring, 0, 8);
                                 $num2 = substr($timestring, 8) . $this->combination($i);
                                 // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
-                                $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
+                                // $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
+                                $code = iconv("UTF-8","UCS-2",$code);
                                 // iconv("UTF-8","gbk",$code);
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
                                 // // print_r($code);die;
