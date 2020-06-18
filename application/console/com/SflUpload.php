@@ -884,7 +884,7 @@ class SflUpload extends Pzlife {
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
-                    continue;
+                    // continue;
                     $err_task_num = [];
                     $send_data    = [];
                     if ($son_path_data !== false) {
@@ -1056,7 +1056,7 @@ class SflUpload extends Pzlife {
                                 ];
                                 $fram_key                 = explode('.', $fvalue[4]);
                                 $sfl_SMS_fram             = $all_models[$fram_key[0]];
-                                $sfl_model['title']       = $sfl_SMS_fram['title'];
+                                $sfl_model['title']       = "来自【丝芙兰】：".$sfl_SMS_fram['title'];
                                 $sfl_model['create_time'] = time();
                                 unset($sfl_SMS_fram['title']);
                                 if ($mysql_connect->query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
@@ -1530,9 +1530,9 @@ class SflUpload extends Pzlife {
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
 
-                            if (!strpos($svalue, date("Ymd"))) {
+                            /* if (!strpos($svalue, date("Ymd"))) {
                                 continue;
-                            }
+                            } */
                             $file_info = explode('.', $svalue);
                             if ($file_info[1] == 'zip') { //需要解压
                                 //开始解压
@@ -1687,7 +1687,7 @@ class SflUpload extends Pzlife {
                                 ];
                                 $fram_key                 = explode('.', $fvalue[4]);
                                 $sfl_SMS_fram             = $all_models[$fram_key[0]];
-                                $sfl_model['title']       = $sfl_SMS_fram['title'];
+                                $sfl_model['title']       = "来自【丝芙兰】：".$sfl_SMS_fram['title'];
                                 $sfl_model['create_time'] = time();
                                 unset($sfl_SMS_fram['title']);
                                 if ($mysql_connect->query("SELECT * FROM yx_sfl_multimedia_template WHERE `sfl_model_id` = " . $fvalue[3])) {
