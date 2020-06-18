@@ -498,7 +498,7 @@ class Administrator extends CommonIndex
                 if (isset($usertask['appointment_time']) && $usertask['appointment_time'] > 0) {
                     $res = $this->redis->rpush("index:meassage:marketingtiming:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => $usertask['appointment_time'],'deduct' => $user['market_deduct']])); //定时
                 } else {
-                    $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => 0])); //非定时
+                    $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => 0,'deduct' => $user['market_deduct']])); //非定时
                 }
                 // marketing
             }
