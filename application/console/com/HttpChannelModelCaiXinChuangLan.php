@@ -22,7 +22,7 @@ class HttpChannelModelCaiXinChuangLan extends Pzlife
             'send_var_api'    => 'http://caixin.253.com/open/sendVarByTemplate', //模板变量发送地址
             'send_model_api'    => 'http://caixin.253.com/open/sendByTemplate', //模板非变量发送地址
             'call_api'    => 'http://api.1cloudsp.com/report/up', //上行地址
-            'call_back'    => 'http://sendapidev.shyuxi.com/index/send/chuangLanMmsModelCallBack', //回执回调地址
+            'call_back'    => 'http://sendapidev.shyuxi.com/index/send/chuangLanMmsCallBack', //回执回调地址
             'overage_api' => '', //余额地址
             // 'receive_api' => 'http://api.1cloudsp.com/report/status', //回执，报告
         ];
