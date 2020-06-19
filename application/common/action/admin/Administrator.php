@@ -867,7 +867,7 @@ class Administrator extends CommonIndex
             }else{
                 return ['code' => '3006','msg' => '该通道报备失败'];
             }
-        }elseif ($channel_id == 59) {
+        }elseif ($channel_id == 103) {
             $report_api = 'http://caixin.253.com/open/saveTemplate';
             $data = [];
            

@@ -426,6 +426,8 @@ return $result;
 
     public function getSmsBuiness($Username, $Password, $Content, $Mobiles, $ip, $signature_id = '', $develop_no = '', $msg_id = '')
     {
+        // log::write("系统日志!",'error');
+        // log::write("系统日志!",'info');
         $this->redis = Phpredis::getConn();
         // print_r($this->redis);
         // die;
@@ -443,7 +445,7 @@ return $result;
         // $prefix = substr($Mobiles, 0, 7);
         // $res    = DbProvinces::getNumberSource(['mobile' => $prefix], 'source,province_id,province', true);
 
-        $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
+        // $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
 
         // print_r($res);die;
         $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 6], 'id,num_balance', true);
@@ -580,10 +582,7 @@ return $result;
                 }
             }
         }
-        if ($data['free_trial'] == 1) {
-            $to = '2947784567@qq.com';
-            $subject = '有新的营销短信需要审核';
-        }
+       
         if (!empty($msg_id)) {
             $data['send_msg_id'] = $msg_id;
         }
@@ -1693,7 +1692,7 @@ return $result;
         }
     }
 
-    public function submitBatchCustomMultimediaMessage($appid, $appkey, $template_id, $connect, $ip, $signature_id = '')
+    public function submitBatchCustomMultimediaMessage($appid, $appkey, $template_id, $connect, $ip,$msg_id = '', $signature_id = '')
     {
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
@@ -1826,7 +1825,9 @@ return $result;
             'source'         => $ip,
             'send_num'       => count($send_data_mobile),
         ];
-
+        if (!empty($msg_id)) {
+            $send_task['send_msg_id'] = $msg_id;
+        }
         // print_r($template['multimedia_frame']);die;
         $send_task['free_trial'] = 1;
         Db::startTrans();
@@ -1856,10 +1857,13 @@ return $result;
             }
             */
             Db::commit();
+            if (!empty($msg_id)) {
+                return ['code' => '200', 'task_no' => $task_no, 'msg_id' => $msg_id,'beyond' => join(';', $beyond)];
+            }
             return ['code' => '200', 'task_no' => $task_no, 'beyond' => join(';', $beyond)];
         } catch (\Exception $e) {
             Db::rollback();
-            exception($e);
+            // exception($e);
             return ['code' => '3009'];
         }
     }
@@ -1917,7 +1921,7 @@ return $result;
         return ['code' => '200', 'upGoing' => $result];
     }
 
-    public function submitTemplateMultimediaMessage($appid, $appkey, $template_id, $mobile_content, $ip)
+    public function submitTemplateMultimediaMessage($appid, $appkey, $template_id, $mobile_content, $ip, $msg_id = '')
     {
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
@@ -1966,7 +1970,9 @@ return $result;
             'free_trial'     => 1,
             'template_id'     => $template_id,
         ];
-
+        if (!empty($msg_id)) {
+            $SmsMultimediaMessageTask['send_msg_id'] = $msg_id;
+        }
         Db::startTrans();
         try {
             DbAdministrator::modifyBalance($user_equities['id'], $send_num, 'dec');
@@ -1979,6 +1985,9 @@ return $result;
                 }
             }
             Db::commit();
+            if (!empty($msg_id)) {
+                return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no'], 'msg_id' => $msg_id];
+            }
             return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no']];
         } catch (\Exception $e) {
             Db::rollback();

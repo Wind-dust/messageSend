@@ -352,39 +352,41 @@ class Send extends MyController
     public function getSmsBuiness()
     {
         $appid   = trim($this->request->post('appid')); //登录名
-        $appkey  = trim($this->request->post('appkey')); //登陆密码
-        $Content = trim($this->request->post('content')); //短信内容
-        $Mobile  = trim($this->request->post('mobile')); //接收手机号码
-        $develop_no  = trim($this->request->post('develop_no')); //拓展码号
-        $signature_id  = trim($this->request->post('signature_id')); //接收手机号码
-        $ip      = trim($this->request->ip());
-        $Mobiles = explode(',', $Mobile);
-
-        // print_r($Content);die;
-        // echo phpinfo();die;
-        if (empty($appid)) {
-            return ['code' => '3000'];
-        }
-        if (empty($appkey)) {
-            return ['code' => '3000'];
-        }
-        // if (empty($Mobile) || checkMobile($Mobile) === false) {
-        //     return ['code'=>'3001'];
-        // }
-        if (empty($Content) || mb_strlen($Content) > 500) {
-            return ['code' => '3002'];
-        }
-        // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
-        if (empty($signature_id)) {
-            if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 20) {
-                return ['code' => '3003'];
+            $appkey  = trim($this->request->post('appkey')); //登陆密码
+            $Content = trim($this->request->post('content')); //短信内容
+            $Mobile  = trim($this->request->post('mobile')); //接收手机号码
+            $develop_no  = trim($this->request->post('develop_no')); //拓展码号
+            $signature_id  = trim($this->request->post('signature_id')); //接收手机号码
+            $ip      = trim($this->request->ip());
+            $Mobiles = explode(',', $Mobile);
+           
+            // print_r($Content);die;
+            // echo phpinfo();die;
+            if (empty($appid)) {
+                return ['code' => '3000'];
             }
-        }
-        if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
-            return ['code' => '3011'];
-        }
-        $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id, $develop_no);
-        return $result;
+            if (empty($appkey)) {
+                return ['code' => '3000'];
+            }
+            // if (empty($Mobile) || checkMobile($Mobile) === false) {
+            //     return ['code'=>'3001'];
+            // }
+            if (empty($Content) || mb_strlen($Content) > 500) {
+                return ['code' => '3002'];
+            }
+            // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
+            if (empty($signature_id)) {
+                if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 20) {
+                    return ['code' => '3003'];
+                }
+            }
+            if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
+                return ['code' => '3011'];
+            }
+            $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id, $develop_no);
+            
+            return $result;
+       
     }
 
     /**
@@ -406,40 +408,42 @@ class Send extends MyController
     public function getSmsBuinessMsgId()
     {
         $appid   = trim($this->request->post('appid')); //登录名
-        $appkey  = trim($this->request->post('appkey')); //登陆密码
-        $Content = trim($this->request->post('content')); //短信内容
-        $Mobile  = trim($this->request->post('mobile')); //接收手机号码
-        $develop_no  = trim($this->request->post('develop_no')); //拓展码号
-        $signature_id  = trim($this->request->post('signature_id')); //接收手机号码
-        $msg_id  = trim($this->request->post('msg_id')); //接收手机号码
-        $ip      = trim($this->request->ip());
-        $Mobiles = explode(',', $Mobile);
+            $appkey  = trim($this->request->post('appkey')); //登陆密码
+            $Content = trim($this->request->post('content')); //短信内容
+            $Mobile  = trim($this->request->post('mobile')); //接收手机号码
+            $develop_no  = trim($this->request->post('develop_no')); //拓展码号
+            $signature_id  = trim($this->request->post('signature_id')); //接收手机号码
+            $msg_id  = trim($this->request->post('msg_id')); //接收手机号码
+            $ip      = trim($this->request->ip());
+            $Mobiles = explode(',', $Mobile);
 
-        // print_r($Content);die;
-        // echo phpinfo();die;
-        if (empty($appid)) {
-            return ['code' => '3000'];
-        }
-        if (empty($appkey)) {
-            return ['code' => '3000'];
-        }
-        // if (empty($Mobile) || checkMobile($Mobile) === false) {
-        //     return ['code'=>'3001'];
-        // }
-        if (empty($Content) || mb_strlen($Content) > 500) {
-            return ['code' => '3002'];
-        }
-        // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
-        if (empty($signature_id)) {
-            if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 20) {
-                return ['code' => '3003'];
+            // print_r($Content);die;
+            // echo phpinfo();die;
+            if (empty($appid)) {
+                return ['code' => '3000'];
             }
-        }
-        if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
-            return ['code' => '3011'];
-        }
-        $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id, $develop_no,$msg_id);
-        return $result;
+            if (empty($appkey)) {
+                return ['code' => '3000'];
+            }
+            // if (empty($Mobile) || checkMobile($Mobile) === false) {
+            //     return ['code'=>'3001'];
+            // }
+            if (empty($Content) || mb_strlen($Content) > 500) {
+                return ['code' => '3002'];
+            }
+            // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
+            if (empty($signature_id)) {
+                if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 20) {
+                    return ['code' => '3003'];
+                }
+            }
+            if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
+                return ['code' => '3011'];
+            }
+            $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id, $develop_no,$msg_id);
+            Log::write(json_encode($result),'info');
+            return $result;
+        
     }
 
     /**
@@ -1105,7 +1109,8 @@ class Send extends MyController
      * @apiName          submitBatchCustomMultimediaMessage
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
-     * @apiParam (入参) {String} template_id template_id报备的template_id 内容替换为模板中文字内容变量
+     * @apiParam (入参) {String} [msg_id] 客户提交msg_id非必填
+     * @apiParam (入参) {String} template_id 彩信模板报备的template_id 内容替换为模板中文字内容变量
      * @apiParam (入参) {String} connect template组合方式：变量,变量:手机号;变量,变量:手机号;变量:手机号;
      * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:单批次手机号码为空 / 3003:send_time发送时间格式错误 / 3004:预约发送时间小于当前时间 / 3005:该账户没有此项服务 / 3006:余额不足 / 3007:title 短信标题不能为空 / 3008:无效的图片 / 3009:彩信文件长度超过100KB或内容为空 / 3010 图片未上传过 / 3011:服务器错误
      * @apiSampleRequest /index/send/submitBatchCustomMultimediaMessage
@@ -1119,6 +1124,7 @@ class Send extends MyController
         $template_id  = trim($this->request->post('template_id'));
         // $signature_id  = trim($this->request->post('signature_id'));
         $connect  = trim($this->request->post('connect'));
+        $msg_id  = trim($this->request->post('msg_id'));
         if (empty($appid)) {
             return ['code' => '3000'];
         }
@@ -1132,7 +1138,7 @@ class Send extends MyController
             return ['code' => '3003'];
         }
         $ip       = trim($this->request->ip());
-        $result = $this->app->send->submitBatchCustomMultimediaMessage($appid, $appkey, $template_id, $connect, $ip);
+        $result = $this->app->send->submitBatchCustomMultimediaMessage($appid, $appkey, $template_id, $connect, $ip, $msg_id);
         return $result;
     }
 
@@ -1143,6 +1149,7 @@ class Send extends MyController
      * @apiName          submitTemplateMultimediaMessage
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {String} [msg_id] 客户提交msg_id非必填
      * @apiParam (入参) {String} template_id 通过接口或者平台报备的template_id
      * @apiParam (入参) {String} mobile_content 电话号码集合,多个用','，分开，最多支持50000
      * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 / 3001:template_id为空 / 3002:手机号码为空
@@ -1156,6 +1163,7 @@ class Send extends MyController
         $template_id  = trim($this->request->post('template_id'));
         $mobile_content = trim($this->request->post('mobile_content')); //接收手机号码
         $ip             = trim($this->request->ip());
+        $msg_id  = trim($this->request->post('msg_id'));
         $mobile_content = explode(',', $mobile_content); //短信数组
         if (empty($appid)) {
             return ['code' => '3000'];
@@ -1169,12 +1177,12 @@ class Send extends MyController
         if (empty($mobile_content)) {
             return ['code' => '3002'];
         }
-        $result = $this->app->send->submitTemplateMultimediaMessage($appid, $appkey, $template_id, $mobile_content, $ip);
+        $result = $this->app->send->submitTemplateMultimediaMessage($appid, $appkey, $template_id, $mobile_content, $ip, $msg_id);
         return $result;
     }
 
     /**
-     * @api              {post} / 行业短信日志查询
+     * @api              {post} / 彩信回执
      * @apiDescription   multimediaReceive
      * @apiGroup         index_send
      * @apiName          multimediaReceive
