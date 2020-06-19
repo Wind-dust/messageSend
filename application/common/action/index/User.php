@@ -212,7 +212,8 @@ class User extends CommonIndex
             if (empty($res)) {
                 return ['code' => '3000'];
             }
-            $res['uid'] = enUid($res['id']);
+            // $res['uid'] = enUid($res['id']);
+            $res['uid'] = $res['id'];
             unset($res['id']);
             $this->saveUser($uid, $res);
         }
