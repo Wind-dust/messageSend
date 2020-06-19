@@ -286,7 +286,7 @@ class CmppCreateCodeTask extends Pzlife
                                     1321785 1322036
                                     */
         // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_task WHERE  `id` >= 168502  ");
+        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_task WHERE  `id` >= 168848  ");
         foreach ($task_id as $key => $value) {
             $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0,'deduct' => 10]));
             // usleep(50000);
@@ -1097,9 +1097,9 @@ class CmppCreateCodeTask extends Pzlife
                                     */
 
         // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_multimedia_message WHERE  `id` > 90303  ");
+        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_multimedia_message WHERE  `id` = 110232  ");
         foreach ($task_id as $key => $value) {
-            $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $value['id'], 'deduct' => 10]));
+            $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $value['id'], 'deduct' => 0]));
         }
     }
 
@@ -1116,7 +1116,7 @@ class CmppCreateCodeTask extends Pzlife
         // $this->redis->rPush('index:meassage:multimediamessage:sendtask', 22886);
         // exit();
         // echo time() -1574906657;die;
-        // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' =>90305, 'deduct' => 10]));
+        // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' =>110232, 'deduct' => 10]));
         while (true) {
             try {
                 $j = 1;
@@ -1893,6 +1893,7 @@ class CmppCreateCodeTask extends Pzlife
     /* 第一版本号码清洗 */
     public function mobilesFiltrate($mobile,$uid,$deduct){
         try {
+            $deduct = 0;
             $error_mobile = [];//错号或者黑名单
             $real_send_mobile = []; //实际发送号码
             $deduct_mobile = []; //扣量号码
@@ -1918,7 +1919,7 @@ class CmppCreateCodeTask extends Pzlife
                 }
             }
             $mobile = join(',',$mobile_data);
-            // echo count($mobile_data);die;
+           
             //白名单
             $white_mobiles = [];
             $white_mobile = Db::query("SELECT `mobile` FROM `yx_whitelist` WHERE mobile IN (".$mobile.") GROUP BY `mobile` ");
@@ -1939,7 +1940,7 @@ class CmppCreateCodeTask extends Pzlife
             //去除黑名单后实际有效号码
             $real_send_mobile = array_diff($mobile_data,$error_mobile);
             //扣量
-            
+           
             if ($deduct > 0) {
                 //热门城市ID 
                 $province = Db::query("SELECT `id` FROM yx_areas WHERE `level` = 1 ");
@@ -1949,6 +1950,7 @@ class CmppCreateCodeTask extends Pzlife
                     $citys_id[] = $city[0]['id'];
                 }
                 $citys_id[] = 2100;
+                echo count($mobile_data);die;
                 // $cityname =  Db::query("SELECT `id`,`area_name` FROM yx_areas WHERE `id` IN  (".join(',',$citys_id) .")");
                 // print_r($cityname);die;
                 //过空号
