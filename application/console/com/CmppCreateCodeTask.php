@@ -1950,7 +1950,7 @@ class CmppCreateCodeTask extends Pzlife
                     $citys_id[] = $city[0]['id'];
                 }
                 $citys_id[] = 2100;
-                echo count($mobile_data);die;
+                // echo count($mobile_data);die;
                 // $cityname =  Db::query("SELECT `id`,`area_name` FROM yx_areas WHERE `id` IN  (".join(',',$citys_id) .")");
                 // print_r($cityname);die;
                 //过空号
