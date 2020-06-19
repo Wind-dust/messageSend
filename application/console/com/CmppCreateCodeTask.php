@@ -1885,6 +1885,7 @@ class CmppCreateCodeTask extends Pzlife
     }
 
     public function deDuctTest($id){
+        $this->redis = Phpredis::getConn();
         $sendTask = $this->getSendTask($id);
         $mobile_result = $this-> mobilesFiltrate($sendTask['mobile_content'], $sendTask['uid'],10);
         print_r($mobile_result);die;
@@ -1940,7 +1941,7 @@ class CmppCreateCodeTask extends Pzlife
             //去除黑名单后实际有效号码
             $real_send_mobile = array_diff($mobile_data,$error_mobile);
             //扣量
-           
+            
             if ($deduct > 0) {
                 //热门城市ID 
                 $province = Db::query("SELECT `id` FROM yx_areas WHERE `level` = 1 ");
@@ -1958,12 +1959,15 @@ class CmppCreateCodeTask extends Pzlife
                 // echo count($real_send_mobile);die;
                 // print_r($white_mobile);die;
                 $remaining_mobile = array_diff($real_send_mobile,$white_mobiles);
-                
+               
                 //白名单发送
                 foreach($white_mobiles as $key => $value){
                     $prefix = substr(trim($value), 0, 7);
+                    
                     $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                     $newres = array_shift($res);
+                    // $newres = $this->redis->hget('index:mobile:source',$prefix);
+                    // $newres = json_decode($newres,true);
                     if ($newres) {
                         if ($newres['source'] == 1) {//移动
                             // $channel_id = $yidong_channel_id;
@@ -1992,6 +1996,8 @@ class CmppCreateCodeTask extends Pzlife
                         $prefix = substr(trim($value['mobile']), 0, 7);
                         $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                         $newres = array_shift($res);
+                        // $newres = $this->redis->hget('index:mobile:source',$prefix);
+                        // $newres = json_decode($newres,true);
                         /* if ($newres) {
                             if ($newres['source'] == 1) {//移动
                                 // $channel_id = $yidong_channel_id;
@@ -2023,8 +2029,9 @@ class CmppCreateCodeTask extends Pzlife
                 }
                 //未知或者空号
                 $vacant  = array_diff($remaining_mobile,$entity_mobiles);
-                
-
+                // echo count($vacant);
+                // die;
+               
                 //空号检测
                 // print_r($vacant);
                 foreach($vacant as $key => $value){
@@ -2309,6 +2316,23 @@ class CmppCreateCodeTask extends Pzlife
         }
        
 
+    }
+
+    public function setMobileSource(){
+        $this->redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $ids = Db::query("SELECT `id` FROM yx_number_source");
+        foreach($ids as $key => $value){
+            $source = Db::query("SELECT `mobile`,`source`,`province_id`,`city_id` FROM yx_number_source WHERE `id` = ".$value['id'])[0];
+            // print_r($source);die;
+            $mobile_source = [];
+            $mobile_source = [
+                'source' => $source['source'],
+                'province_id' => $source['province_id'],
+                'city_id' => $source['city_id'],
+            ];
+            $this->redis->hset("index:mobile:source",$source['mobile'],json_encode($mobile_source));
+        }
     }
 
     //书写行业通知任务日志并写入通道
@@ -8601,7 +8625,7 @@ class CmppCreateCodeTask extends Pzlife
             $receipt_id = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_multimediatask_receipt ORDER BY `id` DESC LIMIT 1  " )[0]['id'];
             $receipt_id++;
             // print_r($receipt_id);die;
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` IN('100177398','100181563','100181556','100181558')  AND `create_time` >  " . $tody_time);
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` IN('100181722','100181717','100181712')  AND `create_time` >  " . $tody_time);
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` IN('100177398','100181563','100181556','100181558')  AND `create_time` >  " . $tody_time;die;
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time;die;
             // $white_send = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `` `create_time` >  ".$tody_time );
