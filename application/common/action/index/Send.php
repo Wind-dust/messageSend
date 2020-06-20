@@ -532,9 +532,9 @@ return $result;
         if ($data['free_trial'] == 2) {
             // $data['free_trial'] = 2;
             if ($user['pid'] == 10) {
-                $data['yidong_channel_id'] = 85;
-                $data['liantong_channel_id'] = 85;
-                $data['dianxin_channel_id'] = 85;
+                $data['yidong_channel_id'] = 60;
+                $data['liantong_channel_id'] = 62;
+                $data['dianxin_channel_id'] = 61;
             } elseif ($user['id'] == 91) {
                 $data['yidong_channel_id'] = 18;
                 $data['liantong_channel_id'] = 19;
@@ -551,34 +551,34 @@ return $result;
                 // $data['dianxin_channel_id'] = 9;
             } elseif ($user['pid'] == 137) {
                 if ($user['id'] == 133) {
-                    $data['yidong_channel_id'] = 85;
-                    $data['liantong_channel_id'] = 85;
-                    $data['dianxin_channel_id'] = 85;
+                    $data['yidong_channel_id'] = 60;
+                $data['liantong_channel_id'] = 62;
+                $data['dianxin_channel_id'] = 61;
                 } elseif ($user['id'] == 134) {
-                    $data['yidong_channel_id'] = 85;
-                    $data['liantong_channel_id'] = 85;
-                    $data['dianxin_channel_id'] = 85;
+                    $data['yidong_channel_id'] = 60;
+                    $data['liantong_channel_id'] = 62;
+                    $data['dianxin_channel_id'] = 61;
                 } else {
-                    $data['yidong_channel_id'] = 85;
-                    $data['liantong_channel_id'] = 85;
-                    $data['dianxin_channel_id'] = 85;
+                    $data['yidong_channel_id'] = 60;
+                $data['liantong_channel_id'] = 62;
+                $data['dianxin_channel_id'] = 61;
                 }
                 // $data['yidong_channel_id'] = 9;
                 // $data['liantong_channel_id'] = 9;
                 // $data['dianxin_channel_id'] = 9;
             } else {
                 if (strpos($Content, '亲爱的美田会员') !== false) {
-                    $data['yidong_channel_id'] = 18;
-                    $data['liantong_channel_id'] = 19;
-                    $data['dianxin_channel_id'] = 19;
+                    $data['yidong_channel_id'] = 60;
+                    $data['liantong_channel_id'] = 62;
+                    $data['dianxin_channel_id'] = 61;
                 } elseif (strpos($Content, '问卷') !== false) {
-                    $data['yidong_channel_id'] = 18;
-                    $data['liantong_channel_id'] = 19;
-                    $data['dianxin_channel_id'] = 19;
+                    $data['yidong_channel_id'] = 60;
+                    $data['liantong_channel_id'] = 62;
+                    $data['dianxin_channel_id'] = 61;
                 } else {
-                    $data['yidong_channel_id'] = 85;
-                    $data['liantong_channel_id'] = 85;
-                    $data['dianxin_channel_id'] = 85;
+                    $data['yidong_channel_id'] = 60;
+                $data['liantong_channel_id'] = 62;
+                $data['dianxin_channel_id'] = 61;
                 }
             }
         }
