@@ -902,9 +902,9 @@ class SflUpload extends Pzlife {
                             if (!strpos($svalue, date("Ymd"))) {
                                 continue;
                             }
-                             if (strpos($svalue,'2020061810') !== false) {
+                            /*  if (strpos($svalue,'2020061810') !== false) {
                                 continue;
-                            }
+                            } */
                             $file_info = explode('.', $svalue);
                             if ($file_info[1] == 'zip') { //需要解压
                                 //开始解压
@@ -1238,15 +1238,15 @@ class SflUpload extends Pzlife {
                     $err_task_num = [];
                     if ($son_path_data !== false) {
                         foreach ($son_path_data as $skey => $svalue) {
-                            continue;
+                            // continue;
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
                             if (!strpos($svalue,date("Ymd"))) {
-                            continue;
-                            }
-                            if (strpos($svalue,'2020061810') !== false) {
                                 continue;
                             }
+                          /*   if (strpos($svalue,'2020061810') !== false) {
+                                continue;
+                            } */
                            /*  if (strpos($svalue,'2020061910') !== false) {
                                 continue;
                             } */
