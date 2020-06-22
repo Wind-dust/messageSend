@@ -1894,7 +1894,7 @@ class CmppCreateCodeTask extends Pzlife
     /* 第一版本号码清洗 */
     public function mobilesFiltrate($mobile,$uid,$deduct){
         try {
-            $deduct = 0;
+            // $deduct = 0;
             $error_mobile = [];//错号或者黑名单
             $real_send_mobile = []; //实际发送号码
             $deduct_mobile = []; //扣量号码
@@ -2085,6 +2085,7 @@ class CmppCreateCodeTask extends Pzlife
                     }
                 }
                 //计算实际占比和扣量占比
+                //冷门全扣
                 $proportion = bcdiv( count($cool_city_mobile),count($real_send_mobile),2);
                 // print_r($proportion); die;
                 if ($proportion * 100 > $deduct) {
