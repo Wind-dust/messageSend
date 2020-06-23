@@ -1985,7 +1985,9 @@ class CmppCreateCodeTask extends Pzlife
                 }
                
                 //实号
-                $entity_mobile = Db::query("SELECT `mobile` FROM `yx_real_mobile` WHERE mobile IN (".join(',',$remaining_mobile).") GROUP BY `mobile` ");
+                if (!empty($remaining_mobile)) {
+                    $entity_mobile = Db::query("SELECT `mobile` FROM `yx_real_mobile` WHERE mobile IN (".join(',',$remaining_mobile).") GROUP BY `mobile` ");
+                }
                 // echo count($entity_mobile);die;
                 //去除实号
                 // print_r(count($entity_mobile));die;
