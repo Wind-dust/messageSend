@@ -8612,7 +8612,7 @@ class CmppCreateCodeTask extends Pzlife
         $j = 1;
         $receipt = [];
         $send_msg = [];
-        $deduct = 1; //1扣量,2不扣
+        $deduct = 2; //1扣量,2不扣
         $rate = 50;
         /*    $all_task = 
         while (true) {
@@ -8670,9 +8670,7 @@ class CmppCreateCodeTask extends Pzlife
                                     $num = mt_rand(0, 100);
                                     if ($value['sfl_relation_id'] == '100180028') {
                                         // print_r(1);die;
-                                        if (in_array(trim($value['mobile']), $fault) || in_array(trim($value['mobile']), $bir)) {
-                                            continue;
-                                        }
+                                       
                                         if ($num >= 40 || in_array(trim($value['mobile']), $white_list) || $value['sfl_relation_id'] != '100180389') {
                                             $prefix = '';
                                             $prefix = substr(trim($value['mobile']), 0, 7);
