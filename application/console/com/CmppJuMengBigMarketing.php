@@ -43,11 +43,11 @@ class CmppJuMengBigMarketing extends Pzlife
         return [
             'host'          => "47.106.127.182", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "240662", //企业id  企业代码
-            'Shared_secret' => '466FFF', //网关登录密码
-            'Service_Id'    => "240662", //业务代码
+            'Source_Addr'   => "240663", //企业id  企业代码
+            'Shared_secret' => '466HHH', //网关登录密码
+            'Service_Id'    => "240663", //业务代码
             'template_id'   => "", //模板id
-            'Dest_Id'       => "1069240662", //短信接入码 短信端口号 服务代码
+            'Dest_Id'       => "1069240663", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
             'master_num'    => 300,
