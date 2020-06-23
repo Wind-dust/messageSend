@@ -422,6 +422,32 @@ function getExpressList()
     ];
     return $ExpressList;
 }
+/**
+ * 需要匹配成功回执码
+ * @return array
+ * @author rzc
+ */
+function updateReceivedForMessage(){
+    $Received = [
+        'REJECTD', 
+        'REJECT', 
+        'MA:0001', 
+        'DB:0141',
+        'MA:0001',
+        'MK:100D',
+        'MK:100C',
+        'IC:0151',
+        'IC:0055',
+        'NOROUTE',
+        'EXPIRED',
+        '-1012',
+        '-1013',
+        '4442',
+        '4446',
+        '4014'
+    ];
+    return $Received;
+}
 
 /**
  * 检测银行卡号是否合法

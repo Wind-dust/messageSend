@@ -56,6 +56,7 @@ return [
     'cmppmijiayidongbusiness'          => $commandPath . 'CmppMiJiaYiDongBusiness',
     'cmppmijialiantongdianxinmarketing'        => $commandPath . 'CmppMiJiaLianTongDianXinMarketing', //米加联通电信营销
     'cmppjumengyidongmarketing'        => $commandPath . 'CmppJuMengYiDongMarketing',
+    'cmppjumengbigmarketing'        => $commandPath . 'CmppJuMengBigMarketing',
     'cmppjumengliandianmarketing'      => $commandPath . 'CmppJuMengLianDianMarketing',
     'cmppjumengbusiness'      => $commandPath . 'CmppJuMengBusiness', //聚梦行业
     'cmppjumengsanwangbusiness'      => $commandPath . 'CmppJuMengSanWangBusiness', //聚梦行业
@@ -94,7 +95,8 @@ return [
     'Cmppmiaoxinliandianmarketing'         => $commandPath . 'CmppMiaoXinLianDianMarketing', //北京秒信三网行业
     'Cmppmiaoxinyidongbusiness'         => $commandPath . 'CmppMiaoXinYiDongBusiness', //北京秒信三网行业
     'cmppbeijingmiaoxinmarketing'         => $commandPath . 'CmppBeiJingMiaoXinMarketing', //北京秒信会员营销
-    'cmppbishangyidongbusiness'         => $commandPath . 'CmppBiShangYiDongBusiness', //比上移动行业
+    'cmppbishangyidongbusiness'         => $commandPath . 'CmppBiShangYiDongBusiness', //必上移动行业
+    'cmppyunjubigmarketing'         => $commandPath . 'CmppYunJuBigMarketing', //云聚高投诉通道
     'serversocketshuhe'                => $commandPath . 'ServerSocketShuHe',
     'ServerSocketjyy'                  => $commandPath . 'ServerSocketJYY',
     'ServerSocketjyylt'                  => $commandPath . 'ServerSocketJYYLT',
