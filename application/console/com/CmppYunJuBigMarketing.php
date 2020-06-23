@@ -88,11 +88,11 @@ class CmppYunJuBigMarketing extends Pzlife
             'mar_task_id' => '',
             'content'     => '【中消云快讯】2020年智慧消防很火爆，50万亿新基建背景下，行业巨头带你分享新一波财富，详询18715731599。退订回T',
         ])); */
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+       /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15601607386',
             'mar_task_id' => '',
             'content'     => '【中消云】广东要安装45万只烟感，怎么抢智慧消防新商机？预定本月29号深圳财富分享会席位，详询17812176368。退订回T',
-        ]));
+        ])); */
         /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15172413692',
             'mar_task_id' => '',
