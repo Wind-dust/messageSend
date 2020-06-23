@@ -78,13 +78,13 @@ class CmppYunJuBigMarketing extends Pzlife
             'mar_task_id' => '',
             'content'     => '【美丽田园】尊敬的顾客您好！即日起非会员只需支付212元即可尊享指定护理一折体验，每月前20位体验顾客加赠精美化妆包1个，10/22-12/31日我和万象城有个约会，万象城全体员工恭候您的体验，竭诚为您的皮肤保驾护航！详询：021-54700816 回T退订',
         ])); */
-            $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15201926171',
+        /*     $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15821193682',
             'mar_task_id' => '',
             'content'     => '【中消云物联网】传统消防生意难做，2020年怎么转型？27年消防一哥带你分享智慧消防新财富，详询13661147127。退订回T',
         ]));
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15201926171',
+            'mobile'      => '15172413692',
             'mar_task_id' => '',
             'content'     => '【中消云快讯】2020年智慧消防很火爆，50万亿新基建背景下，行业巨头带你分享新一波财富，详询18715731599。退订回T',
         ]));
@@ -92,13 +92,17 @@ class CmppYunJuBigMarketing extends Pzlife
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'content'     => '【中消云】广东要安装45万只烟感，怎么抢智慧消防新商机？预定本月29号深圳财富分享会席位，详询17812176368。退订回T',
-        ]));
+        ])); */
         $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15201926171',
+            'mobile'      => '15172413692',
             'mar_task_id' => '',
             'content'     => '【瑞俪洗衣】热门创业项目诚邀财富合伙人，于6月日在上海总部召开项目说明会，会员报名免加盟费，联系电话：18302181935,退订回T。',
         ]));
-
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15821193682',
+            'mar_task_id' => '',
+            'content'     => '【瑞俪洗衣】热门创业项目诚邀财富合伙人，于6月日在上海总部召开项目说明会，会员报名免加盟费，联系电话：18302181935,退订回T。',
+        ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/".$content.".log";
         $myfile = fopen($log_path, 'a+');
