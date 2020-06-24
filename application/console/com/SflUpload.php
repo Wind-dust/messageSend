@@ -652,7 +652,7 @@ class SflUpload extends Pzlife
                 exception($e);
             }
         }
-        die;
+        // die;
         // print_r($this_id);
         // die;
         $task_receipt_all = [];
@@ -704,13 +704,23 @@ class SflUpload extends Pzlife
                 exception($e);
             }
         }
-        $deduct = ceil(2000000 / 3383176 * 10);
+        $deduct = ceil(1863361 / 2863361 * 10);
 
         /* 扣量 */
         // $all_num = [0,1,2,3,4];
         // $deduct_key = array_rand($all_num,3);
         // print_r($deduct_key);die;
+        $all_num = [];
+        for ($i = 0; $i < 100; $i++) {
+            # code...
+            $all_num[] = $i;
+        }
+        // echo count($all_num);
+        // die;
+        /* print_r($all_num);
+        die; */
         $deduct_nums = 5;
+        $i = 1;
         while (true) {
             $white_task = $redis->lpop('sftp:sfl:marketing:sendtask');
             if (empty($white_task)) {
@@ -723,9 +733,9 @@ class SflUpload extends Pzlife
             $white_task['id'] = $this_id;
             $send_task[]      = $white_task;
             $white_task = $redis->rpush('sftp:sfl:marketing:deductsendtask', json_encode($white_task));
-            if ($i > 5) {
-                $all_num    = [0, 1, 2, 3, 4];
-                $deduct_key = array_rand($all_num, 3);
+            if ($i > count($all_num)) {
+                // $all_num    = [0, 1, 2, 3, 4];
+                $deduct_key = array_rand($all_num, $deduct);
                 foreach ($send_task as $key => $value) {
                     if (in_array($key, $deduct_key)) {
                         continue;
@@ -891,7 +901,7 @@ class SflUpload extends Pzlife
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
-                    // continue;
+                    continue;
                     $err_task_num = [];
                     $send_data    = [];
                     if ($son_path_data !== false) {
@@ -1250,15 +1260,15 @@ class SflUpload extends Pzlife
                             // continue;
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
-                            if (!strpos($svalue, date("Ymd"))) {
-                                continue;
-                            }
-                            /* if (strpos($svalue, '2020062010') == false) {
+                            /*  if (!strpos($svalue, date("Ymd"))) {
                                 continue;
                             } */
-                            $start_time = strtotime("2020-06-24");
+                            if (strpos($svalue, '2020062414') == false) {
+                                continue;
+                            }
+                            // $start_time = strtotime("2020-06-24");
                             // $end_time = $start_time+86400;
-                            $expeort_time = $start_time + 43200 - mt_rand(0, 3000);
+                            // $expeort_time = $start_time + 43200 - mt_rand(0, 3000);
                             /*   if (strpos($svalue,'2020061810') !== false) {
                                 continue;
                             } */
@@ -1408,8 +1418,8 @@ class SflUpload extends Pzlife
                                         $SMS_real_send['send_num']    = 1;
                                         $SMS_real_send['send_status'] = 1;
                                         $SMS_real_send['template_id'] = $tvalue[2];
-                                        // $SMS_real_send['create_time'] = time();
-                                        $SMS_real_send['create_time'] =  $expeort_time + ceil($key / 7000);
+                                        $SMS_real_send['create_time'] = time();
+                                        // $SMS_real_send['create_time'] =  $expeort_time + ceil($key / 7000);
 
                                         $content                      = $SMS_model[$tvalue[2]]['content'];
                                         $content                      = str_replace('{FULL_NAME}', $tvalue[4], $content);
