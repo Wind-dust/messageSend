@@ -375,16 +375,15 @@ return $result;
         if (!empty($msg_id)) {
             $data['send_msg_id'] = $msg_id;
         }
-        if ($user['marketing_free_trial'] == 2){
+        if ($user['marketing_free_trial'] == 2) {
             $data['free_trial'] = 2;
             if ($user['marketing_free_credit'] > 0) {
-                if (count($effective_mobile) >= $user['marketing_free_credit'] ) {
+                if (count($effective_mobile) >= $user['marketing_free_credit']) {
                     $data['free_trial'] = 1;
                 }
             }
-           
         }
-       
+
         /* if ($real_num > 100) {
             $data['free_trial'] = 1;
         } */
@@ -393,7 +392,11 @@ return $result;
             $data['yidong_channel_id'] = 18;
             $data['liantong_channel_id'] = 19;
             $data['dianxin_channel_id'] = 19;
-            
+            if ($user['id'] == '185') {
+                $data['yidong_channel_id'] = 107;
+                $data['liantong_channel_id'] = 107;
+                $data['dianxin_channel_id'] = 107;
+            }
         }
         if (!empty($msg_id)) {
             $data['send_msg_id'] = $msg_id;
@@ -520,14 +523,13 @@ return $result;
         $data['send_length']    = mb_strlen($Content);
         $data['free_trial']     = 1;
         $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
-        if ($user['free_trial'] == 2){
+        if ($user['free_trial'] == 2) {
             $data['free_trial'] = 2;
             if ($user['business_deduct'] > 0) {
-                if ($real_num >= $user['business_deduct'] ) {
+                if ($real_num >= $user['business_deduct']) {
                     $data['free_trial'] = 1;
                 }
             }
-           
         }
         if ($data['free_trial'] == 2) {
             // $data['free_trial'] = 2;
@@ -542,7 +544,7 @@ return $result;
                 // $data['yidong_channel_id'] = 9;
                 // $data['liantong_channel_id'] = 9;
                 // $data['dianxin_channel_id'] = 9;
-            }elseif ($user['id'] == 110) {//快递
+            } elseif ($user['id'] == 110) { //快递
                 $data['yidong_channel_id'] = 85;
                 $data['liantong_channel_id'] = 85;
                 $data['dianxin_channel_id'] = 85;
@@ -552,16 +554,16 @@ return $result;
             } elseif ($user['pid'] == 137) {
                 if ($user['id'] == 133) {
                     $data['yidong_channel_id'] = 60;
-                $data['liantong_channel_id'] = 62;
-                $data['dianxin_channel_id'] = 61;
+                    $data['liantong_channel_id'] = 62;
+                    $data['dianxin_channel_id'] = 61;
                 } elseif ($user['id'] == 134) {
                     $data['yidong_channel_id'] = 85;
                     $data['liantong_channel_id'] = 85;
                     $data['dianxin_channel_id'] = 85;
                 } else {
                     $data['yidong_channel_id'] = 85;
-                $data['liantong_channel_id'] = 85;
-                $data['dianxin_channel_id'] = 85;
+                    $data['liantong_channel_id'] = 85;
+                    $data['dianxin_channel_id'] = 85;
                 }
                 // $data['yidong_channel_id'] = 9;
                 // $data['liantong_channel_id'] = 9;
@@ -582,7 +584,7 @@ return $result;
                 }
             }
         }
-       
+
         if (!empty($msg_id)) {
             $data['send_msg_id'] = $msg_id;
         }
@@ -592,7 +594,7 @@ return $result;
             $bId = DbAdministrator::addUserSendCodeTask($data); //
             Db::commit();
             if ($data['free_trial'] == 2) {
-                $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id'=>$bId,'deduct' => $user['business_deduct']]));
+                $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $bId, 'deduct' => $user['business_deduct']]));
             }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'task_no' => $data['task_no'], 'msg_id' => $msg_id];
@@ -948,7 +950,7 @@ return $result;
             }
             Db::commit();
             if ($free_trial == 2) {
-                $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id'=>$bId,'deduct' => $user['multimedia_deduct']]));
+                $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $bId, 'deduct' => $user['multimedia_deduct']]));
             }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no'], 'msg_id' => $msg_id];
@@ -1208,7 +1210,7 @@ return $result;
                             $send_task['yidong_channel_id'] = 85;
                             $send_task['liantong_channel_id'] = 85;
                             $send_task['dianxin_channel_id'] = 85;
-                        } elseif ($user['id'] == 134 ) {
+                        } elseif ($user['id'] == 134) {
                             $send_task['yidong_channel_id'] = 85;
                             $send_task['liantong_channel_id'] = 85;
                             $send_task['dianxin_channel_id'] = 85;
@@ -1225,27 +1227,25 @@ return $result;
                         $free_taskno[] = $task_no;
                         $send_task['free_trial'] = 2;
                         if ($user['pid'] == 137) {
-                          
+
                             $send_task['yidong_channel_id'] = 85;
                             $send_task['liantong_channel_id'] = 85;
                             $send_task['dianxin_channel_id'] = 85;
-                           
                         } else {
                             if ($user['id'] == 110) {
                                 $send_task['yidong_channel_id'] = 85;
                                 $send_task['liantong_channel_id'] = 85;
                                 $send_task['dianxin_channel_id'] = 85;
-                            }else{
+                            } else {
                                 $send_task['yidong_channel_id'] = 85;
                                 $send_task['liantong_channel_id'] = 85;
                                 $send_task['dianxin_channel_id'] = 85;
-
                             }
                         }
                         // array_push($free_trial, $send_task);
                     }
                 }
-            }else{
+            } else {
                 $send_task['free_trial'] = 1;
                 $send_task['yidong_channel_id'] = 0;
                 $send_task['liantong_channel_id'] = 0;
@@ -1277,7 +1277,7 @@ return $result;
                     //免审
                     $free_ids = DbAdministrator::getUserSendCodeTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
                     foreach ($free_ids as $key => $value) {
-                        $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id'=>$value['id'],'deduct' => $user['business_deduct']]));
+                        $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value['id'], 'deduct' => $user['business_deduct']]));
                     }
                 }
             }
@@ -1492,6 +1492,10 @@ return $result;
                             $send_task['yidong_channel_id'] = 73;
                             $send_task['liantong_channel_id'] = 75;
                             $send_task['dianxin_channel_id'] = 76;
+                        } elseif ($user['id'] == 185) {
+                            $send_task['yidong_channel_id'] = 107;
+                            $send_task['liantong_channel_id'] = 107;
+                            $send_task['dianxin_channel_id'] = 107;
                         } else {
                             $send_task['yidong_channel_id'] = 18;
                             $send_task['liantong_channel_id'] = 19;
@@ -1516,7 +1520,7 @@ return $result;
                         // array_push($free_trial, $send_task);
                     }
                 }
-            }else{
+            } else {
                 $send_task['free_trial'] = 1;
                 $send_task['yidong_channel_id'] = 0;
                 $send_task['liantong_channel_id'] = 0;
@@ -1692,7 +1696,7 @@ return $result;
         }
     }
 
-    public function submitBatchCustomMultimediaMessage($appid, $appkey, $template_id, $connect, $ip,$msg_id = '', $signature_id = '')
+    public function submitBatchCustomMultimediaMessage($appid, $appkey, $template_id, $connect, $ip, $msg_id = '', $signature_id = '')
     {
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
@@ -1705,11 +1709,11 @@ return $result;
         if (empty($user_equities)) {
             return ['code' => '3002'];
         }
-            $template =  DbSendMessage::getUserMultimediaTemplate(['template_id' => $template_id], '*', true);
-            if (empty($template) ||$template['status'] != 2 ) {
-                return ['code' => '3003'];
-            }
-            $template['multimedia_frame'] = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $template['id']], 'num,name,content,image_path,image_type,variable_len', false, ['num' => 'asc']);
+        $template =  DbSendMessage::getUserMultimediaTemplate(['template_id' => $template_id], '*', true);
+        if (empty($template) || $template['status'] != 2) {
+            return ['code' => '3003'];
+        }
+        $template['multimedia_frame'] = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $template['id']], 'num,name,content,image_path,image_type,variable_len', false, ['num' => 'asc']);
         if (!empty($signature_id)) {
             $signature =  DbSendMessage::getUserSignature(['uid' => $user['uid'], 'signature_id' => $signature_id], '*', true);
             if (empty($signature)) {
@@ -1723,42 +1727,42 @@ return $result;
         $connect_data = array_filter($connect_data);
         // $send_data = [];
         $send_data_mobile = [];
-       
+
         //有模板目前只支持有模板进行提交
         $MMS_data = [];
         // 变量,变量:手机号;变量,变量:手机号;变量:手机号;
         foreach ($connect_data as $key => $data) {
-            
+
             $send_text = explode(':', $data);
-            
+
             if (checkMobile($send_text[1]) == false || strlen($send_text[1]) != 11) {
                 continue;
             }
             $son_MMS_data = [];
-                $son_MMS_data = [
-                    'title' => $template['title']
-                ];
-                $the_frame = explode(',', $send_text[0]);
-                foreach ($template['multimedia_frame'] as $mf => $mula) {
-                    for ($i = 0; $i < count($the_frame); $i++) {
-                        $var_num = $i + 1;
-                        $mula['content'] = str_replace("{{var" . $var_num . "}}", $the_frame[$i], $mula['content']); //内容
-                    }
-                    $the_mula['content'] = $mula['content'];
-                    $the_mula['num'] = $mula['num'];
-                    $the_mula['name'] = $mula['name'];
-                    $the_mula['image_path'] = $mula['image_path'];
-                    $the_mula['image_type'] = $mula['image_type'];
-                    $son_MMS_data['multimedia_frame'][] = $the_mula;
+            $son_MMS_data = [
+                'title' => $template['title']
+            ];
+            $the_frame = explode(',', $send_text[0]);
+            foreach ($template['multimedia_frame'] as $mf => $mula) {
+                for ($i = 0; $i < count($the_frame); $i++) {
+                    $var_num = $i + 1;
+                    $mula['content'] = str_replace("{{var" . $var_num . "}}", $the_frame[$i], $mula['content']); //内容
                 }
-                if (in_array($son_MMS_data, $MMS_data)) {
-                    $send_data_mobile[array_search($son_MMS_data, $MMS_data)] = $data;
-                } else {
-                    $MMS_data[] = $son_MMS_data;
-                    $send_data_mobile[array_search($son_MMS_data, $MMS_data)] = $data;
-                }
+                $the_mula['content'] = $mula['content'];
+                $the_mula['num'] = $mula['num'];
+                $the_mula['name'] = $mula['name'];
+                $the_mula['image_path'] = $mula['image_path'];
+                $the_mula['image_type'] = $mula['image_type'];
+                $son_MMS_data['multimedia_frame'][] = $the_mula;
+            }
+            if (in_array($son_MMS_data, $MMS_data)) {
+                $send_data_mobile[array_search($son_MMS_data, $MMS_data)] = $data;
+            } else {
+                $MMS_data[] = $son_MMS_data;
+                $send_data_mobile[array_search($son_MMS_data, $MMS_data)] = $data;
+            }
         }
-       
+
         $free_taskno = [];
         $trial = []; //需审核
         //组合任务包
@@ -1785,7 +1789,7 @@ return $result;
                             'verify_peer_name' => false,
                         ],
                     ]);
-                    
+
                     $head = get_headers($mf['image_path'], 1);
                     $content_length += $head['Content-Length'];
                 } else {
@@ -1797,11 +1801,11 @@ return $result;
             if ($content_length <= $max_length) {
             } else {
                 $beyond[] = $send_data_mobile[$key];
-               unset($send_data_mobile[$key]);
+                unset($send_data_mobile[$key]);
             }
         }
-        
-       
+
+
         $task_as_mobile = [];
         foreach ($task_no_mobile as $key => $value) {
             $as_value = [];
@@ -1809,7 +1813,7 @@ return $result;
             $as_value['mobiles'] = $value;
             $task_as_mobile[] = $as_value;
         }
-        
+
         $real_num = count($send_data_mobile);
         if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3004'];
@@ -1858,7 +1862,7 @@ return $result;
             */
             Db::commit();
             if (!empty($msg_id)) {
-                return ['code' => '200', 'task_no' => $task_no, 'msg_id' => $msg_id,'beyond' => join(';', $beyond)];
+                return ['code' => '200', 'task_no' => $task_no, 'msg_id' => $msg_id, 'beyond' => join(';', $beyond)];
             }
             return ['code' => '200', 'task_no' => $task_no, 'beyond' => join(';', $beyond)];
         } catch (\Exception $e) {
@@ -2053,8 +2057,9 @@ return $result;
         }
     }
 
-    public function numberDetection($appid, $appkey, $mobile){
-        
+    public function numberDetection($appid, $appkey, $mobile)
+    {
+
         $check_mobile_result = [];
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
@@ -2074,12 +2079,12 @@ return $result;
         $secret_id = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
         $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
         $api = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
-        $ts =date("YmdHis",time());
+        $ts = date("YmdHis", time());
         $sig = sha1($secret_id . $secret_key . $ts);
         // echo $sig;
         // $mobile = '15201926171';
         // return $this->encrypt($mobile, $secret_id);
-        $mobile_data = explode(',',$mobile);
+        $mobile_data = explode(',', $mobile);
         if (count($mobile_data) > $userEquities['num_balance']) {
             return ['code' => '3002'];
         }
@@ -2087,7 +2092,7 @@ return $result;
             return ['code' => '3003'];
         }
         /* 实号数据库查询 */
-        $entity_mobile = Db::query("SELECT `mobile` FROM `yx_real_mobile` WHERE mobile IN (".join(',',$mobile_data).") GROUP BY `mobile` ");
+        $entity_mobile = Db::query("SELECT `mobile` FROM `yx_real_mobile` WHERE mobile IN (" . join(',', $mobile_data) . ") GROUP BY `mobile` ");
         $entity_mobiles = [];
         if (!empty($entity_mobile)) {
             foreach ($entity_mobile as $key => $value) {
@@ -2099,17 +2104,15 @@ return $result;
                 $check_mobile_result[] = $chech_mobile;
                 $entity_mobiles[] = $value['mobile'];
             }
-           
         }
         $had_mobile = array_diff($mobile_data, $entity_mobiles);
 
-        $empty_mobile = Db::query("SELECT `mobile`,`check_result`,`update_time` FROM `yx_mobile` WHERE mobile IN (".join(',',$had_mobile).") ");
+        $empty_mobile = Db::query("SELECT `mobile`,`check_result`,`update_time` FROM `yx_mobile` WHERE mobile IN (" . join(',', $had_mobile) . ") ");
         $empty_mobiles = [];
         if (!empty($empty_mobile)) {
             foreach ($empty_mobile as $key => $value) {
-                if (date("Ymd",$value['update_time']) < date('Ymd',time())){
-
-                }else{
+                if (date("Ymd", $value['update_time']) < date('Ymd', time())) {
+                } else {
                     $chech_mobile = [];
                     $chech_mobile = [
                         'mobile' => $value['mobile'],
@@ -2118,20 +2121,18 @@ return $result;
                     $check_mobile_result[] = $chech_mobile;
                     $empty_mobiles[] = $value['mobile'];
                 }
-                
             }
-           
         }
 
-        $need_check_mobile = array_diff($had_mobile,$empty_mobiles);
-        
+        $need_check_mobile = array_diff($had_mobile, $empty_mobiles);
+
 
         foreach ($need_check_mobile as $key => $value) {
-            
+
             if (checkMobile($value) != false) {
                 if (strlen($value) == 11) {
                     $true_mobile[] = $this->encrypt($value, $secret_id);
-                }else{
+                } else {
                     $chech_mobile = [];
                     $chech_mobile = [
                         'mobile' => $value,
@@ -2139,7 +2140,7 @@ return $result;
                     ];
                     $check_mobile_result[] = $chech_mobile;
                 }
-            }else{
+            } else {
                 $chech_mobile = [];
                 $chech_mobile = [
                     'mobile' => $value,
@@ -2149,8 +2150,8 @@ return $result;
             }
         }
         // print_r($check_mobile_result);die;
-        if (!empty($true_mobile )) {
-            $api = $api.$sig."&sid=" .$secret_id."&skey=" .$secret_key."&ts=".$ts;
+        if (!empty($true_mobile)) {
+            $api = $api . $sig . "&sid=" . $secret_id . "&skey=" . $secret_key . "&ts=" . $ts;
 
             $data = [];
             $data = [
@@ -2161,14 +2162,14 @@ return $result;
                 'mobiles' => $true_mobile
             ];
             $headers = [
-                'Authorization:'.base64_encode($secret_id.':'.$ts),'Content-Type:application/json'
+                'Authorization:' . base64_encode($secret_id . ':' . $ts), 'Content-Type:application/json'
             ];
             // echo base64_decode('MDZGREM0QTcxRjVFMUZERTRDMDYxREJBNjUzREQyQTU6MTU5MTAwNzE5Ng==');
-          
-            $data = $this->sendRequest2($api,'post',$data,$headers);
+
+            $data = $this->sendRequest2($api, 'post', $data, $headers);
             // print_r(json_decode($data),true);die;
             // print_r($data);die;
-            $result = json_decode($data,true);
+            $result = json_decode($data, true);
             if ($result['code'] == 0) { //接口请求成功
                 $mobiles = $result['mobiles'];
                 foreach ($mobiles as $key => $value) {
@@ -2185,7 +2186,6 @@ return $result;
                             'update_time' => time(),
                             'create_time' => time()
                         ]);
-                        
                     } else {
                         Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
                         Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
@@ -2196,7 +2196,6 @@ return $result;
                             'update_time' => time(),
                             'create_time' => time()
                         ]);
-                       
                     }
                     $chech_mobile = [];
                     $chech_mobile = [
@@ -2205,17 +2204,17 @@ return $result;
                     ];
                     $check_mobile_result[] = $chech_mobile;
                 }
-            }else{
+            } else {
                 return ['code' => '3004'];
             }
         }
         // $en_mobile = $this->encrypt($mobile, $secret_id);
         // echo $en_mobile;
-      
-        return ['code' => '200','check_result' => $check_mobile_result];
+
+        return ['code' => '200', 'check_result' => $check_mobile_result];
     }
 
-    function sendRequest2($requestUrl, $method = 'get', $data = [],$headers)
+    function sendRequest2($requestUrl, $method = 'get', $data = [], $headers)
     {
         $methonArr = ['get', 'post'];
         if (!in_array(strtolower($method), $methonArr)) {
@@ -2246,12 +2245,12 @@ return $result;
         return $res; // 显示获得的数据
     }
 
-       /**
-    *
-    * @param string $string 需要加密的字符串
-    * @param string $key 密钥
-    * @return string
-    */
+    /**
+     *
+     * @param string $string 需要加密的字符串
+     * @param string $key 密钥
+     * @return string
+     */
     public static function encrypt($string, $key)
     {
         // 对接java，服务商做的AES加密通过SHA1PRNG算法（只要password一样，每次生成的数组都是一样的），Java的加密源码翻译php如下：
