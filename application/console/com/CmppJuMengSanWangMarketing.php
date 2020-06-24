@@ -90,7 +90,7 @@ class CmppJuMengSanWangMarketing extends Pzlife
         ])); */
 
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $log_path = realpath("") . "/error/85.log";
+        $log_path = realpath("") . "/error/107.log";
         $myfile = fopen($log_path, 'a+');
         fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
         fwrite($myfile, " Begin" . "\n");
@@ -602,7 +602,7 @@ class CmppJuMengSanWangMarketing extends Pzlife
                             }
                             socket_close($socket);
 
-                            $log_path = realpath("") . "/error/85.log";
+                            $log_path = realpath("") . "/error/107.log";
                             $myfile = fopen($log_path, 'a+');
                             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                             fwrite($myfile, $e . "\n");
