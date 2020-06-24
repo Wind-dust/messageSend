@@ -44,7 +44,7 @@ return [
     'httpchannelcaixinhuaxingtongxun'  => $commandPath . 'HttpChannelCaiXinHuaxingtongxun',
     'httpchannelcaixinhangzhoumaiyuan' => $commandPath . 'HttpChannelCaiXinHangZhouMaiYuan',
     'httpchannelcaixinchuanglan' => $commandPath . 'HttpChannelCaiXinChuangLan',
-    'httpchannelmodelcaixinchuanglan' => $commandPath .'HttpChannelModelCaiXinChuangLan',
+    'httpchannelmodelcaixinchuanglan' => $commandPath . 'HttpChannelModelCaiXinChuangLan',
     'httpchannelcaixinmeilian' => $commandPath . 'HttpChannelCaiXinMeiLian', //美联软通彩信
     'cmppmeilianruantongyidonggame' => $commandPath . 'CmppMeiLianRuanTongYiDongGame', //美联软通移动游戏
     'httpchannelcaixinbangzhixinyidong' => $commandPath . 'HttpChannelCaiXinBangZhiXinYiDong', //邦之信移动彩信
@@ -58,8 +58,9 @@ return [
     'cmppjumengyidongmarketing'        => $commandPath . 'CmppJuMengYiDongMarketing',
     'cmppjumengbigmarketing'        => $commandPath . 'CmppJuMengBigMarketing',
     'cmppjumengliandianmarketing'      => $commandPath . 'CmppJuMengLianDianMarketing',
-    'cmppjumengbusiness'      => $commandPath . 'CmppJuMengBusiness', //聚梦行业
-    'cmppjumengsanwangbusiness'      => $commandPath . 'CmppJuMengSanWangBusiness', //聚梦行业
+    'cmppjumengbusiness'      => $commandPath . 'CmppJuMengBusiness', //聚梦三网行业
+    'cmppjumengsanwangbusiness'      => $commandPath . 'CmppJuMengSanWangBusiness', //聚梦三网合一行业
+    'cmppjumengsanwangmarketing'      => $commandPath . 'CmppJuMengSanWangMarketing', //聚梦三网合一营销
     'cmppyixinyidongbusiness'          => $commandPath . 'CmppYiXinYiDongBusiness', //易信移动行业通道
     'cmppyixindianxinbusiness'         => $commandPath . 'CmppYiXinDianxinBusiness', //易信移动行业通道
     'cmppyixinyidongmarketing'         => $commandPath . 'CmppYiXinYiDongMarketing', //易信移动营销通道
