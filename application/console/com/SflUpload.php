@@ -601,6 +601,7 @@ class SflUpload extends Pzlife
     /* sftp 短信任务入库 */
     public function sftpSflSendTaskToBase()
     {
+
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $mysql_connect->query("set names utf8mb4");
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
@@ -613,7 +614,11 @@ class SflUpload extends Pzlife
         } */
         $send_task = [];
         $task_id   = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task  ORDER BY `id` DESC limit 1 ");
-        $this_id   = $task_id[0]['id'];
+        if (empty($task_id)) {
+            $this_id = 1;
+        } else {
+            $this_id   = $task_id[0]['id'];
+        }
         // print_r($this_id);
         // die;
         $i = 1;
@@ -704,7 +709,7 @@ class SflUpload extends Pzlife
                 exception($e);
             }
         }
-        $deduct = ceil(1863361 / 2863361 * 10);
+        $deduct = ceil(1863361 / 2863361 * 100);
 
         /* 扣量 */
         // $all_num = [0,1,2,3,4];
@@ -715,6 +720,9 @@ class SflUpload extends Pzlife
             # code...
             $all_num[] = $i;
         }
+        // $deduct_key = array_rand($all_num, $deduct);
+        /*  print_r($deduct_key);
+        die; */
         // echo count($all_num);
         // die;
         /* print_r($all_num);
@@ -736,6 +744,8 @@ class SflUpload extends Pzlife
             if ($i > count($all_num)) {
                 // $all_num    = [0, 1, 2, 3, 4];
                 $deduct_key = array_rand($all_num, $deduct);
+                /*  print_r($deduct_key);
+                die; */
                 foreach ($send_task as $key => $value) {
                     if (in_array($key, $deduct_key)) {
                         continue;
@@ -771,8 +781,8 @@ class SflUpload extends Pzlife
             }
         }
         if (!empty($send_task)) {
-            $all_num    = [0, 1, 2, 3, 4];
-            $deduct_key = array_rand($all_num, 3);
+            // $all_num    = [0, 1, 2, 3, 4];
+            $deduct_key = array_rand($all_num, $deduct);
             foreach ($send_task as $key => $value) {
                 if (in_array($key, $deduct_key)) {
                     continue;
