@@ -9548,4 +9548,20 @@ class CmppCreateCodeTask extends Pzlife
             $redis->rpush();
         }
     }
+
+    public function futureReceiveCallBack()
+    {
+        $task_id = Db::query("SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) ");
+        foreach ($task_id as $key => $value) {
+            $task = Db::query("SELECT `*` FROM yx_user_send_task WHERE `id` = " . $value['id']);
+            if (empty($task)) {
+                continue;
+            }
+            $task_receive = Db::query("SELECT `*` FROM yx_send_task_receipt WHERE `task_id` = " . $task[0]['id']);
+            if (empty($task_receive)) {
+            }
+            $push_received = [];
+            $push_received = [];
+        }
+    }
 }
