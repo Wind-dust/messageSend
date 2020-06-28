@@ -1846,6 +1846,15 @@ class CmppCreateCodeTask extends Pzlife
                 sleep(1);
             } catch (\Exception $th) {
                 //throw $th;
+                $this->redis->rpush('index:meassage:code:send' . ":" . 85, json_encode([
+                    'mobile'  => 15201926171,
+                    'content' => "【钰晰科技】创建彩信任务日志功能出现错误，请查看并解决！！！时间" . date("Y-m-d H:i:s", time())
+                ])); //三体营销通道
+                $log_path = realpath("") . "/error/createMultimediaMessageSendTaskLog.log";
+                $myfile = fopen($log_path, 'a+');
+                fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
+                fwrite($myfile, $th . "\n");
+                fclose($myfile);
                 exception($th);
             }
 
@@ -2808,6 +2817,11 @@ class CmppCreateCodeTask extends Pzlife
                     'mobile'  => 15201926171,
                     'content' => "【钰晰科技】创建任务功能出现错误，请查看并解决！！！时间" . date("Y-m-d H:i:s", time())
                 ])); //三体营销通道
+                $log_path = realpath("") . "/error/createBusinessMessageSendTaskLog.log";
+                $myfile = fopen($log_path, 'a+');
+                fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
+                fwrite($myfile, $th . "\n");
+                fclose($myfile);
                 exception($e);
             }
         }
@@ -9610,6 +9624,56 @@ class CmppCreateCodeTask extends Pzlife
 
                 /*  $push_received = [];
                 $push_received = []; */
+            }
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
+        }
+    }
+
+    public function sflMulTaskLogCreate()
+    {
+        $redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M');
+        try {
+            //code...
+            $start_time = strtotime("2020-06-27 20:00:00");
+            $end_time = strtotime("2020-06-28 10:00:00");
+            $task = Db::query("SELECT * FROM yx_user_multimedia_message WHERE `id` >= 122743 AND `id` <= 124273 ");
+            foreach ($task as $key => $value) {
+                $mobile_content = [];
+                $mobile_content = explode(',', $value['mobile_content']);
+                // echo date('Y-m-d H:i:s', $value['create_time']);
+                // die;
+                if ($value['create_time'] >= $start_time && $value['create_time'] <= $end_time) {
+                    $send_time = $end_time + mt_rand(10, 300);
+                } else {
+                    $send_time = $value['create_time'] + mt_rand(10, 300);
+                }
+                for ($i = 0; $i < count($mobile_content); $i++) {
+                    Db::table('yx_user_multimedia_message_log')->insert([
+                        'task_no'      => $value['task_no'],
+                        'uid'          => $value['uid'],
+                        'source'       => $value['source'],
+                        'task_content' => $value['title'],
+                        'mobile'       => $mobile_content[$i],
+                        'channel_id'   => $value['yidong_channel_id'],
+                        'send_status'  => 2,
+                        'status_message'  => 'DELIVRD',
+                        'real_message'  => 'DELIVRD',
+                        'create_time'  => time(),
+                    ]);
+                    $redis->rpush('index:meassage:code:user:mulreceive:' . $value['uid'], json_encode([
+                        'task_no'        => $value['task_no'],
+                        'status_message' => 'DELIVRD',
+                        'message_info'   => '发送成功',
+                        'mobile'         => $mobile_content[$i],
+                        'send_time'      => isset($send_time) ? date('Y-m-d H:i:s', trim($send_time)) : date('Y-m-d H:i:s', time()),
+                    ])); //写入用户带处理日志
+                }
+
+                /* print_r($value);
+                die; */
             }
         } catch (\Exception $th) {
             //throw $th;
