@@ -8584,7 +8584,7 @@ class CmppCreateCodeTask extends Pzlife
         try {
             /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
             // $mysql_connect->table('yx_sfl_multimedia_message')->where([['create_time', '>', $tody_time],['sfl_relation_id','IN','100181558,100181556,100181563,100177398']])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
-            // $mysql_connect->table('yx_sfl_multimedia_message')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
+            $mysql_connect->table('yx_sfl_multimedia_message')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
         } catch (\Exception $th) {
             exception($th);
         }
@@ -8592,7 +8592,7 @@ class CmppCreateCodeTask extends Pzlife
         $j = 2;
         $receipt = [];
         $send_msg = [];
-        $deduct = 1; //1扣量,2不扣
+        $deduct = 2; //1扣量,2不扣
         $rate = 60;
         /*    $all_task = 
         while (true) {
@@ -8607,7 +8607,7 @@ class CmppCreateCodeTask extends Pzlife
             $receipt_id++;
             // print_r($receipt_id);die;
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time);
-            $sendid = $mysql_connect->query("SELECT * FROM `sflsftp`.`yx_sfl_multimedia_message` WHERE `create_time` >= '" . $tody_time . "' AND `sfl_relation_id` IN ('100181712','100181722')");
+            $sendid = $mysql_connect->query("SELECT * FROM `sflsftp`.`yx_sfl_multimedia_message` WHERE `create_time` >= '" . $tody_time . "' AND `sfl_relation_id` IN ('100181872')");
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` IN('100177398','100181563','100181556','100181558')  AND `create_time` >  " . $tody_time;die;
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time;die;
             // $white_send = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `` `create_time` >  ".$tody_time );
@@ -9551,17 +9551,69 @@ class CmppCreateCodeTask extends Pzlife
 
     public function futureReceiveCallBack()
     {
-        $task_id = Db::query("SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) ");
-        foreach ($task_id as $key => $value) {
-            $task = Db::query("SELECT `*` FROM yx_user_send_task WHERE `id` = " . $value['id']);
-            if (empty($task)) {
-                continue;
+        /* echo "SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) ";
+        die; */
+        $redis = Phpredis::getConn();
+        try {
+            $task_id = Db::query("SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) ");
+            /*  print_r($task_id);
+        die; */
+
+            foreach ($task_id as $key => $value) {
+                $task = Db::query("SELECT * FROM yx_user_send_task WHERE `id` = " . $value['id']);
+                if (empty($task)) {
+                    continue;
+                }
+                if ($task[0]['yidong_channel_id'] == 0) {
+                    continue;
+                }
+                $mobile_content = [];
+                $mobile_content = explode(',', $task[0]['mobile_content']);
+                /*  print_r($mobile_content);
+                die; */
+                foreach ($mobile_content as $mkey => $mvalue) {
+                    $task_receive = Db::query("SELECT * FROM yx_send_task_receipt WHERE `task_id` = " . $task[0]['id'] . " AND `mobile` =" . $mvalue);
+
+                    if (!empty($task_receive)) {
+                        $send_len = 0;
+                        $send_len = mb_strlen($task[0]['task_content']);
+                        $s_num = 1;
+                        if ($send_len > 70) {
+                            $s_num = ceil($send_len / 67);
+                        }
+                        $stat = trim($task_receive[0]['status_message']);
+                        if (strpos($stat, 'DB:0141') !== false || strpos($stat, 'MBBLACK') !== false || strpos($stat, 'BLACK') !== false) {
+                            $message_info = '黑名单';
+                        } else if (trim($stat == 'DELIVRD')) {
+                            $message_info = '发送成功';
+                        } else if (in_array(trim($stat), ['REJECTD', 'REJECT', 'MA:0001', 'DB:0141'])) {
+                            $stat = 'DELIVRD';
+                            $message_info = '发送成功';
+                        } else {
+                            $message_info = '发送失败';
+                        }
+                        for ($a = 0; $a < $s_num; $a++) {
+                            $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
+                                'task_no'        => trim($task[0]['task_no']),
+                                'status_message' => $stat,
+                                'message_info'   => $message_info,
+                                'mobile'         => trim($mvalue),
+                                'msg_id'         => trim($task[0]['send_msg_id']),
+                                // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                'send_time'      => isset($task_receive[0]['create_time']) ? date('Y-m-d H:i:s', trim($task_receive[0]['create_time'])) : date('Y-m-d H:i:s', time()),
+                                'smsCount' => $s_num,
+                                'smsIndex' => $a + 1,
+                            ])); //写入用户带处理日志
+                        }
+                    }
+                }
+
+                /*  $push_received = [];
+                $push_received = []; */
             }
-            $task_receive = Db::query("SELECT `*` FROM yx_send_task_receipt WHERE `task_id` = " . $task[0]['id']);
-            if (empty($task_receive)) {
-            }
-            $push_received = [];
-            $push_received = [];
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
         }
     }
 }
