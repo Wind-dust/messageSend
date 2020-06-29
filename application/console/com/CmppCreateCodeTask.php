@@ -9709,6 +9709,7 @@ class CmppCreateCodeTask extends Pzlife
                         $dayTime = $sendday.'100000';
                     }
                     $dayTime = strtotime($dayTime);
+                    $dayTime = intval($dayTime) + mt_rand(10,300);
                     for ($i = 0; $i < count($mobile_content); $i++) {
                         Db::table('yx_user_multimedia_message_log')->insert([
                             'task_no'      => $sendTask['task_no'],
@@ -9727,7 +9728,7 @@ class CmppCreateCodeTask extends Pzlife
                             'status_message' => 'DELIVRD',
                             'message_info'   => '发送成功',
                             'mobile'         => $mobile_content[$i],
-                            'send_time'      => isset($dayTime) ? date('Y-m-d H:i:s', trim($dayTime) + mt_rand(10,300)) : date('Y-m-d H:i:s', time()),
+                            'send_time'      => isset($dayTime) ? date('Y-m-d H:i:s', trim($dayTime)) : date('Y-m-d H:i:s', time()),
                         ])); //写入用户带处理日志
                     }
             }
