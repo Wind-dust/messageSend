@@ -9684,7 +9684,7 @@ class CmppCreateCodeTask extends Pzlife
     public function sflMulMessageCreate(){
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M');
-        // $redis->rpush("index:meassage:multimediamessage:buffersendtask", json_encode(['id' =>94348, 'deduct' => 10]));
+        $redis->rpush("index:meassage:multimediamessage:buffersendtask", json_encode(['id' =>94348, 'deduct' => 10]));
         try {
             while(true){
                 $send = $redis->lpop('index:meassage:multimediamessage:buffersendtask');
@@ -9702,12 +9702,13 @@ class CmppCreateCodeTask extends Pzlife
                         $sendday = $day+1;
                         $dayTime = $sendday.'100000';
                         // $send_time = 
-                        // $date = strtotime()
+                        // $dayTime = strtotime($dayTime);
                     }
                     if (date('H',$sendTask['update_time'])<= 10) {
                         $sendday = $day;
                         $dayTime = $sendday.'100000';
                     }
+                    $dayTime = strtotime($dayTime);
                     for ($i = 0; $i < count($mobile_content); $i++) {
                         Db::table('yx_user_multimedia_message_log')->insert([
                             'task_no'      => $sendTask['task_no'],
@@ -9726,7 +9727,7 @@ class CmppCreateCodeTask extends Pzlife
                             'status_message' => 'DELIVRD',
                             'message_info'   => '发送成功',
                             'mobile'         => $mobile_content[$i],
-                            'send_time'      => isset($send_time) ? date('Y-m-d H:i:s', trim($send_time)) : date('Y-m-d H:i:s', time()),
+                            'send_time'      => isset($dayTime) ? date('Y-m-d H:i:s', trim($dayTime) + mt_rand(10,300)) : date('Y-m-d H:i:s', time()),
                         ])); //写入用户带处理日志
                     }
             }
