@@ -1795,9 +1795,9 @@ class SflUpload extends Pzlife
                                         ];
 
                                         $MMS_real_send['sfl_relation_id'] = $tvalue[2];
-                                        if ($tvalue[2] != '100181872') {
+                                       /*  if ($tvalue[2] != '100181872') {
                                             continue;
-                                        }
+                                        } */
                                         /* foreach ($file_data as $fkey => $fvalue) {
                                         if ($fvalue[0] == $tvalue[2]) {
 
@@ -1916,6 +1916,7 @@ class SflUpload extends Pzlife
                             /*  if (!strpos($svalue, date("Ymd"))) {
                                 continue;
                             } */
+                            continue;
                             $file_info = explode('.', $svalue);
                             if ($file_info[1] == 'zip') { //需要解压
                                 if ($zip->open($son_path) === true) {
