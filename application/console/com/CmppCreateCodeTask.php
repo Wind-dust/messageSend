@@ -1112,7 +1112,7 @@ class CmppCreateCodeTask extends Pzlife
         // $this->redis->rPush('index:meassage:multimediamessage:sendtask', 22886);
         // exit();
         // echo time() -1574906657;die;
-        // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' =>110232, 'deduct' => 10]));
+        // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' =>125214, 'deduct' => 0]));
         while (true) {
             try {
                 $j = 1;
@@ -1171,15 +1171,15 @@ class CmppCreateCodeTask extends Pzlife
 
                     $real_send['deduct'] = isset($real_send['deduct']) ? $real_send['deduct'] : 0;
                     if (!empty($sendTask['template_id'])) {
-                        $yidong_channel_template = Db::query("SELECT `*` FROM yx_user_multimedia_template_third_report WHERE `channel_id` = '" . $yidong_channel_id . "' AND `template_id` = '" . $sendTask['template_id'] . "'");
+                        $yidong_channel_template = Db::query("SELECT * FROM yx_user_multimedia_template_third_report WHERE `channel_id` = '" . $yidong_channel_id . "' AND `template_id` = '" . $sendTask['template_id'] . "'");
                         if (!empty($yidong_channel_template)) {
                             $yidong_channel_template_id = $yidong_channel_template[0]['third_template_id'];
                         }
-                        $liantong_channel_template = Db::query("SELECT `*` FROM yx_user_multimedia_template_third_report WHERE `channel_id` = '" . $liantong_channel_id . "' AND `template_id` = '" . $sendTask['template_id'] . "'");
+                        $liantong_channel_template = Db::query("SELECT * FROM yx_user_multimedia_template_third_report WHERE `channel_id` = '" . $liantong_channel_id . "' AND `template_id` = '" . $sendTask['template_id'] . "'");
                         if (!empty($liantong_channel_template)) {
                             $liantong_channel_template_id = $liantong_channel_template[0]['third_template_id'];
                         }
-                        $dianxin_channel_template = Db::query("SELECT `*` FROM yx_user_multimedia_template_third_report WHERE `channel_id` = '" . $dianxin_channel_id . "' AND `template_id` = '" . $sendTask['template_id'] . "'");
+                        $dianxin_channel_template = Db::query("SELECT * FROM yx_user_multimedia_template_third_report WHERE `channel_id` = '" . $dianxin_channel_id . "' AND `template_id` = '" . $sendTask['template_id'] . "'");
                         if (!empty($dianxin_channel_template)) {
                             $dianxin_channel_template_id = $dianxin_channel_template[0]['third_template_id'];
                         }
@@ -9684,7 +9684,7 @@ class CmppCreateCodeTask extends Pzlife
     public function sflMulMessageCreate(){
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M');
-        $redis->rpush("index:meassage:multimediamessage:buffersendtask", json_encode(['id' =>94348, 'deduct' => 10]));
+        // $redis->rpush("index:meassage:multimediamessage:buffersendtask", json_encode(['id' =>94348, 'deduct' => 10]));
         try {
             while(true){
                 $send = $redis->lpop('index:meassage:multimediamessage:buffersendtask');
@@ -9731,6 +9731,69 @@ class CmppCreateCodeTask extends Pzlife
                             'send_time'      => isset($dayTime) ? date('Y-m-d H:i:s', trim($dayTime)) : date('Y-m-d H:i:s', time()),
                         ])); //写入用户带处理日志
                     }
+            }
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
+        }
+       
+    }
+
+    public function sflMessageCreate(){
+        $redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M');
+        // $redis->rpush("index:meassage:multimediamessage:buffersendtask", json_encode(['id' =>94348, 'deduct' => 10]));
+        try {
+            while(true){
+                $send = $redis->lpop('index:meassage:business:buffersendtask');
+                if (empty($send)) {
+                break;
+                }
+                $real_send = json_decode($send, true);
+                if ($real_send['id'] <= 94348) {
+                    $sendTask = $this->getMultimediaSendTask($real_send['id']);
+                    // print_r($sendTask);die;
+                    $day = date('Ymd',$sendTask['update_time']);
+                    $sendday = 0;
+                    // echo $dayTime;die;
+                    $mobile_content = explode(',', $sendTask['mobile_content']);
+                    if (date('H',$sendTask['update_time'])>= 20) {
+                        $sendday = $day+1;
+                        $dayTime = $sendday.'100000';
+                        // $send_time = 
+                        // $dayTime = strtotime($dayTime);
+                    }
+                    if (date('H',$sendTask['update_time'])<= 10) {
+                        $sendday = $day;
+                        $dayTime = $sendday.'100000';
+                    }
+                    $dayTime = strtotime($dayTime);
+                    $dayTime = intval($dayTime) + mt_rand(10,300);
+                    for ($i = 0; $i < count($mobile_content); $i++) {
+                        Db::table('yx_user_multimedia_message_log')->insert([
+                            'task_no'      => $sendTask['task_no'],
+                            'uid'          => $sendTask['uid'],
+                            'source'       => $sendTask['source'],
+                            'task_content' => $sendTask['title'],
+                            'mobile'       => $mobile_content[$i],
+                            'channel_id'   => $sendTask['yidong_channel_id'],
+                            'send_status'  => 2,
+                            'status_message'  => 'DELIVRD',
+                            'real_message'  => 'DELIVRD',
+                            'create_time'  => time(),
+                        ]);
+                        $redis->rpush('index:meassage:code:user:mulreceive:' . $sendTask['uid'], json_encode([
+                            'task_no'        => $sendTask['task_no'],
+                            'status_message' => 'DELIVRD',
+                            'message_info'   => '发送成功',
+                            'mobile'         => $mobile_content[$i],
+                            'send_time'      => isset($dayTime) ? date('Y-m-d H:i:s', trim($dayTime)) : date('Y-m-d H:i:s', time()),
+                        ])); //写入用户带处理日志
+                    }
+                }else{
+
+                }
+                    
             }
         } catch (\Exception $th) {
             //throw $th;
