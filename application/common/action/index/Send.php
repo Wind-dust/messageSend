@@ -397,6 +397,11 @@ return $result;
                 $data['liantong_channel_id'] = 107;
                 $data['dianxin_channel_id'] = 107;
             }
+            if ($user['id'] == 187) {
+                $send_task['yidong_channel_id'] = 107;
+                $send_task['liantong_channel_id'] = 107;
+                $send_task['dianxin_channel_id'] = 107;
+            }
         }
         if (!empty($msg_id)) {
             $data['send_msg_id'] = $msg_id;
@@ -564,6 +569,11 @@ return $result;
                     $data['yidong_channel_id'] = 85;
                     $data['liantong_channel_id'] = 85;
                     $data['dianxin_channel_id'] = 85;
+                }
+                if ($user['id'] == 187) {
+                    $send_task['yidong_channel_id'] = 95;
+                    $send_task['liantong_channel_id'] = 95;
+                    $send_task['dianxin_channel_id'] = 95;
                 }
                 // $data['yidong_channel_id'] = 9;
                 // $data['liantong_channel_id'] = 9;
@@ -981,7 +991,7 @@ return $result;
         if (!empty($status)) {
             array_push($where, ['status', '=', $status]);
         }
-        $result = DbSendMessage::getUserUserMultimediaMessageLog($where, '*', false, '', $offset . ',' . $pageNum);
+        $result = DbSendMessage::getUserMultimediaMessageLog($where, '*', false, '', $offset . ',' . $pageNum);
         $total = DbSendMessage::countUserMultimediaMessageLog($where);
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
@@ -995,7 +1005,7 @@ return $result;
         if ($appkey != $user['appkey']) {
             return ['code' => '3000'];
         }
-        $result = DbSendMessage::getUserUserMultimediaMessageLog([['uid', '=', $user['id']], ['user_query_status', '=', 1], ['status_message', '<>', '']], 'id,task_no,mobile,status_message,update_time', false, '', 200);
+        $result = DbSendMessage::getUserMultimediaMessageLog([['uid', '=', $user['id']], ['user_query_status', '=', 1], ['status_message', '<>', '']], 'id,task_no,mobile,status_message,update_time', false, '', 200);
         $update_log = [];
         foreach ($result as $key => $value) {
             $update_value['id'] = $value['id'];
@@ -1219,6 +1229,11 @@ return $result;
                             $send_task['liantong_channel_id'] = 85;
                             $send_task['dianxin_channel_id'] = 85;
                         }
+                        if ($user['id'] == 187) {
+                            $send_task['yidong_channel_id'] = 95;
+                            $send_task['liantong_channel_id'] = 95;
+                            $send_task['dianxin_channel_id'] = 95;
+                        }
                         $free_taskno[] = $task_no;
                         // array_push($free_trial, $send_task);
                     }
@@ -1231,6 +1246,11 @@ return $result;
                             $send_task['yidong_channel_id'] = 85;
                             $send_task['liantong_channel_id'] = 85;
                             $send_task['dianxin_channel_id'] = 85;
+                            if ($user['id'] == 187) {
+                                $send_task['yidong_channel_id'] = 95;
+                                $send_task['liantong_channel_id'] = 95;
+                                $send_task['dianxin_channel_id'] = 95;
+                            }
                         } else {
                             if ($user['id'] == 110) {
                                 $send_task['yidong_channel_id'] = 85;
@@ -1496,7 +1516,11 @@ return $result;
                             $send_task['yidong_channel_id'] = 107;
                             $send_task['liantong_channel_id'] = 107;
                             $send_task['dianxin_channel_id'] = 107;
-                        } else {
+                        } elseif ($user['id'] == 187) {
+                            $send_task['yidong_channel_id'] = 107;
+                            $send_task['liantong_channel_id'] = 107;
+                            $send_task['dianxin_channel_id'] = 107;
+                        }else {
                             $send_task['yidong_channel_id'] = 18;
                             $send_task['liantong_channel_id'] = 19;
                             $send_task['dianxin_channel_id'] = 19;
@@ -1516,6 +1540,11 @@ return $result;
                             $send_task['yidong_channel_id'] = 18;
                             $send_task['liantong_channel_id'] = 19;
                             $send_task['dianxin_channel_id'] = 19;
+                        }
+                        if ($user['id'] == 187) {
+                            $send_task['yidong_channel_id'] = 107;
+                            $send_task['liantong_channel_id'] = 107;
+                            $send_task['dianxin_channel_id'] = 107;
                         }
                         // array_push($free_trial, $send_task);
                     }
@@ -2262,5 +2291,81 @@ return $result;
         $data = strtoupper(bin2hex($data));
         // print_r($data);
         return $data;
+    }
+
+    public function upMmsGoing($appid, $appkey)
+    {
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $result = [];
+        $this->redis = Phpredis::getConn();
+        $i = 0;
+        while ($i < 100) {
+            $userstat = $this->redis->lpop('index:message:Mmsupriver:' . $user['id']);
+            $userstat = json_decode($userstat, true);
+            if (empty($userstat)) {
+                break;
+            }
+            $result[] = $userstat;
+        }
+        return ['code' => '200', 'upGoing' => $result];
+    }
+
+    public function upGoingForChuangLan($account, $phone, $msg, $moTime, $extendCode)
+    {
+        //C4786051
+        //C0120120
+        $this->redis = Phpredis::getConn();
+        if ($account == 'C0120120') {
+            $user = DbSendMessage::getUserMultimediaMessageLog(['mobile' => $phone], 'task_no,uid', true, ['id' => 'desc']);
+            $upgoing = [];
+            $upgoing = [
+                'mobile' => $phone,
+                'message_info' => $msg,
+                'get_time' => $moTime,
+            ];
+            $this->redis->rPush('index:message:Mmsupriver:' . $user['uid'], json_encode($upgoing));
+            $insert_data = [];
+            $insert_data = [
+                'uid' => $user['uid'],
+                'task_no' => $user['task_no'],
+                'mobile' => $phone,
+                'message_info' => $msg,
+                'create_time' => strtotime($moTime),
+                'business_id' => 8,
+            ];
+            Db::startTrans();
+            try {
+                DbSendMessage::addUserUpriver($insert_data);
+                Db::commit();
+                return 'OK';
+            } catch (\Exception $e) {
+                Db::rollback();
+                exception($e);
+                return ['code' => '3007'];
+            }
+        } elseif ($account == 'C4786051') { //sftp
+            $prefix = substr(trim($phone), 0, 7);
+            // $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+            $numberSource = DbSendMessage::getNumberSource(['mobile' => $prefix], 'source_name,city', true);
+            $insert_data = [];
+
+            $insert_data = [
+                'from' => 'sfl',
+                'mobile' => $phone,
+                'type' => 'MMS',
+                'message_info' => $msg,
+                'receive_time' => $moTime,
+                'source_name' => $numberSource['source_name'],
+                'city' => $numberSource['city'],
+            ];
+            $this->redis->rPush('sftp:upriver:chuanglan', json_encode($insert_data));
+            return 'OK';
+        }
     }
 }
