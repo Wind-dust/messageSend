@@ -2823,7 +2823,7 @@ class CmppCreateCodeTask extends Pzlife
                 $log_path = realpath("") . "/error/createBusinessMessageSendTaskLog.log";
                 $myfile = fopen($log_path, 'a+');
                 fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
-                fwrite($myfile, $th . "\n");
+                fwrite($myfile, $e . "\n");
                 fclose($myfile);
                 exception($e);
             }
@@ -9632,6 +9632,7 @@ class CmppCreateCodeTask extends Pzlife
                                 // print_r($all_report);die;
                                 $res = sendRequestJson('https://www.futurersms.com/api/callback/xjy/report','post',$all_report);
                                 //推送失败
+                                print_r($res);
                                 if ($res != 'SUCCESS') {
                                     usleep(300);
                                     $res = sendRequestJson('https://www.futurersms.com/api/callback/xjy/report','post',$all_report);
