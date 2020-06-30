@@ -9570,9 +9570,11 @@ class CmppCreateCodeTask extends Pzlife
     {
         /* echo "SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) ";
         die; */
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
         try {
-            $all_report = [];
+            $all_report = '';
+            $receipt_report = [];
             $j = 1;
             $task_id = Db::query("SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) ");
             /*  print_r($task_id);
@@ -9624,22 +9626,23 @@ class CmppCreateCodeTask extends Pzlife
                                 'smsCount' => $s_num,
                                 'smsIndex' => $a + 1,
                             ];
-                            
-                            $all_report[] = $receipt_report;
+                            $all_report = $all_report.json_encode($receipt_report)."\n";
+                            // print_r(json_encode($receipt_report));die;
+                            $receipt_report[] = $receipt_report;
                             
                             $j ++;
                             if ($j > 100) {
-                                // print_r($all_report);die;
-                                $res = sendRequestJson('https://www.futurersms.com/api/callback/xjy/report','post',$all_report);
+                                //  print_r($all_report);die;
+                                $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report','post',$all_report);
                                 //推送失败
                                 print_r($res);
                                 if ($res != 'SUCCESS') {
                                     usleep(300);
-                                    $res = sendRequestJson('https://www.futurersms.com/api/callback/xjy/report','post',$all_report);
+                                    $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report','post',$all_report);
                                     if ($res != 'SUCCESS') {
                                         usleep(300);
-                                        $res = sendRequestJson('https://www.futurersms.com/api/callback/xjy/report','post',$all_report);
-                                        foreach ($all_report as $akey => $avalue) {
+                                        $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report','post',$all_report);
+                                        foreach ($receipt_report as $akey => $avalue) {
                                             // # code...
                                             // print_r($avalue);die;
                                              $redis->rpush('index:meassage:code:receive_for_future_default', json_encode($avalue)); //写入用户带处理日志
@@ -9648,7 +9651,8 @@ class CmppCreateCodeTask extends Pzlife
                                     }
 
                                 }
-                                $all_report = [];
+                                $all_report = '';
+                                $receipt_report = [];
                                 $j = 1;
                             }
                            /*  $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
@@ -9672,15 +9676,15 @@ class CmppCreateCodeTask extends Pzlife
                 $push_received = []; */
             }
             if (!empty($all_report)){
-                $res = sendRequestJson('https://www.futurersms.com/api/callback/xjy/report','post',$all_report);
+                $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report','post',$all_report);
                 //推送失败
                 if ($res != 'SUCCESS') {
                     usleep(300);
-                    $res = sendRequestJson('https://www.futurersms.com/api/callback/xjy/report','post',$all_report);
+                    $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report','post',$all_report);
                     if ($res != 'SUCCESS') {
                         usleep(300);
-                        $res = sendRequestJson('https://www.futurersms.com/api/callback/xjy/report','post',$all_report);
-                        foreach ($all_report as $akey => $avalue) {
+                        $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report','post',$all_report);
+                        foreach ($receipt_report as $akey => $avalue) {
                             // # code...
                             // print_r($avalue);die;
                              $redis->rpush('index:meassage:code:receive_for_future_default', json_encode($avalue)); //写入用户带处理日志
@@ -9689,7 +9693,8 @@ class CmppCreateCodeTask extends Pzlife
                     }
 
                 }
-                $all_report = [];
+                $all_report = '';
+                $receipt_report = [];
                 $j = 1;
             }
             if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
