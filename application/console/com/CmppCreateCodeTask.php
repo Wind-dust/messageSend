@@ -9579,7 +9579,7 @@ class CmppCreateCodeTask extends Pzlife
             $receipt_report = [];
             $j = 1;
             $task_id = Db::query("SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `create_time` >= ".$time);
-            echo "SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `create_time` >= ".$time;die;
+            // echo "SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `create_time` >= ".$time;die;
             /* print_r($task_id);
             die; */
 
