@@ -8059,13 +8059,13 @@ class CmppCreateCodeTask extends Pzlife
         $tody_time = strtotime(date("Ymd", time()));
         // $tody_time = 1592478000;
         try {
-            // $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84]);
+            $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84, 'update_time' => time()]);
             /* $where = [];
             $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
             $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-            // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `template_id` IN ('100181818','100181820') AND `create_time` >  '" . $tody_time ."' ");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  '" . $tody_time . "' ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100181593' AND `create_time` >  " . $tody_time;die;
-            $sendid = $mysql_connect->query("SELECT `id` FROM `sflsftp`.`yx_sfl_send_task` WHERE `template_id` IN ('100181864','100181869') ");
+            // $sendid = $mysql_connect->query("SELECT `id` FROM `sflsftp`.`yx_sfl_send_task` WHERE `template_id` IN ('100181864','100181869') ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100180528' AND `create_time` >  " . $tody_time;die;
             foreach ($sendid as $key => $value) {
                 $this->redis->rpush('index:meassage:sflmessage:sendtask', $value['id']);
