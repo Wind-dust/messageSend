@@ -9744,37 +9744,52 @@ class CmppCreateCodeTask extends Pzlife
                                 if ($j > 100) {
                                     //  print_r($all_report);die;
                                     $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
-                                                    //推送失败
-                                                    print_r($res);
-                                                    if ($res != 'SUCCESS') {
-                                                        usleep(300);
-                                                        $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
-                                                        if ($res != 'SUCCESS') {
-                                                            usleep(300);
-                                                            $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
-                                                            foreach ($receipt_reports as $akey => $avalue) {
-                                                                // # code...
-                                                                // print_r($avalue);die;
-                                                                $redis->rpush('index:meassage:code:receive_for_future_default', json_encode($avalue)); //写入用户带处理日志
-                                                            }
-                                                        }
-                                                    }
-                                                    $all_report = '';
-                                                    $receipt_reports = [];
-                                                    $j = 1;
-                                                }
-                                                /*  $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
-                                                    'task_no'        => trim($task[0]['task_no']),
-                                                    'status_message' => $stat,
-                                                    'message_info'   => $message_info,
-                                                    'mobile'         => trim($mvalue),
-                                                    'msg_id'         => trim($task[0]['send_msg_id']),
-                                                    // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                                                    'send_time'      => isset($task_receive[0]['create_time']) ? date('Y-m-d H:i:s', trim($task_receive[0]['create_time'])) : date('Y-m-d H:i:s', time()),
-                                                    'smsCount' => $s_num,
-                                                    'smsIndex' => $a + 1,
-                                                ])); //写入用户带处理日志 */
+                                    //推送失败
+                                    print_r($res);
+                                    if ($res != 'SUCCESS') {
+                                        usleep(300);
+                                        $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                                        if ($res != 'SUCCESS') {
+                                            usleep(300);
+                                            $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                                            foreach ($receipt_reports as $akey => $avalue) {
+                                                // print_r($avalue);die;
+                                                $redis->rpush('index:meassage:code:receive_for_future_default', json_encode($avalue)); //写入用户带处理日志
+                                            }
+                                        }
+                                    }
+                                    $all_report = '';
+                                    $receipt_reports = [];
+                                    $j = 1;
+                                }
+                                                
                             }
+            }
+            if (!empty($all_report)) {
+                $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                //推送失败
+                if ($res != 'SUCCESS') {
+                    usleep(300);
+                    $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                    if ($res != 'SUCCESS') {
+                        usleep(300);
+                        $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                        foreach ($receipt_reports as $akey => $avalue) {
+                            // # code...
+                            // print_r($avalue);die;
+                            $redis->rpush('index:meassage:code:receive_for_future_default', json_encode($avalue)); //写入用户带处理日志
+                        }
+                    }
+                }
+                $all_report = '';
+                $receipt_report = [];
+                $j = 1;
+            }
+            if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
+                $redis->rpush('index:meassage:code:send', json_encode([
+                    'mobile'  => 15201926171,
+                    'content' => "【钰晰科技】客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time())
+                ]));
             }
             // echo count($task_receipt);die;
         } catch (\Exception $th) {
