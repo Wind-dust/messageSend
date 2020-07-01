@@ -8596,8 +8596,8 @@ class CmppCreateCodeTask extends Pzlife
             13581809553,
             13213032008
         ];
-        $tody_time = strtotime(date("Ymd", time()));
-        // $tody_time = 1592582400;
+        // $tody_time = strtotime(date("Ymd", time()));
+        $tody_time = 1593601200;
         try {
             /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
             // $mysql_connect->table('yx_sfl_multimedia_message')->where([['create_time', '>', $tody_time],['sfl_relation_id','IN','100181558,100181556,100181563,100177398']])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
@@ -8609,7 +8609,7 @@ class CmppCreateCodeTask extends Pzlife
         $j = 2;
         $receipt = [];
         $send_msg = [];
-        $deduct = 1; //1扣量,2不扣
+        $deduct = 2; //1扣量,2不扣
         $rate = 60;
         /*    $all_task = 
         while (true) {
@@ -9738,8 +9738,42 @@ class CmppCreateCodeTask extends Pzlife
                                     'smsIndex' => $a + 1,
                                 ];
                                 $all_report = $all_report . json_encode($receipt_report) . "\n";
-                                print_r(json_encode($receipt_report));die;
+                                // print_r(json_encode($receipt_report));die;
                                 $receipt_reports[] = $receipt_report;
+                                $j++;
+                                if ($j > 100) {
+                                    //  print_r($all_report);die;
+                                    $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                                                    //推送失败
+                                                    print_r($res);
+                                                    if ($res != 'SUCCESS') {
+                                                        usleep(300);
+                                                        $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                                                        if ($res != 'SUCCESS') {
+                                                            usleep(300);
+                                                            $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                                                            foreach ($receipt_reports as $akey => $avalue) {
+                                                                // # code...
+                                                                // print_r($avalue);die;
+                                                                $redis->rpush('index:meassage:code:receive_for_future_default', json_encode($avalue)); //写入用户带处理日志
+                                                            }
+                                                        }
+                                                    }
+                                                    $all_report = '';
+                                                    $receipt_reports = [];
+                                                    $j = 1;
+                                                }
+                                                /*  $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
+                                                    'task_no'        => trim($task[0]['task_no']),
+                                                    'status_message' => $stat,
+                                                    'message_info'   => $message_info,
+                                                    'mobile'         => trim($mvalue),
+                                                    'msg_id'         => trim($task[0]['send_msg_id']),
+                                                    // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                                    'send_time'      => isset($task_receive[0]['create_time']) ? date('Y-m-d H:i:s', trim($task_receive[0]['create_time'])) : date('Y-m-d H:i:s', time()),
+                                                    'smsCount' => $s_num,
+                                                    'smsIndex' => $a + 1,
+                                                ])); //写入用户带处理日志 */
                             }
             }
             // echo count($task_receipt);die;
