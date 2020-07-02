@@ -345,13 +345,15 @@ class Administrator extends CommonIndex
 
     public function getUserSendTask($page, $pageNum, $id)
     {
+        $time = strtotime('-4 days',time());
+        // echo $time;die;
         $offset = ($page - 1) * $pageNum;
         if (!empty($id)) {
             $result = DbAdministrator::getUserSendTask(['id' => $id], '*', true);
         } else {
-            $result = DbAdministrator::getUserSendTask([], '*', false, '', $offset . ',' . $pageNum);
+            $result = DbAdministrator::getUserSendTask([['create_time' ,'>=', $time]], '*', false, ['free_trial' => 'desc'], $offset . ',' . $pageNum);
         }
-        $total = DbAdministrator::countUserSendTask([]);
+        $total = DbAdministrator::countUserSendTask([['create_time' ,'>=', $time]]);
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
 
@@ -570,13 +572,14 @@ class Administrator extends CommonIndex
 
     public function getUserSendCodeTask($page, $pageNum, $id)
     {
+        $time = strtotime('-4 days',time());
         $offset = ($page - 1) * $pageNum;
         if (!empty($id)) {
             $result = DbAdministrator::getUserSendCodeTask(['id' => $id], '*', true);
         } else {
-            $result = DbAdministrator::getUserSendCodeTask([], '*', false, '', $offset . ',' . $pageNum);
+            $result = DbAdministrator::getUserSendCodeTask([['create_time' ,'>=', $time]], '*', false, ['free_trial' => 'desc'], $offset . ',' . $pageNum);
         }
-        $total = DbAdministrator::countUserSendCodeTask([]);
+        $total = DbAdministrator::countUserSendCodeTask([['create_time' ,'>=', $time]]);
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
 
@@ -786,7 +789,7 @@ class Administrator extends CommonIndex
             $result = sendRequest($report_api, 'post', $data);
             print_r($result);
             die;
-        }elseif ($channel_id == 96){//联麓彩信批量通道
+        }elseif ($channel_id == 104){//联麓彩信批量通道
             if ($model_val == 1) {
                 return ['code' => '3005','msg' => '该通道不支持模板变量报备'];
             }
