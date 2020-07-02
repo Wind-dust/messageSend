@@ -502,11 +502,14 @@ class User extends CommonIndex
         }
     }
 
-    public function apportionSonUser($conId, $nick_name, $user_type, $passwd, $mobile, $email)
+    public function apportionSonUser($conId, $nick_name, $user_type, $passwd, $mobile, $email, $company_name = '')
     {
         $uid = $this->getUidByConId($conId);
         if (empty($uid)) { //用户不存在
             return ['code' => '3003'];
+        }
+        if (DbUser::getUserOne(['nick_name' => $nick_name], 'id', true)) {
+            return ['code' => '3005'];//该手机号已注册
         }
         // if (!empty($this->checkAccount($mobile))) {
         //     return ['code' => '3006'];//该手机号已注册
@@ -517,6 +520,7 @@ class User extends CommonIndex
             'mobile'    => $mobile,
             'passwd'    => $cipherPassword,
             'nick_name' => $nick_name,
+            'company_name' => $company_name,
             'user_type' => $user_type,
             'email'     => $email,
             'appid'     => uniqid(''),

@@ -242,6 +242,7 @@ class User extends MyController
         $apiName   = classBasename($this) . '/' . __function__;
         $conId     = trim($this->request->post('con_id'));
         $nick_name = trim($this->request->post('nick_name'));
+        $company_name = trim($this->request->post('company_name'));
         $user_type = trim($this->request->post('user_type'));
         $passwd    = trim($this->request->post('passwd'));
         $mobile    = trim($this->request->post('mobile'));
@@ -258,7 +259,7 @@ class User extends MyController
         if (checkPassword($passwd) === false) {
             return ['code' => '3005'];
         }
-        $result = $this->app->user->apportionSonUser($conId, $nick_name, $user_type, $passwd, $mobile, $email);
+        $result = $this->app->user->apportionSonUser($conId, $nick_name, $user_type, $passwd, $mobile, $email, $company_name);
         $this->apiLog($apiName, [$conId, $nick_name, $user_type, $passwd, $mobile, $email], $result['code'], $conId);
         return $result;
     }
