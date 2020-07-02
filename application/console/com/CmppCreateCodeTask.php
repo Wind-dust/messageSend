@@ -3618,7 +3618,7 @@ class CmppCreateCodeTask extends Pzlife
                                     'message_info'   => '发送成功',
                                     'mobile'         => trim($deduct['mobile']),
                                     // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                                    'send_time'      => date('Y-m-d H:i:s', $deduct['Submit_time'] + mt_rand(0, 2)),
+                                    'send_time'      => date('Y-m-d H:i:s', $deduct['Submit_time'] + mt_rand(0, 5)),
                                 ])); //写入用户带处理日志
                             } else {
                                 $redis->rpush('index:meassage:code:user:receive:' . $deduct['uid'], json_encode([
@@ -3627,7 +3627,7 @@ class CmppCreateCodeTask extends Pzlife
                                     'message_info'   => '发送成功',
                                     'mobile'         => trim($deduct['mobile']),
                                     // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                                    'send_time'      => date('Y-m-d H:i:s',$deduct['Submit_time'] + mt_rand(0, 2)),
+                                    'send_time'      => date('Y-m-d H:i:s',$deduct['Submit_time'] + mt_rand(0, 5)),
                                 ])); //写入用户带处理日志
                             }
                         }
