@@ -911,7 +911,7 @@ class SflUpload extends Pzlife
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
-                    // continue;
+                    continue;
                     $err_task_num = [];
                     $send_data    = [];
                     if ($son_path_data !== false) {
@@ -922,13 +922,13 @@ class SflUpload extends Pzlife
                             // $file = fopen($path.$value."/".$svalue,"r");
                             // print_r($svalue);die;
 
-                            /*  if (!strpos($svalue,'20200530')) {
+                             if (!strpos($svalue,'20200624')) {
                             continue;
-                            } */
-                            // print_r($svalue);die;
-                            if (!strpos($svalue, date("Ymd"))) {
-                                continue;
                             }
+                            // print_r($svalue);die;
+                           /*  if (!strpos($svalue, date("Ymd"))) {
+                                continue;
+                            } */
                             /* if (strpos($svalue, '2020062010') == false) {
                                 continue;
                             } */
@@ -1132,8 +1132,8 @@ class SflUpload extends Pzlife
                                         $MMS_real_send['send_num']     = 1;
                                         $MMS_real_send['send_status']  = 1;
                                         $MMS_real_send['sfl_model_id'] = 1;
-                                        $MMS_real_send['create_time']  = time();
-                                        // $MMS_real_send['create_time']  = $expeort_time + ceil($key / 7000);
+                                        // $MMS_real_send['create_time']  = time();
+                                        $MMS_real_send['create_time']  = $expeort_time + ceil($key / 7000);
                                         if (isset($model_check[$tvalue[2]])) {
                                             $model_check[$tvalue[2]]++;
                                         } else {
@@ -1276,15 +1276,15 @@ class SflUpload extends Pzlife
                             /*  if (strpos($svalue, '2020062414') == false) {
                                 continue;
                             } */
-                            // $start_time = strtotime("2020-06-24");
-                            // $end_time = $start_time+86400;
-                            // $expeort_time = $start_time + 43200 - mt_rand(0, 3000);
-                            /*   if (strpos($svalue,'2020061810') !== false) {
+                            $start_time = strtotime("2020-06-25");
+                            $end_time = $start_time+86400;
+                            $expeort_time = $start_time + 43200 - mt_rand(0, 3000);
+                            /*   if (strpos($svalue,'20200625') == false) {
                                 continue;
                             } */
-                            /*  if (strpos($svalue,'2020061910') !== false) {
+                             if (strpos($svalue,'2020070210') !== false) {
                                 continue;
-                            } */
+                            }
                             // if (strpos($svalue,'2020061510') !== false) {
                             // continue;
                             // }
@@ -1343,6 +1343,15 @@ class SflUpload extends Pzlife
                             } elseif ($file_info[1] == 'txt') { //获取模板信息
                                 $file_data = $this->readForTxtToDyadicArray($son_path); //关联关系
                                 // print_r($son_path);die;
+                                if (!empty($file_data)) {
+                                    foreach ($file_data as $fkey => $fvalue) {
+                                        // print_r($fvalue);
+                                        $tem                   = [];
+                                        $tem['num']            = $fvalue[2];
+                                        $tem['content']        = $fvalue[4];
+                                        $SMS_model[$fvalue[0]] = $tem;
+                                    }
+                                }
                             }
                         }
                         if (!empty($file_data)) {
@@ -1572,9 +1581,9 @@ class SflUpload extends Pzlife
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
 
-                            /*   if (strpos($svalue, date("Ymd")) !== false) {
+                            if (strpos($svalue, date("Ymd")) === false) {
                                 continue;
-                            } */
+                            }
                             $file_info = explode('.', $svalue);
                             if ($file_info[1] == 'zip') { //需要解压
                                 //开始解压
@@ -1913,10 +1922,10 @@ class SflUpload extends Pzlife
                         foreach ($son_path_data as $skey => $svalue) {
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
-                            /*  if (!strpos($svalue, date("Ymd"))) {
+                             if (!strpos($svalue, date("Ymd"))) {
                                 continue;
-                            } */
-                            continue;
+                            }
+                            // continue;
                             $file_info = explode('.', $svalue);
                             if ($file_info[1] == 'zip') { //需要解压
                                 if ($zip->open($son_path) === true) {
@@ -2334,9 +2343,9 @@ class SflUpload extends Pzlife
 
             $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
             ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-            $start_time = strtotime("2020-06-17");
+            $start_time = strtotime("2020-06-24");
             $end_time = $start_time + 86400;
-            $expeort_time = $start_time + 43200 - mt_rand(0, 3000);
+            $expeort_time = $start_time + 46800 - mt_rand(0, 180);
             $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $start_time . " AND   `create_time` <  " . $end_time . " ");
             $ids          = [];
             foreach ($mul_task_ids as $key => $value) {
@@ -2401,7 +2410,7 @@ class SflUpload extends Pzlife
                         'real_message'             => $receipts[0]['real_message'],
                         'SENDING_TIME'             => date('Y-m-d H:i:s', $expeort_time + ceil($key / 7000)),
                     ];
-                    $num = mt_rand(0, 5378);
+                    $num = mt_rand(0, 1000);
                     /* if ($num>=0 && $num < 113) {
                     $receive_all['STATUS'] = "MMS:2";
                     }else{
@@ -2418,12 +2427,12 @@ class SflUpload extends Pzlife
                         'real_message'             => '',
                         'SENDING_TIME'             => date('Y-m-d H:i:s', $expeort_time + ceil($key / 7000)),
                     ];
-                    /*  $num = mt_rand(0, 5378);
-                    if ($num>=0 && $num < 144) {
-                    $receive_all['STATUS'] = "MMS:2";
+                     $num = mt_rand(0, 1000);
+                    if ($num>=0 && $num < 35) {
+                        $receive_all['STATUS'] = "MMS:2";
                     }else{
-                    $receive_all['STATUS'] = "MMS:1";
-                    } */
+                         $receive_all['STATUS'] = "MMS:1";
+                    }
                     if (checkMobile($task[0]['mobile']) == false) {
                         $receive_all['STATUS'] = "MMS:2";
                     } else {
@@ -2505,12 +2514,17 @@ class SflUpload extends Pzlife
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $objReader = PHPExcel_IOFactory::createReader('Excel2007');
         // print_r(realpath("../"). "\yt_area_mobile.csv");die;
-        $start_time = strtotime("2020-06-17");
-        $end_time = $start_time + 86400;
-        $expeort_time = $start_time + 43200 - mt_rand(0, 3000);
+        $start_time = strtotime("2020-06-25");
+        $end_time = $start_time+86400;
+        $expeort_time = $start_time+43200-mt_rand(0,3000);
+        $expeort_time = 1593062400;
         try {
             // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591891200 AND   `create_time` <  1591977600 AND `task_content` NOT LIKE '%test%' ");
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  " . $start_time . " AND   `create_time` <  " . $end_time . "  AND `task_content` NOT LIKE '%test%' ");
+            // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$start_time." AND   `create_time` <  ".$end_time."  AND `task_content` NOT LIKE '%test%' ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$start_time." AND   `create_time` <  ".$end_time."  AND `template_id` IN ('529','100150820','100150821','100150822','100180393','100181850','100181855','100181864','100181869','100181873','100181874','100181875','100181876') ");
+            // echo "SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$start_time." AND   `create_time` <  ".$end_time."  AND `template_id` IN ('529','100150820','100150821','100150822','100180393','100181850','100181855','100181864','100181869','100181873','100181874','100181875','100181876') ";die;
+            // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$start_time." AND   `create_time` <  ".$end_time."  AND `template_id` IN ('100181607','100181610','100181736','100181737') ");
+            // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `template_id` ='100181517'  AND `task_content` NOT LIKE '%test%' ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591286400 AND   `create_time` <  1591372800 AND `task_content` NOT LIKE '%test%' ";die;
             $ids          = [];
             $i = 1;
@@ -2574,7 +2588,7 @@ class SflUpload extends Pzlife
                 if (strpos($task[0]['task_content'], 'test')) {
                     continue;
                 }
-                $num = mt_rand(0, 15055);
+                $num = mt_rand(0, 1000);
 
                 if (!empty($receipts)) {
 
@@ -2614,13 +2628,11 @@ class SflUpload extends Pzlife
                         'real_message'             => '',
                         'SENDING_TIME'             => date('Y-m-d H:i:s', $expeort_time + ceil($key / 7300)),
                     ];
-                    /*  if ($num >= 0 && $num < 17) {
-                        $receive_all['STATUS'] = "SMS:3";
-                    } elseif ($num >= 17 && $num < 591) {
+                     if ($num >= 0 && $num <= 35) {
                         $receive_all['STATUS'] = "SMS:2";
                     } else {
                         $receive_all['STATUS'] = "SMS:1";
-                    } */
+                    }
                     if (checkMobile($task[0]['mobile']) == false) {
                         $receive_all['STATUS'] = "SMS:2";
                     } else {
