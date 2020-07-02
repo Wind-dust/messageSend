@@ -64,6 +64,10 @@ class CmppCreateCodeTask extends Pzlife
                 $uid        = 115;
                 $channel_id = 14;
             }
+            if (trim($send['Source_Addr']) == 101106) { //移动
+                $uid        = 207;
+                $channel_id = 29;
+            }
             $user = $this->getUserInfo($uid);
             if (empty($user) || $user['user_status'] == 1) {
                 continue;

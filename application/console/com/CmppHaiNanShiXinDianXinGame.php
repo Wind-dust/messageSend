@@ -56,11 +56,11 @@ class CmppHaiNanShiXinDianXinGame extends Pzlife
             'content'     => '【超变传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/3Ypm7 回T退订 ',
         ])); */
 
-        /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15316188669',
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '17721160630',
             'mar_task_id' => '',
-            'content'     => '【超变传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/3Ypm7 回T退订',
-        ])); */
+            'content'     => '【神姬奇谭】{te}用户，恭喜您被选中玩游戏免费领取爱奇艺VIP年卡！次日作废，请及时查收 https://itwq.cn/Gs 回T退订',
+        ]));
 
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/29.log";
