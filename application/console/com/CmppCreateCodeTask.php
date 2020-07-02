@@ -8622,8 +8622,8 @@ class CmppCreateCodeTask extends Pzlife
         $j = 1;
         $receipt = [];
         $send_msg = [];
-        $deduct = 2; //1扣量,2不扣
-        $rate = 50;
+        $deduct = 1; //1扣量,2不扣
+        $rate = 10;
         /*    $all_task = 
         while (true) {
             $task_id = $this->redis->lpop('index:meassage:sflmulmessage:sendtask');
@@ -8636,7 +8636,7 @@ class CmppCreateCodeTask extends Pzlife
             $receipt_id = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_multimediatask_receipt ORDER BY `id` DESC LIMIT 1  ")[0]['id'];
             $receipt_id++;
             // print_r($receipt_id);die;
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time);
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `id` > '647399' AND  `create_time` >  " . $tody_time);
             // $sendid = $mysql_connect->query("SELECT * FROM `sflsftp`.`yx_sfl_multimedia_message` WHERE `create_time` >= '" . $tody_time . "' AND `sfl_relation_id` IN ('100181871')");
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` IN('100177398','100181563','100181556','100181558')  AND `create_time` >  " . $tody_time;die;
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time;die;
