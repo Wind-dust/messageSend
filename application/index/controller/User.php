@@ -18,6 +18,7 @@ class User extends MyController
      * @apiGroup         index_user
      * @apiName          userRegistered
      * @apiParam (入参) {String} nick_name 用户姓名
+     * @apiParam (入参) {String} company_name 公司名称
      * @apiParam (入参) {Number} user_type 用户类型1.个人账户2.企业账户
      * @apiParam (入参) {String} passwd 密码
      * @apiParam (入参) {String} mobile 手机号
@@ -31,6 +32,7 @@ class User extends MyController
     {
         $apiName   = classBasename($this) . '/' . __function__;
         $nick_name = trim($this->request->post('nick_name'));
+        $company_name = trim($this->request->post('company_name'));
         $user_type = trim($this->request->post('user_type'));
         $passwd    = trim($this->request->post('passwd'));
         $mobile    = trim($this->request->post('mobile'));
@@ -51,7 +53,7 @@ class User extends MyController
         if (empty($nick_name)) {
             return ['code' => '3007'];
         }
-        $result = $this->app->user->userRegistered($nick_name, $user_type, $passwd, $mobile, $email, $vercode);
+        $result = $this->app->user->userRegistered($nick_name, $user_type, $passwd, $mobile, $email, $vercode, $company_name);
         // $this->apiLog($apiName, [$Banner_id, $source], $result['code'], '');
         return $result;
     }

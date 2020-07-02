@@ -408,7 +408,7 @@ class User extends CommonIndex
         return $result;
     }
 
-    public function userRegistered($nick_name, $user_type, $passwd, $mobile, $email, $vercode)
+    public function userRegistered($nick_name, $user_type, $passwd, $mobile, $email, $vercode, $company_name = '')
     {
 
         $stype = 1;
@@ -419,12 +419,16 @@ class User extends CommonIndex
         // if (!empty($this->checkAccount($mobile))) {
         //     return ['code' => '3005'];//该手机号已注册
         // }
+        if (DbUser::getUserOne(['nick_name' => $nick_name], 'id', true)) {
+            return ['code' => '3005'];//该手机号已注册
+        }
         $cipherPassword = $this->getPassword($passwd, $this->cipherUserKey); //加密后的password
 
         $data = [
             'mobile'    => $mobile,
             'passwd'    => $cipherPassword,
             'nick_name' => $nick_name,
+            'company_name' => $company_name,
             'user_type' => $user_type,
             'email'     => $email,
             'appid'     => uniqid(''),
