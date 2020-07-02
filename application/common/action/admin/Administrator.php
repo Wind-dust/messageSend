@@ -575,7 +575,7 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function getUserSendCodeTask($page, $pageNum, $id, $free_trial = 0)
+    public function getUserSendCodeTask($page, $pageNum, $id, $free_trial = 0, $channel_id = 0)
     {
         $time = strtotime('-4 days',time());
         // echo $time;die;
@@ -584,6 +584,9 @@ class Administrator extends CommonIndex
         $offset = ($page - 1) * $pageNum;
         if ($free_trial) {
             array_push($where,['free_trial','=',$free_trial]);
+        }
+        if ($channel_id == 0) {
+            array_push($where,['yidong_channel_id','=',0]);
         }
         $offset = ($page - 1) * $pageNum;
         if (!empty($id)) {
