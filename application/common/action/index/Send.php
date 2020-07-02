@@ -440,7 +440,7 @@ return $result;
         // print_r($this->redis);
         // die;
         $Mobiles = array_unique(array_filter($Mobiles));
-        $user    = DbUser::getUserOne(['appid' => $Username], 'id,pid,appkey,user_type,user_status,reservation_service,free_trial,pid,business_deduct', true);
+        $user    = DbUser::getUserOne(['appid' => $Username], 'id,pid,appkey,user_type,user_status,reservation_service,free_trial,pid,business_deduct,business_free_credit', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -530,8 +530,8 @@ return $result;
         $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
         if ($user['free_trial'] == 2) {
             $data['free_trial'] = 2;
-            if ($user['business_deduct'] > 0) {
-                if ($real_num >= $user['business_deduct']) {
+            if ($user['business_free_credit'] > 0) {
+                if ($real_num >= $user['business_free_credit'] ) {
                     $data['free_trial'] = 1;
                 }
             }
@@ -571,6 +571,11 @@ return $result;
                     $data['dianxin_channel_id'] = 85;
                 }
                 if ($user['id'] == 187) {
+                    $data['yidong_channel_id'] = 95;
+                    $data['liantong_channel_id'] = 95;
+                    $data['dianxin_channel_id'] = 95;
+                }
+                if ($user['id'] == 200) {
                     $data['yidong_channel_id'] = 95;
                     $data['liantong_channel_id'] = 95;
                     $data['dianxin_channel_id'] = 95;
@@ -1234,6 +1239,11 @@ return $result;
                             $send_task['liantong_channel_id'] = 95;
                             $send_task['dianxin_channel_id'] = 95;
                         }
+                        if ($user['id'] == 200) {
+                            $send_task['yidong_channel_id'] = 95;
+                            $send_task['liantong_channel_id'] = 95;
+                            $send_task['dianxin_channel_id'] = 95;
+                        }
                         $free_taskno[] = $task_no;
                         // array_push($free_trial, $send_task);
                     }
@@ -1247,6 +1257,11 @@ return $result;
                             $send_task['liantong_channel_id'] = 85;
                             $send_task['dianxin_channel_id'] = 85;
                             if ($user['id'] == 187) {
+                                $send_task['yidong_channel_id'] = 95;
+                                $send_task['liantong_channel_id'] = 95;
+                                $send_task['dianxin_channel_id'] = 95;
+                            }
+                            if ($user['id'] == 200) {
                                 $send_task['yidong_channel_id'] = 95;
                                 $send_task['liantong_channel_id'] = 95;
                                 $send_task['dianxin_channel_id'] = 95;
@@ -1752,30 +1767,76 @@ return $result;
                 return ['code' => '3010'];
             }
         }
-        $connect_data = explode(';', $connect);
-        $connect_data = array_filter($connect_data);
+        // print_r($connect);die;
+        // $connect_data = explode(';', $connect);
+        // $connect_data = array_filter($connect_data);
         // $send_data = [];
         $send_data_mobile = [];
 
         //有模板目前只支持有模板进行提交
         $MMS_data = [];
         // 变量,变量:手机号;变量,变量:手机号;变量:手机号;
-        foreach ($connect_data as $key => $data) {
-
-            $send_text = explode(':', $data);
-
-            if (checkMobile($send_text[1]) == false || strlen($send_text[1]) != 11) {
+        foreach ($connect as $key => $data) {
+             
+            // $send_text = explode(':', $data);
+            if (empty($data['mobile'])) {
+                continue;
+            }
+            if (checkMobile($data['mobile']) == false || strlen($data['mobile']) != 11) {
                 continue;
             }
             $son_MMS_data = [];
-            $son_MMS_data = [
-                'title' => $template['title']
-            ];
-            $the_frame = explode(',', $send_text[0]);
-            foreach ($template['multimedia_frame'] as $mf => $mula) {
-                for ($i = 0; $i < count($the_frame); $i++) {
-                    $var_num = $i + 1;
-                    $mula['content'] = str_replace("{{var" . $var_num . "}}", $the_frame[$i], $mula['content']); //内容
+                $son_MMS_data = [
+                    'title' => $template['title']
+                ];
+                // $the_frame = explode(',', $send_text[0]);
+                foreach ($template['multimedia_frame'] as $mf => $mula) {
+                   /*  for ($i = 0; $i < count($the_frame); $i++) {
+                        $var_num = $i + 1;
+                        $mula['content'] = str_replace("{{var" . $var_num . "}}", $the_frame[$i], $mula['content']); //内容
+                    } */
+                    if (!empty($data['{{var1}}'])) {
+                        $mula['content'] = str_replace("{{var1}}", $data['{{var1}}'], $mula['content']); //内容
+                    }
+                    if (!empty($data['{{var2}}'])) {
+                        $mula['content'] = str_replace("{{var2}}", $data['{{var2}}'], $mula['content']); //内2
+                    }
+                    if (!empty($data['{{var3}}'])) {
+                        $mula['content'] = str_replace("{{var3}}", $data['{{var3}}'], $mula['content']); //内2
+                    }
+                    if (!empty($data['{{var4}}'])) {
+                        $mula['content'] = str_replace("{{var4}}", $data['{{var4}}'], $mula['content']); //内2
+                    }
+                    if (!empty($data['{{var5}}'])) {
+                        $mula['content'] = str_replace("{{var5}}", $data['{{var5}}'], $mula['content']); //内2
+                    }
+                    if (!empty($data['{{var6}}'])) {
+                        $mula['content'] = str_replace("{{var6}}", $data['{{var6}}'], $mula['content']); //内2
+                    }
+                    if (!empty($data['{{var7}}'])) {
+                        $mula['content'] = str_replace("{{var7}}", $data['{{var7}}'], $mula['content']); //内2
+                    }
+                    if (!empty($data['{{var8}}'])) {
+                        $mula['content'] = str_replace("{{var8}}", $data['{{var8}}'], $mula['content']); //内2
+                    }
+                    if (!empty($data['{{var9}}'])) {
+                        $mula['content'] = str_replace("{{var9}}", $data['{{var9}}'], $mula['content']); //内2
+                    }
+                    if (!empty($data['{{var10}}'])) {
+                        $mula['content'] = str_replace("{{var10}}", $data['{{var10}}'], $mula['content']); //内2
+                    }
+                    $the_mula['content'] = $mula['content'];
+                    $the_mula['num'] = $mula['num'];
+                    $the_mula['name'] = $mula['name'];
+                    $the_mula['image_path'] = $mula['image_path'];
+                    $the_mula['image_type'] = $mula['image_type'];
+                    $son_MMS_data['multimedia_frame'][] = $the_mula;
+                }
+                if (in_array($son_MMS_data, $MMS_data)) {
+                    $send_data_mobile[array_search($son_MMS_data, $MMS_data)] = $data;
+                } else {
+                    $MMS_data[] = $son_MMS_data;
+                    $send_data_mobile[array_search($son_MMS_data, $MMS_data)] = $data;
                 }
                 $the_mula['content'] = $mula['content'];
                 $the_mula['num'] = $mula['num'];
@@ -1783,15 +1844,16 @@ return $result;
                 $the_mula['image_path'] = $mula['image_path'];
                 $the_mula['image_type'] = $mula['image_type'];
                 $son_MMS_data['multimedia_frame'][] = $the_mula;
-            }
+            
             if (in_array($son_MMS_data, $MMS_data)) {
                 $send_data_mobile[array_search($son_MMS_data, $MMS_data)] = $data;
             } else {
                 $MMS_data[] = $son_MMS_data;
                 $send_data_mobile[array_search($son_MMS_data, $MMS_data)] = $data;
             }
+        
         }
-
+        // print_r($send_data_mobile);die;
         $free_taskno = [];
         $trial = []; //需审核
         //组合任务包
@@ -1854,7 +1916,7 @@ return $result;
             'template_id' => $template_id,
             'uid'     => $user['id'],
             'title' => $value['title'],
-            'submit_content' => join(';', $send_data_mobile),
+            'submit_content' => json_encode($send_data_mobile),
             'source'         => $ip,
             'send_num'       => count($send_data_mobile),
         ];
