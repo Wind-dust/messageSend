@@ -351,7 +351,7 @@ class Administrator extends CommonIndex
         if (!empty($id)) {
             $result = DbAdministrator::getUserSendTask(['id' => $id], '*', true);
         } else {
-            $result = DbAdministrator::getUserSendTask([['create_time' ,'>=', $time]], '*', false, ['free_trial' => 'desc'], $offset . ',' . $pageNum);
+            $result = DbAdministrator::getUserSendTask([['create_time' ,'>=', $time]], '*', false, ['free_trial' => 'asc'], $offset . ',' . $pageNum);
         }
         $total = DbAdministrator::countUserSendTask([['create_time' ,'>=', $time]]);
         return ['code' => '200', 'total' => $total, 'data' => $result];
@@ -577,7 +577,7 @@ class Administrator extends CommonIndex
         if (!empty($id)) {
             $result = DbAdministrator::getUserSendCodeTask(['id' => $id], '*', true);
         } else {
-            $result = DbAdministrator::getUserSendCodeTask([['create_time' ,'>=', $time]], '*', false, ['free_trial' => 'desc'], $offset . ',' . $pageNum);
+            $result = DbAdministrator::getUserSendCodeTask([['create_time' ,'>=', $time]], '*', false, ['free_trial' => 'asc'], $offset . ',' . $pageNum);
         }
         $total = DbAdministrator::countUserSendCodeTask([['create_time' ,'>=', $time]]);
         return ['code' => '200', 'total' => $total, 'data' => $result];
