@@ -575,7 +575,7 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function getUserSendCodeTask($page, $pageNum, $id, $free_trial = 0, $channel_id = 0)
+    public function getUserSendCodeTask($page, $pageNum, $id, $free_trial = 0, $channel_id = 0, $send_status)
     {
         $time = strtotime('-4 days',time());
         // echo $time;die;
@@ -585,8 +585,11 @@ class Administrator extends CommonIndex
         if ($free_trial) {
             array_push($where,['free_trial','=',$free_trial]);
         }
-        if ($channel_id == 0) {
+        /* if ($channel_id == 0) {
             array_push($where,['yidong_channel_id','=',0]);
+        } */
+        if ($send_status) {
+            array_push($where,['send_status','=',$send_status]);
         }
         $offset = ($page - 1) * $pageNum;
         if (!empty($id)) {
@@ -733,7 +736,7 @@ class Administrator extends CommonIndex
 
             // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
             foreach ($real_usertask as $key => $value) {
-                DbAdministrator::editUserSendCodeTask(['free_trial' => $free_trial,  'yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id], $value['id']);
+                DbAdministrator::editUserSendCodeTask(['free_trial' => $free_trial,  'yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id,'send_status' =>2], $value['id']);
             }
             foreach ($real_usertask as $real => $usertask) {
                 $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $usertask['id'], 'deduct' => $user['business_deduct']]));
