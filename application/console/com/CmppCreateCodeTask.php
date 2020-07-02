@@ -1093,10 +1093,11 @@ class CmppCreateCodeTask extends Pzlife
                                     */
 
         // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_multimedia_message WHERE  `id` >= 125456  ");
+      /*   $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_multimedia_message WHERE  `id` >= 125456  ");
         foreach ($task_id as $key => $value) {
             $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $value['id'], 'deduct' => 60]));
-        }
+        } */
+        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 129502, 'deduct' => 60]));
     }
 
     //书写彩信任务日志并写入通道
@@ -1112,7 +1113,7 @@ class CmppCreateCodeTask extends Pzlife
         // $this->redis->rPush('index:meassage:multimediamessage:sendtask', 22886);
         // exit();
         // echo time() -1574906657;die;
-        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 125214, 'deduct' => 0]));
+        // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 125214, 'deduct' => 0]));
         while (true) {
             try {
                 $j = 1;
@@ -1943,9 +1944,10 @@ class CmppCreateCodeTask extends Pzlife
             }
             //去除黑名单后实际有效号码
             $real_send_mobile = array_diff($mobile_data, $error_mobile);
+            // print_r($real_send_mobile);die;
             //扣量
 
-            if ($deduct > 0) {
+            if ($deduct > 0 && count($real_send_mobile) > 0) {
                 //热门城市ID 
                 $province = Db::query("SELECT `id` FROM yx_areas WHERE `level` = 1 ");
                 $citys_id = [];
@@ -2288,26 +2290,27 @@ class CmppCreateCodeTask extends Pzlife
                 // die;
                 return ['error_mobile' => $error_mobile, 'yidong_mobile' => $yidong_mobile, 'liantong_mobile' => $liantong_mobile, 'dianxin_mobile' => $dianxin_mobile, 'deduct_mobile' => $deduct_mobile];
             } else {
-                foreach ($real_send_mobile as $key => $value) {
-                    $prefix = substr(trim($value), 0, 7);
-                    $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
-                    $newres = array_shift($res);
-                    if ($newres) {
-                        if ($newres['source'] == 1) { //移动
-                            // $channel_id = $yidong_channel_id;
+                if (!empty($real_send_mobile)) {
+                    foreach ($real_send_mobile as $key => $value) {
+                        $prefix = substr(trim($value), 0, 7);
+                        $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                        $newres = array_shift($res);
+                        if ($newres) {
+                            if ($newres['source'] == 1) { //移动
+                                // $channel_id = $yidong_channel_id;
+                                $yidong_mobile[] = $value;
+                            } elseif ($newres['source'] == 2) { //联通
+                                // $channel_id = $liantong_channel_id;
+                                $liantong_mobile[] = $value;
+                            } elseif ($newres['source'] == 3) { //电信
+                                // $channel_id = $dianxin_channel_id;
+                                $dianxin_mobile[] = $value;
+                            }
+                        } else {
                             $yidong_mobile[] = $value;
-                        } elseif ($newres['source'] == 2) { //联通
-                            // $channel_id = $liantong_channel_id;
-                            $liantong_mobile[] = $value;
-                        } elseif ($newres['source'] == 3) { //电信
-                            // $channel_id = $dianxin_channel_id;
-                            $dianxin_mobile[] = $value;
                         }
-                    } else {
-                        $yidong_mobile[] = $value;
                     }
                 }
-
                 return ['error_mobile' => $error_mobile, 'yidong_mobile' => $yidong_mobile, 'liantong_mobile' => $liantong_mobile, 'dianxin_mobile' => $dianxin_mobile, 'deduct_mobile' => $deduct_mobile];
             }
         } catch (\Exception $th) {
@@ -3544,92 +3547,98 @@ class CmppCreateCodeTask extends Pzlife
         'mobile' =>  $mobilesend[$i],
         'content'   => $sendTask['task_content'],
         'Submit_time'   => time(), */
-        while (true) {
-            sleep(3);
+        try {
             while (true) {
-                $deduct = $redis->lpop('index:message:code:deduct:deliver');
-                if (empty($deduct)) {
-                    break;
-                }
-                $deduct = json_decode($deduct, true);
-                $data = [];
-                $data = [
-                    'task_id'        => $deduct['mar_task_id'],
-                    'mobile'         => $deduct['mobile'],
-                    'real_message'   => $deduct['Stat'],
-                    'status_message' => $deduct['Stat'],
-                    'create_time'    => $deduct['Submit_time'],
-                ];
-                if ($deduct['from'] == 'yx_user_send_task') {
-                    Db::table('yx_send_task_receipt')->insert($data);
-                } else if ($deduct['from'] == 'yx_user_send_code_task') {
-                    Db::table('yx_send_code_task_receipt')->insert($data);
-                } else if ($deduct['from'] == 'yx_user_send_game_task') {
-                    Db::table('yx_user_send_game_task')->where(['id' => $deduct['mar_task_id'], 'mobile'         => $deduct['mobile']])->update(
-                        [
-                            'real_message'   => 'DEDUCT:1',
-                            'status_message' => $deduct['Stat'],
-                            'update_time'    => $deduct['Submit_time'],
-                        ]
-                    );
-                } elseif ($deduct['from'] == 'yx_user_multimedia_message') {
-                    Db::table('yx_user_multimedia_message_log')->where(['task_id' => $deduct['mar_task_id'], 'mobile'         => $deduct['mobile']])->update(
-                        [
-                            'real_message'   => 'DEDUCT:1',
-                            'status_message' => $deduct['Stat'],
-                            'update_time'    => $deduct['Submit_time'],
-                        ]
-                    );
-                }
-                if (in_array($deduct['uid'], [47, 49, 51, 52, 53, 54, 55])) {
-                    $request_url = "http://116.228.60.189:15901/rtreceive?";
-                    $request_url .= 'task_no=' . trim($deduct['task_no']) . "&status_message=" . trim($deduct['Stat']) . "&mobile=" . trim($deduct['mobile']) . "&send_time=" . date('Y-m-d H:i:s', trim($deduct['Submit_time']));
-                } else {
-                    $user = Db::query("SELECT `pid` FROM yx_users WHERE `id` = " . $deduct['uid']);
-                    if ($user[0]['pid'] == 137) {
-                        $send_len = 0;
-                        $send_len = mb_strlen($deduct['content']);
-                        $s_num = 1;
-                        if ($send_len > 70) {
-                            $s_num = ceil($send_len / 67);
-                        }
-                        for ($a = 0; $a < $s_num; $a++) {
-                            $redis->rpush('index:meassage:code:user:receive:' . $deduct['uid'], json_encode([
-                                'task_no'        => trim($deduct['task_no']),
+                sleep(3);
+                while (true) {
+                    $deduct = $redis->lpop('index:message:code:deduct:deliver');
+                    if (empty($deduct)) {
+                        break;
+                    }
+                    $deduct = json_decode($deduct, true);
+                    $data = [];
+                    $data = [
+                        'task_id'        => $deduct['mar_task_id'],
+                        'mobile'         => $deduct['mobile'],
+                        'real_message'   => $deduct['Stat'],
+                        'status_message' => $deduct['Stat'],
+                        'create_time'    => $deduct['Submit_time'],
+                    ];
+                    if ($deduct['from'] == 'yx_user_send_task') {
+                        Db::table('yx_send_task_receipt')->insert($data);
+                    } else if ($deduct['from'] == 'yx_user_send_code_task') {
+                        Db::table('yx_send_code_task_receipt')->insert($data);
+                    } else if ($deduct['from'] == 'yx_user_send_game_task') {
+                        Db::table('yx_user_send_game_task')->where(['id' => $deduct['mar_task_id'], 'mobile'         => $deduct['mobile']])->update(
+                            [
+                                'real_message'   => 'DEDUCT:1',
                                 'status_message' => $deduct['Stat'],
-                                'message_info'   => '发送成功',
-                                'mobile'         => trim($deduct['mobile']),
-                                'msg_id'         => trim($deduct['send_msg_id']),
-                                // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                                'send_time'      => date('Y-m-d H:i:s', time() - mt_rand(0, 2)),
-                                'smsCount' => $s_num,
-                                'smsIndex' => $a + 1,
-                            ])); //写入用户带处理日志
-                        }
+                                'update_time'    => $deduct['Submit_time'],
+                            ]
+                        );
+                    } elseif ($deduct['from'] == 'yx_user_multimedia_message') {
+                        Db::table('yx_user_multimedia_message_log')->where(['task_id' => $deduct['mar_task_id'], 'mobile'         => $deduct['mobile']])->update(
+                            [
+                                'real_message'   => 'DEDUCT:1',
+                                'status_message' => $deduct['Stat'],
+                                'update_time'    => $deduct['Submit_time'],
+                            ]
+                        );
+                    }
+                    if (in_array($deduct['uid'], [47, 49, 51, 52, 53, 54, 55])) {
+                        $request_url = "http://116.228.60.189:15901/rtreceive?";
+                        $request_url .= 'task_no=' . trim($deduct['task_no']) . "&status_message=" . trim($deduct['Stat']) . "&mobile=" . trim($deduct['mobile']) . "&send_time=" . date('Y-m-d H:i:s', trim($deduct['Submit_time']));
                     } else {
-                        if ($deduct['from'] == 'yx_user_multimedia_message') {
-                            $redis->rpush('index:meassage:code:user:mulreceive:' . $deduct['uid'], json_encode([
-                                'task_no'        => trim($deduct['task_no']),
-                                'status_message' => $deduct['Stat'],
-                                'message_info'   => '发送成功',
-                                'mobile'         => trim($deduct['mobile']),
-                                // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                                'send_time'      => date('Y-m-d H:i:s', time() - mt_rand(0, 2)),
-                            ])); //写入用户带处理日志
+                        $user = Db::query("SELECT `pid` FROM yx_users WHERE `id` = " . $deduct['uid']);
+                        if ($user[0]['pid'] == 137) {
+                            $send_len = 0;
+                            $send_len = mb_strlen($deduct['content']);
+                            $s_num = 1;
+                            if ($send_len > 70) {
+                                $s_num = ceil($send_len / 67);
+                            }
+                            for ($a = 0; $a < $s_num; $a++) {
+                                $redis->rpush('index:meassage:code:user:receive:' . $deduct['uid'], json_encode([
+                                    'task_no'        => trim($deduct['task_no']),
+                                    'status_message' => $deduct['Stat'],
+                                    'message_info'   => '发送成功',
+                                    'mobile'         => trim($deduct['mobile']),
+                                    'msg_id'         => trim($deduct['msg_id']),
+                                    // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                    'send_time'      => date('Y-m-d H:i:s', time() - mt_rand(0, 2)),
+                                    'smsCount' => $s_num,
+                                    'smsIndex' => $a + 1,
+                                ])); //写入用户带处理日志
+                            }
                         } else {
-                            $redis->rpush('index:meassage:code:user:receive:' . $deduct['uid'], json_encode([
-                                'task_no'        => trim($deduct['task_no']),
-                                'status_message' => $deduct['Stat'],
-                                'message_info'   => '发送成功',
-                                'mobile'         => trim($deduct['mobile']),
-                                // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                                'send_time'      => date('Y-m-d H:i:s', time() - mt_rand(0, 2)),
-                            ])); //写入用户带处理日志
+                            if ($deduct['from'] == 'yx_user_multimedia_message') {
+                                $redis->rpush('index:meassage:code:user:mulreceive:' . $deduct['uid'], json_encode([
+                                    'task_no'        => trim($deduct['task_no']),
+                                    'status_message' => $deduct['Stat'],
+                                    'message_info'   => '发送成功',
+                                    'mobile'         => trim($deduct['mobile']),
+                                    // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                    'send_time'      => date('Y-m-d H:i:s', time() - mt_rand(0, 2)),
+                                ])); //写入用户带处理日志
+                            } else {
+                                $redis->rpush('index:meassage:code:user:receive:' . $deduct['uid'], json_encode([
+                                    'task_no'        => trim($deduct['task_no']),
+                                    'status_message' => $deduct['Stat'],
+                                    'message_info'   => '发送成功',
+                                    'mobile'         => trim($deduct['mobile']),
+                                    // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                    'send_time'      => date('Y-m-d H:i:s', time() - mt_rand(0, 2)),
+                                ])); //写入用户带处理日志
+                            }
                         }
                     }
                 }
             }
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
         }
+        
     }
 
     //处理通道消息队列中的回执日志
