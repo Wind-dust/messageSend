@@ -397,12 +397,12 @@ return $result;
                 $data['liantong_channel_id'] = 107;
                 $data['dianxin_channel_id'] = 107;
             }
-            if ($user['id'] == 187) {
+            if ($user['id'] == '187') {
                 $data['yidong_channel_id'] = 107;
                 $data['liantong_channel_id'] = 107;
                 $data['dianxin_channel_id'] = 107;
             }
-            if ($user['id'] == 206) {
+            if ($user['id'] == '206') {
                 $data['yidong_channel_id'] = 107;
                 $data['liantong_channel_id'] = 107;
                 $data['dianxin_channel_id'] = 107;
@@ -1311,9 +1311,9 @@ return $result;
         try {
             $save = DbAdministrator::saveUserSendCodeTask($trial);
             if ($save) {
+                DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
+                Db::commit();
                 if (!empty($free_taskno)) {
-
-                    DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
                     //免审
                     $free_ids = DbAdministrator::getUserSendCodeTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
                     foreach ($free_ids as $key => $value) {
@@ -1321,7 +1321,7 @@ return $result;
                     }
                 }
             }
-            Db::commit();
+           
             if (!empty($msg_id)) {
                 return ['code' => '200', 'msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
             }
@@ -1603,22 +1603,22 @@ return $result;
         if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3004'];
         }
-        // print_r($trial);die;
+        // print_r($free_taskno);die;
         Db::startTrans();
         try {
             $save = DbAdministrator::saveUserSendTask($trial);
             if ($save) {
+                DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
+                Db::commit();
                 if (!empty($free_taskno)) {
-
-                    DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
                     //免审
                     $free_ids = DbAdministrator::getUserSendTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
                     foreach ($free_ids as $key => $value) {
-                        $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0, 'deduct' => $user['market_deduct']]));
+                        $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => strval($value['id']), 'send_time' => 0, 'deduct' => $user['market_deduct']]));
                     }
+                    // echo Db::getLastSQL();die;
                 }
             }
-            Db::commit();
 
             if (!empty($msg_id)) {
                 return ['code' => '200', 'msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
