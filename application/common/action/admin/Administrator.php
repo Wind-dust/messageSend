@@ -354,7 +354,7 @@ class Administrator extends CommonIndex
             array_push($where,['free_trial','=',$free_trial]);
         }
         if ($send_status) {
-            array_push($where,['free_trial','=',$send_status]);
+            array_push($where,['send_status','=',$send_status]);
         }
         if (!empty($id)) {
             $result = DbAdministrator::getUserSendTask(['id' => $id], '*', true);
