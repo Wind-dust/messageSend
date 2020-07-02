@@ -3562,7 +3562,7 @@ class CmppCreateCodeTask extends Pzlife
                     $data = [];
                     $data = [
                         'task_id'        => $deduct['mar_task_id'],
-                        'mobile'         => trim($deduct['mobile']),
+                        'mobile'         => intval(trim($deduct['mobile'])),
                         'real_message'   => 'DEDUCT:1',
                         'status_message' => $deduct['Stat'],
                         'create_time'    => $deduct['Submit_time'],
@@ -3605,7 +3605,7 @@ class CmppCreateCodeTask extends Pzlife
                                     'task_no'        => trim($deduct['task_no']),
                                     'status_message' => $deduct['Stat'],
                                     'message_info'   => '发送成功',
-                                    'mobile'         => trim($deduct['mobile']),
+                                    'mobile'         => intval(trim($deduct['mobile'])),
                                     'msg_id'         => trim($deduct['msg_id']),
                                     // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
                                     'send_time'      => date('Y-m-d H:i:s', $deduct['Submit_time'] + mt_rand(0, 2)),
