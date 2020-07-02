@@ -20,8 +20,19 @@ class Message extends CommonIndex {
      * @return array
      * @author rzc
      */
-    public function getMultimediaMessageTask($page, $pageNum, $id = 0, $title = '') {
+    public function getMultimediaMessageTask($page, $pageNum, $id = 0, $title = '', $free_trial = 0, $send_status = 0) {
         $offset = ($page - 1) * $pageNum;
+        $time = strtotime('-4 days',time());
+        // echo $time;die;
+        $where = [];
+        array_push($where,['create_time','>=',$time]);
+        $offset = ($page - 1) * $pageNum;
+        if ($free_trial) {
+            array_push($where,['free_trial','=',$free_trial]);
+        }
+        if ($send_status) {
+            array_push($where,['send_status','=',$send_status]);
+        }
         $where  = [];
         if (!empty($id)) {
             $result            = DbSendMessage::getUserMultimediaMessage(['id' => $id], '*', true);
@@ -144,7 +155,7 @@ class Message extends CommonIndex {
 
             // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
             foreach ($real_usertask as $key => $value) {
-                DbSendMessage::editUserMultimediaMessage(['free_trial' => $free_trial, 'yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id], $value['id']);
+                DbSendMessage::editUserMultimediaMessage(['free_trial' => $free_trial, 'yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id, 'send_status' => 2], $value['id']);
             }
             if ($free_trial == 2) {
                 foreach ($real_usertask as $real => $usertask) {
