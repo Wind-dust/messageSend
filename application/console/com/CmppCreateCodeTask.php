@@ -3555,10 +3555,11 @@ class CmppCreateCodeTask extends Pzlife
                     if (empty($deduct)) {
                         break;
                     }
+                    
+                    $deduct = json_decode($deduct, true);
                     if (strlen($deduct['mobile']) > 11) {
                         continue;
                     }
-                    $deduct = json_decode($deduct, true);
                     $data = [];
                     $data = [
                         'task_id'        => $deduct['mar_task_id'],
