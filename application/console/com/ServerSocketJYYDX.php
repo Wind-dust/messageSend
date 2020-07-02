@@ -423,8 +423,8 @@ class ServerSocketJYYDX extends Pzlife
         // }
         return [
             // 'host'          => "47.103.200.251", //服务商ip
-            // 'host'          => "127.0.0.1", //服务商ip
-            'host'          => "0.0.0.0", //服务商ip
+            'host'          => "127.0.0.1", //服务商ip
+            // 'host'          => "0.0.0.0", //服务商ip
             'port'          => "7890", //短连接端口号   17890长连接端口号
             'Source_Addr'   => "101106 ", //企业id  企业代码移动
             'Shared_secret' => 'Jyy12dx56', //网关登录密码
