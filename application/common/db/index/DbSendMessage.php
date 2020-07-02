@@ -16,6 +16,8 @@ use app\common\model\SflSendTask;
 use app\common\model\SflMultimediaMessage;
 use app\common\model\SflMultimediaTemplateFrame;
 use app\common\model\SflMultimediaTemplate;
+use app\common\model\UserUpriver;
+use app\common\model\NumberSource;
 use think\Db;
 
 class DbSendMessage extends Db
@@ -349,4 +351,26 @@ class DbSendMessage extends Db
         return $UserSendTask->save($data, ['id' => $id]);
     }
 
+    public function getUserUpriver($where, $field, $row = false, $orderBy = '', $limit = '')
+    {
+        $UserUpriver = new UserUpriver;
+        $obj = UserUpriver::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function addUserUpriver($data)
+    {
+        $UserUpriver = new UserUpriver;
+        $UserUpriver->save($data);
+        // $UserModel->save($data);
+        // return $UserModel->id;
+        return $UserUpriver->id;
+    }
+
+    public function getNumberSource($where, $field, $row = false, $orderBy = '', $limit = '')
+    {
+        $NumberSource = new NumberSource;
+        $obj = NumberSource::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
 }

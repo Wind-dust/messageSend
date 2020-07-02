@@ -397,7 +397,7 @@ return $result;
                 $data['liantong_channel_id'] = 107;
                 $data['dianxin_channel_id'] = 107;
             }
-            if ($user['id'] == 187) {
+            if ($user['id'] == '187') {
                 $data['yidong_channel_id'] = 107;
                 $data['liantong_channel_id'] = 107;
                 $data['dianxin_channel_id'] = 107;

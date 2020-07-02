@@ -352,41 +352,40 @@ class Send extends MyController
     public function getSmsBuiness()
     {
         $appid   = trim($this->request->post('appid')); //登录名
-            $appkey  = trim($this->request->post('appkey')); //登陆密码
-            $Content = trim($this->request->post('content')); //短信内容
-            $Mobile  = trim($this->request->post('mobile')); //接收手机号码
-            $develop_no  = trim($this->request->post('develop_no')); //拓展码号
-            $signature_id  = trim($this->request->post('signature_id')); //接收手机号码
-            $ip      = trim($this->request->ip());
-            $Mobiles = explode(',', $Mobile);
-           
-            // print_r($Content);die;
-            // echo phpinfo();die;
-            if (empty($appid)) {
-                return ['code' => '3000'];
+        $appkey  = trim($this->request->post('appkey')); //登陆密码
+        $Content = trim($this->request->post('content')); //短信内容
+        $Mobile  = trim($this->request->post('mobile')); //接收手机号码
+        $develop_no  = trim($this->request->post('develop_no')); //拓展码号
+        $signature_id  = trim($this->request->post('signature_id')); //接收手机号码
+        $ip      = trim($this->request->ip());
+        $Mobiles = explode(',', $Mobile);
+
+        // print_r($Content);die;
+        // echo phpinfo();die;
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        // if (empty($Mobile) || checkMobile($Mobile) === false) {
+        //     return ['code'=>'3001'];
+        // }
+        if (empty($Content) || mb_strlen($Content) > 500) {
+            return ['code' => '3002'];
+        }
+        // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
+        if (empty($signature_id)) {
+            if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 20) {
+                return ['code' => '3003'];
             }
-            if (empty($appkey)) {
-                return ['code' => '3000'];
-            }
-            // if (empty($Mobile) || checkMobile($Mobile) === false) {
-            //     return ['code'=>'3001'];
-            // }
-            if (empty($Content) || mb_strlen($Content) > 500) {
-                return ['code' => '3002'];
-            }
-            // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
-            if (empty($signature_id)) {
-                if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 20) {
-                    return ['code' => '3003'];
-                }
-            }
-            if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
-                return ['code' => '3011'];
-            }
-            $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id, $develop_no);
-            
-            return $result;
-       
+        }
+        if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
+            return ['code' => '3011'];
+        }
+        $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id, $develop_no);
+
+        return $result;
     }
 
     /**
@@ -408,42 +407,41 @@ class Send extends MyController
     public function getSmsBuinessMsgId()
     {
         $appid   = trim($this->request->post('appid')); //登录名
-            $appkey  = trim($this->request->post('appkey')); //登陆密码
-            $Content = trim($this->request->post('content')); //短信内容
-            $Mobile  = trim($this->request->post('mobile')); //接收手机号码
-            $develop_no  = trim($this->request->post('develop_no')); //拓展码号
-            $signature_id  = trim($this->request->post('signature_id')); //接收手机号码
-            $msg_id  = trim($this->request->post('msg_id')); //接收手机号码
-            $ip      = trim($this->request->ip());
-            $Mobiles = explode(',', $Mobile);
+        $appkey  = trim($this->request->post('appkey')); //登陆密码
+        $Content = trim($this->request->post('content')); //短信内容
+        $Mobile  = trim($this->request->post('mobile')); //接收手机号码
+        $develop_no  = trim($this->request->post('develop_no')); //拓展码号
+        $signature_id  = trim($this->request->post('signature_id')); //接收手机号码
+        $msg_id  = trim($this->request->post('msg_id')); //接收手机号码
+        $ip      = trim($this->request->ip());
+        $Mobiles = explode(',', $Mobile);
 
-            // print_r($Content);die;
-            // echo phpinfo();die;
-            if (empty($appid)) {
-                return ['code' => '3000'];
+        // print_r($Content);die;
+        // echo phpinfo();die;
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        // if (empty($Mobile) || checkMobile($Mobile) === false) {
+        //     return ['code'=>'3001'];
+        // }
+        if (empty($Content) || mb_strlen($Content) > 500) {
+            return ['code' => '3002'];
+        }
+        // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
+        if (empty($signature_id)) {
+            if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 20) {
+                return ['code' => '3003'];
             }
-            if (empty($appkey)) {
-                return ['code' => '3000'];
-            }
-            // if (empty($Mobile) || checkMobile($Mobile) === false) {
-            //     return ['code'=>'3001'];
-            // }
-            if (empty($Content) || mb_strlen($Content) > 500) {
-                return ['code' => '3002'];
-            }
-            // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
-            if (empty($signature_id)) {
-                if (mb_strpos($Content, '】') - mb_strpos($Content, '【') < 2 || mb_strpos($Content, '】') - mb_strpos($Content, '【') > 20) {
-                    return ['code' => '3003'];
-                }
-            }
-            if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
-                return ['code' => '3011'];
-            }
-            $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id, $develop_no,$msg_id);
-            Log::write(json_encode($result),'info');
-            return $result;
-        
+        }
+        if (!empty($develop_no) && (strlen(intval($develop_no)) < 2 || !is_numeric($develop_no) || strlen(intval($develop_no)) > 6)) {
+            return ['code' => '3011'];
+        }
+        $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id, $develop_no, $msg_id);
+        Log::write(json_encode($result), 'info');
+        return $result;
     }
 
     /**
@@ -467,7 +465,7 @@ class Send extends MyController
     }
 
     /**
-     * @api              {post} / 上行查询
+     * @api              {post} / 短信上行查询
      * @apiDescription   upGoing
      * @apiGroup         index_send
      * @apiName          upGoing
@@ -744,7 +742,7 @@ class Send extends MyController
         if (empty($title)) {
             return ['code' => '3007'];
         }
-        $result = $this->app->send->getSmsMultimediaMessageTask($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title, $signature_id,$msg_id);
+        $result = $this->app->send->getSmsMultimediaMessageTask($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title, $signature_id, $msg_id);
         return $result;
     }
 
@@ -1229,7 +1227,7 @@ class Send extends MyController
         if ($result == 'OK') {
             echo 'OK';
             exit;
-        }else{
+        } else {
             echo 'error';
             exit;
         }
@@ -1248,7 +1246,8 @@ class Send extends MyController
      * @apiSampleRequest /index/send/chuangLanMmsSftpCallBack
      * @author rzc
      */
-    public function chuangLanMmsSftpCallBack(){
+    public function chuangLanMmsSftpCallBack()
+    {
         $code   = trim($this->request->post('code')); //返回码
         $desc  = trim($this->request->post('desc')); //状态说明
         $task_id  = trim($this->request->post('ext_id')); //登陆密码
@@ -1257,12 +1256,12 @@ class Send extends MyController
         if ($result == 'OK') {
             echo 'OK';
             exit;
-        }else{
+        } else {
             echo 'error';
             exit;
         }
     }
-    
+
     /**
      * @api              {post} / 空号检测接口
      * @apiDescription   numberDetection
@@ -1275,9 +1274,10 @@ class Send extends MyController
      * @apiSampleRequest /index/send/numberDetection
      * @author rzc
      */
-    public function numberDetection(){
+    public function numberDetection()
+    {
         $mobile         = trim($this->request->post('mobile'));
-       
+
         $appid   = trim($this->request->post('appid')); //登录名
         $appkey  = trim($this->request->post('appkey')); //登陆密码
         // return $this->encrypt($mobile, $secret_id);
@@ -1287,7 +1287,63 @@ class Send extends MyController
         if (empty($appkey)) {
             return ['code' => '3000'];
         }
-        $result = $this->app->send->numberDetection($appid, $appkey,$mobile);
+        $result = $this->app->send->numberDetection($appid, $appkey, $mobile);
         return $result;
+    }
+
+    /**
+     * @api              {post} / 彩信信上行查询
+     * @apiDescription   upMmsGoing
+     * @apiGroup         index_send
+     * @apiName          upMmsGoing
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误
+     * @apiSampleRequest /index/send/upMmsGoing
+     * @author rzc
+     */
+    public function upMmsGoing()
+    {
+        $appid  = trim($this->request->post('appid')); //登录名
+        $appkey = trim($this->request->post('appkey')); //登陆密码
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        $result = $this->app->send->upMmsGoing($appid, $appkey);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 彩信信上行查询
+     * @apiDescription   upGoingForChuangLan
+     * @apiGroup         index_send
+     * @apiName          upGoingForChuangLan
+     * @apiParam (入参) {String} account account 账户
+     * @apiParam (入参) {String} phone 上行手机号 
+     * @apiParam (入参) {String} msg 上行内容 
+     * @apiParam (入参) {String} moTime 上行时间 
+     * @apiParam (入参) {String} extendCode 上行端口
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误
+     * @apiSampleRequest /index/send/upGoingForChuangLan
+     * @author rzc
+     */
+    public function upGoingForChuangLan()
+    {
+        $account  = trim($this->request->post('account')); //登录名
+        $phone = trim($this->request->post('phone')); //登陆密码
+        $msg = trim($this->request->post('msg')); //登陆密码
+        $moTime = trim($this->request->post('moTime')); //登陆密码
+        $extendCode = trim($this->request->post('extendCode')); //登陆密码
+        $result = $this->app->send->upGoingForChuangLan($account, $phone, $msg, $moTime, $extendCode);
+        if ($result == 'OK') {
+            echo 'OK';
+            exit;
+        } else {
+            echo 'error';
+            exit;
+        }
     }
 }
