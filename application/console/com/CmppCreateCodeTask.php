@@ -8074,7 +8074,7 @@ class CmppCreateCodeTask extends Pzlife
         // echo "SELECT * FROM yx_sfl_send_task WHERE `mobile` IN (".join(',',$white_list).") ";die;
         // $tody_time = 1590645600;
         $tody_time = strtotime(date("Ymd", time()));
-        $tody_time = 1593680400;
+        // $tody_time = 1593601200;
         try {
             $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84, 'update_time' => time()]);
             /* $where = [];
@@ -8091,7 +8091,7 @@ class CmppCreateCodeTask extends Pzlife
             exception($th);
         }
         // die;
-        $deduct = 2; //1扣量,2不扣
+        $deduct = 1; //1扣量,2不扣
         $rate = 50;
 
         $ids = [];
@@ -8613,8 +8613,8 @@ class CmppCreateCodeTask extends Pzlife
             13581809553,
             13213032008
         ];
-        $tody_time = strtotime(date("Ymd", time()));
-        // $tody_time = 1593601200;
+        // $tody_time = strtotime(date("Ymd", time()));
+        $tody_time = 1593680400;
         try {
             /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
             // $mysql_connect->table('yx_sfl_multimedia_message')->where([['create_time', '>', $tody_time],['sfl_relation_id','IN','100181558,100181556,100181563,100177398']])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
@@ -8626,7 +8626,7 @@ class CmppCreateCodeTask extends Pzlife
         $j = 1;
         $receipt = [];
         $send_msg = [];
-        $deduct = 1; //1扣量,2不扣
+        $deduct = 2; //1扣量,2不扣
         $rate = 90;
         /*    $all_task = 
         while (true) {
@@ -8640,7 +8640,7 @@ class CmppCreateCodeTask extends Pzlife
             $receipt_id = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_multimediatask_receipt ORDER BY `id` DESC LIMIT 1  ")[0]['id'];
             $receipt_id++;
             // print_r($receipt_id);die;
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `id` > '651173' AND  `create_time` >  " . $tody_time);
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time);
             // $sendid = $mysql_connect->query("SELECT * FROM `sflsftp`.`yx_sfl_multimedia_message` WHERE `create_time` >= '" . $tody_time . "' AND `sfl_relation_id` IN ('100181871')");
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` IN('100177398','100181563','100181556','100181558')  AND `create_time` >  " . $tody_time;die;
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time;die;
@@ -8648,7 +8648,7 @@ class CmppCreateCodeTask extends Pzlife
             foreach ($sendid as $key => $value) {
                 $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
             }
-
+            
             while (true) {
                 $task_id = $this->redis->lpop('index:meassage:sflmulmessage:sendtask');
                 if (empty($task_id)) {
@@ -8901,7 +8901,7 @@ class CmppCreateCodeTask extends Pzlife
                         foreach ($send_msg as $skey => $svalue) {
                             $channel_id = $svalue['channel_id'];
                             unset($svalue['channel_id']);
-                            $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($svalue)); //三体营销通道
+                            $res = $this->redis->lpush('index:meassage:code:send' . ":" . $channel_id, json_encode($svalue)); //三体营销通道
                         }
                     }
 
@@ -9191,7 +9191,7 @@ class CmppCreateCodeTask extends Pzlife
                     foreach ($send_msg as $skey => $svalue) {
                         $channel_id = $svalue['channel_id'];
                         unset($svalue['channel_id']);
-                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($svalue)); //三体营销通道
+                        $res = $this->redis->lpush('index:meassage:code:send' . ":" . $channel_id, json_encode($svalue)); //三体营销通道
                     }
                 }
                 unset($ids);
