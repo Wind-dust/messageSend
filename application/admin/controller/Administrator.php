@@ -478,6 +478,7 @@ class Administrator extends AdminController
      * @apiName          getUserSendTask
      * @apiParam (入参) {String} cms_con_id
      * @apiParam (入参) {String} id 任务id
+     * @apiParam (入参) {String} free_trial 1:需要审核;2:审核通过;3:审核不通过
      * @apiParam (入参) {String} page 页码 默认1
      * @apiParam (入参) {String} pageNum 条数 默认10
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 
@@ -488,14 +489,16 @@ class Administrator extends AdminController
     public function getUserSendTask()
     {
         $id       = trim($this->request->post('id'));
+        $free_trial       = trim($this->request->post('free_trial'));
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
         $cmsConId = trim($this->request->post('cms_con_id'));
         $page     = is_numeric($page) ? $page : 1;
         $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        $free_trial  = is_numeric($free_trial) ? $free_trial : 0;
         intval($page);
         intval($pageNum);
-        $result = $this->app->administrator->getUserSendTask($page, $pageNum, $id);
+        $result = $this->app->administrator->getUserSendTask($page, $pageNum, $id, $free_trial);
         return $result;
     }
 

@@ -343,17 +343,22 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function getUserSendTask($page, $pageNum, $id)
+    public function getUserSendTask($page, $pageNum, $id, $free_trial = 0)
     {
         $time = strtotime('-4 days',time());
         // echo $time;die;
+        $where = [];
+        array_push($where,['create_time','>=',$time]);
         $offset = ($page - 1) * $pageNum;
+        if ($free_trial) {
+            array_push($where,['free_trial','=',$free_trial]);
+        }
         if (!empty($id)) {
             $result = DbAdministrator::getUserSendTask(['id' => $id], '*', true);
         } else {
-            $result = DbAdministrator::getUserSendTask([['create_time' ,'>=', $time]], '*', false, ['free_trial' => 'asc'], $offset . ',' . $pageNum);
+            $result = DbAdministrator::getUserSendTask($where, '*', false, ['id' => 'desc',], $offset . ',' . $pageNum);
         }
-        $total = DbAdministrator::countUserSendTask([['create_time' ,'>=', $time]]);
+        $total = DbAdministrator::countUserSendTask($where);
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
 
