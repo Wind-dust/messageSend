@@ -575,16 +575,23 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function getUserSendCodeTask($page, $pageNum, $id)
+    public function getUserSendCodeTask($page, $pageNum, $id, $free_trial = 0)
     {
         $time = strtotime('-4 days',time());
+        // echo $time;die;
+        $where = [];
+        array_push($where,['create_time','>=',$time]);
+        $offset = ($page - 1) * $pageNum;
+        if ($free_trial) {
+            array_push($where,['free_trial','=',$free_trial]);
+        }
         $offset = ($page - 1) * $pageNum;
         if (!empty($id)) {
             $result = DbAdministrator::getUserSendCodeTask(['id' => $id], '*', true);
         } else {
-            $result = DbAdministrator::getUserSendCodeTask([['create_time' ,'>=', $time]], '*', false, ['free_trial' => 'asc'], $offset . ',' . $pageNum);
+            $result = DbAdministrator::getUserSendCodeTask($where, '*', false, ['free_trial' => 'asc'], $offset . ',' . $pageNum);
         }
-        $total = DbAdministrator::countUserSendCodeTask([['create_time' ,'>=', $time]]);
+        $total = DbAdministrator::countUserSendCodeTask($where);
         return ['code' => '200', 'total' => $total, 'data' => $result];
     }
 
