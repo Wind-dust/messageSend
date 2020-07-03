@@ -9592,7 +9592,8 @@ class CmppCreateCodeTask extends Pzlife
         /* echo "SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) ";
         die; */
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $time = strtotime('2020-06-27 00:00:00');
+        $time = strtotime('2020-06-30 00:00:00');
+        $end_time = strtotime('2020-07-2 00:00:00');
         // echo $time;die;
         $redis = Phpredis::getConn();
         try {
@@ -9725,7 +9726,8 @@ class CmppCreateCodeTask extends Pzlife
             //     ]));
             // }
 
-            $task_receipt = Db::query("SELECT `*` FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `create_time` >= 1593187200  ORDER BY `task_id` DESC)");
+            $task_receipt = Db::query("SELECT `*` FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `create_time` >= ".$time." AND `create_time` <= ".$end_time."  ORDER BY `task_id` DESC)");
+            echo count($task_receipt);die;
             foreach($task_receipt as $key => $value){
                 $task = Db::query("SELECT `task_content`,`task_no`,`send_msg_id` FROM yx_user_send_task WHERE `id` = " . $value['task_id']);
                 $send_len = 0;
