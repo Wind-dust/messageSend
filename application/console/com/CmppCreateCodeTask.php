@@ -290,9 +290,14 @@ class CmppCreateCodeTask extends Pzlife
                                     1321785 1322036
                                     */
         // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_task WHERE  `id` >= 168848  ");
+     /*    $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_task WHERE  `id` >= 168848  ");
         foreach ($task_id as $key => $value) {
             $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0, 'deduct' => 10]));
+            // usleep(50000);
+        } */
+        $task_id =['184992','184977','184998'];
+        foreach ($task_id as $key => $value) {
+            $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value, 'send_time' => 0, 'deduct' => 0]));
             // usleep(50000);
         }
     }
