@@ -598,7 +598,7 @@ class Administrator extends CommonIndex
         if (!empty($id)) {
             $result = DbAdministrator::getUserSendCodeTask(['id' => $id], '*', true);
         } else {
-            $result = DbAdministrator::getUserSendCodeTask($where, '*', false, ['free_trial' => 'asc'], $offset . ',' . $pageNum);
+            $result = DbAdministrator::getUserSendCodeTask($where, '*', false, ['id' => 'desc'], $offset . ',' . $pageNum);
         }
         $total = DbAdministrator::countUserSendCodeTask($where);
         return ['code' => '200', 'total' => $total, 'data' => $result];
