@@ -9727,7 +9727,7 @@ class CmppCreateCodeTask extends Pzlife
             // }
 
             $task_receipt = Db::query("SELECT `*` FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `create_time` >= ".$time." AND `create_time` <= ".$end_time."  ORDER BY `task_id` DESC)");
-            echo count($task_receipt);die;
+            // echo count($task_receipt);die;
             foreach($task_receipt as $key => $value){
                 $task = Db::query("SELECT `task_content`,`task_no`,`send_msg_id` FROM yx_user_send_task WHERE `id` = " . $value['task_id']);
                 $send_len = 0;
