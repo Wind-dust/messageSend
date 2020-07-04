@@ -1203,11 +1203,16 @@ return $result;
                 $real_num += count($send_data_mobile[$key]);
                 $send_task['real_num'] =  count($send_data_mobile[$key]);
             }
-
-            if (count($send_data_mobile[$key]) > 10) {
-                $user['free_trial'] = 1;
-            }
             if ($user['free_trial'] == 2) {
+                $send_task['free_trial'] = 2;
+            }else{
+                $send_task['free_trial'] = 1;
+            }
+           
+            if (count($send_data_mobile[$key]) > 30) {
+                $send_task['free_trial'] = 1;
+            }
+            if ($send_task['free_trial'] == 2) {
                 //短信内容分词
                 $search_analyze = $this->search_analyze($value);
                 $search_result = json_decode($search_analyze, true);
@@ -1505,11 +1510,17 @@ return $result;
                 $send_task['real_num'] =  count($send_data_mobile[$key]);
             }
             // echo count($send_data_mobile[$key]);die;
-            if (count($send_data_mobile[$key]) > 10) {
-                $user['marketing_free_trial'] = 1;
-            }
-            $send_task['free_trial'] = 1;
             if ($user['marketing_free_trial'] == 2) {
+                $send_task['free_trial'] = 2;
+            }else{
+                $send_task['free_trial'] = 1;
+            }
+            if (count($send_data_mobile[$key]) > 30) {
+                // $user['marketing_free_trial'] = 1;
+                $send_task['free_trial'] = 1;
+            }
+            // $send_task['free_trial'] = 1;
+            if ($send_task['free_trial'] == 2) {
                 //短信内容分词
                 $search_analyze = $this->search_analyze($value);
                 $search_result = json_decode($search_analyze, true);
