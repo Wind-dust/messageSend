@@ -6418,7 +6418,7 @@ class CmppCreateCodeTask extends Pzlife
                 sleep(900);
             }
         } catch (\Exception $th) {
-            exception($e);
+            exception($th);
         }
         
         die;
