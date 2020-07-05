@@ -6320,14 +6320,15 @@ class CmppCreateCodeTask extends Pzlife
                             if (empty($task)) {
                                 continue;
                             }
-                            $receipt = Db::query("SELECT `status_message` FROM yx_sfl_send_multimediatask_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $value['mobile'] . "' LIMIT 1 ");
+                            if ($value['create_time'] + 259200 < time()) {
+                                $value['status_message'] = 'DELIVRD';
+                            }
+                           /*  $receipt = Db::query("SELECT `status_message` FROM yx_sfl_send_multimediatask_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $value['mobile'] . "' LIMIT 1 ");
                             if (empty($receipt)) {
-                                if ($value['create_time'] + 259200 < time()) {
-                                    $value['status_message'] = 'DELIVRD';
-                                }
+                                
                             } else {
                                 $value['status_message'] = $receipt[0]['status_message'];
-                            }
+                            } */
                         }
                         $num         = 1;
     
