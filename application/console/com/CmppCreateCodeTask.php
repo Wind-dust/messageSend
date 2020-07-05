@@ -10107,7 +10107,7 @@ class CmppCreateCodeTask extends Pzlife
     {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M');
-        // $redis->rpush("index:meassage:multimediamessage:buffersendtask", json_encode(['id' =>1379154, 'deduct' => 10]));
+        $redis->rpush("index:meassage:multimediamessage:buffersendtask", json_encode(['id' =>92556, 'deduct' => 10]));
         try {
             while (true) {
                 $send = $redis->lpop('index:meassage:business:buffersendtask');
