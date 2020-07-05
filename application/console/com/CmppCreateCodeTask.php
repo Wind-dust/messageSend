@@ -7760,12 +7760,12 @@ class CmppCreateCodeTask extends Pzlife
     public function receiptMulToBase()
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $start_time = strtotime(date("Y-m-d", strtotime("-2 day")));
-        // $start_time = strtotime("2020-04-01");
+        // $start_time = strtotime(date("Y-m-d", strtotime("-2 day")));
+        $start_time = strtotime("2020-06-01");
         // $end_time = strtotime('2020-04-23 20:00:00');
         $end_time   = time();
         // $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . time() . "' ");
-        $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message WHERE  `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' ORDER BY id ASC ");
+        $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message WHERE  `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' AND `free_trial` = 2 ORDER BY id ASC   ");
         // $mul_task   = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . time() . "' ");
         // print_r("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . time() . "' ");die;
         foreach ($mul_task as $key => $value) {
