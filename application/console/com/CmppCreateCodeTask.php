@@ -6294,129 +6294,133 @@ class CmppCreateCodeTask extends Pzlife
     public function MultimediaSettlement()
     {
         ini_set('memory_limit', '1024M'); // 临时设置最大内存占用为10G
-
-        while (true) {
-            $day_businessSettlement   = [];
-            $day_users                = [];
-            // $start_time               = strtotime('-10 days');
-            // print_r($start_time);die;
-            $start_time = (int) strtotime(date('2020-06-01'));
-            // $end_time = $start_time + 86400;
-            // echo $end_time;die;
+        try {
             while (true) {
-                $end_time = $start_time + 86400;
-                if ($end_time > time()) {
-                    break;
-                }
                 $day_businessSettlement   = [];
                 $day_users                = [];
-                $code_task_log = [];
-                $code_task_log            = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
-                foreach ($code_task_log as $key => $value) {
-                    $send_length = mb_strlen($value['task_content'], 'utf8');
-                    $num         = 1;
-                    if (empty($value['status_message']) && empty($value['real_message'])) {
-                        $task = Db::query("SELECT id FROM yx_user_multimedia_message WHERE `task_no` = '" . $value['task_no'] . "' LIMIT 1 ");
-                        if (empty($task)) {
-                            continue;
+                // $start_time               = strtotime('-10 days');
+                // print_r($start_time);die;
+                $start_time = (int) strtotime(date('2020-06-01'));
+                // $end_time = $start_time + 86400;
+                // echo $end_time;die;
+                while (true) {
+                    $end_time = $start_time + 86400;
+                    if ($end_time > time()) {
+                        break;
+                    }
+                    $day_businessSettlement   = [];
+                    $day_users                = [];
+                    $code_task_log = [];
+                    $code_task_log            = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
+                    foreach ($code_task_log as $key => $value) {
+                        $send_length = mb_strlen($value['task_content'], 'utf8');
+                        $num         = 1;
+                        if (empty($value['status_message']) && empty($value['real_message'])) {
+                            $task = Db::query("SELECT id FROM yx_user_multimedia_message WHERE `task_no` = '" . $value['task_no'] . "' LIMIT 1 ");
+                            if (empty($task)) {
+                                continue;
+                            }
+                            $receipt = Db::query("SELECT `status_message` FROM yx_sfl_send_multimediatask_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $value['mobile'] . "' LIMIT 1 ");
+                            if (empty($receipt)) {
+                                if ($value['create_time'] + 259200 < time()) {
+                                    $value['status_message'] = 'DELIVRD';
+                                }
+                            } else {
+                                $value['status_message'] = $receipt[0]['status_message'];
+                            }
                         }
-                        $receipt = Db::query("SELECT `status_message` FROM yx_sfl_send_multimediatask_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $value['mobile'] . "' LIMIT 1 ");
-                        if (empty($receipt)) {
-                            if ($value['create_time'] + 259200 < time()) {
-                                $value['status_message'] = 'DELIVRD';
+                        $num         = 1;
+    
+                        $day   = date('Ymd', $value['create_time']);
+                        if (!array_key_exists($day, $day_users)) {
+                            $day_users[$day] = [];
+                        }
+                        if (in_array($value['uid'], $day_users[$day])) {
+                            $day_businessSettlement[$day][$value['uid']]['num'] += $num;
+                            $day_businessSettlement[$day][$value['uid']]['mobile_num'] += 1;
+                            if ($value['status_message'] == 'DELIVRD') {
+                                if (isset($day_businessSettlement[$day][$value['uid']]['success'])) {
+                                    $day_businessSettlement[$day][$value['uid']]['success'] += $num;
+                                } else {
+                                    $day_businessSettlement[$day][$value['uid']]['success'] = $num;
+                                }
+                            } elseif (empty($value['status_message'])) {
+                                if (isset($day_businessSettlement[$day][$value['uid']]['unknown'])) {
+                                    $day_businessSettlement[$day][$value['uid']]['unknown'] += $num;
+                                } else {
+                                    $day_businessSettlement[$day][$value['uid']]['unknown'] = $num;
+                                }
+                            } else {
+                                if (isset($day_businessSettlement[$day][$value['uid']]['default'])) {
+                                    $day_businessSettlement[$day][$value['uid']]['default'] += $num;
+                                } else {
+                                    $day_businessSettlement[$day][$value['uid']]['default'] = $num;
+                                }
+                                // $day_businessSettlement[$day][$value['uid']]['default'] = $num;
                             }
                         } else {
-                            $value['status_message'] = $receipt[0]['status_message'];
-                        }
-                    }
-                    $num         = 1;
-
-                    $day   = date('Ymd', $value['create_time']);
-                    if (!array_key_exists($day, $day_users)) {
-                        $day_users[$day] = [];
-                    }
-                    if (in_array($value['uid'], $day_users[$day])) {
-                        $day_businessSettlement[$day][$value['uid']]['num'] += $num;
-                        $day_businessSettlement[$day][$value['uid']]['mobile_num'] += 1;
-                        if ($value['status_message'] == 'DELIVRD') {
-                            if (isset($day_businessSettlement[$day][$value['uid']]['success'])) {
-                                $day_businessSettlement[$day][$value['uid']]['success'] += $num;
-                            } else {
+                            $day_users[$day][]                                         = $value['uid'];
+                            $day_businessSettlement[$day][$value['uid']]['num']        = $num;
+                            $day_businessSettlement[$day][$value['uid']]['mobile_num'] = 1;
+                            if ($value['status_message'] == 'DELIVRD') {
                                 $day_businessSettlement[$day][$value['uid']]['success'] = $num;
-                            }
-                        } elseif (empty($value['status_message'])) {
-                            if (isset($day_businessSettlement[$day][$value['uid']]['unknown'])) {
-                                $day_businessSettlement[$day][$value['uid']]['unknown'] += $num;
-                            } else {
+                            } elseif ($value['status_message'] == '') {
                                 $day_businessSettlement[$day][$value['uid']]['unknown'] = $num;
-                            }
-                        } else {
-                            if (isset($day_businessSettlement[$day][$value['uid']]['default'])) {
-                                $day_businessSettlement[$day][$value['uid']]['default'] += $num;
                             } else {
-                                $day_businessSettlement[$day][$value['uid']]['default'] = $num;
+                                $value[$day][$value['uid']]['default'] = $num;
                             }
-                            // $day_businessSettlement[$day][$value['uid']]['default'] = $num;
-                        }
-                    } else {
-                        $day_users[$day][]                                         = $value['uid'];
-                        $day_businessSettlement[$day][$value['uid']]['num']        = $num;
-                        $day_businessSettlement[$day][$value['uid']]['mobile_num'] = 1;
-                        if ($value['status_message'] == 'DELIVRD') {
-                            $day_businessSettlement[$day][$value['uid']]['success'] = $num;
-                        } elseif ($value['status_message'] == '') {
-                            $day_businessSettlement[$day][$value['uid']]['unknown'] = $num;
-                        } else {
-                            $value[$day][$value['uid']]['default'] = $num;
                         }
                     }
-                }
-                Db::startTrans();
-                try {
-                    foreach ($day_businessSettlement as $dkey => $d_value) {
-                        foreach ($d_value as $key => $value) {
-                            $success             = isset($value['success']) ? $value['success'] : 0;
-                            $num                 = isset($value['num']) ? $value['num'] : 0;
-                            $day_user_settlement = [];
-                            $day_user_settlement = [
-                                'timekey'     => $dkey,
-                                'uid'         => $key,
-                                'success'     => $success,
-                                'unknown'     => isset($value['unknown']) ? $value['unknown'] : 0,
-                                'default'     => isset($value['default']) ? $value['default'] : 0,
-                                'num'         => $num,
-                                'ratio'       => $success / $num * 100,
-                                'mobile_num'  => $value['mobile_num'],
-                                'business_id' => '8',
-                                'create_time' => time(),
-                                'update_time' => time(),
-                            ];
-                            $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 8 AND `timekey` = ' . $dkey . ' AND `uid` = ' . $key);
-                            if ($has) {
-                                Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                    Db::startTrans();
+                    try {
+                        foreach ($day_businessSettlement as $dkey => $d_value) {
+                            foreach ($d_value as $key => $value) {
+                                $success             = isset($value['success']) ? $value['success'] : 0;
+                                $num                 = isset($value['num']) ? $value['num'] : 0;
+                                $day_user_settlement = [];
+                                $day_user_settlement = [
+                                    'timekey'     => $dkey,
+                                    'uid'         => $key,
                                     'success'     => $success,
                                     'unknown'     => isset($value['unknown']) ? $value['unknown'] : 0,
                                     'default'     => isset($value['default']) ? $value['default'] : 0,
                                     'num'         => $num,
-                                    'mobile_num'  => $value['mobile_num'],
                                     'ratio'       => $success / $num * 100,
+                                    'mobile_num'  => $value['mobile_num'],
+                                    'business_id' => '8',
+                                    'create_time' => time(),
                                     'update_time' => time(),
-                                ]);
-                            } else {
-                                Db::table('yx_statistics_day')->insert($day_user_settlement);
+                                ];
+                                $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 8 AND `timekey` = ' . $dkey . ' AND `uid` = ' . $key);
+                                if ($has) {
+                                    Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                                        'success'     => $success,
+                                        'unknown'     => isset($value['unknown']) ? $value['unknown'] : 0,
+                                        'default'     => isset($value['default']) ? $value['default'] : 0,
+                                        'num'         => $num,
+                                        'mobile_num'  => $value['mobile_num'],
+                                        'ratio'       => $success / $num * 100,
+                                        'update_time' => time(),
+                                    ]);
+                                } else {
+                                    Db::table('yx_statistics_day')->insert($day_user_settlement);
+                                }
                             }
                         }
+                        Db::commit();
+                    } catch (\Exception $e) {
+                        Db::rollback();
+                        exception($e);
                     }
-                    Db::commit();
-                } catch (\Exception $e) {
-                    Db::rollback();
-                    exception($e);
+                    $start_time = $end_time;
                 }
-                $start_time = $end_time;
+    
+                sleep(900);
             }
-
-            sleep(900);
+        } catch (\Exception $th) {
+            exception($e);
         }
+        
         die;
         $year_businessSettlement  = [];
         $month_businessSettlement = [];
