@@ -9598,12 +9598,13 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
-    public function futureReceiveCallBack()
+    public function futureReceiveCallBack($date)
     {
         /* echo "SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) ";
         die; */
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $time = strtotime('2020-06-01 00:00:00');
+        // $time = strtotime('2020-06-03 00:00:00');
+        $time = strtotime($date);
         // $end_time = strtotime('2020-06-02 00:00:00');
         $end_time = $time + 86400;
         // echo $time;die;
