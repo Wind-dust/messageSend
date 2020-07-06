@@ -1322,17 +1322,17 @@ class Send extends MyController
     }
 
     /**
-     * @api              {post} / 彩信信上行查询
-     * @apiDescription   upGoingForChuangLan
+     * @api              {post} / 创蓝彩信信上行回调
+     * @apiDescription   upGoingFCL
      * @apiGroup         index_send
-     * @apiName          upGoingForChuangLan
+     * @apiName          upGoingFCL
      * @apiParam (入参) {String} account account 账户
      * @apiParam (入参) {String} phone 上行手机号 
      * @apiParam (入参) {String} msg 上行内容 
      * @apiParam (入参) {String} moTime 上行时间 
      * @apiParam (入参) {String} extendCode 上行端口
      * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误
-     * @apiSampleRequest /index/send/upGoingForChuangLan
+     * @apiSampleRequest /index/send/upGoingFCL
      * @author rzc
      */
     public function upGoingForChuangLan()
