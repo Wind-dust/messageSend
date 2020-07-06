@@ -1335,7 +1335,7 @@ class Send extends MyController
      * @apiSampleRequest /index/send/upGoingFCL
      * @author rzc
      */
-    public function upGoingForChuangLan()
+    public function upGoingFCL()
     {
         $account  = trim($this->request->post('account')); //登录名
         $phone = trim($this->request->post('phone')); //登陆密码
