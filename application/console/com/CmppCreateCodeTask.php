@@ -5658,7 +5658,7 @@ class CmppCreateCodeTask extends Pzlife
                         continue;
                     }
                     Db::startTrans();
-                    Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'],  'send_status' => $send_log['send_status'], 'update_time' => $send_log['send_time']]);
+                    Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'], 'status_message' => $send_log['status_message'],  'send_status' => $send_log['send_status'], 'update_time' => $send_log['send_time']]);
                     Db::commit();
                     if (!empty($sendtasklog[0]['status_message'])) {
                         continue;
