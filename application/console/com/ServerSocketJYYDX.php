@@ -391,7 +391,7 @@ class ServerSocketJYYDX extends Pzlife
                     }
                     //捕获异常
                     catch (Exception $e) {
-                        exception($e);
+                        // exception($e);
                         $new_bodyData = pack("C", 1); //status | 1 | Unsigned Integer |状态 0：正确 1：消息结构错  2：非法源地址  3：认证错  4：版本太高   5~ ：其他错误
                         $Total_Length = strlen($new_bodyData) + 12;
                         $new_headData = pack("NNN", $Total_Length, 0x00000002, 1);
@@ -426,7 +426,7 @@ class ServerSocketJYYDX extends Pzlife
             // 'host'          => "47.103.200.251", //服务商ip
             // 'host'          => "127.0.0.1", //服务商ip
             'host'          => "0.0.0.0", //服务商ip
-            'port'          => "7890", //短连接端口号   17890长连接端口号
+            'port'          => "7891", //短连接端口号   17890长连接端口号
             'Source_Addr'   => "101106 ", //企业id  企业代码移动
             'Shared_secret' => 'Jyy12dx56', //网关登录密码
             'Service_Id'    => "",
