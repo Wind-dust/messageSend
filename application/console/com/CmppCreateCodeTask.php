@@ -8225,7 +8225,7 @@ class CmppCreateCodeTask extends Pzlife
         }
         // die;
         $deduct = 1; //1扣量,2不扣
-        $rate = 50;
+        $rate = 60;
 
         $ids = [];
         $j = 1;
