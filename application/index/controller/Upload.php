@@ -531,7 +531,7 @@ class Upload extends MyController
      * @apiName          uploadModelMultimediaVar
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
-     * @apiParam (入参) {file} 文件 
+     * @apiParam (入参) {file}  filename 文件 
      * @apiSuccess (返回) {String} code 200:成功  / 3000:appid或者appkey错误/ 3001:上传的不是图片 / 3002:上传图片不能超过2M / 3003:上传失败 / 3004:上传文件不能为空
      * @apiSuccess (data) {Array} data 结果
      * @apiSampleRequest /index/upload/uploadModelMultimediaVar
