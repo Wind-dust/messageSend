@@ -523,4 +523,150 @@ class Upload extends MyController
         // $this->apiLog($apiName, [$conId, $image], $result['code'], $conId);
         return $result;
     }
+
+    /**
+     * @api              {post} / 上传彩信模板变量表格
+     * @apiDescription   uploadModelMultimediaVar
+     * @apiGroup         index_upload
+     * @apiName          uploadModelMultimediaVar
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {file} 文件 
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:appid或者appkey错误/ 3001:上传的不是图片 / 3002:上传图片不能超过2M / 3003:上传失败 / 3004:上传文件不能为空
+     * @apiSuccess (data) {Array} data 结果
+     * @apiSampleRequest /index/upload/uploadModelMultimediaVar
+     * @author zyr
+     */
+    public function uploadModelMultimediaVar(){
+        $filename = $this->request->file('filename');
+        // echo $filename->getError();die;
+        if (empty($filename)) {
+            return ['code' => '3001'];
+        }
+        //表格拓展类型  xlsx:vnd.openxmlformats-officedocument.spreadsheetml.sheet,xls:vnd.ms-excel,csv:csv
+        $fileInfo = $filename->getInfo();
+        $fileType = explode('/', $fileInfo['type']);
+        $info = $filename->move('../uploads/excel');
+        $send_data = [];
+        // print_r($info);die;
+        if ($info) {
+            $type = $info->getExtension();
+            if ($type == 'csv') {
+                $type      = 'CSV';
+                $path      = $info->getpathName();
+                $objReader = PHPExcel_IOFactory::createReader($type)
+                    ->setDelimiter(',')
+                    ->setInputEncoding('GBK') //不设置将导致中文列内容返回boolean(false)或乱码
+                    ->setEnclosure('"')
+                    ->setSheetIndex(0);
+                // print_r(realpath("../"). "\yt_area_mobile.csv");die;
+
+                $objPHPExcel = $objReader->load($path);
+                // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
+                //选择标签页
+                $sheet            = $objPHPExcel->getSheet(0); //获取行数与列数,注意列数需要转换
+                $highestRowNum    = $sheet->getHighestRow();
+                $highestColumn    = $sheet->getHighestColumn();
+                $highestColumnNum = PHPExcel_Cell::columnIndexFromString($highestColumn); //取得字段，这里测试表格中的第一行为数据的字段，因此先取出用来作后面数组的键名
+                for ($i = 1; $i <= $highestRowNum; $i++) {
+                    
+                    $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
+                    if (empty($mobile)) {
+                        continue;
+                    }
+                    $var_data = [];
+                    $var_data['mobile'] = $mobile;
+                    $text = '';
+                    $cor = '';
+                    for ($j = 1; $j < $highestColumnNum; $j++) {
+                        $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
+                        $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
+                        if (!empty($cellVal)) {
+                           /*  $text .= $cor .urlencode($cellVal);
+                            $cor = ','; */
+                            // $var_num = $j-1;
+                            $var_data['{{var'.$j.'}}'] = $cellVal;
+                        }
+                    }
+                    // $send_data[] = $text . ":" . $mobile;
+                    $send_data[] = $var_data;
+                    // $row      = array();
+                    // $cellName = PHPExcel_Cell::stringFromColumnIndex(0) . $i;
+                    // // $cellVal  = $sheet->getCell($cellName)->getValue();
+                    // $mobile   = $sheet->getCell($cellName)->getValue();
+                    // $cellName = PHPExcel_Cell::stringFromColumnIndex(1) . $i;
+                    // $connect = $sheet->getCell($cellName)->getValue();
+                    // $send_data[] = $connect . ":" . $mobile;
+                }
+            } elseif ($type == 'xlsx') {
+                $type = 'Excel2007';
+                $objReader = PHPExcel_IOFactory::createReader($type);
+                $path      = $info->getpathName();
+                $objPHPExcel = $objReader->load($path, $encode = 'utf-8'); //加载文件
+                $sheet = $objPHPExcel->getSheet(0); //取得sheet(0)表
+                $highestRow = $sheet->getHighestRow(); // 取得总行数
+
+                $highestColumn    = $sheet->getHighestColumn();
+                $highestColumnNum = PHPExcel_Cell::columnIndexFromString($highestColumn); //取得字段，这里测试表格中的第一行为数据的字段，因此先取出用来作后面数组的键名
+                for ($i = 1; $i <= $highestRow; $i++) {
+                    $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
+                    if (empty($mobile)) {
+                        continue;
+                    }
+                    $var_data = [];
+                    $var_data['mobile'] = $mobile;
+                    $text = '';
+                    $cor = '';
+                    for ($j = 1; $j < $highestColumnNum; $j++) {
+                        $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
+                        $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
+
+                        if (!empty($cellVal)) {
+                            // $var_num = $j-1;
+                            $var_data['{{var'.$j.'}}'] = $cellVal;
+                        }
+                    }
+                    // $send_data[] = $text . ":" . $mobile;
+                    // print_r($send_data);
+                    $send_data[] = $var_data;
+                }
+                // die;
+            } elseif ($type == 'xls') {
+                $type = 'Excel5';
+                $objReader = PHPExcel_IOFactory::createReader($type);
+                $path      = $info->getpathName();
+                $objPHPExcel = $objReader->load($path, $encode = 'utf-8'); //加载文件
+                $sheet = $objPHPExcel->getSheet(0); //取得sheet(0)表
+                $highestRow = $sheet->getHighestRow(); // 取得总行数
+                $highestColumn    = $sheet->getHighestColumn();
+                $highestColumnNum = PHPExcel_Cell::columnIndexFromString($highestColumn); //取得字段，这里测试表格中的第一行为数据的字段，因此先取出用来作后面数组的键名
+                for ($i = 1; $i <= $highestRow; $i++) {
+                    $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
+                    if (empty($mobile)) {
+                        continue;
+                    }
+                    $text = '';
+                    $cor = '';
+                    $var_data = [];
+                    $var_data['mobile'] = $mobile;
+                    for ($j = 1; $j < $highestColumnNum; $j++) {
+                        $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
+                        $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
+                        if (!empty($cellVal)) {
+                            // $text .= $cor . urlencode($cellVal);
+                            // $cor = ',';
+                            // $var_num = $j-1;
+                            $var_data['{{var'.$j.'}}'] = $cellVal;
+                        }
+                    }
+                    // $send_data[] = $text . ":" . $mobile;
+                    $send_data[] = $var_data;
+                }
+            }
+            if (empty($send_data)) {
+                return ['code' => '3003'];
+            }
+        }
+        return ['code' => 200, 'send_data' => $send_data];
+    }
 }
