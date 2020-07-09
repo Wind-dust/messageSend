@@ -2060,13 +2060,7 @@ class CmppCreateCodeTask extends Pzlife
     
                 if ($deduct > 0 && count($real_send_mobile) > 0) {
                     //热门城市ID 
-                    $province = Db::query("SELECT `id` FROM yx_areas WHERE `level` = 1 ");
-                    $citys_id = [];
-                    foreach ($province as $key => $value) {
-                        $city = Db::query("SELECT `id` FROM yx_areas WHERE `pid` =  " . $value['id'] . " LIMIT 1");
-                        $citys_id[] = $city[0]['id'];
-                    }
-                    $citys_id[] = 2100;
+                    $citys_id = [2,20,38,241,378,500,615,694,842,860,981,1083,1220,1315,1427,1602,1803,1923,2077,2279,2405,2455,2496,2704,2802,2948,3034,3152,3255,3310,3338,2100];
                     // echo count($mobile_data);die;
                     // $cityname =  Db::query("SELECT `id`,`area_name` FROM yx_areas WHERE `id` IN  (".join(',',$citys_id) .")");
                     // print_r($cityname);die;
@@ -2079,21 +2073,19 @@ class CmppCreateCodeTask extends Pzlife
                    
     
                     //实号
-                    if (!empty($remaining_mobile)) {
-                        $entity_mobile = Db::query("SELECT `mobile` FROM `yx_real_mobile` WHERE mobile IN (" . join(',', $remaining_mobile) . ") GROUP BY `mobile` ");
-                    }
+                    $entity_mobile = Db::query("SELECT `mobile` FROM `yx_real_mobile` WHERE mobile IN (".join(',',$remaining_mobile).") GROUP BY `mobile` ");
                     // echo count($entity_mobile);die;
                     //去除实号
                     // print_r(count($entity_mobile));die;
                     $entity_mobiles = []; //实号即能扣量号码
                     if (!empty($entity_mobile)) {
-                        foreach ($entity_mobile as $key => $value) {
+                        foreach($entity_mobile as $key => $value){
                             $entity_mobiles[] = $value['mobile'];
                             $prefix = substr(trim($value['mobile']), 0, 7);
-                            $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
-                            $newres = array_shift($res);
-                            // $newres = $this->redis->hget('index:mobile:source',$prefix);
-                            // $newres = json_decode($newres,true);
+                            // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                            // $newres = array_shift($res);
+                            $newres = $this->redis->hget('index:mobile:source',$prefix);
+                            $newres = json_decode($newres,true);
                             /* if ($newres) {
                                 if ($newres['source'] == 1) {//移动
                                     // $channel_id = $yidong_channel_id;
@@ -2113,11 +2105,11 @@ class CmppCreateCodeTask extends Pzlife
                                 'mobile' => $value['mobile'],
                                 'source' => $newres['source'],
                             ];
-                            if (in_array($newres['city_id'], $citys_id)) {
+                            if (in_array($newres['city_id'],$citys_id)) {
                                 //热门城市号码
-    
+                              
                                 $host_city_mobile[] = $mobile_info;
-                            } else {
+                            }else{
                                 //冷门城市号码
                                 $cool_city_mobile[] = $mobile_info;
                             }
@@ -2130,7 +2122,112 @@ class CmppCreateCodeTask extends Pzlife
     
                     //空号检测
                     // print_r($vacant);
-                    foreach ($vacant as $key => $value) {
+                    $the_month_time = date('Ymd', time());
+                    $the_month_checkvacant = [];
+                    $the_month_checkvacant =  Db::query("SELECT `mobile` FROM  yx_mobile WHERE `mobile` IN (" . join(',',$vacant) . ") AND `check_status` = 2 AND `update_time` >= ".$the_month_time."  GROUP BY  mobile  ");
+                    $the_month_checkvacant_mobiles = [];
+                    if (!empty($the_month_checkvacant)) {
+                        foreach($the_month_checkvacant as $key => $value) {
+                            $the_month_checkvacant_mobiles[] = $value['mobile'];
+                            //划分运营商
+                            $prefix = substr(trim($value['mobile']), 0, 7);
+                            // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                            // $newres = array_shift($res);
+                            $newres = $this->redis->hget('index:mobile:source',$prefix);
+                            $newres = json_decode($newres,true);
+                            if ($newres) {
+                                if ($newres['source'] == 1) {//移动
+                                    // $channel_id = $yidong_channel_id;
+                                    $yidong_mobile[] = $value['mobile']; 
+                                } elseif ($newres['source'] == 2) { //联通
+                                    // $channel_id = $liantong_channel_id;
+                                    $liantong_mobile[] = $value['mobile']; 
+                                } elseif ($newres['source'] == 3) { //电信
+                                    // $channel_id = $dianxin_channel_id;
+                                    $dianxin_mobile[] = $value['mobile']; 
+                                }
+                            }else{
+                                $yidong_mobile[] = $value['mobile']; 
+                            }
+                        }
+                    }
+                    $need_check_mobile = [];
+                    $need_check_mobile = array_diff($vacant, $the_month_checkvacant_mobiles);
+                    $check_result = [];
+                    if (!empty($need_check_mobile)) {
+                        $check_result = $this->checkMobileApi($need_check_mobile);
+                        // print_r($check_result);
+                        // die;
+                        // ['real_mobile' => $real_mobile, 'empty_mobile' => $empty_mobile]
+                        $check_empty_mobile = [];
+                        $check_empty_mobile = $check_result['empty_mobile'];//检测出来的空号
+                        $check_real_mobile = [];
+                        $check_real_mobile = $check_result['real_mobile'];//检测出来的实号
+                        if (!empty($check_empty_mobile)) {
+                            foreach($check_empty_mobile as $key => $value) {
+                                //划分运营商
+                                $prefix = substr(trim($value), 0, 7);
+                                // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                                // $newres = array_shift($res);
+                                $newres = $this->redis->hget('index:mobile:source',$prefix);
+                                $newres = json_decode($newres,true);
+                                if ($newres) {
+                                    if ($newres['source'] == 1) {//移动
+                                        // $channel_id = $yidong_channel_id;
+                                        $yidong_mobile[] = $value; 
+                                    } elseif ($newres['source'] == 2) { //联通
+                                        // $channel_id = $liantong_channel_id;
+                                        $liantong_mobile[] = $value; 
+                                    } elseif ($newres['source'] == 3) { //电信
+                                        // $channel_id = $dianxin_channel_id;
+                                        $dianxin_mobile[] = $value; 
+                                    }
+                                }else{
+                                    $yidong_mobile[] = $value; 
+                                }
+                            }
+                        }
+                        if (!empty($check_real_mobile)) {
+                            //区分热门和冷门
+                            foreach($check_real_mobile as $key => $value) {
+                                $prefix = substr(trim($value['mobile']), 0, 7);
+                                // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                                // $newres = array_shift($res);
+                                $newres = $this->redis->hget('index:mobile:source',$prefix);
+                                $newres = json_decode($newres,true);
+                                // $newres = $this->redis->hget('index:mobile:source',$prefix);
+                                // $newres = json_decode($newres,true);
+                                /* if ($newres) {
+                                    if ($newres['source'] == 1) {//移动
+                                        // $channel_id = $yidong_channel_id;
+                                        $yidong_mobile[] = $value['mobile']; 
+                                    } elseif ($newres['source'] == 2) { //联通
+                                        // $channel_id = $liantong_channel_id;
+                                        $liantong_mobile[] = $value['mobile']; 
+                                    } elseif ($newres['source'] == 3) { //电信
+                                        // $channel_id = $dianxin_channel_id;
+                                        $dianxin_mobile[] = $value['mobile']; 
+                                    }
+                                }else{
+                                    $yidong_mobile[] = $value['mobile']; 
+                                } */
+                                $mobile_info = [];
+                                $mobile_info = [
+                                    'mobile' => $value['mobile'],
+                                    'source' => $newres['source'],
+                                ];
+                                if (in_array($newres['city_id'],$citys_id)) {
+                                    //热门城市号码
+                                  
+                                    $host_city_mobile[] = $mobile_info;
+                                }else{
+                                    //冷门城市号码
+                                    $cool_city_mobile[] = $mobile_info;
+                                }
+                            }
+                        }
+                    }
+                    /* foreach ($vacant as $key => $value) {
                         $result = Db::query("SELECT `mobile`,`check_status`,`check_result`,`update_time` FROM  yx_mobile WHERE `mobile` = '" . $value . "'  ORDER BY `id` DESC LIMIT 1 ");
                         $check_result = true; //空号
                         // $check_result = false; //空号
@@ -2179,7 +2276,7 @@ class CmppCreateCodeTask extends Pzlife
                             }
                             //归属地查询 
                         }
-                    }
+                    } */
                     //计算实际占比和扣量占比
                     //冷门全扣
                     $proportion = bcdiv(count($cool_city_mobile), count($real_send_mobile), 2);
