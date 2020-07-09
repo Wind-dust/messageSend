@@ -8310,7 +8310,7 @@ class CmppCreateCodeTask extends Pzlife
             /* $where = [];
             $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
             $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  '" . $tody_time . "' ");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id`  IN ('100182163') AND `create_time` >  '" . $tody_time . "' ");
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` NOT IN ('100182058') AND  `create_time` >  '" . $tody_time . "' ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100181593' AND `create_time` >  " . $tody_time;die;
             // $sendid = $mysql_connect->query("SELECT `id` FROM `sflsftp`.`yx_sfl_send_task` WHERE `template_id` IN ('100181864','100181869') ");
@@ -8323,7 +8323,7 @@ class CmppCreateCodeTask extends Pzlife
         }
         // die;
         $deduct = 1; //1扣量,2不扣
-        $rate = 60;
+        $rate = 50;
 
         $ids = [];
         $j = 1;
@@ -10142,12 +10142,13 @@ class CmppCreateCodeTask extends Pzlife
         // echo $time;die;
         $redis = Phpredis::getConn();
         // print_r($redis);die;
-        // $receipt = $redis->rPush('index:meassage:code:user:receive:168','{"task_no":"bus20063022452104364246","status_message":"DELIVRD","message_info":"\u53d1\u9001\u6210\u529f","mobile":"15103230163","msg_id":"70000500020200630224527169053","send_time":"2020-06-30 22:45:28","smsCount":1,"smsIndex":1}');
+        // $receipt = $redis->rPush('index:meassage:code:user:receive:168','{"task_no":"bus20063022452104364246","status_message":"NOROUTE","message_info":"\u53d1\u9001\u6210\u529f","mobile":"15103230163","msg_id":"70000500020200630224527169053","send_time":"2020-06-30 22:45:28","smsCount":1,"smsIndex":1}');
         try {
             while (true) {
                 $all_report = '';
                 $receipt_report = [];
                 $j = 1;
+                $Received = updateReceivedForMessage();
                 $user = Db::query("SELECT `id` FROM yx_users WHERE `pid` = 137 ");
                 foreach ($user as $key => $value) {
                     while (true) {
@@ -10155,6 +10156,13 @@ class CmppCreateCodeTask extends Pzlife
                         if (empty($receipt)) {
                             break;
                         }
+                        // updateReceivedForMessage
+                        $receipt = json_decode($receipt,true);
+                        if (in_array($receipt['status_message'],$Received)) {
+                            $receipt['status_message'] = 'DELIVRD';
+                            $receipt['message_info'] = '发送成功';
+                        }
+                        $receipt = json_encode($receipt);
                         $all_report = $all_report . $receipt . "\n";
                         $receipt_report[] = $receipt;
                         $j++;
