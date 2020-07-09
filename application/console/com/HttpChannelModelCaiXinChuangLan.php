@@ -227,7 +227,7 @@ class HttpChannelModelCaiXinChuangLan extends Pzlife
                                 $send_var = [];
                                 if (!empty($model_var_task[$send_data['mar_task_id']])) {
                                     $send_variable = [];
-                                    $send_variable['mobile'] = $send_data['mobile'];
+                                    $send_variable['phone'] = $send_data['mobile'];
                                     foreach ($send_data['variable'] as $key => $value) {
                                         // print_r($value);die;
                                         $new_key = str_replace('{{','',$key);
@@ -292,7 +292,7 @@ class HttpChannelModelCaiXinChuangLan extends Pzlife
                                     // print_r($send_data['variable']);die;
                                     /* 生成变量 */
                                     $send_variable = [];
-                                    $send_variable['mobile'] = $send_data['mobile'];
+                                    $send_variable['phone'] = $send_data['mobile'];
                                     foreach ($send_data['variable'] as $key => $value) {
                                         // print_r($value);die;
                                         $new_key = str_replace('{{','',$key);
@@ -548,7 +548,7 @@ class HttpChannelModelCaiXinChuangLan extends Pzlife
                             'variable'   => json_encode($mvalue['variable']),
                             'sign'   => $sign,
                         ];
-                        print_r($real_send['variable']);
+                        // print_r($real_send['variable']);
                        /*  $log_path = realpath("") . "/sign.log";
                         $myfile = fopen($log_path, 'w');
                 
