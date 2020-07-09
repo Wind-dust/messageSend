@@ -23,6 +23,10 @@ function checkMobile($mobile)
     if (strlen($mobile) != 11) {
         return false;
     }
+    if (in_array(substr(trim($mobile), 0, 3),['141','142','143','144','145','146','148','149'])) {
+        return false;
+    }
+    
     if (!empty($mobile) && preg_match('/^1[3-9]{1}\d{9}$/', $mobile)) {
         return true;
     }
@@ -514,8 +518,6 @@ function updateReceivedForMessage(){
         'MK:100D',
         'MK:100C',
         'IC:0151',
-        'IC:0055',
-        'NOROUTE',
         'EXPIRED',
         '-1012',
         '-1013',
