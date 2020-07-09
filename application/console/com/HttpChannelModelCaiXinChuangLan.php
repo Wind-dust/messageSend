@@ -19,7 +19,8 @@ class HttpChannelModelCaiXinChuangLan extends Pzlife
         return [
             'account' => 'C0120120',
             'key' => 'OdJugXUcv99bca',
-            'send_var_api'    => 'http://caixin.253.com/open/sendVarByTemplate', //模板变量发送地址
+            // 'send_var_api'    => 'http://caixin.253.com/open/sendVarByTemplate', //模板变量发送地址老接口地址
+            'send_var_api'    => 'http://caixin.253.com/api/sendVar', //新模板变量发送地址
             'send_model_api'    => 'http://caixin.253.com/open/sendByTemplate', //模板非变量发送地址
             'call_api'    => 'http://api.1cloudsp.com/report/up', //上行地址
             'call_back'    => 'http://sendapidev.shyuxi.com/index/send/chuangLanMmsCallBack', //回执回调地址
@@ -109,6 +110,8 @@ class HttpChannelModelCaiXinChuangLan extends Pzlife
                 $send_task    = [];
                 $model_var_task = [];//模板变量彩信任务
                 $model_task = [];//模板彩信任务
+                $template_info = [];
+                $template_title = [];
                 $send_num     = [];
                 $send_content = [];
                 $send_title   = [];
@@ -223,24 +226,48 @@ class HttpChannelModelCaiXinChuangLan extends Pzlife
                                 
                                 $send_var = [];
                                 if (!empty($model_var_task[$send_data['mar_task_id']])) {
-                                    $model_var_task[$send_data['mar_task_id']]['variable'] = $model_var_task[$send_data['mar_task_id']]['variable'].';'.$send_data['mobile'].','.$send_data['variable'];
+                                    $send_variable = [];
+                                    $send_variable['mobile'] = $send_data['mobile'];
+                                    foreach ($send_data['variable'] as $key => $value) {
+                                        // print_r($value);die;
+                                        $new_key = str_replace('{{','',$key);
+                                        $new_key = str_replace('}}','',$new_key);
+                                        // $new_key = str_replace('}}','',$key);
+                                        $send_variable[$new_key] = $value;
+                                    }
+                                    $model_var_task[$send_data['mar_task_id']]['variable'][] = $send_variable;
+                                    // $model_var_task[$send_data['mar_task_id']]['variable'] = $model_var_task[$send_data['mar_task_id']]['variable'].';'.$send_data['mobile'].','.$send_data['variable'];
                                     $model_var_task[$send_data['mar_task_id']]['send_num'] ++;
-                                    if ($model_var_task[$send_data['mar_task_id']]['send_num'] > 2000) {//一个包大于2000
+                                    if ($model_var_task[$send_data['mar_task_id']]['send_num'] > 500) {//一个包大于2000
                                         $real_send = [];
                                         $time = time();
                                         $sign = '';
-                                        $sign = "account=" . $user_info['account']  . "ext_id=" . $send_data['mar_task_id'] . "templateId=".$send_data['template_id']. "timestamp=" . $time .  "url=" . $user_info['call_back'] ."variable=".$model_var_task[$send_data['mar_task_id']]['variable'];
-                                        $sign = hash_hmac('sha256',$sign,$user_info['key']);
+                                       /*  $sign = "account=" . $user_info['account']  . "ext_id=" . $send_data['mar_task_id'] . "templateId=".$send_data['template_id']. "timestamp=" . $time .  "url=" . $user_info['call_back'] ."variable=".json_encode($model_var_task[$send_data['mar_task_id']]['variable']);
+                                        // $sign = hash_hmac('sha256',$sign,$user_info['key']);
                                         $real_send = [
                                             'account'    => $user_info['account'],
                                             'ext_id'   =>  $send_data['mar_task_id'],
                                             'templateId'     => $send_data['template_id'],
                                             'timestamp' => $time,
                                             'url' => $user_info['call_back'],
-                                            'variable'   => $model_var_task[$send_data['mar_task_id']]['variable'],
+                                            'variable'   => json_encode($model_var_task[$send_data['mar_task_id']]['variable']),
+                                            'sign'   => $sign,
+                                        ]; */
+                                        $sign = "account=" . $user_info['account']  . "ext_id=" . $send_data['mar_task_id'] . "msg=".$template_info[$send_data['template_id']]. "timestamp=" . $time .  "title=".$template_title[$send_data['template_id']]."url=" . $user_info['call_back'] ."variable=".json_encode($model_var_task[$send_data['mar_task_id']]['variable'])."key=".$user_info['key'];
+                                        $sign = md5($sign);
+                                        // $template_info[$send_data['template_id']] = json_encode($send_template);
+                                        $real_send = [
+                                            'account'    => $user_info['account'],
+                                            'ext_id'   =>  $send_data['mar_task_id'],
+                                            'msg'     => $template_info[$send_data['template_id']],
+                                            'title'     => $template_title[$send_data['template_id']],
+                                            // 'templateId'     => $mvalue['template_id'],
+                                            'timestamp' => $time,
+                                            'url' => $user_info['call_back'],
+                                            'variable'   => json_encode($model_var_task[$send_data['mar_task_id']]['variable']),
                                             'sign'   => $sign,
                                         ];
-            
+                                        // print_r($real_send);die;
                                         $res = sendRequest($user_info['send_var_api'], 'post', $real_send);
                                         $result = json_decode($res, true);
                                         if ($result['code'] == 1) { //提交成功
@@ -262,12 +289,92 @@ class HttpChannelModelCaiXinChuangLan extends Pzlife
                                         usleep(5000);
                                     }
                                 }else{
+                                    // print_r($send_data['variable']);die;
+                                    /* 生成变量 */
+                                    $send_variable = [];
+                                    $send_variable['mobile'] = $send_data['mobile'];
+                                    foreach ($send_data['variable'] as $key => $value) {
+                                        // print_r($value);die;
+                                        $new_key = str_replace('{{','',$key);
+                                        $new_key = str_replace('}}','',$new_key);
+                                        // $new_key = str_replace('}}','',$key);
+                                        $send_variable[$new_key] = $value;
+                                    }
+
+                                    /* 生成模板 */
+                                    $send_template = [];
                                    
+                                   
+                                    foreach ($send_data['content'] as $key => $value) {
+                                        $frame = [];
+                                        if (!empty($value['content'])) {
+                                            $frame['frame'] = $value['num'];
+                                            $frame['part'] = 1;
+                                            $frame['type'] = 1;
+                                            // $frame['content'] = $value['content'];
+                                            $value['content'] = str_replace('{{var1}}','{s1}',$value['content']);
+                                            $value['content'] = str_replace('{{var2}}','{s2}',$value['content']);
+                                            $value['content'] = str_replace('{{var3}}','{s3}',$value['content']);
+                                            $value['content'] = str_replace('{{var4}}','{s4}',$value['content']);
+                                            $value['content'] = str_replace('{{var5}}','{s5}',$value['content']);
+                                            $value['content'] = str_replace('{{var6}}','{s6}',$value['content']);
+                                            $value['content'] = str_replace('{{var7}}','{s7}',$value['content']);
+                                            $value['content'] = str_replace('{{var8}}','{s8}',$value['content']);
+                                            $value['content'] = str_replace('{{var9}}','{s9}',$value['content']);
+                                            $value['content'] = str_replace('{{var10}}','{s10}',$value['content']);
+                                            $frame['content'] = base64_encode($value['content']);
+                                            $send_template[] = $frame;
+                                        }
+                                        if (!empty($value['image_path'])) {
+                                            $frame = [];
+                                            $type = explode('.', $value['image_path']);
+            
+                                            $frame['frame'] = $value['num'];
+                                            $frame['part'] = 1;
+                                            if ($type[1] == 'jpg') {
+                                                $frame['type'] = 2;
+                                            } elseif ($type[1] == 'jpeg') {
+                                                $frame['type'] = 2;
+                                            } elseif ($type[1] == 'png') {
+                                                $frame['type'] = 3;
+                                            } elseif ($type[1] == 'gif') {
+                                                $frame['type'] = 4;
+                                            } elseif ($type[1] == 'gif') {
+                                                $frame['type'] = 4;
+                                            } elseif ($type[1] == 'wbmp') {
+                                                $frame['type'] = 5;
+                                            } elseif ($type[1] == 'bmp') {
+                                                $frame['type'] = 5;
+                                            } elseif ($type[1] == 'amr') {
+                                                $frame['type'] = 6;
+                                            } elseif ($type[1] == 'midi') {
+                                                $frame['type'] = 7;
+                                            }
+                                            $md5 = md5($value['image_path']);
+                                            if (isset($image_data[$md5])) {
+                                                $frame['content'] = $image_data[$md5];
+                                    
+                                            }else{
+                                                $imagebase = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' .$value['image_path']));
+                                                $image_data[$md5] = $imagebase;
+                                                $frame['content'] =$imagebase;
+                                               
+                                            }
+                                            // print_r($frame);
+                                            // $frame['content'] = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                                            $send_template[] = $frame;
+                                        }
+
+                                    }
+                                    $template_info[$send_data['template_id']] = json_encode($send_template);
+                                    $template_title[$send_data['template_id']] = $send_data['title'];
+                                    // print_r($send_variable);die;
                                     $model_var_task[$send_data['mar_task_id']]['template_id'] = $send_data['template_id'];
-                                    $model_var_task[$send_data['mar_task_id']]['variable'] = $send_data['mobile'].','.$send_data['variable'];
+                                    $model_var_task[$send_data['mar_task_id']]['variable'][] = $send_variable;
+                                    // $model_var_task[$send_data['mar_task_id']]['variable'] = $send_data['mobile'].','.$send_data['variable'];
                                     $model_var_task[$send_data['mar_task_id']]['send_num'] = 1;
                                 }
-
+                              
                             }else{//普通模板
                                 if (!empty($model_task[$send_data['mar_task_id']])) {
                                     $model_task[$send_data['mar_task_id']]['mobile'] =$model_task[$send_data['mar_task_id']]['mobile'].','.$send_data['mobile'];
@@ -322,18 +429,32 @@ class HttpChannelModelCaiXinChuangLan extends Pzlife
                                     $real_send = [];
                                     $time = time();
                                     $sign = '';
-                                    $sign = "account=" . $user_info['account']  . "ext_id=" . $mkey . "templateId=".$mvalue['template_id']. "timestamp=" . $time .  "url=" . $user_info['call_back'] ."variable=".$mvalue['variable'];
-                                    $sign = hash_hmac('sha256',$sign,$user_info['key']);
+                                    /* $sign = "account=" . $user_info['account']  . "ext_id=" . $mkey . "templateId=".$mvalue['template_id']. "timestamp=" . $time .  "url=" . $user_info['call_back'] ."variable=".json_encode($mvalue['variable']);
+                                    // $sign = hash_hmac('sha256',$sign,$user_info['key']);
+                                    $sign = md5($sign);
                                     $real_send = [
                                         'account'    => $user_info['account'],
                                         'ext_id'   =>  $mkey,
                                         'templateId'     => $mvalue['template_id'],
                                         'timestamp' => $time,
                                         'url' => $user_info['call_back'],
-                                        'variable'   => $mvalue['variable'],
+                                        'variable'   => json_encode($mvalue['variable']),
+                                        'sign'   => $sign,
+                                    ]; */
+                                    $sign = "account=" . $user_info['account']  . "ext_id=" . $mkey . "msg=".$template_info[$mvalue['template_id']]. "timestamp=" . $time .  "title=".$template_title[$mvalue['template_id']]."url=" . $user_info['call_back'] ."variable=".json_encode($mvalue['variable'])."key=".$user_info['key'];
+                                    $sign = md5($sign);
+                                    // $template_info[$send_data['template_id']] = json_encode($send_template);
+                                    $real_send = [
+                                        'account'    => $user_info['account'],
+                                        'ext_id'   =>  $mkey,
+                                        'msg'     => $template_info[$mvalue['template_id']],
+                                        'title'     => $template_title[$mvalue['template_id']],
+                                        // 'templateId'     => $mvalue['template_id'],
+                                        'timestamp' => $time,
+                                        'url' => $user_info['call_back'],
+                                        'variable'   => json_encode($mvalue['variable']),
                                         'sign'   => $sign,
                                     ];
-        
                                     $res = sendRequest($user_info['send_var_api'], 'post', $real_send);
                                     $result = json_decode($res, true);
                                     if ($result['code'] == 1) { //提交成功
@@ -404,23 +525,37 @@ class HttpChannelModelCaiXinChuangLan extends Pzlife
                 //剩下的号码再做提交
                 // print_r($model_var_task);
                 // print_r($send_num);die;
+                // print_r($template_info);die;
                 if (!empty($model_var_task)) {
                     foreach ($model_var_task as $mkey => $mvalue) {
                         $real_send = [];
                         $time = time();
                         $sign = '';
-                        $sign = "account=" . $user_info['account']  . "ext_id=" . $mkey . "templateId=".$mvalue['template_id']. "timestamp=" . $time .  "url=" . $user_info['call_back'] ."variable=".$mvalue['variable'];
-                        $sign = hash_hmac('sha256',$sign,$user_info['key']);
+                        // $sign = "account=" . $user_info['account']  . "ext_id=" . $mkey . "templateId=".$mvalue['template_id']. "timestamp=" . $time .  "url=" . $user_info['call_back'] ."variable=".json_encode($mvalue['variable']);
+                        // $sign = hash_hmac('sha256',$sign,$user_info['key']);
+                        // $template_info[$send_data['template_id']] = json_encode($send_template);
+                        $sign = "account=" . $user_info['account']  . "ext_id=" . $mkey . "msg=".$template_info[$mvalue['template_id']]. "timestamp=" . $time .  "title=".$template_title[$mvalue['template_id']]."url=" . $user_info['call_back'] ."variable=".json_encode($mvalue['variable'])."key=".$user_info['key'];
+                        $sign = md5($sign);
+                        
                         $real_send = [
                             'account'    => $user_info['account'],
                             'ext_id'   =>  $mkey,
-                            'templateId'     => $mvalue['template_id'],
+                            'msg'     => $template_info[$mvalue['template_id']],
+                            'title'     => $template_title[$mvalue['template_id']],
+                            // 'templateId'     => $mvalue['template_id'],
                             'timestamp' => $time,
                             'url' => $user_info['call_back'],
-                            'variable'   => $mvalue['variable'],
+                            'variable'   => json_encode($mvalue['variable']),
                             'sign'   => $sign,
                         ];
-
+                       /*  $log_path = realpath("") . "/sign.log";
+                        $myfile = fopen($log_path, 'w');
+                
+                        foreach ($real_send as $key => $value) {
+                            fwrite($myfile, $key . ":" . $value . "\n");
+                        } */
+                        // fwrite($myfile,"account=" . $user_info['account']  . "ext_id=" . $mkey . "msg=".$template_info[$mvalue['template_id']]. "timestamp=" . $time .  "title=".$template_title[$mvalue['template_id']]."url=" . $user_info['call_back'] ."variable=".json_encode($mvalue['variable'])."key=".$user_info['key']. "\n");
+                        // fclose($myfile);
                         $res = sendRequest($user_info['send_var_api'], 'post', $real_send);
                         $result = json_decode($res, true);
                         // print_r($result);
@@ -515,6 +650,7 @@ class HttpChannelModelCaiXinChuangLan extends Pzlife
             ])); //三体营销通道
 
         }
+        exception($th);
         
     }
 
