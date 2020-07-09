@@ -548,6 +548,7 @@ class HttpChannelModelCaiXinChuangLan extends Pzlife
                             'variable'   => json_encode($mvalue['variable']),
                             'sign'   => $sign,
                         ];
+                        print_r($real_send['variable']);
                        /*  $log_path = realpath("") . "/sign.log";
                         $myfile = fopen($log_path, 'w');
                 
