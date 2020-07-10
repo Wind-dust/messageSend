@@ -1273,7 +1273,7 @@ class SflUpload extends Pzlife
                             if (!strpos($svalue, date("Ymd"))) {
                                 continue;
                             }
-                             if (strpos($svalue, '2020071017') !== false) {
+                             if (strpos($svalue, '2020071017') == false) {
                                 continue;
                             }
                             $start_time = strtotime("2020-06-18");
