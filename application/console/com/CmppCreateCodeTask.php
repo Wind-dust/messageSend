@@ -127,7 +127,7 @@ class CmppCreateCodeTask extends Pzlife
                     $new_num_balance = $userEquities['num_balance'] - 1;
                     Db::table('yx_user_equities')->where('id', $userEquities['id'])->update(['num_balance' => $new_num_balance]);
                     Db::commit();
-                    $redis->rPush('index:meassage:game:sendtask', $task_id);
+                    $redis->rPush('index:meassage:business:sendtask', $task_id);
                 } catch (\Exception $e) {
                     $redis->rPush($redisMessageCodeSendReal, $SendText);
                     exception($e);
