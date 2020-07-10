@@ -3051,7 +3051,7 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
-    public function checkMobileApi($mobile)
+    /* public function checkMobileApi($mobile)
     {
         $secret_id = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
         $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
@@ -3109,7 +3109,126 @@ class CmppCreateCodeTask extends Pzlife
         }
         return false;
     }
-
+ */
+public function checkMobileApi($mobiledata = [])
+    {
+        $real_mobile = [];
+        $empty_mobile = [];
+        $secret_id = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
+        $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
+        $api = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
+        $ts = date("YmdHis", time());
+        $sig = sha1($secret_id . $secret_key . $ts);
+        $api = $api . $sig . "&sid=" . $secret_id . "&skey=" . $secret_key . "&ts=" . $ts;
+        // $check_mobile = $this->decrypt('6C38881649F7003B910582D1095DA821',$secret_id);
+        // print_r($check_mobile);die;
+        $data = [];
+        $check_mobile_data = [];
+        $j = 1;
+        foreach($mobiledata as $key => $value){
+            $check_mobile_data[] = encrypt($value, $secret_id);
+            $j++;
+            if ($j > 2000){
+                $data = [
+                    'mobiles' => $check_mobile_data
+                ];
+                $headers = [
+                    'Authorization:' . base64_encode($secret_id . ':' . $ts), 'Content-Type:application/json'
+                ];
+                $result = $this->sendRequest2($api, 'post', $data, $headers);
+                // print_r(json_decode($data),true);
+                // print_r($data);
+                $result = json_decode($result, true);
+                if ($result['code'] == 0) { //接口请求成功
+                    $mobiles = $result['mobiles'];
+                    foreach ($mobiles as $key => $value) {
+                        $mobile = decrypt($value['mobile'], $secret_id);
+                        $check_result = $value['mobileStatus'];
+                        $check_status = 2;
+                        if ($check_result == 2) { //实号
+                            Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
+                            Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
+                            Db::table('yx_real_mobile')->insert([
+                                'mobile' => $mobile,
+                                'check_result' => 3,
+                                'check_status' => $check_status,
+                                'update_time' => time(),
+                                'create_time' => time()
+                            ]);
+                            // return false;
+                            $real_mobile[] = $mobile;
+                        } else {
+                            Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
+                            Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
+                            Db::table('yx_mobile')->insert([
+                                'mobile' => $mobile,
+                                'check_result' => $check_result,
+                                'check_status' => $check_status,
+                                'update_time' => time(),
+                                'create_time' => time()
+                            ]);
+                            $empty_mobile[] = $mobile;
+                        }
+                    }
+        
+                }else{
+                    $empty_mobile = $mobiledata;
+                }
+                $check_mobile_data = [];
+                $j = 1;
+            }
+        }
+        if (!empty($check_mobile_data)) {
+            $data = [
+                'mobiles' => $check_mobile_data
+            ];
+            $headers = [
+                'Authorization:' . base64_encode($secret_id . ':' . $ts), 'Content-Type:application/json'
+            ];
+            $result = $this->sendRequest2($api, 'post', $data, $headers);
+            // print_r(json_decode($data),true);
+            // print_r($data);
+            $result = json_decode($result, true);
+            if ($result['code'] == 0) { //接口请求成功
+                $mobiles = $result['mobiles'];
+                foreach ($mobiles as $key => $value) {
+                    $mobile = decrypt($value['mobile'], $secret_id);
+                    $check_result = $value['mobileStatus'];
+                    $check_status = 2;
+                    if ($check_result == 2) { //实号
+                        Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
+                        Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
+                        Db::table('yx_real_mobile')->insert([
+                            'mobile' => $mobile,
+                            'check_result' => 3,
+                            'check_status' => $check_status,
+                            'update_time' => time(),
+                            'create_time' => time()
+                        ]);
+                        // return false;
+                        $real_mobile[] = $mobile;
+                    } else {
+                        Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
+                        Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
+                        Db::table('yx_mobile')->insert([
+                            'mobile' => $mobile,
+                            'check_result' => $check_result,
+                            'check_status' => $check_status,
+                            'update_time' => time(),
+                            'create_time' => time()
+                        ]);
+                        $empty_mobile[] = $mobile;
+                    }
+                }
+    
+            }else{
+                $empty_mobile = $mobiledata;
+            }
+        }
+        
+      return ['real_mobile' => $real_mobile, 'empty_mobile' => $empty_mobile];
+    }
+    
     function sendRequest2($requestUrl, $method = 'get', $data = [], $headers)
     {
         $methonArr = ['get', 'post'];
