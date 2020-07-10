@@ -911,7 +911,7 @@ class SflUpload extends Pzlife
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
-                    // continue;
+                    continue;
                     $err_task_num = [];
                     $send_data    = [];
                     if ($son_path_data !== false) {
@@ -1273,9 +1273,9 @@ class SflUpload extends Pzlife
                             if (!strpos($svalue, date("Ymd"))) {
                                 continue;
                             }
-                            /*  if (strpos($svalue, '2020062414') == false) {
+                             if (strpos($svalue, '2020071017') !== false) {
                                 continue;
-                            } */
+                            }
                             $start_time = strtotime("2020-06-18");
                             $end_time = $start_time+86400;
                             $expeort_time = $start_time + 43200 - mt_rand(0, 3000);
@@ -1585,9 +1585,9 @@ class SflUpload extends Pzlife
                                 continue;
                             }
 
-                            if (!strpos($svalue, '2020070217')) {
+                           /*  if (!strpos($svalue, '2020070217')) {
                                 continue;
-                            }
+                            } */
                            /*  print_r($svalue);
                             echo "\n";
                             print_r(strpos($svalue, '2020070217'));
@@ -2351,10 +2351,12 @@ class SflUpload extends Pzlife
 
             $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
             ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-            $start_time = strtotime("2020-06-24");
+            $start_time = strtotime("2020-06-29");
             $end_time = $start_time + 86400;
-            $expeort_time = $start_time + 46800 - mt_rand(0, 180);
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $start_time . " AND   `create_time` <  " . $end_time . " ");
+            // $expeort_time = $start_time + 46800 - mt_rand(0, 180);
+            $expeort_time = 1593421200;
+            // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $start_time . " AND   `create_time` <  " . $end_time . " AND `sfl_relation_id` IN ('100181712','100181717','100181722') ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` IN ('100181871') ");
             $ids          = [];
             foreach ($mul_task_ids as $key => $value) {
                 $ids[] = $value['id'];
@@ -2510,7 +2512,7 @@ class SflUpload extends Pzlife
                     $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                 }
             }
-            $objWriter->save('imp_mobile_status_report_mms_1_' . date("Ymd", $start_time) . '.xlsx');
+            $objWriter->save('imp_mobile_status_report_mms_2_' . date("Ymd", $start_time) . '.xlsx');
         } catch (\Exception $th) {
             exception($th);
         }
@@ -2522,22 +2524,22 @@ class SflUpload extends Pzlife
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $objReader = PHPExcel_IOFactory::createReader('Excel2007');
         // print_r(realpath("../"). "\yt_area_mobile.csv");die;
-        $start_time = strtotime("2020-06-18");
+        $start_time = strtotime("2020-06-23");
         $end_time = $start_time+86400;
-        $expeort_time = $start_time+43200-mt_rand(0,3000);
-        // $expeort_time = 1593062400;
+        // $expeort_time = $start_time+43200-mt_rand(0,3000);
+        $expeort_time = 1592884416;
         try {
             // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591891200 AND   `create_time` <  1591977600 AND `task_content` NOT LIKE '%test%' ");
             // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$start_time." AND   `create_time` <  ".$end_time."  AND `task_content` NOT LIKE '%test%' ");
             // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$start_time." AND   `create_time` <  ".$end_time."  AND `template_id` IN ('529','100150820','100150821','100150822','100180393','100181850','100181855','100181864','100181869','100181873','100181874','100181875','100181876') ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$start_time." AND   `create_time` <  ".$end_time."  AND `template_id` IN ('529','100150820','100150821','100150822','100180393','100181850','100181855','100181864','100181869','100181873','100181874','100181875','100181876') ";die;
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$start_time." AND   `create_time` <  ".$end_time."  AND `template_id` IN ('529','100150820','100150821','100150822','100180393') ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$start_time." AND   `create_time` <  ".$end_time."  AND `template_id`  IN ('100181820') ");
            /*  echo "SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$start_time." AND   `create_time` <  ".$end_time."  AND `template_id` IN ('529','100150820','100150821','100150822','100180393') ";die; */
             // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `template_id` ='100181517'  AND `task_content` NOT LIKE '%test%' ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591286400 AND   `create_time` <  1591372800 AND `task_content` NOT LIKE '%test%' ";die;
             $ids          = [];
             $i = 1;
-            $j = 1;
+            $j = 3;
             foreach ($mul_task_ids as $key => $value) {
                 // $ids[] = $value['id'];
                 /*  $objPHPExcel = $objReader->load(realpath("./") . "/0522.xlsx");
