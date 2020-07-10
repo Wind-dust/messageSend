@@ -338,7 +338,8 @@ class ServerSocketJYYLT extends Pzlife
                             //     ],
                             // ];
                             // $redis->rPush('index:meassage:code:cmppdeliver:'.$uid,json_encode($deliver));
-                            $deliver = $redis->lpop('index:meassage:game:cmppdeliver:' . $uid); //取出用户发送任务
+                            // $deliver = $redis->lpop('index:meassage:game:cmppdeliver:' . $uid); //取出用户发送任务
+                            $deliver = $redis->lpop('index:meassage:code:user:receive:' . $uid); //取出用户发送任务
                             if (!empty($deliver)) {
                                 $deliver            = json_decode($deliver, true);
                                 $deliver_timestring = time();
@@ -438,16 +439,16 @@ class ServerSocketJYYLT extends Pzlife
             // 'host'          => "127.0.0.1", //服务商ip
             'host'          => "0.0.0.0", //服务商ip
             'port'          => "7891", //短连接端口号   17890长连接端口号
-            'Source_Addr'   => "101103", //企业id  企业代码移动
-            'Shared_secret' => 'JyyLT3456', //网关登录密码
+            'Source_Addr'   => "101107", //企业id  企业代码移动
+            'Shared_secret' => 'tjysLT3456', //网关登录密码
             'Service_Id'    => "",
             'Dest_Id'       => "10692054963", //短信接入码 短信端口号
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
-            'bin_ip'        => ["221.228.217.57", "127.0.0.1"], //客户端绑定IP
+            'bin_ip'        => ['47.98.178.87', "127.0.0.1"], //客户端绑定IP
             'free_trial'    => 2,
             'master_num'    => 300,
-            'uid'           => 58,
+            'uid'           => 222,
         ];
     }
 

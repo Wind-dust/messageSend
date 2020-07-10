@@ -64,9 +64,13 @@ class CmppCreateCodeTask extends Pzlife
                 $uid        = 115;
                 $channel_id = 14;
             }
-            if (trim($send['Source_Addr']) == 101106) { //移动
+            if (trim($send['Source_Addr']) == 101106) { //电信
                 $uid        = 207;
                 $channel_id = 29;
+            }
+            if (trim($send['Source_Addr']) == 101107) { //电信
+                $uid        = 222;
+                $channel_id = 28;
             }
             $user = $this->getUserInfo($uid);
             if (empty($user) || $user['user_status'] == 1) {
@@ -95,7 +99,9 @@ class CmppCreateCodeTask extends Pzlife
             $send_code_task['create_time']    = time();
             $send_code_task['mobile_content'] = $send['mobile'];
             $send_code_task['send_num']       = 1;
-            $send_code_task['channel_id']     = $channel_id;
+            $send_code_task['yidong_channel_id']     = $channel_id;
+            $send_code_task['liantong_channel_id']     = $channel_id;
+            $send_code_task['dianxin_channel_id']     = $channel_id;
             $send_code_task['send_length']    = mb_strlen(trim($send['message']));
             // $sendData['uid']          = 1;
             // $sendData['Submit_time']  = date('YMDHM', time());
@@ -110,7 +116,13 @@ class CmppCreateCodeTask extends Pzlife
                         $send_code_task['free_trial'] = 1;
                     }
                     //游戏任务
-                    $task_id = Db::table('yx_user_send_game_task')->insertGetId($send_code_task);
+                    /* $task_id = Db::table('yx_user_send_game_task')->insertGetId($send_code_task);
+                    //扣除余额
+                    $new_num_balance = $userEquities['num_balance'] - 1;
+                    Db::table('yx_user_equities')->where('id', $userEquities['id'])->update(['num_balance' => $new_num_balance]);
+                    Db::commit();
+                    $redis->rPush('index:meassage:game:sendtask', $task_id); */
+                    $task_id = Db::table('yx_user_send_code_task')->insertGetId($send_code_task);
                     //扣除余额
                     $new_num_balance = $userEquities['num_balance'] - 1;
                     Db::table('yx_user_equities')->where('id', $userEquities['id'])->update(['num_balance' => $new_num_balance]);
