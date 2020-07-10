@@ -308,7 +308,7 @@ class CmppCreateCodeTask extends Pzlife
             $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0, 'deduct' => 10]));
             // usleep(50000);
         } */
-        $task_id =['184992','184977','184998'];
+        $task_id =['227892'];
         foreach ($task_id as $key => $value) {
             $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value, 'send_time' => 0, 'deduct' => 0]));
             // usleep(50000);
@@ -387,6 +387,7 @@ class CmppCreateCodeTask extends Pzlife
                 $error_mobile = [];
                 $deduct_mobile = [];
                 $mobile_result = $this->mobilesFiltrate($sendTask['mobile_content'], $sendTask['uid'], $real_send['deduct']);
+                // print_r($mobile_result);die;
                 /*  return ['error_mobile' => $error_mobile, 'yidong_mobile' => $yidong_mobile,'liantong_mobile' => $liantong_mobile, 'dianxin_mobile' => $dianxin_mobile, 'deduct_mobile' => $deduct_mobile]; */
                 /* 实际发送号码 */
                 $yidong_mobile = $mobile_result['yidong_mobile'];
@@ -2001,7 +2002,10 @@ class CmppCreateCodeTask extends Pzlife
                     }
                 }
                 $real_send_mobile = array_diff($mobile_data, $error_mobile);
+                $real_send_mobile = array_diff($real_send_mobile, $white_mobiles);
+                // print_r($real_send_mobile);die;
             if (count($real_send_mobile) == 1) {
+               
                 $num = mt_rand(0,100);
                 if ($uid == 91 ) {
                     if ($num <= $deduct && !empty($real_send_mobile)) {
@@ -2080,10 +2084,8 @@ class CmppCreateCodeTask extends Pzlife
                     //去除黑名单和白名单
                     // echo count($real_send_mobile);die;
                     // print_r($white_mobile);die;
-                    $remaining_mobile = array_diff($real_send_mobile, $white_mobiles);
-    
-                   
-    
+                    // $remaining_mobile = array_diff($real_send_mobile, $white_mobiles);
+                    $remaining_mobile = $real_send_mobile;
                     //实号
                     $entity_mobile = Db::query("SELECT `mobile` FROM `yx_real_mobile` WHERE mobile IN (".join(',',$remaining_mobile).") GROUP BY `mobile` ");
                     // echo count($entity_mobile);die;
