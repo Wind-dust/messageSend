@@ -44,6 +44,9 @@ return [
     'httpchannelcaixinhuaxingtongxun'  => $commandPath . 'HttpChannelCaiXinHuaxingtongxun',
     'httpchannelcaixinhangzhoumaiyuan' => $commandPath . 'HttpChannelCaiXinHangZhouMaiYuan',
     'httpchannelcaixinchuanglan' => $commandPath . 'HttpChannelCaiXinChuangLan',
+    'httpchannelcaixinchuanglanlankouone' => $commandPath . 'HttpChannelCaiXinChuangLanLanKouOne',
+    'httpchannelcaixinchuanglanlankoutwo' => $commandPath . 'HttpChannelCaiXinChuangLanLanKouTwo',
+    'httpchannelcaixinchuanglanlankouthree' => $commandPath . 'HttpChannelCaiXinChuangLanLanKouThree',
     'httpchannelmodelcaixinchuanglan' => $commandPath . 'HttpChannelModelCaiXinChuangLan',
     'httpchannelcaixinmeilian' => $commandPath . 'HttpChannelCaiXinMeiLian', //美联软通彩信
     'cmppmeilianruantongyidonggame' => $commandPath . 'CmppMeiLianRuanTongYiDongGame', //美联软通移动游戏

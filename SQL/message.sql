@@ -968,6 +968,21 @@ CREATE TABLE `yx_user_channel_group`(
   UNIQUE KEY `user_business_priority_deletime_status`(`uid`,`business_id`,`priority`,`status`,`delete_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT= "用户通道组";
 
+DROP TABLE IF EXISTS `yx_user_channel`;
+CREATE TABLE `yx_user_channel` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `yidong_channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '移动通道ID',
+  `liantong_channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '联通通道id',
+  `dianxin_channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '电信通道id',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `nick_name` char(30) NOT NULL DEFAULT '' COMMENT '用户名',
+  `business_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '业务服务id',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户通道表';
+
 DROP TABLE IF EXISTS `yx_user_channel_group_son`;
 CREATE TABLE `yx_user_channel_group_son` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

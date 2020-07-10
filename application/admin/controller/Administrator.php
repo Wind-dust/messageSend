@@ -374,15 +374,18 @@ class Administrator extends AdminController
     }
 
     /**
-     * @api              {post} / 分配用户通道
+     * @api              {post} / 设置用户免审通道
      * @apiDescription   distributeUserChannel
      * @apiGroup         admin_Administrator
      * @apiName          distributeUserChannel
      * @apiParam (入参) {String} cms_con_id
-     * @apiParam (入参) {String} channel_id 通道ID
-     * @apiParam (入参) {String} user_phone 被设置用户手机号
-     * @apiParam (入参) {String} priority 优先级:1,默认省网优先;2,非接入省网外优先
-     * @apiSuccess (返回) {String} code 200:成功 / 3001:手机号格式错误 / 3002:channel_id格式错误 / 3003:非法的优先级  / 3004:该用户不存在
+     * @apiParam (入参) {String} yidong_channel_id 移动通道ID
+     * @apiParam (入参) {String} liantong_channel_id 联通通道ID
+     * @apiParam (入参) {String} dianxin_channel_id 电信通道ID
+     * @apiParam (入参) {String} dianxin_channel_id 电信通道ID
+     * @apiParam (入参) {String} nick_name 用户名，用户名为唯一值
+     * @apiParam (入参) {String} business_id 服务类型ID
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:手机号格式错误 / 3002:channel_id格式错误 / 3003:非法的业务服务ID  / 3004:该用户不存在
      * @apiSampleRequest /admin/administrator/distributeUserChannel
      * @return array
      * @author rzc
@@ -394,19 +397,25 @@ class Administrator extends AdminController
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
             return ['code' => '3100'];
         }
-        $channel_id = trim($this->request->post('channel_id'));
-        $user_phone = trim($this->request->post('user_phone'));
-        $priority = trim($this->request->post('priority'));
-        if (checkMobile($user_phone) === false) {
-            return ['code' => '3001'];
-        }
-        if (empty($channel_id) || intval($channel_id) < 1 || !is_numeric($channel_id)) {
+        $yidong_channel_id = trim($this->request->post('yidong_channel_id'));
+        $liantong_channel_id = trim($this->request->post('liantong_channel_id'));
+        $dianxin_channel_id = trim($this->request->post('dianxin_channel_id'));
+        $nick_name = trim($this->request->post('nick_name'));
+        $business_id = trim($this->request->post('business_id'));
+       
+        if (empty($yidong_channel_id) || intval($yidong_channel_id) < 1 || !is_numeric($yidong_channel_id)) {
             return ['code' => '3002'];
         }
-        if (!in_array($priority, [1, 2])) {
+        if (empty($liantong_channel_id) || intval($liantong_channel_id) < 1 || !is_numeric($liantong_channel_id)) {
+            return ['code' => '3002'];
+        }
+        if (empty($dianxin_channel_id) || intval($dianxin_channel_id) < 1 || !is_numeric($dianxin_channel_id)) {
+            return ['code' => '3002'];
+        }
+        if (!in_array($business_id, [5, 6, 7, 8, 9])) {
             return ['code' => '3003'];
         }
-        $result  = $this->app->administrator->distributeUserChannel(intval($channel_id), intval($user_phone), intval($priority));
+        $result  = $this->app->administrator->distributeUserChannel(intval($yidong_channel_id), intval($liantong_channel_id),intval($dianxin_channel_id),intval($business_id), strval($nick_name));
         return $result;
     }
 

@@ -671,7 +671,7 @@ return $result;
     public function getSmsMultimediaMessageTask($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title, $signature_id = '', $msg_id = '')
     {
         $this->redis = Phpredis::getConn();
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial,mul_free_trial,multimedia_deduct', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial,mul_free_trial,multimedia_deduct,multimeda_free_credit', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -785,17 +785,60 @@ return $result;
         if (!empty($send_time)) {
             $SmsMultimediaMessageTask['appointment_time'] = strtotime($send_time);
         }
+            $free_trial = 1;
+            $yidong_channel_id = 0;
+            $liantong_channel_id = 0;
+            $dianxin_channel_id = 0;
         if ($user['mul_free_trial'] == 2) {
             $free_trial = 2;
             $yidong_channel_id = 59;
             $liantong_channel_id = 59;
             $dianxin_channel_id = 59;
-            $SmsMultimediaMessageTask['free_trial'] = $free_trial;
-            $SmsMultimediaMessageTask['yidong_channel_id'] = $yidong_channel_id;
-            $SmsMultimediaMessageTask['liantong_channel_id'] = $liantong_channel_id;
-            $SmsMultimediaMessageTask['dianxin_channel_id'] = $dianxin_channel_id;
+            if ($user['id'] == 221) {
+                if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+                    $free_trial = 2;
+                    $yidong_channel_id = 108;
+                    $liantong_channel_id = 108;
+                    $dianxin_channel_id = 108;
+                }else{
+                    $free_trial = 1;
+                    $yidong_channel_id = 0;
+                    $liantong_channel_id = 0;
+                    $dianxin_channel_id = 0;
+                }
+            }
+            if ($user['id'] == 219) {
+                if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+                    $free_trial = 2;
+                    $yidong_channel_id = 109;
+                    $liantong_channel_id = 109;
+                    $dianxin_channel_id = 109;
+                }else{
+                    $free_trial = 1;
+                    $yidong_channel_id = 0;
+                    $liantong_channel_id = 0;
+                    $dianxin_channel_id = 0;
+                }
+            }
+            if ($user['id'] == 220) {
+                if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+                    $free_trial = 2;
+                    $yidong_channel_id = 110;
+                    $liantong_channel_id = 110;
+                    $dianxin_channel_id = 110;
+                }else{
+                    $free_trial = 1;
+                    $yidong_channel_id = 0;
+                    $liantong_channel_id = 0;
+                    $dianxin_channel_id = 0;
+                }
+            }
             // $channel_id = 59;
         }
+        $SmsMultimediaMessageTask['free_trial'] = $free_trial;
+        $SmsMultimediaMessageTask['yidong_channel_id'] = $yidong_channel_id;
+        $SmsMultimediaMessageTask['liantong_channel_id'] = $liantong_channel_id;
+        $SmsMultimediaMessageTask['dianxin_channel_id'] = $dianxin_channel_id;
         if (!empty($msg_id)) {
             $SmsMultimediaMessageTask['send_msg_id'] = $msg_id;
         }
@@ -1635,7 +1678,7 @@ return $result;
 
     public function submitBatchCustomMultimediaMessage($appid, $appkey, $template_id, $connect, $ip, $msg_id = '', $signature_id = '')
     {
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,mul_free_trial,multimedia_deduct,multimeda_free_credit', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -1826,7 +1869,60 @@ return $result;
             $send_task['send_msg_id'] = $msg_id;
         }
         // print_r($template['multimedia_frame']);die;
-        $send_task['free_trial'] = 1;
+        $free_trial = 1;
+        $yidong_channel_id = 0;
+        $liantong_channel_id = 0;
+        $dianxin_channel_id = 0;
+        if ($user['mul_free_trial'] == 2) {
+            $free_trial = 2;
+            $yidong_channel_id = 59;
+            $liantong_channel_id = 59;
+            $dianxin_channel_id = 59;
+            if ($user['id'] == 221) {
+                if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+                    $free_trial = 2;
+                    $yidong_channel_id = 108;
+                    $liantong_channel_id = 108;
+                    $dianxin_channel_id = 108;
+                }else{
+                    $free_trial = 1;
+                    $yidong_channel_id = 0;
+                    $liantong_channel_id = 0;
+                    $dianxin_channel_id = 0;
+                }
+            }
+            if ($user['id'] == 219) {
+                if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+                    $free_trial = 2;
+                    $yidong_channel_id = 109;
+                    $liantong_channel_id = 109;
+                    $dianxin_channel_id = 109;
+                }else{
+                    $free_trial = 1;
+                    $yidong_channel_id = 0;
+                    $liantong_channel_id = 0;
+                    $dianxin_channel_id = 0;
+                }
+            }
+            if ($user['id'] == 220) {
+                if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+                    $free_trial = 2;
+                    $yidong_channel_id = 110;
+                    $liantong_channel_id = 110;
+                    $dianxin_channel_id = 110;
+                }else{
+                    $free_trial = 1;
+                    $yidong_channel_id = 0;
+                    $liantong_channel_id = 0;
+                    $dianxin_channel_id = 0;
+                }
+            }
+        }
+        // $send_task['free_trial'] = 1;
+        $send_task['free_trial'] = $free_trial;
+        $send_task['yidong_channel_id'] = $yidong_channel_id;
+        $send_task['liantong_channel_id'] = $liantong_channel_id;
+        $send_task['dianxin_channel_id'] = $dianxin_channel_id;
         // print_r($send_task);die;
         Db::startTrans();
         try {
@@ -1974,6 +2070,60 @@ return $result;
         if (!empty($msg_id)) {
             $SmsMultimediaMessageTask['send_msg_id'] = $msg_id;
         }
+        $free_trial = 1;
+        $yidong_channel_id = 0;
+        $liantong_channel_id = 0;
+        $dianxin_channel_id = 0;
+        if ($user['mul_free_trial'] == 2) {
+            $free_trial = 2;
+            $yidong_channel_id = 59;
+            $liantong_channel_id = 59;
+            $dianxin_channel_id = 59;
+            if ($user['id'] == 221) {
+                if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+                    $free_trial = 2;
+                    $yidong_channel_id = 108;
+                    $liantong_channel_id = 108;
+                    $dianxin_channel_id = 108;
+                }else{
+                    $free_trial = 1;
+                    $yidong_channel_id = 0;
+                    $liantong_channel_id = 0;
+                    $dianxin_channel_id = 0;
+                }
+            }
+            if ($user['id'] == 219) {
+                if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+                    $free_trial = 2;
+                    $yidong_channel_id = 109;
+                    $liantong_channel_id = 109;
+                    $dianxin_channel_id = 109;
+                }else{
+                    $free_trial = 1;
+                    $yidong_channel_id = 0;
+                    $liantong_channel_id = 0;
+                    $dianxin_channel_id = 0;
+                }
+            }
+            if ($user['id'] == 220) {
+                if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+                    $free_trial = 2;
+                    $yidong_channel_id = 110;
+                    $liantong_channel_id = 110;
+                    $dianxin_channel_id = 110;
+                }else{
+                    $free_trial = 1;
+                    $yidong_channel_id = 0;
+                    $liantong_channel_id = 0;
+                    $dianxin_channel_id = 0;
+                }
+            }
+        }
+        // $send_task['free_trial'] = 1;
+        $SmsMultimediaMessageTask['free_trial'] = $free_trial;
+        $SmsMultimediaMessageTask['yidong_channel_id'] = $yidong_channel_id;
+        $SmsMultimediaMessageTask['liantong_channel_id'] = $liantong_channel_id;
+        $SmsMultimediaMessageTask['dianxin_channel_id'] = $dianxin_channel_id;
         Db::startTrans();
         try {
             DbAdministrator::modifyBalance($user_equities['id'], $send_num, 'dec');
@@ -2334,6 +2484,90 @@ return $result;
             ];
             $this->redis->rPush('sftp:upriver:chuanglan', json_encode($insert_data));
             return 'OK';
-        }
+        }elseif ($account == 'C2431630_C4786051') {
+            $user = DbSendMessage::getUserMultimediaMessageLog(['mobile' => $phone,'uid' => 221], 'task_no,uid', true, ['id' => 'desc']);
+            $upgoing = [];
+            $upgoing = [
+                'mobile' => $phone,
+                'message_info' => $msg,
+                'get_time' => $moTime,
+            ];
+            $this->redis->rPush('index:message:Mmsupriver:221', json_encode($upgoing));
+            $insert_data = [];
+            $insert_data = [
+                'uid' => $user['uid'],
+                'task_no' => $user['task_no'],
+                'mobile' => $phone,
+                'message_info' => $msg,
+                'create_time' => strtotime($moTime),
+                'business_id' => 8,
+            ];
+            Db::startTrans();
+            try {
+                DbSendMessage::addUserUpriver($insert_data);
+                Db::commit();
+                return 'OK';
+            } catch (\Exception $e) {
+                Db::rollback();
+                exception($e);
+                return ['code' => '3007'];
+            }
+        } elseif ($account == 'C5304745_C4786051') {
+            $user = DbSendMessage::getUserMultimediaMessageLog(['mobile' => $phone,'uid' => 219], 'task_no,uid', true, ['id' => 'desc']);
+            $upgoing = [];
+            $upgoing = [
+                'mobile' => $phone,
+                'message_info' => $msg,
+                'get_time' => $moTime,
+            ];
+            $this->redis->rPush('index:message:Mmsupriver:219', json_encode($upgoing));
+            $insert_data = [];
+            $insert_data = [
+                'uid' => $user['uid'],
+                'task_no' => $user['task_no'],
+                'mobile' => $phone,
+                'message_info' => $msg,
+                'create_time' => strtotime($moTime),
+                'business_id' => 8,
+            ];
+            Db::startTrans();
+            try {
+                DbSendMessage::addUserUpriver($insert_data);
+                Db::commit();
+                return 'OK';
+            } catch (\Exception $e) {
+                Db::rollback();
+                exception($e);
+                return ['code' => '3007'];
+            }
+        } elseif ($account == 'C5427166_C4786051') {
+            $user = DbSendMessage::getUserMultimediaMessageLog(['mobile' => $phone,'uid' => 220], 'task_no,uid', true, ['id' => 'desc']);
+            $upgoing = [];
+            $upgoing = [
+                'mobile' => $phone,
+                'message_info' => $msg,
+                'get_time' => $moTime,
+            ];
+            $this->redis->rPush('index:message:Mmsupriver:220', json_encode($upgoing));
+            $insert_data = [];
+            $insert_data = [
+                'uid' => $user['uid'],
+                'task_no' => $user['task_no'],
+                'mobile' => $phone,
+                'message_info' => $msg,
+                'create_time' => strtotime($moTime),
+                'business_id' => 8,
+            ];
+            Db::startTrans();
+            try {
+                DbSendMessage::addUserUpriver($insert_data);
+                Db::commit();
+                return 'OK';
+            } catch (\Exception $e) {
+                Db::rollback();
+                exception($e);
+                return ['code' => '3007'];
+            }
+        } 
     }
 }
