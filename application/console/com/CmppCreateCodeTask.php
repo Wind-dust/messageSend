@@ -10270,6 +10270,7 @@ public function checkMobileApi($mobiledata = [])
                 $Received = updateReceivedForMessage();
                 $user = Db::query("SELECT `id` FROM yx_users WHERE `pid` = 137 ");
                 foreach ($user as $key => $value) {
+                    /* 短信部分 */
                     while (true) {
                         $receipt = $redis->lpop('index:meassage:code:user:receive:' . $value['id']);
                         if (empty($receipt)) {
@@ -10339,6 +10340,74 @@ public function checkMobileApi($mobiledata = [])
                 sleep(1);
             }
 
+            while (true) {
+                $receipt = $redis->lpop('index:meassage:code:user:mulreceive:' . $value['id']);
+                if (empty($receipt)) {
+                    break;
+                }
+                // updateReceivedForMessage
+                $receipt = json_decode($receipt,true);
+                if (in_array($receipt['status_message'],$Received)) {
+                    $receipt['status_message'] = 'DELIVRD';
+                    $receipt['message_info'] = '发送成功';
+                }
+                $receipt = json_encode($receipt);
+                $all_report = $all_report . $receipt . "\n";
+                $receipt_report[] = $receipt;
+                $j++;
+                if ($j > 100) {
+                    //  print_r($all_report);die;
+                    $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                    //推送失败
+                    print_r($res);
+                    if ($res != 'SUCCESS') {
+                        usleep(300);
+                        $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                        if ($res != 'SUCCESS') {
+                            usleep(300);
+                            $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                            foreach ($receipt_report as $akey => $avalue) {
+                                // # code...
+                                // print_r($avalue);die;
+                                $redis->rpush('index:meassage:code:receive_for_future_default', $avalue); //写入用户带处理日志
+                            }
+                        }
+                    }
+                    $all_report = '';
+                    $receipt_report = [];
+                    $j = 1;
+                }
+            }
+        }
+        // print_r($receipt_report);die;
+        if (!empty($all_report)) {
+            $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+            //推送失败
+            if ($res != 'SUCCESS') {
+                usleep(300);
+                $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                if ($res != 'SUCCESS') {
+                    usleep(300);
+                    $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                    foreach ($receipt_report as $akey => $avalue) {
+                        // # code...
+                        // print_r($avalue);die;
+                        $redis->rpush('index:meassage:code:receive_for_future_default', json_encode($avalue)); //写入用户带处理日志
+                    }
+                }
+            }
+            $all_report = '';
+            $receipt_report = [];
+            $j = 1;
+        }
+        if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
+            $redis->rpush('index:meassage:code:send', json_encode([
+                'mobile'  => 15201926171,
+                'content' => "【钰晰科技】客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time())
+            ]));
+        }
+        sleep(1);
+    }
             // print_r($user);
         } catch (\Exception $th) {
             //throw $th;
