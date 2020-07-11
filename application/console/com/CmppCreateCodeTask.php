@@ -8438,13 +8438,13 @@ public function checkMobileApi($mobiledata = [])
         // echo "SELECT * FROM yx_sfl_send_task WHERE `mobile` IN (".join(',',$white_list).") ";die;
         // $tody_time = 1590645600;
         $tody_time = strtotime(date("Ymd", time()));
-        $tody_time = 1594375200;
+        // $tody_time = 1594375200;
         try {
-            // $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84, 'update_time' => time()]);
+            $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84, 'update_time' => time()]);
             /* $where = [];
             $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
             $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id`  IN ('100182398') AND `create_time` >  '" . $tody_time . "' ");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  '" . $tody_time . "' ");
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` NOT IN ('100182058') AND  `create_time` >  '" . $tody_time . "' ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100181593' AND `create_time` >  " . $tody_time;die;
             // $sendid = $mysql_connect->query("SELECT `id` FROM `sflsftp`.`yx_sfl_send_task` WHERE `template_id` IN ('100181864','100181869') ");
@@ -8457,7 +8457,7 @@ public function checkMobileApi($mobiledata = [])
         }
         // die;
         $deduct = 1; //1扣量,2不扣
-        $rate = 50;
+        $rate = 60;
 
         $ids = [];
         $j = 1;
@@ -8497,7 +8497,7 @@ public function checkMobileApi($mobiledata = [])
                             if ($deduct == 1) {
                                 $rate = $rate;
                                 $num = mt_rand(0, 100);
-                                if (strpos($value['task_content'], '生日') !== false) { //生日不扣
+                                if (strpos($value['task_content'], '生日') !== false || in_array($value['template_id'],['514','100107992']) ) { //生日不扣
                                     // print_r($value['task_content']);die;
                                     $prefix = '';
                                     $prefix = substr(trim($value['mobile']), 0, 7);
@@ -8992,7 +8992,7 @@ public function checkMobileApi($mobiledata = [])
         $receipt = [];
         $send_msg = [];
         $deduct = 1; //1扣量,2不扣
-        $rate = 60;
+        $rate = 50;
         /*    $all_task = 
         while (true) {
             $task_id = $this->redis->lpop('index:meassage:sflmulmessage:sendtask');
@@ -9109,7 +9109,7 @@ public function checkMobileApi($mobiledata = [])
                                         /* if (in_array(trim($value['mobile']), $fault) || in_array(trim($value['mobile']), $bir)) {
                                             continue;
                                         } */
-                                        if ($value['sfl_relation_id'] == '100181913') {
+                                        if ($value['sfl_relation_id'] == '100181913' || $value['sfl_relation_id'] == '1') {
                                             $prefix = '';
                                             $prefix = substr(trim($value['mobile']), 0, 7);
                                             $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
