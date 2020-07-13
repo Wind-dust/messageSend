@@ -7907,7 +7907,7 @@ public function checkMobileApi($mobiledata = [])
         $this->redis = Phpredis::getConn();
         $start_time = strtotime('2020-06-09 20:00:00');
         $end_time   = strtotime("2020-07-11 20:00:00");
-        $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "') AND `status_message` = '' ");
+        $mul_task   = Db::query("SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time),`create_time` FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "') AND `status_message` = '' ");
         // echo "SELECT `id`,`uid`,`mobile`,`status_message`,`task_no`,FROM_UNIXTIME(create_time),FROM_UNIXTIME(update_time) FROM yx_user_multimedia_message_log WHERE `task_no`  IN (SELECT `task_no` FROM yx_user_multimedia_message WHERE `uid` = '91' AND `create_time` >= '".$start_time."' AND  `create_time` <= '".$end_time."') AND `status_message` = '' " ;die;
         // echo count($mul_task);die;
         // $num = count($mul_task) - 12;
@@ -7935,6 +7935,25 @@ public function checkMobileApi($mobiledata = [])
                     ])); //写入用户带处理日志 */
                 continue;
             }
+            $day = date('Ymd', $value['create_time']);
+            $sendday = 0;
+            // echo $dayTime;die;
+            $dayTime = $value['create_time'];
+            
+            if (date('H', $value['create_time']) >= 20) {
+                $sendday = $day + 1;
+                $dayTime = $sendday . '100000';
+                // $send_time = 
+                // $dayTime = strtotime($dayTime);
+                $dayTime = strtotime($dayTime);
+            }
+            if (date('H', $value['create_time']) <= 10) {
+                $sendday = $day;
+                $dayTime = $sendday . '100000';
+                $dayTime = strtotime($dayTime);
+            }
+            $dayTime = intval($dayTime) + mt_rand(10, 300);
+            
             Db::startTrans();
             try {
                 Db::table('yx_user_multimedia_message_log')->where('id', $value['id'])->update([
@@ -7950,7 +7969,7 @@ public function checkMobileApi($mobiledata = [])
                     'message_info'   => '发送成功',
                     'mobile'         => $value['mobile'],
                     // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                    'send_time'      => date('Y-m-d H:i:s', $time),
+                    'send_time'      => date('Y-m-d H:i:s', $dayTime),
                 ])); //写入用户带处理日志
             } catch (\Exception $e) {
                 // $this->redis->rPush('index:meassage:business:sendtask', $send);
@@ -8925,58 +8944,6 @@ public function checkMobileApi($mobiledata = [])
             13764272451,
             18019762207,
             13162248755,
-        ];
-
-        $fault = [
-            13520501357,
-            13718220299,
-            15101566520,
-            13488831042,
-            13488826562,
-            15001288584,
-            18701221128,
-            18810228910,
-            13581969946,
-            13426293530,
-            13691433078,
-            15801539016,
-            15010254528,
-            13810004721,
-            13681797319,
-            13910956649,
-            13671055396,
-            13911023936,
-            18691105065,
-            15501991878,
-            18800150354,
-            13488685506,
-            18810545927,
-            15801430798,
-            13601256897,
-            13501135333,
-            15201279300,
-            18620854966,
-            13810850630,
-            13995562626,
-            13800997707,
-            13611280616,
-            13917449788,
-            13808829129,
-            13683320261,
-            13426373539,
-            13718612012,
-            13699102097,
-            15810374600,
-            13811133528,
-            13911667822,
-            15273116323,
-            18621714497,
-            13811275299,
-            18571710598,
-            13971022283,
-            13871164645,
-            13581809553,
-            13213032008
         ];
         $tody_time = strtotime(date("Ymd", time()));
         // $tody_time = 1594184400;
