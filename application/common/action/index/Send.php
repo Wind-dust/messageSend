@@ -1220,8 +1220,25 @@ return $result;
         }
         Db::startTrans();
         try {
-            $save = DbAdministrator::saveUserSendCodeTask($trial);
-            if ($save) {
+            // $save = DbAdministrator::saveUserSendCodeTask($trial);
+            $free_ids = [];
+            foreach ($trial as $key => $value) {
+                # code...
+                $id = DbAdministrator::addUserSendCodeTask($value);
+                if ($value['free_trial'] == 2) {
+                    // $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $id, 'deduct' => $user['business_deduct']]));
+                    $free_ids[] = $id;
+                }
+            }
+            DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
+            Db::commit();
+            if (!empty($free_ids)) {
+                foreach ($free_ids as $key => $value) {
+                    $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value, 'deduct' => $user['business_deduct']]));
+                }
+            }
+            
+           /*  if ($save) {
                 DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
                 Db::commit();
                 if (!empty($free_taskno)) {
@@ -1231,7 +1248,7 @@ return $result;
                         $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value['id'], 'deduct' => $user['business_deduct']]));
                     }
                 }
-            }
+            } */
 
             if (!empty($msg_id)) {
                 return ['code' => '200', 'msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
@@ -1523,7 +1540,7 @@ return $result;
         // print_r($free_taskno);die;
         Db::startTrans();
         try {
-            $save = DbAdministrator::saveUserSendTask($trial);
+            /* $save = DbAdministrator::saveUserSendTask($trial);
             if ($save) {
                 DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
                 Db::commit();
@@ -1535,8 +1552,21 @@ return $result;
                     }
                     // echo Db::getLastSQL();die;
                 }
+            } */
+            $free_ids = [];
+            foreach ($trial as $key => $value) {
+                $id = DbAdministrator::addUserSendTask($value);
+                if ($value['free_trial'] == 2) {
+                    $free_ids[] = $id;
+                }
             }
-
+            DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
+            Db::commit();
+            if (!empty($free_ids)) {
+                foreach ($free_ids as $key => $value) {
+                    $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => strval($value), 'send_time' => 0, 'deduct' => $user['market_deduct']]));
+                }
+            }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
             }
@@ -1712,6 +1742,7 @@ return $result;
         // $send_data = [];
         $send_data_mobile = [];
 
+        
         //有模板目前只支持有模板进行提交
         $MMS_data = [];
         $send_num = 0;
@@ -1729,6 +1760,7 @@ return $result;
             $son_MMS_data = [
                 'title' => $template['title']
             ];
+            
             $send_num++;
             // $the_frame = explode(',', $send_text[0]);
             foreach ($template['multimedia_frame'] as $mf => $mula) {
@@ -1774,12 +1806,13 @@ return $result;
                 $son_MMS_data['multimedia_frame'][] = $the_mula;
             }
             
-            $the_mula['content'] = $mula['content'];
+           
+           /*  $the_mula['content'] = $mula['content'];
             $the_mula['num'] = $mula['num'];
             $the_mula['name'] = $mula['name'];
             $the_mula['image_path'] = $mula['image_path'];
             $the_mula['image_type'] = $mula['image_type'];
-            $son_MMS_data['multimedia_frame'][] = $the_mula;
+            $son_MMS_data['multimedia_frame'][] = $the_mula; */
 
             /* if (in_array($son_MMS_data, $MMS_data)) {
                 $send_data_mobile[array_search($son_MMS_data, $MMS_data)] = $data;
@@ -1794,7 +1827,6 @@ return $result;
                 $send_data_mobile[] = $data;
             }
         }
-        
         // print_r($send_data_mobile);die;
         // echo $send_num;die;
         $free_taskno = [];
@@ -1839,90 +1871,94 @@ return $result;
             }
         }
         /* 开放免审需检测是否在免审默认通道中报备过模板，否则强制审核 */
-
-        $task_as_mobile = [];
-        foreach ($task_no_mobile as $key => $value) {
-            $as_value = [];
-            $as_value['task_no'] = $all_task_no[$key];
-            $as_value['mobiles'] = $value;
-            $task_as_mobile[] = $as_value;
-        }
-
-        $real_num =$send_num;
-        if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
-            return ['code' => '3004'];
-        }
-        // print_r($send_data_mobile);die;
-        $send_task = [];
-        $task_no = 'mul' . date('ymdHis') . substr(uniqid('', true), 15, 8);
-        $send_task = [
-            'task_no' => $task_no,
-            'template_id' => $template_id,
-            'uid'     => $user['id'],
-            'title' => $value['title'],
-            'submit_content' => json_encode($send_data_mobile),
-            'source'         => $ip,
-            'send_num'       => $send_num,
-            'real_num'       => $real_num,
-        ];
-        if (!empty($msg_id)) {
-            $send_task['send_msg_id'] = $msg_id;
-        }
-        // print_r($template['multimedia_frame']);die;
-        $free_trial = 1;
-        $yidong_channel_id = 0;
-        $liantong_channel_id = 0;
-        $dianxin_channel_id = 0;
-        if ($user['mul_free_trial'] == 2) {
-            $free_trial = 2;
-            $yidong_channel_id = 59;
-            $liantong_channel_id = 59;
-            $dianxin_channel_id = 59;
-            if ($user['id'] == 221) {
-                if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
-                    $free_trial = 2;
-                    $yidong_channel_id = 108;
-                    $liantong_channel_id = 108;
-                    $dianxin_channel_id = 108;
-                }else{
-                    $free_trial = 1;
-                    $yidong_channel_id = 0;
-                    $liantong_channel_id = 0;
-                    $dianxin_channel_id = 0;
+        if (!empty($send_data_mobile)) {
+            $task_as_mobile = [];
+            foreach ($task_no_mobile as $key => $value) {
+                $as_value = [];
+                $as_value['task_no'] = $all_task_no[$key];
+                $as_value['mobiles'] = $value;
+                $task_as_mobile[] = $as_value;
+            }
+    
+            $real_num =$send_num;
+            if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
+                return ['code' => '3004'];
+            }
+            // print_r($send_data_mobile);die;
+            $send_task = [];
+            $task_no = 'mul' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+            $send_task = [
+                'task_no' => $task_no,
+                'template_id' => $template_id,
+                'uid'     => $user['id'],
+                'title' => $value['title'],
+                'submit_content' => json_encode($send_data_mobile),
+                'source'         => $ip,
+                'send_num'       => $send_num,
+                'real_num'       => $real_num,
+            ];
+            if (!empty($msg_id)) {
+                $send_task['send_msg_id'] = $msg_id;
+            }
+            // print_r($template['multimedia_frame']);die;
+            $free_trial = 1;
+            $yidong_channel_id = 0;
+            $liantong_channel_id = 0;
+            $dianxin_channel_id = 0;
+            if ($user['mul_free_trial'] == 2) {
+                $free_trial = 2;
+                $yidong_channel_id = 59;
+                $liantong_channel_id = 59;
+                $dianxin_channel_id = 59;
+                if ($user['id'] == 221) {
+                    if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+                        $free_trial = 2;
+                        $yidong_channel_id = 108;
+                        $liantong_channel_id = 108;
+                        $dianxin_channel_id = 108;
+                    }else{
+                        $free_trial = 1;
+                        $yidong_channel_id = 0;
+                        $liantong_channel_id = 0;
+                        $dianxin_channel_id = 0;
+                    }
+                }
+                if ($user['id'] == 219) {
+                    if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+                        $free_trial = 2;
+                        $yidong_channel_id = 109;
+                        $liantong_channel_id = 109;
+                        $dianxin_channel_id = 109;
+                    }else{
+                        $free_trial = 1;
+                        $yidong_channel_id = 0;
+                        $liantong_channel_id = 0;
+                        $dianxin_channel_id = 0;
+                    }
+                }
+                if ($user['id'] == 220) {
+                    if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+                        $free_trial = 2;
+                        $yidong_channel_id = 110;
+                        $liantong_channel_id = 110;
+                        $dianxin_channel_id = 110;
+                    }else{
+                        $free_trial = 1;
+                        $yidong_channel_id = 0;
+                        $liantong_channel_id = 0;
+                        $dianxin_channel_id = 0;
+                    }
                 }
             }
-            if ($user['id'] == 219) {
-                if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
-                    $free_trial = 2;
-                    $yidong_channel_id = 109;
-                    $liantong_channel_id = 109;
-                    $dianxin_channel_id = 109;
-                }else{
-                    $free_trial = 1;
-                    $yidong_channel_id = 0;
-                    $liantong_channel_id = 0;
-                    $dianxin_channel_id = 0;
-                }
-            }
-            if ($user['id'] == 220) {
-                if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
-                    $free_trial = 2;
-                    $yidong_channel_id = 110;
-                    $liantong_channel_id = 110;
-                    $dianxin_channel_id = 110;
-                }else{
-                    $free_trial = 1;
-                    $yidong_channel_id = 0;
-                    $liantong_channel_id = 0;
-                    $dianxin_channel_id = 0;
-                }
-            }
+            // $send_task['free_trial'] = 1;
+            $send_task['free_trial'] = $free_trial;
+            $send_task['yidong_channel_id'] = $yidong_channel_id;
+            $send_task['liantong_channel_id'] = $liantong_channel_id;
+            $send_task['dianxin_channel_id'] = $dianxin_channel_id;
+        }else{
+            return ["code" => '3005', 'beyond' =>  $beyond,'msg' => '本次提交有效彩信失败'];
         }
-        // $send_task['free_trial'] = 1;
-        $send_task['free_trial'] = $free_trial;
-        $send_task['yidong_channel_id'] = $yidong_channel_id;
-        $send_task['liantong_channel_id'] = $liantong_channel_id;
-        $send_task['dianxin_channel_id'] = $dianxin_channel_id;
+       
         // print_r($send_task);die;
         Db::startTrans();
         try {
@@ -1951,13 +1987,14 @@ return $result;
             }
             */
             Db::commit();
+           
             if (!empty($msg_id)) {
-                return ['code' => '200', 'task_no' => $task_no, 'msg_id' => $msg_id, 'beyond' => join(';', $beyond)];
+                return ['code' => '200', 'task_no' => $task_no, 'msg_id' => $msg_id, 'beyond' =>  $beyond];
             }
-            return ['code' => '200', 'task_no' => $task_no, 'beyond' => join(';', $beyond)];
+            return ['code' => '200', 'task_no' => $task_no, 'beyond' => $beyond];
         } catch (\Exception $e) {
             Db::rollback();
-            // exception($e);
+            exception($e);
             return ['code' => '3009'];
         }
     }
