@@ -10465,6 +10465,11 @@ public function checkMobileApi($mobiledata = [])
                             }
                         }
                     }
+                    print_r($res);
+                    echo "\n";
+                    print_r($all_report);
+                    echo "\n";
+                    print_r("http://test.futurersms.com/api/callback/xjy/report");
                     $all_report = '';
                     $receipt_report = [];
                     $j = 1;
