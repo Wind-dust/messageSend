@@ -10370,6 +10370,91 @@ public function checkMobileApi($mobiledata = [])
         }
     }
 
+    public function futureReceiptCallBackForRedis(){
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        // $time = strtotime('2020-06-27 00:00:00');
+        // echo $time;die;
+        $redis = Phpredis::getConn();
+        $uid = 223;
+        try {
+            //code...
+            while(true){
+                $Received = updateReceivedForMessage();
+                $all_report = '';
+                    $receipt_report = [];
+                    $j = 1;
+                while (true) {
+                    $receipt = $redis->lpop('index:meassage:code:user:mulreceive:' . $uid);
+                    if (empty($receipt)) {
+                        break;
+                    }
+                    // updateReceivedForMessage
+                    $receipt = json_decode($receipt,true);
+                    if (in_array($receipt['status_message'],$Received)) {
+                        $receipt['status_message'] = 'DELIVRD';
+                        $receipt['message_info'] = '发送成功';
+                    }
+                    $receipt = json_encode($receipt);
+                    $all_report = $all_report . $receipt . "\n";
+                    $receipt_report[] = $receipt;
+                    $j++;
+                    if ($j > 100) {
+                        //  print_r($all_report);die;
+                        $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                        //推送失败
+                        // print_r($res);
+                        if ($res != 'SUCCESS') {
+                            usleep(300);
+                            $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                            if ($res != 'SUCCESS') {
+                                usleep(300);
+                                $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                                foreach ($receipt_report as $akey => $avalue) {
+                                    // # code...
+                                    // print_r($avalue);die;
+                                    $redis->rpush('index:meassage:code:receive_for_future_default', $avalue); //写入用户带处理日志
+                                }
+                            }
+                        }
+                        $all_report = '';
+                        $receipt_report = [];
+                        $j = 1;
+                    }
+                }
+                if (!empty($all_report)) {
+                    $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                    //推送失败
+                    if ($res != 'SUCCESS') {
+                        usleep(300);
+                        $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                        if ($res != 'SUCCESS') {
+                            usleep(300);
+                            $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                            foreach ($receipt_report as $akey => $avalue) {
+                                // # code...
+                                // print_r($avalue);die;
+                                $redis->rpush('index:meassage:code:receive_for_future_default', json_encode($avalue)); //写入用户带处理日志
+                            }
+                        }
+                    }
+                    $all_report = '';
+                    $receipt_report = [];
+                    $j = 1;
+                }
+                if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
+                    $redis->rpush('index:meassage:code:send:85', json_encode([
+                        'mobile'  => 15201926171,
+                        'content' => "【钰晰科技】客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time())
+                    ]));
+                }
+                sleep(1);
+            }
+            
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
+
     public function sflMulTaskLogCreate()
     {
         $redis = Phpredis::getConn();
