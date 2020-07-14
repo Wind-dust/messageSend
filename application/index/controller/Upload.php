@@ -430,8 +430,8 @@ class Upload extends MyController
         if ($fileType[0] != 'image') {
             return ['3001']; //上传的不是图片
         }
-        if ($fileInfo['size'] > 1024 * 80) {
-            return [ 'code' => '3002']; //上传图片不能超过80KB
+        if ($fileInfo['size'] > 1024 * 90) {
+            return [ 'code' => '3002']; //上传图片不能超过90KB
         }
         $result = $this->app->upload->uploadFile($appid, $appkey, $fileInfo);
         // $this->apiLog($apiName, [$conId, $image], $result['code'], $conId);
@@ -510,8 +510,6 @@ class Upload extends MyController
             return ['code' => '3004'];
         }
         $fileInfo = $image->getInfo();
-        print_r($fileInfo);
-        die;
         $fileType = explode('/', $fileInfo['type']);
         if ($fileType[0] != 'image') {
             return ['3001']; //上传的不是图片
