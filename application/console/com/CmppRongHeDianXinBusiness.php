@@ -582,6 +582,19 @@ class CmppRongHeDianXinBusiness extends Pzlife
                             fwrite($myfile, $e . "\n");
                             fclose($myfile);
                             //  exception($e);
+                            $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                            $check_data = [];
+                            $check_data = [
+                                'msgtype' => "text",
+                                'text' => [
+                                    "content" => "Hi，错误提醒机器人\n您有一条通道出现故障\n通道编号【".$content."】",
+                                ],
+                            ];
+                            $headers = [
+                                'Content-Type:application/json'
+                            ];
+                            $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+                            exception($e);
                             sleep(5);
                             //重新创建连接
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -632,6 +645,37 @@ class CmppRongHeDianXinBusiness extends Pzlife
                 }
             }
         }
+    }
+
+    function sendRequest2($requestUrl, $method = 'get', $data = [],$headers)
+    {
+        $methonArr = ['get', 'post'];
+        if (!in_array(strtolower($method), $methonArr)) {
+            return [];
+        }
+        if ($method == 'post') {
+            if (!is_array($data) || empty($data)) {
+                return [];
+            }
+        }
+        $curl = curl_init(); // 初始化一个 cURL 对象
+        curl_setopt($curl, CURLOPT_URL, $requestUrl); // 设置你需要抓取的URL
+        curl_setopt($curl, CURLOPT_HEADER, 0); // 设置header 响应头是否输出
+        if ($method == 'post') {
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 60);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($curl, CURLOPT_USERAGENT, 'Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400'); // 模拟用户使用的浏览器
+        }
+        // 设置cURL 参数，要求结果保存到字符串中还是输出到屏幕上。
+        // 1如果成功只将结果返回，不自动输出任何内容。如果失败返回FALSE
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        $res = curl_exec($curl); // 运行cURL，请求网页
+        curl_close($curl); // 关闭URL请求
+        return $res; // 显示获得的数据
     }
 
     public function error_log($error_type)
