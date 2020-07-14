@@ -10374,6 +10374,7 @@ public function checkMobileApi($mobiledata = [])
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // $time = strtotime('2020-06-27 00:00:00');
         // echo $time;die;
+        // $receipt = $redis->rPush('index:meassage:code:user:receive:168','{"task_no":"bus20063022452104364246","status_message":"NOROUTE","message_info":"\u53d1\u9001\u6210\u529f","mobile":"15103230163","msg_id":"70000500020200630224527169053","send_time":"2020-06-30 22:45:28","smsCount":1,"smsIndex":1}');
         $redis = Phpredis::getConn();
         $uid = 223;
         try {
@@ -10383,6 +10384,33 @@ public function checkMobileApi($mobiledata = [])
                 $all_report = '';
                     $receipt_report = [];
                     $j = 1;
+                    $base_receipt = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = 223 ");
+                    foreach ($base_receipt as $bkey => $bvalue) {
+                        $receipt = [];
+                        if (in_array($bvalue['status_message'],$Received)) {
+                            $receipt['status_message'] = 'DELIVRD';
+                            $receipt['message_info'] = '发送成功';
+                        }elseif ($bvalue['status_message'] == 'DELIVRD') {
+                            $receipt['status_message'] = 'DELIVRD';
+                            $receipt['message_info'] = '发送成功';
+                        }elseif (!empty($bvalue['status_message'])) {
+                            $receipt['status_message'] = $bvalue['status_message'];
+                            $receipt['message_info'] = '发送失败';
+                        }else{
+                            continue;
+                        }
+                        $mul_task = Db::query("SELECT `send_msg_id` FROM yx_user_multimedia_message WHERE `task_no` = '".$bvalue['task_no']."' ")[0];
+                        $receipt['msg_id'] = $mul_task['send_msg_id'];
+                        $receipt['mobile'] = $bvalue['mobile'];
+                        $receipt['send_time'] = date('Y-m-d H:i:s', $bvalue['update_time']);
+                        $receipt['smsCount'] = 1;
+                        $receipt['smsIndex'] = 1;
+                        $receipt = json_encode($receipt);
+                        $all_report = $all_report . $receipt . "\n";
+                        $receipt_report[] = $receipt;
+                        $j++;
+                    }
+
                 while (true) {
                     $receipt = $redis->lpop('index:meassage:code:user:mulreceive:' . $uid);
                     if (empty($receipt)) {
