@@ -130,14 +130,14 @@ class LocalScript extends Pzlife
         $secret_id = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
         $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
         $api = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
-        $ts =date("YmdHis",time());
+        $ts = date("YmdHis", time());
         $sig = sha1($secret_id . $secret_key . $ts);
         // // echo $sig;
         $mobile = '15201926171';
         // return $this->encrypt($mobile, $secret_id);
         $en_mobile = $this->encrypt($mobile, $secret_id);
         // // echo $en_mobile;
-        $api = $api.$sig."&sid=" .$secret_id."&skey=" .$secret_key."&ts=".$ts;
+        $api = $api . $sig . "&sid=" . $secret_id . "&skey=" . $secret_key . "&ts=" . $ts;
 
         $data = [];
         $data = [
@@ -150,7 +150,7 @@ class LocalScript extends Pzlife
             ]
         ];
         $headers = [
-            'Authorization:'.base64_encode($secret_id.':'.$ts),'Content-Type:application/json'
+            'Authorization:' . base64_encode($secret_id . ':' . $ts), 'Content-Type:application/json'
         ];
         // // echo base64_decode('MDZGREM0QTcxRjVFMUZERTRDMDYxREJBNjUzREQyQTU6MTU5MTAwNzE5Ng==');
         // print_r($api);
@@ -158,12 +158,12 @@ class LocalScript extends Pzlife
         // print_r($headers);
         // echo "\n";
         // print_r($data);
-        $data = $this->sendRequest2($api,'post',$data,$headers);
+        $data = $this->sendRequest2($api, 'post', $data, $headers);
         // // print_r(json_decode($data),true);
         // print_r($data);
     }
 
-    function sendRequest2($requestUrl, $method = 'get', $data = [],$headers)
+    function sendRequest2($requestUrl, $method = 'get', $data = [], $headers)
     {
         $methonArr = ['get', 'post'];
         if (!in_array(strtolower($method), $methonArr)) {
@@ -194,12 +194,12 @@ class LocalScript extends Pzlife
         return $res; // 显示获得的数据
     }
 
-   /**
-    *
-    * @param string $string 需要加密的字符串
-    * @param string $key 密钥
-    * @return string
-    */
+    /**
+     *
+     * @param string $string 需要加密的字符串
+     * @param string $key 密钥
+     * @return string
+     */
     public static function encrypt($string, $key)
     {
         // 对接java，服务商做的AES加密通过SHA1PRNG算法（只要password一样，每次生成的数组都是一样的），Java的加密源码翻译php如下：
@@ -213,14 +213,15 @@ class LocalScript extends Pzlife
         return $data;
     }
 
-    public function hadMobile(){
+    public function hadMobile()
+    {
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $max_id = Db::query("SELECT `id` FROM yx_send_task_receipt ORDER BY `id` DESC limit 1 ");
         // // print_r($max_id);
-        
+
         $mobile_data = [];
         $ALL_NUM = Db::query("SELECT `mobile`,`real_message` FROM yx_send_task_receipt WHERE (`real_message` LIKE '%MK%' OR `real_message` LIKE '%MI%' OR `real_message` LIKE '%MN%' OR `real_message` LIKE '%MO%'  OR `real_message` LIKE '%UNDELI%') GROUP BY `mobile`,`real_message` ");
-       /*  $max_num = $max_id[0]['id'];
+        /*  $max_num = $max_id[0]['id'];
         for ($i=0; $i < $max_num; $i++) { 
             $receipts = Db::query('SELECT ');
         } */
@@ -234,14 +235,13 @@ class LocalScript extends Pzlife
             //     'create_time' => time(),
             // ];
             $mobile_data[] = $value['mobile'];
-           
         }
         $ALL_NUM = Db::query("SELECT `mobile`,`real_message` FROM yx_send_code_task_receipt WHERE (`real_message` LIKE '%MK%' OR `real_message` LIKE '%MI%' OR `real_message` LIKE '%MN%' OR `real_message` LIKE '%MO%'  OR `real_message` LIKE '%UNDELI%') GROUP BY `mobile`,`real_message` ");
-       /*  $max_num = $max_id[0]['id'];
+        /*  $max_num = $max_id[0]['id'];
         for ($i=0; $i < $max_num; $i++) { 
             $receipts = Db::query('SELECT ');
         } */
-        
+
         foreach ($ALL_NUM as $key => $value) {
             // // print_r($value['mobile']);die;
             // $mobile = [];
@@ -251,7 +251,6 @@ class LocalScript extends Pzlife
             //     'create_time' => time(),
             // ];
             $mobile_data[] = $value['mobile'];
-           
         }
         $mobile_data = array_unique($mobile_data);
         // // echo count($mobile_data);
@@ -275,17 +274,17 @@ class LocalScript extends Pzlife
         if (!empty($insert_mobile)) {
             Db::table('yx_mobile')->insertAll($insert_mobile);
         }
-
     }
 
-    public function getRealNumber(){
+    public function getRealNumber()
+    {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
         // $max_id = Db::query("SELECT `id` FROM yx_send_task_receipt ORDER BY `id` DESC limit 1 ");
         // // print_r($max_id);
-        
+
         $mobile_data = [];
         $ALL_NUM = Db::query("SELECT `mobile` FROM yx_send_task_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile` ");
-       /*  $max_num = $max_id[0]['id'];
+        /*  $max_num = $max_id[0]['id'];
         for ($i=0; $i < $max_num; $i++) { 
             $receipts = Db::query('SELECT ');
         } */
@@ -299,7 +298,6 @@ class LocalScript extends Pzlife
             //     'create_time' => time(),
             // ];
             $mobile_data[] = $value['mobile'];
-           
         }
 
         $mobile_data = array_unique($mobile_data);
@@ -325,7 +323,7 @@ class LocalScript extends Pzlife
         }
         $mobile_data = [];
         $ALL_NUM = Db::query("SELECT `mobile` FROM yx_send_code_task_receipt WHERE `real_message` = 'DELIVRD'  OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`");
-       /*  $max_num = $max_id[0]['id'];
+        /*  $max_num = $max_id[0]['id'];
         for ($i=0; $i < $max_num; $i++) { 
             $receipts = Db::query('SELECT ');
         } */
@@ -339,7 +337,6 @@ class LocalScript extends Pzlife
             //     'create_time' => time(),
             // ];
             $mobile_data[] = $value['mobile'];
-           
         }
         $mobile_data = array_unique($mobile_data);
         $i = 1;
@@ -523,10 +520,10 @@ class LocalScript extends Pzlife
     }
 
     /**
-    * @param string $string 需要解密的字符串
-    * @param string $key 密钥
-    * @return string
-    */
+     * @param string $string 需要解密的字符串
+     * @param string $key 密钥
+     * @return string
+     */
     public static function decrypt($string, $key)
     {
 
@@ -538,18 +535,19 @@ class LocalScript extends Pzlife
         return $decrypted;
     }
 
-    public function mobileCheckTest(){
+    public function mobileCheckTest()
+    {
         $secret_id = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
         $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
         $api = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
-        $ts =date("YmdHis",time());
+        $ts = date("YmdHis", time());
         $sig = sha1($secret_id . $secret_key . $ts);
         // // echo $sig;
         $mobile = '15201926171';
         // return $this->encrypt($mobile, $secret_id);
         $en_mobile = $this->encrypt($mobile, $secret_id);
         // // echo $en_mobile;
-        $api = $api.$sig."&sid=" .$secret_id."&skey=" .$secret_key."&ts=".$ts;
+        $api = $api . $sig . "&sid=" . $secret_id . "&skey=" . $secret_key . "&ts=" . $ts;
         // $check_mobile = $this->decrypt('6C38881649F7003B910582D1095DA821',$secret_id);
         // // print_r($check_mobile);die;
         $data = [];
@@ -567,7 +565,7 @@ class LocalScript extends Pzlife
         ];
         // // print_r($data);die;
         $headers = [
-            'Authorization:'.base64_encode($secret_id.':'.$ts),'Content-Type:application/json'
+            'Authorization:' . base64_encode($secret_id . ':' . $ts), 'Content-Type:application/json'
         ];
         // // echo base64_decode('MDZGREM0QTcxRjVFMUZERTRDMDYxREJBNjUzREQyQTU6MTU5MTAwNzE5Ng==');
         // print_r($api);
@@ -575,15 +573,15 @@ class LocalScript extends Pzlife
         // print_r($headers);
         // echo "\n";
         // print_r($data);
-        $result = $this->sendRequest2($api,'post',$data,$headers);
+        $result = $this->sendRequest2($api, 'post', $data, $headers);
         // // print_r(json_decode($data),true);
         // // print_r($data);
-        $result = json_decode($result,true);
+        $result = json_decode($result, true);
         // print_r($result);
-        if ($result['code'] == 0) {//接口请求成功
+        if ($result['code'] == 0) { //接口请求成功
             $mobiles = $result['mobiles'];
             foreach ($mobiles as $key => $value) {
-                $mobile = $this->decrypt($value['mobile'],$secret_id);
+                $mobile = $this->decrypt($value['mobile'], $secret_id);
                 $check_result = $value['mobileStatus'];
                 $check_status = 2;
                 if ($check_result == 2) {
@@ -591,52 +589,52 @@ class LocalScript extends Pzlife
                     Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
                     Db::table('yx_real_mobile')->insert([
                         'mobile' => $mobile,
-                        'check_result' => 3, 
+                        'check_result' => 3,
                         'check_status' => $check_status,
                         'update_time' => time(),
                         'create_time' => time()
                     ]);
-                }else{
+                } else {
                     Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
                     Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
                     Db::table('yx_mobile')->insert([
                         'mobile' => $mobile,
-                        'check_result' => $check_result, 
+                        'check_result' => $check_result,
                         'check_status' => $check_status,
                         'update_time' => time(),
                         'create_time' => time()
                     ]);
                 }
-               
             }
         }
     }
 
-    public function getMarketingMobile(){
+    public function getMarketingMobile()
+    {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
-        
+
         $mobile = Db::query("SELECT `uid`,`task_no`,`mobile` FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) GROUP BY `uid`,`task_no`,`mobile`  ");
         $all_mobiles = [];
         foreach ($mobile as $key => $value) {
             // // print_r($value);die;
-            $time_key = mb_substr($value['task_no'],3,6);
+            $time_key = mb_substr($value['task_no'], 3, 6);
             // // print_r($time_key);die;
             if (isset($all_mobiles[$value['uid']][$value['mobile']])) {
-                if (in_array($time_key,$all_mobiles[$value['uid']][$value['mobile']]['date'])) {
-                    $all_mobiles[$value['uid']][$value['mobile']]['day_times'][$time_key] ++;
-                }else{
+                if (in_array($time_key, $all_mobiles[$value['uid']][$value['mobile']]['date'])) {
+                    $all_mobiles[$value['uid']][$value['mobile']]['day_times'][$time_key]++;
+                } else {
                     $all_mobiles[$value['uid']][$value['mobile']]['date'][] = $time_key;
                     $all_mobiles[$value['uid']][$value['mobile']]['day_times'][$time_key] = 1;
                 }
-            }else{
+            } else {
                 $all_mobiles[$value['uid']][$value['mobile']]['date'][] = $time_key;
                 $all_mobiles[$value['uid']][$value['mobile']]['day_times'][$time_key] = 1;
             }
-        //    // print_r($all_mobiles);die;
+            //    // print_r($all_mobiles);die;
         }
         // // print_r($all_mobiles);die;
         $mobile_times = [];
-        foreach ($all_mobiles as $key => $value) {  
+        foreach ($all_mobiles as $key => $value) {
             foreach ($value as $ukey => $uvalue) {
                 $mobile_times = [];
                 $mobile_times = [
@@ -647,14 +645,14 @@ class LocalScript extends Pzlife
                     'all_times' => array_sum($uvalue['day_times']),
                 ];
                 // // print_r($mobile_times);die;
-                Db::table('yx_mobile_times')->where(['mobile' => $ukey,'uid' => $key])->delete();
+                Db::table('yx_mobile_times')->where(['mobile' => $ukey, 'uid' => $key])->delete();
                 Db::table('yx_mobile_times')->insert($mobile_times);
             }
-           
         }
     }
 
-    public function newRedisConnect(){
+    public function newRedisConnect()
+    {
         try {
             $mobileredis = PhpredisNew::getConn();
             $redis = Phpredis::getConn();
@@ -667,8 +665,8 @@ class LocalScript extends Pzlife
                 $prefix = substr(trim($value['mobile']), 0, 7);
                 // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                 // $newres = array_shift($res);
-                $newres = $redis->hget('index:mobile:source',$prefix);
-                $newres = json_decode($newres,true);
+                $newres = $redis->hget('index:mobile:source', $prefix);
+                $newres = json_decode($newres, true);
                 // print_r($newres);die;
                 if (empty($newres)) {
                     $source = Db::query("SELECT `mobile`,`source`,`province_id`,`city_id` FROM yx_number_source WHERE `id` = " . $value['id'])[0];
@@ -680,7 +678,7 @@ class LocalScript extends Pzlife
                         'city_id' => $source['city_id'],
                     ];
                 }
-                $mobileredis->hset('yx:mobile:white',$value['mobile'],json_encode($newres));
+                $mobileredis->hset('yx:mobile:white', $value['mobile'], json_encode($newres));
             }
             /* 黑名单设置 */
             $black_mobiles = Db::query("SELECT * FROM yx_blacklist ");
@@ -689,8 +687,8 @@ class LocalScript extends Pzlife
                 $prefix = substr(trim($value['mobile']), 0, 7);
                 // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                 // $newres = array_shift($res);
-                $newres = $redis->hget('index:mobile:source',$prefix);
-                $newres = json_decode($newres,true);
+                $newres = $redis->hget('index:mobile:source', $prefix);
+                $newres = json_decode($newres, true);
                 // print_r($newres);die;
                 if (empty($newres)) {
                     $source = Db::query("SELECT `mobile`,`source`,`province_id`,`city_id` FROM yx_number_source WHERE `id` = " . $value['id'])[0];
@@ -702,7 +700,7 @@ class LocalScript extends Pzlife
                         'city_id' => $source['city_id'],
                     ];
                 }
-                $mobileredis->hset('yx:mobile:black',$value['mobile'],json_encode($newres));
+                $mobileredis->hset('yx:mobile:black', $value['mobile'], json_encode($newres));
             }
 
             /* 空号设置 */
@@ -712,8 +710,8 @@ class LocalScript extends Pzlife
                 $prefix = substr(trim($value['mobile']), 0, 7);
                 // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                 // $newres = array_shift($res);
-                $newres = $redis->hget('index:mobile:source',$prefix);
-                $newres = json_decode($newres,true);
+                $newres = $redis->hget('index:mobile:source', $prefix);
+                $newres = json_decode($newres, true);
                 // print_r($newres);die;
                 if (empty($newres)) {
                     $source = Db::query("SELECT `mobile`,`source`,`province_id`,`city_id` FROM yx_number_source WHERE `id` = " . $value['id'])[0];
@@ -728,7 +726,7 @@ class LocalScript extends Pzlife
                 $newres['check_status'] = $value['check_status'];
                 $newres['update_time'] = $value['update_time'];
                 $newres['check_result'] = $value['check_result'];
-                $mobileredis->hset('yx:mobile:empty',$value['mobile'],json_encode($newres));
+                $mobileredis->hset('yx:mobile:empty', $value['mobile'], json_encode($newres));
             }
 
             /* 实号设置 */
@@ -739,15 +737,15 @@ class LocalScript extends Pzlife
                 $prefix = substr(trim($value['mobile']), 0, 7);
                 // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                 // $newres = array_shift($res);
-                $newres = $redis->hget('index:mobile:source',$prefix);
-                $newres = json_decode($newres,true);
+                $newres = $redis->hget('index:mobile:source', $prefix);
+                $newres = json_decode($newres, true);
                 // print_r($newres);die;
-               /*  if (in_array(substr(trim($value['mobile']), 0, 3),['141','142','143','144','145','146','148','149','154'])){
+                if (in_array(substr(trim($value['mobile']), 0, 3), ['141', '142', '143', '144', '145', '146', '148', '149', '154', '163', '169', '179', '196'])) {
                     continue;
-                } */
-                
-                if (in_array(trim($value['mobile']),['15402915944','15433445566','15445563221'])) {
-                    $mobileredis->hset('yx:mobile:empty',$value['mobile'],json_encode(['check_status' => 2,'check_result' => 0,'create_time' =>time(),'update_time' => time()]));
+                }
+
+                if (in_array(trim($value['mobile']), ['15402915944', '15433445566', '15445563221'])) {
+                    $mobileredis->hset('yx:mobile:empty', $value['mobile'], json_encode(['check_status' => 2, 'check_result' => 0, 'create_time' => time(), 'update_time' => time()]));
                     continue;
                 }
                 if ($prefix == 1650006) {
@@ -756,168 +754,168 @@ class LocalScript extends Pzlife
                         'province_id' => 1802,
                         'city_id' => 1803
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ($prefix == 1650713) {
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif ($prefix == 1650713) {
                     $newres = [
                         'source' => 1,
                         'province_id' => 1802,
                         'city_id' => 1885
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ($prefix == 1651033) {
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif ($prefix == 1651033) {
                     $newres = [
                         'source' => 1,
                         'province_id' => 1426,
                         'city_id' => 1439
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ($prefix == 1653427) {
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif ($prefix == 1653427) {
                     $newres = [
                         'source' => 1,
                         'province_id' => 499,
                         'city_id' => 586
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ( in_array($prefix,[1660020,1660021,1660025,1660027,1660034,1662236,1662237,1662215,1662288,1662290,])) { //天津联通
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif (in_array($prefix, [1660020, 1660021, 1660025, 1660027, 1660034, 1662236, 1662237, 1662215, 1662288, 1662290,])) { //天津联通
                     $newres = [
                         'source' => 2,
                         'province_id' => 19,
                         'city_id' => 20
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif (in_array($prefix,[1660102,1660114,1660137,1660152,1660155])) {//北京联通
-                    
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif (in_array($prefix, [1660102, 1660114, 1660137, 1660152, 1660155])) { //北京联通
+
                     $newres = [
                         'source' => 2,
                         'province_id' => 1,
                         'city_id' => 2
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif (in_array($prefix,[1660170,1660173,1660178,1660179,1660181,1660183,1660184,1660174,1662102,1662103,1662107,1662109,1660214,1662120,1662122,1662123,1662152,1662160,1662167,1662169,1662171,1662173,1662174,1662178,1662179])) {//上海联通
-                   
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif (in_array($prefix, [1660170, 1660173, 1660178, 1660179, 1660181, 1660183, 1660184, 1660174, 1662102, 1662103, 1662107, 1662109, 1660214, 1662120, 1662122, 1662123, 1662152, 1662160, 1662167, 1662169, 1662171, 1662173, 1662174, 1662178, 1662179])) { //上海联通
+
                     $newres = [
                         'source' => 2,
                         'province_id' => 841,
                         'city_id' => 842
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ($prefix == 1660271) {
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif ($prefix == 1660271) {
                     $newres = [
                         'source' => 2,
                         'province_id' => 1802,
                         'city_id' => 1803
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ($prefix == 1660272) {
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif ($prefix == 1660272) {
                     $newres = [
                         'source' => 2,
                         'province_id' => 1802,
                         'city_id' => 1803
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ($prefix == 1660351) {
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif ($prefix == 1660351) {
                     $newres = [
                         'source' => 2,
                         'province_id' => 240,
                         'city_id' => 241
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ($prefix == 1660371) {
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif ($prefix == 1660371) {
                     $newres = [
                         'source' => 2,
                         'province_id' => 1601,
                         'city_id' => 1602
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ($prefix == 1660387) {
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif ($prefix == 1660387) {
                     $newres = [
                         'source' => 2,
                         'province_id' => 1601,
                         'city_id' => 1602
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ($prefix == 1660396) {
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif ($prefix == 1660396) {
                     $newres = [
                         'source' => 2,
                         'province_id' => 1601,
                         'city_id' => 1788
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ($prefix == 1660399) {
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif ($prefix == 1660399) {
                     $newres = [
                         'source' => 2,
                         'province_id' => 1601,
                         'city_id' => 1602
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ($prefix == 1660427) {
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif ($prefix == 1660427) {
                     $newres = [
                         'source' => 2,
                         'province_id' => 499,
                         'city_id' => 586
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ($prefix == 1660471) {
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif ($prefix == 1660471) {
                     $newres = [
                         'source' => 2,
                         'province_id' => 377,
                         'city_id' => 378
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ($prefix == 1660532) {
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif ($prefix == 1660532) {
                     $newres = [
                         'source' => 2,
                         'province_id' => 1426,
                         'city_id' => 1439
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ($prefix == 1660713) {
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif ($prefix == 1660713) {
                     $newres = [
                         'source' => 2,
                         'province_id' => 1802,
                         'city_id' => 1439
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif ($prefix == 1660875) {
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif ($prefix == 1660875) {
                     $newres = [
                         'source' => 2,
                         'province_id' => 2801,
                         'city_id' => 2837
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif (in_array($prefix,[1662303,1662312,1662331])) {//重庆联通
-                   
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif (in_array($prefix, [1662303, 1662312, 1662331])) { //重庆联通
+
                     $newres = [
                         'source' => 2,
                         'province_id' => 2454,
                         'city_id' => 2455
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif (in_array($prefix,[1662477])) {//广州联通
-                   
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif (in_array($prefix, [1662477])) { //广州联通
+
                     $newres = [
                         'source' => 2,
                         'province_id' => 2076,
                         'city_id' => 2077
                     ];
-                    $redis->hset('index:mobile:source',$prefix,json_encode($newres));
-                }elseif(substr(trim($value['mobile']), 0, 3) == 166){
+                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                } elseif (substr(trim($value['mobile']), 0, 3) == 166) {
                     $newres = [
                         'source' => 2
                     ];
-                }elseif(in_array(substr(trim($value['mobile']), 0, 3),[170,173,178,184,191,199,162,133,149,153,173,177,180,181,189]) ){//电信
+                } elseif (in_array(substr(trim($value['mobile']), 0, 3), [170, 173, 178, 184, 191, 199, 162, 133, 149, 153, 173, 177, 180, 181, 189])) { //电信
                     $newres = [
                         'source' => 3
                     ];
-                }elseif(in_array(substr(trim($value['mobile']), 0, 3) , [171,175,176,185,167,130,131,132,145,155,156,166,186,166])){//联通
+                } elseif (in_array(substr(trim($value['mobile']), 0, 3), [171, 175, 176, 185, 167, 130, 131, 132, 145, 155, 156, 166, 186, 166])) { //联通
                     $newres = [
                         'source' => 2
                     ];
-                }   elseif(in_array(substr(trim($value['mobile']), 0, 3), [147,172,177,187,188,195,198,165,134,135,136,137,138,139,147,150,151,152,157,158,159,1705,178,182,183,184,187,188,198])){ //移动
+                } elseif (in_array(substr(trim($value['mobile']), 0, 3), [147, 172, 177, 187, 188, 195, 198, 165, 134, 135, 136, 137, 138, 139, 147, 150, 151, 152, 157, 158, 159, 1705, 178, 182, 183, 184, 187, 188, 198])) { //移动
                     $newres = [
-                        'source' =>1
+                        'source' => 1
                     ];
-                }   
+                }
                 if (empty($newres)) {
                     $source = Db::query("SELECT `mobile`,`source`,`province_id`,`city_id` FROM yx_number_source WHERE `id` = " . $value['id']);
                     // print_r($source);die;
@@ -929,18 +927,16 @@ class LocalScript extends Pzlife
                         'city_id' => $source['city_id']
                     ];
                 }
-                
+
                 $newres['update_time'] = $value['update_time'];
                 $newres['check_status'] = $value['check_status'];
                 $newres['check_result'] = $value['check_result'];
-                $mobileredis->hset('yx:mobile:real',$value['mobile'],json_encode($newres));
+                $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
             }
         } catch (\Exception $th) {
             //throw $th
             print_r($value);
             // exception($th);
         }
-        
     }
-
 }
