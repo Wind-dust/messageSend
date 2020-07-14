@@ -1121,7 +1121,7 @@ class CmppCreateCodeTask extends Pzlife
         foreach ($task_id as $key => $value) {
             $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $value['id'], 'deduct' => 60]));
         } */
-        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 129522, 'deduct' => 60]));
+        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 148817, 'deduct' => 00]));
     }
 
     //书写彩信任务日志并写入通道
@@ -1240,6 +1240,7 @@ class CmppCreateCodeTask extends Pzlife
                     $deduct_mobile = [];
                     $mobile_result = $this->mobilesFiltrate($sendTask['mobile_content'], $sendTask['uid'], $real_send['deduct']);
                     
+                    // print_r($sendTask['template_id']);die;
                     // print_r($sendTask['template_id']);die;
 
                     /*  return ['error_mobile' => $error_mobile, 'yidong_mobile' => $yidong_mobile,'liantong_mobile' => $liantong_mobile, 'dianxin_mobile' => $dianxin_mobile, 'deduct_mobile' => $deduct_mobile]; */
@@ -8516,7 +8517,7 @@ public function checkMobileApi($mobiledata = [])
                             if ($deduct == 1) {
                                 $rate = $rate;
                                 $num = mt_rand(0, 100);
-                                if (strpos($value['task_content'], '生日') !== false || in_array($value['template_id'],['514','100107992']) ) { //生日不扣
+                                if (strpos($value['task_content'], '生日') !== false || in_array($value['template_id'],['514','100107992','100182484','100182485']) ) { //生日不扣
                                     // print_r($value['task_content']);die;
                                     $prefix = '';
                                     $prefix = substr(trim($value['mobile']), 0, 7);
@@ -8712,7 +8713,7 @@ public function checkMobileApi($mobiledata = [])
                         $receipt[] = $rece;
                     } else {
                         if ($deduct == 1) { //扣量
-                            if (strpos($value['task_content'], '生日') !== false) { //生日不扣
+                            if (strpos($value['task_content'], '生日') !== false || in_array($value['template_id'],['514','100107992','100182484','100182485'])) { //生日不扣
                                 // print_r($value['task_content']);die;
                                 $prefix = '';
                                 $prefix = substr(trim($value['mobile']), 0, 7);
@@ -10244,6 +10245,7 @@ public function checkMobileApi($mobiledata = [])
         $redis = Phpredis::getConn();
         // print_r($redis);die;
         // $receipt = $redis->rPush('index:meassage:code:user:receive:168','{"task_no":"bus20063022452104364246","status_message":"NOROUTE","message_info":"\u53d1\u9001\u6210\u529f","mobile":"15103230163","msg_id":"70000500020200630224527169053","send_time":"2020-06-30 22:45:28","smsCount":1,"smsIndex":1}');
+
         try {
             while (true) {
                 $all_report = '';
@@ -10352,7 +10354,7 @@ public function checkMobileApi($mobiledata = [])
                     $j = 1;
                 }
                 if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
-                    $redis->rpush('index:meassage:code:send', json_encode([
+                    $redis->rpush('index:meassage:code:send:85', json_encode([
                         'mobile'  => 15201926171,
                         'content' => "【钰晰科技】客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time())
                     ]));
