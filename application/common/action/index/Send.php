@@ -1833,7 +1833,8 @@ return $result;
         $trial = []; //需审核
         //组合任务包
         $real_num = 0;
-        $max_length               = 81920; //最大字节长度80Kb
+        // $max_length               = 81920; //最大字节长度80Kb
+        $max_length               = 92160; //最大字节长度80Kb
         $all_task_no = [];
         $task_no_mobile = [];
         $beyond = [];
@@ -1864,6 +1865,7 @@ return $result;
             }
             $send_task['multimedia_frame'] = $value['multimedia_frame'];
             // $content_length  = 102402;
+            // print_r($content_length);die;
             if ($content_length <= $max_length) {
             } else {
                 $beyond[] = $send_data_mobile[$key];
