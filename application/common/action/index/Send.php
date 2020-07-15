@@ -781,9 +781,9 @@ return $result;
         if ($send_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3001'];
         }
-        $channel_id = 0;
+       /*  $channel_id = 0;
         $free_trial = 1;
-
+ */
 
         $SmsMultimediaMessageTask = [];
         $SmsMultimediaMessageTask = [
