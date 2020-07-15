@@ -70,7 +70,7 @@ class CmppCreateCodeTask extends Pzlife
             }
             if (trim($send['Source_Addr']) == 101107) { //电信
                 $uid        = 222;
-                $channel_id = 28;
+                $channel_id = 111;
             }
             $user = $this->getUserInfo($uid);
             if (empty($user) || $user['user_status'] == 1) {
@@ -78,9 +78,14 @@ class CmppCreateCodeTask extends Pzlife
             }
             $userEquities = $this->getUserEquities($uid, 9); //游戏业务
             if (empty($userEquities)) {
+                /* foreach($send['send_msgid'] as $key => $value){
+                   
+                } */
+                $redis->rPush('index:meassage:code:user:receive:'.$uid, json_encode(['Stat'=>'REJECTED','Submit_time' => date('YMDHM', time()),'Done_time'   => date('YMDHM', time()),'send_msgid'  =>join(',', $send['send_msgid'])]));
                 continue;
             }
             if ($userEquities['num_balance'] < 1 && $user['reservation_service'] == 1) {
+                $redis->rPush('index:meassage:code:user:receive:'.$uid, json_encode(['Stat'=>'REJECTED','Submit_time' => date('YMDHM', time()),'Done_time'   => date('YMDHM', time()),'send_msgid'  =>join(',', $send['send_msgid'])]));
                 continue;
             }
 
@@ -122,13 +127,20 @@ class CmppCreateCodeTask extends Pzlife
                     Db::table('yx_user_equities')->where('id', $userEquities['id'])->update(['num_balance' => $new_num_balance]);
                     Db::commit();
                     $redis->rPush('index:meassage:game:sendtask', $task_id); */
-                    $task_id = Db::table('yx_user_send_code_task')->insertGetId($send_code_task);
+                   /*  $task_id = Db::table('yx_user_send_code_task')->insertGetId($send_code_task);
                     //扣除余额
                     $new_num_balance = $userEquities['num_balance'] - 1;
                     Db::table('yx_user_equities')->where('id', $userEquities['id'])->update(['num_balance' => $new_num_balance]);
                     Db::commit();
                     // ['id' => $value, 'deduct' => 0]
-                    $redis->rPush('index:meassage:business:sendtask', json_encode(['id'=>$task_id,'deduct' => 0]));
+                    $redis->rPush('index:meassage:business:sendtask', json_encode(['id'=>$task_id,'deduct' => 0])); */
+                    $task_id = Db::table('yx_user_send_task')->insertGetId($send_code_task);
+                    //扣除余额
+                    $new_num_balance = $userEquities['num_balance'] - 1;
+                    Db::table('yx_user_equities')->where('id', $userEquities['id'])->update(['num_balance' => $new_num_balance]);
+                    Db::commit();
+                    // ['id' => $value, 'deduct' => 0]
+                    $redis->rPush('index:meassage:marketing:sendtask', json_encode(['id'=>$task_id,'deduct' => 0]));
                 } catch (\Exception $e) {
                     $redis->rPush($redisMessageCodeSendReal, $SendText);
                     exception($e);
@@ -3730,7 +3742,7 @@ public function checkMobileApi($mobiledata = [])
                     if (!empty($send_log['from']) && $send_log['from'] == 'yx_sfl_send_task') {
                         continue;
                     }
-                    $sql = "SELECT `send_msg_id`,`task_no`,`uid` FROM ";
+                    $sql = "SELECT `send_msg_id`,`task_no`,`uid`,`create_time` FROM ";
                     if ($channel['business_id'] == 5) { //营销
                         if (isset($send_log['from'])) {
                             $sql .= " " . $send_log['from'] . " ";
@@ -3809,7 +3821,7 @@ public function checkMobileApi($mobiledata = [])
                                 $message_info = '发送成功';
                             }
                         }
-                        $user = Db::query("SELECT `pid` FROM yx_users WHERE `id` = " . $task[0]['uid']);
+                        $user = Db::query("SELECT `pid`,`need_receipt_cmpp` FROM yx_users WHERE `id` = " . $task[0]['uid']);
                         if ($user[0]['pid'] == 137) {
                             $send_len = 0;
                             $send_len = mb_strlen($send_log['content']);
@@ -3831,14 +3843,27 @@ public function checkMobileApi($mobiledata = [])
                                 ])); //写入用户带处理日志
                             }
                         } else {
-                            $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
-                                'task_no'        => trim($task[0]['task_no']),
-                                'status_message' => $stat,
-                                'message_info'   => $message_info,
-                                'mobile'         => trim($send_log['mobile']),
-                                // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                                'send_time'      => isset($send_log['receive_time']) ? date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                            ])); //写入用户带处理日志
+                            if ($user[0]['need_receipt_cmpp'] == 2) {
+                                $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
+                                    'Stat'        => trim($task[0]['task_no']),
+                                    'send_msgid'        => trim($task[0]['send_msg_id']),
+                                    'status_message' => $stat,
+                                    'mobile'         => trim($send_log['mobile']),
+                                    // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                    'Done_time'      => isset($send_log['receive_time']) ? date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                    'Submit_time'      => isset($task[0]['create_time']) ? date('Y-m-d H:i:s', trim($task[0]['create_time'])) : date('Y-m-d H:i:s', time()),
+                                ])); //写入用户带处理日志
+                            }else{
+                                $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
+                                    'task_no'        => trim($task[0]['task_no']),
+                                    'status_message' => $stat,
+                                    'message_info'   => $message_info,
+                                    'mobile'         => trim($send_log['mobile']),
+                                    // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                    'send_time'      => isset($send_log['receive_time']) ? date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                ])); //写入用户带处理日志
+                            }
+                           
                         }
                     }
                     $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode($send_log)); //写入通道处理日志
@@ -9899,6 +9924,14 @@ public function checkMobileApi($mobiledata = [])
                         unset($all_upriver);
                     }
                 }
+                $redis->rpush('sftp:upriver:chuanglan','{"from":"sfl","mobile":"13251428205","type":"MMS","message_info":"b\u00fc\u01d6bb","receive_time":"2020-07-06 23:45:48","source_name":"\u4e2d\u56fd\u8054\u901a","city":"\u91cd\u5e86\u5e02"}');
+                while(true){
+                    $upriver = [];
+                    $upriver =  $redis->lpop('sftp:upriver:chuanglan');
+                    if (empty($upriver)) {
+                        break;
+                    }
+                }
                 sleep(300);
             }
         } catch (\Exception $th) {
@@ -10384,7 +10417,7 @@ public function checkMobileApi($mobiledata = [])
                 $all_report = '';
                     $receipt_report = [];
                     $j = 1;
-                    $base_receipt = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = 223 ");
+                    /* $base_receipt = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = 223 ");
                     foreach ($base_receipt as $bkey => $bvalue) {
                         $receipt = [];
                         if (in_array($bvalue['status_message'],$Received)) {
@@ -10409,7 +10442,7 @@ public function checkMobileApi($mobiledata = [])
                         $all_report = $all_report . $receipt . "\n";
                         $receipt_report[] = $receipt;
                         $j++;
-                    }
+                    } */
 
                 while (true) {
                     $receipt = $redis->lpop('index:meassage:code:user:mulreceive:' . $uid);
