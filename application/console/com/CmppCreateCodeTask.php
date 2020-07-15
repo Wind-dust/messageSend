@@ -10429,7 +10429,7 @@ public function checkMobileApi($mobiledata = [])
                 $all_report = '';
                     $receipt_report = [];
                     $j = 1;
-                    /* $base_receipt = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = 223 ");
+                    $base_receipt = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = 223 ");
                     foreach ($base_receipt as $bkey => $bvalue) {
                         $receipt = [];
                         if (in_array($bvalue['status_message'],$Received)) {
@@ -10454,7 +10454,29 @@ public function checkMobileApi($mobiledata = [])
                         $all_report = $all_report . $receipt . "\n";
                         $receipt_report[] = $receipt;
                         $j++;
-                    } */
+                        if ($j > 100) {
+                            //  print_r($all_report);die;
+                            $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                            //推送失败
+                            // print_r($res);
+                            if ($res != 'SUCCESS') {
+                                usleep(300);
+                                $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                                if ($res != 'SUCCESS') {
+                                    usleep(300);
+                                    $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                                    foreach ($receipt_report as $akey => $avalue) {
+                                        // # code...
+                                        // print_r($avalue);die;
+                                        $redis->rpush('index:meassage:code:receive_for_future_default', $avalue); //写入用户带处理日志
+                                    }
+                                }
+                            }
+                            $all_report = '';
+                            $receipt_report = [];
+                            $j = 1;
+                        }
+                    }
 
                 while (true) {
                     $receipt = $redis->lpop('index:meassage:code:user:mulreceive:' . $uid);
