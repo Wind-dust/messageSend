@@ -1133,7 +1133,8 @@ class CmppCreateCodeTask extends Pzlife
         foreach ($task_id as $key => $value) {
             $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $value['id'], 'deduct' => 60]));
         } */
-        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 148817, 'deduct' => 00]));
+        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 150393, 'deduct' => 0]));
+        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 150394, 'deduct' => 0]));
     }
 
     //书写彩信任务日志并写入通道
@@ -1252,7 +1253,7 @@ class CmppCreateCodeTask extends Pzlife
                     $deduct_mobile = [];
                     $mobile_result = $this->mobilesFiltrate($sendTask['mobile_content'], $sendTask['uid'], $real_send['deduct']);
                     
-                    // print_r($sendTask['template_id']);die;
+                    // print_r($mobile_result);die;
                     // print_r($sendTask['template_id']);die;
 
                     /*  return ['error_mobile' => $error_mobile, 'yidong_mobile' => $yidong_mobile,'liantong_mobile' => $liantong_mobile, 'dianxin_mobile' => $dianxin_mobile, 'deduct_mobile' => $deduct_mobile]; */
@@ -8502,7 +8503,7 @@ public function checkMobileApi($mobiledata = [])
         }
         // die;
         $deduct = 1; //1扣量,2不扣
-        $rate = 60;
+        $rate = 70;
 
         $ids = [];
         $j = 1;
@@ -8971,8 +8972,8 @@ public function checkMobileApi($mobiledata = [])
             18019762207,
             13162248755,
         ];
-        $tody_time = strtotime(date("Ymd", time()));
-        // $tody_time = 1594184400;
+        // $tody_time = strtotime(date("Ymd", time()));
+        $tody_time = 1594785600;
         try {
             /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
             // $mysql_connect->table('yx_sfl_multimedia_message')->where([['create_time', '>', $tody_time],['sfl_relation_id','IN','100181558,100181556,100181563,100177398']])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
@@ -8985,7 +8986,7 @@ public function checkMobileApi($mobiledata = [])
         $receipt = [];
         $send_msg = [];
         $deduct = 1; //1扣量,2不扣
-        $rate = 50;
+        $rate = 70;
         /*    $all_task = 
         while (true) {
             $task_id = $this->redis->lpop('index:meassage:sflmulmessage:sendtask');

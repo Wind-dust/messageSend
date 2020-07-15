@@ -205,13 +205,15 @@ return $result;
         }
         if ($user['marketing_free_trial'] == 2) {
             $data['free_trial'] = 2;
+            if (strpos($Content,'道信')) {
+                $data['free_trial'] = 1;
+            }
             if ($user['marketing_free_credit'] > 0) {
                 if (count($effective_mobile) >= $user['marketing_free_credit']) {
                     $data['free_trial'] = 1;
                 }
             }
         }
-
         /* if ($real_num > 100) {
             $data['free_trial'] = 1;
         } */
@@ -363,6 +365,9 @@ return $result;
         $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
         if ($user['free_trial'] == 2) {
             $data['free_trial'] = 2;
+            if (strpos($Content,'道信')) {
+                $data['free_trial'] = 1;
+            }
             if ($user['business_free_credit'] > 0) {
                 if ($real_num >= $user['business_free_credit']) {
                     $data['free_trial'] = 1;
@@ -695,7 +700,16 @@ return $result;
         $multimedia_message_frame = [];
         $content_length           = 0;
         $max_length               = 102400; //最大字节长度
-
+        $free_trial = 1;
+            $yidong_channel_id = 0;
+            $liantong_channel_id = 0;
+            $dianxin_channel_id = 0;
+            if ($user['mul_free_trial'] == 2) {
+                $free_trial = 2;
+            }
+            if (strpos($title,'道信')) {
+                $free_trial = 1;
+            }
         foreach ($content_data as $key => $value) {
             $frame = [];
             if (empty($value['image_path']) && empty($value['content'])) {
@@ -712,6 +726,9 @@ return $result;
                     unset($signature);
                 } else {
                     $frame['content'] = $value['content'];
+                }
+                if (strpos($value['content'],'道信')) {
+                    $free_trial = 1;
                 }
                 // $content_length+= strlen($value['content']);
 
@@ -785,12 +802,8 @@ return $result;
         if (!empty($send_time)) {
             $SmsMultimediaMessageTask['appointment_time'] = strtotime($send_time);
         }
-            $free_trial = 1;
-            $yidong_channel_id = 0;
-            $liantong_channel_id = 0;
-            $dianxin_channel_id = 0;
-        if ($user['mul_free_trial'] == 2) {
-            $free_trial = 2;
+            
+        if ($free_trial == 2) {
             $yidong_channel_id = 59;
             $liantong_channel_id = 59;
             $dianxin_channel_id = 59;
@@ -1907,11 +1920,18 @@ return $result;
             $yidong_channel_id = 0;
             $liantong_channel_id = 0;
             $dianxin_channel_id = 0;
-            if ($user['mul_free_trial'] == 2) {
+            if  ($user['mul_free_trial'] == 2){
                 $free_trial = 2;
-                $yidong_channel_id = 59;
-                $liantong_channel_id = 59;
-                $dianxin_channel_id = 59;
+            }
+            $third_template = DbAdministrator::getUserMultimediaTemplateThirdReport(['channel_id'=> 103,'template_id' => $template_id],'id',true);
+            if (empty($third_template)) {
+                $free_trial = 1;
+            }
+            if ($free_trial == 2) {
+                // $free_trial = 2;
+                $yidong_channel_id = 103;
+                $liantong_channel_id = 103;
+                $dianxin_channel_id = 103;
                 if ($user['id'] == 221) {
                     if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
                         $free_trial = 2;
