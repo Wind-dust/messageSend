@@ -2009,7 +2009,9 @@ return $result;
             }
             */
             Db::commit();
-           
+            if ($free_trial == 2) {
+                $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $bId, 'deduct' => $user['multimedia_deduct']]));
+            }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'task_no' => $task_no, 'msg_id' => $msg_id, 'beyond' =>  $beyond];
             }
