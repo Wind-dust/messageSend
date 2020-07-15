@@ -108,7 +108,12 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
         } else {
             socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
-            $Sequence_Id = 1;
+            $Sequence_Id = $redis->get('channel_'.$content);
+            if (empty($Sequence_Id)) {
+                $Sequence_Id = 1;
+               
+            }
+            $redis->set('channel_'.$content,$Sequence_Id+1);
             //先进行连接验证
             date_default_timezone_set('PRC');
             $time                = 0;
@@ -295,6 +300,8 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
                     while (true) {
                         $receipt_data = [];
+                        $Sequence_Id = $redis->get('channel_'.$content);
+                        $redis->set('channel_'.$content,$Sequence_Id+1);
                         // echo $Sequence_Id . "\n";
                         try {
                             $receive = 1;
@@ -544,6 +551,7 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
                                     ++$Sequence_Id;
                                     if ($Sequence_Id > 65536) {
                                         $Sequence_Id = 1;
+                                        $redis->set('channel_'.$content,$Sequence_Id);
                                     }
                                     if ($i > $security_master) {
                                         $i = 0;
@@ -610,6 +618,7 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
                             ++$Sequence_Id;
                             if ($Sequence_Id > 65536) {
                                 $Sequence_Id = 1;
+                                $redis->set('channel_'.$content,$Sequence_Id);
                             }
                         }
                         //捕获异常
@@ -627,11 +636,24 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
                             fclose($myfile);
                             //  exception($e);
                             sleep(20);
+                            $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                            $check_data = [];
+                            $check_data = [
+                                'msgtype' => "text",
+                                'text' => [
+                                    "content" => "Hi，错误提醒机器人\n您有一条通道出现故障\n通道编号【".$content."】",
+                                ],
+                            ];
+                            $headers = [
+                                'Content-Type:application/json'
+                            ];
+                            $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+                            // exception($e);
                             //重新创建连接
-                            $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
+                            /* $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
                                 'mobile'  => 15201926171,
                                 'content' => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
-                            ])); //易信行业通道
+                            ])); //易信行业通道 */
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                             if (socket_connect($socket, $host, $port) == false) {
                                 $myfile = fopen($log_path, 'a+');
@@ -663,7 +685,7 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
                                     fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                                     fwrite($myfile, "通道延迟5秒后写入socket失败，请联系通道方检查原因\n");
                                     fclose($myfile);
-                                    $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
+                                    /* $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
                                         'mobile'  => 15201926171,
                                         'content' => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
                                     ])); //三体营销通道
@@ -674,7 +696,19 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
                                     $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
                                         'mobile'  => 15201926171,
                                         'content' => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
-                                    ])); //易信行业通道
+                                    ])); //易信行业通道 */
+                                    $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                                    $check_data = [];
+                                    $check_data = [
+                                        'msgtype' => "text",
+                                        'text' => [
+                                            "content" => "Hi，错误提醒机器人\n您有一条通道出现故障\n通道编号【".$content."】",
+                                        ],
+                                    ];
+                                    $headers = [
+                                        'Content-Type:application/json'
+                                    ];
+                                    $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
                                     exit();
                                 }
                                 ++$i;
@@ -685,6 +719,37 @@ class CmppSflJuMengYiDongMarketing extends Pzlife {
                 }
             }
         }
+    }
+
+    function sendRequest2($requestUrl, $method = 'get', $data = [],$headers)
+    {
+        $methonArr = ['get', 'post'];
+        if (!in_array(strtolower($method), $methonArr)) {
+            return [];
+        }
+        if ($method == 'post') {
+            if (!is_array($data) || empty($data)) {
+                return [];
+            }
+        }
+        $curl = curl_init(); // 初始化一个 cURL 对象
+        curl_setopt($curl, CURLOPT_URL, $requestUrl); // 设置你需要抓取的URL
+        curl_setopt($curl, CURLOPT_HEADER, 0); // 设置header 响应头是否输出
+        if ($method == 'post') {
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 60);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($curl, CURLOPT_USERAGENT, 'Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400'); // 模拟用户使用的浏览器
+        }
+        // 设置cURL 参数，要求结果保存到字符串中还是输出到屏幕上。
+        // 1如果成功只将结果返回，不自动输出任何内容。如果失败返回FALSE
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        $res = curl_exec($curl); // 运行cURL，请求网页
+        curl_close($curl); // 关闭URL请求
+        return $res; // 显示获得的数据
     }
 
     //16进制转2进制
