@@ -9924,13 +9924,24 @@ public function checkMobileApi($mobiledata = [])
                         unset($all_upriver);
                     }
                 }
-                $redis->rpush('sftp:upriver:chuanglan','{"from":"sfl","mobile":"13251428205","type":"MMS","message_info":"b\u00fc\u01d6bb","receive_time":"2020-07-06 23:45:48","source_name":"\u4e2d\u56fd\u8054\u901a","city":"\u91cd\u5e86\u5e02"}');
+                // $redis->rpush('sftp:upriver:chuanglan','{"from":"sfl","mobile":"13251428205","type":"MMS","message_info":"b\u00fc\u01d6bb","receive_time":"2020-07-06 23:45:48","source_name":"\u4e2d\u56fd\u8054\u901a","city":"\u91cd\u5e86\u5e02"}');
                 while(true){
                     $upriver = [];
                     $upriver =  $redis->lpop('sftp:upriver:chuanglan');
                     if (empty($upriver)) {
                         break;
                     }
+                    $upriver = json_decode($upriver,true);
+                    $all_upriver[] = $upriver;
+                    $i++;
+                    if ($i > 100) {
+                        $mysql_connect->table('yx_sftp_upriver')->insertAll($all_upriver);
+                        unset($all_upriver);
+                    }
+                }
+                if (!empty($all_upriver)) {
+                    $mysql_connect->table('yx_sftp_upriver')->insertAll($all_upriver);
+                    unset($all_upriver);
                 }
                 sleep(300);
             }
