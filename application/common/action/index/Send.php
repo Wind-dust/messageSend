@@ -376,9 +376,9 @@ return $result;
                 $data['liantong_channel_id'] = 62;
                 $data['dianxin_channel_id'] = 61;
             } elseif ($user['id'] == 91) {
-                $data['yidong_channel_id'] = 18;
-                $data['liantong_channel_id'] = 19;
-                $data['dianxin_channel_id'] = 19;
+                $data['yidong_channel_id'] = 85;
+                $data['liantong_channel_id'] = 85;
+                $data['dianxin_channel_id'] = 85;
                 // $data['yidong_channel_id'] = 9;
                 // $data['liantong_channel_id'] = 9;
                 // $data['dianxin_channel_id'] = 9;
