@@ -794,7 +794,7 @@ return $result;
             'source'         => $ip,
             'send_num'       => $send_num,
             'real_num'       => $real_num,
-            'channel_id'     => $channel_id,
+            // 'channel_id'     => $channel_id,
             // 'yidong_channel_id'     => $yidong_channel_id,
             // 'liantong_channel_id'     => $liantong_channel_id,
             // 'dianxin_channel_id'     => $dianxin_channel_id,
