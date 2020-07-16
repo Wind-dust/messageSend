@@ -3068,12 +3068,12 @@ class CmppCreateCodeTask extends Pzlife
             $result = Db::query("SELECT `mobile`,`check_status`,`check_result`,`update_time` FROM  yx_mobile WHERE `mobile` = '" . $mobile . "'  ORDER BY `id` DESC LIMIT 1 ");
             if (!empty($result)) {
                 if ($result[0]['check_status'] == 1 || date('Ymd', time()) > date('Ymd', $result[0]['update_time'])) { //未检测
-                    return $this->checkMobileApi($mobile);
+                    return $this->checkMobileApi([$mobile]);
                 } else {
                     return true;
                 }
             }
-            return $this->checkMobileApi($mobile);
+            return $this->checkMobileApi([$mobile]);
         } catch (\Exception $th) {
             //throw $th;
             exception($th);
