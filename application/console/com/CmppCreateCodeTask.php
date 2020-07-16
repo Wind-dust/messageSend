@@ -8491,7 +8491,7 @@ public function checkMobileApi($mobiledata = [])
             /* $where = [];
             $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
             $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  '" . $tody_time . "' AND `template_id` = '100182541' ");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  '" . $tody_time . "' AND `template_id` = '100182541' AND `id` >= 5316219 ");
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id`  IN ('100182166','100182575') AND  `create_time` >  '" . $tody_time . "' ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100181593' AND `create_time` >  " . $tody_time;die;
             // $sendid = $mysql_connect->query("SELECT `id` FROM `sflsftp`.`yx_sfl_send_task` WHERE `template_id` IN ('100181864','100181869') ");
@@ -8586,6 +8586,9 @@ public function checkMobileApi($mobiledata = [])
                                    /*  if (in_array(trim($value['mobile']), $white_list)) {
                                         continue;
                                     } */
+                                    if (in_array(trim($value['mobile']), $white_list)) {
+                                        continue;
+                                    }
                                     if ($value['template_id'] == '100181315') {
                                         
                                         $rate = 60;
