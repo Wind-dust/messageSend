@@ -8582,10 +8582,11 @@ public function checkMobileApi($mobiledata = [])
                                     //
                                     // echo "不含生日";
                                     // print_r($value['task_content']);die;
+                                    if (in_array(trim($value['mobile']), $white_list)) {
+                                        continue;
+                                    }
                                     if ($value['template_id'] == '100181315') {
-                                        if (in_array(trim($value['mobile']), $white_list)) {
-                                            continue;
-                                        }
+                                        
                                         $rate = 60;
                                     } elseif ($value['template_id'] == '100181316') {
                                         if (in_array(trim($value['mobile']), $white_list)) {
