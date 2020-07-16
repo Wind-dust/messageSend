@@ -2219,7 +2219,7 @@ class CmppCreateCodeTask extends Pzlife
                         if (!empty($check_real_mobile)) {
                             //区分热门和冷门
                             foreach($check_real_mobile as $key => $value) {
-                                $prefix = substr(trim($value['mobile']), 0, 7);
+                                $prefix = substr(trim($value), 0, 7);
                                 // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                                 // $newres = array_shift($res);
                                 $newres = $this->redis->hget('index:mobile:source',$prefix);
@@ -2242,7 +2242,7 @@ class CmppCreateCodeTask extends Pzlife
                                 } */
                                 $mobile_info = [];
                                 $mobile_info = [
-                                    'mobile' => $value['mobile'],
+                                    'mobile' => $value,
                                     'source' => $newres['source'],
                                 ];
                                 if (in_array($newres['city_id'],$citys_id)) {
