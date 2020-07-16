@@ -321,7 +321,7 @@ class CmppCreateCodeTask extends Pzlife
             $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0, 'deduct' => 10]));
             // usleep(50000);
         } */
-        $task_id =['227892'];
+        $task_id =['230895','230897'];
         foreach ($task_id as $key => $value) {
             $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value, 'send_time' => 0, 'deduct' => 0]));
             // usleep(50000);
