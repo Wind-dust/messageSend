@@ -3068,19 +3068,19 @@ class CmppCreateCodeTask extends Pzlife
             $result = Db::query("SELECT `mobile`,`check_status`,`check_result`,`update_time` FROM  yx_mobile WHERE `mobile` = '" . $mobile . "'  ORDER BY `id` DESC LIMIT 1 ");
             if (!empty($result)) {
                 if ($result[0]['check_status'] == 1 || date('Ymd', time()) > date('Ymd', $result[0]['update_time'])) { //未检测
-                    return $this->checkMobileApi([$mobile]);
+                    return $this->checkMobileApiOne($mobile);
                 } else {
                     return true;
                 }
             }
-            return $this->checkMobileApi([$mobile]);
+            return $this->checkMobileApiOne($mobile);
         } catch (\Exception $th) {
             //throw $th;
             exception($th);
         }
     }
 
-    /* public function checkMobileApi($mobile)
+    public function checkMobileApiOne($mobile)
     {
         $secret_id = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
         $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
@@ -3138,7 +3138,7 @@ class CmppCreateCodeTask extends Pzlife
         }
         return false;
     }
- */
+
 public function checkMobileApi($mobiledata = [])
     {
         $real_mobile = [];
