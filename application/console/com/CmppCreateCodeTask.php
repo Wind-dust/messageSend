@@ -8977,8 +8977,8 @@ public function checkMobileApi($mobiledata = [])
             18019762207,
             13162248755,
         ];
-        // $tody_time = strtotime(date("Ymd", time()));
-        $tody_time = 1594785600;
+        $tody_time = strtotime(date("Ymd", time()));
+        // $tody_time = 1594785600;
         try {
             /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
             // $mysql_connect->table('yx_sfl_multimedia_message')->where([['create_time', '>', $tody_time],['sfl_relation_id','IN','100181558,100181556,100181563,100177398']])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
