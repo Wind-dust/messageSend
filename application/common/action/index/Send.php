@@ -428,6 +428,11 @@ return $result;
                     $data['liantong_channel_id'] = 95;
                     $data['dianxin_channel_id'] = 95;
                 }
+                if ($user['id'] == 224) {
+                    $data['yidong_channel_id'] = 95;
+                    $data['liantong_channel_id'] = 95;
+                    $data['dianxin_channel_id'] = 95;
+                }
                 // $data['yidong_channel_id'] = 9;
                 // $data['liantong_channel_id'] = 9;
                 // $data['dianxin_channel_id'] = 9;
@@ -1191,6 +1196,11 @@ return $result;
                                 $send_task['dianxin_channel_id'] = 95;
                             }
                             if ($user['id'] == 218) {
+                                $send_task['yidong_channel_id'] = 95;
+                                $send_task['liantong_channel_id'] = 95;
+                                $send_task['dianxin_channel_id'] = 95;
+                            }
+                            if ($user['id'] == 224) {
                                 $send_task['yidong_channel_id'] = 95;
                                 $send_task['liantong_channel_id'] = 95;
                                 $send_task['dianxin_channel_id'] = 95;
