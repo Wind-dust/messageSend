@@ -29,7 +29,7 @@ class CmppRongHeSanWangBusiness extends Pzlife
             'Shared_secret' => '576200', //网关登录密码
             'Service_Id'    => "484036", //业务代码
             'template_id'   => "", //模板id
-            'Dest_Id'       => "", //短信接入码 短信端口号 服务代码
+            'Dest_Id'       => "10692218000", //短信接入码 短信端口号 服务代码
             'Sequence_Id'   => 1,
             'SP_ID'         => "",
             'master_num'    => 160,
