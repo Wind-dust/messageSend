@@ -10787,6 +10787,7 @@ class CmppCreateCodeTask extends Pzlife
                 'send_status' => '4',
                 'send_time' => time(),
             ];
+            $redis->rpush('index:meassage:multimediamessage:deliver:59', json_encode($send_task_log));
         }
     }
 }
