@@ -71,6 +71,7 @@ return [
     'cmpplanjingmarketing'             => $commandPath . 'CmppLanJingMarketing',
     'cmpplanjingbusiness'              => $commandPath . 'CmppLanJingBusiness',
     'cmpprongheyidongbusiness'              => $commandPath . 'CmppRongHeYiDongBusiness', //融合移动行业
+    'cmppronghesanwangbusiness'              => $commandPath . 'CmppRongHeSanWangBusiness', //融合移动行业
     'cmpprongheyidongmarketingreport'              => $commandPath . 'CmppRongHeYiDongMarketingReport', //融合移动营销报备
     'cmpprongheyidongmarketing'              => $commandPath . 'CmppRongHeYiDongMarketing', //融合移动营销
     'cmpprongheliantongbusiness'              => $commandPath . 'CmppRongHeLianTongBusiness', //融合联通行业

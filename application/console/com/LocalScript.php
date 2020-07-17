@@ -11,20 +11,23 @@ use Kafka\Producer;
 use Kafka\Produce;
 use think\Db;
 
-class LocalScript extends Pzlife {
+class LocalScript extends Pzlife
+{
     private $redis;
 
     //    private $connect;
 
-    private function orderInit() {
+    private function orderInit()
+    {
         $this->redis = Phpredis::getConn();
         //        $this->connect = Db::connect(Config::get('database.db_config'));
     }
 
-    public function kafkaTest() {
+    public function kafkaTest()
+    {
         // $produce = Producer::getInstance('localhost:2181', 3000);
         try {
-       /*      $objRdKafka = new Producer();
+            /*      $objRdKafka = new Producer();
         $objRdKafka->setLogLevel(LOG_DEBUG);
         $objRdKafka->addBrokers("http://139.224.119.119:9000/clusters/kafka/brokers");
 
@@ -46,38 +49,34 @@ class LocalScript extends Pzlife {
             // 发送消息
             $oObjTopic->produce(RD_KAFKA_PARTITION_UA, 0, $sMsg);
         } */
-        $produce=ProducerConfig::getInstance('http://139.224.119.119:9000/clusters/kafka/brokers',3000);
+            $produce = ProducerConfig::getInstance('http://139.224.119.119:9000/clusters/kafka/brokers', 3000);
 
-        $produce->setRequireAck(-1);
-        $topicName='testtopic';
-        $partitions=$produce->getAvailablePartitions($topicName);
-         
-        $count=1;
-        $partitionCount=count($partitions);
-        while(true){
-            $message=json_encode(array('uid'=>$count,'age'=>$count%100,'datetime'=>date('Y-m-d H:i:s')));
-            $partitionId=$count%$partitionCount;
-     
-            $produce->setMessages('testtopic',$partitionId,array($message));
-            $result=$produce->send();
-            var_dump($result);
-            $count++;
-            echo "producer sleeping/n";
-            sleep(1);
+            $produce->setRequireAck(-1);
+            $topicName = 'testtopic';
+            $partitions = $produce->getAvailablePartitions($topicName);
+
+            $count = 1;
+            $partitionCount = count($partitions);
+            while (true) {
+                $message = json_encode(array('uid' => $count, 'age' => $count % 100, 'datetime' => date('Y-m-d H:i:s')));
+                $partitionId = $count % $partitionCount;
+
+                $produce->setMessages('testtopic', $partitionId, array($message));
+                $result = $produce->send();
+                var_dump($result);
+                $count++;
+                echo "producer sleeping/n";
+                sleep(1);
                 echo "done\n";
-        }
- 
-    //发送消息到不同的partition   
-     
-    
+            }
+
+            //发送消息到不同的partition   
+
+
         } catch (\Exception $th) {
             //throw $th;
             exception($th);
         }
-        
-
-        
-
     }
 
     /**
@@ -85,7 +84,8 @@ class LocalScript extends Pzlife {
      * @return array
      * @author rzc
      */
-    public function WxBatchgetMaterial() {
+    public function WxBatchgetMaterial()
+    {
 
         //获取微信公众号access_token
         $access_token = $this->getWeiXinAccessTokenTencent();
@@ -137,7 +137,8 @@ class LocalScript extends Pzlife {
         die;
     }
 
-    function sendRequestWx($requestUrl, $data = []) {
+    function sendRequestWx($requestUrl, $data = [])
+    {
         $curl = curl_init();
         $data = json_encode($data);
         curl_setopt($curl, CURLOPT_URL, $requestUrl);
@@ -158,7 +159,8 @@ class LocalScript extends Pzlife {
      * @return array
      * @author rzc
      */
-    protected function getWeiXinAccessTokenTencent() {
+    protected function getWeiXinAccessTokenTencent()
+    {
         $this->orderInit();
         $redisAccessTokenTencent = Config::get('redisKey.weixin.redisAccessTokenTencent');
         $access_token            = $this->redis->get($redisAccessTokenTencent);
@@ -181,7 +183,8 @@ class LocalScript extends Pzlife {
         return $access_token;
     }
 
-    public function numberDetection() {
+    public function numberDetection()
+    {
         $secret_id  = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
         $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
         $api        = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
@@ -218,7 +221,8 @@ class LocalScript extends Pzlife {
         // print_r($data);
     }
 
-    function sendRequest2($requestUrl, $method = 'get', $data = [], $headers) {
+    function sendRequest2($requestUrl, $method = 'get', $data = [], $headers)
+    {
         $methonArr = ['get', 'post'];
         if (!in_array(strtolower($method), $methonArr)) {
             return [];
@@ -254,7 +258,8 @@ class LocalScript extends Pzlife {
      * @param string $key 密钥
      * @return string
      */
-    public static function encrypt($string, $key) {
+    public static function encrypt($string, $key)
+    {
         // 对接java，服务商做的AES加密通过SHA1PRNG算法（只要password一样，每次生成的数组都是一样的），Java的加密源码翻译php如下：
         $key = substr(openssl_digest(openssl_digest($key, 'sha1', true), 'sha1', true), 0, 16);
 
@@ -266,7 +271,8 @@ class LocalScript extends Pzlife {
         return $data;
     }
 
-    public function hadMobile() {
+    public function hadMobile()
+    {
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $max_id = Db::query("SELECT `id` FROM yx_send_task_receipt ORDER BY `id` DESC limit 1 ");
         // // print_r($max_id);
@@ -328,7 +334,8 @@ class LocalScript extends Pzlife {
         }
     }
 
-    public function getRealNumber() {
+    public function getRealNumber()
+    {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
         // $max_id = Db::query("SELECT `id` FROM yx_send_task_receipt ORDER BY `id` DESC limit 1 ");
         // // print_r($max_id);
@@ -575,7 +582,8 @@ class LocalScript extends Pzlife {
      * @param string $key 密钥
      * @return string
      */
-    public static function decrypt($string, $key) {
+    public static function decrypt($string, $key)
+    {
 
         // 对接java，服务商做的AES加密通过SHA1PRNG算法（只要password一样，每次生成的数组都是一样的），Java的加密源码翻译php如下：
         $key = substr(openssl_digest(openssl_digest($key, 'sha1', true), 'sha1', true), 0, 16);
@@ -585,7 +593,8 @@ class LocalScript extends Pzlife {
         return $decrypted;
     }
 
-    public function mobileCheckTest() {
+    public function mobileCheckTest()
+    {
         $secret_id  = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
         $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
         $api        = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
@@ -658,7 +667,8 @@ class LocalScript extends Pzlife {
         }
     }
 
-    public function getMarketingMobile() {
+    public function getMarketingMobile()
+    {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
 
         $mobile      = Db::query("SELECT `uid`,`task_no`,`mobile` FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) GROUP BY `uid`,`task_no`,`mobile`  ");
@@ -699,7 +709,8 @@ class LocalScript extends Pzlife {
         }
     }
 
-    public function newRedisConnect() {
+    public function newRedisConnect()
+    {
         try {
             $mobileredis = PhpredisNew::getConn();
             $redis       = Phpredis::getConn();
@@ -987,5 +998,8 @@ class LocalScript extends Pzlife {
         }
     }
 
-
+    //sql 查询任务统计 sum
+    public function resultForTaskSumSelect()
+    {
+    }
 }
