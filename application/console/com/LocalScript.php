@@ -1002,4 +1002,17 @@ class LocalScript extends Pzlife
     public function resultForTaskSumSelect()
     {
     }
+
+    //sql 查询单客户单日发送情况统计
+    public function resultSumForUserSendCondition($uid, $time)
+    {
+        $start_time = strtotime($time);
+        $end_time = $start_time + 86400;
+        /* SELECT * FROM `yx_user_send_task` WHERE `uid` =205 AND `create_time` >= '1594310400' AND `create_time` <= '1594656000';
+        SELECT SUM(`real_num`) FROM `yx_user_send_task` WHERE `uid` =205 AND `create_time` >= '1594310400' AND `create_time` <= '1594656000';
+        SELECT SUM(`send_num`) FROM `yx_user_send_task` WHERE `uid` =205 AND `create_time` >= '1594310400' AND `create_time` <= '1594656000';
+        SELECT COUNT(*) FROM `yx_user_send_task_log` WHERE `task_no` IN (SELECT task_no FROM `yx_user_send_task` WHERE `uid` =205 AND `create_time` >= '1594310400' AND `create_time` <= '1594656000') ;
+        SELECT * FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT id FROM `yx_user_send_task` WHERE `uid` =205 AND `create_time` >= '1594310400' AND `create_time` <= '1594656000') ;
+        SELECT id,task_no FROM `yx_user_send_task` WHERE `uid` =205 AND `create_time` >= '1594310400' AND `create_time` <= '1594656000' AND task_no NOT IN (SELECT task_no FROM `yx_user_send_task_log` WHERE `task_no` IN (SELECT task_no FROM `yx_user_send_task` WHERE `uid` =205 AND `create_time` >= '1594310400' AND `create_time` <= '1594656000')) */
+    }
 }

@@ -103,6 +103,7 @@ return [
     'cmppbeijingmiaoxinmarketing'         => $commandPath . 'CmppBeiJingMiaoXinMarketing', //北京秒信会员营销
     'cmppbishangyidongbusiness'         => $commandPath . 'CmppBiShangYiDongBusiness', //必上移动行业
     'cmppyunjubigmarketing'         => $commandPath . 'CmppYunJuBigMarketing', //云聚高投诉通道
+    'cmppshutongyidongshengbeihuanbei'         => $commandPath . 'CmppShuTongYiDongShengBeiHuanBei', //曙通信息移动省呗 还呗
     'serversocketshuhe'                => $commandPath . 'ServerSocketShuHe',
     'ServerSocketjyy'                  => $commandPath . 'ServerSocketJYY',
     'ServerSocketjyylt'                  => $commandPath . 'ServerSocketJYYLT',
