@@ -5464,11 +5464,16 @@ class CmppCreateCodeTask extends Pzlife
     public function getUpRiver()
     {
         $redis = Phpredis::getConn();
-        $redis->rpush('index:message:code:upriver:22', json_encode([
-            'mobile' => 13817346471,
-            'message_info' => 'QX',
-            'develop_code' => '3435',
-        ]));
+        /* $redis->rpush('index:message:code:upriver:95', json_encode([
+            'mobile' => 18652851494,
+            'message_info' => '3',
+            'develop_code' => '7195',
+        ])); */
+        /*  $redis->rpush('index:message:code:upriver:95', json_encode([
+            'mobile' => 15618356476,
+            'message_info' => '3',
+            'develop_code' => '7195',
+        ])); */
         try {
             while (true) {
                 $channels = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `delete_time` = 0 ");
@@ -5559,7 +5564,7 @@ class CmppCreateCodeTask extends Pzlife
                         }
                     }
                 }
-                sleep(300);
+                sleep(60);
             }
         } catch (\Exception $th) {
             exception($th);
