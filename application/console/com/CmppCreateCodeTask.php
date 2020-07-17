@@ -10762,4 +10762,31 @@ class CmppCreateCodeTask extends Pzlife
             exception($th);
         }
     }
+
+    public function callbackChannelStatus($id)
+    {
+        $redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M');
+        while (true) {
+            $send = $redis->lpop("index:meassage:code:send:" . $id);
+            if (empty($send)) {
+                break;
+            }
+            $send = json_decode($send, true);
+            $task = Db::query("SELECT * FROM " . $send['from'] . " WHERE `id` =" . $send['mar_task_id']);
+            if (empty($task)) {
+                comtinue;
+            }
+            $task = $task[0];
+            $send_task_log = [];
+            $send_task_log = [
+                'task_no' => $task['task_no'],
+                'uid' => $task['uid'],
+                'mobile' => $send['mobile'],
+                'status_message' => '6150',
+                'send_status' => '4',
+                'send_time' => time(),
+            ];
+        }
+    }
 }
