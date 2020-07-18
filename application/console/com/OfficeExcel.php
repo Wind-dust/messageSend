@@ -2884,18 +2884,21 @@ class OfficeExcel extends Pzlife {
         // $error_path = realpath("./")."/error.txt";
         // $error_file = fopen($error_path, "w");
         //黑卡
-        $black_error_path = realpath("./")."/100180395.txt";
+        $black_error_path = realpath("./")."/0625.txt";
         $black_error_file       = fopen($black_error_path, "r");
         $black_error_mobile = [];
         $receive_alls = [];
         while (!feof($black_error_file)) {
             $cellVal = trim(fgets($black_error_file));
             if (!empty($cellVal)) {
+                $cellVal = str_replace('"','',$cellVal);
+                $cellVal = trim($cellVal);
+                // print_r($cellVal);die;
                 $black_error_mobile[] = $cellVal;
             }
         }
 
-        $white_error_path = realpath("./")."/100180396.txt";
+       /*  $white_error_path = realpath("./")."/100180396.txt";
         $white_error_file       = fopen($white_error_path, "r");
         $white_error_mobile = [];
         while (!feof($white_error_file)) {
@@ -2903,18 +2906,20 @@ class OfficeExcel extends Pzlife {
             if (!empty($cellVal)) {
                 $white_error_mobile[] = $cellVal;
             }
-        }
+        } */
 
         //黑卡写入文件地址
-        $black_receipt_path = realpath("./")."/100180395_receipt.txt";
+       /*  $black_receipt_path = realpath("./")."/100180395_receipt.txt";
         $black_receipt_file       = fopen($black_receipt_path, "w");
         
         $white_receipt_path = realpath("./")."/100180396_receipt.txt";
-        $white_receipt_file       = fopen($white_receipt_path, "w");
+        $white_receipt_file       = fopen($white_receipt_path, "w"); */
         // echo count($black_error_mobile);die;
-        $start_time = 1590804000;
+        $start_time = 1592884416;
         $i = 1;
-        $model_path = realpath("./uploads/SFL/UnZip/SMS/Communication_targets_SMS_1_20200529140223") . "/Communication_targets_SMS_1_20200529140223.txt";
+        $j = 1;
+        $model_path = realpath("./uploads/SFL/UnZip/MMS/Communication_targets_MMS_1_20200628103453") . "/Communication_targets_MMS_1_20200623103438.txt";
+        // $model_path = realpath("./") . "/0624.txt";
         $file       = fopen($model_path, "r");
         while (!feof($file)) {
             $cellVal = trim(fgets($file));
@@ -2927,7 +2932,12 @@ class OfficeExcel extends Pzlife {
                 if (checkMobile($value[3]) == false || strlen($value[3]) > 11) {
                     continue;
                 }
-                
+               /*  if (!in_array($value[2],['529','100150820','100150821','100150822','100180393'])) {
+                    continue;
+                } */
+                if (!in_array($value[2],['82301','82309','100125372','100180389'])) {
+                    continue;
+                }
                 $receive = [];
                 $receive = [
                     'MESSAGE_ID'=>$value[0],
@@ -2945,9 +2955,15 @@ class OfficeExcel extends Pzlife {
                     if (in_array(substr(trim($value[3]), 0, 3),['141','142','143','144','145','146','148','149'])){
                         $receive['STATUS'] = 'SMS:2';
                     }
-                   
-                    
-                    if ($value[2] == 100180395) {//黑卡
+                    $num = mt_rand(0,1000);
+                    if ($num <= 33) {
+                        $receive['STATUS'] = 'SMS:2';
+                    }
+                   /*  if (in_array($value[3],$black_error_mobile)) {
+                        $receive['STATUS'] = 'SMS:2';
+                    } */
+                    //  $this->redis->rpush('0625',json_encode($receive));
+                   /*  if ($value[2] == 100180395) {//黑卡
                         continue;
                         if (in_array($value[3],$black_error_mobile)) {
                             $receive['STATUS'] = 'SMS:2';
@@ -2966,17 +2982,29 @@ class OfficeExcel extends Pzlife {
                         }
                         // fwrite($white_receipt_file,json_encode($receive)."\n");
                         $this->redis->rpush('100180396',json_encode($receive));
-                    }
+                    }*/
                     
-                }
+                } 
                 // print_r($receive);die;
+                $receive_alls[] = $receive;
                 $i++;
+                if ($i > 200000) {
+                    $name = "imp_mobile_status_report_mms_".$j."_20200623.xlsx";
+                    $this->derivedTables($receive_alls,$name);
+                    $j ++;
+                    $receive_alls = [];
+                    $i = 0;
+                }
             }
         }
         fclose($file);
-        fclose($black_receipt_file);
-        fclose($white_receipt_file);
+        // fclose($black_receipt_file);
+        // fclose($white_receipt_file);
         // fclose($error_file);
+        if (!empty($receive_alls)) {
+            $name = "imp_mobile_status_report_mms_".$j."_20200623.xlsx";
+            $this->derivedTables($receive_alls,$name);
+        }
     }
 
     public function export(){
@@ -3095,5 +3123,727 @@ class OfficeExcel extends Pzlife {
         //imp_mobile_status_report_mms_1_20200531.xlsx
         $objWriter->save($name);
         return 1;
+    }
+
+    public function futureExport($uid){
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        // $task = Db::query("SELECT `id` FROM `yx_user_send_task` WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137 AND `create_time` >= '1590940800' AND `create_time` <= '1593532800' ");
+        // print_r();die;
+       /*  $task = Db::query("SELECT
+        yx_user_send_task.uid,
+        yx_user_send_task.task_content,
+        yx_user_send_task.mobile_content,
+        yx_user_send_task.send_msg_id,
+        yx_user_send_task.create_time,
+        yx_send_task_receipt.status_message,
+        yx_send_task_receipt.mobile
+        FROM
+        yx_user_send_task
+        LEFT JOIN yx_send_task_receipt ON yx_user_send_task.id = yx_send_task_receipt.task_id
+        WHERE
+        yx_user_send_task.uid IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND
+        yx_user_send_task.create_time >= '1590940800' AND
+        yx_user_send_task.create_time <= '1593532800' AND
+        yx_user_send_task.send_num = '1'");
+        echo count($task);die; */
+        $all_log = [];
+        $user = Db::query("SELECT * FROM yx_users WHERE `pid` = 137 AND `id` =".$uid);
+        if (empty($user)) {
+            exit;
+        }
+        try {
+            $value = $user[0];
+            
+            $task = Db::query("SELECT * FROM `yx_user_send_task` WHERE `uid` = ".$value['id']."  AND `create_time` >= '1590940800' AND `create_time` <= '1593532800' ");
+            // print_r($task);die;
+            if (empty($task)) {
+                exit;
+            } 
+            // print_r($value);die;
+           /*  echo count($task);
+            die; */
+            $j = 1;
+            $a = 1;
+            foreach($task as $key => $tvalue){
+                    
+                // $send_task =  Db::query("SELECT * FROM `yx_user_send_code_task` WHERE `id` = ".$tvalue['id']);
+                // $send_task = $send_task[0];
+                $send_task = $tvalue;
+                // print_r($send_task);die;
+                // print_r($send_task);die;
+                $task_log = [];
+                $real_num = 1;
+                // $real_num = $send_task['real_num'] / $send_task['send_num'] ;
+                if (mb_strlen($send_task['task_content']) > 70) {
+                    $real_num = ceil(mb_strlen($send_task['task_content']) / 67);
+                }
+                $task_log = [
+                    'uid' => $send_task['uid'],
+                    'task_content' => $send_task['task_content'],
+                    'send_msg_id' => $send_task['send_msg_id'],
+                    'send_length' => $send_task['send_length'],
+                    'real_num' => $real_num,
+                    'create_time' => date('Y-m-d H:i:s',$send_task['create_time']),
+                ];
+                $mobile_content = explode(',',$send_task['mobile_content']);
+                if ($send_task['yidong_channel_id']) {
+                    $has_mobile = [];
+                    $task_receipt = Db::query("SELECT `*` FROM yx_send_task_receipt WHERE `task_id` = ".$tvalue['id']." AND `mobile` IN (".$send_task['mobile_content'].") ");
+                    //有回执的
+                    foreach ($task_receipt as $rkey => $rvalue) {
+                        // print_r($rvalue);die;
+                        if (trim($rvalue['status_message'] == 'DELIVRD')) {
+                            $task_log['success_num'] = $real_num;
+                            $task_log['default_num'] = 0;
+                        }else{
+                            $task_log['success_num'] = 0;
+                            $task_log['default_num'] = $real_num;
+                        }
+                        $stat = '';
+                        $stat_info = '';
+                        for ($n=0; $n < $real_num; $n++) { 
+                            $k = $n+1;
+                            $stat.= $k.'|'.$rvalue['status_message'].';';
+                            if (trim($rvalue['status_message'] == 'DELIVRD')) {
+                                $stat_info.= $k.'|发送成功;';
+                            }else{
+                                $stat_info.= $k.'|发送失败;';
+                            }
+                        }
+                        $task_log['mobile'] = $rvalue['mobile'];
+                        $task_log['status'] = $stat;
+                        $task_log['status_info'] = $stat_info;
+                        $all_log[] = $task_log;
+                        // print_r($task_log);die;
+                        $a ++;
+                        $has_mobile[] =  $rvalue['mobile'];
+                        if ($a > 200000) {
+                            $this->derivedTablesForTaskReceipt($all_log,$value['nick_name']."_".$j.'_营销'.'.xlsx');
+                            $all_log = [];
+                            $a = 1;
+                            $j ++ ;
+                        }
+                    }
+                    $nuknow_mobile = [];
+                    $nuknow_mobile = array_diff($mobile_content,$has_mobile);
+                    
+                    if (!empty($nuknow_mobile)) {
+                        foreach ($nuknow_mobile as $nkey => $nvalue) {
+                            $stat = '';
+                            $stat_info = '';
+                            for ($n=0; $n < $real_num; $n++) { 
+                                $k = $n+1;
+                                $stat.= $k.'|UNDELIV;';
+                                $stat_info.= $k.'|发送失败;';
+                            }
+                            $task_log['success_num'] = 0;
+                            $task_log['default_num'] = $real_num;
+                            $task_log['mobile'] = $nvalue;
+                            $task_log['status'] = $stat;
+                            $task_log['status_info'] = $stat_info;
+                            $all_log[] = $task_log;
+                            $a++;
+                            if ($a > 200000) {
+                                $this->derivedTablesForTaskReceipt($all_log,$value['nick_name']."_".$j.'_营销'.'.xlsx');
+                                $all_log = [];
+                                $a = 1;
+                                $j ++ ;
+                            }
+                        }
+                        // for ($i=0; $i < count($nuknow_mobile); $i++) { 
+                            
+                        // }
+                    }
+                }else{
+                    for ($i=0; $i < count($mobile_content); $i++) { 
+                        $stat = '';
+                        $stat_info = '';
+                        for ($n=0; $n < $real_num; $n++) { 
+                            $k = $n+1;
+                            $stat.= $k.'|MK:100C;';
+                            $stat_info.= $k.'|发送失败;';
+                        }
+                        $task_log['success_num'] = 0;
+                        $task_log['default_num'] = $real_num;
+                        $task_log['mobile'] = $mobile_content[$i];
+                        $task_log['status'] = $stat;
+                        $task_log['status_info'] = $stat_info;
+                        $all_log[] = $task_log;
+                        $a++;
+                        if ($a > 200000) {
+                            $this->derivedTablesForTaskReceipt($all_log,$value['nick_name']."_".$j.'_营销'.'.xlsx');
+                            $all_log = [];
+                            $a = 1;
+                            $j ++ ;
+                        }
+                    }
+                }
+                print_r($a);
+                echo "\n";
+            }
+            if (!empty($all_log)) {
+                $this->derivedTablesForTaskReceipt($all_log,$value['nick_name']."_".$j.'_营销'.'.xlsx');
+                $all_log = [];
+                $a = 1;
+                $j ++ ;
+            }
+            die;
+            /*  foreach ($user as $key => $value) {
+                // # code...
+                //
+               
+            } */
+           
+            $task = [];
+                $j = 1;
+                $a = 1;
+                $task = Db::query("SELECT * FROM `yx_user_send_task` WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137)  AND `create_time` >= '1590940800' AND `create_time` <= '1593532800' ");
+                if (!empty($task)) {
+                    foreach($task as $key => $tvalue){
+                        
+                        // $send_task =  Db::query("SELECT * FROM `yx_user_send_code_task` WHERE `id` = ".$tvalue['id']);
+                        // $send_task = $send_task[0];
+                        $send_task = $tvalue;
+                        // print_r($send_task);die;
+                        // print_r($send_task);die;
+                        $task_log = [];
+                        $real_num = 1;
+                        // $real_num = $send_task['real_num'] / $send_task['send_num'] ;
+                        if (mb_strlen($send_task['task_content']) > 70) {
+                            $real_num = ceil(mb_strlen($send_task['task_content']) / 67);
+                        }
+                        $task_log = [
+                            'uid' => $send_task['uid'],
+                            'task_content' => $send_task['task_content'],
+                            'send_msg_id' => $send_task['send_msg_id'],
+                            'send_length' => $send_task['send_length'],
+                            'real_num' => $real_num,
+                            'create_time' => date('Y-m-d H:i:s',$send_task['create_time']),
+                        ];
+                        $mobile_content = explode(',',$send_task['mobile_content']);
+                        if ($send_task['yidong_channel_id']) {
+                            $has_mobile = [];
+                            $task_receipt = Db::query("SELECT `*` FROM yx_send_task_receipt WHERE `task_id` = ".$tvalue['id']." AND `mobile` IN (".$send_task['mobile_content'].") ");
+                            //有回执的
+                            foreach ($task_receipt as $rkey => $rvalue) {
+                                // print_r($rvalue);die;
+                                if (trim($rvalue['status_message'] == 'DELIVRD')) {
+                                    $task_log['success_num'] = $real_num;
+                                    $task_log['default_num'] = 0;
+                                }else{
+                                    $task_log['success_num'] = 0;
+                                    $task_log['default_num'] = $real_num;
+                                }
+                                $stat = '';
+                                $stat_info = '';
+                                for ($n=0; $n < $real_num; $n++) { 
+                                    $k = $n+1;
+                                    $stat.= $k.'|'.$rvalue['status_message'].';';
+                                    if (trim($rvalue['status_message'] == 'DELIVRD')) {
+                                        $stat_info.= $k.'|发送成功;';
+                                    }else{
+                                        $stat_info.= $k.'|发送失败;';
+                                    }
+                                }
+                                $task_log['mobile'] = $rvalue['mobile'];
+                                $task_log['status'] = $stat;
+                                $task_log['status_info'] = $stat_info;
+                                $all_log[] = $task_log;
+                                // print_r($task_log);die;
+                                $a ++;
+                                $has_mobile[] =  $rvalue['mobile'];
+                                if ($a > 200000) {
+                                    $this->derivedTablesForTaskReceipt($all_log,"future_".$j.'_营销'.'.xlsx');
+                                    $all_log = [];
+                                    $a = 1;
+                                    $j ++ ;
+                                }
+                            }
+                            $nuknow_mobile = [];
+                            $nuknow_mobile = array_diff($mobile_content,$has_mobile);
+                            
+                            if (!empty($nuknow_mobile)) {
+                                foreach ($nuknow_mobile as $nkey => $nvalue) {
+                                    $stat = '';
+                                    $stat_info = '';
+                                    for ($n=0; $n < $real_num; $n++) { 
+                                        $k = $n+1;
+                                        $stat.= $k.'|UNDELIV;';
+                                        $stat_info.= $k.'|发送失败;';
+                                    }
+                                    $task_log['success_num'] = 0;
+                                    $task_log['default_num'] = $real_num;
+                                    $task_log['mobile'] = $nvalue;
+                                    $task_log['status'] = $stat;
+                                    $task_log['status_info'] = $stat_info;
+                                    $all_log[] = $task_log;
+                                    $a++;
+                                    if ($a > 200000) {
+                                        $this->derivedTablesForTaskReceipt($all_log,"future_".$j.'_营销'.'.xlsx');
+                                        $all_log = [];
+                                        $a = 1;
+                                        $j ++ ;
+                                    }
+                                }
+                                // for ($i=0; $i < count($nuknow_mobile); $i++) { 
+                                    
+                                // }
+                            }
+                        }else{
+                            for ($i=0; $i < count($mobile_content); $i++) { 
+                                $stat = '';
+                                $stat_info = '';
+                                for ($n=0; $n < $real_num; $n++) { 
+                                    $k = $n+1;
+                                    $stat.= $k.'|MK:100C;';
+                                    $stat_info.= $k.'|发送失败;';
+                                }
+                                $task_log['success_num'] = 0;
+                                $task_log['default_num'] = $real_num;
+                                $task_log['mobile'] = $mobile_content[$i];
+                                $task_log['status'] = $stat;
+                                $task_log['status_info'] = $stat_info;
+                                $all_log[] = $task_log;
+                                $a++;
+                                if ($a > 200000) {
+                                    $this->derivedTablesForTaskReceipt($all_log,"future_".$j.'_营销'.'.xlsx');
+                                    $all_log = [];
+                                    $a = 1;
+                                    $j ++ ;
+                                }
+                            }
+                        }
+                        print_r($a);
+                        echo "\n";
+                    }
+                    
+                    
+                }
+                if (!empty($all_log)) {
+                    $this->derivedTablesForTaskReceipt($all_log,"future_".$j.'_营销'.'.xlsx');
+                    $all_log = [];
+                    $a = 1;
+                    $j ++ ;
+                }
+           
+           /*  foreach($task as $key => $value){
+                $send_task =  Db::query("SELECT * FROM `yx_user_send_task` WHERE `id` = ".$value['id']);
+                $send_task = $send_task[0];
+                // print_r($send_task);die;
+                $task_log = [];
+                $task_log = [
+                    'task_content' => $send_task['task_content'],
+                    'send_msg_id' => $send_task['send_msg_id'],
+                    'send_length' => $send_task['send_length'],
+                    'real_num' => $send_task['real_num'] / $send_task['send_num'] ,
+                    'create_time' => date('Y-m-d H:i:s',$send_task['create_time']),
+                ];
+                $mobile_content = explode(',',$send_task['mobile_content']);
+                if ($send_task['yidong_channel_id']) {
+                    $has_mobile = [];
+                    $task_receipt = Db::query("SELECT `*` FROM yx_send_task_receipt WHERE `task_id` = ".$value['id']." AND `mobile` IN (".$send_task['mobile_content'].") ");
+                    //有回执的
+                    foreach ($task_receipt as $rkey => $rvalue) {
+                        // print_r($rvalue);die;
+                        $task_log['mobile'] = $rvalue['mobile'];
+                        $task_log['status'] = $rvalue['status_message'];
+                        $all_log[] = $task_log;
+                        $j ++;
+                        $has_mobile[] =  $rvalue['mobile'];
+                    }
+                    $nuknow_mobile = [];
+                    $nuknow_mobile = array_diff($mobile_content,$has_mobile);
+                    
+                    if (!empty($nuknow_mobile)) {
+                        foreach ($nuknow_mobile as $nkey => $nvalue) {
+                            $task_log['mobile'] = $nvalue;
+                            $task_log['status'] = 'UNDELIV';
+                            $all_log[] = $task_log;
+                            $j++;
+                        }
+                        // for ($i=0; $i < count($nuknow_mobile); $i++) { 
+                            
+                        // }
+                    }
+                }else{
+                    for ($i=0; $i < count($mobile_content); $i++) { 
+                        $task_log['mobile'] = $mobile_content[$i];
+                        $task_log['status'] = 'MK:100C';
+                        $all_log[] = $task_log;
+                        $j++;
+                    }
+                }
+            }
+            $this->derivedTablesForTaskReceipt($all_log,'future_KOLON.xlsx'); */
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
+        }
+       
+    }
+
+
+    public function derivedTablesForTaskReceipt($receive_alls,$name){
+        $objExcel = new PHPExcel();
+        // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+        // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
+        $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+        $objWriter->setOffice2003Compatibility(true);
+
+        //设置文件属性
+        $objProps = $objExcel->getProperties();
+        $objProps->setTitle("imp_mobile_status_report");
+        $objProps->setSubject("imp_mobile_status_report:" . date('Y-m-d H:i:s', time()));
+
+        $objExcel->setActiveSheetIndex(0);
+        $objActSheet = $objExcel->getActiveSheet();
+
+        $date = date('Y-m-d H:i:s', time());
+
+        //设置当前活动sheet的名称
+        $objActSheet->setTitle("imp_mobile_status_report");
+        $CellList = array(
+            array('uid', '账户id'),
+            array('mobile', '手机号'),
+            array('task_content', '短信内容'),
+            array('create_time', '发送时间'),
+            array('send_msg_id', 'msg_id'),
+            // array('send_length', '长度'),
+            array('real_num', '总条数'),
+            array('success_num', '成功数'),
+            array('default_num', '失败数'),
+            array('status', '状态码'),
+            array('status_info', '错误信息'),
+        );
+
+        foreach ($CellList as $i => $Cell) {
+            $row = chr(65 + $i);
+            $col = 1;
+            $objActSheet->setCellValue($row . $col, $Cell[1]);
+            $objActSheet->getColumnDimension($row)->setWidth(30);
+
+            $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+            $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+            $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+            // $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+            // $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+            $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        }
+        // $outputFileName = "receive_mms_1_20200523.xlsx";
+        $i = 0;
+        foreach ($receive_alls as $key => $orderdata) {
+            //行
+            $col = $key + 2;
+            foreach ($CellList as $i => $Cell) {
+                //列
+                $row = chr(65 + $i);
+                $objActSheet->getRowDimension($i)->setRowHeight(15);
+                $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            }
+        }
+        //imp_mobile_status_report_mms_1_20200531.xlsx
+        $objWriter->save($name);
+        return 1;
+    }
+
+    public function mobileChecked(){
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $black_error_path = realpath("./")."/20200708.txt";
+        $black_error_file       = fopen($black_error_path, "r");
+        $black_error_mobile = [];
+        while (!feof($black_error_file)) {
+            $cellVal = trim(fgets($black_error_file));
+            if (!empty($cellVal)) {
+                $cellVal = str_replace('"','',$cellVal);
+                $cellVal = trim($cellVal);
+                // print_r($cellVal);die;
+                $black_error_mobile[] = $cellVal;
+            }
+        }
+        // print_r(count($black_error_mobile));
+        $result = $this->mobilesFiltrate(join(',',$black_error_mobile));
+        // print_r($result);
+        $white_receipt_path = realpath("./")."/20200708new.txt";
+        $white_receipt_file       = fopen($white_receipt_path, "w"); 
+        foreach ($result as $key => $value) {
+            fwrite($white_receipt_file,$value."\n");
+        }
+        fclose($white_receipt_file);;
+    }
+
+
+    /* 第二版本号码清洗 */
+    public function mobilesFiltrate($mobile){
+        try {
+            // $deduct = 0;
+            $error_mobile = [];//错号或者黑名单
+            $real_send_mobile = []; //实际发送号码
+            $true_mobile = []; //实号号码
+            $mobile = str_replace('&quot;','',$mobile);
+            $mobile_data = explode(',',$mobile);
+            // echo count($mobile_data);
+            // echo "\n";
+            foreach($mobile_data as $key => $value){
+                // print_r($value);die;
+                if (!is_numeric($value)) {
+                    unset($mobile_data[$key]);
+                    continue;
+                }
+                if (checkMobile($value) == false) {
+                   
+                    $error_mobile[] = $value;
+                   
+                }
+            }
+            $mobile = join(',',$mobile_data);
+           
+            //白名单
+            $white_mobiles = [];
+            $white_mobile = Db::query("SELECT `mobile` FROM `yx_whitelist` WHERE mobile IN (".$mobile.") GROUP BY `mobile` ");
+            // print_r("SELECT `mobile` FROM `yx_whitelist` WHERE mobile IN (".$mobile.") ");
+            if (!empty($white_mobile)) {
+                foreach($white_mobile as $key => $value){
+                    $white_mobiles[] = $value['mobile'];
+                    $true_mobile[] = $value['mobile'];
+                }
+            }
+            //黑名单
+            $black_mobile = Db::query("SELECT `mobile` FROM `yx_blacklist` WHERE mobile IN (".$mobile.") GROUP BY `mobile` ");
+            // print_r("SELECT `mobile` FROM `yx_whitelist` WHERE mobile IN (".$mobile.") ");
+            if (!empty($black_mobile)) {
+                foreach($black_mobile as $key => $value){
+                    $error_mobile[] = $value['mobile'];
+                    $true_mobile[] = $value['mobile'];
+                }
+            }
+            //去除黑名单后实际有效号码
+            $real_send_mobile = array_diff($mobile_data,$error_mobile);
+            //扣量
+            
+                $remaining_mobile = array_diff($real_send_mobile,$white_mobiles);
+               
+                //实号
+                $entity_mobile = Db::query("SELECT `mobile` FROM `yx_real_mobile` WHERE mobile IN (".join(',',$remaining_mobile).") GROUP BY `mobile` ");
+                // echo count($entity_mobile);die;
+                //去除实号
+                // print_r(count($entity_mobile));die;
+                $entity_mobiles = [];//实号即能扣量号码
+                if (!empty($entity_mobile)) {
+                    foreach($entity_mobile as $key => $value){
+                        $entity_mobiles[] = $value['mobile'];
+                        $true_mobile[] = $value['mobile'];
+                    }
+                }
+                
+                //未知或者空号
+                
+               
+               
+                $vacant  = array_diff($remaining_mobile,$entity_mobiles);
+                // echo count($vacant);
+                // die;
+               //空号检测
+                    // print_r($vacant);
+                    //查出这个月内检测出的空号
+                    $the_month_time = date('Ymd', time());
+                    $the_month_checkvacant = [];
+                    $the_month_checkvacant =  Db::query("SELECT `mobile` FROM  yx_mobile WHERE `mobile` IN (" . join(',',$vacant) . ") AND `check_status` = 2 AND `update_time` >= ".$the_month_time."  GROUP BY  mobile  ");
+                   /*  print_r($the_month_checkvacant);
+                    echo"SELECT `mobile` FROM  yx_mobile WHERE `mobile` IN (" . join(',',$vacant) . ") AND `check_status` = 2 AND `update_time` >= ".$the_month_time."  GROUP BY  mobile  ";
+                    die; */
+                    $the_month_checkvacant_mobiles = [];
+                    if (!empty($the_month_checkvacant)) {
+                        foreach($the_month_checkvacant as $key => $value) {
+                            $the_month_checkvacant_mobiles[] = $value['mobile'];
+                        }
+                    }
+                    $need_check_mobile = [];
+                    $need_check_mobile = array_diff($vacant, $the_month_checkvacant_mobiles);
+                    $check_result = [];
+                    // print_r($the_month_checkvacant_mobiles);die;
+                    if (!empty($need_check_mobile)) {
+                        $check_result = $this->checkMobileApi($need_check_mobile);
+                        // print_r($check_result);
+                        // die;
+                        // ['real_mobile' => $real_mobile, 'empty_mobile' => $empty_mobile]
+                        $check_empty_mobile = [];
+                        $check_empty_mobile = $check_result['empty_mobile'];//检测出来的空号
+                        $check_real_mobile = [];
+                        $check_real_mobile = $check_result['real_mobile'];//检测出来的实号
+                       
+                    }
+                    foreach ($check_real_mobile as $key => $value) {
+                        $true_mobile[] = $value;
+                    }
+                    // return ['']
+                    return $true_mobile;
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
+        }
+       
+
+    }
+
+    public function checkMobileApi($mobiledata = [])
+    {
+        $real_mobile = [];
+        $empty_mobile = [];
+        $secret_id = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
+        $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
+        $api = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
+        $ts = date("YmdHis", time());
+        $sig = sha1($secret_id . $secret_key . $ts);
+        $api = $api . $sig . "&sid=" . $secret_id . "&skey=" . $secret_key . "&ts=" . $ts;
+        // $check_mobile = $this->decrypt('6C38881649F7003B910582D1095DA821',$secret_id);
+        // print_r($check_mobile);die;
+        $data = [];
+        $check_mobile_data = [];
+        $j = 1;
+        foreach($mobiledata as $key => $value){
+            $check_mobile_data[] = encrypt($value, $secret_id);
+            $j++;
+            if ($j > 2000){
+                $data = [
+                    'mobiles' => $check_mobile_data
+                ];
+                $headers = [
+                    'Authorization:' . base64_encode($secret_id . ':' . $ts), 'Content-Type:application/json'
+                ];
+                $result = $this->sendRequest2($api, 'post', $data, $headers);
+                // print_r(json_decode($data),true);
+                
+                $result = json_decode($result, true);
+                // print_r($result);
+                if ($result['code'] == 0) { //接口请求成功
+                    $mobiles = $result['mobiles'];
+                    foreach ($mobiles as $mkey => $value) {
+                        $mobile = decrypt($value['mobile'], $secret_id);
+                        $check_result = $value['mobileStatus'];
+                        $check_status = 2;
+                        if ($check_result == 2) { //实号
+                            Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
+                            Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
+                            Db::table('yx_real_mobile')->insert([
+                                'mobile' => $mobile,
+                                'check_result' => 3,
+                                'check_status' => $check_status,
+                                'update_time' => time(),
+                                'create_time' => time()
+                            ]);
+                            // return false;
+                            $real_mobile[] = $mobile;
+                        } else {
+                            Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
+                            Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
+                            Db::table('yx_mobile')->insert([
+                                'mobile' => $mobile,
+                                'check_result' => $check_result,
+                                'check_status' => $check_status,
+                                'update_time' => time(),
+                                'create_time' => time()
+                            ]);
+                            $empty_mobile[] = $mobile;
+                        }
+                    }
+        
+                }else{
+                    $empty_mobile = $mobiledata;
+                }
+                $check_mobile_data = [];
+                $j = 1;
+            }
+        }
+        if (!empty($check_mobile_data)) {
+            $data = [
+                'mobiles' => $check_mobile_data
+            ];
+            $headers = [
+                'Authorization:' . base64_encode($secret_id . ':' . $ts), 'Content-Type:application/json'
+            ];
+            $result = $this->sendRequest2($api, 'post', $data, $headers);
+            // print_r(json_decode($data),true);
+            // print_r($data);
+            $result = json_decode($result, true);
+            if ($result['code'] == 0) { //接口请求成功
+                $mobiles = $result['mobiles'];
+                if (!is_array($mobiles)) {
+                    $result = $this->sendRequest2($api, 'post', $data, $headers);
+                    // print_r(json_decode($data),true);
+                    // print_r($data);
+                    $result = json_decode($result, true);
+                    if ($result['code'] == 0) { //接口请求成功
+                        $mobiles = $result['mobiles'];
+                    }
+                }
+                foreach ($mobiles as $key => $value) {
+                    $mobile = decrypt($value['mobile'], $secret_id);
+                    $check_result = $value['mobileStatus'];
+                    $check_status = 2;
+                    if ($check_result == 2) { //实号
+                        Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
+                        Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
+                        Db::table('yx_real_mobile')->insert([
+                            'mobile' => $mobile,
+                            'check_result' => 3,
+                            'check_status' => $check_status,
+                            'update_time' => time(),
+                            'create_time' => time()
+                        ]);
+                        // return false;
+                        $real_mobile[] = $mobile;
+                    } else {
+                        Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
+                        Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
+                        Db::table('yx_mobile')->insert([
+                            'mobile' => $mobile,
+                            'check_result' => $check_result,
+                            'check_status' => $check_status,
+                            'update_time' => time(),
+                            'create_time' => time()
+                        ]);
+                        $empty_mobile[] = $mobile;
+                    }
+                }
+    
+            }else{
+                $empty_mobile = $mobiledata;
+            }
+        }
+        
+      return ['real_mobile' => $real_mobile, 'empty_mobile' => $empty_mobile];
+    }
+
+    function sendRequest2($requestUrl, $method = 'get', $data = [], $headers)
+    {
+        $methonArr = ['get', 'post'];
+        if (!in_array(strtolower($method), $methonArr)) {
+            return [];
+        }
+        if ($method == 'post') {
+            if (!is_array($data) || empty($data)) {
+                return [];
+            }
+        }
+        $curl = curl_init(); // 初始化一个 cURL 对象
+        curl_setopt($curl, CURLOPT_URL, $requestUrl); // 设置你需要抓取的URL
+        curl_setopt($curl, CURLOPT_HEADER, 0); // 设置header 响应头是否输出
+        if ($method == 'post') {
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 60);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($curl, CURLOPT_USERAGENT, 'Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400'); // 模拟用户使用的浏览器
+        }
+        // 设置cURL 参数，要求结果保存到字符串中还是输出到屏幕上。
+        // 1如果成功只将结果返回，不自动输出任何内容。如果失败返回FALSE
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        $res = curl_exec($curl); // 运行cURL，请求网页
+        curl_close($curl); // 关闭URL请求
+        return $res; // 显示获得的数据
     }
 }
