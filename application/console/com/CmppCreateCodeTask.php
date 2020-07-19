@@ -2851,10 +2851,10 @@ class CmppCreateCodeTask extends Pzlife
                                             'source'       => $sendTask['source'],
                                             'task_content' => $sendTask['task_content'],
                                             'mobile'       => $mobilesend[$i],
-                                            'send_status'  => 2,
                                             'channel_id'   => $channel_id,
-                                            'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
                                             'send_length'  => $send_length,
+                                            'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
+                                            'send_status'  => 2,
                                             'create_time'  => time(),
                                         ];
                                         $sendmessage = [
@@ -2910,10 +2910,10 @@ class CmppCreateCodeTask extends Pzlife
                                         'source'       => $sendTask['source'],
                                         'task_content' => $sendTask['task_content'],
                                         'mobile'       => $mobilesend[$i],
-                                        'send_status'  => 2,
                                         'channel_id'   => $channel_id,
-                                        'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
                                         'send_length'  => $send_length,
+                                        'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
+                                        'send_status'  => 2,
                                         'create_time'  => time(),
                                     ];
                                     $sendmessage = [
