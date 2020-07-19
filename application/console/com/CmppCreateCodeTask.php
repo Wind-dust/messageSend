@@ -9003,7 +9003,7 @@ class CmppCreateCodeTask extends Pzlife
         try {
             /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
             // $mysql_connect->table('yx_sfl_multimedia_message')->where([['create_time', '>', $tody_time],['sfl_relation_id','IN','100181558,100181556,100181563,100177398']])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
-            // $mysql_connect->table('yx_sfl_multimedia_message')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94, 'update_time' => time()]);
+            $mysql_connect->table('yx_sfl_multimedia_message')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94, 'update_time' => time()]);
         } catch (\Exception $th) {
             exception($th);
         }
@@ -9011,7 +9011,7 @@ class CmppCreateCodeTask extends Pzlife
         $j = 1;
         $receipt = [];
         $send_msg = [];
-        $deduct = 1; //1扣量,2不扣
+        $deduct = 2; //1扣量,2不扣
         $rate = 70;
         /*    $all_task = 
         while (true) {
@@ -9026,7 +9026,7 @@ class CmppCreateCodeTask extends Pzlife
             $receipt_id++;
             // print_r($receipt_id);die;
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . " AND `sfl_relation_id`  IN ('100181913','82301','82309','100125372')");
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . "  AND  `sfl_relation_id` NOT IN ('100181724','100181870','100181729','100182634')  ");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . "  AND  `sfl_relation_id`  IN ('100181731')  ");
             // $sendid = $mysql_connect->query("SELECT * FROM `sflsftp`.`yx_sfl_multimedia_message` WHERE `create_time` >= '" . $tody_time . "' AND `sfl_relation_id` IN ('100181871')");
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` IN('100177398','100181563','100181556','100181558')  AND `create_time` >  " . $tody_time;die;
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time;die;
@@ -10830,7 +10830,7 @@ class CmppCreateCodeTask extends Pzlife
                 $end_time = $start_time+ 300;
                 //行业
                 $code_task_log = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `status_message` = '' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' LIMIT 1 ");
-    
+                // echo "SELECT * FROM yx_user_send_code_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `status_message` = '' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' LIMIT 1 ";die;
                 if (!empty($code_task_log)) {
                     $task         = Db::query("SELECT `id`,`send_msg_id` FROM yx_user_send_code_task WHERE `task_no` = '" . $code_task_log[0]['task_no'] . "' ");
                     $task_receipt = Db::query("SELECT * FROM yx_send_code_task_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $code_task_log[0]['mobile'] . "' ");
@@ -10869,7 +10869,7 @@ class CmppCreateCodeTask extends Pzlife
                             $receipt_reports[] = $receipt_report;
                             $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
                             //推送失败
-                            print_r($res);
+                            // print_r($res);
                             if ($res != 'SUCCESS') {
                                 usleep(300);
                                 $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
@@ -10931,7 +10931,7 @@ class CmppCreateCodeTask extends Pzlife
                                 // $receipt_reports[] = $receipt_report;
                                 $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
                                 //推送失败
-                                print_r($res);
+                                // print_r($res);
                                 if ($res != 'SUCCESS') {
                                     usleep(300);
                                     $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
@@ -10965,8 +10965,8 @@ class CmppCreateCodeTask extends Pzlife
                             'content' => "【钰晰科技】客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time())
                         ]));
                     }
-                    echo 'Over' . "\n";
-                    sleep(120);
+                    // echo 'Over' . "\n";
+                    sleep(10);
                 }
             }
         } catch (\Exception $th) {
