@@ -5474,8 +5474,8 @@ class CmppCreateCodeTask extends Pzlife
             'message_info' => '3',
             'develop_code' => '7195',
         ])); */
-        // $redis->rpush('index:message:code:upriver:112','{"mobile":"15821193682","message_info":"3","develop_code":"9546"}');
-        // $redis->rpush('index:message:code:upriver:112','{"mobile":"15821193682","message_info":"2","develop_code":"2517"}');
+        $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"3","develop_code":"1503"}');
+        $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"2","develop_code":"6594"}');
         // $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"1","develop_code":"1750"}');
         // $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"1","develop_code":"6401"}');
         try {
@@ -5515,7 +5515,8 @@ class CmppCreateCodeTask extends Pzlife
                             }
                             $sql .= " AND  `develop_no` = " . $encodemessageupriver['develop_code'] . " AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ";
                             $message = Db::query($sql);
-                            // echo $sql;die;
+                            echo $sql;
+                            echo "\n";
                             if (!empty($message)) {
                                 //上行入库
 
