@@ -5474,8 +5474,9 @@ class CmppCreateCodeTask extends Pzlife
             'message_info' => '3',
             'develop_code' => '7195',
         ])); */
-        // $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"3","develop_code":"1503"}');
-        // $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"2","develop_code":"6594"}');
+        $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"1","develop_code":"1503"}');
+        $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"2","develop_code":"6594"}');
+        $redis->rpush('index:message:code:upriver:112','{"mobile":"15821193682","message_info":"3","develop_code":"2580"}');
         // $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"1","develop_code":"1750"}');
         // $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"1","develop_code":"6401"}');
         try {
@@ -5515,12 +5516,12 @@ class CmppCreateCodeTask extends Pzlife
                             }
                             $sql .= " AND  `develop_no` = " . $encodemessageupriver['develop_code'] . " AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ";
                             $message = Db::query($sql);
-                            echo $sql;
-                            echo "\n";
+                            // echo $sql;
+                            // echo "\n";
                             if (!empty($message)) {
                                 //上行入库
 
-                                Db::table('yx_user_upriver')->insert(['mobile' => $encodemessageupriver['mobile'], 'uid' => $message[0]['uid'], 'task_no' => $message[0]['task_no'], 'message_info' => $encodemessageupriver['message_info'], 'create_time' => time(), 'business_id' => 5]);
+                                Db::table('yx_user_upriver')->insert(['mobile' => $encodemessageupriver['mobile'], 'uid' => $message[0]['uid'], 'task_no' => $message[0]['task_no'], 'message_info' => $encodemessageupriver['message_info'], 'create_time' => time(), 'business_id' => $business_id]);
                                 //上行写入用户调用位置
                                 $user = Db::query("SELECT `need_upriver_api`,`pid` FROM `yx_users` WHERE `id` = " . $message[0]['uid']);
                                 if ($user && $user[0]['need_upriver_api'] == 2) {
@@ -5538,7 +5539,7 @@ class CmppCreateCodeTask extends Pzlife
                                         }
                                         continue;
                                     } else {
-                                        $redis->rpush("index:message:upriver:" . $message[0]['uid'], json_encode(['mobile' => $encodemessageupriver['mobile'], 'message_info' => $encodemessageupriver['message_info'], 'business_id' => 5, 'get_time' => date('Y-m-d H:i:s', time())]));
+                                        $redis->rpush("index:message:upriver:" . $message[0]['uid'], json_encode(['mobile' => $encodemessageupriver['mobile'], 'message_info' => $encodemessageupriver['message_info'], 'business_id' => $business_id, 'get_time' => date('Y-m-d H:i:s', time())]));
                                         continue;
                                     }
                                 }
@@ -5565,7 +5566,7 @@ class CmppCreateCodeTask extends Pzlife
                                 $message = Db::query($sql);
                                 if (!empty($message)) {
                                     //上行入库
-                                    Db::table('yx_user_upriver')->insert(['mobile' => $encodemessageupriver['mobile'], 'uid' => $message[0]['uid'], 'task_no' => $message[0]['task_no'], 'message_info' => $encodemessageupriver['message_info'], 'create_time' => time(), 'business_id' => 6]);
+                                    Db::table('yx_user_upriver')->insert(['mobile' => $encodemessageupriver['mobile'], 'uid' => $message[0]['uid'], 'task_no' => $message[0]['task_no'], 'message_info' => $encodemessageupriver['message_info'], 'create_time' => time(), 'business_id' => $business_id]);
                                     //上行写入用户调用位置
 
                                     $user = Db::query("SELECT `need_upriver_api`,`pid` FROM `yx_users` WHERE `id` = " . $message[0]['uid']);
@@ -5576,9 +5577,9 @@ class CmppCreateCodeTask extends Pzlife
                                             } elseif ($value['business_id'] == 6) { // 行业
                                                 $msg_id = Db::query("SELECT `send_msg_id` FROM yx_user_send_code_task WHERE `task_no` = '" . $message[0]['task_no'] . "'");
                                             } 
-                                            $redis->rpush("index:message:upriver:" . $message[0]['uid'], json_encode(['mobile' => $encodemessageupriver['mobile'], 'message_info' => $encodemessageupriver['message_info'], 'msg_id' => $msg_id[0]['send_msg_id'], 'business_id' => 6, 'get_time' => date('Y-m-d H:i:s', time())]));
+                                            $redis->rpush("index:message:upriver:" . $message[0]['uid'], json_encode(['mobile' => $encodemessageupriver['mobile'], 'message_info' => $encodemessageupriver['message_info'], 'msg_id' => $msg_id[0]['send_msg_id'], 'business_id' => $business_id, 'get_time' => date('Y-m-d H:i:s', time())]));
                                         } else {
-                                            $redis->rpush("index:message:upriver:" . $message[0]['uid'], json_encode(['mobile' => $encodemessageupriver['mobile'], 'message_info' => $encodemessageupriver['message_info'], 'business_id' => 6, 'get_time' => date('Y-m-d H:i:s', time())]));
+                                            $redis->rpush("index:message:upriver:" . $message[0]['uid'], json_encode(['mobile' => $encodemessageupriver['mobile'], 'message_info' => $encodemessageupriver['message_info'], 'business_id' => $business_id, 'get_time' => date('Y-m-d H:i:s', time())]));
                                         }
                                     }
                                     continue;
