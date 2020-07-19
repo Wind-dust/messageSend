@@ -5544,7 +5544,7 @@ class CmppCreateCodeTask extends Pzlife
                                     }
                                 }
                             } else {
-                                $sql = '';
+                               /*  $sql = '';
                                 $sql = "SELECT  `uid`,`id`,`task_no` FROM ";
                                 if ($value['business_id'] == 5) { //营销
                                     $sql .= " yx_user_send_task_log  WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'";
@@ -5583,7 +5583,7 @@ class CmppCreateCodeTask extends Pzlife
                                         }
                                     }
                                     continue;
-                                }
+                                } */
                             }
                         }
                         $sql                  = "SELECT `uid`,`id`,`task_no` FROM ";
