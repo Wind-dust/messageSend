@@ -5474,8 +5474,8 @@ class CmppCreateCodeTask extends Pzlife
             'message_info' => '3',
             'develop_code' => '7195',
         ])); */
-        $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"3","develop_code":"1503"}');
-        $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"2","develop_code":"6594"}');
+        // $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"3","develop_code":"1503"}');
+        // $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"2","develop_code":"6594"}');
         // $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"1","develop_code":"1750"}');
         // $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"1","develop_code":"6401"}');
         try {
