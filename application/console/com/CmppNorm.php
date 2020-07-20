@@ -47,6 +47,9 @@ class CmppNorm extends Pzlife
         // $this->clientSocketInit();
         $contdata = $this->content($content);
         // print_r($contdata);die;
+        if (empty($contdata)) {
+            exit("CHANNEL IS NOT SET !");
+        }
         $redis = Phpredis::getConn();
         date_default_timezone_set('PRC');
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
