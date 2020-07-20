@@ -11,6 +11,7 @@
 $commandPath = \think\facade\Config::get('console.command_path');
 return [
     'curl'                             => $commandPath . 'Curl',
+    'cmppnorm'                         => $commandPath .'CmppNorm',
     'user'                             => $commandPath . 'User',
     'areas'                            => $commandPath . 'Areas',
     'cmpp'                             => $commandPath . 'Cmpp',
