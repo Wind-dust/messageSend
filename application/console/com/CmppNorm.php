@@ -34,7 +34,7 @@ class CmppNorm extends Pzlife
             'SP_ID'         => "",
             'master_num'    => 160,
         ]; */
-        $channel = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `id` = ".$content);
+        $channel = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `id` = ".$content . " AND channel_type = 2");
         if (empty($channel)) {
             return false;
         }
