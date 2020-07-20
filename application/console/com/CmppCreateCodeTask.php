@@ -9752,38 +9752,59 @@ class CmppCreateCodeTask extends Pzlife
         $j = 1;
         $commit_tobase = [];
         $back = [];
-        while (true) {
-            $receipt = $this->redis->lpop($mul_receipt_key);
-            if (empty($receipt)) {
-                break;
+        while(true){
+            while (true) {
+                $receipt = $this->redis->lpop($mul_receipt_key);
+                if (empty($receipt)) {
+                    break;
+                }
+                $receipts = json_decode($receipt, true);
+                if (empty($receipts['mseeage_id'])) {
+                    continue;
+                }
+                if (trim($receipts['mobile']) == '15201926171' || trim($receipts['mobile']) == '15821193682') {
+                    continue;
+                }
+                $commit = [];
+                $mul_task = $mysql_connect->query("SELECT `id`,`sfl_relation_id` FROM yx_sfl_multimedia_message WHERE `mseeage_id` =  " . trim($receipts['mseeage_id'] . " LIMIT 1"));
+                $commit = [
+                    'mseeage_id' => $receipts['mseeage_id'],
+                    'mobile' => $receipts['mobile'],
+                    'real_message' => $receipts['status_message'],
+                    'task_id' => $mul_task[0]['id'],
+                    'template_id' => $mul_task[0]['sfl_relation_id'],
+                ];
+                if ($receipts['status_message'] == 'DELIVRD') {
+                    $commit['status_message'] = "MMS:1";
+                    $commit['messageinfo'] = "发送成功";
+                } else {
+                    $commit['status_message'] = "MMS:2";
+                    $commit['messageinfo'] = "发送失败";
+                }
+                $commit_tobase[] = $commit;
+                $back[] = $receipt;
+                $j++;
+                if ($j > 100) {
+                    $mysql_connect->startTrans();
+                    try {
+                        $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insertAll($commit_tobase);
+                        $mysql_connect->commit();
+                        unset($commit_tobase);
+                        unset($back);
+                        $j = 1;
+                    } catch (\Exception $e) {
+                        $mysql_connect->rollback();
+                        if (!empty($back)) {
+                            foreach ($back as $key => $value) {
+                                $this->redis->rPush($mul_receipt_key, $value);
+                            }
+                        }
+    
+                        exception($e);
+                    }
+                }
             }
-            $receipts = json_decode($receipt, true);
-            if (empty($receipts['mseeage_id'])) {
-                continue;
-            }
-            if (trim($receipts['mobile']) == '15201926171' || trim($receipts['mobile']) == '15821193682') {
-                continue;
-            }
-            $commit = [];
-            $mul_task = $mysql_connect->query("SELECT `id`,`sfl_relation_id` FROM yx_sfl_multimedia_message WHERE `mseeage_id` =  " . trim($receipts['mseeage_id'] . " LIMIT 1"));
-            $commit = [
-                'mseeage_id' => $receipts['mseeage_id'],
-                'mobile' => $receipts['mobile'],
-                'real_message' => $receipts['status_message'],
-                'task_id' => $mul_task[0]['id'],
-                'template_id' => $mul_task[0]['sfl_relation_id'],
-            ];
-            if ($receipts['status_message'] == 'DELIVRD') {
-                $commit['status_message'] = "MMS:1";
-                $commit['messageinfo'] = "发送成功";
-            } else {
-                $commit['status_message'] = "MMS:2";
-                $commit['messageinfo'] = "发送失败";
-            }
-            $commit_tobase[] = $commit;
-            $back[] = $receipt;
-            $j++;
-            if ($j > 100) {
+            if (!empty($commit_tobase)) {
                 $mysql_connect->startTrans();
                 try {
                     $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insertAll($commit_tobase);
@@ -9798,29 +9819,12 @@ class CmppCreateCodeTask extends Pzlife
                             $this->redis->rPush($mul_receipt_key, $value);
                         }
                     }
-
                     exception($e);
                 }
             }
+            sleep(300);
         }
-        if (!empty($commit_tobase)) {
-            $mysql_connect->startTrans();
-            try {
-                $mysql_connect->table('yx_sfl_send_multimediatask_receipt')->insertAll($commit_tobase);
-                $mysql_connect->commit();
-                unset($commit_tobase);
-                unset($back);
-                $j = 1;
-            } catch (\Exception $e) {
-                $mysql_connect->rollback();
-                if (!empty($back)) {
-                    foreach ($back as $key => $value) {
-                        $this->redis->rPush($mul_receipt_key, $value);
-                    }
-                }
-                exception($e);
-            }
-        }
+        
     }
 
     public function sflSftpTaskReceipt($content)
@@ -9836,52 +9840,73 @@ class CmppCreateCodeTask extends Pzlife
         $j = 1;
         $commit_tobase = [];
         $back = [];
-        while (true) {
-            $receipt = $this->redis->lpop($task_receipt_key);
-            if (empty($receipt)) {
-                break;
-            }
-            $receipts = json_decode($receipt, true);
-            if (empty($receipts['mseeage_id'])) {
-                if ($receipts['from'] == 'yx_user_send_code_task') {
-                    if ($content == '83') {
-                        $this->redis->rpush('index:meassage:code:new:deliver:18', json_encode($receipts));
-                    } else {
-                        $this->redis->rpush('index:meassage:code:new:deliver:19', json_encode($receipts));
+        while(true){
+            while (true) {
+                $receipt = $this->redis->lpop($task_receipt_key);
+                if (empty($receipt)) {
+                    break;
+                }
+                $receipts = json_decode($receipt, true);
+                if (empty($receipts['mseeage_id'])) {
+                    if ($receipts['from'] == 'yx_user_send_code_task') {
+                        if ($content == '83') {
+                            $this->redis->rpush('index:meassage:code:new:deliver:18', json_encode($receipts));
+                        } else {
+                            $this->redis->rpush('index:meassage:code:new:deliver:19', json_encode($receipts));
+                        }
+                    }
+                    continue;
+                }
+                if (empty($receipts['mar_task_id'])) {
+                    continue;
+                }
+                if (trim($receipts['mobile']) == '15201926171' || trim($receipts['mobile']) == '15821193682') {
+                    continue;
+                }
+                $commit = [];
+                /*  $mul_task = $mysql_connect->query("SELECT `id`,`template_id` FROM yx_sfl_send_task WHERE `mseeage_id` =  ".trim($receipts['mseeage_id']." LIMIT 1")); */
+                $commit = [
+                    'mseeage_id' => $receipts['mseeage_id'],
+                    'mobile' => $receipts['mobile'],
+                    'real_message' => $receipts['Stat'],
+                    'task_id' => $receipts['mar_task_id'],
+                    'template_id' => $receipts['template_id'],
+                ];
+                $receipts['Stat'] = trim($receipts['Stat']);
+                if ($receipts['Stat'] == 'DELIVRD' || $receipts['Stat'] == 'MK:100D' || $receipts['Stat'] == 'DB:0141') {
+                    $commit['status_message'] = "SMS:1";
+                    $commit['messageinfo'] = "发送成功";
+                } elseif (strpos($receipts['Stat'], 'BLACK')) {
+                    $commit['status_message'] = "SMS:4";
+                    $commit['messageinfo'] = "黑名单";
+                } else {
+                    $commit['status_message'] = "SMS:2";
+                    $commit['messageinfo'] = "发送失败";
+                }
+                $commit_tobase[] = $commit;
+                $back[] = $receipt;
+                $j++;
+                if ($j > 100) {
+                    $mysql_connect->startTrans();
+                    try {
+                        $mysql_connect->table('yx_sfl_send_task_receipt')->insertAll($commit_tobase);
+                        $mysql_connect->commit();
+                        unset($commit_tobase);
+                        unset($back);
+                        $j = 1;
+                    } catch (\Exception $e) {
+                        $mysql_connect->rollback();
+                        if (!empty($back)) {
+                            foreach ($back as $key => $value) {
+                                $this->redis->rPush($task_receipt_key, $value);
+                            }
+                        }
+    
+                        exception($e);
                     }
                 }
-                continue;
             }
-            if (empty($receipts['mar_task_id'])) {
-                continue;
-            }
-            if (trim($receipts['mobile']) == '15201926171' || trim($receipts['mobile']) == '15821193682') {
-                continue;
-            }
-            $commit = [];
-            /*  $mul_task = $mysql_connect->query("SELECT `id`,`template_id` FROM yx_sfl_send_task WHERE `mseeage_id` =  ".trim($receipts['mseeage_id']." LIMIT 1")); */
-            $commit = [
-                'mseeage_id' => $receipts['mseeage_id'],
-                'mobile' => $receipts['mobile'],
-                'real_message' => $receipts['Stat'],
-                'task_id' => $receipts['mar_task_id'],
-                'template_id' => $receipts['template_id'],
-            ];
-            $receipts['Stat'] = trim($receipts['Stat']);
-            if ($receipts['Stat'] == 'DELIVRD' || $receipts['Stat'] == 'MK:100D' || $receipts['Stat'] == 'DB:0141') {
-                $commit['status_message'] = "SMS:1";
-                $commit['messageinfo'] = "发送成功";
-            } elseif (strpos($receipts['Stat'], 'BLACK')) {
-                $commit['status_message'] = "SMS:4";
-                $commit['messageinfo'] = "黑名单";
-            } else {
-                $commit['status_message'] = "SMS:2";
-                $commit['messageinfo'] = "发送失败";
-            }
-            $commit_tobase[] = $commit;
-            $back[] = $receipt;
-            $j++;
-            if ($j > 100) {
+            if (!empty($commit_tobase)) {
                 $mysql_connect->startTrans();
                 try {
                     $mysql_connect->table('yx_sfl_send_task_receipt')->insertAll($commit_tobase);
@@ -9896,29 +9921,12 @@ class CmppCreateCodeTask extends Pzlife
                             $this->redis->rPush($task_receipt_key, $value);
                         }
                     }
-
                     exception($e);
                 }
             }
+            sleep(300);
         }
-        if (!empty($commit_tobase)) {
-            $mysql_connect->startTrans();
-            try {
-                $mysql_connect->table('yx_sfl_send_task_receipt')->insertAll($commit_tobase);
-                $mysql_connect->commit();
-                unset($commit_tobase);
-                unset($back);
-                $j = 1;
-            } catch (\Exception $e) {
-                $mysql_connect->rollback();
-                if (!empty($back)) {
-                    foreach ($back as $key => $value) {
-                        $this->redis->rPush($task_receipt_key, $value);
-                    }
-                }
-                exception($e);
-            }
-        }
+        
     }
 
     public function json()

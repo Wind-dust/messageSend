@@ -26,10 +26,10 @@ class CmppTest extends Pzlife
             //移动
             return [
                 'host'          => "127.0.0.1", //服务商ip
-                'port'          => "7890", //短连接端口号   17890长连接端口号
-                'Source_Addr'   => "101102", //企业id  企业代码
-                'Shared_secret' => 'Jyy123456', //网关登录密码
-                'Service_Id'    => "101102",
+                'port'          => "7891", //短连接端口号   17890长连接端口号
+                'Source_Addr'   => "101107", //企业id  企业代码
+                'Shared_secret' => 'tjysLT3456', //网关登录密码
+                'Service_Id'    => "101106",
                 'Dest_Id'       => "10692054963", //短信接入码 短信端口号
                 'Sequence_Id'   => 1,
                 'SP_ID'         => "",
@@ -207,7 +207,7 @@ class CmppTest extends Pzlife
         $security_coefficient = 0.8; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
         $Sequence_Id = 1;
-        $redis->set('channel_'.$content,$Sequence_Id);
+        // $redis->set('channel_'.$content,$Sequence_Id);
         $content = 83;
         // $a_time = 0;
 
@@ -225,13 +225,13 @@ class CmppTest extends Pzlife
         // $redisMessageCodeDeliver    = 'index:meassage:marketing:deliver:' . $content; //营销行业通知MsgId
         // echo $redisMessageCodeSend;die;
     
-     /*    $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'uid'         => '',
             'content'     => '【宝洁中国】风倍清去味除菌喷雾~懒人清洁神器，一喷清新！付几套送几套，限量送加湿器 http://weu.me/_4BbkA 回QX退订',
             'Submit_time' => date('mdHis', time()),
-        ])); */
+        ]));
 
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         // $content = 1;
@@ -248,6 +248,11 @@ class CmppTest extends Pzlife
             socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
             $Sequence_Id = $redis->get('channel_'.$content);
+            if (empty($Sequence_Id)) {
+                $Sequence_Id = 1;
+               
+            }
+            $redis->set('channel_'.$content,$Sequence_Id+1);
             //先进行连接验证
             date_default_timezone_set('PRC');
             $time                = 0;
@@ -259,6 +264,8 @@ class CmppTest extends Pzlife
             $Total_Length        = strlen($bodyData) + 12;
             $headData            = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
             // ;
+            // $Sequence_Id++;
+            // $redis->set('channel_'.$content,$Sequence_Id);
             if (socket_write($socket, $headData . $bodyData, $Total_Length) == false) {
                 echo 'write_verify fail massege:' . socket_strerror(socket_last_error());
             } else {
@@ -434,6 +441,8 @@ class CmppTest extends Pzlife
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
                     while (true) {
                         $receipt_data = [];
+                        $Sequence_Id = $redis->get('channel_'.$content);
+                        $redis->set('channel_'.$content,$Sequence_Id+1);
                         echo $Sequence_Id . "\n";
                         try {
                             $receive = 1;
@@ -680,9 +689,9 @@ class CmppTest extends Pzlife
                                         $send_status = 2;
                                         ++$i;
                                     }
-                                    ++$Sequence_Id;
+                                    // $Sequence_Id++;
                                     
-                                    $redis->set('channel_'.$content,$Sequence_Id+1);
+                                    // $redis->set('channel_'.$content,$Sequence_Id);
                                     if ($Sequence_Id > 65536) {
                                         $Sequence_Id = 1;
                                         $redis->set('channel_'.$content,$Sequence_Id);
@@ -750,7 +759,7 @@ class CmppTest extends Pzlife
 
                             ++$i;
                             ++$Sequence_Id;
-                            $redis->set('channel_'.$content,$Sequence_Id);
+                            // $redis->set('channel_'.$content,$Sequence_Id);
                             if ($Sequence_Id > 65536) {
                                 $Sequence_Id = 1;
                                 $redis->set('channel_'.$content,$Sequence_Id);

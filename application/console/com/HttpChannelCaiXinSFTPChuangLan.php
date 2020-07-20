@@ -448,7 +448,7 @@ class HttpChannelCaiXinSFTPChuangLan extends Pzlife
                 }
             }
 
-            $log_path = realpath("") . "/error/95.log";
+            $log_path = realpath("") . "/error/94.log";
             $myfile = fopen($log_path, 'a+');
             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
             fwrite($myfile, $th . "\n");

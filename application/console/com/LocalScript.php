@@ -9,6 +9,9 @@ use Config;
 use Env;
 use Kafka\Producer;
 use Kafka\Produce;
+use Kafka\ProducerConfig;
+use Monolog\Logger;
+use Monolog\Handler\StdoutHandler;
 use think\Db;
 
 class LocalScript extends Pzlife
@@ -27,52 +30,46 @@ class LocalScript extends Pzlife
     {
         // $produce = Producer::getInstance('localhost:2181', 3000);
         try {
-            /*      $objRdKafka = new Producer();
-        $objRdKafka->setLogLevel(LOG_DEBUG);
-        $objRdKafka->addBrokers("http://139.224.119.119:9000/clusters/kafka/brokers");
+            
+            date_default_timezone_set('PRC');
+            // Create the logger
+            // $logger = new Logger('my_logger');
+            $config = \Kafka\ProducerConfig::getInstance();
+            $config->setMetadataRefreshIntervalMs(10000);
+            $config->setMetadataBrokerList('139.224.119.119:9000');
+            $config->setBrokerVersion('0.9.0.1');
+            $config->setRequiredAck(1);
+            $config->setIsAsyn(false);
+            $config->setProduceInterval(500);
+            $producer = new \Kafka\Producer();
+            // $producer->setLogger($logger);
 
-        $oObjTopic = $objRdKafka->newTopic("test");
-        $oObjTopic = $objRdKafka->newTopic("test");
-
-        // 从终端接收输入 
-        $oInputHandler = fopen('php://stdin', 'r');
-
-        while (true) {
-            echo "\nEnter  messages:\n";
-            $sMsg = trim(fgets($oInputHandler));
-
-        // 空消息意味着退出
-            if (empty($sMsg)) {
-                break;
+            for($i = 0; $i < 100; $i++) {
+                    $result = $producer->send(array(
+                            array(
+                                    'topic' => 'test1',
+                                    'value' => 'test1....message.',
+                                    'key' => '',
+                            ),
+                    ));
+                    var_dump($result);
             }
-
-            // 发送消息
-            $oObjTopic->produce(RD_KAFKA_PARTITION_UA, 0, $sMsg);
-        } */
-            $produce = ProducerConfig::getInstance('http://139.224.119.119:9000/clusters/kafka/brokers', 3000);
-
-            $produce->setRequireAck(-1);
-            $topicName = 'testtopic';
-            $partitions = $produce->getAvailablePartitions($topicName);
-
-            $count = 1;
-            $partitionCount = count($partitions);
-            while (true) {
-                $message = json_encode(array('uid' => $count, 'age' => $count % 100, 'datetime' => date('Y-m-d H:i:s')));
-                $partitionId = $count % $partitionCount;
-
-                $produce->setMessages('testtopic', $partitionId, array($message));
-                $result = $produce->send();
-                var_dump($result);
-                $count++;
-                echo "producer sleeping/n";
-                sleep(1);
-                echo "done\n";
-            }
-
-            //发送消息到不同的partition   
-
-
+            // $logger = new Logger('my_logger');
+            // // Now add some handlers
+            // $logger->pushHandler(new StdoutHandler());
+            
+            /* $config = \Kafka\ConsumerConfig::getInstance();
+            $config->setMetadataRefreshIntervalMs(10000);
+            $config->setMetadataBrokerList('139.224.119.119:9000');
+            $config->setGroupId('test');
+            $config->setBrokerVersion('0.9.0.1');
+            $config->setTopics(array('test'));
+            //$config->setOffsetReset('earliest');
+            $consumer = new \Kafka\Consumer();
+            // $consumer->setLogger($logger);
+            $consumer->start(function($topic, $part, $message) {
+                var_dump($message);
+            }); */
         } catch (\Exception $th) {
             //throw $th;
             exception($th);

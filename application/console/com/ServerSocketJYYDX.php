@@ -353,6 +353,7 @@ class ServerSocketJYYDX extends Pzlife
                                 $deliver_bodyData .= pack('a21', $deliver['mobile']);
                                 $deliver_bodyData .= pack('C', 1);
                                 if (isset($deliver['send_msgid'])) {
+                                    $deliver['send_msgid'] = explode(',',$deliver['send_msgid']);
                                     foreach ($deliver['send_msgid'] as $key => $value) {
                                         // // print_r(substr($value,8,8));
                                         $send1 = substr($value, 0, 8);

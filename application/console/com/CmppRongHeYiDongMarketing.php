@@ -58,13 +58,12 @@ class CmppRongHeYiDongMarketing extends Pzlife
 
         ])); */
 
-       /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
-            // 'content'     => '感谢您对于CellCare的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价https://www.wenjuan.com/s/6rqIZz/ ，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142【美丽田园】',
-            'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
-
-        ])); */
+            'content'     => 'Hi, 亲爱的会员，好久不见，您已经有三个月没来护理了，秋冬已近，换季当前，在肌肤需要“进补”的季节里，来美田即刻开启深度补水模式吧！联系您身边的专属客户经理或拨打预约热线 400-820-6142 回T退订【美丽田园】',
+            // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
+        ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
         $myfile = fopen($log_path, 'a+');
@@ -515,7 +514,7 @@ class CmppRongHeYiDongMarketing extends Pzlife
                                         $bodyData .= pack("C", $uer_num);
                                         $p_n      = 21 * $uer_num;
                                         $bodyData .= pack("a" . $p_n, $mobile);
-                                        $udh     = pack("cccccc", 5, 0, 3, $Sequence_Id, $num_messages, $j + 1);
+                                        $udh     = pack("cccccc", 5, 0, 3, 'XX', $num_messages, $j + 1);
                                         $newcode = $udh . substr($code, $j * $max_len, $max_len);
                                         $len     = strlen($newcode);
                                         $bodyData .= pack("C", $len);
@@ -530,10 +529,10 @@ class CmppRongHeYiDongMarketing extends Pzlife
                                         socket_write($socket, $headData . $bodyData, $Total_Length);
                                         $send_status = 2;
                                         ++$i;
-                                    }
-                                    ++$Sequence_Id;
-                                    if ($Sequence_Id > 65536) {
-                                        $Sequence_Id = 1;
+                                        ++$Sequence_Id;
+                                        if ($Sequence_Id > 65536) {
+                                            $Sequence_Id = 1;
+                                        }
                                     }
                                     if ($i > $security_master) {
                                         $i    = 0;
