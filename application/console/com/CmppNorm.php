@@ -85,8 +85,8 @@ class CmppNorm extends Pzlife
         // $content = 0;
         
         // // print_r($contdata);die;
-        $host                 = $contdata['host']; //服务商ip
-        $port                 = $contdata['port']; //短连接端口号   17890长连接端口号
+        $host                 = $contdata['channel_host']; //服务商ip
+        $port                 = $contdata['channel_port']; //短连接端口号   17890长连接端口号
         $Source_Addr          = $contdata['channel_source_addr']; //企业id  企业代码
         $Shared_secret        = $contdata['channel_shared_secret']; //网关登录密码
         $Service_Id           = $contdata['channel_service_id'];
