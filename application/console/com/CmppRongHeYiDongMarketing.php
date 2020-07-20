@@ -486,7 +486,7 @@ class CmppRongHeYiDongMarketing extends Pzlife
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
                                 // // print_r($code);die;
                                 if (strlen($code) > 140) {
-                                    $pos          = 0;
+                                    $pos          = mt_rand(0,99);
                                     $num_messages = ceil(strlen($code) / $max_len);
                                     for ($j = 0; $j < $num_messages; $j++) {
                                         $bodyData = pack("N", $num1) . pack("N", $num2);
@@ -514,7 +514,7 @@ class CmppRongHeYiDongMarketing extends Pzlife
                                         $bodyData .= pack("C", $uer_num);
                                         $p_n      = 21 * $uer_num;
                                         $bodyData .= pack("a" . $p_n, $mobile);
-                                        $udh     = pack("cccccc", 5, 0, 3, 'XX', $num_messages, $j + 1);
+                                        $udh     = pack("cccccc", 5, 0, 3, $pos, $num_messages, $j + 1);
                                         $newcode = $udh . substr($code, $j * $max_len, $max_len);
                                         $len     = strlen($newcode);
                                         $bodyData .= pack("C", $len);
