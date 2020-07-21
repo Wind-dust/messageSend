@@ -410,8 +410,10 @@ class Administrator extends CommonIndex
                 $billing[$value['uid']] = $value['real_num'];
             }
             $mobiles = explode(',',$value['mobile_content']);
-            foreach ($mobiles as $mkey => $mvalue) {
-                $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"REJECTED","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $mvalue]));
+            if ($free_trial == 3) {
+                foreach ($mobiles as $mkey => $mvalue) {
+                    $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"REJECTED","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $mvalue]));
+                }
             }
         }
 
@@ -659,9 +661,12 @@ class Administrator extends CommonIndex
                 $billing[$value['uid']] = $value['real_num'];
             }
             $mobiles = explode(',',$value['mobile_content']);
-            foreach ($mobiles as $mkey => $mvalue) {
-                $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"REJECTED","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $mvalue]));
+            if ($free_trial == 3) {
+                foreach ($mobiles as $mkey => $mvalue) {
+                    $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"REJECTED","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $mvalue]));
+                }
             }
+            
         }
         if (empty($real_effective_id)) {
             return ['code' => '3002', 'msg' => '没有需要审核的任务'];
