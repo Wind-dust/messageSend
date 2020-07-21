@@ -253,6 +253,21 @@ return $result;
             if ($data['free_trial'] == 2) {
                 $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $id, 'send_time' => 0, 'deduct' => $user['market_deduct']]));
             }
+            if ($data['free_trial'] == 1) {
+                $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                $check_data = [];
+                $check_data = [
+                    'msgtype' => "text",
+                    'text' => [
+                        "content" => "Hi，审核机器人\n您有一条新的短信任务需要审核【test】\n【任务类型】：营销短信\n【任务编号】:".$data['task_no']." \n 【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n【任务信息】：".$data['task_content'],
+                    ],
+                ];
+                $headers = [
+                    'Content-Type:application/json'
+                ];
+                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+                // print_r($audit_api);die;
+            }
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
             // exception($e);
@@ -473,6 +488,21 @@ return $result;
             Db::commit();
             if ($data['free_trial'] == 2) {
                 $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $bId, 'deduct' => $user['business_deduct']]));
+            }
+            if ($data['free_trial'] == 1) {
+                $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                $check_data = [];
+                $check_data = [
+                    'msgtype' => "text",
+                    'text' => [
+                        "content" => "Hi，审核机器人\n您有一条新的短信任务需要审核【test】\n【任务类型】：行业短信\n【任务编号】:".$data['task_no']." \n 【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n【任务信息】：".$data['task_content'],
+                    ],
+                ];
+                $headers = [
+                    'Content-Type:application/json'
+                ];
+                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+                // print_r($audit_api);die;
             }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'task_no' => $data['task_no'], 'msg_id' => $msg_id];
@@ -1259,6 +1289,7 @@ return $result;
         Db::startTrans();
         try {
             // $save = DbAdministrator::saveUserSendCodeTask($trial);
+            $no_free = [];
             $free_ids = [];
             foreach ($trial as $key => $value) {
                 # code...
@@ -1266,6 +1297,8 @@ return $result;
                 if ($value['free_trial'] == 2) {
                     // $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $id, 'deduct' => $user['business_deduct']]));
                     $free_ids[] = $id;
+                }else{
+                    $no_free[] = $id;
                 }
             }
             DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
@@ -1275,7 +1308,20 @@ return $result;
                     $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value, 'deduct' => $user['business_deduct']]));
                 }
             }
-            
+            if (!empty($no_free)) {
+                $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                $check_data = [];
+                $check_data = [
+                    'msgtype' => "text",
+                    'text' => [
+                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核【test】\n【任务类型】：行业短信\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                    ],
+                ];
+                $headers = [
+                    'Content-Type:application/json'
+                ];
+                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+            }
            /*  if ($save) {
                 DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
                 Db::commit();
@@ -1592,10 +1638,13 @@ return $result;
                 }
             } */
             $free_ids = [];
+            $no_free = [];
             foreach ($trial as $key => $value) {
                 $id = DbAdministrator::addUserSendTask($value);
                 if ($value['free_trial'] == 2) {
                     $free_ids[] = $id;
+                }else{
+                    $no_free[] = $id;
                 }
             }
             DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
@@ -1604,6 +1653,20 @@ return $result;
                 foreach ($free_ids as $key => $value) {
                     $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => strval($value), 'send_time' => 0, 'deduct' => $user['market_deduct']]));
                 }
+            }
+            if (!empty($no_free)) {
+                $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                $check_data = [];
+                $check_data = [
+                    'msgtype' => "text",
+                    'text' => [
+                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核【test】\n【任务类型】：营销短信\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                    ],
+                ];
+                $headers = [
+                    'Content-Type:application/json'
+                ];
+                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
             }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
