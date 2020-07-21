@@ -23,7 +23,7 @@ function checkMobile($mobile)
     if (strlen($mobile) != 11) {
         return false;
     }
-    if (in_array(substr(trim($mobile), 0, 3),['141','142','143','144','145','146','148','149'])) {
+    if (in_array(substr(trim($mobile), 0, 3),['141','142','143','144','145','146','148','149','154'])) {
         return false;
     }
     
@@ -763,4 +763,31 @@ function getRandomString($len, $chars = null)
         $data = strtoupper(bin2hex($data));
         // print_r($data);
         return $data;
+    }
+    /**
+    *
+    * @param string $string 需要加密的字符串
+    * @param string $key 密钥
+    * @return string
+    */
+    function daxie($number){
+        $number=substr($number,0,2);
+        $arr=array("零","一","二","三","四","五","六","七","八","九");
+        if(strlen($number)==1){
+            $result=$arr[$number];
+        }else{
+            if($number==10){
+                $result="十";
+            }else{
+                if($number<20){
+                    $result="十";
+                }else{
+                    $result=$arr[substr($number,0,1)]."十";
+                }
+                if(substr($number,1,1)!="0"){
+                    $result.=$arr[substr($number,1,1)];
+                }
+            }
+        }
+        return $result;
     }
