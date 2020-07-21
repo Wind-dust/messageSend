@@ -379,7 +379,7 @@ class Administrator extends CommonIndex
     public function auditUserSendTask($effective_id = [], $free_trial)
     {
         // print_r($effective_id);die;
-        $userchannel = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'id,uid,send_msg_id,mobile_content,task_content,free_trial,real_num', false);
+        $userchannel = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'task_no,id,uid,send_msg_id,mobile_content,task_content,free_trial,real_num', false);
 
         if (empty($userchannel)) {
             return ['code' => '3001'];
@@ -626,7 +626,7 @@ class Administrator extends CommonIndex
     public function auditUserSendCodeTask($effective_id = [], $free_trial)
     {
         // print_r($effective_id);die;
-        $userchannel = DbAdministrator::getUserSendCodeTask([['id', 'in', join(',', $effective_id)]], 'id,uid,real_num,mobile_content,free_trial', false);
+        $userchannel = DbAdministrator::getUserSendCodeTask([['id', 'in', join(',', $effective_id)]], 'task_no,id,uid,real_num,mobile_content,free_trial', false);
 
         if (empty($userchannel)) {
             return ['code' => '3001'];
