@@ -11,6 +11,7 @@ use app\common\model\StatisticsMonth;
 use app\common\model\StatisticsDay;
 use app\common\model\LogTrading;
 use app\common\model\UserUpriver;
+use app\common\model\SflReportLog;
 use think\Db;
 
 class DbUser
@@ -266,5 +267,19 @@ class DbUser
 
     public function countUserUpriver($where){
         return UserUpriver::where($where)->count();
+    }
+
+    public function saveSflReport($data){
+         $res = Db::table('yx_sfl_report_log')->insert($data);
+         return $res;
+    }
+
+    public function getSflReportLog(){
+        $res = Db::table('yx_sfl_report_log')->select();
+        return $res;
+    }
+    public function editSflReportLog($update){
+        $res = Db::table('yx_sfl_report_log')->update($update);
+        return $res;
     }
 }

@@ -142,4 +142,50 @@ class User extends CommonIndex
 
         return ['code' => '200', 'user_info' => $result, 'user_equies' => $user_equies];
     }
+    public function setSflReportLog($total,$jf,$success,$fail,$unknown,$rate,$ym)
+    {
+        $where = [
+            'ym' => $ym,
+            'total' => $total,
+            'jf' => $jf,
+            'success' => $success,
+            'fail' => $fail,
+            'unknown' => $unknown,
+            'rate' => $rate,
+            'create_time' => time()
+        ];
+        $res = DbUser::saveSflReport($where);
+        if(empty($res)){
+            return ['code' => 3002,'msg'=>'保存失败'];
+        }
+        return ['code' => 200];
+    }
+
+    public function getSflReportLog(){
+        $res = DbUser::getSflReportLog();
+        if(empty($res)){
+            return ['code' => 3000, 'msg'=>'未获取到数据'];
+        }
+        return ['code' => 200, 'data' => $res];
+    }
+    public function editSflReportLog($id,$total,$jf,$success,$fail,$unknown,$rate,$ym){
+
+        $update = [
+            'id' => $id,
+            'total' => $total,
+            'jf' => $jf,
+            'success' => $success,
+            'fail' => $fail,
+            'unknown' => $unknown,
+            'rate' => $rate,
+            'ym' => $ym,
+            'update_time' => time()
+        ];
+        $res = DbUser::editSflReportLog($update);
+        if(empty($res)){
+            return ['code'=>3002,'msg'=>'修改失败'];
+        }
+        return ['code' => 200];
+
+    }
 }

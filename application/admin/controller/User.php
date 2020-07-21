@@ -192,4 +192,91 @@ class User extends AdminController
         $result = $this->app->user->getUserInfo($uid);
         return $result;
     }
+        /**
+         * @api              {post} / 设置丝芙兰报表显示数据
+         * @apiDescription   setSflReportLog
+         * @apiGroup         admin_Users
+         * @apiName          setSflReportLog
+         * @apiParam (入参) {String} cms_con_id
+         * @apiParam (入参) {String} ym 当前这条报表所属年月
+         * @apiParam (入参) {Int} total 总号码数
+         * @apiParam (入参) {Int} jf 总计费数
+         * @apiParam (入参) {Int} success 成功计费数
+         * @apiParam (入参) {Int} fail 失败计费数
+         * @apiParam (入参) {Int} unknown 未知数
+         * @apiParam (入参) {Int} rate 成功率
+         * @apiSuccess (返回) {String} code 200:成功 / 3001:参数错误 /3002:保存失败
+         * @apiSampleRequest /admin/user/setSflReportLog
+         * @author jackiwu
+         */
+    public function setSflReportLog()
+    {
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        $total = intval(trim($this->request->post('total')));
+        $jf = intval(trim($this->request->post('jf')));
+        $success = intval(trim($this->request->post('success')));
+        $fail = intval(trim($this->request->post('fail')));
+        $unknown = intval(trim($this->request->post('unknown')));
+        $rate = trim($this->request->post('reta'));
+        $ym = trim($this->request->post('ym'));
+        if(!$ym){
+            return ['code'=> 3001,'msg'=>'年月必填'];
+        }
+        if(empty($cmsConId) || !$total || !$jf || !$success || empty($rate)){
+            return ['code' => 3001,'msg' => '不可为空'];
+        }
+        $result = $this->app->user->setSflReportLog($total,$jf,$success,$fail,$unknown,$rate,$ym);
+        return $result;
+    }
+        /**
+         * @api              {post} / 获取丝芙兰报表显示数据
+         * @apiDescription   getSflReportLog
+         * @apiGroup         admin_Users
+         * @apiName          getSflReportLog
+         * @apiParam (入参) {String} cms_con_id
+         * @apiSuccess (返回) {String} code 200:成功 / 3000:未获取到数据 
+         * @apiSampleRequest /admin/user/getSflReportLog
+         * @author jackiwu
+         */
+    public function getSflReportLog(){
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        $result = $this->app->user->getSflReportLog();
+        return $result;
+    }
+        /**
+         *
+         * @api              {post} / 修改丝芙兰报表显示数据
+         * @apiDescription   editSflReportLog
+         * @apiGroup         admin_Users
+         * @apiName          editSflReportLog
+         * @apiParam (入参) {String} cms_con_id
+         * @apiParam (入参) {String} id
+         * @apiParam (入参) {String} ym 当前这条报表所属年月
+         * @apiParam (入参) {Int} total 总号码数
+         * @apiParam (入参) {Int} jf 总计费数
+         * @apiParam (入参) {Int} success 成功计费数
+         * @apiParam (入参) {Int} fail 失败计费数
+         * @apiParam (入参) {Int} unknown 未知数
+         * @apiParam (入参) {Int} rate 成功率
+         * @apiSuccess (返回) {String} code 200:成功 / 3000:未获取到数据 
+         * @apiSampleRequest /admin/user/editSflReportLog
+         * @author jackiwu
+         */
+    public function editSflReportLog(){
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        $total = intval(trim($this->request->post('total')));
+        $jf = intval(trim($this->request->post('jf')));
+        $success = intval(trim($this->request->post('success')));
+        $fail = intval(trim($this->request->post('fail')));
+        $unknown = intval(trim($this->request->post('unknown')));
+        $rate = trim($this->request->post('reta'));
+        $ym = trim($this->request->post('ym'));
+        $id = trim($this->request->post('id'));
+        if(!$id){
+            return ['code'=>3001,'msg'=>'id错误'];
+        }
+        $result = $this->app->user->editSflReportLog($id,$total,$jf,$success,$fail,$unknown,$rate,$ym);
+        return $result;
+    }
+
 }
