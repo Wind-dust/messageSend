@@ -10358,7 +10358,23 @@ class CmppCreateCodeTask extends Pzlife
                 $all_report = '';
                 $receipt_report = [];
                 $j = 1;
-                $Received = updateReceivedForMessage();
+                // $Received = updateReceivedForMessage();
+                $Received =  [
+                    'REJECTD', 
+                    'REJECT', 
+                    'MA:0001', 
+                    'DB:0141',
+                    'MA:0001',
+                    'MK:100D',
+                    'MK:100C',
+                    'IC:0151',
+                    'EXPIRED',
+                    '-1012',
+                    '-1013',
+                    '4442',
+                    '4446',
+                    '4014'
+                ];
                 $user = Db::query("SELECT `id` FROM yx_users WHERE `pid` = 137 ");
                 foreach ($user as $key => $value) {
                     /* 短信部分 */

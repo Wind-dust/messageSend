@@ -62,7 +62,7 @@ class Message extends CommonIndex {
             return ['code' => '3001'];
         }
         $real_effective_id = [];
-        $rejected_num = [];
+        $INTERCEPT_num = [];
         // $receipt = $redis->rPush('index:meassage:code:user:receive:168','{"task_no":"bus20063022452104364246","status_message":"NOROUTE","message_info":"\u53d1\u9001\u6210\u529f","mobile":"15103230163","msg_id":"70000500020200630224527169053","send_time":"2020-06-30 22:45:28","smsCount":1,"smsIndex":1}');
         // print_r($userchannel);die;
         $uids = [];
@@ -72,7 +72,7 @@ class Message extends CommonIndex {
             }
             $real_effective_id[] = $value['id'];
             if ($free_trial == 3) {
-                // $rejected[] = $value['id'];
+                // $INTERCEPT[] = $value['id'];
                 // $res = $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' =>$usertask['id'],'deduct' => $user['multimedia_deduct']]));
                 // $mobile = explode()
                 
@@ -81,21 +81,21 @@ class Message extends CommonIndex {
                     if (!empty($submit_content)) {
                         foreach ($submit_content as $skey => $svalue) {
                             // # code...
-                            $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"REJECTED","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $svalue['mobile']]));
+                            $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"INTERCEPT","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $svalue['mobile']]));
                         }
                     }else{
-                        $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"REJECTED","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time())]));
+                        $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"INTERCEPT","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time())]));
                     }
                 }else{
                     $mobiles = explode(',',$value['mobile_content']);
                     foreach ($mobiles as $mkey => $mvalue) {
-                        $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"REJECTED","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $mvalue]));
+                        $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"INTERCEPT","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $mvalue]));
                     }
                 }
-                if (isset($rejected_num[$value['uid']])) {
-                    $rejected_num[$value['uid']] += $value['real_num'];
+                if (isset($INTERCEPT_num[$value['uid']])) {
+                    $INTERCEPT_num[$value['uid']] += $value['real_num'];
                 }else{
-                     $rejected_num[$value['uid']] = $value['real_num'];
+                     $INTERCEPT_num[$value['uid']] = $value['real_num'];
                      $uids[] = $value['uid'];
                 }
                 
@@ -109,7 +109,7 @@ class Message extends CommonIndex {
         ];
         $user_equities = DbAdministrator::getUserEquities($where_equitise, 'id,uid,num_balance', false);
         /* print_r($user_equities);die;
-        foreach ($rejected_num as $rkey => $rvalue) {
+        foreach ($INTERCEPT_num as $rkey => $rvalue) {
             
         } */
         Db::startTrans();
@@ -119,7 +119,7 @@ class Message extends CommonIndex {
             }
             if ($free_trial == 3) {
                 foreach ($user_equities as $key => $value) {
-                    DbAdministrator::modifyBalance($value['id'], $rejected_num[$value['uid']], 'inc');
+                    DbAdministrator::modifyBalance($value['id'], $INTERCEPT_num[$value['uid']], 'inc');
                 }
             }
             Db::commit();

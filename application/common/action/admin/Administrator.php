@@ -412,7 +412,7 @@ class Administrator extends CommonIndex
             $mobiles = explode(',',$value['mobile_content']);
             if ($free_trial == 3) {
                 foreach ($mobiles as $mkey => $mvalue) {
-                    $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"REJECTED","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $mvalue]));
+                    $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"INTERCEPT","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $mvalue]));
                 }
             }
         }
@@ -663,7 +663,7 @@ class Administrator extends CommonIndex
             $mobiles = explode(',',$value['mobile_content']);
             if ($free_trial == 3) {
                 foreach ($mobiles as $mkey => $mvalue) {
-                    $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"REJECTED","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $mvalue]));
+                    $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"INTERCEPT","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $mvalue]));
                 }
             }
             
