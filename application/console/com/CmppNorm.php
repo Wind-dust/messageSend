@@ -711,7 +711,8 @@ class CmppNorm extends Pzlife
     }
 
      function writeToRobot($content,$error_data,$title){
-        $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+        // $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+        $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa';
         $check_data = [];
         $check_data = [
             'msgtype' => "text",
