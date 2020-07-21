@@ -687,7 +687,7 @@ class Send extends MyController
     }
 
     /**
-     * @api              {post} / 短信任务接收接口（彩信业务）（对外客户MsgId）
+     * @api              {post} / 短信任务接收接口（彩信业务）（对外客户MsgId,及段落的格式）
      * @apiDescription   getSmsMultimediaMessageTaskMsgId
      * @apiGroup         index_send
      * @apiName          getSmsMultimediaMessageTaskMsgId
@@ -698,11 +698,14 @@ class Send extends MyController
      * @apiParam (入参) {String} title 任务名称
      * @apiParam (入参) {String} mobile_content 电话号码集合,多个用','，分开，最多支持50000
      * @apiParam (入参) {String} signature_id 已报备签名ID
+     * @apiParam (入参) {String} develop_no 扩展号
      * @apiParam (入参) {String} [send_time] 预约发送时间 示例： 2019-12-08 17:02:25
-     * @apiParam (content_data) {String} content 单个帧文字内容
-     * @apiParam (content_data) {String} image_path 单个帧图片路径,必须已上传的文件
+     * @apiParam (content_data) {Array} paragraph 单个帧文字内容
      * @apiParam (content_data) {String} num 顺序 按自然数排列 从小到大 必传
      * @apiParam (content_data) {String} name 对应帧数 如第一帧
+     * @apiParam (content_data[paragraph]) {String} num 对应段落数 如第一段
+     * @apiParam (content_data[paragraph]) {String} type 类型 1文本，2图片
+     * @apiParam (content_data[paragraph]) {String} content 内容
      * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:余额不足 / 3002:单批次手机号码为空 / 3003:send_time发送时间格式错误 / 3004:预约发送时间小于当前时间 / 3005:该账户没有此项服务 / 3006:余额不足 / 3007:title 彩信标题不能为空 / 3008:无效的图片 / 3009:彩信文件长度超过80KB或内容为空 / 3010 图片未上传过 / 3011:服务器错误 / 3012:该签名不存在 / 3013:该签名未被审核通过 
      * @apiSampleRequest /index/send/getSmsMultimediaMessageTaskMsgId
      * @author rzc
@@ -717,6 +720,7 @@ class Send extends MyController
         $content_data   = $this->request->post('content_data'); //短信内容
         $send_time      = trim($this->request->post('send_time')); //预约发送时间
         $mobile_content = trim($this->request->post('mobile_content')); //接收手机号码
+        $develop_no  = trim($this->request->post('develop_no')); //拓展码号
         $ip             = trim($this->request->ip());
         $mobile_content = explode(',', $mobile_content); //短信数组
         // $content_data   = json_decode($content_data, true);
@@ -742,7 +746,8 @@ class Send extends MyController
         if (empty($title)) {
             return ['code' => '3007'];
         }
-        $result = $this->app->send->getSmsMultimediaMessageTask($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title, $signature_id, $msg_id);
+        // print_r($content_data);die;
+        $result = $this->app->send->getSmsMultimediaMessageTaskNew($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title, $signature_id, $msg_id);
         return $result;
     }
 
@@ -1101,6 +1106,54 @@ class Send extends MyController
     }
 
     /**
+     * @api              {post} / 彩信模板报备接口段落类型
+     * @apiDescription   multimediaTemplateSignatureReport
+     * @apiGroup         index_send
+     * @apiName          multimediaTemplateSignatureReport
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {Array} content_data 短信内容
+     * @apiParam (入参) {String} title 模板主题
+     * @apiParam (入参) {String} name 模板别名
+     * @apiParam (content_data) {Array} paragraph 单个帧文字内容
+     * @apiParam (content_data) {String} num 顺序 按自然数排列 从小到大 必传
+     * @apiParam (content_data) {String} name 对应帧数 如第一帧
+     * @apiParam (content_data[paragraph]) {String} num 对应段落数 如第一段
+     * @apiParam (content_data[paragraph]) {String} type 类型 1文本，2图片
+     * @apiParam (content_data[paragraph]) {String} content 内容
+     * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:单批次手机号码为空 / 3003:send_time发送时间格式错误 / 3004:预约发送时间小于当前时间 / 3005:该账户没有此项服务 / 3006:余额不足 / 3007:title 短信标题不能为空 / 3008:无效的图片 / 3009:彩信文件长度超过100KB或内容为空 / 3010 图片未上传过 / 3011:服务器错误
+     * @apiSampleRequest /index/send/multimediaTemplateSignatureReport
+     * @author rzc
+     */
+    public function multimediaTemplateSignatureReportForParagraph()
+    {
+        $appid          = trim($this->request->post('appid')); //登录名
+        $appkey         = trim($this->request->post('appkey')); //登陆密码
+        $title          = trim($this->request->post('title')); //短信标题
+        $name          = trim($this->request->post('name')); //短信标题
+        $content_data   = $this->request->post('content_data'); //短信内容
+        // $content_data   = json_decode($content_data, true);
+        // print_r($content_data);die;
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        if (empty($content_data)) {
+            return ['code' => '3001'];
+        }
+        if (empty($title)) {
+            return ['code' => '3002'];
+        }
+        if (empty($name)) {
+            return ['code' => '3003', 'msg' => '别名为空'];
+        }
+        $result = $this->app->send->multimediaTemplateSignatureReportForParagraph($appid, $appkey, $content_data, $title, $name);
+        return $result;
+    }
+
+    /**
      * @api              {post} / 模板变量彩信提交
      * @apiDescription   submitBatchCustomMultimediaMessage
      * @apiGroup         index_send
@@ -1110,6 +1163,11 @@ class Send extends MyController
      * @apiParam (入参) {String} [msg_id] 客户提交msg_id非必填
      * @apiParam (入参) {String} template_id 彩信模板报备的template_id 内容替换为模板中文字内容变量
      * @apiParam (入参) {Array} connect 变量数组
+     * @apiParam (connect) {String} mobile 手机号
+     * @apiParam (connect) {String} {{var1}} 变量1内容
+     * @apiParam (connect) {String} {{var2}}
+     * @apiParam (connect) {String} ...
+     * @apiParam (connect) {String} {{var10}} 变量10内容 
      * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:手机号格式错误 / 3002:单批次手机号码为空 / 3003:send_time发送时间格式错误 / 3004:预约发送时间小于当前时间 / 3005:该账户没有此项服务 / 3006:余额不足 / 3007:title 短信标题不能为空 / 3008:无效的图片 / 3009:彩信文件长度超过100KB或内容为空 / 3010 图片未上传过 / 3011:服务器错误
      * @apiSampleRequest /index/send/submitBatchCustomMultimediaMessage
      * @author rzc

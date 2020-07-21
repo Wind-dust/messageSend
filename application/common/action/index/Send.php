@@ -2656,4 +2656,336 @@ return $result;
             }
         } 
     }
+
+    public function getSmsMultimediaMessageTaskNew($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title, $signature_id, $msg_id){
+        $this->redis = Phpredis::getConn();
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial,mul_free_trial,multimedia_deduct,multimeda_free_credit', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 8], 'id,num_balance', true); //彩信
+        if (empty($user_equities)) {
+            return ['code' => '3005'];
+        }
+        if (!empty($signature_id)) {
+            $signature =  DbSendMessage::getUserSignature(['uid' => $user['id'], 'signature_id' => $signature_id], '*', true);
+            if (empty($signature)) {
+                return ['code' => '3012'];
+            }
+            if ($signature['status'] != 2) {
+                return ['code' => '3013'];
+            }
+        }
+        $content_data             = array_filter($content_data);
+        $multimedia_message_frame = [];
+        $content_length           = 0;
+        $max_length               = 102400; //最大字节长度
+        $free_trial = 1;
+        $yidong_channel_id = 0;
+        $liantong_channel_id = 0;
+        $dianxin_channel_id = 0;
+        if ($user['mul_free_trial'] == 2) {
+            $free_trial = 2;
+        }
+        if (strpos($title,'道信')) {
+            $free_trial = 1;
+        }
+        $i = 0;
+        foreach ($content_data as $key => $value) {
+           
+            if (empty($value['paragraph'])) {
+                return ['code' => '3014'];
+            }
+            // print_r($value);die;
+            foreach ($value['paragraph'] as $pkey => $pvalue) {
+                $frame = [];
+                if ($pvalue['type'] == 1) {//文本类
+                    if (!isset($pvalue['content'])) {
+                        $frame['content'] = '';
+                        // if (!empty($signature)) {
+                        //     $frame['content'] = '' . $signature['title'];
+                        // }
+                    }else{
+                        if (!empty($signature)) {
+                            $frame['content'] = $signature['title'] . $pvalue['content'];
+                            unset($signature);
+                        } else {
+                            $frame['content'] = $pvalue['content'];
+                        }
+                        if (strpos($pvalue['content'],'道信')) {
+                            $free_trial = 1;
+                        }
+                        // $content_length+= strlen($value['content']);
+                        $content_length += (strlen($frame['content']) / 8);
+                    }
+
+                }elseif ($pvalue['type'] == 2) {//图片类
+                    if (!isset($pvalue['content']) || empty($pvalue['content'])) {
+                        $frame['image_path'] = '';
+                    }else{
+                        stream_context_set_default([
+                            'ssl' => [
+                                'verify_peer'      => false,
+                                'verify_peer_name' => false,
+                            ],
+                        ]);
+                        $head = get_headers($pvalue['content'], 1);
+                        if ($head['Content-Type'] == 'image/jpeg') {
+                            $frame['image_type'] = 'jpg';
+                        } elseif ($head['Content-Type'] == 'image/gif ') {
+                            $frame['image_type'] = 'gif';
+                        }
+                        if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['image/gif', 'image/jpeg', 'image/png'])) {
+                            return ['code' => '3008'];
+                        }
+                        $filename = filtraImage(Config::get('qiniu.domain'), $pvalue['content']);
+                        // print_r($value['image_path']);die;
+                        $logfile  = DbImage::getLogImageAll($filename); //判断时候有未完成的图片
+                        if (empty($logfile)) { //图片不存在
+                            return ['code' => '3010']; //图片没有上传过
+                        }
+                        $content_length += $head['Content-Length'];
+                        $frame['image_path'] = $pvalue['content'];
+                    }
+                }
+                $frame_num = 0;
+                $frame_num = $i + $pvalue['num'];
+                
+                // echo $i;die;
+                $frame['num'] = $frame_num;
+                $frame['name'] = "第".daxie($frame_num)."帧";
+                $multimedia_message_frame[] = $frame;
+    
+            }
+            $i = count($value['paragraph']);
+           
+        }
+        if ($content_length > $max_length) {
+            return ['code' => '3009'];
+        }
+        $mobile_content = array_filter($mobile_content);
+        $real_mobile    = [];
+        foreach ($mobile_content as $key => $value) {
+            if (checkMobile($value)) {
+                $real_mobile[] = $value;
+            }
+        }
+        $send_num = count($mobile_content);
+        $real_num = count($real_mobile); //真实发送数量
+        if ($send_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
+            return ['code' => '3006'];
+        }
+       /*  $channel_id = 0;
+        $free_trial = 1;
+ */
+
+        $SmsMultimediaMessageTask = [];
+        $SmsMultimediaMessageTask = [
+            'task_no'        => 'mul' . date('ymdHis') . substr(uniqid('', true), 15, 8),
+            'uid'            => $user['id'],
+            'title'          => $title,
+            'mobile_content' => join(',', $mobile_content),
+            'source'         => $ip,
+            'send_num'       => $send_num,
+            'real_num'       => $real_num,
+            // 'channel_id'     => $channel_id,
+            // 'yidong_channel_id'     => $yidong_channel_id,
+            // 'liantong_channel_id'     => $liantong_channel_id,
+            // 'dianxin_channel_id'     => $dianxin_channel_id,
+        ];
+        if (!empty($send_time)) {
+            $SmsMultimediaMessageTask['appointment_time'] = strtotime($send_time);
+        }
+            
+        if ($free_trial == 2) {
+            $yidong_channel_id = 59;
+            $liantong_channel_id = 59;
+            $dianxin_channel_id = 59;
+            if ($user['id'] == 221) {
+                if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+                    $free_trial = 2;
+                    $yidong_channel_id = 108;
+                    $liantong_channel_id = 108;
+                    $dianxin_channel_id = 108;
+                }else{
+                    $free_trial = 1;
+                    $yidong_channel_id = 0;
+                    $liantong_channel_id = 0;
+                    $dianxin_channel_id = 0;
+                }
+            }
+            if ($user['id'] == 219) {
+                if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+                    $free_trial = 2;
+                    $yidong_channel_id = 109;
+                    $liantong_channel_id = 109;
+                    $dianxin_channel_id = 109;
+                }else{
+                    $free_trial = 1;
+                    $yidong_channel_id = 0;
+                    $liantong_channel_id = 0;
+                    $dianxin_channel_id = 0;
+                }
+            }
+            if ($user['id'] == 220) {
+                if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+                    $free_trial = 2;
+                    $yidong_channel_id = 110;
+                    $liantong_channel_id = 110;
+                    $dianxin_channel_id = 110;
+                }else{
+                    $free_trial = 1;
+                    $yidong_channel_id = 0;
+                    $liantong_channel_id = 0;
+                    $dianxin_channel_id = 0;
+                }
+            }
+            // $channel_id = 59;
+        }
+        $SmsMultimediaMessageTask['free_trial'] = $free_trial;
+        $SmsMultimediaMessageTask['yidong_channel_id'] = $yidong_channel_id;
+        $SmsMultimediaMessageTask['liantong_channel_id'] = $liantong_channel_id;
+        $SmsMultimediaMessageTask['dianxin_channel_id'] = $dianxin_channel_id;
+        if (!empty($msg_id)) {
+            $SmsMultimediaMessageTask['send_msg_id'] = $msg_id;
+        }
+
+        Db::startTrans();
+        try {
+            DbAdministrator::modifyBalance($user_equities['id'], $send_num, 'dec');
+            $bId = DbSendMessage::addUserMultimediaMessage($SmsMultimediaMessageTask); //添加后的商品id
+            if ($bId) {
+                foreach ($multimedia_message_frame as $key => $frame) {
+                    $frame['multimedia_message_id'] = $bId;
+                    if (!empty($frame['image_path'])) {
+                        $frame['image_path'] = filtraImage(Config::get('qiniu.domain'), $frame['image_path']);
+                    }
+                   
+                    DbSendMessage::addUserMultimediaMessageFrame($frame); //添加后的商品id
+                }
+            }
+            Db::commit();
+            if ($free_trial == 2) {
+                $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $bId, 'deduct' => $user['multimedia_deduct']]));
+            }
+            if (!empty($msg_id)) {
+                return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no'], 'msg_id' => $msg_id];
+            }
+            return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no']];
+        } catch (\Exception $e) {
+            Db::rollback();
+            // exception($e);
+            return ['code' => '3011'];
+        }
+    }
+
+    public function multimediaTemplateSignatureReportForParagraph($appid, $appkey, $content_data, $title, $name){
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $content_data             = array_filter($content_data);
+        $multimedia_message_frame = [];
+        $content_length           = 0;
+        $max_length               = 102400; //最大字节长度
+        $i = 0;
+        foreach ($content_data as $key => $value) {
+            if (empty($value['paragraph'])) {
+                return ['code' => '3004'];
+            }
+            foreach ($value['paragraph'] as $pkey => $pvalue) {
+                $frame = [];
+                if ($pvalue['type'] == 1) {//文本类
+                    if (!isset($pvalue['content'])) {
+                        $frame['content'] = '';
+                        // if (!empty($signature)) {
+                        //     $frame['content'] = '' . $signature['title'];
+                        // }
+                    }else{
+                        $frame['content'] = $pvalue['content'];
+                        // $content_length+= strlen($value['content']);
+                        $content_length += (strlen($frame['content']) / 8);
+                    }
+
+                }elseif ($pvalue['type'] == 2) {//图片类
+                    if (!isset($pvalue['content']) || empty($pvalue['content'])) {
+                        $frame['image_path'] = '';
+                    }else{
+                        stream_context_set_default([
+                            'ssl' => [
+                                'verify_peer'      => false,
+                                'verify_peer_name' => false,
+                            ],
+                        ]);
+                        $head = get_headers($pvalue['content'], 1);
+                        if ($head['Content-Type'] == 'image/jpeg') {
+                            $frame['image_type'] = 'jpg';
+                        } elseif ($head['Content-Type'] == 'image/gif ') {
+                            $frame['image_type'] = 'gif';
+                        }
+                        if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['image/gif', 'image/jpeg', 'image/png'])) {
+                            return ['code' => '3008'];
+                        }
+                        $filename = filtraImage(Config::get('qiniu.domain'), $pvalue['content']);
+                        // print_r($value['image_path']);die;
+                        $logfile  = DbImage::getLogImageAll($filename); //判断时候有未完成的图片
+                        if (empty($logfile)) { //图片不存在
+                            return ['code' => '3005']; //图片没有上传过
+                        }
+                        $content_length += $head['Content-Length'];
+                        $frame['image_path'] = $pvalue['content'];
+                    }
+                }
+                $frame_num = 0;
+                $frame_num = $i + $pvalue['num'];
+                
+                // echo $i;die;
+                $frame['num'] = $frame_num;
+                $frame['name'] = "第".daxie($frame_num)."帧";
+                $multimedia_message_frame[] = $frame;
+    
+            }
+            $i = count($value['paragraph']);
+        }
+        if ($content_length > $max_length) {
+            return ['code' => '3006'];
+        }
+        do {
+            $template_id = getRandomString(8);
+            $has = DbSendMessage::getUserMultimediaTemplate(['template_id' => $template_id], 'id', true);
+        } while ($has);
+        $SmsMultimediaMessageTask = [];
+        $SmsMultimediaMessageTask = [
+            'template_id'        => $template_id,
+            'uid'            => $user['id'],
+            'title'          => $title,
+            'name'          => $name,
+        ];
+
+        Db::startTrans();
+        try {
+            $bId = DbSendMessage::addUserMultimediaTemplate($SmsMultimediaMessageTask); //添加后的商品id
+            if ($bId) {
+                foreach ($multimedia_message_frame as $key => $frame) {
+                    $frame['multimedia_template_id'] = $bId;
+                    if (!empty($frame['image_path'])) {
+                        $frame['image_path'] = filtraImage(Config::get('qiniu.domain'), $frame['image_path']);
+                    }
+                    DbSendMessage::addUserMultimediaTemplateFrame($frame); //添加后的商品id
+                }
+            }
+            Db::commit();
+            return ['code' => '200', 'template_id' => $template_id];
+        } catch (\Exception $e) {
+            Db::rollback();
+            // exception($e);
+            return ['code' => '3007'];
+        }
+    }
 }
