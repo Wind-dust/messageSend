@@ -430,7 +430,10 @@ class CmppNorm extends Pzlife
                                                 $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence", $body['Msg_Content']);
                                             }
                                             // print_r($Msg_Content);
-                                            $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
+                                            $message_id = '';
+                                            $message_id = strval($Msg_Content['Msg_Id1']).strval( $Msg_Content['Msg_Id2']);
+                                            // $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
+                                            $mesage = $redis->hget($message_id);
                                             if ($mesage) {
                                                 // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
                                                 $mesage                = json_decode($mesage, true);
@@ -440,7 +443,8 @@ class CmppNorm extends Pzlife
                                                 $mesage['Done_time']   = isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis', time());
                                                 $mesage['receive_time'] = time(); //回执时间戳
                                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
-                                                $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
+                                                // $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
+                                                $redis->hdel($redisMessageCodeMsgId, $message_id);
                                             } else { //不在记录中的回执存入缓存，
                                                 $Result = 9;
                                                 $mesage['Stat']        = isset($Msg_Content['Stat']) ? $Msg_Content['Stat'] : 'UNKNOWN';
