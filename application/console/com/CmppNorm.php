@@ -716,7 +716,7 @@ class CmppNorm extends Pzlife
         $check_data = [
             'msgtype' => "text",
             'text' => [
-                "content" => "Hi，错误提醒机器人\n您有一条通道出现故障\n通道编号【".$content."】\n通道名称【".$title."】",
+                "content" => "Hi，错误提醒机器人\n您有一条通道出现故障\n通道编号【".$content."】\n【错误信息】：".$error_data."\n通道名称【".$title."】",
             ],
         ];
         $headers = [
