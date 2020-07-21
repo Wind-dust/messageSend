@@ -113,7 +113,7 @@ class CmppNorm extends Pzlife
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
             socket_set_nonblock($socket); //设置非阻塞模式
-            // $pos          = 0;
+            $pos          = 0;
             $i           = 1;
             $Sequence_Id = 1;
             //先进行连接验证
@@ -711,8 +711,8 @@ class CmppNorm extends Pzlife
     }
 
      function writeToRobot($content,$error_data,$title){
-        // $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
-        $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa';
+        $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+        // $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa';
         $check_data = [];
         $check_data = [
             'msgtype' => "text",
