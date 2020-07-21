@@ -279,24 +279,35 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function distributeUserChannel($channel_id, $user_phone, $priority)
+    // distributeUserChannel(intval($yidong_channel_id), intval($liantong_channel_id),intval($dianxin_channel_id),intval($business_id), strval($nick_name))
+    public function distributeUserChannel($yidong_channel_id, $liantong_channel_id,$dianxin_channel_id, $business_id, $nick_name)
     {
-        $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id], 'id', true);
-        if (empty($channel)) {
+        $yd_channel = DbAdministrator::getSmsSendingChannel(['id' => $yidong_channel_id, $business_id => $business_id], 'id', true);
+        if (empty($yd_channel)) {
             return ['code' => '3002'];
         }
-        $user = DbUser::getUserInfo(['mobile' => $user_phone], 'id', true);
+        $lt_channel = DbAdministrator::getSmsSendingChannel(['id' => $liantong_channel_id, $business_id => $business_id], 'id', true);
+        if (empty($lt_channel)) {
+            return ['code' => '3002'];
+        }
+        $dx_channel = DbAdministrator::getSmsSendingChannel(['id' => $dianxin_channel_id, $business_id => $business_id], 'id', true);
+        if (empty($dx_channel)) {
+            return ['code' => '3002'];
+        }
+        $user = DbUser::getUserInfo(['nick_name' => $nick_name], 'id', true);
         if (empty($user)) {
             return ['code' => '3004'];
         }
-        if (DbAdministrator::getUserChannel(['uid' => $user['id'], 'channel_id' => $channel_id], 'id', true)) {
+        if (DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => $business_id], 'id', true)) {
             return ['code' => '3005'];
         }
         $data = [];
         $data = [
-            'channel_id' => $channel_id,
+            'yidong_channel_id' => $yidong_channel_id,
+            'liantong_channel_id' => $liantong_channel_id,
+            'dianxin_channel_id' => $dianxin_channel_id,
             'uid'        => $user['id'],
-            'priority'   => $priority,
+            'business_id'   => $business_id,
         ];
         Db::startTrans();
         try {
@@ -368,7 +379,7 @@ class Administrator extends CommonIndex
     public function auditUserSendTask($effective_id = [], $free_trial)
     {
         // print_r($effective_id);die;
-        $userchannel = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,task_content,free_trial,real_num', false);
+        $userchannel = DbAdministrator::getUserSendTask([['id', 'in', join(',', $effective_id)]], 'id,uid,send_msg_id,mobile_content,task_content,free_trial,real_num', false);
 
         if (empty($userchannel)) {
             return ['code' => '3001'];
@@ -398,6 +409,14 @@ class Administrator extends CommonIndex
             } else {
                 $billing[$value['uid']] = $value['real_num'];
             }
+            $mobiles = explode(',',$value['mobile_content']);
+            foreach ($mobiles as $mkey => $mvalue) {
+                $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"REJECTED","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $mvalue]));
+            }
+        }
+
+        if (empty($real_effective_id)) {
+            return ['code' => '3002', 'msg' => '没有需要审核的任务'];
         }
 
         $where_equitise = [
@@ -639,12 +658,17 @@ class Administrator extends CommonIndex
             } else {
                 $billing[$value['uid']] = $value['real_num'];
             }
+            $mobiles = explode(',',$value['mobile_content']);
+            foreach ($mobiles as $mkey => $mvalue) {
+                $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"REJECTED","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $mvalue]));
+            }
+        }
+        if (empty($real_effective_id)) {
+            return ['code' => '3002', 'msg' => '没有需要审核的任务'];
         }
         $where_equitise = [
             ['uid', 'IN', join(',', $uids)], ['business_id', '=', 6]
         ];
-
-
         $user_equities = DbAdministrator::getUserEquities($where_equitise, 'id,uid,num_balance', false);
         Db::startTrans();
         try {
