@@ -393,7 +393,8 @@ class Upload extends MyController
                 return ['code' => '3003'];
             }
         }
-        return ['code' => 200, 'send_data' => join(';', $send_data)];
+        $number = count($send_data);
+        return ['code' => 200, 'number' => $number, 'send_data' => join(';', $send_data)];
     }
 
     /**
@@ -665,6 +666,7 @@ class Upload extends MyController
                 return ['code' => '3003'];
             }
         }
-        return ['code' => 200, 'send_data' => $send_data];
+        $number = count($send_data);
+        return ['code' => 200, 'number' => $number, 'send_data' => $send_data];
     }
 }
