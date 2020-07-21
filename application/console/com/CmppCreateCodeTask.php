@@ -3716,7 +3716,8 @@ class CmppCreateCodeTask extends Pzlife
         'Done_time' => '191224164236',
         'from' => 'yx_user_send_code_task',
         ])); */
-
+        $redis->rpush($redisMessageCodeSend, '{"mobile":"15201926171","mar_task_id":"","content":"Hi, \u4eb2\u7231\u7684\u4f1a\u5458\uff0c\u597d\u4e45\u4e0d\u89c1\uff0c\u60a8\u5df2\u7ecf\u6709\u4e09\u4e2a\u6708\u6ca1\u6765\u62a4\u7406\u4e86\uff0c\u79cb\u51ac\u5df2\u8fd1\uff0c\u6362\u5b63\u5f53\u524d\uff0c\u5728\u808c\u80a4\u9700\u8981\u201c\u8fdb\u8865\u201d\u7684\u5b63\u8282\u91cc\uff0c\u6765\u7f8e\u7530\u5373\u523b\u5f00\u542f\u6df1\u5ea6\u8865\u6c34\u6a21\u5f0f\u5427\uff01\u8054\u7cfb\u60a8\u8eab\u8fb9\u7684\u4e13\u5c5e\u5ba2\u6237\u7ecf\u7406\u6216\u62e8\u6253\u9884\u7ea6\u70ed\u7ebf 400-820-6142 \u56deT\u9000\u8ba2\u3010\u7f8e\u4e3d\u7530\u56ed\u3011","my_submit_time":1595316101,"Msg_Id":"2059229824357040145","Stat":"REJECTD","Submit_time":"2007211521","Done_time":"2007211521","receive_time":1595316110}'); 
+        
         // $request_url = 'http://116.228.60.189:15901/rtreceive?task_no=bus19123111560308152071&status_message=E:CHAN&mobile=18643198590&send_time=1912311333';
         // sendRequest($request_url);
         try {
@@ -8538,7 +8539,7 @@ class CmppCreateCodeTask extends Pzlife
         // $tody_time = 1594886400;// 时间下午16点3条 已发第一条
         // $tody_time = 1594891200;// 时间下午17点20
         try {
-            $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 87, 'dianxin_channel_id' => 88, 'update_time' => time()]);
+            $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84, 'update_time' => time()]);
             /* $where = [];
             $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
             $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
@@ -10166,7 +10167,22 @@ class CmppCreateCodeTask extends Pzlife
             //         'content' => "【钰晰科技】客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time())
             //     ]));
             // }
-
+            $Received =  [
+                'REJECTD', 
+                'REJECT', 
+                'MA:0001', 
+                'DB:0141',
+                'MA:0001',
+                'MK:100D',
+                'MK:100C',
+                'IC:0151',
+                'EXPIRED',
+                '-1012',
+                '-1013',
+                '4442',
+                '4446',
+                '4014'
+            ];
             $task_receipt = Db::query("SELECT `*` FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `create_time` >= " . $time . " AND `create_time` <= " . $end_time . ")  ORDER BY `task_id` DESC");
             /* echo "SELECT `*` FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `create_time` >= ".$time." AND `create_time` <= ".$end_time."  ORDER BY `id` DESC)";die; */
             foreach ($task_receipt as $key => $value) {
@@ -10182,7 +10198,7 @@ class CmppCreateCodeTask extends Pzlife
                     $message_info = '黑名单';
                 } else if (trim($stat == 'DELIVRD')) {
                     $message_info = '发送成功';
-                } else if (in_array(trim($stat), ['REJECTD', 'REJECT', 'MA:0001', 'DB:0141'])) {
+                } else if (in_array(trim($stat), $Received)) {
                     $stat = 'DELIVRD';
                     $message_info = '发送成功';
                 } else {
@@ -10351,15 +10367,15 @@ class CmppCreateCodeTask extends Pzlife
         // echo $time;die;
         $redis = Phpredis::getConn();
         // print_r($redis);die;
-        // $receipt = $redis->rPush('index:meassage:code:user:receive:168','{"task_no":"bus20063022452104364246","status_message":"NOROUTE","message_info":"\u53d1\u9001\u6210\u529f","mobile":"15103230163","msg_id":"70000500020200630224527169053","send_time":"2020-06-30 22:45:28","smsCount":1,"smsIndex":1}');
+        // $receipt = $redis->rPush('index:meassage:code:user:receive:168','{"task_no":"bus20063022452104364246","status_message":"REJECT","message_info":"\u53d1\u9001\u6210\u529f","mobile":"15103230163","msg_id":"70000500020200630224527169053","send_time":"2020-06-30 22:45:28","smsCount":1,"smsIndex":1}');
 
         try {
             while (true) {
                 $all_report = '';
                 $receipt_report = [];
                 $j = 1;
-                // $Received = updateReceivedForMessage();
-                $Received =  [
+                $Received = updateReceivedForMessage();
+              /*   $Received =  [
                     'REJECTD', 
                     'REJECT', 
                     'MA:0001', 
@@ -10374,7 +10390,7 @@ class CmppCreateCodeTask extends Pzlife
                     '4442',
                     '4446',
                     '4014'
-                ];
+                ]; */
                 $user = Db::query("SELECT `id` FROM yx_users WHERE `pid` = 137 ");
                 foreach ($user as $key => $value) {
                     /* 短信部分 */
@@ -10385,7 +10401,7 @@ class CmppCreateCodeTask extends Pzlife
                         }
                         // updateReceivedForMessage
                         $receipt = json_decode($receipt, true);
-                        if (in_array($receipt['status_message'], $Received)) {
+                        if (in_array(trim($receipt['status_message']), $Received)) {
                             $receipt['status_message'] = 'DELIVRD';
                             $receipt['message_info'] = '发送成功';
                         }
@@ -10397,7 +10413,7 @@ class CmppCreateCodeTask extends Pzlife
                             //  print_r($all_report);die;
                             $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
                             //推送失败
-                            print_r($res);
+                            // print_r($res);
                             if ($res != 'SUCCESS') {
                                 usleep(300);
                                 $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
