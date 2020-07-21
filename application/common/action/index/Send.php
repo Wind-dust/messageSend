@@ -2682,7 +2682,7 @@ return $result;
         $content_data             = array_filter($content_data);
         $multimedia_message_frame = [];
         $content_length           = 0;
-        $max_length               = 102400; //最大字节长度
+        $max_length               = 92160; //最大字节长度
         $free_trial = 1;
         $yidong_channel_id = 0;
         $liantong_channel_id = 0;
@@ -2893,7 +2893,7 @@ return $result;
         $content_data             = array_filter($content_data);
         $multimedia_message_frame = [];
         $content_length           = 0;
-        $max_length               = 102400; //最大字节长度
+        $max_length               = 92160; //最大字节长度90KB
         $i = 0;
         foreach ($content_data as $key => $value) {
             if (empty($value['paragraph'])) {
