@@ -69,7 +69,7 @@ class CmppNorm extends Pzlife
 
         ])); */
 
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'content'     => '【施华洛世奇】亲爱的会员，感谢您一路以来的支持！您已获得2020年会员周年礼券，购买正价商品满1999元即可获得闪耀玫瑰金色简约吊坠一条，请于2020年10月19日前使用。可前往“施华洛世奇会员中心”小程序查看该券。详询4006901078。 回TD退订',
@@ -80,7 +80,7 @@ class CmppNorm extends Pzlife
             'mar_task_id' => '',
             'content'     => '【施华洛世奇】亲爱的会员，感谢您一路以来的支持！您已获得2020年会员周年礼券，购买正价商品满1999元即可获得闪耀玫瑰金色简约吊坠一条，请于2020年10月19日前使用。可前往“施华洛世奇会员中心”小程序查看该券。详询4006901078。 回TD退订',
             // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
-        ]));
+        ])); */
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
         $myfile = fopen($log_path, 'a+');
@@ -113,7 +113,7 @@ class CmppNorm extends Pzlife
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
             socket_set_nonblock($socket); //设置非阻塞模式
-            $pos          = 0;
+            // $pos          = 0;
             $i           = 1;
             $Sequence_Id = 1;
             //先进行连接验证
@@ -639,24 +639,21 @@ class CmppNorm extends Pzlife
                             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                             fwrite($myfile, $e . "\n");
                             fclose($myfile);
-                            $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                           /*  $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
                             $check_data = [];
                             $check_data = [
                                 'msgtype' => "text",
                                 'text' => [
-                                    "content" => "Hi，错误提醒机器人\n您有一条通道出现故障\n通道编号【".$content."】",
+                                    "content" => "Hi，错误提醒机器人\n您有一条通道出现故障\n通道编号【".$content."】\n通道名称【".$contdata['title']."】",
                                 ],
                             ];
                             $headers = [
                                 'Content-Type:application/json'
                             ];
-                            $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+                            $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers); */
+                            $this->writeToRobot($content,$e,$contdata['title']);
                             exception($e);
-                            $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
-                                'mobile'      => 15201926171,
-                                'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
-                            ])); //易信行业通道
-                            sleep(30);
+                            
                             //重新创建连接
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                             if (socket_connect($socket, $host, $port) == false) {
@@ -664,16 +661,16 @@ class CmppNorm extends Pzlife
                                 fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                                 fwrite($myfile,  "通道延迟5秒后再次连接失败，请联系通道方检查原因\n");
                                 fclose($myfile);
-                                $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
+                               /*  $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
                                     'mobile'      => 15201926171,
                                     'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
                                 ])); //三体营销通道
                                 $redis->rpush('index:meassage:code:send' . ":" . 24, json_encode([
                                     'mobile'      => 15201926171,
                                     'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
-                                ])); //易信行业通道
+                                ])); //易信行业通道*/
                                
-                                exit();
+                                exit(); 
                             } else {
                                 $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
                                 $Timestamp           = date('mdHis');
@@ -689,7 +686,7 @@ class CmppNorm extends Pzlife
                                     fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                                     fwrite($myfile,  "通道延迟5秒后写入socket失败，请联系通道方检查原因\n");
                                     fclose($myfile);
-                                    $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
+                                   /*  $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
                                         'mobile'      => 15201926171,
                                         'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
                                     ])); //三体营销通道
@@ -700,7 +697,7 @@ class CmppNorm extends Pzlife
                                     $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
                                         'mobile'      => 15201926171,
                                         'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
-                                    ])); //易信行业通道
+                                    ])); //易信行业通道 */
                                     exit();
                                 }
                                 ++$i;
@@ -712,6 +709,21 @@ class CmppNorm extends Pzlife
             }
         }
     }
+
+     function writeToRobot($content,$error_data,$title){
+        $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+        $check_data = [];
+        $check_data = [
+            'msgtype' => "text",
+            'text' => [
+                "content" => "Hi，错误提醒机器人\n您有一条通道出现故障\n通道编号【".$content."】\n通道名称【".$title."】",
+            ],
+        ];
+        $headers = [
+            'Content-Type:application/json'
+        ];
+        $this->sendRequest2($api,'post',$check_data,$headers);
+     }
 
     function sendRequest2($requestUrl, $method = 'get', $data = [],$headers)
     {
