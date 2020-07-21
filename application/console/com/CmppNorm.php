@@ -433,7 +433,7 @@ class CmppNorm extends Pzlife
                                             $message_id = '';
                                             $message_id = strval($Msg_Content['Msg_Id1']).strval( $Msg_Content['Msg_Id2']);
                                             // $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
-                                            $mesage = $redis->hget($message_id);
+                                            $mesage = $redis->hget($redisMessageCodeMsgId,$message_id);
                                             if ($mesage) {
                                                 // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
                                                 $mesage                = json_decode($mesage, true);
