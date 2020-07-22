@@ -217,7 +217,7 @@ class User extends AdminController
         $success = intval(trim($this->request->post('success')));
         $fail = intval(trim($this->request->post('fail')));
         $unknown = intval(trim($this->request->post('unknown')));
-        $rate = trim($this->request->post('reta'));
+        $rate = trim($this->request->post('rate'));
         $ym = trim($this->request->post('ym'));
         $type = intval(trim($this->request->post('type')));
         if(!$ym){
@@ -270,7 +270,7 @@ class User extends AdminController
         $success = intval(trim($this->request->post('success')));
         $fail = intval(trim($this->request->post('fail')));
         $unknown = intval(trim($this->request->post('unknown')));
-        $rate = trim($this->request->post('reta'));
+        $rate = trim($this->request->post('rate'));
         $ym = trim($this->request->post('ym'));
         $id = trim($this->request->post('id'));
         $type = intval(trim($this->request->post('type')));
