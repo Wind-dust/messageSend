@@ -142,7 +142,7 @@ class User extends CommonIndex
 
         return ['code' => '200', 'user_info' => $result, 'user_equies' => $user_equies];
     }
-    public function setSflReportLog($total,$jf,$success,$fail,$unknown,$rate,$ym)
+    public function setSflReportLog($total,$jf,$success,$fail,$unknown,$rate,$ym,$type)
     {
         $where = [
             'ym' => $ym,
@@ -152,7 +152,8 @@ class User extends CommonIndex
             'fail' => $fail,
             'unknown' => $unknown,
             'rate' => $rate,
-            'create_time' => time()
+            'create_time' => time(),
+            'type' => $type
         ];
         $res = DbUser::saveSflReport($where);
         if(empty($res)){
@@ -168,7 +169,7 @@ class User extends CommonIndex
         }
         return ['code' => 200, 'data' => $res];
     }
-    public function editSflReportLog($id,$total,$jf,$success,$fail,$unknown,$rate,$ym){
+    public function editSflReportLog($id,$total,$jf,$success,$fail,$unknown,$rate,$ym,$type){
 
         $update = [
             'id' => $id,
@@ -179,7 +180,8 @@ class User extends CommonIndex
             'unknown' => $unknown,
             'rate' => $rate,
             'ym' => $ym,
-            'update_time' => time()
+            'update_time' => time(),
+            'type' => $type
         ];
         $res = DbUser::editSflReportLog($update);
         if(empty($res)){
