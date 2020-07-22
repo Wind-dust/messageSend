@@ -219,13 +219,14 @@ class User extends AdminController
         $unknown = intval(trim($this->request->post('unknown')));
         $rate = trim($this->request->post('reta'));
         $ym = trim($this->request->post('ym'));
+        $type = intval(trim($this->request->post('type')));
         if(!$ym){
             return ['code'=> 3001,'msg'=>'年月必填'];
         }
-        if(empty($cmsConId) || !$total || !$jf || !$success || empty($rate)){
+        if(empty($cmsConId) || !$total || !$jf || !$success || empty($rate) || !$type){
             return ['code' => 3001,'msg' => '不可为空'];
         }
-        $result = $this->app->user->setSflReportLog($total,$jf,$success,$fail,$unknown,$rate,$ym);
+        $result = $this->app->user->setSflReportLog($total,$jf,$success,$fail,$unknown,$rate,$ym,$type);
         return $result;
     }
         /**
@@ -272,10 +273,17 @@ class User extends AdminController
         $rate = trim($this->request->post('reta'));
         $ym = trim($this->request->post('ym'));
         $id = trim($this->request->post('id'));
+        $type = intval(trim($this->request->post('type')));
         if(!$id){
             return ['code'=>3001,'msg'=>'id错误'];
         }
-        $result = $this->app->user->editSflReportLog($id,$total,$jf,$success,$fail,$unknown,$rate,$ym);
+        if(!$ym){
+            return ['code'=> 3001,'msg'=>'年月必填'];
+        }
+        if(empty($cmsConId) || !$total || !$jf || !$success || empty($rate) || !$type){
+            return ['code' => 3001,'msg' => '不可为空'];
+        }
+        $result = $this->app->user->editSflReportLog($id,$total,$jf,$success,$fail,$unknown,$rate,$ym,$type);
         return $result;
     }
 
