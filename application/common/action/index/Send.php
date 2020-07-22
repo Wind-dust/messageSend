@@ -22,7 +22,7 @@ class Send extends CommonIndex
     {
         // $Password = md5($Password);
         $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
-        if (empty($user)) {
+        if (empty($user) || $user['user_status'] != 2) {
             return -1;
         }
         if ($Password != $user['appkey']) {
@@ -87,7 +87,7 @@ return $result;
         // $Password = md5($Password);
         $user = DbUser::getUserOne(['appid' => $Username], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         // print_r($Username);die;
-        if (empty($user)) {
+        if (empty($user) || $user['user_status'] != 2) {
             return -1;
         }
         if ($Password != $user['appkey']) {
