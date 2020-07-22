@@ -259,7 +259,7 @@ return $result;
                 $check_data = [
                     'msgtype' => "text",
                     'text' => [
-                        "content" => "Hi，审核机器人\n您有一条新的短信任务需要审核【test】\n【任务类型】：营销短信\n【任务编号】:".$data['task_no']." \n 【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n【任务信息】：".$data['task_content'],
+                        "content" => "Hi，审核机器人\n您有一条新的短信任务需要审核\n【任务类型】：营销短信\n【任务编号】:".$data['task_no']." \n 【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n【任务信息】：".$data['task_content'],
                     ],
                 ];
                 $headers = [
@@ -495,7 +495,7 @@ return $result;
                 $check_data = [
                     'msgtype' => "text",
                     'text' => [
-                        "content" => "Hi，审核机器人\n您有一条新的短信任务需要审核【test】\n【任务类型】：行业短信\n【任务编号】:".$data['task_no']." \n 【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n【任务信息】：".$data['task_content'],
+                        "content" => "Hi，审核机器人\n您有一条新的短信任务需要审核\n【任务类型】：行业短信\n【任务编号】:".$data['task_no']." \n 【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n【任务信息】：".$data['task_content'],
                     ],
                 ];
                 $headers = [
@@ -716,7 +716,7 @@ return $result;
     public function getSmsMultimediaMessageTask($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title, $signature_id = '', $msg_id = '')
     {
         $this->redis = Phpredis::getConn();
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial,mul_free_trial,multimedia_deduct,multimeda_free_credit', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,nick_name,appkey,user_type,user_status,reservation_service,free_trial,mul_free_trial,multimedia_deduct,multimeda_free_credit', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -911,6 +911,20 @@ return $result;
             if ($free_trial == 2) {
                 $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $bId, 'deduct' => $user['multimedia_deduct']]));
             }
+            if ($free_trial == 1) {
+                $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                $check_data = [];
+                $check_data = [
+                    'msgtype' => "text",
+                    'text' => [
+                        "content" => "Hi，审核机器人\n您有一条新的彩信任务需要审核\n【任务类型】：图文彩信\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                    ],
+                ];
+                $headers = [
+                    'Content-Type:application/json'
+                ];
+                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+            }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no'], 'msg_id' => $msg_id];
             }
@@ -975,7 +989,7 @@ return $result;
 
     public function textTemplateSignatureReport($appid, $appkey, $type, $title, $content)
     {
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,nick_name,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -1006,6 +1020,18 @@ return $result;
         try {
             DbSendMessage::addUserModel($user_model);
             Db::commit();
+            $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                $check_data = [];
+                $check_data = [
+                    'msgtype' => "text",
+                    'text' => [
+                        "content" => "Hi，审核机器人\n您有一个新的文本模板需要审核\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n【模板名称】：".$title."\n【模板内容】：".$content,
+                    ],
+                ];
+                $headers = [
+                    'Content-Type:application/json'
+                ];
+                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
             return ['code' => '200', 'template_id' => $template_id];
         } catch (\Exception $e) {
             Db::rollback();
@@ -1314,7 +1340,7 @@ return $result;
                 $check_data = [
                     'msgtype' => "text",
                     'text' => [
-                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核【test】\n【任务类型】：行业短信\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核\n【任务类型】：行业短信\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
                     ],
                 ];
                 $headers = [
@@ -1660,7 +1686,7 @@ return $result;
                 $check_data = [
                     'msgtype' => "text",
                     'text' => [
-                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核【test】\n【任务类型】：营销短信\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核\n【任务类型】：营销短信\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
                     ],
                 ];
                 $headers = [
@@ -1681,7 +1707,7 @@ return $result;
 
     public function  SignatureReport($appid, $appkey, $type, $title)
     {
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,nick_name,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -1710,6 +1736,18 @@ return $result;
         try {
             DbSendMessage::addUserSignature($user_model);
             Db::commit();
+            $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+            $check_data = [];
+            $check_data = [
+                'msgtype' => "text",
+                'text' => [
+                    "content" => "Hi，审核机器人\n您有一个新的签名需要审核\n【签名】：".$title."\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                ],
+            ];
+            $headers = [
+                'Content-Type:application/json'
+            ];
+            $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
             return ['code' => '200', 'signature_id' => $signature_id];
         } catch (\Exception $e) {
             Db::rollback();
@@ -1719,7 +1757,7 @@ return $result;
 
     public function multimediaTemplateSignatureReport($appid, $appkey, $content_data, $title, $name)
     {
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,nick_name,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -1799,6 +1837,18 @@ return $result;
                 }
             }
             Db::commit();
+            $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+            $check_data = [];
+            $check_data = [
+                'msgtype' => "text",
+                'text' => [
+                    "content" => "Hi，审核机器人\n您有一个新的彩信模板需要审核\n【模板标题】：".$title."\n【模板别名】：".$name."\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                ],
+            ];
+            $headers = [
+                'Content-Type:application/json'
+            ];
+            $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
             return ['code' => '200', 'template_id' => $template_id];
         } catch (\Exception $e) {
             Db::rollback();
@@ -1809,7 +1859,7 @@ return $result;
 
     public function submitBatchCustomMultimediaMessage($appid, $appkey, $template_id, $connect, $ip, $msg_id = '', $signature_id = '')
     {
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,mul_free_trial,multimedia_deduct,multimeda_free_credit', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,nick_name,appkey,user_type,user_status,reservation_service,mul_free_trial,multimedia_deduct,multimeda_free_credit', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -2080,6 +2130,20 @@ return $result;
                     $frame['image_path'] = filtraImage(Config::get('qiniu.domain'), $frame['image_path']);
                     DbSendMessage::addUserMultimediaMessageFrame($frame); //添加后的商品id
                 }
+            }
+            if ($free_trial == 1) {
+                $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                $check_data = [];
+                $check_data = [
+                    'msgtype' => "text",
+                    'text' => [
+                        "content" => "Hi，审核机器人\n您有一条新的模板变量彩信需要审核\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                    ],
+                ];
+                $headers = [
+                    'Content-Type:application/json'
+                ];
+                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
             }
             /* foreach ($trial as $tr => $tal) {
                 $son = [];
