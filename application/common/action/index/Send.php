@@ -247,9 +247,6 @@ return $result;
             $id = DbAdministrator::addUserSendTask($data);
 
             Db::commit();
-            if (!empty($msg_id)) {
-                return ['code' => '200', 'task_no' => $data['task_no'], 'msg_id' => $msg_id];
-            }
             if ($data['free_trial'] == 2) {
                 $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $id, 'send_time' => 0, 'deduct' => $user['market_deduct']]));
             }
@@ -268,6 +265,11 @@ return $result;
                 $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
                 // print_r($audit_api);die;
             }
+            if (!empty($msg_id)) {
+                return ['code' => '200', 'task_no' => $data['task_no'], 'msg_id' => $msg_id];
+            }
+            
+            
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
             // exception($e);
@@ -1120,6 +1122,9 @@ return $result;
                 } else {
                     // $real_text = base64_decode($send_text[0]);
                     $real_text = urldecode($send_text[0]);
+                    if (mb_strpos($real_text, '】') - mb_strpos($real_text, '【') < 2 || mb_strpos($real_text, '】') - mb_strpos($real_text, '【') > 20) {
+                        return ['code' => '3006'];
+                    }
                 }
                 if (checkMobile($send_text[1]) == false) {
                     continue;
