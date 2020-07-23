@@ -77,13 +77,13 @@ class CmppCreateCodeTask extends Pzlife
             if (trim($send['Source_Addr']) == 101108) { //电信
                 $uid        = 222;
                 $channel_id = 113;
-                $userEquities = $this->getUserEquities($uid, 7); //游戏业务
+               
             }
             $user = $this->getUserInfo($uid);
             if (empty($user) || $user['user_status'] == 1) {
                 continue;
             }
-           
+            $userEquities = $this->getUserEquities($uid, 7); //游戏业务
             if (empty($userEquities)) {
                 /* foreach($send['send_msgid'] as $key => $value){
                    
