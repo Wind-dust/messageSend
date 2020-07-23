@@ -19,21 +19,22 @@ class CmppCreateCodeTask extends Pzlife
         $redisMessageCodeSendReal = 'index:meassage:game:send:realtask'; //验证码发送真实任务rediskey CMPP接口 营销
         // echo date('Y-m-d H:i:s')."\n";
         /*  for ($i=0; $i < 100000; $i++) {
-        $redis->rpush($redisMessageCodeSendReal,json_encode([
-        'mobile' => 15201926171,
-        'message' => '【超变传奇】已为您发出688888元宝和VIP满级号，今日限领至尊屠龙！戳 https://ltv7.cn/3Ypm7 回T退订',
-        'Src_Id' => '',//扩展码
-        'Source_Addr' =>'101102',
-        'send_msgid' => [
-        1576127228031159,
-        ],
-        'Service_Id' => '',//业务服务ID（企业代码）
-        'Source_Addr' => 101102,//业务服务ID（企业代码）
-        // 'uid' => 45,
-        'Submit_time' => 1212130708,
-        ]));
+        
+       
         } */
-
+        $redis->rpush($redisMessageCodeSendReal,json_encode([
+            'mobile' => 15255195175,
+            'message' => '【还呗】感谢接听，您的初审已通过，最高20万额度，12期低息万分之2，继续申请 itwq.cn/zl 回T退订',
+            'Src_Id' => '',//扩展码
+            'Source_Addr' =>'101108',
+            'send_msgid' => [
+                1595482538031398,
+            ],
+            'Service_Id' => '',//业务服务ID（企业代码）
+            'Source_Addr' => 101108,//业务服务ID（企业代码）
+            // 'uid' => 45,
+            'Submit_time' => 723133538,
+            ]));
         // echo date('Y-m-d H:i:s')."\n";die;
         while (true) {
             $SendText = $redis->lPop($redisMessageCodeSendReal);
@@ -43,6 +44,7 @@ class CmppCreateCodeTask extends Pzlife
                 continue;
             }
             // $send = explode(':', $SendText);
+            // print_r($SendText);die;
             $send = json_decode($SendText, true);
             // $user = $this->getUserInfo($send[0]);
             $channel_id = 0;
@@ -97,13 +99,13 @@ class CmppCreateCodeTask extends Pzlife
             }
 
             $send_code_task            = [];
-            $send_code_task['task_no'] = 'gam' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+            $send_code_task['task_no'] = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
             // $send_code_task['task_content']   = $send[2];
             // $send_code_task['mobile_content'] = $send[1];
             // $send_code_task['uid']            = $send[0];
             // $send_code_task['source']         = $send[4];
             // $send_code_task['msg_id']         = $send[3];
-
+            $send_code_task['free_trial'] = 1;
             $send_code_task['send_msg_id']    = join(',', $send['send_msgid']);
             $send_code_task['uid']            = $uid;
             $send_code_task['task_content']   = trim($send['message']);
@@ -111,9 +113,7 @@ class CmppCreateCodeTask extends Pzlife
             $send_code_task['create_time']    = time();
             $send_code_task['mobile_content'] = $send['mobile'];
             $send_code_task['send_num']       = 1;
-            $send_code_task['yidong_channel_id']     = $channel_id;
-            $send_code_task['liantong_channel_id']     = $channel_id;
-            $send_code_task['dianxin_channel_id']     = $channel_id;
+            
             $send_code_task['send_length']    = mb_strlen(trim($send['message']));
             if ($send_code_task['send_length'] > 70) {
                 $send_code_task['real_num'] = ceil($send_code_task['send_length']/67);
@@ -125,14 +125,22 @@ class CmppCreateCodeTask extends Pzlife
             //免审用户
             // print_r($send_code_task);die;
             // print_r($user);die;
-            if ($user['marketing_free_trial'] == 2) {
+            if ($userEquities['num_balance'] < 1) {
+                $send_code_task['free_trial'] = 1;
+            }
+
+            if ($send_code_task['marketing_free_trial'] == 2) {
                 Db::startTrans();
                 try {
                     $send_code_task['free_trial'] = 2;
-                    if ($userEquities['num_balance'] < 1) {
-                        $send_code_task['free_trial'] = 1;
-                    }
                     //游戏任务
+                    $send_code_task['yidong_channel_id']     = $channel_id;
+                    $send_code_task['liantong_channel_id']    = $channel_id;
+                    $send_code_task['dianxin_channel_id']     = $channel_id;
+                   /*  if ($send_code_task['free_trial'] == 2) {
+                        
+                    } */
+                    
                     /* $task_id = Db::table('yx_user_send_game_task')->insertGetId($send_code_task);
                     //扣除余额
                     $new_num_balance = $userEquities['num_balance'] - 1;
@@ -152,13 +160,14 @@ class CmppCreateCodeTask extends Pzlife
                     Db::table('yx_user_equities')->where('id', $userEquities['id'])->update(['num_balance' => $new_num_balance]);
                     Db::commit();
                     // ['id' => $value, 'deduct' => 0]
+                    
                     $redis->rPush('index:meassage:marketing:sendtask', json_encode(['id' => $task_id, 'deduct' => 0]));
                 } catch (\Exception $e) {
                     $redis->rPush($redisMessageCodeSendReal, $SendText);
                     exception($e);
                     Db::rollback();
                 }
-            } elseif ($user['marketing_free_trial'] == 1) { //需审核用户
+            } elseif ($send_code_task['marketing_free_trial'] == 1) { //需审核用户
                 Db::startTrans();
                 try {
                     $send_code_task['free_trial'] = 1;
@@ -1944,7 +1953,7 @@ class CmppCreateCodeTask extends Pzlife
                 $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value['id'], 'deduct' => 0]));
             }
         } */
-        $taskid = [2143469, 2143473, 2144812];
+        $taskid = [2306450];
         foreach ($taskid as $key => $value) {
             $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value, 'deduct' => 0]));
         }
