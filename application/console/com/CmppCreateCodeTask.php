@@ -83,7 +83,7 @@ class CmppCreateCodeTask extends Pzlife
             if (empty($user) || $user['user_status'] == 1) {
                 continue;
             }
-            $userEquities = $this->getUserEquities($uid, 7); //游戏业务
+            $userEquities = $this->getUserEquities($uid, 5); //普通营销
             if (empty($userEquities)) {
                 /* foreach($send['send_msgid'] as $key => $value){
                    
@@ -174,7 +174,7 @@ class CmppCreateCodeTask extends Pzlife
 
     private function getUserInfo($uid)
     {
-        $getUserSql = sprintf("select id,user_status,reservation_service,free_trial from yx_users where delete_time=0 and id = %d", $uid);
+        $getUserSql = sprintf("select id,user_status,reservation_service,free_trial,marketing_free_trial from yx_users where delete_time=0 and id = %d", $uid);
         // print_r($getUserSql);die;
         $userInfo = Db::query($getUserSql);
         if (!$userInfo) {
