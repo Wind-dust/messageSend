@@ -5540,6 +5540,11 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
+    public function pushUpRiver(){
+        $redis = Phpredis::getConn();
+         $redis->rpush('index:message:code:upriver:111','{"mobile":"15201926171","message_info":"1","develop_code":"1503"}');
+    }
+
     public function getUpRiver()
     {
         $redis = Phpredis::getConn();
@@ -5557,7 +5562,7 @@ class CmppCreateCodeTask extends Pzlife
         // $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"2","develop_code":"6594"}');
         // $redis->rpush('index:message:code:upriver:112','{"mobile":"15821193682","message_info":"3","develop_code":"2580"}');
         // $redis->rpush('index:message:code:upriver:111','{"mobile":"15821193682","message_info":"1","develop_code":"1750"}');
-        // $redis->rpush('index:message:code:upriver:111','{"mobile":"18917638640","message_info":"1","develop_code":"1503"}');
+        $redis->rpush('index:message:code:upriver:111','{"mobile":"18917638640","message_info":"1","develop_code":"1503"}');
         try {
             while (true) {
                 $channels = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `delete_time` = 0 ");
@@ -5623,7 +5628,7 @@ class CmppCreateCodeTask extends Pzlife
                                     }
                                 }
                             } else {
-                               /*  $sql = '';
+                                $sql = '';
                                 $sql = "SELECT  `uid`,`id`,`task_no` FROM ";
                                 if ($value['business_id'] == 5) { //营销
                                     $sql .= " yx_user_send_task_log  WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'";
@@ -5641,7 +5646,8 @@ class CmppCreateCodeTask extends Pzlife
                                     $sql .= " yx_user_multimedia_message_log WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'";
                                     $business_id = 8;
                                 }
-                                $sql .= " AND  `develop_no` = " . $encodemessageupriver['develop_code'] . " AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ";
+                                $sql .= "  AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ";
+                                // echo $sql;die;
                                 $message = Db::query($sql);
                                 if (!empty($message)) {
                                     //上行入库
@@ -5661,8 +5667,7 @@ class CmppCreateCodeTask extends Pzlife
                                             $redis->rpush("index:message:upriver:" . $message[0]['uid'], json_encode(['mobile' => $encodemessageupriver['mobile'], 'message_info' => $encodemessageupriver['message_info'], 'business_id' => $business_id, 'get_time' => date('Y-m-d H:i:s', time())]));
                                         }
                                     }
-                                    continue;
-                                } */
+                                }
                             }
                         }else{
                             $sql                  = "SELECT `uid`,`id`,`task_no` FROM ";
@@ -5697,7 +5702,7 @@ class CmppCreateCodeTask extends Pzlife
                        
                     }
                 }
-                sleep(60);
+                sleep(30);
             }
         } catch (\Exception $th) {
             exception($th);
