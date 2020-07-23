@@ -8647,7 +8647,7 @@ class CmppCreateCodeTask extends Pzlife
             /* $where = [];
             $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
             $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  '" . $tody_time . "'  ");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id`  IN ('100182048','100182169','100182173','100182176','100182179','100182482','100182571') AND  `create_time` >  '" . $tody_time . "'  ");
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id`  IN ('100182166','100182575') AND  `create_time` >  '" . $tody_time . "' ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100181593' AND `create_time` >  " . $tody_time;die;
             // $sendid = $mysql_connect->query("SELECT `id` FROM `sflsftp`.`yx_sfl_send_task` WHERE `template_id` IN ('100181864','100181869') ");
@@ -8659,7 +8659,7 @@ class CmppCreateCodeTask extends Pzlife
             exception($th);
         }
         // die;
-        $deduct = 1; //1扣量,2不扣
+        $deduct = 2; //1扣量,2不扣
         $rate = 60;
 
         $ids = [];
