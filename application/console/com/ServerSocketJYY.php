@@ -338,7 +338,7 @@ class ServerSocketJYY extends Pzlife
                             //     ],
                             // ];
                             // $redis->rPush('index:meassage:code:cmppdeliver:'.$uid,json_encode($deliver));
-                            $deliver = $redis->lpop('index:meassage:game:cmppdeliver:45'); //取出用户发送任务
+                            $deliver = $redis->lpop('index:meassage:code:user:receive:' . $uid); //取出用户发送任务
                             if (!empty($deliver)) {
                                 $deliver            = json_decode($deliver, true);
                                 $deliver_timestring = time();
@@ -436,7 +436,7 @@ class ServerSocketJYY extends Pzlife
             'bin_ip'        => ["47.98.178.87", "127.0.0.1"], //客户端绑定IP
             'free_trial'    => 2,
             'master_num'    => 300,
-            'uid'           => 45,
+            'uid'           => 222,
         ];
     }
 
