@@ -115,6 +115,11 @@ class CmppCreateCodeTask extends Pzlife
             $send_code_task['liantong_channel_id']     = $channel_id;
             $send_code_task['dianxin_channel_id']     = $channel_id;
             $send_code_task['send_length']    = mb_strlen(trim($send['message']));
+            if ($send_code_task['send_length'] > 70) {
+                $send_code_task['real_num'] = ceil($send_code_task['send_length']/67);
+            }else{
+                $send_code_task['real_num'] = 1;
+            }
             // $sendData['uid']          = 1;
             // $sendData['Submit_time']  = date('YMDHM', time());
             //免审用户
