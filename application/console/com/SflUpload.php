@@ -911,7 +911,7 @@ class SflUpload extends Pzlife
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
-                    // continue;
+                    continue;
                     $err_task_num = [];
                     $send_data    = [];
                     if ($son_path_data !== false) {
@@ -1274,9 +1274,9 @@ class SflUpload extends Pzlife
                                 continue;
                             }
                             //  strpos($svalue, '2020071518') == false
-                            /*  if (strpos($svalue, '2020071518') == false) {
+                             if (strpos($svalue, '2020072314') == false) {
                                 continue;
-                            } */
+                            }
                             $start_time = strtotime("2020-06-18");
                             $end_time = $start_time+86400;
                             $expeort_time = $start_time + 43200 - mt_rand(0, 3000);
@@ -1462,7 +1462,9 @@ class SflUpload extends Pzlife
                                                 $content = $content . " 回T退订";
                                             } elseif ($tvalue[2] == '100181315') {
                                                 $content = $content . " 回T退订";
-                                            } else {
+                                            }elseif ($tvalue[2] == '100182791') {
+                                                $content = $content . " /回T退订";
+                                            }  else {
                                                 $content = $content . "/回T退订";
                                             }
                                         }
