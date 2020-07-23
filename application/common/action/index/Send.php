@@ -237,6 +237,11 @@ return $result;
                 $data['liantong_channel_id'] = 107;
                 $data['dianxin_channel_id'] = 107;
             }
+            if ($user['id'] == '222') {
+                $data['yidong_channel_id'] = 113;
+                $data['liantong_channel_id'] = 113;
+                $data['dianxin_channel_id'] = 113;
+            }
         }
         if (!empty($msg_id)) {
             $data['send_msg_id'] = $msg_id;
