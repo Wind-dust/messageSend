@@ -22,7 +22,7 @@ class CmppCreateCodeTask extends Pzlife
         
        
         } */
-        $redis->rpush($redisMessageCodeSendReal,json_encode([
+       /*  $redis->rpush($redisMessageCodeSendReal,json_encode([
             'mobile' => 15255195175,
             'message' => '【还呗】感谢接听，您的初审已通过，最高20万额度，12期低息万分之2，继续申请 itwq.cn/zl 回T退订',
             'Src_Id' => '',//扩展码
@@ -34,7 +34,7 @@ class CmppCreateCodeTask extends Pzlife
             'Source_Addr' => 101108,//业务服务ID（企业代码）
             // 'uid' => 45,
             'Submit_time' => 723133538,
-            ]));
+            ])); */
         // echo date('Y-m-d H:i:s')."\n";die;
         while (true) {
             $SendText = $redis->lPop($redisMessageCodeSendReal);
