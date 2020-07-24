@@ -483,6 +483,11 @@ return $result;
                 $data['liantong_channel_id'] = 62;
                 $data['dianxin_channel_id'] = 61;
             }
+            if ($user['id'] == 112) {
+                $data['yidong_channel_id'] = 60;
+                $data['liantong_channel_id'] = 62;
+                $data['dianxin_channel_id'] = 61;
+            }
         }
 
         if (!empty($msg_id)) {
