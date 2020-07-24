@@ -350,7 +350,7 @@ class Administrator extends CommonIndex
         if (!empty($business_id)) {
             array_push($where,['business_id' , '=', $business_id]);
         }
-        $result = DbAdministrator::getUserChannel($where, 'id', false, '', $offset.','.$pageNum);
+        $result = DbAdministrator::getUserChannel($where, '*', false, '', $offset.','.$pageNum);
         $total = DbAdministrator::countUserChannel($where);
         return ['code' => 200, 'total' => $total, 'user_channel' => $result];
     }
