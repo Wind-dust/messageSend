@@ -247,6 +247,10 @@ class DbAdministrator
         $obj = UserChannel::field($field)->where($where);
         return $this->getResult($obj, $row, $orderBy, $limit);
     }
+    public function countUserChannel($where)
+    {
+        return UserChannel::where($where)->count();
+    }
 
     public function addUserChannel($data)
     {

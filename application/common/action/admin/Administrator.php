@@ -337,6 +337,23 @@ class Administrator extends CommonIndex
         }
     }
 
+    public function getUserChannel($uid = 0, $nick_name = '', $business_id = 0, $page, $pageNum){
+        $offset = ($page - 1) * $pageNum;
+        $where = [];
+        if (!empty($uid)) {
+            array_push($where,['uid' , '=', $uid]);
+        }
+        if (!empty($nick_name)) {
+            array_push($where, ['nick_name' , 'like', '%'.$nick_name.'%']);
+        }
+        if (!empty($business_id)) {
+            array_push($where,['business_id' , '=', $business_id]);
+        }
+        $result = DbAdministrator::getUserChannel($where, 'id', false, '', $offset.','.$pageNum);
+        $total = DbAdministrator::countUserChannel($where);
+        return ['code' => 200, 'total' => $total, 'user_channel' => $result];
+    }
+
     public function delUserChannel($id)
     {
         $userchannel = DbAdministrator::getUserChannel(['id' => $id], 'id', true);

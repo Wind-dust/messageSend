@@ -419,6 +419,35 @@ class Administrator extends AdminController
     }
 
     /**
+     * @api              {post} / 获取用户免审通道
+     * @apiDescription   getUserChannel
+     * @apiGroup         admin_Administrator
+     * @apiName          getUserChannel
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} uid 用户id
+     * @apiParam (入参) {String} nick_name 用户名，用户名为唯一值
+     * @apiParam (入参) {String} business_id 服务类型ID
+     * @apiParam (入参) {String} page 页码 默认1
+     * @apiParam (入参) {String} pageNum 条数 默认10
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:手机号格式错误 / 3002:channel_id格式错误 / 3003:非法的业务服务ID  / 3004:该用户不存在
+     * @apiSampleRequest /admin/administrator/getUserChannel
+     * @return array
+     * @author rzc
+     */
+    public function getUserChannel(){
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        $uid = trim($this->request->post('uid'));
+        $nick_name = trim($this->request->post('nick_name'));
+        $business_id = trim($this->request->post('business_id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        $result = $this->app->administrator->getUserChannel($uid, $nick_name, $business_id, $page, $pageNum);
+        return $result;
+    }
+
+    /**
      * @api              {post} / 修改用户免审通道
      * @apiDescription   updateUserChannel
      * @apiGroup         admin_Administrator
@@ -1119,5 +1148,26 @@ class Administrator extends AdminController
         }
         $result = $this->app->administrator->editSmsSendingChannel($id,$title,$channel_type, $channel_host, $channel_port,$channel_source,$business_id, $channel_price, $channel_postway, $channel_source_addr, $channel_shared_secret, $channel_service_id, $channel_template_id, $channel_dest_id, $channel_flow_velocity);
         return $result;
+    }
+
+    /**
+     * @api              {post} / 配置客户侧CMPP账户
+     * @apiDescription   setUserAccountForCmpp
+     * @apiGroup         admin_Administrator
+     * @apiName          setUserAccountForCmpp
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} uid 用户id
+     * @apiParam (入参) {String} channel_id 通道ID
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:channel_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /admin/administrator/setUserAccountForCmpp
+     * @return array
+     * @author rzc
+     */
+    public function setUserAccountForCmpp(){
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
     }
 }
