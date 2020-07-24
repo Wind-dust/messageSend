@@ -1143,4 +1143,12 @@ class User extends CommonIndex
         $total = DbUser::countUserUpriver($where);
         return ['code' => '200', 'total' => $total, 'upriver' => $result];
     }
+
+    public function getSflReportLog(){
+        $res = DbUser::getSflReportLog();
+        if(empty($res)){
+            return ['code'=>3000,'msg'=>'未找到数据'];
+        }
+        return ['code' =>200, 'data'=>$res];
+    }
 }

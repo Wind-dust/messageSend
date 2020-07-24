@@ -994,4 +994,20 @@ class User extends MyController
         $result = $this->app->user->getUserUpriver($ConId, $page, $pageNum, $start_time, $end_time, $business_id);
         return $result;
     }
+    /**
+     * @api              {post} / 获取丝芙兰报表
+     * @apiDescription   getSflReport
+     * @apiGroup         index_user
+     * @apiName          getSflReport
+     * @apiParam (入参) {String} con_id
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /index/user/getSflReport
+     * @return array
+     * @author jackiwu
+     */
+    public function getSflReport(){
+        $ConId = trim($this->request->post('con_id'));
+        $result = $this->app->user->getSflReportLog();
+        return $result;
+    }
 }
