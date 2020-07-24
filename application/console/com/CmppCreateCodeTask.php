@@ -185,7 +185,7 @@ class CmppCreateCodeTask extends Pzlife
                     Db::commit();
                     // ['id' => $value, 'deduct' => 0]
                     
-                    $redis->rPush('index:meassage:marketing:sendtask', json_encode(['id' => $task_id, 'deduct' => 0]));
+                    $redis->rPush('index:meassage:marketing:sendtask', json_encode(['id' => $task_id, 'send_time' => 0,'deduct' => 0]));
                 } catch (\Exception $e) {
                     $redis->rPush($redisMessageCodeSendReal, $SendText);
                     exception($e);
