@@ -52,40 +52,46 @@ class CmppCreateCodeTask extends Pzlife
             if (trim($send['Source_Addr']) == 101102) { //移动
                 $uid        = 45;
                 $channel_id = 14;
+                $business_id = 9;
             }
             if (trim($send['Source_Addr']) == 101103) { //联通
                 $uid        = 58;
                 $channel_id = 28;
+                $business_id = 9;
             }
             if (trim($send['Source_Addr']) == 101104) { //电信
                 $uid        = 59;
                 $channel_id = 29;
+                $business_id = 9;
             }
 
             if (trim($send['Source_Addr']) == 101105) { //移动
                 $uid        = 115;
                 $channel_id = 14;
+                $business_id = 9;
             }
             if (trim($send['Source_Addr']) == 101106) { //电信
                 $uid        = 207;
                 $channel_id = 29;
-                $userEquities = $this->getUserEquities($uid, 9); //游戏业务
+                $business_id = 9;
+                // $userEquities = $this->getUserEquities($uid, 9); //游戏业务
             }
             if (trim($send['Source_Addr']) == 101107) { //电信
                 $uid        = 222;
                 $channel_id = 111;
+                $business_id = 9;
                 // $userEquities = $this->getUserEquities($uid, 9); //游戏业务
             }
             if (trim($send['Source_Addr']) == 101108) { //电信
                 $uid        = 222;
                 $channel_id = 113;
-               
+                $business_id = 5;
             }
             $user = $this->getUserInfo($uid);
             if (empty($user) || $user['user_status'] == 1) {
                 continue;
             }
-            $userEquities = $this->getUserEquities($uid, 5); //普通营销
+            $userEquities = $this->getUserEquities($uid, $business_id); //普通营销
             if (empty($userEquities)) {
                 /* foreach($send['send_msgid'] as $key => $value){
                    
@@ -125,14 +131,32 @@ class CmppCreateCodeTask extends Pzlife
             //免审用户
             // print_r($send_code_task);die;
             // print_r($user);die;
-            if ($userEquities['num_balance'] < 1) {
-                $send_code_task['free_trial'] = 1;
+            if ($user['marketing_free_trial'] == 2 && $business_id == 5) {
+                if ($userEquities['num_balance'] < 1) {
+                    $send_code_task['free_trial'] = 1;
+                }else{
+                    $send_code_task['free_trial'] = 2;
+                }
+                $table = 'yx_user_send_task';
+                $rediskey = 'index:meassage:marketing:sendtask';
+            }elseif($user['free_trial'] == 2 && $business_id == 6) {
+                if ($userEquities['num_balance'] < 1) {
+                    $send_code_task['free_trial'] = 1;
+                }else{
+                    $send_code_task['free_trial'] = 2;
+                }
+                $table = 'yx_user_send_code_task';
+                $rediskey = 'index:meassage:business:sendtask';
+            }elseif ($business_id == 9) {
+                $table = 'yx_user_send_game_task';
+                $rediskey = 'index:meassage:game:sendtask';
             }
+            
 
-            if ($send_code_task['marketing_free_trial'] == 2) {
+            if ($send_code_task['free_trial'] == 2) {
                 Db::startTrans();
                 try {
-                    $send_code_task['free_trial'] = 2;
+                    // $send_code_task['free_trial'] = 2;
                     //游戏任务
                     $send_code_task['yidong_channel_id']     = $channel_id;
                     $send_code_task['liantong_channel_id']    = $channel_id;
@@ -154,7 +178,7 @@ class CmppCreateCodeTask extends Pzlife
                     Db::commit();
                     // ['id' => $value, 'deduct' => 0]
                     $redis->rPush('index:meassage:business:sendtask', json_encode(['id'=>$task_id,'deduct' => 0])); */
-                    $task_id = Db::table('yx_user_send_task')->insertGetId($send_code_task);
+                    $task_id = Db::table($table)->insertGetId($send_code_task);
                     //扣除余额
                     $new_num_balance = $userEquities['num_balance'] - 1;
                     Db::table('yx_user_equities')->where('id', $userEquities['id'])->update(['num_balance' => $new_num_balance]);
@@ -167,12 +191,12 @@ class CmppCreateCodeTask extends Pzlife
                     exception($e);
                     Db::rollback();
                 }
-            } elseif ($send_code_task['marketing_free_trial'] == 1) { //需审核用户
+            } elseif ($send_code_task['free_trial'] == 1) { //需审核用户
                 Db::startTrans();
                 try {
-                    $send_code_task['free_trial'] = 1;
+                    // $send_code_task['free_trial'] = 1;
                     // $task_id                      = Db::table('yx_user_send_game_task')->insertGetId($send_code_task);
-                    $task_id                      = Db::table('yx_user_send_task')->insertGetId($send_code_task);
+                    $task_id                      = Db::table($table)->insertGetId($send_code_task);
                     //扣除余额
                     $new_num_balance = $userEquities['num_balance'] - 1;
                     Db::table('yx_user_equities')->where('id', $userEquities['id'])->update(['num_balance' => $new_num_balance]);
