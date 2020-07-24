@@ -382,7 +382,6 @@ class Administrator extends AdminController
      * @apiParam (入参) {String} yidong_channel_id 移动通道ID
      * @apiParam (入参) {String} liantong_channel_id 联通通道ID
      * @apiParam (入参) {String} dianxin_channel_id 电信通道ID
-     * @apiParam (入参) {String} dianxin_channel_id 电信通道ID
      * @apiParam (入参) {String} nick_name 用户名，用户名为唯一值
      * @apiParam (入参) {String} business_id 服务类型ID
      * @apiSuccess (返回) {String} code 200:成功 / 3001:手机号格式错误 / 3002:channel_id格式错误 / 3003:非法的业务服务ID  / 3004:该用户不存在
@@ -420,13 +419,15 @@ class Administrator extends AdminController
     }
 
     /**
-     * @api              {post} / 修改用户该通道的优先级
+     * @api              {post} / 修改用户免审通道
      * @apiDescription   updateUserChannel
      * @apiGroup         admin_Administrator
      * @apiName          updateUserChannel
      * @apiParam (入参) {String} cms_con_id
      * @apiParam (入参) {String} id 设置ID
-     * @apiParam (入参) {String} priority 优先级:1,默认省网优先;2,非接入省网外优先
+     * @apiParam (入参) {String} yidong_channel_id 移动通道ID
+     * @apiParam (入参) {String} liantong_channel_id 联通通道ID
+     * @apiParam (入参) {String} dianxin_channel_id 电信通道ID
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3003:非法的优先级
      * @apiSampleRequest /admin/administrator/updateUserChannel
      * @return array
@@ -440,15 +441,27 @@ class Administrator extends AdminController
             return ['code' => '3100'];
         }
         $id = trim($this->request->post('id'));
-        $priority = trim($this->request->post('priority'));
+        $yidong_channel_id = trim($this->request->post('yidong_channel_id'));
+        $liantong_channel_id = trim($this->request->post('liantong_channel_id'));
+        $dianxin_channel_id = trim($this->request->post('dianxin_channel_id'));
+        // $priority = trim($this->request->post('priority'));
 
         if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
             return ['code' => '3001'];
         }
-        if (!in_array($priority, [1, 2])) {
+        /* if (!in_array($priority, [1, 2])) {
             return ['code' => '3003'];
+        } */
+        if (empty($yidong_channel_id) || intval($yidong_channel_id) < 1 || !is_numeric($yidong_channel_id)) {
+            return ['code' => '3002'];
         }
-        $result  = $this->app->administrator->updateUserChannel(intval($id), intval($priority));
+        if (empty($liantong_channel_id) || intval($liantong_channel_id) < 1 || !is_numeric($liantong_channel_id)) {
+            return ['code' => '3002'];
+        }
+        if (empty($dianxin_channel_id) || intval($dianxin_channel_id) < 1 || !is_numeric($dianxin_channel_id)) {
+            return ['code' => '3002'];
+        }
+        $result  = $this->app->administrator->updateUserChannel(intval($id), intval($yidong_channel_id), intval($liantong_channel_id) ,intval($dianxin_channel_id));
         return $result;
     }
 
@@ -908,6 +921,203 @@ class Administrator extends AdminController
             return ['code' => '3003', 'msg' => '关键词不能为空'];
         } */
         $result = $this->app->administrator->updateDeductWord($id,$business_id, $uid, $word);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 添加通道
+     * @apiDescription   addSmsSendingChannel
+     * @apiGroup         admin_Administrator
+     * @apiName          addSmsSendingChannel
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} title 通道名称
+     * @apiParam (入参) {String} channel_type 通道类型 1.http 2.cmpp 
+     * @apiParam (入参) {String} channel_host 通道连接主机或者域名
+     * @apiParam (入参) {String} [channel_port] 连接端口,若无端口则不填
+     * @apiParam (入参) {String} channel_source 通道归属:1,中国移动;2,中国联通;3,中国电信;4,三网通;5,移动联通;6,移动电信;7,联通电信
+     * @apiParam (入参) {String} business_id 业务服务id 与平台提供服务相对应
+     * @apiParam (入参) {String} [channel_price] 通道单价（单位：元）
+     * @apiParam (入参) {String} [channel_postway] http请求方式:1,get;2,post;CMPP接口不填
+     * @apiParam (入参) {String} channel_source_addr 企业id,企业代码(账户)
+     * @apiParam (入参) {String} channel_shared_secret 网关登录密码
+     * @apiParam (入参) {String} channel_service_id 业务代码,一般情况下与企业代码一致
+     * @apiParam (入参) {String} [channel_template_id] 模板id
+     * @apiParam (入参) {String} [channel_dest_id] 短信接入码 短信端口号
+     * @apiParam (入参) {String} [channel_flow_velocity] 通道最大流速/秒
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:cmpp类接口必填端口 / 3002:通道名称为空 / 3003:地址为空 / 3004:必须确认通道支持运营商范围 / 3005:必须确认通道支持服务/ 3006:企业id,企业代码(账户)不能为空 / 3007:密码不能为空 / 3008:名称不能重复 / 3009:业务代码不能为空
+     * @apiSampleRequest /admin/administrator/addSmsSendingChannel
+     * @return array
+     * @author rzc
+     */
+    public function addSmsSendingChannel(){
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $title = trim($this->request->post('title'));
+        $channel_type = trim($this->request->post('channel_type'));
+        $channel_host = trim($this->request->post('channel_host'));
+        $channel_port = trim($this->request->post('channel_port'));
+        $channel_source = trim($this->request->post('channel_source'));
+        $business_id = trim($this->request->post('business_id'));
+        $channel_price = trim($this->request->post('channel_price'));
+        $channel_postway = trim($this->request->post('channel_postway'));
+        $channel_source_addr = trim($this->request->post('channel_source_addr'));
+        $channel_shared_secret = trim($this->request->post('channel_shared_secret'));
+        $channel_service_id = trim($this->request->post('channel_service_id'));
+        $channel_template_id = trim($this->request->post('channel_template_id'));
+        $channel_dest_id = trim($this->request->post('channel_dest_id'));
+        $channel_flow_velocity = trim($this->request->post('channel_flow_velocity'));
+        if ($channel_type == 2 && empty($channel_port)) {
+            return ['code' => '3001', 'msg' => 'cmpp类接口必填端口'];
+        }
+        if (empty($title)) {
+             return ['code' => '3002', 'msg' => '通道名称为空' ];
+        }
+        if (empty($channel_host)) {
+            return ['code' => '3003', 'msg' => '地址为空' ];
+        }
+        if (empty($channel_source)) {
+            return ['code' => '3004', 'msg' => '必须确认通道支持运营商范围' ];
+        }
+        if (empty($business_id)) {
+            return ['code' => '3005', 'msg' => '必须确认通道支持服务' ];
+        }
+        if (empty($channel_source_addr)) {
+            return ['code' => '3006', 'msg' => '企业id,企业代码(账户)不能为空' ];
+        }
+        if (empty($channel_shared_secret)) {
+            return ['code' => '3007', 'msg' => '密码不能为空' ];
+        }
+        if (empty($channel_service_id)) {
+            return ['code' => '3009', 'msg' => '业务代码不能为空' ];
+        }
+        $result = $this->app->administrator->addSmsSendingChannel($title,$channel_type, $channel_host, $channel_port,$channel_source,$business_id, $channel_price, $channel_postway, $channel_source_addr, $channel_shared_secret, $channel_service_id, $channel_template_id, $channel_dest_id, $channel_flow_velocity);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 获取通道信息
+     * @apiDescription   getSmsSendingChannel
+     * @apiGroup         admin_Administrator
+     * @apiName          getSmsSendingChannel
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} title 通道名称
+     * @apiParam (入参) {String} channel_type 通道类型 1.http 2.cmpp 
+     * @apiParam (入参) {String} channel_host 通道连接主机或者域名
+     * @apiParam (入参) {String} channel_port 连接端口,若无端口则不填
+     * @apiParam (入参) {String} channel_source 通道归属:1,中国移动;2,中国联通;3,中国电信;4,三网通;5,移动联通;6,移动电信;7,联通电信
+     * @apiParam (入参) {String} business_id 业务服务id 与平台提供服务相对应
+     * @apiParam (入参) {String} channel_price 通道单价（单位：元）
+     * @apiParam (入参) {String} channel_postway http请求方式:1,get;2,post;CMPP接口不填
+     * @apiParam (入参) {String} channel_source_addr 企业id,企业代码(账户)
+     * @apiParam (入参) {String} channel_shared_secret 网关登录密码
+     * @apiParam (入参) {String} channel_service_id 业务代码,一般情况下与企业代码一致
+     * @apiParam (入参) {String} channel_template_id 模板id
+     * @apiParam (入参) {String} channel_dest_id 短信接入码 短信端口号
+     * @apiParam (入参) {String} channel_flow_velocity 通道最大流速/秒
+     * @apiParam (入参) {String} page 页码 默认1
+     * @apiParam (入参) {String} pageNum 条数 默认10
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:cmpp类接口必填端口 / 3002:通道名称为空 / 3003:地址为空 / 3004:必须确认通道支持运营商范围 / 3005:必须确认通道支持服务/ 3006:企业id,企业代码(账户)不能为空 / 3007:密码不能为空 / 3008:名称不能重复 / 3009:业务代码不能为空
+     * @apiSuccess (返回) {Array} channel_list 
+     * @apiSuccess (channel_list) {String} title 通道名称
+     * @apiSuccess (channel_list) {String} channel_type 通道类型 1.http 2.cmpp 
+     * @apiSuccess (channel_list) {String}  channel_host 通道连接主机或者域名
+     * @apiSuccess (channel_list) {String}  channel_port 连接端口,若无端口则不填
+     * @apiSuccess (channel_list) {String}  channel_source 通道归属:1,中国移动;2,中国联通;3,中国电信;4,三网通;5,移动联通;6,移动电信;7,联通电信
+     * @apiSuccess (channel_list) {String} business_id 业务服务id 与平台提供服务相对应
+     * @apiSuccess (channel_list) {Number} channel_price 通道单价（单位：元）
+     * @apiSuccess (channel_list) {Number} channel_postway http请求方式:1,get;2,post;CMPP接口不填
+     * @apiSuccess (channel_list) {String} channel_source_addr 企业id,企业代码(账户)
+     * @apiSuccess (channel_list) {String} channel_shared_secret 网关登录密码
+     * @apiSuccess (channel_list) {String} channel_service_id 业务代码,一般情况下与企业代码一致
+     * @apiSuccess (channel_list) {String} channel_template_id 模板id
+     * @apiSuccess (channel_list) {String} channel_dest_id 短信接入码 短信端口号
+     * @apiSuccess (channel_list) {Int} channel_flow_velocity 通道最大流速/秒
+     * @apiSuccess (channel_list) {Int} channel_status 通道状态:1,空闲;2,正常;3,忙碌;4,停止使用
+     * @apiSampleRequest /admin/administrator/getSmsSendingChannel
+     * @return array
+     * @author rzc
+     */
+    public function getSmsSendingChannel(){
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        $title = trim($this->request->post('title'));
+        $channel_type = trim($this->request->post('channel_type'));
+        $channel_host = trim($this->request->post('channel_host'));
+        $channel_port = trim($this->request->post('channel_port'));
+        $channel_source = trim($this->request->post('channel_source'));
+        $business_id = trim($this->request->post('business_id'));
+        $channel_price = trim($this->request->post('channel_price'));
+        $channel_postway = trim($this->request->post('channel_postway'));
+        $channel_source_addr = trim($this->request->post('channel_source_addr'));
+        $channel_shared_secret = trim($this->request->post('channel_shared_secret'));
+        $channel_service_id = trim($this->request->post('channel_service_id'));
+        $channel_template_id = trim($this->request->post('channel_template_id'));
+        $channel_dest_id = trim($this->request->post('channel_dest_id'));
+        $channel_flow_velocity = trim($this->request->post('channel_flow_velocity'));
+
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        $result = $this->app->administrator->getSmsSendingChannel($title,$channel_type, $channel_host, $channel_port,$channel_source,$business_id, $channel_price, $channel_postway, $channel_source_addr, $channel_shared_secret, $channel_service_id, $channel_template_id, $channel_dest_id, $channel_flow_velocity, $page, $pageNum);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 修改通道信息,修改后通道需重启否则不生效
+     * @apiDescription   editSmsSendingChannel
+     * @apiGroup         admin_Administrator
+     * @apiName          editSmsSendingChannel
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 通道id
+     * @apiParam (入参) {String} title 通道名称
+     * @apiParam (入参) {String} channel_type 通道类型 1.http 2.cmpp 
+     * @apiParam (入参) {String} channel_host 通道连接主机或者域名
+     * @apiParam (入参) {String} [channel_port] 连接端口,若无端口则不填
+     * @apiParam (入参) {String} channel_source 通道归属:1,中国移动;2,中国联通;3,中国电信;4,三网通;5,移动联通;6,移动电信;7,联通电信
+     * @apiParam (入参) {String} business_id 业务服务id 与平台提供服务相对应
+     * @apiParam (入参) {String} [channel_price] 通道单价（单位：元）
+     * @apiParam (入参) {String} [channel_postway] http请求方式:1,get;2,post;CMPP接口不填
+     * @apiParam (入参) {String} channel_source_addr 企业id,企业代码(账户)
+     * @apiParam (入参) {String} channel_shared_secret 网关登录密码
+     * @apiParam (入参) {String} channel_service_id 业务代码,一般情况下与企业代码一致
+     * @apiParam (入参) {String} [channel_template_id] 模板id
+     * @apiParam (入参) {String} [channel_dest_id] 短信接入码 短信端口号
+     * @apiParam (入参) {String} [channel_flow_velocity] 通道最大流速/秒
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 
+     * @apiSampleRequest /admin/administrator/editSmsSendingChannel
+     * @return array
+     * @author rzc
+     */
+    public function editSmsSendingChannel(){
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id = trim($this->request->post('id'));
+        $title = trim($this->request->post('title'));
+        $channel_type = trim($this->request->post('channel_type'));
+        $channel_host = trim($this->request->post('channel_host'));
+        $channel_port = trim($this->request->post('channel_port'));
+        $channel_source = trim($this->request->post('channel_source'));
+        $business_id = trim($this->request->post('business_id'));
+        $channel_price = trim($this->request->post('channel_price'));
+        $channel_postway = trim($this->request->post('channel_postway'));
+        $channel_source_addr = trim($this->request->post('channel_source_addr'));
+        $channel_shared_secret = trim($this->request->post('channel_shared_secret'));
+        $channel_service_id = trim($this->request->post('channel_service_id'));
+        $channel_template_id = trim($this->request->post('channel_template_id'));
+        $channel_dest_id = trim($this->request->post('channel_dest_id'));
+        $channel_flow_velocity = trim($this->request->post('channel_flow_velocity'));
+        if (empty($id) || !is_numeric($id) || $id < 1) {
+            return  ['code' => '3001', 'msg' => 'id格式错误'];
+        }
+        $result = $this->app->administrator->editSmsSendingChannel($id,$title,$channel_type, $channel_host, $channel_port,$channel_source,$business_id, $channel_price, $channel_postway, $channel_source_addr, $channel_shared_secret, $channel_service_id, $channel_template_id, $channel_dest_id, $channel_flow_velocity);
         return $result;
     }
 }

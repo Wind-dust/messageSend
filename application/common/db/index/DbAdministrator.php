@@ -224,7 +224,11 @@ class DbAdministrator
         $obj = SmsSendingChannel::field($field)->where($where);
         return $this->getResult($obj, $row, $orderBy, $limit);
     }
-
+    public function countSmsSendingChannel($where)
+    {
+        // $obj =
+        return  SmsSendingChannel::where($where)->count();
+    }
     public function addSmsSendingChannel($data)
     {
         $SmsSendingChannel = new SmsSendingChannel;

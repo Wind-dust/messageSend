@@ -320,7 +320,7 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function updateUserChannel($id, $priority)
+    public function updateUserChannel($id, $yidong_channel_id, $liantong_channel_id,$dianxin_channel_id)
     {
         $userchannel = DbAdministrator::getUserChannel(['id' => $id], 'id', true);
         if (empty($userchannel)) {
@@ -328,7 +328,7 @@ class Administrator extends CommonIndex
         }
         Db::startTrans();
         try {
-            DbAdministrator::editUserChannel(['priority' => $priority], $id);
+            DbAdministrator::editUserChannel(['yidong_channel_id' => $yidong_channel_id,'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id], $id);
             Db::commit();
             return ['code' => '200'];
         } catch (\Exception $e) {
@@ -1155,5 +1155,154 @@ class Administrator extends CommonIndex
         $res = curl_exec($curl); // 运行cURL，请求网页
         curl_close($curl); // 关闭URL请求
         return $res; // 显示获得的数据
+    }
+
+    public function addSmsSendingChannel($title,$channel_type, $channel_host, $channel_port = '',$channel_source,$business_id, $channel_price = 0, $channel_postway = 1, $channel_source_addr, $channel_shared_secret, $channel_service_id, $channel_template_id = '', $channel_dest_id = '', $channel_flow_velocity = 0){
+        if (DbAdministrator::getSmsSendingChannel(['title' => $title],'id',true)) {
+            return ['code' => '3008','名称重复，请另外命名'];
+        }
+        $data = [];
+        $data = [
+            'title' => $title,
+            'channel_type' => $channel_type,
+            'channel_host' => $channel_host,
+            'channel_port' => $channel_port,
+            'channel_source' => $channel_source,
+            'business_id' => $business_id,
+            'channel_price' => $channel_price,
+            'channel_postway' => $channel_postway,
+            'channel_source_addr' => $channel_source_addr,
+            'channel_shared_secret' => $channel_shared_secret,
+            'channel_service_id' => $channel_service_id,
+            'channel_template_id' => $channel_template_id,
+            'channel_dest_id' => $channel_dest_id,
+            'channel_flow_velocity' => $channel_flow_velocity,
+        ];
+        
+        Db::startTrans();
+        try {
+            // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
+            DbAdministrator::addSmsSendingChannel($data);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            exception($e);
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function getSmsSendingChannel($title = '',$channel_type = 0, $channel_host = '', $channel_port = '',$channel_source = 0,$business_id = 0, $channel_price = 0, $channel_postway = 0, $channel_source_addr = '', $channel_shared_secret = '', $channel_service_id = '', $channel_template_id = '', $channel_dest_id = '', $channel_flow_velocity = 0, $page, $pageNum){
+        $where = [];
+        if (!empty($title)) {
+            array_push($where,['title','like','%'.$title.'%']);
+        }
+        if (!empty($channel_type)) {
+            array_push($where,['channel_type','=',$channel_type]);
+        }
+        if (!empty($channel_host)) {
+            array_push($where,['channel_host','=',$channel_host]);
+        }
+        if (!empty($channel_port)) {
+            array_push($where,['channel_port','=',$channel_port]);
+        }
+        if (!empty($channel_source)) {
+            array_push($where,['channel_source','=',$channel_source]);
+        }
+        if (!empty($business_id)) {
+            array_push($where,['business_id','=',$business_id]);
+        }
+        if (!empty($channel_price)) {
+            array_push($where,['channel_price','=',$channel_price]);
+        }
+        if (!empty($channel_postway)) {
+            array_push($where,['channel_postway','=',$channel_postway]);
+        }
+        if (!empty($channel_source_addr)) {
+            array_push($where,['channel_source_addr','=',$channel_source_addr]);
+        }
+        if (!empty($channel_shared_secret)) {
+            array_push($where,['channel_shared_secret','=',$channel_shared_secret]);
+        }
+        if (!empty($channel_service_id)) {
+            array_push($where,['channel_service_id','=',$channel_service_id]);
+        }
+        if (!empty($channel_template_id)) {
+            array_push($where,['channel_template_id','=',$channel_template_id]);
+        }
+        if (!empty($channel_dest_id)) {
+            array_push($where,['channel_dest_id','=',$channel_dest_id]);
+        }
+        if (!empty($channel_flow_velocity)) {
+            array_push($where,['channel_flow_velocity','=',$channel_flow_velocity]);
+        }
+        $offset = ($page - 1) * $pageNum;
+        $result = DbAdministrator::getSmsSendingChannel($where,'*',false, '', $offset.','.$pageNum);
+        $total = DbAdministrator::countSmsSendingChannel($where);
+        return ['code' => '200', 'total' => $total, 'channel_list' => $result];
+    }
+
+    public function editSmsSendingChannel($id, $title = '',$channel_type = 0, $channel_host = '', $channel_port = '',$channel_source = 0,$business_id = 0, $channel_price = 0, $channel_postway = 0, $channel_source_addr = '', $channel_shared_secret = '', $channel_service_id = '', $channel_template_id = '', $channel_dest_id = '', $channel_flow_velocity = 0){
+        $data = [];
+        if (!empty($title)) {
+            $data['title'] = $title;
+        }
+        if (!empty($channel_type)) {
+            $data['channel_type'] = $channel_type;
+        }
+        if (!empty($channel_host)) {
+            $data['channel_host'] = $channel_host;
+        }
+        if (!empty($channel_port)) {
+            $data['channel_port'] = $channel_port;
+        }
+        if (!empty($channel_source)) {
+            $data['channel_source'] = $channel_source;
+        }
+        if (!empty($business_id)) {
+            $data['business_id'] = $business_id;
+        }
+        if (!empty($channel_price)) {
+            $data['channel_price'] = $channel_price;
+        }
+        if (!empty($channel_postway)) {
+            $data['channel_postway'] = $channel_postway;
+        }
+        if (!empty($channel_source_addr)) {
+            $data['channel_source_addr'] = $channel_source_addr;
+        }
+        if (!empty($channel_shared_secret)) {
+            $data['channel_shared_secret'] = $channel_shared_secret;
+        }
+        if (!empty($channel_service_id)) {
+            $data['channel_service_id'] = $channel_service_id;
+        }
+        if (!empty($channel_template_id)) {
+            $data['channel_template_id'] = $channel_template_id;
+        }
+        if (!empty($channel_dest_id)) {
+            $data['channel_dest_id'] = $channel_dest_id;
+        }
+        if (!empty($channel_flow_velocity)) {
+            $data['channel_flow_velocity'] = $channel_flow_velocity;
+        }
+        if (empty($data)) {
+            return ['code' => '3002','msg' => '修改内容为空'];
+        }
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $id],'*',true);
+        if (empty($channel)) {
+            return ['code' => '3003','msg' => '该通道不存在'];
+        }
+        Db::startTrans();
+        try {
+            // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
+            DbAdministrator::editSmsSendingChannel($data, $id);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            exception($e);
+            return ['code' => '3009']; //修改失败
+        }
     }
 }
