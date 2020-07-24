@@ -858,7 +858,7 @@ class User extends CommonIndex
         }
         $has_bind = Dbuser::getUserDevelopCode(['uid' => $uid, 'business_id' => $business_id], 'id,uid,business_id,develop_no,source', false);
         if (empty($has_bind)) {
-            return ['code' => '3000'];
+            return ['code' => '200', 'develop_codes' => []];
         }
         return ['code' => '200', 'develop_codes' => $has_bind];
     }
