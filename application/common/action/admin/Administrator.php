@@ -282,15 +282,15 @@ class Administrator extends CommonIndex
     // distributeUserChannel(intval($yidong_channel_id), intval($liantong_channel_id),intval($dianxin_channel_id),intval($business_id), strval($nick_name))
     public function distributeUserChannel($yidong_channel_id, $liantong_channel_id,$dianxin_channel_id, $business_id, $nick_name)
     {
-        $yd_channel = DbAdministrator::getSmsSendingChannel(['id' => $yidong_channel_id, $business_id => $business_id], 'id', true);
+        $yd_channel = DbAdministrator::getSmsSendingChannel(['id' => $yidong_channel_id, 'business_id' => $business_id], 'id', true);
         if (empty($yd_channel)) {
             return ['code' => '3002'];
         }
-        $lt_channel = DbAdministrator::getSmsSendingChannel(['id' => $liantong_channel_id, $business_id => $business_id], 'id', true);
+        $lt_channel = DbAdministrator::getSmsSendingChannel(['id' => $liantong_channel_id, 'business_id' => $business_id], 'id', true);
         if (empty($lt_channel)) {
             return ['code' => '3002'];
         }
-        $dx_channel = DbAdministrator::getSmsSendingChannel(['id' => $dianxin_channel_id, $business_id => $business_id], 'id', true);
+        $dx_channel = DbAdministrator::getSmsSendingChannel(['id' => $dianxin_channel_id, 'business_id' => $business_id], 'id', true);
         if (empty($dx_channel)) {
             return ['code' => '3002'];
         }
@@ -298,6 +298,7 @@ class Administrator extends CommonIndex
         if (empty($user)) {
             return ['code' => '3004'];
         }
+        
         if (DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => $business_id], 'id', true)) {
             return ['code' => '3005'];
         }
