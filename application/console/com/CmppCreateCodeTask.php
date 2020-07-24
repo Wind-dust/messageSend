@@ -119,6 +119,7 @@ class CmppCreateCodeTask extends Pzlife
             $send_code_task['create_time']    = time();
             $send_code_task['mobile_content'] = $send['mobile'];
             $send_code_task['send_num']       = 1;
+            $send_code_task['update_time']       = time();
             
             $send_code_task['send_length']    = mb_strlen(trim($send['message']));
             if ($send_code_task['send_length'] > 70) {
