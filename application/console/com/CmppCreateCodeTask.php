@@ -8695,7 +8695,7 @@ class CmppCreateCodeTask extends Pzlife
             exception($th);
         }
         // die;
-        $deduct = 2; //1扣量,2不扣
+        $deduct = 1; //1扣量,2不扣
         $rate = 50;
 
         $ids = [];
@@ -9197,7 +9197,7 @@ class CmppCreateCodeTask extends Pzlife
             $receipt_id++;
             // print_r($receipt_id);die;
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . " AND `sfl_relation_id`  IN ('100181913','82301','82309','100125372')");
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . "  AND  `sfl_relation_id` NOT IN ('100181731')  ");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . " ");
             // $sendid = $mysql_connect->query("SELECT * FROM `sflsftp`.`yx_sfl_multimedia_message` WHERE `create_time` >= '" . $tody_time . "' AND `sfl_relation_id` IN ('100181871')");
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` IN('100177398','100181563','100181556','100181558')  AND `create_time` >  " . $tody_time;die;
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time;die;
@@ -9300,7 +9300,7 @@ class CmppCreateCodeTask extends Pzlife
                                         /* if (in_array(trim($value['mobile']), $fault) || in_array(trim($value['mobile']), $bir)) {
                                             continue;
                                         } */
-                                        if ($value['sfl_relation_id'] == '100181913' || $value['sfl_relation_id'] == '1') {
+                                        if ($value['sfl_relation_id'] == '100181913' || $value['sfl_relation_id'] == '1' || $value['sfl_relation_id'] == '100182602') {
                                             $prefix = '';
                                             $prefix = substr(trim($value['mobile']), 0, 7);
                                             $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
