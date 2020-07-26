@@ -9300,7 +9300,7 @@ class CmppCreateCodeTask extends Pzlife
                                         /* if (in_array(trim($value['mobile']), $fault) || in_array(trim($value['mobile']), $bir)) {
                                             continue;
                                         } */
-                                        if ($value['sfl_relation_id'] == '100181913' || $value['sfl_relation_id'] == '1' || $value['sfl_relation_id'] == '100182602') {
+                                        if ($value['sfl_relation_id'] == '100181913' || $value['sfl_relation_id'] == '1' || $value['sfl_relation_id'] == '100182607') {
                                             $prefix = '';
                                             $prefix = substr(trim($value['mobile']), 0, 7);
                                             $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
