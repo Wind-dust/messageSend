@@ -370,7 +370,7 @@ class CmppCreateCodeTask extends Pzlife
         } */
         $task_id = ['233976', '233988','233997'];
         foreach ($task_id as $key => $value) {
-            $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value, 'send_time' => 0, 'deduct' => 0]));
+            $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value, 'send_time' => 0, 'deduct' => 5]));
             // usleep(50000);
         }
     }
@@ -411,6 +411,7 @@ class CmppCreateCodeTask extends Pzlife
                     break;
                 }
                 $real_send = json_decode($send, true);
+                // print_r($real_send);die;
                 if ($real_send['send_time'] > time()) {
                     $this->redis->rPush('index:meassage:marketing:sendtask', json_encode($real_send));
                     continue;
@@ -2196,9 +2197,12 @@ class CmppCreateCodeTask extends Pzlife
 
                     //空号检测
                     // print_r($vacant);
-                    $the_month_time = date('Ymd', time());
+                    $the_month_time = strtotime(date('Ymd', time()));
                     $the_month_checkvacant = [];
-                    $the_month_checkvacant =  Db::query("SELECT `mobile` FROM  yx_mobile WHERE `mobile` IN (" . join(',', $vacant) . ") AND `check_status` = 2 AND `update_time` >= " . $the_month_time . "  GROUP BY  mobile  ");
+                    if (!empty($vacant)) {
+                        $the_month_checkvacant =  Db::query("SELECT `mobile` FROM  yx_mobile WHERE `mobile` IN (" . join(',', $vacant) . ") AND `check_status` = 2 AND `update_time` >= " . $the_month_time . "  GROUP BY  mobile  ");
+                    }
+                    
                     $the_month_checkvacant_mobiles = [];
                     if (!empty($the_month_checkvacant)) {
                         foreach ($the_month_checkvacant as $key => $value) {
