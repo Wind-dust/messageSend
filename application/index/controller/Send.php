@@ -440,7 +440,7 @@ class Send extends MyController
             return ['code' => '3011'];
         }
         $result = $this->app->send->getSmsBuiness($appid, $appkey, $Content, $Mobiles, $ip, $signature_id, $develop_no, $msg_id);
-        Log::write(json_encode($result), 'info');
+        // Log::write(json_encode($result), 'info');
         return $result;
     }
 
