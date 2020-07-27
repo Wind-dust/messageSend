@@ -1169,6 +1169,105 @@ class OfficeExcel extends Pzlife {
 
     }
 
+    public function updateDevelopCode(){
+        
+        $two_codes           = [];
+        //查询2位扩展码
+        $two_keep_back_codes = [];
+        $two_have_back_codes = Db::query("SELECT `develop_no` FROM yx_develop_code WHERE `no_lenth` = 2");
+        
+        foreach ($two_have_back_codes as $key => $value) {
+            $two_keep_back_codes[] = $value['develop_no'];
+        }
+       
+        for ($i = 10; $i < 100; $i++) {
+            if (!in_array($i, $two_keep_back_codes)) {
+                $two_codes[] = $i;
+            }
+        }
+
+        $three_keep_back_codes = [];
+        $three_have_back_codes = Db::query("SELECT `develop_no` FROM yx_develop_code WHERE `no_lenth` = 3");
+        foreach ($three_have_back_codes as $key => $value) {
+            $three_keep_back_codes[] = $value['develop_no'];
+        }
+        // print_r($three_keep_back_codes);die;
+        $three_codes = [];
+        foreach ($two_codes as $key => $value) {
+            for ($i = 0; $i < 10; $i++) {
+                $no = 0;
+                $no =  $value . $i;
+                // $three_codes[] = $value . $i;
+                if (!in_array($no, $three_keep_back_codes)) {
+                    $three_codes[] = $no;
+                }
+            }
+        }
+
+        $four_keep_back_codes = [];
+        $four_have_back_codes = Db::query("SELECT `develop_no` FROM yx_develop_code WHERE `no_lenth` = 4");
+        foreach ($four_have_back_codes as $key => $value) {
+            $four_keep_back_codes[] = $value['develop_no'];
+        }
+        // print_r($four_keep_back_codes);die;
+
+        //获取5位已绑定的拓展码
+        $five_has_bind_code = Db::query("SELECT `develop_no` FROM yx_develop_code WHERE `no_lenth` = 5 AND  `is_bind` = '2' ");
+        foreach ($five_has_bind_code as $key => $value) {
+            // $four_keep_back_codes[] = $value['develop_no'];
+            // print_r($value['develop_no']);die;
+            $no = '';
+            $no = mb_substr($value['develop_no'],0,4);
+            $four_keep_back_codes[] = $no;
+        }
+        $four_codes = [];
+        foreach ($three_codes as $key => $value) {
+            for ($i = 0; $i < 10; $i++) {
+                $no = 0;
+                $no =  $value . $i;
+                // $three_codes[] = $value . $i;
+                if (!in_array($no, $four_keep_back_codes)) {
+                    $four_codes[] = $no;
+                }
+            }
+        }
+        // print_r($four_codes);die;
+        $new_four_codes = [];
+        $new_four_codes = array_rand($four_codes,900);
+        $new_insert_four_codes = [];
+        foreach ($new_four_codes as $key => $value) {
+            $no = $four_codes[$value];
+            //SELECT * FROM `messagesend`.`yx_develop_code` WHERE `develop_no` LIKE '1401%'
+            // print_r($no);die;
+            $del_ids = [];
+            $had_set_code = Db::query("SELECT `id` FROM `messagesend`.`yx_develop_code` WHERE `develop_no` LIKE '".$no."%' ");
+            if (!empty($had_set_code)) {
+                foreach ($had_set_code as $key => $value) {
+                    $del_ids[] = $value['id'];
+                }
+                $ids = '';
+                $ids = join(',', $del_ids);
+                // print_r($ids);die;
+                Db::table('yx_develop_code')->where("id in ($ids)")->delete();
+            }
+            
+            $new_insert_four_codes[] = $no;
+        }
+        $all_develop_no = [];
+        foreach ($new_insert_four_codes as $key => $value) {
+            $develop_data = [];
+            $develop_data = [
+                'develop_no'  => $value,
+                'no_lenth'    => strlen($value),
+                'create_time' => time(),
+            ];
+            $all_develop_no[] = $develop_data;
+        }
+        if (!empty($all_develop_no)) {
+            Db::table('yx_develop_code')->insertAll($all_develop_no);
+        }
+    }
+
     /*    public function getReceiveInfo()
     {
     ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
@@ -2875,7 +2974,7 @@ class OfficeExcel extends Pzlife {
     }
 
     public function SflErrorMobile(){
-        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $this->redis = Phpredis::getConn();
         
         // $phone = '';
@@ -2884,7 +2983,7 @@ class OfficeExcel extends Pzlife {
         // $error_path = realpath("./")."/error.txt";
         // $error_file = fopen($error_path, "w");
         //黑卡
-        $black_error_path = realpath("./")."/0625.txt";
+        $black_error_path = realpath("./")."/0726.txt";
         $black_error_file       = fopen($black_error_path, "r");
         $black_error_mobile = [];
         $receive_alls = [];
@@ -2897,7 +2996,7 @@ class OfficeExcel extends Pzlife {
                 $black_error_mobile[] = $cellVal;
             }
         }
-
+        // echo count($black_error_mobile);die;
        /*  $white_error_path = realpath("./")."/100180396.txt";
         $white_error_file       = fopen($white_error_path, "r");
         $white_error_mobile = [];
@@ -2915,10 +3014,10 @@ class OfficeExcel extends Pzlife {
         $white_receipt_path = realpath("./")."/100180396_receipt.txt";
         $white_receipt_file       = fopen($white_receipt_path, "w"); */
         // echo count($black_error_mobile);die;
-        $start_time = 1592884416;
+        $start_time = 1594864920;
         $i = 1;
         $j = 1;
-        $model_path = realpath("./uploads/SFL/UnZip/MMS/Communication_targets_MMS_1_20200628103453") . "/Communication_targets_MMS_1_20200623103438.txt";
+        $model_path = realpath("./uploads\SFL\UnZip\SMS\Communication_targets_SMS_1_20200715141001") . "/Communication_targets_SMS_1_20200715141001.txt";
         // $model_path = realpath("./") . "/0624.txt";
         $file       = fopen($model_path, "r");
         while (!feof($file)) {
@@ -2929,15 +3028,16 @@ class OfficeExcel extends Pzlife {
                 foreach ($value as $key => $svalue) {
                     $value[$key] = str_replace('"', '', $svalue);
                 }
+                // print_r($value);die;
                 if (checkMobile($value[3]) == false || strlen($value[3]) > 11) {
                     continue;
                 }
                /*  if (!in_array($value[2],['529','100150820','100150821','100150822','100180393'])) {
                     continue;
                 } */
-                if (!in_array($value[2],['82301','82309','100125372','100180389'])) {
+               /*  if (!in_array($value[2],['82301','82309','100125372','100180389'])) {
                     continue;
-                }
+                } */
                 $receive = [];
                 $receive = [
                     'MESSAGE_ID'=>$value[0],
@@ -2955,13 +3055,13 @@ class OfficeExcel extends Pzlife {
                     if (in_array(substr(trim($value[3]), 0, 3),['141','142','143','144','145','146','148','149'])){
                         $receive['STATUS'] = 'SMS:2';
                     }
-                    $num = mt_rand(0,1000);
+                    /* $num = mt_rand(0,1000);
                     if ($num <= 33) {
                         $receive['STATUS'] = 'SMS:2';
-                    }
-                   /*  if (in_array($value[3],$black_error_mobile)) {
-                        $receive['STATUS'] = 'SMS:2';
                     } */
+                    if (in_array($value[3],$black_error_mobile)) {
+                        $receive['STATUS'] = 'SMS:2';
+                    }
                     //  $this->redis->rpush('0625',json_encode($receive));
                    /*  if ($value[2] == 100180395) {//黑卡
                         continue;
@@ -2985,15 +3085,16 @@ class OfficeExcel extends Pzlife {
                     }*/
                     
                 } 
-                // print_r($receive);die;
+               
                 $receive_alls[] = $receive;
+               
                 $i++;
                 if ($i > 200000) {
                     $name = "imp_mobile_status_report_mms_".$j."_20200623.xlsx";
                     $this->derivedTables($receive_alls,$name);
                     $j ++;
                     $receive_alls = [];
-                    $i = 0;
+                    $i = 1;
                 }
             }
         }
