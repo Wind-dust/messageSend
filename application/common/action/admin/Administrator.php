@@ -308,6 +308,7 @@ class Administrator extends CommonIndex
             'liantong_channel_id' => $liantong_channel_id,
             'dianxin_channel_id' => $dianxin_channel_id,
             'uid'        => $user['id'],
+            'nick_name'        => $user['nick_name'],
             'business_id'   => $business_id,
         ];
         Db::startTrans();
@@ -1322,5 +1323,9 @@ class Administrator extends CommonIndex
             exception($e);
             return ['code' => '3009']; //修改失败
         }
+    }
+
+    public function setUserAccountForCmpp($uid, $name, $channel_id, $channel_source){
+        $data = [];
     }
 }
