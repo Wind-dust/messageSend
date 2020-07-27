@@ -308,7 +308,7 @@ class Administrator extends CommonIndex
             'liantong_channel_id' => $liantong_channel_id,
             'dianxin_channel_id' => $dianxin_channel_id,
             'uid'        => $user['id'],
-            'nick_name'        => $user['nick_name'],
+            'nick_name'        => $nick_name,
             'business_id'   => $business_id,
         ];
         Db::startTrans();
