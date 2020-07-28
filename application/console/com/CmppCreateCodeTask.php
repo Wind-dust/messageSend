@@ -6240,21 +6240,6 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
-    public function businessSettlementNew(){
-        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        while (true) {
-            $year_businessSettlement  = [];
-            $month_businessSettlement = [];
-            $day_businessSettlement   = [];
-            $year_users               = [];
-            $month_users              = [];
-            $day_users                = [];
-            // $start_time               = strtotime('-10 days');
-            // print_r($start_time);die;
-            $start_time = (int) strtotime(date('2020-06-01'));
-        }
-    }
-
     public function businessSettlement()
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
@@ -11046,7 +11031,7 @@ class CmppCreateCodeTask extends Pzlife
                 $code_task_log = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `status_message` = '' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' LIMIT 1 ");
                 // echo "SELECT * FROM yx_user_send_code_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `status_message` = '' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' LIMIT 1 ";die;
                 if (!empty($code_task_log)) {
-                    $task         = Db::query("SELECT `id`,`send_msg_id` FROM yx_user_send_code_task WHERE `task_no` = '" . $code_task_log[0]['task_no'] . "' ");
+                    $task         = Db::query("SELECT `id`,`send_msg_id`,`task_no` FROM yx_user_send_code_task WHERE `task_no` = '" . $code_task_log[0]['task_no'] . "' ");
                     $task_receipt = Db::query("SELECT * FROM yx_send_code_task_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $code_task_log[0]['mobile'] . "' ");
                     /* $request_url = "http://116.228.60.189:15901/rtreceive?";
                     $request_url .= 'task_no=' . trim($code_task_log[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($code_task_log[0]['mobile']) . "&send_time=" . trim(date('YmdHis', time() + mt_rand(0, 500)));
