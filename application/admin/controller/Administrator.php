@@ -1157,8 +1157,12 @@ class Administrator extends AdminController
      * @apiName          setUserAccountForCmpp
      * @apiParam (入参) {String} cms_con_id
      * @apiParam (入参) {String} uid 用户id
-     * @apiParam (入参) {String} channel_id 通道ID
-     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:channel_id格式错误 / 3003:business_id格式错误
+     * @apiParam (入参) {String} cmpp_name cmpp账户名
+     * @apiParam (入参) {String} [yidong_channel_id] 移动通道ID
+     * @apiParam (入参) {String} [liantong_channel_id] 联通通道ID
+     * @apiParam (入参) {String} [dianxin_channel_id] 电信通道ID
+     * @apiParam (入参) {String} account_host 客户ip
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:uid格式错误 / 3002:name不能为空 / 3003:account_host不能为空 / 3004:至少分配一条有效通道 / 3005:channel_source格式错误 / 3006:用户不存在
      * @apiSampleRequest /admin/administrator/setUserAccountForCmpp
      * @return array
      * @author rzc
@@ -1169,5 +1173,29 @@ class Administrator extends AdminController
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
             return ['code' => '3100'];
         }
+        $uid = trim($this->request->post('uid'));
+        $cmpp_name = trim($this->request->post('cmpp_name'));
+        $yidong_channel_id = trim($this->request->post('yidong_channel_id'));
+        $liantong_channel_id = trim($this->request->post('liantong_channel_id'));
+        $dianxin_channel_id = trim($this->request->post('dianxin_channel_id'));
+        $account_source = trim($this->request->post('account_source'));
+        $account_host = trim($this->request->post('account_host'));
+        if (empty($uid) || !is_numeric($uid) || $uid < 1) {
+            return  ['code' => '3001', 'msg' => 'uid格式错误'];
+        }
+        if (empty($cmpp_name)) {
+            return  ['code' => '3002', 'msg' => 'name不能为空'];
+        }
+        if (empty($account_host)) {
+            return  ['code' => '3003', 'msg' => 'account_host不能为空'];
+        }
+        if (empty($yidong_channel_id) && empty($liantong_channel_id) && empty($dianxin_channel_id)) {
+            return  ['code' => '3004', 'msg' => '至少分配一条有效通道'];
+        }
+       /*  if (empty($account_source) || !in_array($account_source,[1,2,3,4,5,6,7])) {
+            return  ['code' => '3005', 'msg' => 'channel_source格式错误'];
+        } */
+        $result = $this->app->administrator->setUserAccountForCmpp($uid, $cmpp_name, $yidong_channel_id, $liantong_channel_id, $dianxin_channel_id, $account_host);
+        return $result;
     }
 }

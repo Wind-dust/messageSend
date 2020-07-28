@@ -513,9 +513,9 @@ class Administrator extends CommonIndex
         }
         // die;
         // print_r($uids);die;
-        if (count($uids) > 1) {
+        /* if (count($uids) > 1) {
             return ['code' => '3008', 'msg' => '一批只能同时分配一个用户的营销任务'];
-        }
+        } */
         if (empty($real_usertask)) {
             return ['code' => '3010', 'msg' => '待分配的批量任务未空（提交了一批未审核的批量任务）'];
         }
@@ -1325,7 +1325,64 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function setUserAccountForCmpp($uid, $name, $channel_id, $channel_source){
+    //账户归属:1,中国移动;2,中国联通;3,中国电信;4,三网通;5,移动联通;6,移动电信;7,联通电信
+    public function setUserAccountForCmppsetUserAccountForCmpp($uid, $cmpp_name, $yidong_channel_id = 0, $liantong_channel_id = 0, $dianxin_channel_id = 0, $account_host){
+       
+        $user = DbUser::getUserInfo(['id' => $uid], 'id,nick_name', true);
+        if (empty($user)) {
+            return ['code' => '3006', 'msg' => '该用户不存在'];
+        }
+        $cmpp_account = DbAdministrator::getUserCmppAccount(['cmpp_name' => $cmpp_name], 'id',true);
+        if (!empty($cmpp_account)) {
+            return ['code' => '3007', 'msg' => '命名重复'];
+        }
+        if (!empty($yidong_channel_id)) {
+            $yd_channel = DbAdministrator::getSmsSendingChannel(['id' => $yidong_channel_id],'*',true);
+            if (empty($yd_channel)) {
+                return ['code' => '3008','msg' => '该通道不存在'];
+            }
+            if (!in_array($yd_channel['channel_source'],[1,4,5,6])) {
+                return ['code' => '3009', 'msg' => '分配的通道不支持移动号段'];
+            }
+        }
+        if (!empty($liantong_channel_id)) {
+            $lt_channel = DbAdministrator::getSmsSendingChannel(['id' => $liantong_channel_id],'*',true);
+            if (empty($lt_channel)) {
+                return ['code' => '3008','msg' => '该通道不存在'];
+            }
+            if (!in_array($lt_channel['channel_source'],[2,4,5,7])) {
+                return ['code' => '3010', 'msg' => '分配的通道不支持联通号段'];
+            }
+        }
+        if (!empty($dianxin_channel_id)) {
+            $dx_channel = DbAdministrator::getSmsSendingChannel(['id' => $dianxin_channel_id],'*',true);
+            if (empty($dx_channel)) {
+                return ['code' => '3008','msg' => '该通道不存在'];
+            }
+            if (!in_array($dx_channel['channel_source'],[3,4,6,7])) {
+                return ['code' => '3011', 'msg' => '分配的通道不支持电信号段'];
+            }
+        }
         $data = [];
+        $data = [
+            'uid' => $uid,
+            'nick_name' => $user['nick_name'],
+            'cmpp_name' => $cmpp_name,
+            'yidong_channel_id' => $yidong_channel_id,
+            'liantong_channel_id' => $liantong_channel_id,
+            'dianxin_channel_id' => $dianxin_channel_id,
+            'account_host' => $account_host
+        ];
+        Db::startTrans();
+        try {
+            // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
+            DbAdministrator::addUserCmppAccount($data);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            exception($e);
+            return ['code' => '3009']; //修改失败
+        }
     }
 }

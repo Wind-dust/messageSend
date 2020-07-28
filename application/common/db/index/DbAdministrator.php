@@ -19,6 +19,7 @@ use app\common\model\UserSendCodeTaskLog;
 use app\common\model\ThirdPartyMmsTemplateReport;
 use app\common\model\UserMultimediaTemplateThirdReport;
 use app\common\model\UserDeductWord;
+use app\common\model\UserCmppAccount;
 use think\Db;
 
 class DbAdministrator
@@ -451,4 +452,26 @@ class DbAdministrator
         return UserMultimediaTemplateThirdReport::where($where)->count();
     }
 
+    public function getUserCmppAccount($where, $field, $row = false, $orderBy = '', $limit = '')
+    {
+        $obj = UserCmppAccount::field($field)->where($where);
+        return $this->getResult($obj, $row, $orderBy, $limit);
+    }
+    public function addUserCmppAccount($data)
+    {
+        $UserCmppAccount = new UserCmppAccount;
+        $UserCmppAccount->save($data);
+        return $UserCmppAccount->id;
+    }
+
+    public function editUserCmppAccount($data, $id)
+    {
+        $UserCmppAccount = new UserCmppAccount;
+        return $UserCmppAccount->save($data, ['id' => $id]);
+    }
+
+    public function countUserCmppAccount($where)
+    {
+        return UserCmppAccount::where($where)->count();
+    }
 }
