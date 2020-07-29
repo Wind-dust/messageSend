@@ -1045,6 +1045,97 @@ class Administrator extends CommonIndex
                 return ['code' => '3006','msg' => '该通道报备失败'];
             }
             
+        }elseif ($channel_id == 122) {
+            
+            $appid = '350171'; //appid由企业彩信平台提供 是
+            $appkey = 'bac3a3c6ea6649f68ba1389d5f688aa9';
+            // $timestamp =  //时间戳访问接口时间 单位：毫秒 是
+           
+            $timestamp = time();
+            $time = microtime(true);
+            //结果：1541053888.5911
+            //在经过处理得到最终结果:
+            $lastTime = (int)($time * 1000);
+            $sign = md5($appkey.$appid.$lastTime.$appkey);//数字签名参考sign生成规则 是
+            $report_api = 'http://47.110.195.237:8081/api/v2/mms/create?timestamp='.$lastTime.'&appid='.$appid.'&sign='.$sign;
+            $data = [];
+            $data['mms_title'] = $template['title'];
+            $data['mms_type'] = 'multipart/mixed';
+            $data['mmstemplate'] = 1;
+            
+            // print_r($multimedia_message_frame);die;
+            $mmsbody = [];
+            foreach ($multimedia_message_frame as $key => $value) {
+                # code...
+                $content_data = [];
+                if (!empty($value['content'])) {
+                    $value['content'] = str_replace('{{var1}}','{1}',$value['content']);
+                    $value['content'] = str_replace('{{var2}}','{2}',$value['content']);
+                    $value['content'] = str_replace('{{var3}}','{3}',$value['content']);
+                    $value['content'] = str_replace('{{var4}}','{4}',$value['content']);
+                    $value['content'] = str_replace('{{var5}}','{5}',$value['content']);
+                    $value['content'] = str_replace('{{var6}}','{6}',$value['content']);
+                    $value['content'] = str_replace('{{var7}}','{7}',$value['content']);
+                    $value['content'] = str_replace('{{var8}}','{8}',$value['content']);
+                    $value['content'] = str_replace('{{var9}}','{9}',$value['content']);
+                    $value['content'] = str_replace('{{var10}}','{10}',$value['content']);
+                    $content_data = [
+                        'content_data' => $value['content'],
+                        'content_type' => 'text/plain',
+                    ];
+                    $mmsbody[] = $content_data;
+                }
+                $content_data = [];
+                if (!empty($value['image_path'])) {
+
+                    $value['image_path']=filtraImage(Config::get('qiniu.domain'), $value['image_path']);
+                    $type = explode('.', $value['image_path']);
+
+                   
+                    $content_data = [
+                        'content_data' => base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path'])),
+                        'content_type' => 'image/'.$type[1],
+                    ];
+                    $mmsbody[] = $content_data;
+                }
+            }
+            $data['mmsbody'] = $mmsbody;
+            $headers = [];
+            $headers = [
+                'Content-Type:text/plain'
+            ];
+            $result = $this->sendRequest2($report_api,'post',$data,$headers);
+            // $result = '{"msg":"成功","code":"T","data":{"mms_id":"60226","status":"R"}}';
+           
+            if (!empty($result)) {
+                $result = json_decode($result,true);
+                if ($result['msg'] == '成功') {
+                    $report_msg_id = $result['data']['mms_id'];
+                    $had_report = DbAdministrator::getUserMultimediaTemplateThirdReport(['channel_id'=> $channel_id,'template_id' => $template_id],'id',true);
+                    if (!empty($had_report)) {
+                        return ['code' => '3007','msg' => '该模板已在该通道报备过'];
+                    }
+                    $report_data = [];
+                    $report_data = [
+                        'channel_id'=> $channel_id,
+                        'template_id'=> $template_id,
+                        'third_template_id'=> $report_msg_id,
+                    ];
+                    Db::startTrans();
+                    try {
+                        DbAdministrator::addUserMultimediaTemplateThirdReport($report_data);
+                        Db::commit();
+                        return ['code' => '200'];
+                    } catch (\Exception $th) {
+                        exception($th);
+                        Db::rollback();
+                        return ['code' => '3009']; //修改失败
+                    }
+                }
+                return ['code' => '3006','msg' => '该通道报备失败'];
+            }else{
+                return ['code' => '3006','msg' => '该通道报备失败'];
+            }
         }
     }
 
