@@ -373,7 +373,7 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function getUserSendTask($page, $pageNum, $id, $free_trial = 0, $send_status = 0)
+    public function getUserSendTask($page, $pageNum, $id, $free_trial = 0, $send_status = 0, $uid = 0)
     {
         $time = strtotime('-4 days',time());
         // echo $time;die;
@@ -385,6 +385,9 @@ class Administrator extends CommonIndex
         }
         if ($send_status) {
             array_push($where,['send_status','=',$send_status]);
+        }
+        if ($uid) {
+            array_push($where,['uid','=',$uid]);
         }
         if (!empty($id)) {
             $result = DbAdministrator::getUserSendTask(['id' => $id], '*', true);
@@ -618,7 +621,7 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function getUserSendCodeTask($page, $pageNum, $id, $free_trial = 0, $channel_id = 0, $send_status)
+    public function getUserSendCodeTask($page, $pageNum, $id, $free_trial = 0, $channel_id = 0, $send_status, $uid = 0)
     {
         $time = strtotime('-4 days',time());
         // echo $time;die;
@@ -633,6 +636,9 @@ class Administrator extends CommonIndex
         }
         if ($send_status) {
             array_push($where,['send_status','=',$send_status]);
+        }
+        if ($uid) {
+            array_push($where,['uid','=',$uid]);
         }
         $offset = ($page - 1) * $pageNum;
         if (!empty($id)) {
@@ -1057,7 +1063,7 @@ class Administrator extends CommonIndex
             //在经过处理得到最终结果:
             $lastTime = (int)($time * 1000);
             $sign = md5($appkey.$appid.$lastTime.$appkey);//数字签名参考sign生成规则 是
-            $report_api = 'http://47.110.195.237:8081/api/v2/mms/create?timestamp='.$lastTime.'&appid='.$appid.'&sign='.$sign;
+            $report_api = 'http://47.110.195.237:8081/api/v2/mms/create?timestamp='.$lastTime.'&appid='.$appid.'&sign='.$sign.'&mmstemplate=1';
             $data = [];
             $data['mms_title'] = $template['title'];
             $data['mms_type'] = 'multipart/mixed';

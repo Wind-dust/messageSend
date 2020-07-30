@@ -542,6 +542,7 @@ class Administrator extends AdminController
     {
         $id       = trim($this->request->post('id'));
         $free_trial       = trim($this->request->post('free_trial'));
+        $uid       = trim($this->request->post('uid'));
         $send_status       = trim($this->request->post('send_status'));
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
@@ -554,7 +555,7 @@ class Administrator extends AdminController
         intval($pageNum);
         intval($free_trial);
         intval($free_trial);
-        $result = $this->app->administrator->getUserSendTask($page, $pageNum, $id, $free_trial, $send_status);
+        $result = $this->app->administrator->getUserSendTask($page, $pageNum, $id, $free_trial, $send_status, $uid);
         return $result;
     }
 
@@ -680,6 +681,7 @@ class Administrator extends AdminController
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
         $cmsConId = trim($this->request->post('cms_con_id'));
+        $uid       = trim($this->request->post('uid'));
         $page     = is_numeric($page) ? $page : 1;
         $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
         $free_trial  = is_numeric($free_trial) ? $free_trial : 0;
@@ -690,7 +692,7 @@ class Administrator extends AdminController
         intval($free_trial);
         intval($channel_id);
         intval($send_status);
-        $result = $this->app->administrator->getUserSendCodeTask($page, $pageNum, $id, $free_trial, $channel_id, $send_status);
+        $result = $this->app->administrator->getUserSendCodeTask($page, $pageNum, $id, $free_trial, $channel_id, $send_status, $uid);
         return $result;
     }
 
