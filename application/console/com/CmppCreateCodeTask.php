@@ -1181,8 +1181,8 @@ class CmppCreateCodeTask extends Pzlife
         foreach ($task_id as $key => $value) {
             $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $value['id'], 'deduct' => 60]));
         } */
-        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 150393, 'deduct' => 0]));
-        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 150394, 'deduct' => 0]));
+        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 150413, 'deduct' => 0]));
+        // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 150394, 'deduct' => 0]));
     }
 
     //书写彩信任务日志并写入通道
@@ -1979,7 +1979,7 @@ class CmppCreateCodeTask extends Pzlife
                 $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value['id'], 'deduct' => 0]));
             }
         } */
-        $taskid = [2306450];
+        $taskid = [2444024];
         foreach ($taskid as $key => $value) {
             $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value, 'deduct' => 0]));
         }
