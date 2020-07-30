@@ -8725,7 +8725,7 @@ class CmppCreateCodeTask extends Pzlife
                             if ($deduct == 1) {
                                 $rate = $rate;
                                 $num = mt_rand(0, 100);
-                                if (strpos($value['task_content'], '生日') !== false || in_array($value['template_id'], ['514', '100107992', '100182484', '100182485', '100150970'])) { //生日不扣
+                                if (strpos($value['task_content'], '生日') !== false || in_array($value['template_id'], ['514', '100107992', '100182484', '100182485', '100150970','100182609','100182604','100182178'])) { //生日不扣
                                     // print_r($value['task_content']);die;
                                     $prefix = '';
                                     $prefix = substr(trim($value['mobile']), 0, 7);
