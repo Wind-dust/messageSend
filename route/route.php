@@ -21,7 +21,7 @@ Route::get('think', function () {
 //Route::rule('hello/:name/[:sign]/[:timestamp]', 'index/index/hello');
 
 //Route::get('admin/hello/[:name]', 'admin/index/hello');
-
+//test
 return [
 
 ];
