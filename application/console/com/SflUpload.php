@@ -970,8 +970,10 @@ class SflUpload extends Pzlife
                                         // $results[] = $entry;
                                     }
                                     // print_r($files_name);die;
-                                    $mcw = $zip->extractTo($unpath, $files_name); //解压到$route这个目录中
-                                    // // $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
+                                    $mcw = $zip->extractTo($unpath, $files_name); 
+                                    //解压到$route这个目录中
+                                    // // $mcw    = $zip->extractTo($unpath); 
+                                    //解压到$route这个目录中
                                     $zip->close();
                                     //解压完成
                                     $unzip = $this->getDirContent($unpath);
@@ -1327,8 +1329,10 @@ class SflUpload extends Pzlife
                                         // $results[] = $entry;
                                     }
                                     // print_r($files_name);die;
-                                    $mcw = $zip->extractTo($unpath, $files_name); //解压到$route这个目录中
-                                    // $mcw    = $zip->extractTo($unpath); //解压到$route这个目录中
+                                    $mcw = $zip->extractTo($unpath, $files_name); 
+                                    //解压到$route这个目录中
+                                    // $mcw    = $zip->extractTo($unpath); 
+                                    //解压到$route这个目录中
                                     $zip->close();
                                     //解压完成
                                     $unzip = $this->getDirContent($unpath);
@@ -1923,7 +1927,7 @@ class SflUpload extends Pzlife
                         // die;
                     }
                 } elseif ($value == 'SMSTest') {
-                    continue;
+                    // continue;
                     $send_data    = [];
                     $SMS_model    = [];
                     $SMSmessage   = [];
