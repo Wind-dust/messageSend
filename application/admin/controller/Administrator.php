@@ -529,6 +529,7 @@ class Administrator extends AdminController
      * @apiName          getUserSendTask
      * @apiParam (入参) {String} cms_con_id
      * @apiParam (入参) {String} id 任务id
+     * @apiParam (入参) {String} uid 用户id
      * @apiParam (入参) {String} free_trial 1:需要审核;2:审核通过;3:审核不通过
      * @apiParam (入参) {String} send_status 1：待发送,2:已发送;
      * @apiParam (入参) {String} page 页码 默认1
@@ -662,6 +663,7 @@ class Administrator extends AdminController
      * @apiName          getUserSendCodeTask
      * @apiParam (入参) {String} cms_con_id
      * @apiParam (入参) {String} id 任务id
+     * @apiParam (入参) {String} uid 用户id
      * @apiParam (入参) {String} free_trial 1:需要审核;2:审核通过;3:审核不通过
      * @apiParam (入参) {String} channel_id 0 未分配通道 1 已分配通道
      * @apiParam (入参) {String} send_status 1：待发送,2:已发送

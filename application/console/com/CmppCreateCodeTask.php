@@ -362,15 +362,18 @@ class CmppCreateCodeTask extends Pzlife
         /* 
                                     1321785 1322036
                                     */
-        // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
+        // $task_id = Db::query("SELECT `id`,`task_no` FROM yx_user_send_task WHERE  `create_time` >= '1596160800' AND `uid` IN (153,185) ");
         /*    $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_task WHERE  `id` >= 168848  ");
         foreach ($task_id as $key => $value) {
             $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value['id'], 'send_time' => 0, 'deduct' => 10]));
             // usleep(50000);
         } */
-        $task_id = ['233976', '233988','233997'];
+        $task_id = [237014,237019,237020,237022,237023,237050,237051,237052,237053,237072,237073,237074,237077,237078,237079,237083,237085,237087,237103,237110,237113,237114,237115,237116,237117,237119,237122,237123,237124,237125,237126,237127,237800,237801,237802,237803,237804,237805,237806,237809,237810,237811,237812,237813,237817,237818,237819,237828,237830,237832,237834,237841,237843,237844,237845,238357];
         foreach ($task_id as $key => $value) {
-            $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value, 'send_time' => 0, 'deduct' => 5]));
+           /*  if (Db::query("SELECT `task_no` FROM yx_user_send_task_log WHERE `task_no` = '".$value['task_no']."' ")) {
+                continue;
+            } */
+            $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $value, 'send_time' => 0, 'deduct' => 0]));
             // usleep(50000);
         }
     }
@@ -5913,8 +5916,8 @@ class CmppCreateCodeTask extends Pzlife
     {
         $del_ids = [];
         //  for ($i = 158434; $i < 173332; $i++) {
-        for ($i = 143748; $i < 155742; $i++) {
-            $sendTask = $this->getSendCodeTask($i);
+        for ($i = 236983; $i < 238632; $i++) {
+            $sendTask = $this->getSendTask($i);
             if (empty($sendTask)) {
                 continue;
             }
@@ -5923,10 +5926,10 @@ class CmppCreateCodeTask extends Pzlife
             if (count($mobile) > 1) {
                 // continue;
                 foreach ($mobile as $key => $value) {
-                    $log = Db::query("SELECT `id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '" . $task_no . "' AND `mobile` = '" . $value . "'");
+                    $log = Db::query("SELECT `id` FROM `yx_user_send_task_log` WHERE `task_no` = '" . $task_no . "' AND `mobile` = '" . $value . "'");
 
                     if (count($log) > 1) {
-                        print_r($log);
+                        // print_r($sendTask['task_no']);
                         $has     = [];
                         $has[]   = $log[0]['id'];
                         $logs_id = array_column($log, 'id');
@@ -5935,12 +5938,12 @@ class CmppCreateCodeTask extends Pzlife
                         foreach ($del as $key => $value) {
                             $del_ids[] = $value;
                         }
-                        // print_r($del_ids);
+                        // print_r($logs_id);
                         // die;
                     }
                 }
             } else {
-                $log = Db::query("SELECT `id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '" . $task_no . "'");
+                $log = Db::query("SELECT `id` FROM `yx_user_send_task_log` WHERE `task_no` = '" . $task_no . "'");
                 if (count($log) > 1) {
                     $has     = [];
                     $has[]   = $log[0]['id'];
@@ -5955,9 +5958,11 @@ class CmppCreateCodeTask extends Pzlife
                 }
             }
         }
+        print_r($del_ids);
+        // die;
         if ($del_ids) {
             $ids = join(',', $del_ids);
-            Db::table('yx_user_send_code_task_log')->where("id in ($ids)")->delete();
+            Db::table('yx_user_send_task_log')->where("id in ($ids)")->delete();
         }
     }
 
@@ -8662,8 +8667,8 @@ class CmppCreateCodeTask extends Pzlife
         ];
         // echo "SELECT * FROM yx_sfl_send_task WHERE `mobile` IN (".join(',',$white_list).") ";die;
         // $tody_time = 1595491200;
-        $tody_time = strtotime(date("Ymd", time()));
-        // $tody_time = 1594886400;// 时间下午16点3条 已发第一条
+        // $tody_time = strtotime(date("Ymd", time()));
+        $tody_time = 1596189600;// 时间下午16点3条 已发第一条
         // $tody_time = 1594891200;// 时间下午17点20
         try {
             $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84, 'update_time' => time()]);

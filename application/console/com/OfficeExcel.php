@@ -1532,6 +1532,8 @@ class OfficeExcel extends Pzlife {
                     $newres = [
                         'source' => 1,
                     ];
+                }else{
+                    continue;
                 }
                 if (empty($newres)) {
                     $source = Db::query("SELECT `mobile`,`source`,`province_id`,`city_id` FROM yx_number_source WHERE `id` = " . $value['id']);
