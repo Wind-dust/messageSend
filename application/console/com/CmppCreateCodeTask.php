@@ -8667,8 +8667,8 @@ class CmppCreateCodeTask extends Pzlife
         ];
         // echo "SELECT * FROM yx_sfl_send_task WHERE `mobile` IN (".join(',',$white_list).") ";die;
         // $tody_time = 1595491200;
-        $tody_time = strtotime(date("Ymd", time()));
-        // $tody_time = 1594886400;// 时间下午16点3条 已发第一条
+        // $tody_time = strtotime(date("Ymd", time()));
+        $tody_time = 1596189600;// 时间下午16点3条 已发第一条
         // $tody_time = 1594891200;// 时间下午17点20
         try {
             $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84, 'update_time' => time()]);
@@ -8690,7 +8690,7 @@ class CmppCreateCodeTask extends Pzlife
         }
         // die;
         $deduct = 1; //1扣量,2不扣
-        $rate = 60;
+        $rate = 50;
 
         $ids = [];
         $j = 1;
