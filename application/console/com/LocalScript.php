@@ -30,7 +30,7 @@ class LocalScript extends Pzlife
     {
         // $produce = Producer::getInstance('localhost:2181', 3000);
         try {
-            
+
             date_default_timezone_set('PRC');
             // Create the logger
             // $logger = new Logger('my_logger');
@@ -44,20 +44,20 @@ class LocalScript extends Pzlife
             $producer = new \Kafka\Producer();
             // $producer->setLogger($logger);
 
-            for($i = 0; $i < 100; $i++) {
-                    $result = $producer->send(array(
-                            array(
-                                    'topic' => 'test1',
-                                    'value' => 'test1....message.',
-                                    'key' => '',
-                            ),
-                    ));
-                    var_dump($result);
+            for ($i = 0; $i < 100; $i++) {
+                $result = $producer->send(array(
+                    array(
+                        'topic' => 'test1',
+                        'value' => 'test1....message.',
+                        'key' => '',
+                    ),
+                ));
+                var_dump($result);
             }
             // $logger = new Logger('my_logger');
             // // Now add some handlers
             // $logger->pushHandler(new StdoutHandler());
-            
+
             /* $config = \Kafka\ConsumerConfig::getInstance();
             $config->setMetadataRefreshIntervalMs(10000);
             $config->setMetadataBrokerList('139.224.119.119:9000');
@@ -970,6 +970,8 @@ class LocalScript extends Pzlife
                     $newres = [
                         'source' => 1,
                     ];
+                } else {
+                    continue;
                 }
                 if (empty($newres)) {
                     $source = Db::query("SELECT `mobile`,`source`,`province_id`,`city_id` FROM yx_number_source WHERE `id` = " . $value['id']);

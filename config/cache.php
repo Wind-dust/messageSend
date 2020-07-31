@@ -44,9 +44,18 @@ return [
         'type' => 'redis',
         'host' => Env::get('redis.hostname'),
         'port' => '6379',
-        'password' => "as6d7g&h",
+        // 'password' => "as6d7g&h",
+        'password' => Env::get('redisnew.password'),
         'timeout' => 3600,
-        'select' => 2,
+        'select' => 0,
+    ],
+    'redisnew' => [
+        'type' => 'redis',
+        'host' => Env::get('redisnew.hostname'),
+        'port' => '6379',
+        'password' => Env::get('redisnew.password'),
+        'timeout' => 3600,
+        'select' => 0,
     ]
 
 ];
