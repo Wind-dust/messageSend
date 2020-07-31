@@ -24,7 +24,6 @@ class PhpredisNew
         if (class_exists('Redis')) {
             $this->loadConfig();
             $redis = new Redis();
-            print_r($this->redis_config);die;
             $redis->connect($this->redis_config["host"], $this->redis_config["port"]);
             if (!empty($this->redis_config['password'])) {
                 $redis->auth($this->redis_config["password"]);
