@@ -1555,8 +1555,8 @@ class OfficeExcel extends Pzlife {
             }
         } catch (\Exception $th) {
             //throw $th
-            print_r($value);
-            // exception($th);
+            // print_r($value);
+            exception($th);
         }
     }
 
