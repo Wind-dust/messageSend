@@ -5916,8 +5916,8 @@ class CmppCreateCodeTask extends Pzlife
     {
         $del_ids = [];
         //  for ($i = 158434; $i < 173332; $i++) {
-        for ($i = 236983; $i < 238631; $i++) {
-            $sendTask = $this->getSendCodeTask($i);
+        for ($i = 236983; $i < 238632; $i++) {
+            $sendTask = $this->getSendTask($i);
             if (empty($sendTask)) {
                 continue;
             }
@@ -5926,10 +5926,10 @@ class CmppCreateCodeTask extends Pzlife
             if (count($mobile) > 1) {
                 // continue;
                 foreach ($mobile as $key => $value) {
-                    $log = Db::query("SELECT `id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '" . $task_no . "' AND `mobile` = '" . $value . "'");
+                    $log = Db::query("SELECT `id` FROM `yx_user_send_task_log` WHERE `task_no` = '" . $task_no . "' AND `mobile` = '" . $value . "'");
 
                     if (count($log) > 1) {
-                        print_r($log);
+                        // print_r($sendTask['task_no']);
                         $has     = [];
                         $has[]   = $log[0]['id'];
                         $logs_id = array_column($log, 'id');
@@ -5938,12 +5938,12 @@ class CmppCreateCodeTask extends Pzlife
                         foreach ($del as $key => $value) {
                             $del_ids[] = $value;
                         }
-                        // print_r($del_ids);
+                        // print_r($logs_id);
                         // die;
                     }
                 }
             } else {
-                $log = Db::query("SELECT `id` FROM `yx_user_send_code_task_log` WHERE `task_no` = '" . $task_no . "'");
+                $log = Db::query("SELECT `id` FROM `yx_user_send_task_log` WHERE `task_no` = '" . $task_no . "'");
                 if (count($log) > 1) {
                     $has     = [];
                     $has[]   = $log[0]['id'];
@@ -5959,10 +5959,10 @@ class CmppCreateCodeTask extends Pzlife
             }
         }
         print_r($del_ids);
-        die;
+        // die;
         if ($del_ids) {
             $ids = join(',', $del_ids);
-            Db::table('yx_user_send_code_task_log')->where("id in ($ids)")->delete();
+            Db::table('yx_user_send_task_log')->where("id in ($ids)")->delete();
         }
     }
 
