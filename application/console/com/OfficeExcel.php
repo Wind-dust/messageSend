@@ -4,6 +4,7 @@ namespace app\console\com;
 
 use app\console\Pzlife;
 use cache\Phpredis;
+use cache\PhpredisNew;
 use Config;
 use Env;
 use Exception;
@@ -1271,7 +1272,7 @@ class OfficeExcel extends Pzlife {
     public function newRedisConnect()
     {
         try {
-            // $mobileredis = PhpredisNew::getConn();
+            $mobileredis = PhpredisNew::getConn();
             $redis       = Phpredis::getConn();
             // print_r($this->redis);
             ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
@@ -1295,7 +1296,7 @@ class OfficeExcel extends Pzlife {
                         'city_id'     => $source['city_id'],
                     ];
                 }
-                $redis->hset('yx:mobile:white', $value['mobile'], json_encode($newres));
+                $mobileredis->hset('yx:mobile:white', $value['mobile'], json_encode($newres));
             }
             /* 黑名单设置 */
             $black_mobiles = Db::query("SELECT * FROM yx_blacklist ");
@@ -1317,7 +1318,7 @@ class OfficeExcel extends Pzlife {
                         'city_id'     => $source['city_id'],
                     ];
                 }
-                $redis->hset('yx:mobile:black', $value['mobile'], json_encode($newres));
+                $mobileredis->hset('yx:mobile:black', $value['mobile'], json_encode($newres));
             }
 
             /* 空号设置 */
@@ -1343,7 +1344,7 @@ class OfficeExcel extends Pzlife {
                 $newres['check_status'] = $value['check_status'];
                 $newres['update_time']  = $value['update_time'];
                 $newres['check_result'] = $value['check_result'];
-                $redis->hset('yx:mobile:empty', $value['mobile'], json_encode($newres));
+                $mobileredis->hset('yx:mobile:empty', $value['mobile'], json_encode($newres));
             }
 
             /* 实号设置 */
@@ -1550,7 +1551,7 @@ class OfficeExcel extends Pzlife {
                 $newres['update_time']  = $value['update_time'];
                 $newres['check_status'] = $value['check_status'];
                 $newres['check_result'] = $value['check_result'];
-                $redis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
+                $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
             }
         } catch (\Exception $th) {
             //throw $th
