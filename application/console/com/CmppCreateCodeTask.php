@@ -5916,7 +5916,7 @@ class CmppCreateCodeTask extends Pzlife
     {
         $del_ids = [];
         //  for ($i = 158434; $i < 173332; $i++) {
-        for ($i = 143748; $i < 155742; $i++) {
+        for ($i = 236983; $i < 238631; $i++) {
             $sendTask = $this->getSendCodeTask($i);
             if (empty($sendTask)) {
                 continue;
@@ -5958,6 +5958,8 @@ class CmppCreateCodeTask extends Pzlife
                 }
             }
         }
+        print_r($del_ids);
+        die;
         if ($del_ids) {
             $ids = join(',', $del_ids);
             Db::table('yx_user_send_code_task_log')->where("id in ($ids)")->delete();
@@ -8688,7 +8690,7 @@ class CmppCreateCodeTask extends Pzlife
         }
         // die;
         $deduct = 1; //1扣量,2不扣
-        $rate = 50;
+        $rate = 60;
 
         $ids = [];
         $j = 1;
