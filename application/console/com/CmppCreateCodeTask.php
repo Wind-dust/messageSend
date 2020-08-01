@@ -488,6 +488,8 @@ class CmppCreateCodeTask extends Pzlife
                             'content'     => $sendTask['task_content'],
                             'channel_id'  => $yidong_channel_id,
                             'from'        => 'yx_user_send_task',
+                            'send_msg_id'        => $sendTask['send_msg_id'],
+                            'uid'          => $sendTask['uid'],
                         ];
                         if (!empty($sendTask['develop_no'])) {
                             $sendmessage['develop_code'] = $sendTask['develop_no'];
@@ -545,6 +547,8 @@ class CmppCreateCodeTask extends Pzlife
                             'content'     => $sendTask['task_content'],
                             'channel_id'  => $liantong_channel_id,
                             'from'        => 'yx_user_send_task',
+                            'send_msg_id'        => $sendTask['send_msg_id'],
+                            'uid'          => $sendTask['uid'],
                         ];
                         if (!empty($sendTask['develop_no'])) {
                             $sendmessage['develop_code'] = $sendTask['develop_no'];
@@ -602,6 +606,8 @@ class CmppCreateCodeTask extends Pzlife
                             'content'     => $sendTask['task_content'],
                             'channel_id'  => $dianxin_channel_id,
                             'from'        => 'yx_user_send_task',
+                            'send_msg_id'        => $sendTask['send_msg_id'],
+                            'uid'          => $sendTask['uid'],
                         ];
                         if (!empty($sendTask['develop_no'])) {
                             $sendmessage['develop_code'] = $sendTask['develop_no'];
@@ -694,6 +700,7 @@ class CmppCreateCodeTask extends Pzlife
                             'mobile' =>  $deduct_mobile[$i],
                             'content'   => $sendTask['task_content'],
                             'from'   => 'yx_user_send_task',
+                            'send_msg_id'        => $sendTask['send_msg_id'],
                             'Submit_time'   => time(),
                         ];
                         // $this->redis->rpush('index:message:code:deduct:deliver', json_encode());
@@ -754,6 +761,7 @@ class CmppCreateCodeTask extends Pzlife
                             'content'   => $sendTask['task_content'],
                             'from'   => 'yx_user_send_task',
                             'Submit_time'   => time(),
+                            'send_msg_id'        => $sendTask['send_msg_id'],
                         ];
                         // $this->redis->rpush('index:message:code:deduct:deliver', json_encode());
 
@@ -1344,6 +1352,8 @@ class CmppCreateCodeTask extends Pzlife
                                 'content'     => $sendTask['task_content'],
                                 'channel_id'  => $yidong_channel_id,
                                 'from'        => 'yx_user_multimedia_message',
+                                'send_msg_id'        => $sendTask['send_msg_id'],
+                                'uid'          => $sendTask['uid'],
                             ];
 
                             if (!empty($yidong_channel_template_id)) {
@@ -1408,6 +1418,8 @@ class CmppCreateCodeTask extends Pzlife
                                 'content'     => $sendTask['task_content'],
                                 'channel_id'  => $liantong_channel_id,
                                 'from'        => 'yx_user_multimedia_message',
+                                'send_msg_id'        => $sendTask['send_msg_id'],
+                                'uid'          => $sendTask['uid'],
                             ];
                             if (!empty($sendTask['develop_no'])) {
                                 $sendmessage['develop_code'] = $sendTask['develop_no'];
@@ -1469,6 +1481,8 @@ class CmppCreateCodeTask extends Pzlife
                                 'content'     => $sendTask['task_content'],
                                 'channel_id'  => $dianxin_channel_id,
                                 'from'        => 'yx_user_multimedia_message',
+                                'send_msg_id'        => $sendTask['send_msg_id'],
+                                'uid'          => $sendTask['uid'],
                             ];
                             if (!empty($sendTask['develop_no'])) {
                                 $sendmessage['develop_code'] = $sendTask['develop_no'];
@@ -1564,6 +1578,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'content'   => $sendTask['task_content'],
                                 'from'   => 'yx_user_multimedia_message',
                                 'Submit_time'   => time(),
+                                'send_msg_id'        => $sendTask['send_msg_id'],
                             ];
                             $push_messages[] = $sendmessage;
                             $j++;
@@ -1616,6 +1631,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'content'   => $sendTask['task_content'],
                                 'from'   => 'yx_user_multimedia_message',
                                 'Submit_time'   => time(),
+                                'send_msg_id'        => $sendTask['send_msg_id'],
                             ];
                             $push_messages[] = $sendmessage;
                             $j++;
@@ -2770,6 +2786,8 @@ class CmppCreateCodeTask extends Pzlife
                                         'content'     => $sendTask['task_content'],
                                         'channel_id'  => $channel_id,
                                         'from'        => 'yx_user_send_code_task',
+                                        'send_msg_id'        => $sendTask['send_msg_id'],
+                                        'uid'          => $sendTask['uid'],
                                     ];
                                     if (!empty($sendTask['develop_no'])) {
                                         $sendmessage['develop_code'] = $sendTask['develop_no'];
@@ -2856,6 +2874,8 @@ class CmppCreateCodeTask extends Pzlife
                                             'content'     => $sendTask['task_content'],
                                             'channel_id'  => $channel_id,
                                             'from'        => 'yx_user_send_code_task',
+                                            'send_msg_id'        => $sendTask['send_msg_id'],
+                                            'uid'          => $sendTask['uid'],
                                         ];
                                         if (!empty($sendTask['develop_no'])) {
                                             $sendmessage['develop_code'] = $sendTask['develop_no'];
@@ -2918,6 +2938,8 @@ class CmppCreateCodeTask extends Pzlife
                                             'content'     => $sendTask['task_content'],
                                             'channel_id'  => $channel_id,
                                             'from'        => 'yx_user_send_code_task',
+                                            'send_msg_id'        => $sendTask['send_msg_id'],
+                                            'uid'          => $sendTask['uid'],
                                         ];
                                         if (!empty($sendTask['develop_no'])) {
                                             $sendmessage['develop_code'] = $sendTask['develop_no'];
@@ -2977,6 +2999,8 @@ class CmppCreateCodeTask extends Pzlife
                                         'content'     => $sendTask['task_content'],
                                         'channel_id'  => $channel_id,
                                         'from'        => 'yx_user_send_code_task',
+                                        'send_msg_id'        => $sendTask['send_msg_id'],
+                                        'uid'          => $sendTask['uid'],
                                     ];
                                     if (!empty($sendTask['develop_no'])) {
                                         $sendmessage['develop_code'] = $sendTask['develop_no'];
@@ -3755,36 +3779,62 @@ class CmppCreateCodeTask extends Pzlife
 
     public function updateLogNew($channel_id){
         $redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:' . $channel_id; //验证码发送任务rediskey
         $channel              = $this->getChannelinfo($channel_id);
-        $redis->rpush($redisMessageCodeSend, '{"mobile":"15201926171","mar_task_id":"1","content":"Hi, \u4eb2\u7231\u7684\u4f1a\u5458\uff0c\u597d\u4e45\u4e0d\u89c1\uff0c\u60a8\u5df2\u7ecf\u6709\u4e09\u4e2a\u6708\u6ca1\u6765\u62a4\u7406\u4e86\uff0c\u79cb\u51ac\u5df2\u8fd1\uff0c\u6362\u5b63\u5f53\u524d\uff0c\u5728\u808c\u80a4\u9700\u8981\u201c\u8fdb\u8865\u201d\u7684\u5b63\u8282\u91cc\uff0c\u6765\u7f8e\u7530\u5373\u523b\u5f00\u542f\u6df1\u5ea6\u8865\u6c34\u6a21\u5f0f\u5427\uff01\u8054\u7cfb\u60a8\u8eab\u8fb9\u7684\u4e13\u5c5e\u5ba2\u6237\u7ecf\u7406\u6216\u62e8\u6253\u9884\u7ea6\u70ed\u7ebf 400-820-6142 \u56deT\u9000\u8ba2\u3010\u7f8e\u4e3d\u7530\u56ed\u3011","my_submit_time":1595316101,"Msg_Id":"2059229824357040145","Stat":"REJECTD","Submit_time":"2007211521","Done_time":"2007211521","receive_time":1595316110}'); 
-        $redis->rpush($redisMessageCodeSend, '{"mobile":"15201926171","mar_task_id":"1","content":"Hi, \u4eb2\u7231\u7684\u4f1a\u5458\uff0c\u597d\u4e45\u4e0d\u89c1\uff0c\u60a8\u5df2\u7ecf\u6709\u4e09\u4e2a\u6708\u6ca1\u6765\u62a4\u7406\u4e86\uff0c\u79cb\u51ac\u5df2\u8fd1\uff0c\u6362\u5b63\u5f53\u524d\uff0c\u5728\u808c\u80a4\u9700\u8981\u201c\u8fdb\u8865\u201d\u7684\u5b63\u8282\u91cc\uff0c\u6765\u7f8e\u7530\u5373\u523b\u5f00\u542f\u6df1\u5ea6\u8865\u6c34\u6a21\u5f0f\u5427\uff01\u8054\u7cfb\u60a8\u8eab\u8fb9\u7684\u4e13\u5c5e\u5ba2\u6237\u7ecf\u7406\u6216\u62e8\u6253\u9884\u7ea6\u70ed\u7ebf 400-820-6142 \u56deT\u9000\u8ba2\u3010\u7f8e\u4e3d\u7530\u56ed\u3011","my_submit_time":1595316101,"Msg_Id":"2059229824357040146","Stat":"REJECTD","Submit_time":"2007211521","Done_time":"2007211521","receive_time":1595316110}'); 
-        while(true){
-            $send_log = $redis->lpop($redisMessageCodeSend);
-            // $redis->rpush($redisMessageCodeSend, $send_log);
-            $send_log = json_decode($send_log, true);
-            // print_r($send_log);die;
-            if (empty($send_log)) {
-                usleep(50000);
-                continue;
-            }
-            if (!isset($send_log['mar_task_id']) || empty($send_log['mar_task_id'])) {
-                continue;
-            }
-            $new_key = '';
-            $send_log['from'] = isset($send_log['from']) ? $$send_log['from'] : '';
-            $new_key = $send_log['from'].":".$send_log['mar_task_id'].":".$send_log['mobile'];
-            $strlen = 0;
-            $strlen = mb_strlen($send_log['content']);
-            if ($strlen > 70) {
-                $allnum = 0 ;
-                $allnum = ceil($strlen / 67);
-                // echo $strlen;die;
-                $had_receipt = '';
-                $had_receipt = $redis->hget("index:message:receipt",$new_key);
-                $had_receipt = json_decode($had_receipt,true);
-                
-                if (empty($had_receipt)) {
+        $redis->rpush($redisMessageCodeSend, '{"mobile":"15201926171","mar_task_id":"1","content":"Hi, \u4eb2\u7231\u7684\u4f1a\u5458\uff0c\u597d\u4e45\u4e0d\u89c1\uff0c\u60a8\u5df2\u7ecf\u6709\u4e09\u4e2a\u6708\u6ca1\u6765\u62a4\u7406\u4e86\uff0c\u79cb\u51ac\u5df2\u8fd1\uff0c\u6362\u5b63\u5f53\u524d\uff0c\u5728\u808c\u80a4\u9700\u8981\u201c\u8fdb\u8865\u201d\u7684\u5b63\u8282\u91cc\uff0c\u6765\u7f8e\u7530\u5373\u523b\u5f00\u542f\u6df1\u5ea6\u8865\u6c34\u6a21\u5f0f\u5427\uff01\u8054\u7cfb\u60a8\u8eab\u8fb9\u7684\u4e13\u5c5e\u5ba2\u6237\u7ecf\u7406\u6216\u62e8\u6253\u9884\u7ea6\u70ed\u7ebf 400-820-6142 \u56deT\u9000\u8ba2\u3010\u7f8e\u4e3d\u7530\u56ed\u3011","my_submit_time":1595316101,"Msg_Id":"2059229824357040145","Stat":"REJECTD","Submit_time":"2007211521","Done_time":"2007211521","receive_time":1595316110,"from":"yx_user_send_task"}'); 
+        $redis->rpush($redisMessageCodeSend, '{"mobile":"15201926171","mar_task_id":"1","content":"Hi, \u4eb2\u7231\u7684\u4f1a\u5458\uff0c\u597d\u4e45\u4e0d\u89c1\uff0c\u60a8\u5df2\u7ecf\u6709\u4e09\u4e2a\u6708\u6ca1\u6765\u62a4\u7406\u4e86\uff0c\u79cb\u51ac\u5df2\u8fd1\uff0c\u6362\u5b63\u5f53\u524d\uff0c\u5728\u808c\u80a4\u9700\u8981\u201c\u8fdb\u8865\u201d\u7684\u5b63\u8282\u91cc\uff0c\u6765\u7f8e\u7530\u5373\u523b\u5f00\u542f\u6df1\u5ea6\u8865\u6c34\u6a21\u5f0f\u5427\uff01\u8054\u7cfb\u60a8\u8eab\u8fb9\u7684\u4e13\u5c5e\u5ba2\u6237\u7ecf\u7406\u6216\u62e8\u6253\u9884\u7ea6\u70ed\u7ebf 400-820-6142 \u56deT\u9000\u8ba2\u3010\u7f8e\u4e3d\u7530\u56ed\u3011","my_submit_time":1595316101,"Msg_Id":"2059229824357040146","Stat":"DELIVRD","Submit_time":"2007211521","Done_time":"2007211521","receive_time":1595316110,"from":"yx_user_send_task"}'); 
+        try {
+            while(true){
+                $send_log = $redis->lpop($redisMessageCodeSend);
+                // $redis->rpush($redisMessageCodeSend, $send_log);
+                $send_log = json_decode($send_log, true);
+                // print_r($send_log);die;
+                if (empty($send_log)) {
+                    usleep(50000);
+                    continue;
+                }
+                if (!isset($send_log['mar_task_id']) || empty($send_log['mar_task_id'])) {
+                    continue;
+                }
+                $new_key = '';
+                $send_log['from'] = isset($send_log['from']) ? $send_log['from'] : '';
+                $new_key = $send_log['from'].":".$send_log['mar_task_id'].":".$send_log['mobile'];
+                $strlen = 0;
+                $strlen = mb_strlen($send_log['content']);
+                if ($strlen > 70) {
+                    $allnum = 0 ;
+                    $allnum = ceil($strlen / 67);
+                    // echo $strlen;die;
+                    $had_receipt = '';
+                    $had_receipt = $redis->hget("index:message:receipt",$new_key);
+                    $had_receipt = json_decode($had_receipt,true);
+                    
+                    if (empty($had_receipt)) {
+                        $had_receipt = [];
+                        $had_receipt = [
+                            'mobile' => $send_log['mobile'],
+                            'from' => $send_log['from'],
+                            'mar_task_id' => $send_log['mar_task_id'],
+                            'content' => $send_log['content'],
+                            'my_submit_time' => $send_log['my_submit_time'],
+                            'Submit_time' => $send_log['Submit_time'],
+                            'Done_time' => $send_log['Done_time'],
+                            'receive_time' => $send_log['receive_time'],
+                            'send_msg_id' => isset($send_log['send_msg_id']) ? $send_log['send_msg_id'] : '',
+                            'Stat' => [$send_log['Stat']],
+                        ];
+                        $had_receipt = $redis->hset("index:message:receipt",$new_key,json_encode($had_receipt));
+                    }else{
+                        array_push($had_receipt['Stat'],$send_log['Stat']);
+                        if (count($had_receipt['Stat']) == $allnum) {
+                            $redis->rpush("index:message:receipt:".$had_receipt['from'],json_encode($had_receipt));
+                            $redis->hdel("index:message:receipt",$new_key);
+                        }else{
+                            $had_receipt = $redis->hset("index:message:receipt",$new_key,json_encode($had_receipt));
+                        }
+                    }
+                }else{//写入回执通道
                     $had_receipt = [];
                     $had_receipt = [
                         'mobile' => $send_log['mobile'],
@@ -3795,34 +3845,34 @@ class CmppCreateCodeTask extends Pzlife
                         'Submit_time' => $send_log['Submit_time'],
                         'Done_time' => $send_log['Done_time'],
                         'receive_time' => $send_log['receive_time'],
+                        'send_msg_id' => isset($send_log['send_msg_id']) ? $send_log['send_msg_id'] : '',
                         'Stat' => [$send_log['Stat']],
                     ];
-                    $had_receipt = $redis->hset("index:message:receipt",$new_key,json_encode($had_receipt));
-                }else{
-                    array_push($had_receipt['Stat'],$send_log['Stat']);
-                    if (count($had_receipt['Stat']) == $allnum) {
-                        $redis->rpush("index:message:receipt:".$had_receipt['from'],json_encode($had_receipt));
-                        $redis->hdel("index:message:receipt",$new_key);
-                    }else{
-                        $had_receipt = $redis->hset("index:message:receipt",$new_key,json_encode($had_receipt));
-                    }
+                    $redis->rpush("index:message:receipt:".$had_receipt['from'],json_encode($had_receipt));
                 }
-            }else{//写入回执通道
-                $had_receipt = [];
-                $had_receipt = [
-                    'mobile' => $send_log['mobile'],
-                    'from' => $send_log['from'],
-                    'mar_task_id' => $send_log['mar_task_id'],
-                    'content' => $send_log['content'],
-                    'my_submit_time' => $send_log['my_submit_time'],
-                    'Submit_time' => $send_log['Submit_time'],
-                    'Done_time' => $send_log['Done_time'],
-                    'receive_time' => $send_log['receive_time'],
-                    'Stat' => [$send_log['Stat']],
-                ];
-                $redis->rpush("index:message:receipt:".$had_receipt['from'],json_encode($had_receipt));
+                // print_r($send_log);die;
             }
-            // print_r($send_log);die;
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
+        }
+       
+    }
+
+    public function insertInToTable(){
+        $redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $redis->rpush('index:message:receipt:yx_user_send_task','{"mobile":"15201926171","from":"yx_user_send_task","mar_task_id":"1","content":"Hi, \u4eb2\u7231\u7684\u4f1a\u5458\uff0c\u597d\u4e45\u4e0d\u89c1\uff0c\u60a8\u5df2\u7ecf\u6709\u4e09\u4e2a\u6708\u6ca1\u6765\u62a4\u7406\u4e86\uff0c\u79cb\u51ac\u5df2\u8fd1\uff0c\u6362\u5b63\u5f53\u524d\uff0c\u5728\u808c\u80a4\u9700\u8981\u201c\u8fdb\u8865\u201d\u7684\u5b63\u8282\u91cc\uff0c\u6765\u7f8e\u7530\u5373\u523b\u5f00\u542f\u6df1\u5ea6\u8865\u6c34\u6a21\u5f0f\u5427\uff01\u8054\u7cfb\u60a8\u8eab\u8fb9\u7684\u4e13\u5c5e\u5ba2\u6237\u7ecf\u7406\u6216\u62e8\u6253\u9884\u7ea6\u70ed\u7ebf 400-820-6142 \u56deT\u9000\u8ba2\u3010\u7f8e\u4e3d\u7530\u56ed\u3011","my_submit_time":1595316101,"Submit_time":"2007211521","Done_time":"2007211521","receive_time":1595316110,"send_msg_id":"","Stat":["REJECTD","DELIVRD"]}');
+        try{
+            while(true){
+                $receipt = $redis->lpop('index:message:receipt:yx_user_send_task');
+                if (empty($receipt)) {
+
+                }
+            }
+        }catch (\Exception $th) {
+            //throw $th;
+            exception($th);
         }
     }
 
@@ -8667,8 +8717,8 @@ class CmppCreateCodeTask extends Pzlife
         ];
         // echo "SELECT * FROM yx_sfl_send_task WHERE `mobile` IN (".join(',',$white_list).") ";die;
         // $tody_time = 1595491200;
-        // $tody_time = strtotime(date("Ymd", time()));
-        $tody_time = 1596189600;// 时间下午16点3条 已发第一条
+        $tody_time = strtotime(date("Ymd", time()));
+        // $tody_time = 1596189600;// 时间下午16点3条 已发第一条
         // $tody_time = 1594891200;// 时间下午17点20
         try {
             $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84, 'update_time' => time()]);
@@ -9294,7 +9344,7 @@ class CmppCreateCodeTask extends Pzlife
                                         /* if (in_array(trim($value['mobile']), $fault) || in_array(trim($value['mobile']), $bir)) {
                                             continue;
                                         } */
-                                        if ($value['sfl_relation_id'] == '100181913' || $value['sfl_relation_id'] == '1' || $value['sfl_relation_id'] == '100182607') {
+                                        if ($value['sfl_relation_id'] == '100182611' || $value['sfl_relation_id'] == '1' || $value['sfl_relation_id'] == '100182610' || $value['sfl_relation_id'] == '100182620') {
                                             $prefix = '';
                                             $prefix = substr(trim($value['mobile']), 0, 7);
                                             $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
@@ -9541,7 +9591,7 @@ class CmppCreateCodeTask extends Pzlife
                                         $receipt[] = $rece;
                                     }
                                 } else {
-                                    if ($value['sfl_relation_id'] == '100180389') {
+                                    if ($value['sfl_relation_id'] == '100182611' || $value['sfl_relation_id'] == '1' || $value['sfl_relation_id'] == '100182610' || $value['sfl_relation_id'] == '100182620') {
                                         $prefix = '';
                                         $prefix = substr(trim($value['mobile']), 0, 7);
                                         $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
