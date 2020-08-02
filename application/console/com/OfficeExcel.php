@@ -1366,176 +1366,179 @@ class OfficeExcel extends Pzlife {
                     $redis->hset('yx:mobile:empty', $value['mobile'], json_encode(['check_status' => 2, 'check_result' => 0, 'create_time' => time(), 'update_time' => time()]));
                     continue;
                 }
-                if ($prefix == 1650006) {
-                    $newres = [
-                        'source'      => 1,
-                        'province_id' => 1802,
-                        'city_id'     => 1803,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif ($prefix == 1650713) {
-                    $newres = [
-                        'source'      => 1,
-                        'province_id' => 1802,
-                        'city_id'     => 1885,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif ($prefix == 1651033) {
-                    $newres = [
-                        'source'      => 1,
-                        'province_id' => 1426,
-                        'city_id'     => 1439,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif ($prefix == 1653427) {
-                    $newres = [
-                        'source'      => 1,
-                        'province_id' => 499,
-                        'city_id'     => 586,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif (in_array($prefix, [1660020, 1660021, 1660025, 1660027, 1660034, 1662236, 1662237, 1662215, 1662288, 1662290])) { //天津联通
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 19,
-                        'city_id'     => 20,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif (in_array($prefix, [1660102, 1660114, 1660137, 1660152, 1660155])) { //北京联通
-
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 1,
-                        'city_id'     => 2,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif (in_array($prefix, [1660170, 1660173, 1660178, 1660179, 1660181, 1660183, 1660184, 1660174, 1662102, 1662103, 1662107, 1662109, 1660214, 1662120, 1662122, 1662123, 1662152, 1662160, 1662167, 1662169, 1662171, 1662173, 1662174, 1662178, 1662179])) { //上海联通
-
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 841,
-                        'city_id'     => 842,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif ($prefix == 1660271) {
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 1802,
-                        'city_id'     => 1803,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif ($prefix == 1660272) {
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 1802,
-                        'city_id'     => 1803,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif ($prefix == 1660351) {
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 240,
-                        'city_id'     => 241,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif ($prefix == 1660371) {
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 1601,
-                        'city_id'     => 1602,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif ($prefix == 1660387) {
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 1601,
-                        'city_id'     => 1602,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif ($prefix == 1660396) {
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 1601,
-                        'city_id'     => 1788,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif ($prefix == 1660399) {
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 1601,
-                        'city_id'     => 1602,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif ($prefix == 1660427) {
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 499,
-                        'city_id'     => 586,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif ($prefix == 1660471) {
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 377,
-                        'city_id'     => 378,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif ($prefix == 1660532) {
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 1426,
-                        'city_id'     => 1439,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif ($prefix == 1660713) {
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 1802,
-                        'city_id'     => 1439,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif ($prefix == 1660875) {
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 2801,
-                        'city_id'     => 2837,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif (in_array($prefix, [1662303, 1662312, 1662331])) { //重庆联通
-
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 2454,
-                        'city_id'     => 2455,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif (in_array($prefix, [1662477])) { //广州联通
-
-                    $newres = [
-                        'source'      => 2,
-                        'province_id' => 2076,
-                        'city_id'     => 2077,
-                    ];
-                    $redis->hset('index:mobile:source', $prefix, json_encode($newres));
-                } elseif (substr(trim($value['mobile']), 0, 3) == 166) {
-                    $newres = [
-                        'source' => 2,
-                    ];
-                } elseif (in_array(substr(trim($value['mobile']), 0, 3), [170, 173, 178, 184, 191, 199, 162, 133, 149, 153, 173, 177, 180, 181, 189])) { //电信
-                    $newres = [
-                        'source' => 3,
-                    ];
-                } elseif (in_array(substr(trim($value['mobile']), 0, 3), [171, 175, 176, 185, 167, 130, 131, 132, 145, 155, 156, 166, 186, 166])) { //联通
-                    $newres = [
-                        'source' => 2,
-                    ];
-                } elseif (in_array(substr(trim($value['mobile']), 0, 3), [147, 172, 177, 187, 188, 195, 198, 165, 134, 135, 136, 137, 138, 139, 147, 150, 151, 152, 157, 158, 159, 1705, 178, 182, 183, 184, 187, 188, 198])) { //移动
-                    $newres = [
-                        'source' => 1,
-                    ];
-                }else{
-                    continue;
+                if (empty($newres)) {
+                    if ($prefix == 1650006) {
+                        $newres = [
+                            'source'      => 1,
+                            'province_id' => 1802,
+                            'city_id'     => 1803,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif ($prefix == 1650713) {
+                        $newres = [
+                            'source'      => 1,
+                            'province_id' => 1802,
+                            'city_id'     => 1885,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif ($prefix == 1651033) {
+                        $newres = [
+                            'source'      => 1,
+                            'province_id' => 1426,
+                            'city_id'     => 1439,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif ($prefix == 1653427) {
+                        $newres = [
+                            'source'      => 1,
+                            'province_id' => 499,
+                            'city_id'     => 586,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif (in_array($prefix, [1660020, 1660021, 1660025, 1660027, 1660034, 1662236, 1662237, 1662215, 1662288, 1662290])) { //天津联通
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 19,
+                            'city_id'     => 20,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif (in_array($prefix, [1660102, 1660114, 1660137, 1660152, 1660155])) { //北京联通
+    
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 1,
+                            'city_id'     => 2,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif (in_array($prefix, [1660170, 1660173, 1660178, 1660179, 1660181, 1660183, 1660184, 1660174, 1662102, 1662103, 1662107, 1662109, 1660214, 1662120, 1662122, 1662123, 1662152, 1662160, 1662167, 1662169, 1662171, 1662173, 1662174, 1662178, 1662179])) { //上海联通
+    
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 841,
+                            'city_id'     => 842,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif ($prefix == 1660271) {
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 1802,
+                            'city_id'     => 1803,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif ($prefix == 1660272) {
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 1802,
+                            'city_id'     => 1803,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif ($prefix == 1660351) {
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 240,
+                            'city_id'     => 241,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif ($prefix == 1660371) {
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 1601,
+                            'city_id'     => 1602,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif ($prefix == 1660387) {
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 1601,
+                            'city_id'     => 1602,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif ($prefix == 1660396) {
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 1601,
+                            'city_id'     => 1788,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif ($prefix == 1660399) {
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 1601,
+                            'city_id'     => 1602,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif ($prefix == 1660427) {
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 499,
+                            'city_id'     => 586,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif ($prefix == 1660471) {
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 377,
+                            'city_id'     => 378,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif ($prefix == 1660532) {
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 1426,
+                            'city_id'     => 1439,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif ($prefix == 1660713) {
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 1802,
+                            'city_id'     => 1439,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif ($prefix == 1660875) {
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 2801,
+                            'city_id'     => 2837,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif (in_array($prefix, [1662303, 1662312, 1662331])) { //重庆联通
+    
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 2454,
+                            'city_id'     => 2455,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif (in_array($prefix, [1662477])) { //广州联通
+    
+                        $newres = [
+                            'source'      => 2,
+                            'province_id' => 2076,
+                            'city_id'     => 2077,
+                        ];
+                        $redis->hset('index:mobile:source', $prefix, json_encode($newres));
+                    } elseif (substr(trim($value['mobile']), 0, 3) == 166) {
+                        $newres = [
+                            'source' => 2,
+                        ];
+                    } elseif (in_array(substr(trim($value['mobile']), 0, 3), [170, 173, 178, 184, 191, 199, 162, 133, 149, 153, 173, 177, 180, 181, 189])) { //电信
+                        $newres = [
+                            'source' => 3,
+                        ];
+                    } elseif (in_array(substr(trim($value['mobile']), 0, 3), [171, 175, 176, 185, 167, 130, 131, 132, 145, 155, 156, 166, 186, 166])) { //联通
+                        $newres = [
+                            'source' => 2,
+                        ];
+                    } elseif (in_array(substr(trim($value['mobile']), 0, 3), [147, 172, 177, 187, 188, 195, 198, 165, 134, 135, 136, 137, 138, 139, 147, 150, 151, 152, 157, 158, 159, 1705, 178, 182, 183, 184, 187, 188, 198])) { //移动
+                        $newres = [
+                            'source' => 1,
+                        ];
+                    }else{
+                        continue;
+                    }
                 }
+                
                 if (empty($newres)) {
                     $source = Db::query("SELECT `mobile`,`source`,`province_id`,`city_id` FROM yx_number_source WHERE `id` = " . $value['id']);
                     // print_r($source);die;
@@ -1551,6 +1554,7 @@ class OfficeExcel extends Pzlife {
                 $newres['update_time']  = $value['update_time'];
                 $newres['check_status'] = $value['check_status'];
                 $newres['check_result'] = $value['check_result'];
+                // print_r($newres);die;
                 $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
             }
         } catch (\Exception $th) {
