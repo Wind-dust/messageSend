@@ -169,7 +169,7 @@ class HttpChannelModelCaiXinWeiGe extends Pzlife
                         // die;
                         $data = [];
                         $data = [
-                            'mms_from' => $send_data['develop_code'],
+                            'mms_from' => isset($send_data['develop_code']) ? $send_data['develop_code'] : '',
                             'mms_id' => $send_data['template_id'],
                             'phones' => $send_data['mobile'],
                             'templateparam' => $templateparam
