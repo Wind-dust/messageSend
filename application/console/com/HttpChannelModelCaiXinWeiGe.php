@@ -182,7 +182,7 @@ class HttpChannelModelCaiXinWeiGe extends Pzlife
                         $res = $this->sendRequest2($report_api,'post',$data,$headers);
                        
                        
-                        print_r($res);
+                        // print_r($res);
                         
                         $result = json_decode($res, true);
                         if ($result['code'] == 'T') { //提交成功
@@ -224,9 +224,9 @@ class HttpChannelModelCaiXinWeiGe extends Pzlife
                         
                         
                         $result = json_decode($res, true);
-                        print_r($result);
+                       
                         if (!empty($result['data']))  {
-
+                            print_r($result);
                         }
                         sleep(1);
                 }
