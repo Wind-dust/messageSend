@@ -1554,7 +1554,7 @@ class SflUpload extends Pzlife
                                 continue;
                             }
                             //  strpos($svalue, '2020071518') == false
-                            /*  if (strpos($svalue, '2020073118') == false) {
+                            /* if (strpos($svalue, '2020073118') == false) {
                                 continue;
                             } */
                             $start_time = strtotime("2020-06-18");

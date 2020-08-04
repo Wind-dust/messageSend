@@ -17,6 +17,7 @@ return [
     'cmpp'                             => $commandPath . 'Cmpp',
     'cmppsubmit'                       => $commandPath . 'Cmppsubmit',
     'localscript'                      => $commandPath . 'LocalScript',
+    'kafka'                      => $commandPath . 'Kafka',
     'serversocket'                     => $commandPath . 'ServerSocket',
     'clientsocket'                     => $commandPath . 'ClientSocket',
     'officeexcel'                      => $commandPath . 'OfficeExcel',
@@ -50,6 +51,7 @@ return [
     'httpchannelcaixinchuanglanlankouthree' => $commandPath . 'HttpChannelCaiXinChuangLanLanKouThree',
     'httpchannelmodelcaixinchuanglan' => $commandPath . 'HttpChannelModelCaiXinChuangLan',
     'httpchannelcaixinmeilian' => $commandPath . 'HttpChannelCaiXinMeiLian', //美联软通彩信
+    'httpchannelmodelcaixinweige' => $commandPath . 'HttpChannelModelCaiXinWeiGe',
     'cmppmeilianruantongyidonggame' => $commandPath . 'CmppMeiLianRuanTongYiDongGame', //美联软通移动游戏
     'httpchannelcaixinbangzhixinyidong' => $commandPath . 'HttpChannelCaiXinBangZhiXinYiDong', //邦之信移动彩信
     'httpchannelcaixinbangzhixinliandian' => $commandPath . 'HttpChannelCaiXinBangZhiXinLianDian', //邦之信移动彩信
