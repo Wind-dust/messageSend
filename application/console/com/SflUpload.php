@@ -597,7 +597,257 @@ class SflUpload extends Pzlife
     }
 
     /* sftp 彩信任务入库 */
+    public function sftpSflMMSToBase()
+    {
 
+        $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
+        $mysql_connect->query("set names utf8mb4");
+        ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
+        $redis = Phpredis::getConn();
+        //白名单入库
+        /* if (in_array($tvalue[3],$white_list)) {
+        $redis->rpush('sftp:sfl:marketing:whitesendtask',json_encode($SMS_real_send));
+        }else{
+        $redis->rpush('sftp:sfl:marketing:sendtask',json_encode($SMS_real_send));
+        } */
+        $send_task = [];
+        $task_id   = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message  ORDER BY `id` DESC limit 1 ");
+        if (empty($task_id)) {
+            $this_id = 1;
+        } else {
+            $this_id   = $task_id[0]['id'];
+        }
+        // print_r($this_id);
+        // die;
+        $i = 1;
+        while (true) {
+            $white_task = $redis->lpop('sftp:sfl:MMS:whitesendtask');
+            if (empty($white_task)) {
+                break;
+            }
+            $white_task = json_decode($white_task, true);
+            // print_r($white_task);die;
+            $this_id++;
+            $white_task['id'] = $this_id;
+            $send_task[]      = $white_task;
+
+            $i++;
+            if ($i > 100) {
+                $mysql_connect->startTrans();
+                try {
+                    $mysql_connect->table('yx_sfl_multimedia_message')->insertAll($send_task);
+                    unset($send_task);
+                    $i = 1;
+                    $mysql_connect->commit();
+                } catch (\Exception $e) {
+                    exception($e);
+                }
+            }
+        }
+
+        if (!empty($send_task)) {
+            try {
+                $mysql_connect->table('yx_sfl_multimedia_message')->insertAll($send_task);
+                unset($send_task);
+                $i = 1;
+                $mysql_connect->commit();
+            } catch (\Exception $e) {
+                exception($e);
+            }
+        }
+        die;
+        // print_r($this_id);
+        // die;
+        $task_receipt_all = [];
+
+        while (true) {
+            $white_task = $redis->lpop('sftp:sfl:MMS:errorsendtask');
+            if (empty($white_task)) {
+                break;
+            }
+            $white_task = json_decode($white_task, true);
+            // print_r($white_task);die;
+            $this_id++;
+            $white_task['id'] = $this_id;
+            $send_task[]      = $white_task;
+            $task_receipt     = [];
+            $task_receipt     = [
+                'mseeage_id'     => $white_task['mseeage_id'],
+                'mobile'         => $white_task['mobile'],
+                'status_message' => 'SMS:2',
+                'messageinfo'    => '发送失败',
+                'task_id'        => $white_task['id'],
+                'template_id'    => $white_task['template_id'],
+            ];
+            $task_receipt_all[] = $task_receipt;
+            $i++;
+            if ($i > 100) {
+                $mysql_connect->startTrans();
+                try {
+                    $mysql_connect->table('yx_sfl_multimedia_message')->insertAll($send_task);
+                    $mysql_connect->table('yx_sfl_send_task_receipt')->insertAll($task_receipt_all);
+                    unset($send_task);
+                    unset($task_receipt_all);
+                    $i = 1;
+                    $mysql_connect->commit();
+                } catch (\Exception $e) {
+                    exception($e);
+                }
+            }
+        }
+        if (!empty($send_task)) {
+            try {
+                $mysql_connect->table('yx_sfl_multimedia_message')->insertAll($send_task);
+                $mysql_connect->table('yx_sfl_send_task_receipt')->insertAll($task_receipt_all);
+                unset($send_task);
+                unset($task_receipt_all);
+                $i = 1;
+                $mysql_connect->commit();
+            } catch (\Exception $e) {
+                exception($e);
+            }
+        }
+        $deduct = ceil(3963454 / 5963454 * 100);
+
+        /* 扣量 */
+        // $all_num = [0,1,2,3,4];
+        // $deduct_key = array_rand($all_num,3);
+        // print_r($deduct_key);die;
+        $all_num = [];
+        for ($i = 0; $i < 100; $i++) {
+            # code...
+            $all_num[] = $i;
+        }
+        // $deduct_key = array_rand($all_num, $deduct);
+        /*  print_r($deduct_key);
+        die; */
+        // echo count($all_num);
+        // die;
+        /* print_r($all_num);
+        die; */
+        $deduct_nums = 5;
+        $i = 1;
+        while (true) {
+            $white_task = $redis->lpop('sftp:sfl:MMS:sendtask');
+            if (empty($white_task)) {
+                break;
+            }
+            $i++;
+            $white_task = json_decode($white_task, true);
+            // print_r($white_task);die;
+            $this_id++;
+            $white_task['id'] = $this_id;
+            $send_task[]      = $white_task;
+            $white_task = $redis->rpush('sftp:sfl:MMS:deductsendtask', json_encode($white_task));
+            if ($i > count($all_num)) {
+                // $all_num    = [0, 1, 2, 3, 4];
+                $deduct_key = array_rand($all_num, $deduct);
+                /*  print_r($deduct_key);
+                die; */
+                foreach ($send_task as $key => $value) {
+                    if (in_array($key, $deduct_key)) {
+                        continue;
+                    }
+                    $prefix = '';
+                    $prefix = substr(trim($value['mobile']), 0, 7);
+                    $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                    // print_r($res);
+                    if ($res) {
+                        $newres = array_shift($res);
+                        if ($newres['source'] == 1) {
+                            $channel_id = 94;
+                        } elseif ($newres['source'] == 2) {
+                            $channel_id = 94;
+                        } elseif ($newres['source'] == 3) {
+                            $channel_id = 94;
+                        }
+                    } else {
+                        $channel_id = 94;
+                    }
+                    $sendmessage = [
+                        'mseeage_id'  => $value['mseeage_id'],
+                        'template_id' => $value['template_id'],
+                        'mobile'      => $value['mobile'],
+                        'mar_task_id' => $value['id'],
+                        'content'     => $value['task_content'],
+                        'from'        => 'yx_sfl_send_task',
+                    ];
+                    $redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($sendmessage)); //三体营销
+                }
+                $i = 1;
+                unset($send_task);
+            }
+        }
+        if (!empty($send_task)) {
+            // $all_num    = [0, 1, 2, 3, 4];
+            $deduct_key = array_rand($all_num, $deduct);
+            foreach ($send_task as $key => $value) {
+                if (in_array($key, $deduct_key)) {
+                    continue;
+                }
+                $prefix = '';
+                $prefix = substr(trim($value['mobile']), 0, 7);
+                $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                // print_r($res);
+                if ($res) {
+                    $newres = array_shift($res);
+                    if ($newres['source'] == 1) {
+                        $channel_id = 94;
+                    } elseif ($newres['source'] == 2) {
+                        $channel_id = 94;
+                    } elseif ($newres['source'] == 3) {
+                        $channel_id = 94;
+                    }
+                } else {
+                    $channel_id = 94;
+                }
+                $sendmessage = [
+                    'mseeage_id'  => $value['mseeage_id'],
+                    'template_id' => $value['template_id'],
+                    'mobile'      => $value['mobile'],
+                    'mar_task_id' => $value['id'],
+                    'content'     => $value['task_content'],
+                    'from'        => 'yx_sfl_multimedia_message',
+                ];
+                $redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($sendmessage)); //三体营销
+            }
+        }
+        // die;
+        $send_task = [];
+        while (true) {
+            $white_task = $redis->lpop('sftp:sfl:marketing:deductsendtask');
+            if (empty($white_task)) {
+                break;
+            }
+            $white_task = json_decode($white_task, true);
+            $white_task['yidong_channel_id'] = 83;
+            $white_task['liantong_channel_id'] = 83;
+            $white_task['dianxin_channel_id'] = 84;
+            $send_task[]      = $white_task;
+            $i++;
+            if ($i > 100) {
+                $mysql_connect->startTrans();
+                try {
+                    $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
+                    unset($send_task);
+                    $i = 1;
+                    $mysql_connect->commit();
+                } catch (\Exception $e) {
+                    exception($e);
+                }
+            }
+        }
+        if (!empty($send_task)) {
+            try {
+                $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
+                unset($send_task);
+                $i = 1;
+                $mysql_connect->commit();
+            } catch (\Exception $e) {
+                exception($e);
+            }
+        }
+    }
     /* sftp 短信任务入库 */
     public function sftpSflSendTaskToBase()
     {
@@ -911,7 +1161,7 @@ class SflUpload extends Pzlife
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
-                    continue;
+                    // continue;
                     $err_task_num = [];
                     $send_data    = [];
                     if ($son_path_data !== false) {
@@ -1116,7 +1366,7 @@ class SflUpload extends Pzlife
                         $MMSmessage  = [];
                         $model_check = [];
 
-
+                        $j         = 1;
                         if (!empty($send_data)) {
                             foreach ($send_data as $key => $value) {
                                 $txt = [];
@@ -1194,6 +1444,34 @@ class SflUpload extends Pzlife
                                         if (checkMobile($tvalue[3]) == false) {
                                             continue;
                                         }
+                                        if ($save_type == 'redis') {
+                                            if (in_array($tvalue[3], $white_list)) {
+                                                $redis->rpush('sftp:sfl:MMS:whitesendtask', json_encode($MMS_real_send));
+                                            } else {
+                                                if (strpos($tvalue[3], '000000') !== false || strpos($tvalue[3], '111111') || strpos($tvalue[3], '222222') || strpos($tvalue[3], '333333') || strpos($tvalue[3], '444444') || strpos($tvalue[3], '555555') || strpos($tvalue[3], '666666') || strpos($tvalue[3], '777777') || strpos($tvalue[3], '888888') || strpos($tvalue[3], '999999')) {
+                                                    $redis->rpush('sftp:sfl:MMS:errorsendtask', json_encode($MMS_real_send));
+                                                } else {
+                                                    $redis->rpush('sftp:sfl:MMS:sendtask', json_encode($MMS_real_send));
+                                                }
+                                            }
+                                        } else {
+                                            $MMSmessage[] = $MMS_real_send;
+                                            // print_r($content);die;
+                                            $j++;
+                                            if ($j > 100) {
+                                                $mysql_connect->startTrans();
+                                                try {
+                                                    $mysql_connect->table('yx_sfl_send_task')->insertAll($MMSmessage);
+                                                    unset($MMSmessage);
+                                                    $j = 1;
+                                                    $mysql_connect->commit();
+                                                } catch (\Exception $e) {
+                                                    exception($e);
+                                                }
+                                                // $this->redis->rPush('index:meassage:business:sendtask', $send);
+
+                                            }
+                                        }
                                         /*  if ($tvalue[3] == "") {
 
                                         if (isset($err_task_num['The Mobile IS NULL'])) {
@@ -1204,7 +1482,7 @@ class SflUpload extends Pzlife
                                         continue;
 
                                         } */
-                                        $MMSmessage[] = $MMS_real_send;
+                                        // $MMSmessage[] = $MMS_real_send;
                                     }
                                 }
                             }
@@ -1226,7 +1504,7 @@ class SflUpload extends Pzlife
 
                         // continue;
                         $insertMMS = [];
-                        $j         = 1;
+
                         if (!empty($MMSmessage)) {
                             for ($i = 0; $i < count($MMSmessage); $i++) {
                                 // array_push($insertMMS, $MMSmessage[$i]);
@@ -1276,9 +1554,9 @@ class SflUpload extends Pzlife
                                 continue;
                             }
                             //  strpos($svalue, '2020071518') == false
-                            if (strpos($svalue, '2020073118') == false) {
+                            /*  if (strpos($svalue, '2020073118') == false) {
                                 continue;
-                            }
+                            } */
                             $start_time = strtotime("2020-06-18");
                             $end_time = $start_time + 86400;
                             $expeort_time = $start_time + 43200 - mt_rand(0, 3000);
@@ -2358,13 +2636,13 @@ class SflUpload extends Pzlife
 
             $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
             ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
-            $start_time = strtotime("2020-07-26");
+            $start_time = strtotime("2020-07-05");
             $end_time = $start_time + 86400;
-            // $expeort_time = $start_time + 46800 - mt_rand(0, 180);
+            $expeort_time = $start_time + 46800 - mt_rand(0, 180);
             // $expeort_time = 1593421200;
-            $expeort_time = strtotime("2020-07-26 11:30");
+            // $expeort_time = strtotime("2020-07-26 11:30");
             // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $start_time . " AND   `create_time` <  " . $end_time . " AND `sfl_relation_id` IN ('100181712','100181717','100181722') ");
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` IN ('100182607') ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $start_time . " AND   `create_time` <  " . $end_time . " AND `sfl_relation_id` IN ('82301','82309','100125372','100181913','1') ");
             $ids          = [];
             foreach ($mul_task_ids as $key => $value) {
                 $ids[] = $value['id'];
@@ -2520,7 +2798,7 @@ class SflUpload extends Pzlife
                     $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                 }
             }
-            $objWriter->save('imp_mobile_status_report_mms_3_' . date("Ymd", $start_time) . '.xlsx');
+            $objWriter->save('imp_mobile_status_report_mms_1_' . date("Ymd", $start_time) . '.xlsx');
         } catch (\Exception $th) {
             exception($th);
         }
@@ -2534,21 +2812,22 @@ class SflUpload extends Pzlife
         // print_r(realpath("../"). "\yt_area_mobile.csv");die;
         $start_time = strtotime("2020-07-31");
         $end_time = $start_time + 86400;
-        // $expeort_time = $start_time+43200-mt_rand(0,3000);
+        $expeort_time = $start_time + 43200 - mt_rand(0, 3000);
         // $expeort_time = 1592884416;
-        $expeort_time = strtotime("2020-07-31 18:00");
+        // $expeort_time = strtotime("2020-07-31 18:00");
         try {
             // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591891200 AND   `create_time` <  1591977600 AND `task_content` NOT LIKE '%test%' ");
             // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$start_time." AND   `create_time` <  ".$end_time."  AND `task_content` NOT LIKE '%test%' ");
             // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$start_time." AND   `create_time` <  ".$end_time."  AND `template_id` IN ('529','100150820','100150821','100150822','100180393','100181850','100181855','100181864','100181869','100181873','100181874','100181875','100181876') ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$start_time." AND   `create_time` <  ".$end_time."  AND `template_id` IN ('529','100150820','100150821','100150822','100180393','100181850','100181855','100181864','100181869','100181873','100181874','100181875','100181876') ";die;
-            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  " . $start_time . " AND   `create_time` <  " . $end_time . "  AND `template_id`  IN ('100183039') ");
+            $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  " . $start_time . " AND   `create_time` <  " . $end_time . "  AND `template_id`  IN ('514','529','100107992','100150820','100150821','100150822','100182048','100150970') ");
+            // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  " . $start_time . " AND   `create_time` <  " . $end_time . "  AND `template_id`  IN ('100183039') ");
             /*  echo "SELECT `id` FROM yx_sfl_send_task WHERE  `create_time` >  ".$start_time." AND   `create_time` <  ".$end_time."  AND `template_id` IN ('529','100150820','100150821','100150822','100180393') ";die; */
             // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE  `template_id` ='100181517'  AND `task_content` NOT LIKE '%test%' ");
             // echo "SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  1591286400 AND   `create_time` <  1591372800 AND `task_content` NOT LIKE '%test%' ";die;
             $ids          = [];
             $i = 1;
-            $j = 5;
+            $j = 1;
             foreach ($mul_task_ids as $key => $value) {
                 // $ids[] = $value['id'];
                 /*  $objPHPExcel = $objReader->load(realpath("./") . "/0522.xlsx");
