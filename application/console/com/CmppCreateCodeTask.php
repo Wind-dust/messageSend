@@ -6762,6 +6762,9 @@ class CmppCreateCodeTask extends Pzlife
             // $start_time               = strtotime('-10 days');
             // print_r($start_time);die;
             $start_time = (int) strtotime(date('2020-06-01'));
+            $Received = updateReceivedForMessage();
+            // array_push($Received, 'DELIVRD');
+            // echo join(',',$Received);die;
             // $end_time = $start_time + 86400;
             // echo $end_time;die;
             while (true) {
@@ -6788,7 +6791,11 @@ class CmppCreateCodeTask extends Pzlife
                                 }
                             } else {
                                 $value['status_message'] = $receipt[0]['status_message'];
+                               
                             }
+                        }
+                        if (in_array($value['status_message'],$Received)) {
+                            $value['status_message'] = 'DELIVRD';
                         }
                         if ($send_length > 70) {
                             $num = ceil($send_length / 67);
@@ -11399,7 +11406,7 @@ class CmppCreateCodeTask extends Pzlife
     {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M');
-        $redis->rpush("index:meassage:multimediamessage:buffersendtask", json_encode(['id' => 92556, 'deduct' => 10]));
+        // $redis->rpush("index:meassage:multimediamessage:buffersendtask", json_encode(['id' => 92556, 'deduct' => 10]));
         try {
             while (true) {
                 $send = $redis->lpop('index:meassage:business:buffersendtask');
@@ -11507,7 +11514,7 @@ class CmppCreateCodeTask extends Pzlife
             $send = json_decode($send, true);
             $task = Db::query("SELECT * FROM " . $send['from'] . " WHERE `id` =" . $send['mar_task_id']);
             if (empty($task)) {
-                comtinue;
+                continue;
             }
             $task = $task[0];
             $send_task_log = [];
@@ -11523,7 +11530,7 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
-    
+    //future未知补推
     public function reciveSendMessageFoFuture()
     {
         ini_set('memory_limit', '3072M');
