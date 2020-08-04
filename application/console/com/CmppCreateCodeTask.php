@@ -2379,8 +2379,8 @@ class CmppCreateCodeTask extends Pzlife
                     }
                     $result['mobiles'][] = $check_result;
                 } */
-                $result['code'] = 0;
-                $result = json_encode($result);
+              /*   $result['code'] = 0;
+                $result = json_encode($result); */
                 $result = json_decode($result, true);
                 if ($result['code'] == 0) { //接口请求成功
                     $mobiles = $result['mobiles'];
