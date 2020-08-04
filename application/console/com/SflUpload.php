@@ -1482,37 +1482,6 @@ class SflUpload extends Pzlife
                                         continue;
 
                                         } */
-<<<<<<< HEAD
-                                        if ($save_type == 'redis') {
-                                            if (in_array($tvalue[3], $white_list)) {
-                                                $redis->rpush('sftp:sfl:MMS:whitesendtask', json_encode($MMS_real_send));
-                                            } else {
-                                                if (strpos($tvalue[3], '000000') !== false || strpos($tvalue[3], '111111') || strpos($tvalue[3], '222222') || strpos($tvalue[3], '333333') || strpos($tvalue[3], '444444') || strpos($tvalue[3], '555555') || strpos($tvalue[3], '666666') || strpos($tvalue[3], '777777') || strpos($tvalue[3], '888888') || strpos($tvalue[3], '999999')) {
-                                                    $redis->rpush('sftp:sfl:MMS:errorsendtask', json_encode($MMS_real_send));
-                                                } else {
-                                                    $redis->rpush('sftp:sfl:MMS:sendtask', json_encode($MMS_real_send));
-                                                }
-                                            }
-                                        } else {
-                                            $MMSmessage[] = $MMS_real_send;
-                                            // print_r($content);die;
-                                            $j++;
-                                            if ($j > 100) {
-                                                $mysql_connect->startTrans();
-                                                try {
-                                                    $mysql_connect->table('yx_sfl_multimedia_message')->insertAll($MMSmessage);
-                                                    unset($MMSmessage);
-                                                    $j = 1;
-                                                    $mysql_connect->commit();
-                                                } catch (\Exception $e) {
-                                                    exception($e);
-                                                }
-                                                // $this->redis->rPush('index:meassage:business:sendtask', $send);
-
-                                            }
-                                        }
-=======
->>>>>>> 289beeaa9000ed669ce5c6f42767b5d83f06428c
                                         // $MMSmessage[] = $MMS_real_send;
                                     }
                                 }
@@ -1535,11 +1504,6 @@ class SflUpload extends Pzlife
 
                         // continue;
                         $insertMMS = [];
-<<<<<<< HEAD
-                       
-=======
-
->>>>>>> 289beeaa9000ed669ce5c6f42767b5d83f06428c
                         if (!empty($MMSmessage)) {
                             for ($i = 0; $i < count($MMSmessage); $i++) {
                                 // array_push($insertMMS, $MMSmessage[$i]);
