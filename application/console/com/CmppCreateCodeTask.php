@@ -2201,8 +2201,8 @@ class CmppCreateCodeTask extends Pzlife
                         if (!empty($real_send_mobile)) {
                             foreach ($real_send_mobile as $key => $value) {
                                 $prefix = substr(trim($value), 0, 7);
-                                $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
-                                $newres = array_shift($res);
+                                $newres = $this->redis->hget('index:mobile:source', $prefix);
+                                $newres = json_decode($newres, true);
                                 if ($newres) {
                                     if ($newres['source'] == 1) { //移动
                                         // $channel_id = $yidong_channel_id;
