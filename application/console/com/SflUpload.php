@@ -1458,7 +1458,7 @@ class SflUpload extends Pzlife
                                             $MMSmessage[] = $MMS_real_send;
                                             // print_r($content);die;
                                             $j++;
-                                            if ($j > 100) {
+                                            /* if ($j > 100) {
                                                 $mysql_connect->startTrans();
                                                 try {
                                                     $mysql_connect->table('yx_sfl_send_task')->insertAll($MMSmessage);
@@ -1470,7 +1470,7 @@ class SflUpload extends Pzlife
                                                 }
                                                 // $this->redis->rPush('index:meassage:business:sendtask', $send);
 
-                                            }
+                                            } */
                                         }
                                         /*  if ($tvalue[3] == "") {
 
