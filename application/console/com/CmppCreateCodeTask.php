@@ -6761,7 +6761,7 @@ class CmppCreateCodeTask extends Pzlife
             $day_users                = [];
             // $start_time               = strtotime('-10 days');
             // print_r($start_time);die;
-            $start_time = (int) strtotime(date('2020-06-01'));
+            $start_time = (int) strtotime(date('2020-07-01'));
             $Received = updateReceivedForMessage();
             array_push($Received, 'DELIVRD');
             // echo join(',',$Received);die;
