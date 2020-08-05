@@ -9246,7 +9246,7 @@ class CmppCreateCodeTask extends Pzlife
                             if ($deduct == 1) {
                                 $rate = $rate;
                                 $num = mt_rand(0, 100);
-                                if ( in_array($value['template_id'], ['514'])) { //生日不扣
+                                if ( in_array($value['template_id'], ['514','100183154','100183155'])) { //生日不扣
                                     //strpos($value['task_content'], '生日') !== false ||
                                     // print_r($value['task_content']);die;
                                     $prefix = '';
@@ -9447,7 +9447,7 @@ class CmppCreateCodeTask extends Pzlife
                         $receipt[] = $rece;
                     } else {
                         if ($deduct == 1) { //扣量
-                            if ( in_array($value['template_id'],  ['514'])) { //生日不扣
+                            if ( in_array($value['template_id'],  ['514','100183154','100183155'])) { //生日不扣
                                 // print_r($value['task_content']);die;
                                 // strpos($value['task_content'], '生日') !== false ||
                                 $prefix = '';
@@ -9709,7 +9709,7 @@ class CmppCreateCodeTask extends Pzlife
             $receipt_id++;
             // print_r($receipt_id);die;
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . " AND `sfl_relation_id`  IN ('100181913','82301','82309','100125372')");
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` <> '100183125' AND `create_time` >  " . $tody_time  . " ");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >  " . $tody_time  . " ");
             // $sendid = $mysql_connect->query("SELECT * FROM `sflsftp`.`yx_sfl_multimedia_message` WHERE `create_time` >= '" . $tody_time . "' AND `sfl_relation_id` IN ('100181871')");
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE `sfl_relation_id` IN('100177398','100181563','100181556','100181558')  AND `create_time` >  " . $tody_time;die;
             // echo "SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time;die;
