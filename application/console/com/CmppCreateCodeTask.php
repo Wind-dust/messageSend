@@ -6763,7 +6763,7 @@ class CmppCreateCodeTask extends Pzlife
             // print_r($start_time);die;
             $start_time = (int) strtotime(date('2020-06-01'));
             $Received = updateReceivedForMessage();
-            // array_push($Received, 'DELIVRD');
+            array_push($Received, 'DELIVRD');
             // echo join(',',$Received);die;
             // $end_time = $start_time + 86400;
             // echo $end_time;die;
@@ -6794,7 +6794,7 @@ class CmppCreateCodeTask extends Pzlife
                                
                             }
                         }
-                        if (in_array($value['status_message'],$Received)) {
+                        if (in_array(trim($value['status_message']),$Received)) {
                             $value['status_message'] = 'DELIVRD';
                         }
                         if ($send_length > 70) {
@@ -7739,7 +7739,9 @@ class CmppCreateCodeTask extends Pzlife
             $day_users                = [];
             // $start_time               = strtotime('-10 days');
             // print_r($start_time);die;
-            $start_time = (int) strtotime(date('2020-06-01'));
+            $start_time = (int) strtotime(date('2020-07-01'));
+            $Received = updateReceivedForMessage();
+            array_push($Received, 'DELIVRD');
             // $end_time = $start_time + 86400;
             // echo $end_time;die;
             while (true) {
@@ -7768,6 +7770,9 @@ class CmppCreateCodeTask extends Pzlife
                         } else {
                             $task_log[0]['status_message'] = $receipt[0]['status_message'];
                         }
+                    }
+                    if (in_array(trim($task_log[0]['status_message']), $Received)) {
+                        $task_log[0]['status_message'] = 'DELIVRD';
                     }
                     $num         = 1;
                     if ($send_length > 70) {
@@ -11387,7 +11392,7 @@ class CmppCreateCodeTask extends Pzlife
                         'send_status'  => 2,
                         'status_message'  => 'DELIVRD',
                         'real_message'  => 'DELIVRD',
-                        'create_time'  => time(),
+                        'create_time'  =>  $sendTask['create_time'],
                     ]);
                     $redis->rpush('index:meassage:code:user:mulreceive:' . $sendTask['uid'], json_encode([
                         'task_no'        => $sendTask['task_no'],
@@ -11446,7 +11451,7 @@ class CmppCreateCodeTask extends Pzlife
                             'send_status'  => 2,
                             'status_message'  => 'DELIVRD',
                             'real_message'  => 'DELIVRD',
-                            'create_time'  => time(),
+                            'create_time'  => $sendTask['create_time'],
                         ]);
                         $redis->rpush('index:meassage:code:user:mulreceive:' . $sendTask['uid'], json_encode([
                             'task_no'        => $sendTask['task_no'],
