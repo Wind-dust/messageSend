@@ -7764,13 +7764,16 @@ class CmppCreateCodeTask extends Pzlife
                         }
                         $receipt = Db::query("SELECT `status_message` FROM yx_send_task_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $task_log[0]['mobile'] . "' LIMIT 1 ");
                         if (empty($receipt)) {
-                            if ($task_log[0]['create_time'] + 259200 < time()) {
+                            if ($task_log[0]['create_time'] + 259200 < time() && $task_log[0]['uid'] == 51) {
+                                $task_log[0]['status_message'] = 'DELIVRD';
+                            }elseif($task_log[0]['create_time'] + 259200 < time() && $task_log[0]['create_time'] > 1595865600){
                                 $task_log[0]['status_message'] = 'DELIVRD';
                             }
                         } else {
                             $task_log[0]['status_message'] = $receipt[0]['status_message'];
                         }
                     }
+                    // if () {}
                     if (in_array(trim($task_log[0]['status_message']), $Received)) {
                         $task_log[0]['status_message'] = 'DELIVRD';
                     }
