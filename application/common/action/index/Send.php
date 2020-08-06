@@ -1067,7 +1067,7 @@ return $result;
         }
     }
 
-    public function submitBatchCustomBusiness($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '', $msg_id = '')
+    public function submitBatchCustomBusiness($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '', $msg_id = '', $develop_no = '')
     {
         // $connect = str_replace('&amp;','&',$connect);
 
@@ -1101,7 +1101,368 @@ return $result;
                 return ['code' => '3010'];
             }
         }
-        $develop_no = '';
+        if (!empty($develop_no)) {
+            $develop_no_mes = Dbuser::getUserDevelopCode(['business_id' => 6, 'develop_no' => $develop_no], 'id,uid,business_id,source,develop_no', true);
+            if (!empty($develop_no_mes)) {
+                $develop_no = $develop_no_mes['develop_no'];
+            }
+        }
+        if ($user['pid'] == 137) {
+            $develop_no_mes = Dbuser::getUserDevelopCode(['business_id' => 6, 'uid' => $user['id']], 'id,uid,business_id,source,develop_no', true);
+            if (!empty($develop_no_mes)) {
+                $develop_no = $develop_no_mes['develop_no'];
+            }
+        }
+        $connect_data = explode(';', $connect);
+        $connect_data = array_filter($connect_data);
+        $send_data = [];
+        $send_data_mobile = [];
+        $submit_num = count($connect_data);
+        foreach ($connect_data as $key => $data) {
+            $send_text = explode(':', $data);
+            if (!empty($template)) {
+                $replace_data = explode(',', $send_text[0]);
+                $real_text = $template['content'];
+                if (!empty($signature)) {
+                    $real_text = $signature['title'] . $template['content'];
+                }
+                //有变量
+                if ($template['variable_len'] > 0) {
+                    if (empty($replace_data)) {
+                        return ['code' => '3005']; //未获取到变量内容
+                    }
+                    for ($i = 1; $i <= $template['variable_len']; $i++) {
+                        // $var_num = $i + 1;
+                        $real_text = str_replace("{{var" . $i . "}}", base64_decode($replace_data[$i - 1]), $real_text); //内容
+                        // $real_text = str_replace("{{var" . $i . "}}", urldecode($replace_data[$i - 1]), $real_text); //内容
+                    }
+                }
+                if (checkMobile($send_text[1]) == false) {
+                    continue;
+                }
+                if (in_array($real_text, $send_data)) {
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                } else {
+                    $send_data[] = $real_text;
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                }
+            } else {
+                if (!empty($signature_id)) {
+                    $real_text = $signature['title'] .  base64_decode($send_text[0]);
+                    // $real_text = $signature['title'] .  urldecode($send_text[0]);
+                } else {
+                    $real_text = base64_decode($send_text[0]);
+                    // $real_text = urldecode($send_text[0]);
+                    if (mb_strpos($real_text, '】') - mb_strpos($real_text, '【') < 2 || mb_strpos($real_text, '】') - mb_strpos($real_text, '【') > 20) {
+                        return ['code' => '3006'];
+                    }
+                }
+                if (checkMobile($send_text[1]) == false) {
+                    continue;
+                }
+                if (in_array($real_text, $send_data)) {
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                } else {
+                    $send_data[] = $real_text;
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                }
+            }
+        }
+        if (empty($send_data_mobile)) {
+            return ['code' => '3005'];
+        }
+        $free_taskno = [];
+        $trial = []; //需审核
+        //组合任务包
+        $real_num = 0;
+
+        $all_task_no = [];
+        $task_no_mobile = [];
+        foreach ($send_data as $key => $value) {
+            if (empty($send_data_mobile[$key])) {
+                continue;
+            }
+            $send_task = [];
+            $task_no = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+            $send_task = [
+                'task_no' => $task_no,
+                'uid'     => $user['id'],
+                'task_content' => $value,
+                'develop_no' => $develop_no,
+                'mobile_content' => join(',', $send_data_mobile[$key]),
+                'source'         => $ip,
+                'send_length'       => mb_strlen($value),
+                'send_num'       => count($send_data_mobile[$key]),
+            ];
+            if (!empty($msg_id)) {
+                $send_task['send_msg_id'] = $msg_id;
+            }
+            if (mb_strlen($value) > 70) {
+                $real_num += ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
+                $send_task['real_num'] =  ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
+            } else {
+                $real_num += count($send_data_mobile[$key]);
+                $send_task['real_num'] =  count($send_data_mobile[$key]);
+            }
+            if ($user['free_trial'] == 2) {
+                $send_task['free_trial'] = 2;
+            }else{
+                $send_task['free_trial'] = 1;
+            }
+           
+            if (count($send_data_mobile[$key]) > 30) {
+                $send_task['free_trial'] = 1;
+            }
+            if ($send_task['free_trial'] == 2) {
+                //短信内容分词
+                $search_analyze = $this->search_analyze($value);
+                $search_result = json_decode($search_analyze, true);
+                $words = [];
+                if ($search_result['code'] == 20000) {
+                    $words = $search_result['data']['tokens'];
+                }
+                if (!empty($words)) { //敏感词
+                    $analyze_value = DbSendMessage::getSensitiveWord([['word', 'IN', join(',', $words)]], 'id', false);
+                    if (!empty($analyze_value)) {
+                        // array_push($trial, $send_task);
+                        $send_task['free_trial'] = 1;
+                        $send_task['yidong_channel_id'] = 0;
+                        $send_task['liantong_channel_id'] = 0;
+                        $send_task['dianxin_channel_id'] = 0;
+                    } else {
+                        // array_push($task_no, $free_taskno);
+                        $send_task['free_trial'] = 2;
+                        if ($user['pid'] == 137 || $user['id'] == 110) {
+                            $send_task['yidong_channel_id'] = 85;
+                            $send_task['liantong_channel_id'] = 85;
+                            $send_task['dianxin_channel_id'] = 85;
+                        } elseif ($user['id'] == 134) {
+                            $send_task['yidong_channel_id'] = 85;
+                            $send_task['liantong_channel_id'] = 85;
+                            $send_task['dianxin_channel_id'] = 85;
+                        } else {
+                            $send_task['yidong_channel_id'] = 85;
+                            $send_task['liantong_channel_id'] = 85;
+                            $send_task['dianxin_channel_id'] = 85;
+                        }
+                        if ($user['id'] == 172) {
+                            $send_task['yidong_channel_id'] = 95;
+                            $send_task['liantong_channel_id'] = 95;
+                            $send_task['dianxin_channel_id'] = 95;
+                        }
+                        if ($user['id'] == 187) {
+                            $send_task['yidong_channel_id'] = 95;
+                            $send_task['liantong_channel_id'] = 95;
+                            $send_task['dianxin_channel_id'] = 95;
+                        }
+                        if ($user['id'] == 200) {
+                            $send_task['yidong_channel_id'] = 95;
+                            $send_task['liantong_channel_id'] = 95;
+                            $send_task['dianxin_channel_id'] = 95;
+                        }
+                        if ($user['id'] == 217) {
+                            $send_task['yidong_channel_id'] = 95;
+                            $send_task['liantong_channel_id'] = 95;
+                            $send_task['dianxin_channel_id'] = 95;
+                        }
+                        if ($user['id'] == 218) {
+                            $send_task['yidong_channel_id'] = 95;
+                            $send_task['liantong_channel_id'] = 95;
+                            $send_task['dianxin_channel_id'] = 95;
+                        }
+                        if ($user['id'] >= 229) {
+                            $channel = DbAdministrator::getUserChannel(['uid'=> $user['id'],'business_id' => 6],'*',true);
+                            if (!empty($channel)){
+                                $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
+                                $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
+                                $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                            }
+                        }
+                        $free_taskno[] = $task_no;
+                        // array_push($free_trial, $send_task);
+                    }
+                } else {
+                    if (!empty($value)) {
+                        $free_taskno[] = $task_no;
+                        $send_task['free_trial'] = 2;
+                        if ($user['pid'] == 137) {
+
+                            $send_task['yidong_channel_id'] = 85;
+                            $send_task['liantong_channel_id'] = 85;
+                            $send_task['dianxin_channel_id'] = 85;
+                            if ($user['id'] == 187) {
+                                $send_task['yidong_channel_id'] = 95;
+                                $send_task['liantong_channel_id'] = 95;
+                                $send_task['dianxin_channel_id'] = 95;
+                            }
+                            if ($user['id'] == 172) {
+                                $send_task['yidong_channel_id'] = 95;
+                                $send_task['liantong_channel_id'] = 95;
+                                $send_task['dianxin_channel_id'] = 95;
+                            }
+                            if ($user['id'] == 200) {
+                                $send_task['yidong_channel_id'] = 95;
+                                $send_task['liantong_channel_id'] = 95;
+                                $send_task['dianxin_channel_id'] = 95;
+                            }
+                            if ($user['id'] == 217) {
+                                $send_task['yidong_channel_id'] = 95;
+                                $send_task['liantong_channel_id'] = 95;
+                                $send_task['dianxin_channel_id'] = 95;
+                            }
+                            if ($user['id'] == 218) {
+                                $send_task['yidong_channel_id'] = 95;
+                                $send_task['liantong_channel_id'] = 95;
+                                $send_task['dianxin_channel_id'] = 95;
+                            }
+                            if ($user['id'] == 224) {
+                                $send_task['yidong_channel_id'] = 95;
+                                $send_task['liantong_channel_id'] = 95;
+                                $send_task['dianxin_channel_id'] = 95;
+                            }
+                        } else {
+                            if ($user['id'] == 110) {
+                                $send_task['yidong_channel_id'] = 85;
+                                $send_task['liantong_channel_id'] = 85;
+                                $send_task['dianxin_channel_id'] = 85;
+                            } else {
+                                $send_task['yidong_channel_id'] = 85;
+                                $send_task['liantong_channel_id'] = 85;
+                                $send_task['dianxin_channel_id'] = 85;
+                            }
+                        }
+                        if ($user['id'] >= 229) {
+                            $channel = DbAdministrator::getUserChannel(['uid'=> $user['id'],'business_id' => 6],'*',true);
+                            if (!empty($channel)){
+                                $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
+                                $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
+                                $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                            }
+                        }
+                        // array_push($free_trial, $send_task);
+                    }
+                }
+            } else {
+                $send_task['free_trial'] = 1;
+                $send_task['yidong_channel_id'] = 0;
+                $send_task['liantong_channel_id'] = 0;
+                $send_task['dianxin_channel_id'] = 0;
+            }
+            array_push($trial, $send_task);
+            $all_task_no[] = $task_no;
+            $task_no_mobile[$key] = $send_data_mobile[$key];
+        }
+        $task_as_mobile = [];
+        foreach ($task_no_mobile as $key => $value) {
+            $as_value = [];
+            $as_value['task_no'] = $all_task_no[$key];
+            $as_value['mobiles'] = $value;
+            $task_as_mobile[] = $as_value;
+        }
+        // print_r($trial);
+        // die;
+        if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
+            return ['code' => '3004'];
+        }
+        Db::startTrans();
+        try {
+            // $save = DbAdministrator::saveUserSendCodeTask($trial);
+            $no_free = [];
+            $free_ids = [];
+            foreach ($trial as $key => $value) {
+                # code...
+                $id = DbAdministrator::addUserSendCodeTask($value);
+                if ($value['free_trial'] == 2) {
+                    // $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $id, 'deduct' => $user['business_deduct']]));
+                    $free_ids[] = $id;
+                }else{
+                    $no_free[] = $id;
+                }
+            }
+            DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
+            Db::commit();
+            if (!empty($free_ids)) {
+                foreach ($free_ids as $key => $value) {
+                    $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value, 'deduct' => $user['business_deduct']]));
+                }
+            }
+            if (!empty($no_free)) {
+                $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                $check_data = [];
+                $check_data = [
+                    'msgtype' => "text",
+                    'text' => [
+                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核\n【任务类型】：行业短信\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                    ],
+                ];
+                $headers = [
+                    'Content-Type:application/json'
+                ];
+                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+            }
+           /*  if ($save) {
+                DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
+                Db::commit();
+                if (!empty($free_taskno)) {
+                    //免审
+                    $free_ids = DbAdministrator::getUserSendCodeTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
+                    foreach ($free_ids as $key => $value) {
+                        $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value['id'], 'deduct' => $user['business_deduct']]));
+                    }
+                }
+            } */
+
+            if (!empty($msg_id)) {
+                return ['code' => '200', 'msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
+            }
+            return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
+        } catch (\Exception $e) {
+            Db::rollback();
+            // exception($e);
+            return ['code' => '3009'];
+        }
+    }
+
+    public function submitBatchCustomBusinessMsgId($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '', $msg_id = '', $develop_no = '')
+    {
+        // $connect = str_replace('&amp;','&',$connect);
+
+        $this->redis = Phpredis::getConn();
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,nick_name,appkey,user_type,user_status,reservation_service,free_trial,business_deduct', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        // print_r($user);die;
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 6], 'id,num_balance', true);
+        if (empty($user_equities)) {
+            return ['code' => '3002'];
+        }
+        if (!empty($template_id)) {
+            if (!empty($template_id)) {
+                $template =  DbSendMessage::getUserModel(['template_id' => $template_id, 'uid' => $user['id']], '*', true);
+                if (empty($template) || $template['status'] != 3) {
+                    return ['code' => '3003'];
+                }
+            }
+        }
+        if (!empty($signature_id)) {
+            $signature =  DbSendMessage::getUserSignature(['uid' => $user['id'], 'signature_id' => $signature_id], '*', true);
+            if (empty($signature)) {
+                return ['code' => '3008'];
+            }
+            if ($signature['status'] != 2) {
+                return ['code' => '3010'];
+            }
+        }
+        if (!empty($develop_no)) {
+            $develop_no_mes = Dbuser::getUserDevelopCode(['business_id' => 6, 'develop_no' => $develop_no], 'id,uid,business_id,source,develop_no', true);
+            if (!empty($develop_no_mes)) {
+                $develop_no = $develop_no_mes['develop_no'];
+            }
+        }
         if ($user['pid'] == 137) {
             $develop_no_mes = Dbuser::getUserDevelopCode(['business_id' => 6, 'uid' => $user['id']], 'id,uid,business_id,source,develop_no', true);
             if (!empty($develop_no_mes)) {
@@ -1462,7 +1823,7 @@ return $result;
         return $output;
     }
 
-    public function submitBatchCustomMarketing($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '', $msg_id = '')
+    public function submitBatchCustomMarketing($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '', $msg_id = '', $develop_no = '')
     {
         $this->redis = Phpredis::getConn();
         $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,appkey,nick_name,user_type,user_status,reservation_service,marketing_free_trial,market_deduct', true);
@@ -1492,7 +1853,323 @@ return $result;
                 return ['code' => '3010'];
             }
         }
-        $develop_no  = '';
+        if (!empty($develop_no)) {
+            $develop_no_mes = Dbuser::getUserDevelopCode(['business_id' => 5, 'develop_no' => $develop_no], 'id,uid,business_id,source,develop_no', true);
+            if (!empty($develop_no_mes)) {
+                $develop_no = $develop_no_mes['develop_no'];
+            }
+        }
+        if ($user['pid'] == 137) {
+            $develop_no_mes = Dbuser::getUserDevelopCode(['business_id' => 5, 'uid' => $user['id']], 'id,uid,business_id,source,develop_no', true);
+            if (!empty($develop_no_mes)) {
+                $develop_no = $develop_no_mes['develop_no'];
+            }
+        }
+        $connect_data = explode(';', $connect);
+        $connect_data = array_filter($connect_data);
+        $send_data = [];
+        $send_data_mobile = [];
+        foreach ($connect_data as $key => $data) {
+            $send_text = explode(':', $data);
+            if (!empty($template)) {
+                $replace_data = explode(',', $send_text[0]);
+
+                $real_text = $template['content'];
+                if (!empty($signature)) {
+                    $real_text = $signature['title'] . $template['content'];
+                }
+                //有变量
+                if ($template['variable_len'] > 0) {
+                    if (empty($replace_data)) {
+                        return ['code' => '3005']; //未获取到变量内容
+                    }
+                    for ($i = 1; $i <= $template['variable_len']; $i++) {
+
+                        // $var_num = $i + 1;
+                        $real_text = str_replace("{{var" . $i . "}}", base64_decode($replace_data[$i - 1]), $real_text); //内容
+                        // $real_text = str_replace("{{var" . $i . "}}", urldecode($replace_data[$i - 1]), $real_text); //内容
+                    }
+                }
+                if (checkMobile($send_text[1]) == false) {
+                    continue;
+                }
+                if (in_array($real_text, $send_data)) {
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                } else {
+                    $send_data[] = $real_text;
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                }
+            } else {
+                if (checkMobile($send_text[1]) == false) {
+                    continue;
+                }
+                if (!empty($signature_id)) {
+                    $real_text = $signature['title'] .  base64_decode($send_text[0]);
+                    // $real_text = $signature['title'] .  urldecode($send_text[0]);
+                } else {
+                    $real_text = base64_decode($send_text[0]);
+                    // $real_text = urldecode($send_text[0]);
+                }
+                if (in_array($real_text, $send_data)) {
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                } else {
+                    $send_data[] = $real_text;
+                    $send_data_mobile[array_search($real_text, $send_data)][] = $send_text[1];
+                }
+            }
+        }
+        // print_r($send_data_mobile);die;
+        $free_taskno = [];
+        $trial = []; //需审核
+        //组合任务包
+        $real_num = 0;
+
+        $all_task_no = [];
+        $task_no_mobile = [];
+        if (empty($send_data_mobile)) {
+            return ['code' => '3005'];
+        }
+        foreach ($send_data as $key => $value) {
+            $send_task = [];
+            $task_no = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+            if (empty($send_data_mobile[$key])) {
+                continue;
+            }
+            $send_task = [
+                'task_no' => $task_no,
+                'uid'     => $user['id'],
+                'task_content' => $value,
+                'develop_no' => $develop_no,
+                'mobile_content' => join(',', $send_data_mobile[$key]),
+                'source'         => $ip,
+                'send_length'       => mb_strlen($value),
+                'send_num'       => count($send_data_mobile[$key]),
+            ];
+            if (!empty($msg_id)) {
+                $send_task['send_msg_id'] = $msg_id;
+            }
+            if (mb_strlen($value) > 70) {
+                $real_num += ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
+                $send_task['real_num'] =  ceil(mb_strlen($value) / 67) * count($send_data_mobile[$key]);
+            } else {
+                $real_num += count($send_data_mobile[$key]);
+                $send_task['real_num'] =  count($send_data_mobile[$key]);
+            }
+            // echo count($send_data_mobile[$key]);die;
+            if ($user['marketing_free_trial'] == 2) {
+                $send_task['free_trial'] = 2;
+            }else{
+                $send_task['free_trial'] = 1;
+            }
+            if (count($send_data_mobile[$key]) > 30) {
+                // $user['marketing_free_trial'] = 1;
+                $send_task['free_trial'] = 1;
+            }
+            // $send_task['free_trial'] = 1;
+            if ($send_task['free_trial'] == 2) {
+                //短信内容分词
+                $search_analyze = $this->search_analyze($value);
+                $search_result = json_decode($search_analyze, true);
+                $words = [];
+                if ($search_result['code'] == 20000) {
+                    $words = $search_result['data']['tokens'];
+                }
+                if (!empty($words)) { //敏感词
+                    $analyze_value = DbSendMessage::getSensitiveWord([['word', 'IN', join(',', $words)]], 'id', false);
+                    if (!empty($analyze_value)) {
+                        // array_push($trial, $send_task);
+                        $send_task['free_trial'] = 1;
+                        $send_task['yidong_channel_id'] = 0;
+                        $send_task['liantong_channel_id'] = 0;
+                        $send_task['dianxin_channel_id'] = 0;
+                    } else {
+                        // array_push($task_no, $free_taskno);
+                        $send_task['free_trial'] = 2;
+                        if ($user['id'] == 133) {
+                            $send_task['yidong_channel_id'] = 73;
+                            $send_task['liantong_channel_id'] = 75;
+                            $send_task['dianxin_channel_id'] = 76;
+                        } elseif ($user['id'] == 185) {
+                            $send_task['yidong_channel_id'] = 107;
+                            $send_task['liantong_channel_id'] = 107;
+                            $send_task['dianxin_channel_id'] = 107;
+                        } elseif ($user['id'] == 187) {
+                            $send_task['yidong_channel_id'] = 107;
+                            $send_task['liantong_channel_id'] = 107;
+                            $send_task['dianxin_channel_id'] = 107;
+                        } elseif ($user['id'] == 206) {
+                            $send_task['yidong_channel_id'] = 107;
+                            $send_task['liantong_channel_id'] = 107;
+                            $send_task['dianxin_channel_id'] = 107;
+                        } else {
+                            $send_task['yidong_channel_id'] = 18;
+                            $send_task['liantong_channel_id'] = 19;
+                            $send_task['dianxin_channel_id'] = 19;
+                        }
+                        if ($user['id'] >= 229) {
+                            $channel = DbAdministrator::getUserChannel(['uid'=> $user['id'],'business_id' => 5],'*',true);
+                            if (!empty($channel)){
+                                $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
+                                $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
+                                $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                            }
+                        }
+                        $free_taskno[] = $task_no;
+                        // array_push($free_trial, $send_task);
+                    }
+                } else {
+                    if (!empty($value)) {
+                        $free_taskno[] = $task_no;
+                        $send_task['free_trial'] = 2;
+                        if ($user['id'] == 133) {
+                            $send_task['yidong_channel_id'] = 73;
+                            $send_task['liantong_channel_id'] = 75;
+                            $send_task['dianxin_channel_id'] = 76;
+                        } else {
+                            $send_task['yidong_channel_id'] = 18;
+                            $send_task['liantong_channel_id'] = 19;
+                            $send_task['dianxin_channel_id'] = 19;
+                        }
+                        if ($user['id'] == 185) {
+                            $send_task['yidong_channel_id'] = 107;
+                            $send_task['liantong_channel_id'] = 107;
+                            $send_task['dianxin_channel_id'] = 107;
+                        }
+                        if ($user['id'] == 187) {
+                            $send_task['yidong_channel_id'] = 107;
+                            $send_task['liantong_channel_id'] = 107;
+                            $send_task['dianxin_channel_id'] = 107;
+                        }
+                        if ($user['id'] == 206) {
+                            $send_task['yidong_channel_id'] = 107;
+                            $send_task['liantong_channel_id'] = 107;
+                            $send_task['dianxin_channel_id'] = 107;
+                        }
+                        if ($user['id'] >= 229) {
+                            $channel = DbAdministrator::getUserChannel(['uid'=> $user['id'],'business_id' => 5],'*',true);
+                            if (!empty($channel)){
+                                $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
+                                $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
+                                $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                            }
+                        }
+                        // array_push($free_trial, $send_task);
+                    }
+                }
+            } else {
+                $send_task['free_trial'] = 1;
+                $send_task['yidong_channel_id'] = 0;
+                $send_task['liantong_channel_id'] = 0;
+                $send_task['dianxin_channel_id'] = 0;
+            }
+            array_push($trial, $send_task);
+            $all_task_no[] = $task_no;
+            $task_no_mobile[$key] = $send_data_mobile[$key];
+        }
+        $task_as_mobile = [];
+        foreach ($task_no_mobile as $key => $value) {
+            $as_value = [];
+            $as_value['task_no'] = $all_task_no[$key];
+            $as_value['mobiles'] = $value;
+            $task_as_mobile[] = $as_value;
+        }
+        if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
+            return ['code' => '3004'];
+        }
+        // print_r($free_taskno);die;
+        Db::startTrans();
+        try {
+            /* $save = DbAdministrator::saveUserSendTask($trial);
+            if ($save) {
+                DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
+                Db::commit();
+                if (!empty($free_taskno)) {
+                    //免审
+                    $free_ids = DbAdministrator::getUserSendTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
+                    foreach ($free_ids as $key => $value) {
+                        $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => strval($value['id']), 'send_time' => 0, 'deduct' => $user['market_deduct']]));
+                    }
+                    // echo Db::getLastSQL();die;
+                }
+            } */
+            $free_ids = [];
+            $no_free = [];
+            foreach ($trial as $key => $value) {
+                $id = DbAdministrator::addUserSendTask($value);
+                if ($value['free_trial'] == 2) {
+                    $free_ids[] = $id;
+                }else{
+                    $no_free[] = $id;
+                }
+            }
+            DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
+            Db::commit();
+            if (!empty($free_ids)) {
+                foreach ($free_ids as $key => $value) {
+                    $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => strval($value), 'send_time' => 0, 'deduct' => $user['market_deduct']]));
+                }
+            }
+            if (!empty($no_free)) {
+                $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                $check_data = [];
+                $check_data = [
+                    'msgtype' => "text",
+                    'text' => [
+                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核\n【任务类型】：营销短信\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                    ],
+                ];
+                $headers = [
+                    'Content-Type:application/json'
+                ];
+                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+            }
+            if (!empty($msg_id)) {
+                return ['code' => '200', 'msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
+            }
+            return ['code' => '200', 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
+        } catch (\Exception $e) {
+            Db::rollback();
+            // exception($e);
+            return ['code' => '3009'];
+        }
+    }
+
+    public function submitBatchCustomMarketingMsgId($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '', $msg_id = '', $develop_no = '')
+    {
+        $this->redis = Phpredis::getConn();
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,appkey,nick_name,user_type,user_status,reservation_service,marketing_free_trial,market_deduct', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 5], 'id,num_balance', true);
+        if (empty($user_equities)) {
+            return ['code' => '3002'];
+        }
+        if (!empty($template_id)) {
+            $template =  DbSendMessage::getUserModel(['template_id' => $template_id, 'uid' => $user['id']], '*', true);
+            if (empty($template) || $template['status'] != 3) {
+                return ['code' => '3003'];
+            }
+        }
+        if (!empty($signature_id)) {
+            $signature =  DbSendMessage::getUserSignature(['uid' => $user['id'], 'signature_id' => $signature_id], '*', true);
+
+            if (empty($signature)) {
+                return ['code' => '3008'];
+            }
+            if ($signature['status'] != 2) {
+                return ['code' => '3010'];
+            }
+        }
+        if (!empty($develop_no)) {
+            $develop_no_mes = Dbuser::getUserDevelopCode(['business_id' => 5, 'develop_no' => $develop_no], 'id,uid,business_id,source,develop_no', true);
+            if (!empty($develop_no_mes)) {
+                $develop_no = $develop_no_mes['develop_no'];
+            }
+        }
         if ($user['pid'] == 137) {
             $develop_no_mes = Dbuser::getUserDevelopCode(['business_id' => 5, 'uid' => $user['id']], 'id,uid,business_id,source,develop_no', true);
             if (!empty($develop_no_mes)) {
@@ -1940,6 +2617,11 @@ return $result;
         if (empty($template)) {
             return ['code' => '3003'];
         }
+        $develop_no = '';
+        $develop_no_mes = Dbuser::getUserDevelopCode(['business_id' => 8, 'uid' => $user['id']], 'id,uid,business_id,source,develop_no', true);
+        if (!empty($develop_no_mes)) {
+            $develop_no = $develop_no_mes['develop_no'];
+        }
         $template['multimedia_frame'] = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $template['id']], 'num,name,content,image_path,image_type,variable_len', false, ['num' => 'asc']);
         if (!empty($signature_id)) {
             $signature =  DbSendMessage::getUserSignature(['uid' => $user['uid'], 'signature_id' => $signature_id], '*', true);
@@ -2112,6 +2794,7 @@ return $result;
                 'source'         => $ip,
                 'send_num'       => $send_num,
                 'real_num'       => $real_num,
+                'develop_no'       => $develop_no,
             ];
             if (!empty($msg_id)) {
                 $send_task['send_msg_id'] = $msg_id;
