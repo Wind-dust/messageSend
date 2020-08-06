@@ -1653,22 +1653,22 @@ class LocalScript extends Pzlife
 
     public function deDuctTest($id)
     {
-        
+
         $time = microtime(true);
-                        //结果：1541053888.5911
-                        //在经过处理得到最终结果:
-                        $lastTime = (int)($time * 1000);
+        //结果：1541053888.5911
+        //在经过处理得到最终结果:
+        $lastTime = (int)($time * 1000);
         echo $lastTime;
         echo "\n";
         $this->redis = Phpredis::getConn();
         $id = 15939;
         $sendTask = $this->getSendTask($id);
         $mobile_result = $this->mobilesFiltrate($sendTask['mobile_content'], $sendTask['uid'], 10);
-        
+
         $time = microtime(true);
-                        //结果：1541053888.5911
-                        //在经过处理得到最终结果:
-                        $lastTime = (int)($time * 1000);
+        //结果：1541053888.5911
+        //在经过处理得到最终结果:
+        $lastTime = (int)($time * 1000);
         echo $lastTime;
         echo "\n";
         // print_r($mobile_result);
@@ -1751,7 +1751,7 @@ class LocalScript extends Pzlife
             }
             $real_send_mobile = array_diff($mobile_data, $error_mobile);
             $real_send_mobile = array_diff($real_send_mobile, $white_mobiles);
-            
+
             // print_r($real_send_mobile);die;
             if (count($real_send_mobile) == 1) {
 
@@ -1831,14 +1831,14 @@ class LocalScript extends Pzlife
                     $need_check_mobile = []; //需要检测号码
                     foreach ($remaining_mobile as $key => $value) {
                         //判断是否为实号
-                       
-                        $vacant = $mobileredis->hget("yx:mobile:real",$value);//实号
+
+                        $vacant = $mobileredis->hget("yx:mobile:real", $value); //实号
                         // print_r($vacant);die;
                         if (!empty($vacant)) {
-                            $vacant = json_decode($vacant,true);
+                            $vacant = json_decode($vacant, true);
                             //判断检测时间在本月或者上月检测过，则不再检测
                             // print_r($vacant);die;
-                            if (isset($vacant['update_time']) && $vacant['update_time'] >= $the_month_time) {//无效检测号码
+                            if (isset($vacant['update_time']) && $vacant['update_time'] >= $the_month_time) { //无效检测号码
                                 $entity_mobiles[] = $value;
                                 $mobile_info = [];
                                 $mobile_info = [
@@ -1847,21 +1847,20 @@ class LocalScript extends Pzlife
                                 ];
                                 if (isset($vacant['city_id']) && in_array($vacant['city_id'], $citys_id)) {
                                     //热门城市号码
-    
+
                                     $host_city_mobile[] = $mobile_info;
                                 } else {
                                     //冷门城市号码
                                     $cool_city_mobile[] = $mobile_info;
                                 }
-                            }else{//需要检测号码
+                            } else { //需要检测号码
                                 $need_check_mobile[] = $value;
                             }
-
-                        }else{
-                            $entity = $mobileredis->hget("yx:mobile:empty",$value);//空号
-                            $entity = json_decode($entity,true);
+                        } else {
+                            $entity = $mobileredis->hget("yx:mobile:empty", $value); //空号
+                            $entity = json_decode($entity, true);
                             if (!empty($entity)) {
-                                if (isset($vacant['update_time']) && $vacant['update_time'] >= $the_month_time) {//空号
+                                if (isset($vacant['update_time']) && $vacant['update_time'] >= $the_month_time) { //空号
                                     // $entity_mobiles[] = $value;
                                     //空号直接放入发送队列
                                     $prefix = substr(trim($value), 0, 7);
@@ -1883,13 +1882,12 @@ class LocalScript extends Pzlife
                                     } else {
                                         $yidong_mobile[] = $value;
                                     }
-                                }else{//需要检测号码
+                                } else { //需要检测号码
                                     $need_check_mobile[] = $value;
                                 }
-                            }else{
+                            } else {
                                 $need_check_mobile[] = $value;
                             }
-                            
                         }
 
                         // echo "实号";
@@ -2217,25 +2215,24 @@ class LocalScript extends Pzlife
                 // print_r($data);
                 //模拟请求
                 foreach ($check_mobile_data as $ckey => $cvalue) {
-                    
-                    if ($mobileredis->hget("yx:mobile:real",decrypt($cvalue, $secret_id))) {
+
+                    if ($mobileredis->hget("yx:mobile:real", decrypt($cvalue, $secret_id))) {
                         $check_result = [];
                         $check_result = [
                             'mobileStatus' => 2,
-                            'mobile' =>$cvalue
+                            'mobile' => $cvalue
                         ];
-                        
-                    }else {
+                    } else {
                         $check_result = [
                             'mobileStatus' => 0,
-                            'mobile' =>$cvalue
+                            'mobile' => $cvalue
                         ];
                     }
                     $result['mobiles'][] = $check_result;
                 }
                 $result['code'] = 0;
                 $result = json_encode($result);
-               
+
                 $result = json_decode($result, true);
                 if ($result['code'] == 0) { //接口请求成功
                     $mobiles = $result['mobiles'];
@@ -2244,7 +2241,7 @@ class LocalScript extends Pzlife
                         $check_result = $mvalue['mobileStatus'];
                         $check_status = 2;
                         if ($check_result == 2) { //实号
-                           /*  Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
+                            /*  Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
                             Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
                             Db::table('yx_real_mobile')->insert([
                                 'mobile' => $mobile,
@@ -2253,25 +2250,25 @@ class LocalScript extends Pzlife
                                 'update_time' => time(),
                                 'create_time' => time()
                             ]); */
-                            $mobileredis->hdel('yx:mobile:empty',$mobile);
+                            $mobileredis->hdel('yx:mobile:empty', $mobile);
                             $prefix = substr(trim($mobile), 0, 7);
                             $newres = $this->redis->hget('index:mobile:source', $prefix);
                             $newres = json_decode($newres, true);
                             // {"source":1,"province_id":841,"city_id":842,"update_time":1591386721,"check_status":1,"check_result":1}
                             if (!empty($newres)) {
-                                $mobileredis->hset('yx:mobile:real',$mobile,json_encode([
+                                $mobileredis->hset('yx:mobile:real', $mobile, json_encode([
                                     'source' => $newres['source'],
                                     'province_id' => $newres['province_id'],
                                     'city_id' => $newres['city_id'],
                                     'check_status' => 2,
                                     'check_result' => 3,
-                                    'update_time' =>time(),
+                                    'update_time' => time(),
                                 ]));
                             }
                             // return false;
                             $real_mobile[] = $mobile;
                         } else {
-                           /*  Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
+                            /*  Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
                             Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
                             Db::table('yx_mobile')->insert([
                                 'mobile' => $mobile,
@@ -2280,19 +2277,19 @@ class LocalScript extends Pzlife
                                 'update_time' => time(),
                                 'create_time' => time()
                             ]); */
-                            $mobileredis->hdel('yx:mobile:real',$mobile);
+                            $mobileredis->hdel('yx:mobile:real', $mobile);
                             $prefix = substr(trim($mobile), 0, 7);
                             $newres = $this->redis->hget('index:mobile:source', $prefix);
                             $newres = json_decode($newres, true);
                             // {"source":1,"province_id":841,"city_id":842,"update_time":1591386721,"check_status":1,"check_result":1}
                             if (!empty($newres)) {
-                                $mobileredis->hset('yx:mobile:empty',$mobile,json_encode([
+                                $mobileredis->hset('yx:mobile:empty', $mobile, json_encode([
                                     'source' => $newres['source'],
                                     'province_id' => $newres['province_id'],
                                     'city_id' => $newres['city_id'],
                                     'check_status' => 2,
                                     'check_result' => $check_result,
-                                    'update_time' =>time(),
+                                    'update_time' => time(),
                                 ]));
                             }
                             $empty_mobile[] = $mobile;
@@ -2318,18 +2315,17 @@ class LocalScript extends Pzlife
             // print_r($data);
             //模拟请求
             foreach ($check_mobile_data as $ckey => $cvalue) {
-                    
-                if ($mobileredis->hget("yx:mobile:real",decrypt($cvalue, $secret_id))) {
+
+                if ($mobileredis->hget("yx:mobile:real", decrypt($cvalue, $secret_id))) {
                     $check_result = [];
                     $check_result = [
                         'mobileStatus' => 2,
-                        'mobile' =>$cvalue
+                        'mobile' => $cvalue
                     ];
-                    
-                }else {
+                } else {
                     $check_result = [
                         'mobileStatus' => 0,
-                        'mobile' =>$cvalue
+                        'mobile' => $cvalue
                     ];
                 }
                 $result['mobiles'][] = $check_result;
@@ -2353,24 +2349,24 @@ class LocalScript extends Pzlife
                              'update_time' => time(),
                              'create_time' => time()
                          ]); */
-                         $mobileredis->hdel('yx:mobile:empty',$mobile);
-                         $prefix = substr(trim($mobile), 0, 7);
-                         $newres = $this->redis->hget('index:mobile:source', $prefix);
-                         $newres = json_decode($newres, true);
-                         // {"source":1,"province_id":841,"city_id":842,"update_time":1591386721,"check_status":1,"check_result":1}
-                         if (!empty($newres)) {
-                             $mobileredis->hset('yx:mobile:real',$mobile,json_encode([
-                                 'source' => $newres['source'],
-                                 'province_id' => $newres['province_id'],
-                                 'city_id' => $newres['city_id'],
-                                 'check_status' => 2,
-                                 'check_result' => 3,
-                                 'update_time' =>time(),
-                             ]));
-                         }
-                         // return false;
-                         $real_mobile[] = $mobile;
-                     } else {
+                        $mobileredis->hdel('yx:mobile:empty', $mobile);
+                        $prefix = substr(trim($mobile), 0, 7);
+                        $newres = $this->redis->hget('index:mobile:source', $prefix);
+                        $newres = json_decode($newres, true);
+                        // {"source":1,"province_id":841,"city_id":842,"update_time":1591386721,"check_status":1,"check_result":1}
+                        if (!empty($newres)) {
+                            $mobileredis->hset('yx:mobile:real', $mobile, json_encode([
+                                'source' => $newres['source'],
+                                'province_id' => $newres['province_id'],
+                                'city_id' => $newres['city_id'],
+                                'check_status' => 2,
+                                'check_result' => 3,
+                                'update_time' => time(),
+                            ]));
+                        }
+                        // return false;
+                        $real_mobile[] = $mobile;
+                    } else {
                         /*  Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
                          Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
                          Db::table('yx_mobile')->insert([
@@ -2380,23 +2376,23 @@ class LocalScript extends Pzlife
                              'update_time' => time(),
                              'create_time' => time()
                          ]); */
-                         $mobileredis->hdel('yx:mobile:real',$mobile);
-                         $prefix = substr(trim($mobile), 0, 7);
-                         $newres = $this->redis->hget('index:mobile:source', $prefix);
-                         $newres = json_decode($newres, true);
-                         // {"source":1,"province_id":841,"city_id":842,"update_time":1591386721,"check_status":1,"check_result":1}
-                         if (!empty($newres)) {
-                             $mobileredis->hset('yx:mobile:empty',$mobile,json_encode([
-                                 'source' => $newres['source'],
-                                 'province_id' => $newres['province_id'],
-                                 'city_id' => $newres['city_id'],
-                                 'check_status' => 2,
-                                 'check_result' => $check_result,
-                                 'update_time' =>time(),
-                             ]));
-                         }
-                         $empty_mobile[] = $mobile;
-                     }
+                        $mobileredis->hdel('yx:mobile:real', $mobile);
+                        $prefix = substr(trim($mobile), 0, 7);
+                        $newres = $this->redis->hget('index:mobile:source', $prefix);
+                        $newres = json_decode($newres, true);
+                        // {"source":1,"province_id":841,"city_id":842,"update_time":1591386721,"check_status":1,"check_result":1}
+                        if (!empty($newres)) {
+                            $mobileredis->hset('yx:mobile:empty', $mobile, json_encode([
+                                'source' => $newres['source'],
+                                'province_id' => $newres['province_id'],
+                                'city_id' => $newres['city_id'],
+                                'check_status' => 2,
+                                'check_result' => $check_result,
+                                'update_time' => time(),
+                            ]));
+                        }
+                        $empty_mobile[] = $mobile;
+                    }
                 }
             } else {
                 $empty_mobile = $mobiledata;
@@ -2406,7 +2402,8 @@ class LocalScript extends Pzlife
         return ['real_mobile' => $real_mobile, 'empty_mobile' => $empty_mobile];
     }
 
-    public function setMobile(){
+    public function setMobile()
+    {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
         // $max_id = Db::query("SELECT `id` FROM yx_send_task_receipt ORDER BY `id` DESC limit 1 ");
         // // print_r($max_id);
@@ -2415,245 +2412,244 @@ class LocalScript extends Pzlife
         $mobile_data = [];
         try {
             $ALL_NUM     = Db::query("SELECT `mobile`,`create_time` FROM yx_user_send_code_task_log WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`create_time` ");
-        foreach ($ALL_NUM as $key => $value) {
-            $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
-            if ($newres) {
-                $newres = json_decode($newres,true);
-                if ($newres['update_time'] > $value['create_time']) {
-                    continue;
-                }else{
-                    $newres['update_time'] = $value['create_time'];
+            foreach ($ALL_NUM as $key => $value) {
+                $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
+                if ($newres) {
+                    $newres = json_decode($newres, true);
+                    if ($newres['update_time'] > $value['create_time']) {
+                        continue;
+                    } else {
+                        $newres['update_time'] = $value['create_time'];
+                        $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
+                    }
+                } else {
+                    $newres = $this->mobilecheckredis($value['mobile']);
+                    if ($newres == false) {
+                        continue;
+                    }
+                    $newres['update_time']  = $value['create_time'];
+                    $newres['check_status'] = 1;
+                    $newres['check_result'] = 1;
                     $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
                 }
-            }else{
-                $newres = $this->mobilecheckredis($value['mobile']);
-                if ($newres == false) {
-                    continue;
-                }
-                $newres['update_time']  = $value['create_time'];
-                $newres['check_status'] = 1;
-                $newres['check_result'] = 1;
-                $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
             }
-           
-        }
-        $ALL_NUM     = Db::query("SELECT `mobile`,`create_time` FROM yx_send_task_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile` ");
-        /*  $max_num = $max_id[0]['id'];
+            $ALL_NUM     = Db::query("SELECT `mobile`,`create_time` FROM yx_send_task_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile` ");
+            /*  $max_num = $max_id[0]['id'];
         for ($i=0; $i < $max_num; $i++) {
         $receipts = Db::query('SELECT ');
         } */
-        $i = 1;
-        foreach ($ALL_NUM as $key => $value) {
-            $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
-            if ($newres) {
-                $newres = json_decode($newres,true);
-                if ($newres['update_time'] > $value['create_time']) {
-                    continue;
-                }else{
-                    $newres['update_time'] = $value['create_time'];
+            $i = 1;
+            foreach ($ALL_NUM as $key => $value) {
+                $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
+                if ($newres) {
+                    $newres = json_decode($newres, true);
+                    if ($newres['update_time'] > $value['create_time']) {
+                        continue;
+                    } else {
+                        $newres['update_time'] = $value['create_time'];
+                        $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
+                    }
+                } else {
+                    $newres = $this->mobilecheckredis($value['mobile']);
+                    if ($newres == false) {
+                        continue;
+                    }
+                    $newres['update_time']  = $value['create_time'];
+                    $newres['check_status'] = 1;
+                    $newres['check_result'] = 1;
                     $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
                 }
-            }else{
-                $newres = $this->mobilecheckredis($value['mobile']);
-                if ($newres == false) {
-                    continue;
-                }
-                $newres['update_time']  = $value['create_time'];
-                $newres['check_status'] = 1;
-                $newres['check_result'] = 1;
-                $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
             }
-        }
 
-        $ALL_NUM     = Db::query("SELECT `mobile`,`create_time` FROM yx_send_code_task_receipt WHERE `real_message` = 'DELIVRD'  OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`");
-        /*  $max_num = $max_id[0]['id'];
+            $ALL_NUM     = Db::query("SELECT `mobile`,`create_time` FROM yx_send_code_task_receipt WHERE `real_message` = 'DELIVRD'  OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`");
+            /*  $max_num = $max_id[0]['id'];
         for ($i=0; $i < $max_num; $i++) {
         $receipts = Db::query('SELECT ');
         } */
-        // // echo count;
-        foreach ($ALL_NUM as $key => $value) {
-            $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
-            if ($newres) {
-                $newres = json_decode($newres,true);
-                if ($newres['update_time'] > $value['create_time']) {
-                    continue;
-                }else{
-                    $newres['update_time'] = $value['create_time'];
+            // // echo count;
+            foreach ($ALL_NUM as $key => $value) {
+                $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
+                if ($newres) {
+                    $newres = json_decode($newres, true);
+                    if ($newres['update_time'] > $value['create_time']) {
+                        continue;
+                    } else {
+                        $newres['update_time'] = $value['create_time'];
+                        $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
+                    }
+                } else {
+                    $newres = $this->mobilecheckredis($value['mobile']);
+                    if ($newres == false) {
+                        continue;
+                    }
+                    $newres['update_time']  = $value['create_time'];
+                    $newres['check_status'] = 1;
+                    $newres['check_result'] = 1;
                     $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
                 }
-            }else{
-                $newres = $this->mobilecheckredis($value['mobile']);
-                if ($newres == false) {
-                    continue;
-                }
-                $newres['update_time']  = $value['create_time'];
-                $newres['check_status'] = 1;
-                $newres['check_result'] = 1;
-                $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
             }
-            
-        }
-       
-        
-        
-        $ALL_NUM     = Db::query("SELECT `mobile_content`,`create_time` FROM yx_user_send_game_task WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile_content`,`create_time` ");
-        foreach ($ALL_NUM as $key => $value) {
-            $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
-            if ($newres) {
-                $newres = json_decode($newres,true);
-                if ($newres['update_time'] > $value['create_time']) {
-                    continue;
-                }else{
-                    $newres['update_time'] = $value['create_time'];
+
+
+
+            $ALL_NUM     = Db::query("SELECT `mobile_content`,`create_time` FROM yx_user_send_game_task WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile_content`,`create_time` ");
+            foreach ($ALL_NUM as $key => $value) {
+                $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
+                if ($newres) {
+                    $newres = json_decode($newres, true);
+                    if ($newres['update_time'] > $value['create_time']) {
+                        continue;
+                    } else {
+                        $newres['update_time'] = $value['create_time'];
+                        $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
+                    }
+                } else {
+                    $newres = $this->mobilecheckredis($value['mobile']);
+                    if ($newres == false) {
+                        continue;
+                    }
+                    $newres['update_time']  = $value['create_time'];
+                    $newres['check_status'] = 1;
+                    $newres['check_result'] = 1;
                     $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
                 }
-            }else{
-                $newres = $this->mobilecheckredis($value['mobile']);
-                if ($newres == false) {
-                    continue;
-                }
-                $newres['update_time']  = $value['create_time'];
-                $newres['check_status'] = 1;
-                $newres['check_result'] = 1;
-                $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
             }
-        }
-        
-        $ALL_NUM     = Db::query("SELECT `mobile`,`create_time` FROM yx_user_send_task_log WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`create_time` ");
-        foreach ($ALL_NUM as $key => $value) {
-            $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
-            if ($newres) {
-                $newres = json_decode($newres,true);
-                if ($newres['update_time'] > $value['create_time']) {
-                    continue;
-                }else{
-                    $newres['update_time'] = $value['create_time'];
+
+            $ALL_NUM     = Db::query("SELECT `mobile`,`create_time` FROM yx_user_send_task_log WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`create_time` ");
+            foreach ($ALL_NUM as $key => $value) {
+                $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
+                if ($newres) {
+                    $newres = json_decode($newres, true);
+                    if ($newres['update_time'] > $value['create_time']) {
+                        continue;
+                    } else {
+                        $newres['update_time'] = $value['create_time'];
+                        $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
+                    }
+                } else {
+                    $newres = $this->mobilecheckredis($value['mobile']);
+                    if ($newres == false) {
+                        continue;
+                    }
+                    $newres['update_time']  = $value['create_time'];
+                    $newres['check_status'] = 1;
+                    $newres['check_result'] = 1;
                     $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
                 }
-            }else{
-                $newres = $this->mobilecheckredis($value['mobile']);
-                if ($newres == false) {
-                    continue;
-                }
-                $newres['update_time']  = $value['create_time'];
-                $newres['check_status'] = 1;
-                $newres['check_result'] = 1;
-                $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
             }
-        }
-        
-        $ALL_NUM     = Db::query("SELECT `mobile`,`create_time` FROM yx_user_multimedia_message_log WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`create_time` ");
-        foreach ($ALL_NUM as $key => $value) {
-            $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
-            if ($newres) {
-                $newres = json_decode($newres,true);
-                if ($newres['update_time'] > $value['create_time']) {
-                    continue;
-                }else{
-                    $newres['update_time'] = $value['create_time'];
+
+            $ALL_NUM     = Db::query("SELECT `mobile`,`create_time` FROM yx_user_multimedia_message_log WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`create_time` ");
+            foreach ($ALL_NUM as $key => $value) {
+                $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
+                if ($newres) {
+                    $newres = json_decode($newres, true);
+                    if ($newres['update_time'] > $value['create_time']) {
+                        continue;
+                    } else {
+                        $newres['update_time'] = $value['create_time'];
+                        $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
+                    }
+                } else {
+                    $newres = $this->mobilecheckredis($value['mobile']);
+                    if ($newres == false) {
+                        continue;
+                    }
+                    $newres['update_time']  = $value['create_time'];
+                    $newres['check_status'] = 1;
+                    $newres['check_result'] = 1;
                     $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
                 }
-            }else{
-                $newres = $this->mobilecheckredis($value['mobile']);
-                if ($newres == false) {
-                    continue;
-                }
-                $newres['update_time']  = $value['create_time'];
-                $newres['check_status'] = 1;
-                $newres['check_result'] = 1;
-                $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
             }
-        }
-    
-        $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
-        $mysql_connect->query("set names utf8mb4");
-        $ALL_NUM = $mysql_connect->query("SELECT `mobile`,`create_time` FROM yx_sfl_send_task_receipt2 WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`create_time` ");
-        foreach ($ALL_NUM as $key => $value) {
-            $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
-            if ($newres) {
-                $newres = json_decode($newres,true);
-                if ($newres['update_time'] > $value['create_time']) {
-                    continue;
-                }else{
-                    $newres['update_time'] = $value['create_time'];
+
+            $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
+            $mysql_connect->query("set names utf8mb4");
+            $ALL_NUM = $mysql_connect->query("SELECT `mobile`,`create_time` FROM yx_sfl_send_task_receipt2 WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`create_time` ");
+            foreach ($ALL_NUM as $key => $value) {
+                $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
+                if ($newres) {
+                    $newres = json_decode($newres, true);
+                    if ($newres['update_time'] > $value['create_time']) {
+                        continue;
+                    } else {
+                        $newres['update_time'] = $value['create_time'];
+                        $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
+                    }
+                } else {
+                    $newres = $this->mobilecheckredis($value['mobile']);
+                    if ($newres == false) {
+                        continue;
+                    }
+                    $newres['update_time']  = $value['create_time'];
+                    $newres['check_status'] = 1;
+                    $newres['check_result'] = 1;
                     $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
                 }
-            }else{
-                $newres = $this->mobilecheckredis($value['mobile']);
-                if ($newres == false) {
-                    continue;
-                }
-                $newres['update_time']  = $value['create_time'];
-                $newres['check_status'] = 1;
-                $newres['check_result'] = 1;
-                $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
             }
-        }
-    
-        $ALL_NUM = $mysql_connect->query("SELECT `mobile`,`create_time` FROM yx_sfl_send_task_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`create_time` ");
-        foreach ($ALL_NUM as $key => $value) {
-            $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
-            if ($newres) {
-                $newres = json_decode($newres,true);
-                if ($newres['update_time'] > $value['create_time']) {
-                    continue;
-                }else{
-                    $newres['update_time'] = $value['create_time'];
+
+            $ALL_NUM = $mysql_connect->query("SELECT `mobile`,`create_time` FROM yx_sfl_send_task_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`create_time` ");
+            foreach ($ALL_NUM as $key => $value) {
+                $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
+                if ($newres) {
+                    $newres = json_decode($newres, true);
+                    if ($newres['update_time'] > $value['create_time']) {
+                        continue;
+                    } else {
+                        $newres['update_time'] = $value['create_time'];
+                        $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
+                    }
+                } else {
+                    $newres = $this->mobilecheckredis($value['mobile']);
+                    if ($newres == false) {
+                        continue;
+                    }
+                    $newres['update_time']  = $value['create_time'];
+                    $newres['check_status'] = 1;
+                    $newres['check_result'] = 1;
                     $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
                 }
-            }else{
-                $newres = $this->mobilecheckredis($value['mobile']);
-                if ($newres == false) {
-                    continue;
-                }
-                $newres['update_time']  = $value['create_time'];
-                $newres['check_status'] = 1;
-                $newres['check_result'] = 1;
-                $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
             }
-        }
-    
-        $mobile_data = [];
-        $ALL_NUM     = $mysql_connect->query("SELECT `mobile`,`create_time` FROM yx_sfl_send_multimediatask_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`create_time` ");
-        foreach ($ALL_NUM as $key => $value) {
-            $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
-            if ($newres) {
-                $newres = json_decode($newres,true);
-                if ($newres['update_time'] > $value['create_time']) {
-                    continue;
-                }else{
-                    $newres['update_time'] = $value['create_time'];
+
+            $mobile_data = [];
+            $ALL_NUM     = $mysql_connect->query("SELECT `mobile`,`create_time` FROM yx_sfl_send_multimediatask_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`create_time` ");
+            foreach ($ALL_NUM as $key => $value) {
+                $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
+                if ($newres) {
+                    $newres = json_decode($newres, true);
+                    if ($newres['update_time'] > $value['create_time']) {
+                        continue;
+                    } else {
+                        $newres['update_time'] = $value['create_time'];
+                        $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
+                    }
+                } else {
+                    $newres = $this->mobilecheckredis($value['mobile']);
+                    if ($newres == false) {
+                        continue;
+                    }
+                    $newres['update_time']  = $value['create_time'];
+                    $newres['check_status'] = 1;
+                    $newres['check_result'] = 1;
                     $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
                 }
-            }else{
-                $newres = $this->mobilecheckredis($value['mobile']);
-                if ($newres == false) {
-                    continue;
-                }
-                $newres['update_time']  = $value['create_time'];
-                $newres['check_status'] = 1;
-                $newres['check_result'] = 1;
-                $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
             }
-        }
         } catch (\Exception $th) {
             //throw $th;
             exception($th);
         }
-        
-       
     }
 
-    public function mobilecheckredis($mobile){ 
-        $redis       = Phpredis::getConn();$prefix = substr(trim($mobile), 0, 7);
-        
+    public function mobilecheckredis($mobile)
+    {
+        $redis       = Phpredis::getConn();
+        $prefix = substr(trim($mobile), 0, 7);
+
         $newres = $redis->hget('index:mobile:source', $prefix);
         $newres = json_decode($newres, true);
         // print_r($newres);die;
         if (in_array(substr(trim($mobile), 0, 3), ['141', '142', '143', '144', '145', '146', '148', '149', '154', '163', '169', '179', '196'])) {
             return false;
         }
-        echo $mobile;die;
+        echo $mobile;
+        die;
         if ($prefix == 1650006) {
             $newres = [
                 'source'      => 1,
@@ -2836,6 +2832,268 @@ class LocalScript extends Pzlife
             ];
         }
         return $newres;
-       
+    }
+
+    // 计费核对
+    public function checkSendStatus()
+    {
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        try {
+            //code...
+            $uids = Db::query("SELECT `id` FROM yx_users WHERE `pid` = 137 "); //道信核对
+            //行业
+            foreach ($uids as $key => $value) {
+                // continue;
+                $start_time = (int) strtotime(date('2020-07-01'));
+                if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_code_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
+                    continue;
+                }
+                while (true) {
+
+                    $day_business_result = [];
+                    $end_time = $start_time + 86400;
+                    $timekey = date('Ymd', $start_time);
+                    echo "uid:" . $value['id'] . "" . "timekey:" . $timekey;
+                    echo "\n";
+                    $business_id = 6;
+                    if ($end_time > time()) {
+                        // break;
+                        $end_time = time();
+                        $day_business_result = $this->selectSendResultForBusiness($value['id'], $start_time, $end_time);
+                        if ($day_business_result == false) {
+                            break;
+                        } else {
+                            $day_business_result['uid'] = $value['id'];
+                            $day_business_result['timekey'] = $timekey;
+                            $day_business_result['business_id'] = $business_id;
+                            $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 6 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                            if ($has) {
+                                Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                                    'success'     => $day_business_result['success'],
+                                    'unknown'     => $day_business_result['unknown'],
+                                    'default'     => $day_business_result['default'],
+                                    'num'         => $day_business_result['num'],
+                                    'mobile_num'  => $day_business_result['mobile_num'],
+                                    'ratio'       => $day_business_result['ratio'],
+                                    'update_time' => time(),
+                                ]);
+                            } else {
+                                Db::table('yx_statistics_day')->insert($day_business_result);
+                            }
+                            break;
+                        }
+                        // 
+
+                    }
+                    $day_business_result = $this->selectSendResultForBusiness($value['id'], $start_time, $end_time);
+                    if ($day_business_result == false) {
+                        $start_time = $end_time;
+                        continue;
+                    }
+
+                    // die;
+                    $day_business_result['uid'] = $value['id'];
+                    $day_business_result['timekey'] = $timekey;
+                    $day_business_result['business_id'] = $business_id;
+                    // print_r($day_business_result);
+                    $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 6 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                    if ($has) {
+                        Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                            'success'     => $day_business_result['success'],
+                            'unknown'     => $day_business_result['unknown'],
+                            'default'     => $day_business_result['default'],
+                            'num'         => $day_business_result['num'],
+                            'mobile_num'  => $day_business_result['mobile_num'],
+                            'ratio'       => $day_business_result['ratio'],
+                            'update_time' => time(),
+                        ]);
+                    } else {
+                        Db::table('yx_statistics_day')->insert($day_business_result);
+                    }
+                    $start_time = $end_time;
+                }
+            }
+            //营销
+            foreach ($uids as $key => $value) {
+                $start_time = (int) strtotime(date('2020-07-01'));
+                if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
+                    continue;
+                }
+                while (true) {
+                    $end_time = $start_time + 86400;
+                    $timekey = date('Ymd', $start_time);
+                    $business_id = 5;
+                    echo "uid:" . $value['id'] . "" . "timekey:" . $timekey;
+                    echo "\n";
+                    if ($end_time > time()) {
+                        // break;
+                        $end_time = time();
+                        $day_marketing_result = $this->selectSendResultForMarketing($value['id'], $start_time, $end_time);
+                        if ($day_marketing_result == false) {
+                            break;
+                        }
+                        $day_marketing_result['uid'] = $value['id'];
+                        $day_marketing_result['timekey'] = $timekey;
+                        $day_marketing_result['business_id'] = $business_id;
+                        $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                        if ($has) {
+                            Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                                'success'     => $day_marketing_result['success'],
+                                'unknown'     => $day_marketing_result['unknown'],
+                                'default'     => $day_marketing_result['default'],
+                                'num'         => $day_marketing_result['num'],
+                                'mobile_num'  => $day_marketing_result['mobile_num'],
+                                'ratio'       => $day_marketing_result['ratio'],
+                                'update_time' => time(),
+                            ]);
+                        } else {
+                            Db::table('yx_statistics_day')->insert($day_marketing_result);
+                        }
+                        break;
+                        // 
+
+                    }
+
+                    $day_marketing_result = $this->selectSendResultForMarketing($value['id'], $start_time, $end_time);
+                    if ($day_marketing_result == false) {
+                        $start_time = $end_time;
+                        continue;
+                    }
+                    $day_marketing_result['uid'] = $value['id'];
+                    $day_marketing_result['timekey'] = $timekey;
+                    $day_marketing_result['business_id'] = $business_id;
+                    $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                    if ($has) {
+                        Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                            'success'     => $day_marketing_result['success'],
+                            'unknown'     => $day_marketing_result['unknown'],
+                            'default'     => $day_marketing_result['default'],
+                            'num'         => $day_marketing_result['num'],
+                            'mobile_num'  => $day_marketing_result['mobile_num'],
+                            'ratio'       => $day_marketing_result['ratio'],
+                            'update_time' => time(),
+                        ]);
+                    } else {
+                        Db::table('yx_statistics_day')->insert($day_marketing_result);
+                    }
+                    // print_r($day_marketing_result);
+                    // die;
+                    $start_time = $end_time;
+                }
+            }
+        } catch (\Exceptixon $th) {
+            //throw $th;
+            exception($th);
+        }
+    }
+
+    private function selectSendResultForBusiness($uid, $start_time, $end_time)
+    {
+        $all_num = 0;
+        $mobile_num = 0;
+        $success_num = 0;
+        $unknow_num = 0;
+        $default_num = 0;
+        $settlement_num = 1;
+        //行业计费
+
+        $max_len = Db::query("SELECT  send_length FROM `yx_user_send_code_task` WHERE `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "'  ORDER BY `send_length` DESC LIMIT 1");
+        if (empty($max_len)) {
+            return false;
+        } else {
+            $max_len = $max_len[0]['send_length'];
+            if ($max_len > 70) {
+                $settlement_num = ceil($max_len / 67);
+            }
+        }
+        for ($i = 0; $i < $settlement_num; $i++) {
+            # code...
+            if ($i == 0) {
+                $min_length = 0;
+                $max_length = 70;
+            } else {
+                $min_length = 67 * $i;
+                $max_length = 67 * ($i + 1);
+            }
+            $business_mobile_num = Db::query("SELECT SUM(`send_num`) AS send_num FROM `yx_user_send_code_task` WHERE `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length)[0]['send_num'];
+            if (!empty($business_mobile_num)) {
+                if ($start_time >= 1594310400) {
+                    $business_success_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_code_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_code_task` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND status_message IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_id`");
+                    $business_default_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_code_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_code_task` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND status_message NOT IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_id`");
+                } else {
+                    $business_success_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_code_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_code_task` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "'  AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND status_message IN ('DELIVRD','REJECTD', 'REJECT', 'MA:0001', 'DB:0141') GROUP BY `mobile`,`task_id`");
+                    $business_default_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_code_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_code_task` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND status_message NOT IN ('DELIVRD','REJECTD', 'REJECT', 'MA:0001', 'DB:0141') GROUP BY `mobile`,`task_id`");
+                }
+                $mobile_num += $business_mobile_num;
+                $success_num += count($business_success_mobile_num) * ($i + 1);
+                if ($start_time >= 1595692800) {
+                    $success_num += ($business_mobile_num - count($business_success_mobile_num) - count($business_default_mobile_num)) * ($i + 1);
+                    $unknow_num = 0;
+                } else {
+                    $unknow_num += ($business_mobile_num - count($business_success_mobile_num) - count($business_default_mobile_num)) * ($i + 1);
+                }
+
+                $default_num += count($business_default_mobile_num) * ($i + 1);
+            }
+        }
+        $all_num = $success_num + $unknow_num + $default_num;
+        $ratio = $success_num / $all_num * 100;
+        return ['mobile_num' => $mobile_num, 'num' => $all_num, 'success' => $success_num, 'unknown' => $unknow_num, 'default' => $default_num, 'ratio' => $ratio];
+    }
+
+    private function selectSendResultForMarketing($uid, $start_time, $end_time)
+    {
+        $all_num = 0;
+        $mobile_num = 0;
+        $success_num = 0;
+        $unknow_num = 0;
+        $default_num = 0;
+        $settlement_num = 1;
+        //行业计费
+
+        $max_len = Db::query("SELECT  send_length FROM `yx_user_send_task` WHERE `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "'  ORDER BY `send_length` DESC LIMIT 1");
+        if (empty($max_len)) {
+            return false;
+        } else {
+            $max_len = $max_len[0]['send_length'];
+
+            if ($max_len > 70) {
+                $settlement_num = ceil($max_len / 67);
+            }
+        }
+        for ($i = 0; $i < $settlement_num; $i++) {
+            # code...
+            if ($i == 0) {
+                $min_length = 0;
+                $max_length = 70;
+            } else {
+                $min_length = 67 * $i;
+                $max_length = 67 * ($i + 1);
+            }
+            $business_mobile_num = Db::query("SELECT SUM(`send_num`) AS send_num FROM `yx_user_send_task` WHERE `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length)[0]['send_num'];
+            if (!empty($business_mobile_num)) {
+                if ($start_time >= 1594828800) {
+                    $business_success_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_task` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND status_message IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_id`");
+                    $business_default_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_task` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND status_message NOT IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_id`");
+                } else {
+                    $business_success_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_task` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "'  AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND status_message IN ('DELIVRD','REJECTD', 'REJECT', 'MA:0001', 'DB:0141') GROUP BY `mobile`,`task_id`");
+                    $business_default_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_task` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND status_message NOT IN ('DELIVRD','REJECTD', 'REJECT', 'MA:0001', 'DB:0141') GROUP BY `mobile`,`task_id`");
+                }
+                $mobile_num += $business_mobile_num;
+                $success_num += count($business_success_mobile_num) * ($i + 1);
+                // $unknow_num += ($business_mobile_num - count($business_success_mobile_num) - count($business_default_mobile_num)) * ($i + 1);
+                if ($start_time >= 1595692800) {
+                    $success_num += ($business_mobile_num - count($business_success_mobile_num) - count($business_default_mobile_num)) * ($i + 1);
+                    $unknow_num = 0;
+                } else {
+                    $unknow_num += ($business_mobile_num - count($business_success_mobile_num) - count($business_default_mobile_num)) * ($i + 1);
+                }
+                $default_num += count($business_default_mobile_num) * ($i + 1);
+            }
+        }
+        $all_num = $success_num + $unknow_num + $default_num;
+        // return ['mobile_num' => $mobile_num, 'all_num' => $all_num, 'success_num' => $success_num, 'unknow_num' => $unknow_num, 'default_num' => $default_num];
+        $ratio = $success_num / $all_num * 100;
+        return ['mobile_num' => $mobile_num, 'num' => $all_num, 'success' => $success_num, 'unknown' => $unknow_num, 'default' => $default_num, 'ratio' => $ratio];
     }
 }
