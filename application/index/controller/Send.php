@@ -1029,7 +1029,7 @@ class Send extends MyController
             return ['code' => '3011'];
         }
         $ip       = trim($this->request->ip());
-        $result = $this->app->send->submitBatchCustomMarketing($appid, $appkey, $template_id, $connect, $ip, $signature_id, $msg_id, $develop_no);
+        $result = $this->app->send->submitBatchCustomMarketingMsgId($appid, $appkey, $template_id, $connect, $ip, $signature_id, $msg_id, $develop_no);
         return $result;
     }
 
