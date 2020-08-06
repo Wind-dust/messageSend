@@ -14,17 +14,20 @@ use Monolog\Handler\StdoutHandler;
 use Monolog\Logger;
 use think\Db;
 
-class LocalScript extends Pzlife {
+class LocalScript extends Pzlife
+{
     private $redis;
 
     //    private $connect;
 
-    private function orderInit() {
+    private function orderInit()
+    {
         $this->redis = Phpredis::getConn();
         //        $this->connect = Db::connect(Config::get('database.db_config'));
     }
 
-    public function kafkaTest() {
+    public function kafkaTest()
+    {
         // $produce = Producer::getInstance('localhost:2181', 3000);
         try {
 
@@ -78,7 +81,8 @@ class LocalScript extends Pzlife {
      * @return array
      * @author rzc
      */
-    public function WxBatchgetMaterial() {
+    public function WxBatchgetMaterial()
+    {
 
         //获取微信公众号access_token
         $access_token = $this->getWeiXinAccessTokenTencent();
@@ -130,7 +134,8 @@ class LocalScript extends Pzlife {
         die;
     }
 
-    function sendRequestWx($requestUrl, $data = []) {
+    function sendRequestWx($requestUrl, $data = [])
+    {
         $curl = curl_init();
         $data = json_encode($data);
         curl_setopt($curl, CURLOPT_URL, $requestUrl);
@@ -151,7 +156,8 @@ class LocalScript extends Pzlife {
      * @return array
      * @author rzc
      */
-    protected function getWeiXinAccessTokenTencent() {
+    protected function getWeiXinAccessTokenTencent()
+    {
         $this->orderInit();
         $redisAccessTokenTencent = Config::get('redisKey.weixin.redisAccessTokenTencent');
         $access_token            = $this->redis->get($redisAccessTokenTencent);
@@ -174,7 +180,8 @@ class LocalScript extends Pzlife {
         return $access_token;
     }
 
-    public function numberDetection() {
+    public function numberDetection()
+    {
         $secret_id  = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
         $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
         $api        = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
@@ -211,7 +218,8 @@ class LocalScript extends Pzlife {
         // print_r($data);
     }
 
-    function sendRequest2($requestUrl, $method = 'get', $data = [], $headers) {
+    function sendRequest2($requestUrl, $method = 'get', $data = [], $headers)
+    {
         $methonArr = ['get', 'post'];
         if (!in_array(strtolower($method), $methonArr)) {
             return [];
@@ -247,7 +255,8 @@ class LocalScript extends Pzlife {
      * @param string $key 密钥
      * @return string
      */
-    public static function encrypt($string, $key) {
+    public static function encrypt($string, $key)
+    {
         // 对接java，服务商做的AES加密通过SHA1PRNG算法（只要password一样，每次生成的数组都是一样的），Java的加密源码翻译php如下：
         $key = substr(openssl_digest(openssl_digest($key, 'sha1', true), 'sha1', true), 0, 16);
 
@@ -259,7 +268,8 @@ class LocalScript extends Pzlife {
         return $data;
     }
 
-    public function hadMobile() {
+    public function hadMobile()
+    {
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $max_id = Db::query("SELECT `id` FROM yx_send_task_receipt ORDER BY `id` DESC limit 1 ");
         // // print_r($max_id);
@@ -321,7 +331,8 @@ class LocalScript extends Pzlife {
         }
     }
 
-    public function getRealNumber() {
+    public function getRealNumber()
+    {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
         // $max_id = Db::query("SELECT `id` FROM yx_send_task_receipt ORDER BY `id` DESC limit 1 ");
         // // print_r($max_id);
@@ -568,7 +579,8 @@ class LocalScript extends Pzlife {
      * @param string $key 密钥
      * @return string
      */
-    public static function decrypt($string, $key) {
+    public static function decrypt($string, $key)
+    {
 
         // 对接java，服务商做的AES加密通过SHA1PRNG算法（只要password一样，每次生成的数组都是一样的），Java的加密源码翻译php如下：
         $key = substr(openssl_digest(openssl_digest($key, 'sha1', true), 'sha1', true), 0, 16);
@@ -578,7 +590,8 @@ class LocalScript extends Pzlife {
         return $decrypted;
     }
 
-    public function mobileCheckTest() {
+    public function mobileCheckTest()
+    {
         $secret_id  = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
         $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
         $api        = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
@@ -651,7 +664,8 @@ class LocalScript extends Pzlife {
         }
     }
 
-    public function getMarketingMobile() {
+    public function getMarketingMobile()
+    {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
 
         $mobile      = Db::query("SELECT `uid`,`task_no`,`mobile` FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) GROUP BY `uid`,`task_no`,`mobile`  ");
@@ -692,7 +706,8 @@ class LocalScript extends Pzlife {
         }
     }
 
-    public function newRedisConnect() {
+    public function newRedisConnect()
+    {
         try {
             $mobileredis = PhpredisNew::getConn();
             $redis       = Phpredis::getConn();
@@ -983,11 +998,13 @@ class LocalScript extends Pzlife {
     }
 
     //sql 查询任务统计 sum
-    public function resultForTaskSumSelect() {
+    public function resultForTaskSumSelect()
+    {
     }
 
     //sql 查询单客户单日发送情况统计
-    public function resultSumForUserSendCondition($uid, $time) {
+    public function resultSumForUserSendCondition($uid, $time)
+    {
         $start_time = strtotime($time);
         $end_time   = $start_time + 86400;
         /* SELECT * FROM `yx_user_send_task` WHERE `uid` =205 AND `create_time` >= '1594310400' AND `create_time` <= '1594656000';
@@ -998,7 +1015,8 @@ class LocalScript extends Pzlife {
     SELECT id,task_no FROM `yx_user_send_task` WHERE `uid` =205 AND `create_time` >= '1594310400' AND `create_time` <= '1594656000' AND task_no NOT IN (SELECT task_no FROM `yx_user_send_task_log` WHERE `task_no` IN (SELECT task_no FROM `yx_user_send_task` WHERE `uid` =205 AND `create_time` >= '1594310400' AND `create_time` <= '1594656000')) */
     }
 
-    public function businessSettlement() {
+    public function businessSettlement()
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         while (true) {
             $year_businessSettlement  = [];
@@ -1028,7 +1046,7 @@ class LocalScript extends Pzlife {
                     $code_task              = [];
                     $code_task              = Db::query("SELECT * FROM yx_user_send_code_task WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
                     foreach ($code_task as $key => $value) {
-    
+
                         $send_length = mb_strlen($value['task_content'], 'utf8');
                         $num         = 1;
                         if ($send_length > 70) {
@@ -1048,12 +1066,12 @@ class LocalScript extends Pzlife {
                             $default_num = $value['real_num'];
                             $unknown_num = 0;
                         } else {
-    
+
                             $success_mobile_num = 0;
                             $default_mobile_num = 0;
                             $unknown_mobile_num = 0;
                             $success_mobile_num = count(Db::query("SELECT `task_id`,`mobile`,`status_message` FROM yx_send_code_task_receipt WHERE task_id = '" . $value['id'] . "' AND `mobile` IN (" . $value['mobile_content'] . ") AND `status_message` IN (" . $Received_status . ") GROUP BY `task_id`,`mobile`,`status_message` "));
-    
+
                             if ($success_mobile_num < $allnum) {
                                 $default_mobile_num = count(Db::query("SELECT `task_id`,`mobile`,`status_message` FROM yx_send_code_task_receipt WHERE task_id = '" . $value['id'] . "' AND `mobile` IN (" . $value['mobile_content'] . ") AND `status_message` NOT IN (" . $Received_status . ") GROUP BY `task_id`,`mobile`,`status_message` "));
                                 // if () {}
@@ -1062,14 +1080,14 @@ class LocalScript extends Pzlife {
                             $success_num = $success_mobile_num * $num;
                             $default_num = $default_mobile_num * $num;
                             $unknown_num = $unknown_mobile_num * $num;
-    
+
                             /*   print_r($success_num);
                             print_r($default_num);
                             print_r($unknown_num);
                             die; */
                             // echo "SELECT COUNT(`task_id`,`mobile`,`status_message`) FROM yx_send_code_task_receipt WHERE task_id = '".$value['id']."' AND `mobile` IN (".$value['mobile_content'].") AND `status_message` IN (".$Received_status.") GROUP BY `task_id`,`mobile`,`status_message`" ;die;
                         }
-    
+
                         if (in_array($value['uid'], $day_users[$day])) {
                             $day_businessSettlement[$day][$value['uid']]['num'] += $charging_num;
                             $day_businessSettlement[$day][$value['uid']]['mobile_num'] += $allnum;
@@ -1160,13 +1178,13 @@ class LocalScript extends Pzlife {
                         exception($e);
                     }
                     break;
-                }else{
+                } else {
                     $day_businessSettlement = [];
                     $day_users              = [];
                     $code_task              = [];
                     $code_task              = Db::query("SELECT * FROM yx_user_send_code_task WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
                     foreach ($code_task as $key => $value) {
-    
+
                         $send_length = mb_strlen($value['task_content'], 'utf8');
                         $num         = 1;
                         if ($send_length > 70) {
@@ -1186,12 +1204,12 @@ class LocalScript extends Pzlife {
                             $default_num = $value['real_num'];
                             $unknown_num = 0;
                         } else {
-    
+
                             $success_mobile_num = 0;
                             $default_mobile_num = 0;
                             $unknown_mobile_num = 0;
                             $success_mobile_num = count(Db::query("SELECT `task_id`,`mobile`,`status_message` FROM yx_send_code_task_receipt WHERE task_id = '" . $value['id'] . "' AND `mobile` IN (" . $value['mobile_content'] . ") AND `status_message` IN (" . $Received_status . ") GROUP BY `task_id`,`mobile`,`status_message` "));
-    
+
                             if ($success_mobile_num < $allnum) {
                                 $default_mobile_num = count(Db::query("SELECT `task_id`,`mobile`,`status_message` FROM yx_send_code_task_receipt WHERE task_id = '" . $value['id'] . "' AND `mobile` IN (" . $value['mobile_content'] . ") AND `status_message` NOT IN (" . $Received_status . ") GROUP BY `task_id`,`mobile`,`status_message` "));
                                 // if () {}
@@ -1200,14 +1218,14 @@ class LocalScript extends Pzlife {
                             $success_num = $success_mobile_num * $num;
                             $default_num = $default_mobile_num * $num;
                             $unknown_num = $unknown_mobile_num * $num;
-    
+
                             /*   print_r($success_num);
                             print_r($default_num);
                             print_r($unknown_num);
                             die; */
                             // echo "SELECT COUNT(`task_id`,`mobile`,`status_message`) FROM yx_send_code_task_receipt WHERE task_id = '".$value['id']."' AND `mobile` IN (".$value['mobile_content'].") AND `status_message` IN (".$Received_status.") GROUP BY `task_id`,`mobile`,`status_message`" ;die;
                         }
-    
+
                         if (in_array($value['uid'], $day_users[$day])) {
                             $day_businessSettlement[$day][$value['uid']]['num'] += $charging_num;
                             $day_businessSettlement[$day][$value['uid']]['mobile_num'] += $allnum;
@@ -1301,15 +1319,16 @@ class LocalScript extends Pzlife {
                 }
 
                 // print_r($Received_status);die;
-                
-               
+
+
 
             }
             sleep(900);
         }
     }
 
-    public function marketingSettlement() {
+    public function marketingSettlement()
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         while (true) {
             $year_businessSettlement  = [];
@@ -1339,7 +1358,8 @@ class LocalScript extends Pzlife {
                     $code_task              = [];
                     $code_task              = Db::query("SELECT * FROM yx_user_send_task WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
                     foreach ($code_task as $key => $value) {
-                        // print_r($value);die;
+                        print_r($value);
+                        die;
                         $send_length = mb_strlen($value['task_content'], 'utf8');
                         $num         = 1;
                         if ($send_length > 70) {
@@ -1359,12 +1379,12 @@ class LocalScript extends Pzlife {
                             $default_num = $value['real_num'];
                             $unknown_num = 0;
                         } else {
-    
+
                             $success_mobile_num = 0;
                             $default_mobile_num = 0;
                             $unknown_mobile_num = 0;
                             $success_mobile_num = count(Db::query("SELECT `task_id`,`mobile`,`status_message` FROM yx_send_task_receipt WHERE task_id = '" . $value['id'] . "' AND `mobile` IN (" . $value['mobile_content'] . ") AND `status_message` IN (" . $Received_status . ") GROUP BY `task_id`,`mobile`,`status_message` "));
-    
+
                             if ($success_mobile_num < $allnum) {
                                 $default_mobile_num = count(Db::query("SELECT `task_id`,`mobile`,`status_message` FROM yx_send_task_receipt WHERE task_id = '" . $value['id'] . "' AND `mobile` IN (" . $value['mobile_content'] . ") AND `status_message` NOT IN (" . $Received_status . ") GROUP BY `task_id`,`mobile`,`status_message` "));
                                 // if () {}
@@ -1373,14 +1393,14 @@ class LocalScript extends Pzlife {
                             $success_num = $success_mobile_num * $num;
                             $default_num = $default_mobile_num * $num;
                             $unknown_num = $unknown_mobile_num * $num;
-    
+
                             /*   print_r($success_num);
                             print_r($default_num);
                             print_r($unknown_num);
                             die; */
                             // echo "SELECT COUNT(`task_id`,`mobile`,`status_message`) FROM yx_send_code_task_receipt WHERE task_id = '".$value['id']."' AND `mobile` IN (".$value['mobile_content'].") AND `status_message` IN (".$Received_status.") GROUP BY `task_id`,`mobile`,`status_message`" ;die;
                         }
-    
+
                         if (in_array($value['uid'], $day_users[$day])) {
                             $day_businessSettlement[$day][$value['uid']]['num'] += $charging_num;
                             $day_businessSettlement[$day][$value['uid']]['mobile_num'] += $allnum;
@@ -1471,13 +1491,13 @@ class LocalScript extends Pzlife {
                         exception($e);
                     }
                     break;
-                }else{
+                } else {
                     $day_businessSettlement = [];
                     $day_users              = [];
                     $code_task              = [];
                     $code_task              = Db::query("SELECT * FROM yx_user_send_task WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
                     foreach ($code_task as $key => $value) {
-    
+
                         $send_length = mb_strlen($value['task_content'], 'utf8');
                         $num         = 1;
                         if ($send_length > 70) {
@@ -1497,12 +1517,12 @@ class LocalScript extends Pzlife {
                             $default_num = $value['real_num'];
                             $unknown_num = 0;
                         } else {
-    
+
                             $success_mobile_num = 0;
                             $default_mobile_num = 0;
                             $unknown_mobile_num = 0;
                             $success_mobile_num = count(Db::query("SELECT `task_id`,`mobile`,`status_message` FROM yx_send_task_receipt WHERE task_id = '" . $value['id'] . "' AND `mobile` IN (" . $value['mobile_content'] . ") AND `status_message` IN (" . $Received_status . ") GROUP BY `task_id`,`mobile`,`status_message` "));
-    
+
                             if ($success_mobile_num < $allnum) {
                                 $default_mobile_num = count(Db::query("SELECT `task_id`,`mobile`,`status_message` FROM yx_send_task_receipt WHERE task_id = '" . $value['id'] . "' AND `mobile` IN (" . $value['mobile_content'] . ") AND `status_message` NOT IN (" . $Received_status . ") GROUP BY `task_id`,`mobile`,`status_message` "));
                                 // if () {}
@@ -1511,14 +1531,14 @@ class LocalScript extends Pzlife {
                             $success_num = $success_mobile_num * $num;
                             $default_num = $default_mobile_num * $num;
                             $unknown_num = $unknown_mobile_num * $num;
-    
+
                             /*   print_r($success_num);
                             print_r($default_num);
                             print_r($unknown_num);
                             die; */
                             // echo "SELECT COUNT(`task_id`,`mobile`,`status_message`) FROM yx_send_code_task_receipt WHERE task_id = '".$value['id']."' AND `mobile` IN (".$value['mobile_content'].") AND `status_message` IN (".$Received_status.") GROUP BY `task_id`,`mobile`,`status_message`" ;die;
                         }
-    
+
                         if (in_array($value['uid'], $day_users[$day])) {
                             $day_businessSettlement[$day][$value['uid']]['num'] += $charging_num;
                             $day_businessSettlement[$day][$value['uid']]['mobile_num'] += $allnum;
@@ -1560,7 +1580,6 @@ class LocalScript extends Pzlife {
     
                         } */
                         }
-                        
                     }
                     // print_r($day_businessSettlement);
                     Db::startTrans();
@@ -1613,8 +1632,8 @@ class LocalScript extends Pzlife {
                 }
 
                 // print_r($Received_status);die;
-                
-               
+
+
 
             }
             sleep(900);
@@ -1713,8 +1732,8 @@ class LocalScript extends Pzlife {
 
                 // $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                 // $newres = array_shift($res);
-                $newres = $this->redis->hget('index:mobile:source',$prefix);
-                $newres = json_decode($newres,true);
+                $newres = $this->redis->hget('index:mobile:source', $prefix);
+                $newres = json_decode($newres, true);
                 if ($newres) {
                     if ($newres['source'] == 1) { //移动
                         // $channel_id = $yidong_channel_id;
@@ -1749,8 +1768,8 @@ class LocalScript extends Pzlife {
 
                                 // $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                                 // $newres = array_shift($res);
-                                $newres = $this->redis->hget('index:mobile:source',$prefix);
-                                $newres = json_decode($newres,true);
+                                $newres = $this->redis->hget('index:mobile:source', $prefix);
+                                $newres = json_decode($newres, true);
                                 if ($newres) {
                                     if ($newres['source'] == 1) { //移动
                                         // $channel_id = $yidong_channel_id;
@@ -1775,8 +1794,8 @@ class LocalScript extends Pzlife {
 
                             // $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                             // $newres = array_shift($res);
-                            $newres = $this->redis->hget('index:mobile:source',$prefix);
-                            $newres = json_decode($newres,true);
+                            $newres = $this->redis->hget('index:mobile:source', $prefix);
+                            $newres = json_decode($newres, true);
                             if ($newres) {
                                 if ($newres['source'] == 1) { //移动
                                     // $channel_id = $yidong_channel_id;
@@ -1806,7 +1825,7 @@ class LocalScript extends Pzlife {
                 if ($deduct > 0 && count($real_send_mobile) > 0) {
                     //热门城市ID 
                     $citys_id = [2, 20, 38, 241, 378, 500, 615, 694, 842, 860, 981, 1083, 1220, 1315, 1427, 1602, 1803, 1923, 2077, 2279, 2405, 2455, 2496, 2704, 2802, 2948, 3034, 3152, 3255, 3310, 3338, 2100];
-                    
+
                     $remaining_mobile = $real_send_mobile;
                     $entity_mobiles = []; //实号即能扣量号码
                     $need_check_mobile = []; //需要检测号码
@@ -1920,7 +1939,7 @@ class LocalScript extends Pzlife {
                                 // $newres = array_shift($res);
                                 $newres = $this->redis->hget('index:mobile:source', $prefix);
                                 $newres = json_decode($newres, true);
-                               
+
                                 $mobile_info = [];
                                 $mobile_info = [
                                     'mobile' => $value,
@@ -1936,7 +1955,7 @@ class LocalScript extends Pzlife {
                             }
                         }
                     }
-                   
+
                     $proportion = bcdiv(count($cool_city_mobile), count($real_send_mobile), 2);
                     // print_r($proportion); die;
                     if ($proportion * 100 > $deduct) {
