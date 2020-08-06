@@ -158,21 +158,30 @@ class HttpChannelModelCaiXinWeiGe extends Pzlife
                         //在经过处理得到最终结果:
                         $lastTime = (int)($time * 1000);
                         $templateparam = [];
+                        $newtemplateparam = [];
                         $sign = md5($appkey.$appid.$lastTime.$appkey);//数字签名参考sign生成规则 是
                         $report_api = $user_info['send_var_api'].$lastTime.'&appid='.$appid.'&sign='.$sign;
+                        // ksort($send_data['variable']);
+                        // print_r($send_data['variable']);die;
                         foreach ($send_data['variable'] as $key => $value) {
                             # code...
-                            $templateparam[] = $value;
+                            $newkey = str_replace('{{var','',$key);
+                                $newkey = str_replace('}}','',$newkey);
+                            $templateparam[$newkey] = $value;
                         }
-                        
-                        // print_r($templateparam);
-                        // die;
+                        ksort($templateparam);
+                        foreach ($templateparam as $key => $value) {
+                            # code...
+                            $newtemplateparam[] = $value;
+                        }
+                        /* print_r($newtemplateparam);
+                        die; */
                         $data = [];
                         $data = [
                             'mms_from' => isset($send_data['develop_code']) ? $send_data['develop_code'] : '',
                             'mms_id' => $send_data['template_id'],
                             'phones' => $send_data['mobile'],
-                            'templateparam' => $templateparam
+                            'templateparam' => $newtemplateparam
                         ];
                         
                         $headers = [];
@@ -222,24 +231,69 @@ class HttpChannelModelCaiXinWeiGe extends Pzlife
                         ];
                         $res = $this->sendRequest2($report_api,'get',[],$headers);
                         
-                        
+                        /* $res = json_encode([
+                            'code' => 0,
+                            'data' => [
+                                [
+                                    'srcid' => '106904561527',
+                                    'mobile' => '15201926171',
+                                    'id' => '080580911290960321514971136',
+                                    'msgcontent' => '1',
+                                    'time' => '20200805183820',
+                                ]
+                            ],
+                            'msg' => '查询成功'
+                        ]); */
                         $result = json_decode($res, true);
-                       
+                        
                         if (!empty($result['data']))  {
                             print_r($result);
+                            foreach ($result['data'] as $key => $value) {
+                                # code...
+                                $develop_len = strlen($user_info['channel_dest_id']);
+                                $receive_develop_no = mb_substr(trim($value['srcid']),$develop_len);
+                                $task_log = Db::query("SELECT `uid`,`task_no` FROM yx_user_multimedia_message_log WHERE `develop_no` = '".$receive_develop_no."' AND `mobile` = '".$value['mobile']."' ORDER BY id DESC LIMIT 1 ");
+                                if (empty($task_log)) {
+                                    $task_log = Db::query("SELECT `uid`,`task_no` FROM yx_user_multimedia_message_log WHERE `mobile` = '".$value['mobile']."' ORDER BY id DESC LIMIT 1 ");
+                                }
+                                if (!empty($task_log)) {
+                                    $upgoing = [
+                                        'mobile' => $value['mobile'],
+                                        'message_info' =>  $value['msgcontent'],
+                                        'get_time' => date('Y-m-d H:i:s',strtotime($value['time'])),
+                                    ];
+                                    $redis->rPush('index:message:Mmsupriver:' . $task_log[0]['uid'], json_encode($upgoing));
+                                    $insert_data = [];
+                                    $insert_data = [
+                                        'uid' => $task_log[0]['uid'],
+                                        'task_no' => $task_log[0]['task_no'],
+                                        'mobile' =>$value['mobile'],
+                                        'message_info' =>$value['msgcontent'],
+                                        'create_time' => strtotime($value['time']),
+                                        'business_id' => 8,
+                                    ];
+                                    Db::table('yx_user_upriver')->insert($insert_data);
+                                }
+                                
+                            }
+                           
+                        }else{
+                            sleep(1);
                         }
-                        sleep(1);
                 }
                
                 
             }
         } catch (\Exception $th) {
             //throw $th;
-            foreach ($roallback as $key => $value) {
-                foreach ($value as $ne => $val) {
-                    $redis->rpush($redisMessageCodeSend, $val);
+            if (!empty($roallback)) {
+                foreach ($roallback as $key => $value) {
+                    foreach ($value as $ne => $val) {
+                        $redis->rpush($redisMessageCodeSend, $val);
+                    }
                 }
             }
+            
 
             $log_path = realpath("") . "/error/".$content.".log";
             $myfile = fopen($log_path, 'a+');
@@ -248,7 +302,7 @@ class HttpChannelModelCaiXinWeiGe extends Pzlife
             fclose($myfile);
             $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
                 'mobile'      => 15201926171,
-                'content'     => "【钰晰科技】创蓝彩信通道出现异常"
+                'content'     => "【钰晰科技】微格彩信通道出现异常"
             ])); //三体营销通道
 
         }
