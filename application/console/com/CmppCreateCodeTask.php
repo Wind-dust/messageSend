@@ -906,7 +906,7 @@ class CmppCreateCodeTask extends Pzlife
         foreach ($task_id as $key => $value) {
             $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $value['id'], 'deduct' => 60]));
         } */
-        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 150413, 'deduct' => 0]));
+        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 206344, 'deduct' => 0]));
         // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 150394, 'deduct' => 0]));
     }
 
@@ -1024,7 +1024,7 @@ class CmppCreateCodeTask extends Pzlife
                     $dianxin_mobile = [];
                     $error_mobile = [];
                     $deduct_mobile = [];
-                    $mobile_result = $this->mobilesFiltrate($sendTask['mobile_content'], $sendTask['uid'], $real_send['deduct']);
+                    $mobile_result = $this->SecondMobilesFiltrate($sendTask['mobile_content'], $sendTask['uid'], $real_send['deduct']);
 
                     // print_r($mobile_result);die;
                     // print_r($sendTask['template_id']);die;
@@ -1058,6 +1058,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'channel_id'   => $yidong_channel_id,
                                 'send_status'  => 2,
                                 'create_time'  => time(),
+                                'develop_no' => $sendTask['develop_no'],
                             ];
                             $sendmessage = [
                                 'mobile'      => $yidong_mobile[$i],
@@ -1124,6 +1125,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'channel_id'   => $liantong_channel_id,
                                 'send_status'  => 2,
                                 'create_time'  => time(),
+                                'develop_no' => $sendTask['develop_no'],
                             ];
                             $sendmessage = [
                                 'mobile'      => $liantong_mobile[$i],
@@ -1187,6 +1189,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'channel_id'   => $dianxin_channel_id,
                                 'send_status'  => 2,
                                 'create_time'  => time(),
+                                'develop_no' => $sendTask['develop_no'],
                             ];
                             $sendmessage = [
                                 'mobile'      => $dianxin_mobile[$i],
@@ -1280,6 +1283,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'create_time'    => time(),
                                 'status_message' => 'DELIVRD',
                                 'real_message'   => 'DEDUCT:1',
+                                'develop_no' => $sendTask['develop_no'],
                             ];
                             $all_log[] = $send_log;
                             $sendmessage = [
@@ -1333,6 +1337,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'create_time'    => time(),
                                 'status_message' => 'DB:0101',
                                 'real_message'   => 'ERROR:1',
+                                'develop_no' => $sendTask['develop_no'],
                             ];
                             $all_log[] = $send_log;
                             $sendmessage = [
@@ -1712,6 +1717,8 @@ class CmppCreateCodeTask extends Pzlife
                 $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value['id'], 'deduct' => 0]));
             }
         } */
+        // echo strtotime('-6 months');die;
+        
         $taskid = [2444024];
         foreach ($taskid as $key => $value) {
             $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value, 'deduct' => 0]));
@@ -1864,7 +1871,10 @@ class CmppCreateCodeTask extends Pzlife
                     // print_r($real_send_mobile);die;
                     //扣量
                     $the_month = date('Ymd', time());
-                    $the_month_time = strtotime($the_month - 6);
+                    // $the_month_time = strtotime($the_month - 6);
+                    $the_month_time = strtotime('-6 months',strtotime($the_month));
+                    // echo strtotime('-6 months',strtotime(date('Ymd', time())));
+                    // die;
                     if ($deduct > 0 && count($real_send_mobile) > 0) {
                         //热门城市ID 
                         $citys_id = [2, 20, 38, 241, 378, 500, 615, 694, 842, 860, 981, 1083, 1220, 1315, 1427, 1602, 1803, 1923, 2077, 2279, 2405, 2455, 2496, 2704, 2802, 2948, 3034, 3152, 3255, 3310, 3338, 2100];
