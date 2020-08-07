@@ -848,6 +848,7 @@ class SflUpload extends Pzlife
             }
         }
     }
+    // WHERE `template_id` = '100183121';
     /* sftp 短信任务入库 */
     public function sftpSflSendTaskToBase()
     {
@@ -1556,9 +1557,9 @@ class SflUpload extends Pzlife
                             // continue;
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
-                            if (!strpos($svalue, date("Ymd"))) {
+                            /* if (!strpos($svalue, date("Ymd"))) {
                                 continue;
-                            }
+                            } */
                             //  strpos($svalue, '2020071518') == false
                             if (strpos($svalue, '2020080715') == false) {
                                 continue;
