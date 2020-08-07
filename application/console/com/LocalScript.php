@@ -2823,7 +2823,7 @@ class LocalScript extends Pzlife
         try {
             //code...
             while(true){
-                $uids = Db::query("SELECT `id` FROM yx_users WHERE `pid` = 137 "); //道信核对
+                $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
                 //行业
                 foreach ($uids as $key => $value) {
                     // continue;
@@ -2843,7 +2843,7 @@ class LocalScript extends Pzlife
                         if ($end_time > time()) {
                             // break;
                             $end_time            = time();
-                            $day_business_result = $this->selectSendResultForBusiness($value['id'], $start_time, $end_time);
+                            $day_business_result = $this->selectSendResultForBusiness($value['id'], $value['pid'], $start_time, $end_time);
                             if ($day_business_result == false) {
                                 break;
                             } else {
@@ -2869,7 +2869,7 @@ class LocalScript extends Pzlife
                             //
     
                         }
-                        $day_business_result = $this->selectSendResultForBusiness($value['id'], $start_time, $end_time);
+                        $day_business_result = $this->selectSendResultForBusiness($value['id'], $value['pid'],$start_time, $end_time);
                         if ($day_business_result == false) {
                             $start_time = $end_time;
                             continue;
@@ -2899,7 +2899,7 @@ class LocalScript extends Pzlife
                 }
                 //营销
                 foreach ($uids as $key => $value) {
-                    $start_time = (int) strtotime(date('2020-07-01'));
+                    $start_time = (int) strtotime('-3 days',strtotime(date('Y-m-d',time())));
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
                         continue;
                     }
@@ -2912,7 +2912,7 @@ class LocalScript extends Pzlife
                         if ($end_time > time()) {
                             // break;
                             $end_time             = time();
-                            $day_marketing_result = $this->selectSendResultForMarketing($value['id'], $start_time, $end_time);
+                            $day_marketing_result = $this->selectSendResultForMarketing($value['id'], $value['pid'], $start_time, $end_time);
                             if ($day_marketing_result == false) {
                                 break;
                             }
@@ -2938,7 +2938,7 @@ class LocalScript extends Pzlife
     
                         }
     
-                        $day_marketing_result = $this->selectSendResultForMarketing($value['id'], $start_time, $end_time);
+                        $day_marketing_result = $this->selectSendResultForMarketing($value['id'], $value['pid'], $start_time, $end_time);
                         if ($day_marketing_result == false) {
                             $start_time = $end_time;
                             continue;
@@ -2974,7 +2974,7 @@ class LocalScript extends Pzlife
         }
     }
 
-    private function selectSendResultForBusiness($uid, $start_time, $end_time)
+    private function selectSendResultForBusiness($uid, $pid, $start_time, $end_time)
     {
         $all_num        = 0;
         $mobile_num     = 0;
@@ -3007,7 +3007,7 @@ class LocalScript extends Pzlife
             }
             $business_mobile_num = Db::query("SELECT SUM(`send_num`) AS send_num FROM `yx_user_send_code_task` WHERE `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length)[0]['send_num'];
             if (!empty($business_mobile_num)) {
-                if ($start_time >= 1594310400) {
+                if ($pid == 137) {
                     $business_success_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_code_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_code_task` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND status_message IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_id`");
                     $business_default_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_code_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_code_task` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND status_message NOT IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_id`");
                 } else {
@@ -3034,11 +3034,10 @@ class LocalScript extends Pzlife
 
     public function SendResultForMarketingTest()
     {
-        $result = $this->selectSendResultForMarketing(156, 1594310400, 1594396800);
-        print_r($result);
+        $result = $this->selectSendResultForMarketing(156, 137,1594310400, 1594396800);
     }
 
-    private function selectSendResultForMarketing($uid, $start_time, $end_time)
+    private function selectSendResultForMarketing($uid, $pid,$start_time, $end_time)
     {
         $all_num        = 0;
         $mobile_num     = 0;
@@ -3076,7 +3075,7 @@ class LocalScript extends Pzlife
             $business_mobile_num = Db::query("SELECT SUM(`send_num`) AS send_num FROM `yx_user_send_task` WHERE `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length)[0]['send_num'];
 
             if (!empty($business_mobile_num)) {
-                if ($start_time >= 1594828800) {
+                if ($pid == 137) {
                     $business_success_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_task` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND status_message IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_id`");
                     $business_default_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_task` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND status_message NOT IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_id`");
                 } else {
