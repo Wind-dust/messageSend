@@ -1432,8 +1432,8 @@ class Send extends MyController
         // print_r($this->request->post());die;
        $receiptBack = $this->request->post();
         $result = $this->app->send->weigeMmsCallBack($receiptBack);
-        if ($result == 'OK') {
-            echo 'OK';
+        if ($result == 'SUCCESS') {
+            echo 'SUCCESS';
             exit;
         } else {
             echo 'error';

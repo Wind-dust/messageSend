@@ -3163,6 +3163,34 @@ return $result;
         }
     }
 
+    public function weigeMmsCallBack($receiptBack = []){
+        if (empty($receiptBack)) {
+            return 'error';
+        }
+        //index:meassage:code:back_taskno:122
+        $task_no = 'index:meassage:code:back_taskno:122';
+        $redisMessageCodeDeliver = 'index:meassage:multimediamessage:deliver'; //创蓝彩信回执通道
+        $redis = Phpredis::getConn();
+        foreach ($receiptBack as $key => $value) {
+            if (!is_array($value)) {
+                return 'error';
+            }
+            $task_id = $redis->hget($task_no,$value['taskid']);
+            if (empty($task_id)) {
+                continue;
+            }
+            $send_task_log = [
+                'task_id'        => $task_id,
+                'mobile'         => $value['mobile'],
+                'status_message' => $value['code'],
+                'send_time'      => $value['time'],
+            ];
+            $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
+           
+        }
+        return 'SUCCESS';
+    }
+
     public function numberDetection($appid, $appkey, $mobile)
     {
 
