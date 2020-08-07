@@ -900,7 +900,7 @@ class Send extends MyController
             return ['code' => '3011'];
         }
         $ip       = trim($this->request->ip());
-        $result = $this->app->send->submitBatchCustomBusiness($appid, $appkey, $template_id, $connect, $ip, $signature_id, '', $develop_no);
+        $result = $this->app->send->submitBatchCustomBusinessMsgId($appid, $appkey, $template_id, $connect, $ip, $signature_id, '', $develop_no);
         return $result;
     }
 
@@ -986,7 +986,7 @@ class Send extends MyController
             return ['code' => '3011'];
         }
         $ip       = trim($this->request->ip());
-        $result = $this->app->send->submitBatchCustomMarketing($appid, $appkey, $template_id, $connect, $ip, $signature_id, '', $develop_no);
+        $result = $this->app->send->submitBatchCustomMarketingMsgId($appid, $appkey, $template_id, $connect, $ip, $signature_id, '', $develop_no);
         return $result;
     }
 
@@ -1321,6 +1321,33 @@ class Send extends MyController
         $task_id  = trim($this->request->post('ext_id')); //登陆密码
         $phone  = trim($this->request->post('phone')); //登陆密码
         $result = $this->app->send->chuangLanMmsSftpCallBack($code, $desc, $task_id, $phone);
+        if ($result == 'OK') {
+            echo 'OK';
+            exit;
+        } else {
+            echo 'error';
+            exit;
+        }
+    }
+
+     /**
+     * @api              {post} / 薇格彩信平台回调接口
+     * @apiDescription   chuangLanMmsSftpCallBack
+     * @apiGroup         index_send
+     * @apiName          chuangLanMmsSftpCallBack
+     * @apiParam (入参) {String} code 返回码
+     * @apiParam (入参) {String} desc 状态说明
+     * @apiParam (入参) {String} ext_id 彩信任务id
+     * @apiParam (入参) {String} phone 号码
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误
+     * @apiSampleRequest /index/send/chuangLanMmsSftpCallBack
+     * @author rzc
+     */
+    public function weigeMmsCallBack()
+    {
+        // print_r($this->request->post());die;
+       $receiptBack = $this->request->post();
+        $result = $this->app->send->weigeMmsCallBack($receiptBack);
         if ($result == 'OK') {
             echo 'OK';
             exit;
