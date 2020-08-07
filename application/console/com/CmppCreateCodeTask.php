@@ -9214,7 +9214,7 @@ class CmppCreateCodeTask extends Pzlife
         }
         // die;
         $deduct = 1; //1扣量,2不扣
-        $rate = 70;
+        $rate = 50;
 
         $ids = [];
         $j = 1;
@@ -9254,7 +9254,7 @@ class CmppCreateCodeTask extends Pzlife
                             if ($deduct == 1) {
                                 $rate = $rate;
                                 $num = mt_rand(0, 100);
-                                if (in_array($value['template_id'], ['514', '100183154', '100183155', '100182618', '100182622', '100182626'])) { //生日不扣
+                                if (in_array($value['template_id'], ['514', '100183154', '100183155'])) { //生日不扣
                                     //strpos($value['task_content'], '生日') !== false ||
                                     // print_r($value['task_content']);die;
                                     $prefix = '';
@@ -9455,7 +9455,7 @@ class CmppCreateCodeTask extends Pzlife
                         $receipt[] = $rece;
                     } else {
                         if ($deduct == 1) { //扣量
-                            if (in_array($value['template_id'],  ['514', '100183154', '100183155', '100182618', '100182622', '100182626'])) { //生日不扣
+                            if (in_array($value['template_id'],  ['514', '100183154', '100183155'])) { //生日不扣
                                 // print_r($value['task_content']);die;
                                 // strpos($value['task_content'], '生日') !== false ||
                                 $prefix = '';
