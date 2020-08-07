@@ -228,7 +228,9 @@ class Upload extends MyController
                     $cellName = PHPExcel_Cell::stringFromColumnIndex(1) . $i;
                     $connect = $sheet->getCell($cellName)->getValue();
                     // $send_data[] = urlencode($connect) . ":" . $mobile;
-                    $send_data[] = base64_encode($connect) . ":" . $mobile;
+                    if (!empty($mobile) && !empty($connect)) {
+                        $send_data[] = base64_encode($connect)  . ":" . $mobile;
+                    }
                 }
             } elseif ($type == 'xlsx') {
                 $type = 'Excel2007';
@@ -241,7 +243,10 @@ class Upload extends MyController
                     $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
                     $connect = $objPHPExcel->getActiveSheet()->getCell("B" . $i)->getValue();
                     // $send_data[] = urlencode($connect)  . ":" . $mobile;
-                    $send_data[] = base64_encode($connect)  . ":" . $mobile;
+                    if (!empty($mobile) && !empty($connect)) {
+                        $send_data[] = base64_encode($connect)  . ":" . $mobile;
+                    }
+                   
                 }
             } elseif ($type == 'xls') {
                 $type = 'Excel5';
@@ -255,7 +260,9 @@ class Upload extends MyController
                     $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
                     $connect = $objPHPExcel->getActiveSheet()->getCell("B" . $i)->getValue();
                     // $send_data[] = urlencode($connect) . ":" . $mobile;
-                    $send_data[] = base64_encode($connect) . ":" . $mobile;
+                    if (!empty($mobile) && !empty($connect)) {
+                        $send_data[] = base64_encode($connect)  . ":" . $mobile;
+                    }
                 }
             }
             if (empty($send_data)) {
