@@ -856,7 +856,8 @@ class SflUpload extends Pzlife
         $mysql_connect->query("set names utf8mb4");
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
-        //白名单入库
+        while(true){
+//白名单入库
         /* if (in_array($tvalue[3],$white_list)) {
         $redis->rpush('sftp:sfl:marketing:whitesendtask',json_encode($SMS_real_send));
         }else{
@@ -1102,6 +1103,9 @@ class SflUpload extends Pzlife
                 exception($e);
             }
         }
+        sleep(10);
+        }
+        
     }
 
     /* save_type 入库方式 */
