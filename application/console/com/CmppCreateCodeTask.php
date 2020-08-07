@@ -2134,7 +2134,7 @@ class CmppCreateCodeTask extends Pzlife
                                 $deduct_key = array_rand($section_data, $host_proportion);
 
                                 foreach ($section_data as $key => $value) {
-                                    if (!empty($deduct_key) && in_array($key, $deduct_key)) {
+                                    if (is_array($deduct_key) && in_array($key, $deduct_key)) {
                                         $deduct_mobile[] = $value['mobile'];
                                     } else {
                                         if ($value['source'] == 1) { //移动
