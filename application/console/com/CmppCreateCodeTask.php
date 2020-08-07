@@ -2134,7 +2134,7 @@ class CmppCreateCodeTask extends Pzlife
                                 $deduct_key = array_rand($section_data, $host_proportion);
 
                                 foreach ($section_data as $key => $value) {
-                                    if (in_array($key, $deduct_key)) {
+                                    if (!empty($deduct_key) && in_array($key, $deduct_key)) {
                                         $deduct_mobile[] = $value['mobile'];
                                     } else {
                                         if ($value['source'] == 1) { //移动
@@ -2162,7 +2162,7 @@ class CmppCreateCodeTask extends Pzlife
                             $deduct_key = array_rand($section_data, ceil($host_proportion / $section));
                             // print_r($deduct_key);die;
                             foreach ($section_data as $key => $value) {
-                                if (is_array($deduct_key)) {
+                                if ( !empty($deduct_key) && is_array($deduct_key)) {
                                     if (in_array($key, $deduct_key)) {
                                         $deduct_mobile[] = $value['mobile'];
                                     } else {
@@ -11697,6 +11697,19 @@ class CmppCreateCodeTask extends Pzlife
         } catch (\Exception $th) {
             //throw $th;
             exception($th);
+        }
+    }
+
+    public function mmsReceipt(){
+        $rediskey = 'index:meassage:multimediamessage:deliver';
+        $redis = Phpredis::getConn();
+        while(true){
+            $receipt = $redis->lpop($rediskey);
+            if (empty($receipt)) {}
+            sleep(1);
+            continue;
+            $receipt = json_decode($receipt,true);
+
         }
     }
 }
