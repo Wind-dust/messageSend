@@ -865,12 +865,12 @@ class SflUpload extends Pzlife
         $redis->rpush('sftp:sfl:marketing:sendtask',json_encode($SMS_real_send));
         } */
             $send_task = [];
-            $task_id   = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task  ORDER BY `id` DESC limit 1 ");
+            /* $task_id   = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task  ORDER BY `id` DESC limit 1 ");
             if (empty($task_id)) {
                 $this_id = 1;
             } else {
                 $this_id   = $task_id[0]['id'];
-            }
+            } */
             // print_r($this_id);
             // die;
             $i = 1;
@@ -881,7 +881,7 @@ class SflUpload extends Pzlife
                 }
                 $white_task = json_decode($white_task, true);
                 // print_r($white_task);die;
-                $this_id++;
+                // $this_id++;
                 // $white_task['id'] = $this_id;
                 $send_task[]      = $white_task;
 
