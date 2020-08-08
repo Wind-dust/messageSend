@@ -10517,9 +10517,9 @@ class CmppCreateCodeTask extends Pzlife
                     }
                     continue;
                 }
-                if (empty($receipts['mar_task_id'])) {
+                /* if (empty($receipts['mar_task_id'])) {
                     continue;
-                }
+                } */
                 if (trim($receipts['mobile']) == '15201926171' || trim($receipts['mobile']) == '15821193682') {
                     continue;
                 }
