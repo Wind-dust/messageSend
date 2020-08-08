@@ -921,7 +921,7 @@ class SflUpload extends Pzlife
                 }
                 $white_task = json_decode($white_task, true);
                 // print_r($white_task);die;
-                $this_id++;
+                // $this_id++;
                 // $white_task['id'] = $this_id;
                 $send_task[]      = $white_task;
                 $task_receipt     = [];
@@ -989,7 +989,7 @@ class SflUpload extends Pzlife
                 $i++;
                 $white_task = json_decode($white_task, true);
                 // print_r($white_task);die;
-                $this_id++;
+                // $this_id++;
                 // $white_task['id'] = $this_id;
                 $send_task[]      = $white_task;
                 // $white_task = $redis->rpush('sftp:sfl:marketing:deductsendtask', json_encode($white_task));
