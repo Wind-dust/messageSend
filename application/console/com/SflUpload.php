@@ -674,7 +674,7 @@ class SflUpload extends Pzlife
             $task_receipt     = [
                 'mseeage_id'     => $white_task['mseeage_id'],
                 'mobile'         => $white_task['mobile'],
-                'status_message' => 'SMS:2',
+                'status_message' => 'MMS:2',
                 'messageinfo'    => '发送失败',
                 'task_id'        => $white_task['id'],
                 'template_id'    => $white_task['template_id'],
@@ -857,37 +857,49 @@ class SflUpload extends Pzlife
         $mysql_connect->query("set names utf8mb4");
         ini_set('memory_limit', '4096M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
-        while(true){
-//白名单入库
-        /* if (in_array($tvalue[3],$white_list)) {
+        while (true) {
+            //白名单入库
+            /* if (in_array($tvalue[3],$white_list)) {
         $redis->rpush('sftp:sfl:marketing:whitesendtask',json_encode($SMS_real_send));
         }else{
         $redis->rpush('sftp:sfl:marketing:sendtask',json_encode($SMS_real_send));
         } */
-        $send_task = [];
-        $task_id   = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task  ORDER BY `id` DESC limit 1 ");
-        if (empty($task_id)) {
-            $this_id = 1;
-        } else {
-            $this_id   = $task_id[0]['id'];
-        }
-        // print_r($this_id);
-        // die;
-        $i = 1;
-        while (true) {
-            $white_task = $redis->lpop('sftp:sfl:marketing:whitesendtask');
-            if (empty($white_task)) {
-                break;
+            $send_task = [];
+            $task_id   = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task  ORDER BY `id` DESC limit 1 ");
+            if (empty($task_id)) {
+                $this_id = 1;
+            } else {
+                $this_id   = $task_id[0]['id'];
             }
-            $white_task = json_decode($white_task, true);
-            // print_r($white_task);die;
-            $this_id++;
-            $white_task['id'] = $this_id;
-            $send_task[]      = $white_task;
+            // print_r($this_id);
+            // die;
+            $i = 1;
+            while (true) {
+                $white_task = $redis->lpop('sftp:sfl:marketing:whitesendtask');
+                if (empty($white_task)) {
+                    break;
+                }
+                $white_task = json_decode($white_task, true);
+                // print_r($white_task);die;
+                $this_id++;
+                // $white_task['id'] = $this_id;
+                $send_task[]      = $white_task;
 
-            $i++;
-            if ($i > 100) {
-                $mysql_connect->startTrans();
+                $i++;
+                if ($i > 100) {
+                    $mysql_connect->startTrans();
+                    try {
+                        $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
+                        unset($send_task);
+                        $i = 1;
+                        $mysql_connect->commit();
+                    } catch (\Exception $e) {
+                        exception($e);
+                    }
+                }
+            }
+
+            if (!empty($send_task)) {
                 try {
                     $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
                     unset($send_task);
@@ -897,46 +909,47 @@ class SflUpload extends Pzlife
                     exception($e);
                 }
             }
-        }
+            // die;
+            // print_r($this_id);
+            // die;
+            $task_receipt_all = [];
 
-        if (!empty($send_task)) {
-            try {
-                $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
-                unset($send_task);
-                $i = 1;
-                $mysql_connect->commit();
-            } catch (\Exception $e) {
-                exception($e);
+            while (true) {
+                $white_task = $redis->lpop('sftp:sfl:marketing:errorsendtask');
+                if (empty($white_task)) {
+                    break;
+                }
+                $white_task = json_decode($white_task, true);
+                // print_r($white_task);die;
+                $this_id++;
+                // $white_task['id'] = $this_id;
+                $send_task[]      = $white_task;
+                $task_receipt     = [];
+                $task_receipt     = [
+                    'mseeage_id'     => $white_task['mseeage_id'],
+                    'mobile'         => $white_task['mobile'],
+                    'status_message' => 'SMS:2',
+                    'messageinfo'    => '发送失败',
+                    'task_id'        => $white_task['id'],
+                    'template_id'    => $white_task['template_id'],
+                ];
+                $task_receipt_all[] = $task_receipt;
+                $i++;
+                if ($i > 100) {
+                    $mysql_connect->startTrans();
+                    try {
+                        $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
+                        $mysql_connect->table('yx_sfl_send_task_receipt')->insertAll($task_receipt_all);
+                        unset($send_task);
+                        unset($task_receipt_all);
+                        $i = 1;
+                        $mysql_connect->commit();
+                    } catch (\Exception $e) {
+                        exception($e);
+                    }
+                }
             }
-        }
-        // die;
-        // print_r($this_id);
-        // die;
-        $task_receipt_all = [];
-
-        while (true) {
-            $white_task = $redis->lpop('sftp:sfl:marketing:errorsendtask');
-            if (empty($white_task)) {
-                break;
-            }
-            $white_task = json_decode($white_task, true);
-            // print_r($white_task);die;
-            $this_id++;
-            $white_task['id'] = $this_id;
-            $send_task[]      = $white_task;
-            $task_receipt     = [];
-            $task_receipt     = [
-                'mseeage_id'     => $white_task['mseeage_id'],
-                'mobile'         => $white_task['mobile'],
-                'status_message' => 'SMS:2',
-                'messageinfo'    => '发送失败',
-                'task_id'        => $white_task['id'],
-                'template_id'    => $white_task['template_id'],
-            ];
-            $task_receipt_all[] = $task_receipt;
-            $i++;
-            if ($i > 100) {
-                $mysql_connect->startTrans();
+            if (!empty($send_task)) {
                 try {
                     $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
                     $mysql_connect->table('yx_sfl_send_task_receipt')->insertAll($task_receipt_all);
@@ -948,57 +961,82 @@ class SflUpload extends Pzlife
                     exception($e);
                 }
             }
-        }
-        if (!empty($send_task)) {
-            try {
-                $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
-                $mysql_connect->table('yx_sfl_send_task_receipt')->insertAll($task_receipt_all);
-                unset($send_task);
-                unset($task_receipt_all);
-                $i = 1;
-                $mysql_connect->commit();
-            } catch (\Exception $e) {
-                exception($e);
-            }
-        }
-        $deduct = ceil(6000000 / 9500656 * 100);
+            $deduct = ceil(6000000 / 9500656 * 100);
 
-        /* 扣量 */
-        // $all_num = [0,1,2,3,4];
-        // $deduct_key = array_rand($all_num,3);
-        // print_r($deduct_key);die;
-        $all_num = [];
-        for ($i = 0; $i < 100; $i++) {
-            # code...
-            $all_num[] = $i;
-        }
-        // $deduct_key = array_rand($all_num, $deduct);
-        /*  print_r($deduct_key);
-        die; */
-        // echo count($all_num);
-        // die;
-        /* print_r($all_num);
-        die; */
-        $deduct_nums = 5;
-        $i = 1;
-        while (true) {
-            $white_task = $redis->lpop('sftp:sfl:marketing:sendtask');
-            if (empty($white_task)) {
-                break;
+            /* 扣量 */
+            // $all_num = [0,1,2,3,4];
+            // $deduct_key = array_rand($all_num,3);
+            // print_r($deduct_key);die;
+            $all_num = [];
+            for ($i = 0; $i < 100; $i++) {
+                # code...
+                $all_num[] = $i;
             }
-            $i++;
-            $white_task = json_decode($white_task, true);
-            // print_r($white_task);die;
-            $this_id++;
-            $white_task['id'] = $this_id;
-            $send_task[]      = $white_task;
-            // $white_task = $redis->rpush('sftp:sfl:marketing:deductsendtask', json_encode($white_task));
-            // $white_task = $redis->rpush('sftp:sfl:marketing:deductsendtask', json_encode($white_task));
-            if ($i > count($all_num)) {
+            // $deduct_key = array_rand($all_num, $deduct);
+            /*  print_r($deduct_key);
+        die; */
+            // echo count($all_num);
+            // die;
+            /* print_r($all_num);
+        die; */
+            $deduct_nums = 5;
+            $i = 1;
+            while (true) {
+                $white_task = $redis->lpop('sftp:sfl:marketing:sendtask');
+                if (empty($white_task)) {
+                    break;
+                }
+                $i++;
+                $white_task = json_decode($white_task, true);
+                // print_r($white_task);die;
+                $this_id++;
+                // $white_task['id'] = $this_id;
+                $send_task[]      = $white_task;
+                // $white_task = $redis->rpush('sftp:sfl:marketing:deductsendtask', json_encode($white_task));
+                // $white_task = $redis->rpush('sftp:sfl:marketing:deductsendtask', json_encode($white_task));
+                if ($i > count($all_num)) {
+                    // $all_num    = [0, 1, 2, 3, 4];
+                    $deduct_key = array_rand($all_num, $deduct);
+                    /*  print_r($deduct_key);
+                die; */
+                    foreach ($send_task as $key => $value) {
+                        if (in_array($key, $deduct_key)) {
+                            continue;
+                        }
+                        $prefix = '';
+                        $prefix = substr(trim($value['mobile']), 0, 7);
+                        $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                        // print_r($res);
+                        if ($res) {
+                            $newres = array_shift($res);
+                            if ($newres['source'] == 1) {
+                                $channel_id = 83;
+                            } elseif ($newres['source'] == 2) {
+                                $channel_id = 84;
+                            } elseif ($newres['source'] == 3) {
+                                $channel_id = 84;
+                            }
+                        } else {
+                            $channel_id = 83;
+                        }
+                        $sendmessage = [
+                            'mseeage_id'  => $value['mseeage_id'],
+                            'template_id' => $value['template_id'],
+                            'mobile'      => $value['mobile'],
+                            'mar_task_id' => $value['id'],
+                            'content'     => $value['task_content'],
+                            'from'        => 'yx_sfl_send_task',
+                        ];
+                        $redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($sendmessage)); //三体营销
+                    }
+                    $i = 1;
+                    // $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
+                    unset($send_task);
+                }
+            }
+            if (!empty($send_task)) {
                 // $all_num    = [0, 1, 2, 3, 4];
                 $deduct_key = array_rand($all_num, $deduct);
-                /*  print_r($deduct_key);
-                die; */
                 foreach ($send_task as $key => $value) {
                     if (in_array($key, $deduct_key)) {
                         continue;
@@ -1023,67 +1061,40 @@ class SflUpload extends Pzlife
                         'mseeage_id'  => $value['mseeage_id'],
                         'template_id' => $value['template_id'],
                         'mobile'      => $value['mobile'],
-                        'mar_task_id' => $value['id'],
+                        // 'mar_task_id' => $value['id'],
                         'content'     => $value['task_content'],
                         'from'        => 'yx_sfl_send_task',
                     ];
                     $redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($sendmessage)); //三体营销
                 }
-                $i = 1;
                 $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
-                unset($send_task);
             }
-        }
-        if (!empty($send_task)) {
-            // $all_num    = [0, 1, 2, 3, 4];
-            $deduct_key = array_rand($all_num, $deduct);
-            foreach ($send_task as $key => $value) {
-                if (in_array($key, $deduct_key)) {
-                    continue;
+            // die;
+            $send_task = [];
+            while (true) {
+                $white_task = $redis->lpop('sftp:sfl:marketing:deductsendtask');
+                if (empty($white_task)) {
+                    break;
                 }
-                $prefix = '';
-                $prefix = substr(trim($value['mobile']), 0, 7);
-                $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
-                // print_r($res);
-                if ($res) {
-                    $newres = array_shift($res);
-                    if ($newres['source'] == 1) {
-                        $channel_id = 83;
-                    } elseif ($newres['source'] == 2) {
-                        $channel_id = 84;
-                    } elseif ($newres['source'] == 3) {
-                        $channel_id = 84;
+                $white_task = json_decode($white_task, true);
+                $white_task['yidong_channel_id'] = 83;
+                $white_task['liantong_channel_id'] = 83;
+                $white_task['dianxin_channel_id'] = 84;
+                $send_task[]      = $white_task;
+                $i++;
+                if ($i > 100) {
+                    $mysql_connect->startTrans();
+                    try {
+                        $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
+                        unset($send_task);
+                        $i = 1;
+                        $mysql_connect->commit();
+                    } catch (\Exception $e) {
+                        exception($e);
                     }
-                } else {
-                    $channel_id = 83;
                 }
-                $sendmessage = [
-                    'mseeage_id'  => $value['mseeage_id'],
-                    'template_id' => $value['template_id'],
-                    'mobile'      => $value['mobile'],
-                    'mar_task_id' => $value['id'],
-                    'content'     => $value['task_content'],
-                    'from'        => 'yx_sfl_send_task',
-                ];
-                $redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($sendmessage)); //三体营销
             }
-            $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
-        }
-        // die;
-        $send_task = [];
-        while (true) {
-            $white_task = $redis->lpop('sftp:sfl:marketing:deductsendtask');
-            if (empty($white_task)) {
-                break;
-            }
-            $white_task = json_decode($white_task, true);
-            $white_task['yidong_channel_id'] = 83;
-            $white_task['liantong_channel_id'] = 83;
-            $white_task['dianxin_channel_id'] = 84;
-            $send_task[]      = $white_task;
-            $i++;
-            if ($i > 100) {
-                $mysql_connect->startTrans();
+            if (!empty($send_task)) {
                 try {
                     $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
                     unset($send_task);
@@ -1093,20 +1104,8 @@ class SflUpload extends Pzlife
                     exception($e);
                 }
             }
+            sleep(10);
         }
-        if (!empty($send_task)) {
-            try {
-                $mysql_connect->table('yx_sfl_send_task')->insertAll($send_task);
-                unset($send_task);
-                $i = 1;
-                $mysql_connect->commit();
-            } catch (\Exception $e) {
-                exception($e);
-            }
-        }
-        sleep(10);
-        }
-        
     }
 
     /* save_type 入库方式 */

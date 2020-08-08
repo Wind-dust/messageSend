@@ -10529,7 +10529,7 @@ class CmppCreateCodeTask extends Pzlife
                     'mseeage_id' => $receipts['mseeage_id'],
                     'mobile' => $receipts['mobile'],
                     'real_message' => $receipts['Stat'],
-                    'task_id' => $receipts['mar_task_id'],
+                    // 'task_id' => $receipts['mar_task_id'],
                     'template_id' => $receipts['template_id'],
                 ];
                 $receipts['Stat'] = trim($receipts['Stat']);
