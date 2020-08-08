@@ -370,7 +370,7 @@ class CmppCreateCodeTask extends Pzlife
             // usleep(50000);
         } */
         // $task_id = [237014,237019,237020,237022,237023,237050,237051,237052,237053,237072,237073,237074,237077,237078,237079,237083,237085,237087,237103,237110,237113,237114,237115,237116,237117,237119,237122,237123,237124,237125,237126,237127,237800,237801,237802,237803,237804,237805,237806,237809,237810,237811,237812,237813,237817,237818,237819,237828,237830,237832,237834,237841,237843,237844,237845,238357];
-        $task_id = [240573,241031,241037,241056,241284,241285,241286,241303,241318,241530,241531,241532,241542,241543,241544,241548,241549,241550,241551,241552,241553,241554,241555,241556,241557,241558,241559,241560,241561,241562,241563,241564,241565,241566,241567,241568,241569,241570,241571,241572,241573,241574,241575,241576,241577,241578,241579,241580,241581,241582,241583,241584,241585,241586,241587,241588,241589,241590];
+        $task_id = [240573, 241031, 241037, 241056, 241284, 241285, 241286, 241303, 241318, 241530, 241531, 241532, 241542, 241543, 241544, 241548, 241549, 241550, 241551, 241552, 241553, 241554, 241555, 241556, 241557, 241558, 241559, 241560, 241561, 241562, 241563, 241564, 241565, 241566, 241567, 241568, 241569, 241570, 241571, 241572, 241573, 241574, 241575, 241576, 241577, 241578, 241579, 241580, 241581, 241582, 241583, 241584, 241585, 241586, 241587, 241588, 241589, 241590];
         foreach ($task_id as $key => $value) {
             /*  if (Db::query("SELECT `task_no` FROM yx_user_send_task_log WHERE `task_no` = '".$value['task_no']."' ")) {
                 continue;
@@ -1806,7 +1806,7 @@ class CmppCreateCodeTask extends Pzlife
             if (count($real_send_mobile) == 1) {
 
                 $num = mt_rand(0, 100);
-                if ($uid == 91) {
+                if ($uid == 91 && $uid == 92) {
                     if ($num <= $deduct && !empty($real_send_mobile)) {
                         foreach ($real_send_mobile as $key => $value) {
                             $deduct_mobile[] = $value;
@@ -2162,7 +2162,7 @@ class CmppCreateCodeTask extends Pzlife
                             $deduct_key = array_rand($section_data, ceil($host_proportion / $section));
                             // print_r($deduct_key);die;
                             foreach ($section_data as $key => $value) {
-                                if ( !empty($deduct_key) && is_array($deduct_key)) {
+                                if (!empty($deduct_key) && is_array($deduct_key)) {
                                     if (in_array($key, $deduct_key)) {
                                         $deduct_mobile[] = $value['mobile'];
                                     } else {
@@ -11700,16 +11700,17 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
-    public function mmsReceipt(){
+    public function mmsReceipt()
+    {
         $rediskey = 'index:meassage:multimediamessage:deliver';
         $redis = Phpredis::getConn();
-        while(true){
+        while (true) {
             $receipt = $redis->lpop($rediskey);
-            if (empty($receipt)) {}
+            if (empty($receipt)) {
+            }
             sleep(1);
             continue;
-            $receipt = json_decode($receipt,true);
-
+            $receipt = json_decode($receipt, true);
         }
     }
 }
