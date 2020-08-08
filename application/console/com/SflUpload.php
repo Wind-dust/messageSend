@@ -931,7 +931,7 @@ class SflUpload extends Pzlife
                         'mobile'         => $white_task['mobile'],
                         'status_message' => 'SMS:2',
                         'messageinfo'    => '发送失败',
-                        'task_id'        => $white_task['id'],
+                        // 'task_id'        => $white_task['id'],
                         'template_id'    => $white_task['template_id'],
                     ];
                     $task_receipt_all[] = $task_receipt;
