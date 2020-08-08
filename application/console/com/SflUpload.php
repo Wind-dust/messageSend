@@ -1024,7 +1024,7 @@ class SflUpload extends Pzlife
                                 'mseeage_id'  => $value['mseeage_id'],
                                 'template_id' => $value['template_id'],
                                 'mobile'      => $value['mobile'],
-                                'mar_task_id' => $value['id'],
+                                // 'mar_task_id' => $value['id'],
                                 'content'     => $value['task_content'],
                                 'from'        => 'yx_sfl_send_task',
                             ];
