@@ -6573,22 +6573,6 @@ class CmppCreateCodeTask extends Pzlife
         'status_message' => 'DELIVRD',
         'send_status' => 3,
         'send_time' => '1585709212',
-        )));
-        $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
-        'task_no' => 'mul20040110490391162370',
-        'uid' => '91',
-        'mobile' => '13681834423',
-        'status_message' => 'DELIVRD',
-        'send_status' => 3,
-        'send_time' => '1585709212',
-        )));
-        $redis->rpush('index:meassage:multimediamessage:deliver:' . $channel_id, json_encode(array(
-        'task_no' => 'mul20040110490391162370',
-        'uid' => '91',
-        'mobile' => '13681834423',
-        'status_message' => 'DELIVRD',
-        'send_status' => 3,
-        'send_time' => '1585709212',
         ))); */
 
         while (true) {
@@ -6706,22 +6690,23 @@ class CmppCreateCodeTask extends Pzlife
                     $send_status = 4;
                 }
                 Db::startTrans();
-                Db::table('yx_user_multimedia_message_log')->where(['task_no' => $task['task_no'], 'mobile' => trim($task['mobile'])])->update(['real_message' => $send_log['status_message'], 'status_message' => $stat,  'send_status' => $send_status, 'update_time' => strtotime(trim($send_log['send_time']))]);
+                Db::table('yx_user_multimedia_message_log')->where(['task_no' => $task['task_no'], 'mobile' => trim($sendlog['mobile'])])->update(['real_message' => $sendlog['status_message'], 'status_message' => $stat,  'send_status' => $send_status, 'update_time' => strtotime(trim($sendlog['send_time']))]);
                 Db::commit();
                 $redis->rpush('index:meassage:code:user:mulreceive:' . $task['uid'], json_encode([
                     'task_no'        => $task['task_no'],
                     'status_message' => $stat,
                     'msg_id'         => trim($task['send_msg_id']),
                     'message_info'   => $message_info,
-                    'mobile'         => trim($task['mobile']),
+                    'mobile'         => trim($sendlog['mobile']),
                     // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                    'send_time'      => isset($sendlog['send_time']) ? date('Y-m-d H:i:s', trim(strtotime($send_log['send_time']))) : date('Y-m-d H:i:s', time()),
+                    'send_time'      => isset($sendlog['send_time']) ? date('Y-m-d H:i:s', trim(strtotime($sendlog['send_time']))) : date('Y-m-d H:i:s', time()),
                     'smsCount' => 1,
                     'smsIndex' => 1,
                 ])); //写入用户带处理日志
             }
-        } catch (\Throwable $th) {
+        } catch (\Exception $th) {
             //throw $th;
+            exception($th);
         }
     }
 
