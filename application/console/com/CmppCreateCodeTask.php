@@ -11102,7 +11102,7 @@ class CmppCreateCodeTask extends Pzlife
                 $all_report = '';
                 $receipt_report = [];
                 $j = 1;
-                $base_receipt = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = 223 ");
+                /*  $base_receipt = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = 223 ");
                 foreach ($base_receipt as $bkey => $bvalue) {
                     $receipt = [];
                     if (in_array($bvalue['status_message'], $Received)) {
@@ -11149,7 +11149,7 @@ class CmppCreateCodeTask extends Pzlife
                         $receipt_report = [];
                         $j = 1;
                     }
-                }
+                } */
 
                 while (true) {
                     $receipt = $redis->lpop('index:meassage:code:user:mulreceive:' . $uid);
