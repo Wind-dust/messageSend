@@ -2880,6 +2880,8 @@ class LocalScript extends Pzlife
                         $day_business_result['uid']         = $value['id'];
                         $day_business_result['timekey']     = $timekey;
                         $day_business_result['business_id'] = $business_id;
+                        $day_business_result['create_time'] = time();
+                        $day_business_result['update_time'] = time();
                         // print_r($day_business_result);
                         $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 6 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                         if ($has) {
@@ -2937,7 +2939,6 @@ class LocalScript extends Pzlife
                             }
                             break;
                             //
-    
                         }
     
                         $day_marketing_result = $this->selectSendResultForMarketing($value['id'], $value['pid'], $start_time, $end_time);
@@ -2948,6 +2949,8 @@ class LocalScript extends Pzlife
                         $day_marketing_result['uid']         = $value['id'];
                         $day_marketing_result['timekey']     = $timekey;
                         $day_marketing_result['business_id'] = $business_id;
+                        $day_marketing_result['create_time'] = time();
+                        $day_marketing_result['update_time'] = time();
                         $has                                 = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                         if ($has) {
                             Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
