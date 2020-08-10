@@ -6662,7 +6662,7 @@ class CmppCreateCodeTask extends Pzlife
         try {
             ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
             $redis = Phpredis::getConn();
-            $redis->rpush('index:meassage:multimediamessage:deliver', '{"task_id":"210115","mobile":"15618356476","status_message":"DELIVRD","send_time":"20200807151956"}');
+            // $redis->rpush('index:meassage:multimediamessage:deliver', '{"task_id":"210115","mobile":"15618356476","status_message":"DELIVRD","send_time":"20200807151956"}');
             while (true) {
                 $Received = updateReceivedForMessage();
                 $sendlog = $redis->lpop('index:meassage:multimediamessage:deliver');
@@ -9234,15 +9234,17 @@ class CmppCreateCodeTask extends Pzlife
         ];
         // echo "SELECT * FROM yx_sfl_send_task WHERE `mobile` IN (".join(',',$white_list).") ";die;
         // $tody_time = 1595491200;
-        // $tody_time = strtotime(date("Ymd", time()));
+        $tody_time = strtotime(date("Ymd", time()));
         // $tody_time = 1596189600;// 时间下午16点3条 已发第一条
-        $tody_time = 1596877200; // 时间下午17点20
+        // $tody_time = 1596877200; // 时间下午17点20
         try {
-            $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84, 'update_time' => time()]);
+            // $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84, 'update_time' => time()]);
+            $mysql_connect->table('yx_sfl_send_task')->where([['`template_id` ', '=', '100183187']])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84, 'update_time' => time()]);
             /* $where = [];
             $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
             $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  '" . $tody_time . "'  ");
+            // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  '" . $tody_time . "'  ");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100183187'   ");
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id`  IN ('100182791','100181685','100182168','100182172') AND  `create_time` >  '" . $tody_time . "' AND mobile IN (".join(',',$white_list).") ");
             // echo "SELECT * FROM yx_sfl_send_task WHERE `template_id`  IN ('100182791','100181685','100182168','100182172') AND  `create_time` >  '" . $tody_time . "' AND mobile IN (".join(',',$white_list).") ";die;
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id`  IN ('100182166','100182575') AND  `create_time` >  '" . $tody_time . "' ");

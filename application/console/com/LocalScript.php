@@ -2827,7 +2827,7 @@ class LocalScript extends Pzlife
                 //行业
                 foreach ($uids as $key => $value) {
                     // continue;
-                    $start_time = (int) strtotime('-3 days', strtotime(date('Y-m-d', time())));
+                    $start_time = (int) strtotime('-4 days', strtotime(date('Y-m-d', time())));
                     // $start_time = (int) strtotime('2020-08-01');
                     // echo $start_time;die;
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_code_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
@@ -3017,7 +3017,8 @@ class LocalScript extends Pzlife
                 }
                 $mobile_num += $business_mobile_num;
                 $success_num += count($business_success_mobile_num) * ($i + 1);
-                if ($start_time >= 1595692800) {
+                // if ($start_time >= 1595692800) {
+                if (time() - $start_time >= 259200) {
                     $success_num += ($business_mobile_num - count($business_success_mobile_num) - count($business_default_mobile_num)) * ($i + 1);
                     $unknow_num = 0;
                 } else {
@@ -3086,7 +3087,8 @@ class LocalScript extends Pzlife
                 $mobile_num += $business_mobile_num;
                 $success_num += count($business_success_mobile_num) * ($i + 1);
                 // $unknow_num += ($business_mobile_num - count($business_success_mobile_num) - count($business_default_mobile_num)) * ($i + 1);
-                if ($start_time >= 1595692800) {
+                // if ($start_time >= 1595692800) {
+                if (time() - $start_time >= 259200) {
                     $success_num += ($business_mobile_num - count($business_success_mobile_num) - count($business_default_mobile_num)) * ($i + 1);
                     $unknow_num = 0;
                 } else {
