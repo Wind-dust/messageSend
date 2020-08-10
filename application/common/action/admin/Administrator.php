@@ -828,6 +828,10 @@ class Administrator extends CommonIndex
         if ($channel['business_id'] != 8) {
             return ['code' => '3004', '非彩信通道不能使用此接口'];
         }
+        $had_report = DbAdministrator::getUserMultimediaTemplateThirdReport(['channel_id' => $channel_id, 'template_id' => $template_id], 'id', true);
+        if (!empty($had_report)) {
+            return ['code' => '3007', 'msg' => '该模板已在该通道报备过'];
+        }
         //创蓝
         if ($channel_id == 63) {
             $report_api = 'http://mms.mms-sender.cn:8080/mmsServer/sendMms';
@@ -920,10 +924,6 @@ class Administrator extends CommonIndex
                 $result = json_decode($result, true);
                 if ($result['msg'] == '成功') {
                     $report_msg_id = $result['data']['mms_id'];
-                    $had_report = DbAdministrator::getUserMultimediaTemplateThirdReport(['channel_id' => $channel_id, 'template_id' => $template_id], 'id', true);
-                    if (!empty($had_report)) {
-                        return ['code' => '3007', 'msg' => '该模板已在该通道报备过'];
-                    }
                     $report_data = [];
                     $report_data = [
                         'channel_id' => $channel_id,
@@ -1025,10 +1025,6 @@ class Administrator extends CommonIndex
             if (!empty($result)) {
                 if ($result['message'] == '提交成功') {
                     $report_msg_id = $result['data']['templateId'];
-                    $had_report = DbAdministrator::getUserMultimediaTemplateThirdReport(['channel_id' => $channel_id, 'template_id' => $template_id], 'id', true);
-                    if (!empty($had_report)) {
-                        return ['code' => '3007', 'msg' => '该模板已在该通道报备过'];
-                    }
                     $report_data = [];
                     $report_data = [
                         'channel_id' => $channel_id,
@@ -1116,10 +1112,7 @@ class Administrator extends CommonIndex
                 $result = json_decode($result, true);
                 if ($result['msg'] == '成功') {
                     $report_msg_id = $result['data']['mms_id'];
-                    $had_report = DbAdministrator::getUserMultimediaTemplateThirdReport(['channel_id' => $channel_id, 'template_id' => $template_id], 'id', true);
-                    if (!empty($had_report)) {
-                        return ['code' => '3007', 'msg' => '该模板已在该通道报备过'];
-                    }
+
                     $report_data = [];
                     $report_data = [
                         'channel_id' => $channel_id,
