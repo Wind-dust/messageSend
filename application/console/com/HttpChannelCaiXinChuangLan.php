@@ -260,7 +260,6 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                 $res = sendRequest($user_info['send_api'], 'post', $real_send);
                                 $result = json_decode($res, true);
                                 // $result['code'] = 2;
-                                print_r($result);
                                 if ($result['code'] == 1) { //提交成功
                                     unset($roallback[$send_taskid]);
                                 } else {
@@ -317,7 +316,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                         ];
                         $res = sendRequest($user_info['send_api'], 'post', $real_send);
                         $result = json_decode($res, true);
-                        print_r($result);
+                        // print_r($result);
                         // $result['code'] = 2;
                         if ($result['code'] == 1) {
                             unset($roallback[$send_taskid]);
