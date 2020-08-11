@@ -103,7 +103,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
         'content' =>'【鼎业装饰】鼎礼相祝！跨年巨惠！定单送欧派智能晾衣架一套。选欧派产品可秒杀欧派智能马桶999元一个。终极预存大礼，来店给你个超大的惊喜！！！大到超乎您想象！一年只有这一次！电话3236788回T退订',
         ])); */
         try {
-            ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; GreenBrowser)');
+            ini_set('user_agent', 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; GreenBrowser)');
             while (true) {
                 $send_task    = [];
                 $send_num     = [];
@@ -112,11 +112,11 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                 $receive_id   = [];
                 $image_data = [];
                 $roallback = [];
-                
+
                 // if (date('H') >= 18 || date('H') < 8) {
                 //     exit("8点前,18点后通道关闭");
                 // }
-    
+
                 do {
                     $send = $redis->lPop($redisMessageCodeSend);
                     // $redis->rpush($redisMessageCodeSend, $send);
@@ -139,11 +139,11 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                     $frame['content'] = base64_encode($value['content']);
                                     $real_send_content[] = $frame;
                                 }
-    
+
                                 if (!empty($value['image_path'])) {
                                     $frame = [];
                                     $type = explode('.', $value['image_path']);
-    
+
                                     $frame['frame'] = $value['num'];
                                     $frame['part'] = 1;
                                     if ($type[1] == 'jpg') {
@@ -168,12 +168,10 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                     $md5 = md5(Config::get('qiniu.domain') . '/' . $value['image_path']);
                                     if (isset($image_data[$md5])) {
                                         $frame['content'] = $image_data[$md5];
-                            
-                                    }else{
+                                    } else {
                                         $imagebase = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                         $image_data[$md5] = $imagebase;
-                                        $frame['content'] =$imagebase;
-                                       
+                                        $frame['content'] = $imagebase;
                                     }
                                     // $frame['content'] = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                     $real_send_content[] = $frame;
@@ -199,7 +197,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                 $frame = [];
                                 if (!empty($value['image_path'])) {
                                     $type = explode('.', $value['image_path']);
-    
+
                                     $frame['frame'] = $value['num'];
                                     $frame['part'] = 1;
                                     if ($type[1] == 'jpg') {
@@ -224,12 +222,10 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                     $md5 = md5(Config::get('qiniu.domain') . '/' . $value['image_path']);
                                     if (isset($image_data[$md5])) {
                                         $frame['content'] = $image_data[$md5];
-                            
-                                    }else{
+                                    } else {
                                         $imagebase = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                         $image_data[$md5] = $imagebase;
-                                        $frame['content'] =$imagebase;
-                                       
+                                        $frame['content'] = $imagebase;
                                     }
                                     // $frame['content'] = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                                     $real_send_content[] = $frame;
@@ -260,10 +256,11 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                     'ext_id'   => $send_taskid,
                                     'sign'   => $sign,
                                 ];
-    
+
                                 $res = sendRequest($user_info['send_api'], 'post', $real_send);
                                 $result = json_decode($res, true);
                                 // $result['code'] = 2;
+                                print_r($result);
                                 if ($result['code'] == 1) { //提交成功
                                     unset($roallback[$send_taskid]);
                                 } else {
@@ -291,7 +288,6 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                                 usleep(12500);
                             }
                         }
-                        
                     }
                 } while ($send);
                 //剩下的号码再做提交
@@ -321,7 +317,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                         ];
                         $res = sendRequest($user_info['send_api'], 'post', $real_send);
                         $result = json_decode($res, true);
-                        // // print_r($result);
+                        print_r($result);
                         // $result['code'] = 2;
                         if ($result['code'] == 1) {
                             unset($roallback[$send_taskid]);
@@ -339,7 +335,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                             exit(); //关闭通道
                         }
                         // // print_r($res);
-    
+
                         // $result = explode(',', $res);
                         // if ($result['returnstatus'] == 'Success') { //成功
                         //     $receive_id[$result['taskID']] = $send_taskid;
@@ -356,10 +352,10 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                 // ];
                 // // print_r($receive_id);
                 // die;
-    
+
                 // // print_r($receive_data);die;
                 sleep(10);
-    
+
                 unset($send_num);
                 unset($send_content);
                 unset($receive_id);
@@ -384,7 +380,6 @@ class HttpChannelCaiXinChuangLan extends Pzlife
             ])); //三体营销通道
 
         }
-        
     }
 
     public function getSendTask($id)
