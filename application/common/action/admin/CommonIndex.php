@@ -12,6 +12,9 @@ class CommonIndex {
     protected $redisCmsConIdTime;
     protected $redisCmsConIdUid;
     protected $redisAccessToken;
+    protected $redisConIdTime; //conId到期时间的zadd
+    protected $redisConIdUid; //conId和uid的hSet
+
     /**
      * user模块
      */
@@ -22,8 +25,11 @@ class CommonIndex {
         $this->redisCmsConIdTime = Config::get('rediskey.user.redisCmsConIdTime');
         $this->redisCmsConIdUid  = Config::get('rediskey.user.redisCmsConIdUid');
         $this->redisAccessToken  = Config::get('redisKey.weixin.redisAccessToken');
+        $this->redisConIdTime   = Config::get('rediskey.user.redisConIdTime');
+        $this->redisConIdUid    = Config::get('rediskey.user.redisConIdUid');
 
     }
+   
 
     /**
      * 判断是否登录

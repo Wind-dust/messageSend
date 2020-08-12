@@ -1420,7 +1420,7 @@ class Administrator extends CommonIndex
     }
 
     //账户归属:1,中国移动;2,中国联通;3,中国电信;4,三网通;5,移动联通;6,移动电信;7,联通电信
-    public function setUserAccountForCmppsetUserAccountForCmpp($pid, $cmpp_name, $yidong_channel_id = 0, $liantong_channel_id = 0, $dianxin_channel_id = 0, $account_host)
+    public function setUserAccountForCmpp($pid, $cmpp_name, $account_host)
     {
 
         $user = DbUser::getUserInfo(['id' => $pid], 'id,nick_name', true);
@@ -1431,7 +1431,7 @@ class Administrator extends CommonIndex
         // if (!empty($cmpp_account)) {
         //     return ['code' => '3007', 'msg' => '命名重复'];
         // }
-        if (!empty($yidong_channel_id)) {
+       /*  if (!empty($yidong_channel_id)) {
             $yd_channel = DbAdministrator::getSmsSendingChannel(['id' => $yidong_channel_id], '*', true);
             if (empty($yd_channel)) {
                 return ['code' => '3008', 'msg' => '该通道不存在'];
@@ -1457,11 +1457,11 @@ class Administrator extends CommonIndex
             if (!in_array($dx_channel['channel_source'], [3, 4, 6, 7])) {
                 return ['code' => '3011', 'msg' => '分配的通道不支持电信号段'];
             }
-        }
+        } */
         do {
             $nick_name = "C" . mt_rand(10000, 99999);
             $cmpp_user = DbUser::getUserInfo(['nick_name' => $nick_name], 'id', true);
-        } while (!$cmpp_user);
+        } while ($cmpp_user);
         $data = [];
         $data = [
             'pid' => $pid,
