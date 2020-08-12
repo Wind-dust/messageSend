@@ -280,7 +280,7 @@ class Administrator extends CommonIndex
     }
 
     // distributeUserChannel(intval($yidong_channel_id), intval($liantong_channel_id),intval($dianxin_channel_id),intval($business_id), strval($nick_name))
-    public function distributeUserChannel($yidong_channel_id, $liantong_channel_id,$dianxin_channel_id, $business_id, $nick_name)
+    public function distributeUserChannel($yidong_channel_id, $liantong_channel_id, $dianxin_channel_id, $business_id, $nick_name)
     {
         $yd_channel = DbAdministrator::getSmsSendingChannel(['id' => $yidong_channel_id, 'business_id' => $business_id], 'id', true);
         if (empty($yd_channel)) {
@@ -298,7 +298,7 @@ class Administrator extends CommonIndex
         if (empty($user)) {
             return ['code' => '3004'];
         }
-        
+
         if (DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => $business_id], 'id', true)) {
             return ['code' => '3005'];
         }
@@ -322,7 +322,7 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function updateUserChannel($id, $yidong_channel_id, $liantong_channel_id,$dianxin_channel_id)
+    public function updateUserChannel($id, $yidong_channel_id, $liantong_channel_id, $dianxin_channel_id)
     {
         $userchannel = DbAdministrator::getUserChannel(['id' => $id], 'id', true);
         if (empty($userchannel)) {
@@ -330,7 +330,7 @@ class Administrator extends CommonIndex
         }
         Db::startTrans();
         try {
-            DbAdministrator::editUserChannel(['yidong_channel_id' => $yidong_channel_id,'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id], $id);
+            DbAdministrator::editUserChannel(['yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id], $id);
             Db::commit();
             return ['code' => '200'];
         } catch (\Exception $e) {
@@ -339,19 +339,20 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function getUserChannel($uid = 0, $nick_name = '', $business_id = 0, $page, $pageNum){
+    public function getUserChannel($uid = 0, $nick_name = '', $business_id = 0, $page, $pageNum)
+    {
         $offset = ($page - 1) * $pageNum;
         $where = [];
         if (!empty($uid)) {
-            array_push($where,['uid' , '=', $uid]);
+            array_push($where, ['uid', '=', $uid]);
         }
         if (!empty($nick_name)) {
-            array_push($where, ['nick_name' , 'like', '%'.$nick_name.'%']);
+            array_push($where, ['nick_name', 'like', '%' . $nick_name . '%']);
         }
         if (!empty($business_id)) {
-            array_push($where,['business_id' , '=', $business_id]);
+            array_push($where, ['business_id', '=', $business_id]);
         }
-        $result = DbAdministrator::getUserChannel($where, '*', false, '', $offset.','.$pageNum);
+        $result = DbAdministrator::getUserChannel($where, '*', false, '', $offset . ',' . $pageNum);
         $total = DbAdministrator::countUserChannel($where);
         return ['code' => 200, 'total' => $total, 'user_channel' => $result];
     }
@@ -375,19 +376,19 @@ class Administrator extends CommonIndex
 
     public function getUserSendTask($page, $pageNum, $id, $free_trial = 0, $send_status = 0, $uid = 0)
     {
-        $time = strtotime('-4 days',time());
+        $time = strtotime('-4 days', time());
         // echo $time;die;
         $where = [];
-        array_push($where,['create_time','>=',$time]);
+        array_push($where, ['create_time', '>=', $time]);
         $offset = ($page - 1) * $pageNum;
         if ($free_trial) {
-            array_push($where,['free_trial','=',$free_trial]);
+            array_push($where, ['free_trial', '=', $free_trial]);
         }
         if ($send_status) {
-            array_push($where,['send_status','=',$send_status]);
+            array_push($where, ['send_status', '=', $send_status]);
         }
         if ($uid) {
-            array_push($where,['uid','=',$uid]);
+            array_push($where, ['uid', '=', $uid]);
         }
         if (!empty($id)) {
             $result = DbAdministrator::getUserSendTask(['id' => $id], '*', true);
@@ -431,10 +432,10 @@ class Administrator extends CommonIndex
             } else {
                 $billing[$value['uid']] = $value['real_num'];
             }
-            $mobiles = explode(',',$value['mobile_content']);
+            $mobiles = explode(',', $value['mobile_content']);
             if ($free_trial == 3) {
                 foreach ($mobiles as $mkey => $mvalue) {
-                    $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"INTERCEPT","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $mvalue]));
+                    $res = $this->redis->rpush("index:meassage:code:user:mulreceive:" . $value['uid'], json_encode(['task_no' => $value['task_no'], 'msg_id' => $value['send_msg_id'], "status_message" => "INTERCEPT", "message_info" => "驳回", "send_time" => date("Y-m-d H:i:s", time()), 'mobile' => $mvalue]));
                 }
             }
         }
@@ -549,9 +550,9 @@ class Administrator extends CommonIndex
             foreach ($real_usertask as $real => $usertask) {
                 // $res = $this->redis->rpush("index:meassage:marketing:sendtask",$usertask['id']); 
                 if (isset($usertask['appointment_time']) && $usertask['appointment_time'] > 0) {
-                    $res = $this->redis->rpush("index:meassage:marketingtiming:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => $usertask['appointment_time'],'deduct' => $user['market_deduct']])); //定时
+                    $res = $this->redis->rpush("index:meassage:marketingtiming:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => $usertask['appointment_time'], 'deduct' => $user['market_deduct']])); //定时
                 } else {
-                    $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => 0,'deduct' => $user['market_deduct']])); //非定时
+                    $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => 0, 'deduct' => $user['market_deduct']])); //非定时
                 }
                 // marketing
             }
@@ -623,22 +624,22 @@ class Administrator extends CommonIndex
 
     public function getUserSendCodeTask($page, $pageNum, $id, $free_trial = 0, $channel_id = 0, $send_status, $uid = 0)
     {
-        $time = strtotime('-4 days',time());
+        $time = strtotime('-4 days', time());
         // echo $time;die;
         $where = [];
-        array_push($where,['create_time','>=',$time]);
+        array_push($where, ['create_time', '>=', $time]);
         $offset = ($page - 1) * $pageNum;
         if ($free_trial) {
-            array_push($where,['free_trial','=',$free_trial]);
+            array_push($where, ['free_trial', '=', $free_trial]);
         }
         if ($channel_id == 0) {
-            array_push($where,['yidong_channel_id','=',0]);
+            array_push($where, ['yidong_channel_id', '=', 0]);
         }
         if ($send_status) {
-            array_push($where,['send_status','=',$send_status]);
+            array_push($where, ['send_status', '=', $send_status]);
         }
         if ($uid) {
-            array_push($where,['uid','=',$uid]);
+            array_push($where, ['uid', '=', $uid]);
         }
         $offset = ($page - 1) * $pageNum;
         if (!empty($id)) {
@@ -685,13 +686,12 @@ class Administrator extends CommonIndex
             } else {
                 $billing[$value['uid']] = $value['real_num'];
             }
-            $mobiles = explode(',',$value['mobile_content']);
+            $mobiles = explode(',', $value['mobile_content']);
             if ($free_trial == 3) {
                 foreach ($mobiles as $mkey => $mvalue) {
-                    $res = $this->redis->rpush("index:meassage:code:user:mulreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"INTERCEPT","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $mvalue]));
+                    $res = $this->redis->rpush("index:meassage:code:user:mulreceive:" . $value['uid'], json_encode(['task_no' => $value['task_no'], 'msg_id' => $value['send_msg_id'], "status_message" => "INTERCEPT", "message_info" => "驳回", "send_time" => date("Y-m-d H:i:s", time()), 'mobile' => $mvalue]));
                 }
             }
-            
         }
         if (empty($real_effective_id)) {
             return ['code' => '3002', 'msg' => '没有需要审核的任务'];
@@ -793,7 +793,7 @@ class Administrator extends CommonIndex
 
             // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
             foreach ($real_usertask as $key => $value) {
-                DbAdministrator::editUserSendCodeTask(['free_trial' => $free_trial,  'yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id,'send_status' =>2], $value['id']);
+                DbAdministrator::editUserSendCodeTask(['free_trial' => $free_trial,  'yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id, 'send_status' => 2], $value['id']);
             }
             foreach ($real_usertask as $real => $usertask) {
                 $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $usertask['id'], 'deduct' => $user['business_deduct']]));
@@ -827,6 +827,10 @@ class Administrator extends CommonIndex
         }
         if ($channel['business_id'] != 8) {
             return ['code' => '3004', '非彩信通道不能使用此接口'];
+        }
+        $had_report = DbAdministrator::getUserMultimediaTemplateThirdReport(['channel_id' => $channel_id, 'template_id' => $template_id], 'id', true);
+        if (!empty($had_report)) {
+            return ['code' => '3007', 'msg' => '该模板已在该通道报备过'];
         }
         //创蓝
         if ($channel_id == 63) {
@@ -864,9 +868,9 @@ class Administrator extends CommonIndex
             $result = sendRequest($report_api, 'post', $data);
             print_r($result);
             die;
-        }elseif ($channel_id == 104){//联麓彩信批量通道
+        } elseif ($channel_id == 104) { //联麓彩信批量通道
             if ($model_val == 1) {
-                return ['code' => '3005','msg' => '该通道不支持模板变量报备'];
+                return ['code' => '3005', 'msg' => '该通道不支持模板变量报备'];
             }
             $appid = '350304';
             $timestamp = time();
@@ -875,13 +879,13 @@ class Administrator extends CommonIndex
             //在经过处理得到最终结果:
             $lastTime = (int)($time * 1000);
             $appkey = '50e075b4883e49d69c4d08a5b210537d';
-            $sign = md5($appkey.$appid.$lastTime.$appkey);
-            $report_api = 'http://47.110.199.86:8081/api/v2/mms/create?timestamp='.$lastTime.'&appid='.$appid.'&sign='.$sign;
+            $sign = md5($appkey . $appid . $lastTime . $appkey);
+            $report_api = 'http://47.110.199.86:8081/api/v2/mms/create?timestamp=' . $lastTime . '&appid=' . $appid . '&sign=' . $sign;
             $data = [];
             $data['mms_title'] = $template['title'];
             $data['mms_type'] = 'multipart/mixed';
             $data['mmstemplate'] = 1;
-            
+
             // print_r($multimedia_message_frame);die;
             $mmsbody = [];
             foreach ($multimedia_message_frame as $key => $value) {
@@ -897,13 +901,13 @@ class Administrator extends CommonIndex
                 $content_data = [];
                 if (!empty($value['image_path'])) {
 
-                    $value['image_path']=filtraImage(Config::get('qiniu.domain'), $value['image_path']);
+                    $value['image_path'] = filtraImage(Config::get('qiniu.domain'), $value['image_path']);
                     $type = explode('.', $value['image_path']);
 
-                   
+
                     $content_data = [
                         'content_data' => base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path'])),
-                        'content_type' => 'image/'.$type[1],
+                        'content_type' => 'image/' . $type[1],
                     ];
                     $mmsbody[] = $content_data;
                 }
@@ -913,22 +917,18 @@ class Administrator extends CommonIndex
             $headers = [
                 'Content-Type:text/plain'
             ];
-            $result = $this->sendRequest2($report_api,'post',$data,$headers);
+            $result = $this->sendRequest2($report_api, 'post', $data, $headers);
             // $result = '{"msg":"成功","code":"T","data":{"mms_id":"60226","status":"R"}}';
-           
+
             if (!empty($result)) {
-                $result = json_decode($result,true);
+                $result = json_decode($result, true);
                 if ($result['msg'] == '成功') {
                     $report_msg_id = $result['data']['mms_id'];
-                    $had_report = DbAdministrator::getUserMultimediaTemplateThirdReport(['channel_id'=> $channel_id,'template_id' => $template_id],'id',true);
-                    if (!empty($had_report)) {
-                        return ['code' => '3007','msg' => '该模板已在该通道报备过'];
-                    }
                     $report_data = [];
                     $report_data = [
-                        'channel_id'=> $channel_id,
-                        'template_id'=> $template_id,
-                        'third_template_id'=> $report_msg_id,
+                        'channel_id' => $channel_id,
+                        'template_id' => $template_id,
+                        'third_template_id' => $report_msg_id,
                     ];
                     Db::startTrans();
                     try {
@@ -941,14 +941,14 @@ class Administrator extends CommonIndex
                         return ['code' => '3009']; //修改失败
                     }
                 }
-                return ['code' => '3006','msg' => '该通道报备失败'];
-            }else{
-                return ['code' => '3006','msg' => '该通道报备失败'];
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
+            } else {
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
             }
-        }elseif ($channel_id == 103) {
+        } elseif ($channel_id == 103) {
             $report_api = 'http://caixin.253.com/open/saveTemplate';
             $data = [];
-           
+
             $msg = [];
             foreach ($multimedia_message_frame as $key => $value) {
                 $frame = [];
@@ -958,23 +958,23 @@ class Administrator extends CommonIndex
                     $frame['type'] = 1;
                     // $frame['content'] = $value['content'];
                     // if (strpos($value['content'],'{{}}')) {}
-                    $value['content'] = str_replace('{{var1}}','{s1}',$value['content']);
-                    $value['content'] = str_replace('{{var2}}','{s2}',$value['content']);
-                    $value['content'] = str_replace('{{var3}}','{s3}',$value['content']);
-                    $value['content'] = str_replace('{{var4}}','{s4}',$value['content']);
-                    $value['content'] = str_replace('{{var5}}','{s5}',$value['content']);
-                    $value['content'] = str_replace('{{var6}}','{s6}',$value['content']);
-                    $value['content'] = str_replace('{{var7}}','{s7}',$value['content']);
-                    $value['content'] = str_replace('{{var8}}','{s8}',$value['content']);
-                    $value['content'] = str_replace('{{var9}}','{s9}',$value['content']);
-                    $value['content'] = str_replace('{{var10}}','{s10}',$value['content']);
+                    $value['content'] = str_replace('{{var1}}', '{s1}', $value['content']);
+                    $value['content'] = str_replace('{{var2}}', '{s2}', $value['content']);
+                    $value['content'] = str_replace('{{var3}}', '{s3}', $value['content']);
+                    $value['content'] = str_replace('{{var4}}', '{s4}', $value['content']);
+                    $value['content'] = str_replace('{{var5}}', '{s5}', $value['content']);
+                    $value['content'] = str_replace('{{var6}}', '{s6}', $value['content']);
+                    $value['content'] = str_replace('{{var7}}', '{s7}', $value['content']);
+                    $value['content'] = str_replace('{{var8}}', '{s8}', $value['content']);
+                    $value['content'] = str_replace('{{var9}}', '{s9}', $value['content']);
+                    $value['content'] = str_replace('{{var10}}', '{s10}', $value['content']);
                     $frame['content'] = base64_encode($value['content']);
                     $msg[] = $frame;
                 }
 
                 if (!empty($value['image_path'])) {
                     $frame = [];
-                    $value['image_path']=filtraImage(Config::get('qiniu.domain'), $value['image_path']);
+                    $value['image_path'] = filtraImage(Config::get('qiniu.domain'), $value['image_path']);
                     $type = explode('.', $value['image_path']);
 
                     $frame['frame'] = $value['num'];
@@ -999,7 +999,7 @@ class Administrator extends CommonIndex
                         $frame['type'] = 7;
                     }
                     $imagebase = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
-                    $frame['content'] =$imagebase;
+                    $frame['content'] = $imagebase;
                     // $frame['content'] = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
                     $msg[] = $frame;
                 }
@@ -1012,8 +1012,8 @@ class Administrator extends CommonIndex
             $key = 'OdJugXUcv99bca';
             $data['title'] = $template['title'];
             // $sign = "account=" . $data['account']  . "msg=".$msg."notifyUrl=".$notifyUrl."remark=".$remark. "timestamp=" . $timestamp . "title=" .$data['title']. "key=" . $data['key'];
-            $sign = "account=" . $data['account']  . "msg=".$msg."remark=".$remark. "timestamp=" . $timestamp . "title=" .$data['title'];
-            $sign = hash_hmac('sha256',$sign,$key);
+            $sign = "account=" . $data['account']  . "msg=" . $msg . "remark=" . $remark . "timestamp=" . $timestamp . "title=" . $data['title'];
+            $sign = hash_hmac('sha256', $sign, $key);
             // print_r($sign);die;
             $data['msg'] = $msg;
             // $data['notifyUrl'] = $notifyUrl;
@@ -1025,15 +1025,11 @@ class Administrator extends CommonIndex
             if (!empty($result)) {
                 if ($result['message'] == '提交成功') {
                     $report_msg_id = $result['data']['templateId'];
-                    $had_report = DbAdministrator::getUserMultimediaTemplateThirdReport(['channel_id'=> $channel_id,'template_id' => $template_id],'id',true);
-                    if (!empty($had_report)) {
-                        return ['code' => '3007','msg' => '该模板已在该通道报备过'];
-                    }
                     $report_data = [];
                     $report_data = [
-                        'channel_id'=> $channel_id,
-                        'template_id'=> $template_id,
-                        'third_template_id'=> $report_msg_id,
+                        'channel_id' => $channel_id,
+                        'template_id' => $template_id,
+                        'third_template_id' => $report_msg_id,
                     ];
                     Db::startTrans();
                     try {
@@ -1046,47 +1042,46 @@ class Administrator extends CommonIndex
                         return ['code' => '3009']; //修改失败
                     }
                 }
-                return ['code' => '3006','msg' => '该通道报备失败'];
-            }else{
-                return ['code' => '3006','msg' => '该通道报备失败'];
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
+            } else {
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
             }
-            
-        }elseif ($channel_id == 122) {
-            
+        } elseif ($channel_id == 122) {
+
             $appid = '350171'; //appid由企业彩信平台提供 是
             $appkey = 'bac3a3c6ea6649f68ba1389d5f688aa9';
             // $timestamp =  //时间戳访问接口时间 单位：毫秒 是
-           
+
             $timestamp = time();
             $time = microtime(true);
             //结果：1541053888.5911
             //在经过处理得到最终结果:
             $lastTime = (int)($time * 1000);
-            $sign = md5($appkey.$appid.$lastTime.$appkey);//数字签名参考sign生成规则 是
-            $report_api = 'http://47.110.195.237:8081/api/v2/mms/create?timestamp='.$lastTime.'&appid='.$appid.'&sign='.$sign.'&mmstemplate=1';
+            $sign = md5($appkey . $appid . $lastTime . $appkey); //数字签名参考sign生成规则 是
+            $report_api = 'http://47.110.195.237:8081/api/v2/mms/create?timestamp=' . $lastTime . '&appid=' . $appid . '&sign=' . $sign . '&mmstemplate=1';
             $data = [];
             $data['mms_title'] = $template['title'];
             $data['mms_type'] = 'multipart/mixed';
             $data['mmstemplate'] = 1;
-            
+
             // print_r($multimedia_message_frame);die;
             $mmsbody = [];
             foreach ($multimedia_message_frame as $key => $value) {
                 # code...
                 $content_data = [];
                 if (!empty($value['content'])) {
-                    $value['content'] = str_replace('{{var1}}','{1}',$value['content']);
-                    $value['content'] = str_replace('{{var2}}','{2}',$value['content']);
-                    $value['content'] = str_replace('{{var3}}','{3}',$value['content']);
-                    $value['content'] = str_replace('{{var4}}','{4}',$value['content']);
-                    $value['content'] = str_replace('{{var5}}','{5}',$value['content']);
-                    $value['content'] = str_replace('{{var6}}','{6}',$value['content']);
-                    $value['content'] = str_replace('{{var7}}','{7}',$value['content']);
-                    $value['content'] = str_replace('{{var8}}','{8}',$value['content']);
-                    $value['content'] = str_replace('{{var9}}','{9}',$value['content']);
-                    $value['content'] = str_replace('{{var10}}','{10}',$value['content']);
+                    $value['content'] = str_replace('{{var1}}', '{1}', $value['content']);
+                    $value['content'] = str_replace('{{var2}}', '{2}', $value['content']);
+                    $value['content'] = str_replace('{{var3}}', '{3}', $value['content']);
+                    $value['content'] = str_replace('{{var4}}', '{4}', $value['content']);
+                    $value['content'] = str_replace('{{var5}}', '{5}', $value['content']);
+                    $value['content'] = str_replace('{{var6}}', '{6}', $value['content']);
+                    $value['content'] = str_replace('{{var7}}', '{7}', $value['content']);
+                    $value['content'] = str_replace('{{var8}}', '{8}', $value['content']);
+                    $value['content'] = str_replace('{{var9}}', '{9}', $value['content']);
+                    $value['content'] = str_replace('{{var10}}', '{10}', $value['content']);
                     $content_data = [
-                        'content_data' => $value['content'],
+                        'content_data' => trim($value['content']),
                         'content_type' => 'text/plain',
                     ];
                     $mmsbody[] = $content_data;
@@ -1094,13 +1089,13 @@ class Administrator extends CommonIndex
                 $content_data = [];
                 if (!empty($value['image_path'])) {
 
-                    $value['image_path']=filtraImage(Config::get('qiniu.domain'), $value['image_path']);
+                    $value['image_path'] = filtraImage(Config::get('qiniu.domain'), $value['image_path']);
                     $type = explode('.', $value['image_path']);
 
-                   
+
                     $content_data = [
                         'content_data' => base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path'])),
-                        'content_type' => 'image/'.$type[1],
+                        'content_type' => 'image/' . $type[1],
                     ];
                     $mmsbody[] = $content_data;
                 }
@@ -1110,22 +1105,19 @@ class Administrator extends CommonIndex
             $headers = [
                 'Content-Type:text/plain'
             ];
-            $result = $this->sendRequest2($report_api,'post',$data,$headers);
+            $result = $this->sendRequest2($report_api, 'post', $data, $headers);
             // $result = '{"msg":"成功","code":"T","data":{"mms_id":"60226","status":"R"}}';
-           
+
             if (!empty($result)) {
-                $result = json_decode($result,true);
+                $result = json_decode($result, true);
                 if ($result['msg'] == '成功') {
                     $report_msg_id = $result['data']['mms_id'];
-                    $had_report = DbAdministrator::getUserMultimediaTemplateThirdReport(['channel_id'=> $channel_id,'template_id' => $template_id],'id',true);
-                    if (!empty($had_report)) {
-                        return ['code' => '3007','msg' => '该模板已在该通道报备过'];
-                    }
+
                     $report_data = [];
                     $report_data = [
-                        'channel_id'=> $channel_id,
-                        'template_id'=> $template_id,
-                        'third_template_id'=> $report_msg_id,
+                        'channel_id' => $channel_id,
+                        'template_id' => $template_id,
+                        'third_template_id' => $report_msg_id,
                     ];
                     Db::startTrans();
                     try {
@@ -1138,9 +1130,9 @@ class Administrator extends CommonIndex
                         return ['code' => '3009']; //修改失败
                     }
                 }
-                return ['code' => '3006','msg' => '该通道报备失败'];
-            }else{
-                return ['code' => '3006','msg' => '该通道报备失败'];
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
+            } else {
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
             }
         }
     }
@@ -1166,13 +1158,14 @@ class Administrator extends CommonIndex
         // 38gHTjrzh
     }
 
-    public function addDeductWord($business_id, $uid = 0, $word){
+    public function addDeductWord($business_id, $uid = 0, $word)
+    {
         if (!empty($uid)) {
             $user =  DbUser::getUserInfo(['id' => $uid], 'id,reservation_service,user_status,business_deduct', true);
             if (empty($user)) {
                 return ['code' => '3003', 'msg' => '该用户不存在'];
             }
-            $word = DbAdministrator::getUserDeductWord(['word' => $word, 'business_id' => $business_id],'*',true);
+            $word = DbAdministrator::getUserDeductWord(['word' => $word, 'business_id' => $business_id], '*', true);
             if (!empty($word)) {
                 if ($word['uid'] == $uid) {
                     return ['code' => '3004', 'msg' => '该用户已设置敏感词'];
@@ -1200,27 +1193,28 @@ class Administrator extends CommonIndex
                 exception($e);
                 return ['code' => '3009']; //修改失败
             }
-
         }
     }
 
-    public function getDeductWord($business_id, $page, $pageNum){
+    public function getDeductWord($business_id, $page, $pageNum)
+    {
         $offset = ($page - 1) * $pageNum;
-        $result = DbAdministrator::getUserDeductWord(['business_id' => $business_id],'*',false,'',$page.','.$offset);
+        $result = DbAdministrator::getUserDeductWord(['business_id' => $business_id], '*', false, '', $page . ',' . $offset);
         $total = DbAdministrator::countUserDeductWord(['business_id' => $business_id]);
-        return ['code' => '200', 'total' => $total,'result' => $result];
+        return ['code' => '200', 'total' => $total, 'result' => $result];
     }
 
-    public function updateDeductWord($id,$business_id, $uid, $word){
-        $word = DbAdministrator::getUserDeductWord(['id' => $id],'*',true);
-            if (empty($word)) {
-               return ['code' => '3003','msg' => '该记录不存在'];
-            }
-            $data = [];
-          if ($business_id) {
-              $data['business_id'] = $business_id;
-          }
-          if ($uid) {
+    public function updateDeductWord($id, $business_id, $uid, $word)
+    {
+        $word = DbAdministrator::getUserDeductWord(['id' => $id], '*', true);
+        if (empty($word)) {
+            return ['code' => '3003', 'msg' => '该记录不存在'];
+        }
+        $data = [];
+        if ($business_id) {
+            $data['business_id'] = $business_id;
+        }
+        if ($uid) {
             $data['uid'] = $uid;
         }
         if ($word) {
@@ -1230,7 +1224,7 @@ class Administrator extends CommonIndex
             Db::startTrans();
             try {
                 // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
-                DbAdministrator::editUserDeductWord($data,$id);
+                DbAdministrator::editUserDeductWord($data, $id);
                 Db::commit();
                 return ['code' => '200'];
             } catch (\Exception $e) {
@@ -1239,10 +1233,10 @@ class Administrator extends CommonIndex
                 return ['code' => '3009']; //修改失败
             }
         }
-        return ['code' => '3004','msg' =>'没有需要修改的类目'];
+        return ['code' => '3004', 'msg' => '没有需要修改的类目'];
     }
 
-    function sendRequest2($requestUrl, $method = 'get', $data = [],$headers)
+    function sendRequest2($requestUrl, $method = 'get', $data = [], $headers)
     {
         $methonArr = ['get', 'post'];
         if (!in_array(strtolower($method), $methonArr)) {
@@ -1273,9 +1267,10 @@ class Administrator extends CommonIndex
         return $res; // 显示获得的数据
     }
 
-    public function addSmsSendingChannel($title,$channel_type, $channel_host, $channel_port = '',$channel_source,$business_id, $channel_price = 0, $channel_postway = 1, $channel_source_addr, $channel_shared_secret, $channel_service_id, $channel_template_id = '', $channel_dest_id = '', $channel_flow_velocity = 0){
-        if (DbAdministrator::getSmsSendingChannel(['title' => $title],'id',true)) {
-            return ['code' => '3008','名称重复，请另外命名'];
+    public function addSmsSendingChannel($title, $channel_type, $channel_host, $channel_port = '', $channel_source, $business_id, $channel_price = 0, $channel_postway = 1, $channel_source_addr, $channel_shared_secret, $channel_service_id, $channel_template_id = '', $channel_dest_id = '', $channel_flow_velocity = 0)
+    {
+        if (DbAdministrator::getSmsSendingChannel(['title' => $title], 'id', true)) {
+            return ['code' => '3008', '名称重复，请另外命名'];
         }
         $data = [];
         $data = [
@@ -1294,7 +1289,7 @@ class Administrator extends CommonIndex
             'channel_dest_id' => $channel_dest_id,
             'channel_flow_velocity' => $channel_flow_velocity,
         ];
-        
+
         Db::startTrans();
         try {
             // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
@@ -1308,57 +1303,59 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function getSmsSendingChannel($title = '',$channel_type = 0, $channel_host = '', $channel_port = '',$channel_source = 0,$business_id = 0, $channel_price = 0, $channel_postway = 0, $channel_source_addr = '', $channel_shared_secret = '', $channel_service_id = '', $channel_template_id = '', $channel_dest_id = '', $channel_flow_velocity = 0, $page, $pageNum){
+    public function getSmsSendingChannel($title = '', $channel_type = 0, $channel_host = '', $channel_port = '', $channel_source = 0, $business_id = 0, $channel_price = 0, $channel_postway = 0, $channel_source_addr = '', $channel_shared_secret = '', $channel_service_id = '', $channel_template_id = '', $channel_dest_id = '', $channel_flow_velocity = 0, $page, $pageNum)
+    {
         $where = [];
         if (!empty($title)) {
-            array_push($where,['title','like','%'.$title.'%']);
+            array_push($where, ['title', 'like', '%' . $title . '%']);
         }
         if (!empty($channel_type)) {
-            array_push($where,['channel_type','=',$channel_type]);
+            array_push($where, ['channel_type', '=', $channel_type]);
         }
         if (!empty($channel_host)) {
-            array_push($where,['channel_host','=',$channel_host]);
+            array_push($where, ['channel_host', '=', $channel_host]);
         }
         if (!empty($channel_port)) {
-            array_push($where,['channel_port','=',$channel_port]);
+            array_push($where, ['channel_port', '=', $channel_port]);
         }
         if (!empty($channel_source)) {
-            array_push($where,['channel_source','=',$channel_source]);
+            array_push($where, ['channel_source', '=', $channel_source]);
         }
         if (!empty($business_id)) {
-            array_push($where,['business_id','=',$business_id]);
+            array_push($where, ['business_id', '=', $business_id]);
         }
         if (!empty($channel_price)) {
-            array_push($where,['channel_price','=',$channel_price]);
+            array_push($where, ['channel_price', '=', $channel_price]);
         }
         if (!empty($channel_postway)) {
-            array_push($where,['channel_postway','=',$channel_postway]);
+            array_push($where, ['channel_postway', '=', $channel_postway]);
         }
         if (!empty($channel_source_addr)) {
-            array_push($where,['channel_source_addr','=',$channel_source_addr]);
+            array_push($where, ['channel_source_addr', '=', $channel_source_addr]);
         }
         if (!empty($channel_shared_secret)) {
-            array_push($where,['channel_shared_secret','=',$channel_shared_secret]);
+            array_push($where, ['channel_shared_secret', '=', $channel_shared_secret]);
         }
         if (!empty($channel_service_id)) {
-            array_push($where,['channel_service_id','=',$channel_service_id]);
+            array_push($where, ['channel_service_id', '=', $channel_service_id]);
         }
         if (!empty($channel_template_id)) {
-            array_push($where,['channel_template_id','=',$channel_template_id]);
+            array_push($where, ['channel_template_id', '=', $channel_template_id]);
         }
         if (!empty($channel_dest_id)) {
-            array_push($where,['channel_dest_id','=',$channel_dest_id]);
+            array_push($where, ['channel_dest_id', '=', $channel_dest_id]);
         }
         if (!empty($channel_flow_velocity)) {
-            array_push($where,['channel_flow_velocity','=',$channel_flow_velocity]);
+            array_push($where, ['channel_flow_velocity', '=', $channel_flow_velocity]);
         }
         $offset = ($page - 1) * $pageNum;
-        $result = DbAdministrator::getSmsSendingChannel($where,'*',false, '', $offset.','.$pageNum);
+        $result = DbAdministrator::getSmsSendingChannel($where, '*', false, '', $offset . ',' . $pageNum);
         $total = DbAdministrator::countSmsSendingChannel($where);
         return ['code' => '200', 'total' => $total, 'channel_list' => $result];
     }
 
-    public function editSmsSendingChannel($id, $title = '',$channel_type = 0, $channel_host = '', $channel_port = '',$channel_source = 0,$business_id = 0, $channel_price = 0, $channel_postway = 0, $channel_source_addr = '', $channel_shared_secret = '', $channel_service_id = '', $channel_template_id = '', $channel_dest_id = '', $channel_flow_velocity = 0){
+    public function editSmsSendingChannel($id, $title = '', $channel_type = 0, $channel_host = '', $channel_port = '', $channel_source = 0, $business_id = 0, $channel_price = 0, $channel_postway = 0, $channel_source_addr = '', $channel_shared_secret = '', $channel_service_id = '', $channel_template_id = '', $channel_dest_id = '', $channel_flow_velocity = 0)
+    {
         $data = [];
         if (!empty($title)) {
             $data['title'] = $title;
@@ -1403,11 +1400,11 @@ class Administrator extends CommonIndex
             $data['channel_flow_velocity'] = $channel_flow_velocity;
         }
         if (empty($data)) {
-            return ['code' => '3002','msg' => '修改内容为空'];
+            return ['code' => '3002', 'msg' => '修改内容为空'];
         }
-        $channel = DbAdministrator::getSmsSendingChannel(['id' => $id],'*',true);
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $id], '*', true);
         if (empty($channel)) {
-            return ['code' => '3003','msg' => '该通道不存在'];
+            return ['code' => '3003', 'msg' => '该通道不存在'];
         }
         Db::startTrans();
         try {
@@ -1423,57 +1420,72 @@ class Administrator extends CommonIndex
     }
 
     //账户归属:1,中国移动;2,中国联通;3,中国电信;4,三网通;5,移动联通;6,移动电信;7,联通电信
-    public function setUserAccountForCmppsetUserAccountForCmpp($uid, $cmpp_name, $yidong_channel_id = 0, $liantong_channel_id = 0, $dianxin_channel_id = 0, $account_host){
-       
-        $user = DbUser::getUserInfo(['id' => $uid], 'id,nick_name', true);
+    public function setUserAccountForCmppsetUserAccountForCmpp($pid, $cmpp_name, $yidong_channel_id = 0, $liantong_channel_id = 0, $dianxin_channel_id = 0, $account_host)
+    {
+
+        $user = DbUser::getUserInfo(['id' => $pid], 'id,nick_name', true);
         if (empty($user)) {
             return ['code' => '3006', 'msg' => '该用户不存在'];
         }
-        $cmpp_account = DbAdministrator::getUserCmppAccount(['cmpp_name' => $cmpp_name], 'id',true);
-        if (!empty($cmpp_account)) {
-            return ['code' => '3007', 'msg' => '命名重复'];
-        }
+        // $cmpp_account = DbAdministrator::getUserCmppAccount(['cmpp_name' => $cmpp_name], 'id', true);
+        // if (!empty($cmpp_account)) {
+        //     return ['code' => '3007', 'msg' => '命名重复'];
+        // }
         if (!empty($yidong_channel_id)) {
-            $yd_channel = DbAdministrator::getSmsSendingChannel(['id' => $yidong_channel_id],'*',true);
+            $yd_channel = DbAdministrator::getSmsSendingChannel(['id' => $yidong_channel_id], '*', true);
             if (empty($yd_channel)) {
-                return ['code' => '3008','msg' => '该通道不存在'];
+                return ['code' => '3008', 'msg' => '该通道不存在'];
             }
-            if (!in_array($yd_channel['channel_source'],[1,4,5,6])) {
+            if (!in_array($yd_channel['channel_source'], [1, 4, 5, 6])) {
                 return ['code' => '3009', 'msg' => '分配的通道不支持移动号段'];
             }
         }
         if (!empty($liantong_channel_id)) {
-            $lt_channel = DbAdministrator::getSmsSendingChannel(['id' => $liantong_channel_id],'*',true);
+            $lt_channel = DbAdministrator::getSmsSendingChannel(['id' => $liantong_channel_id], '*', true);
             if (empty($lt_channel)) {
-                return ['code' => '3008','msg' => '该通道不存在'];
+                return ['code' => '3008', 'msg' => '该通道不存在'];
             }
-            if (!in_array($lt_channel['channel_source'],[2,4,5,7])) {
+            if (!in_array($lt_channel['channel_source'], [2, 4, 5, 7])) {
                 return ['code' => '3010', 'msg' => '分配的通道不支持联通号段'];
             }
         }
         if (!empty($dianxin_channel_id)) {
-            $dx_channel = DbAdministrator::getSmsSendingChannel(['id' => $dianxin_channel_id],'*',true);
+            $dx_channel = DbAdministrator::getSmsSendingChannel(['id' => $dianxin_channel_id], '*', true);
             if (empty($dx_channel)) {
-                return ['code' => '3008','msg' => '该通道不存在'];
+                return ['code' => '3008', 'msg' => '该通道不存在'];
             }
-            if (!in_array($dx_channel['channel_source'],[3,4,6,7])) {
+            if (!in_array($dx_channel['channel_source'], [3, 4, 6, 7])) {
                 return ['code' => '3011', 'msg' => '分配的通道不支持电信号段'];
             }
         }
+        do {
+            $nick_name = "C" . mt_rand(10000, 99999);
+            $cmpp_user = DbUser::getUserInfo(['nick_name' => $nick_name], 'id', true);
+        } while (!$cmpp_user);
         $data = [];
         $data = [
-            'uid' => $uid,
-            'nick_name' => $user['nick_name'],
-            'cmpp_name' => $cmpp_name,
-            'yidong_channel_id' => $yidong_channel_id,
-            'liantong_channel_id' => $liantong_channel_id,
-            'dianxin_channel_id' => $dianxin_channel_id,
-            'account_host' => $account_host
+            'pid' => $pid,
+            'nick_name' => $nick_name,
+            'company_name' => $cmpp_name,
+            'account_host' => $account_host,
+            'appid'     => uniqid(''),
+            'appkey'     => md5(uniqid('')),
+            'user_type' => 3,
         ];
         Db::startTrans();
         try {
             // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
-            DbAdministrator::addUserCmppAccount($data);
+            $uid = DbUser::addUser($data); //添加后生成的uid
+            Dbuser::updateUser(['user_type' => 2], $pid);
+            $conId = $this->createConId();
+            DbUser::addUserCon(['uid' => $uid, 'con_id' => $conId]);
+            $this->redis->zAdd($this->redisConIdTime, time(), $conId);
+            $conUid = $this->redis->hSet($this->redisConIdUid, $conId, $uid);
+            if ($conUid === false) {
+                $this->redis->zRem($this->redisConIdTime, $conId);
+                $this->redis->hDel($this->redisConIdUid, $conId);
+                Db::rollback();
+            }
             Db::commit();
             return ['code' => '200'];
         } catch (\Exception $e) {
@@ -1481,5 +1493,16 @@ class Administrator extends CommonIndex
             exception($e);
             return ['code' => '3009']; //修改失败
         }
+    }
+
+    /**
+     * 创建唯一conId
+     * @author zyr
+     */
+    private function createConId()
+    {
+        $conId = uniqid(date('ymdHis'));
+        $conId = hash_hmac('ripemd128', $conId, '');
+        return $conId;
     }
 }

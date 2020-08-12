@@ -401,7 +401,7 @@ class Administrator extends AdminController
         $dianxin_channel_id = trim($this->request->post('dianxin_channel_id'));
         $nick_name = trim($this->request->post('nick_name'));
         $business_id = trim($this->request->post('business_id'));
-       
+
         if (empty($yidong_channel_id) || intval($yidong_channel_id) < 1 || !is_numeric($yidong_channel_id)) {
             return ['code' => '3002'];
         }
@@ -414,7 +414,7 @@ class Administrator extends AdminController
         if (!in_array($business_id, [5, 6, 7, 8, 9])) {
             return ['code' => '3003'];
         }
-        $result  = $this->app->administrator->distributeUserChannel(intval($yidong_channel_id), intval($liantong_channel_id),intval($dianxin_channel_id),intval($business_id), strval($nick_name));
+        $result  = $this->app->administrator->distributeUserChannel(intval($yidong_channel_id), intval($liantong_channel_id), intval($dianxin_channel_id), intval($business_id), strval($nick_name));
         return $result;
     }
 
@@ -434,7 +434,8 @@ class Administrator extends AdminController
      * @return array
      * @author rzc
      */
-    public function getUserChannel(){
+    public function getUserChannel()
+    {
         $cmsConId = trim($this->request->post('cms_con_id'));
         $uid = trim($this->request->post('uid'));
         $nick_name = trim($this->request->post('nick_name'));
@@ -490,7 +491,7 @@ class Administrator extends AdminController
         if (empty($dianxin_channel_id) || intval($dianxin_channel_id) < 1 || !is_numeric($dianxin_channel_id)) {
             return ['code' => '3002'];
         }
-        $result  = $this->app->administrator->updateUserChannel(intval($id), intval($yidong_channel_id), intval($liantong_channel_id) ,intval($dianxin_channel_id));
+        $result  = $this->app->administrator->updateUserChannel(intval($id), intval($yidong_channel_id), intval($liantong_channel_id), intval($dianxin_channel_id));
         return $result;
     }
 
@@ -806,7 +807,8 @@ class Administrator extends AdminController
      * @return array
      * @author rzc
      */
-    public function thirdPartyMMSTemplateReport(){
+    public function thirdPartyMMSTemplateReport()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -820,7 +822,7 @@ class Administrator extends AdminController
         if (empty($template_id)) {
             return ['code' => '3002', 'msg' => '模板Id 为空'];
         }
-        $result = $this->app->administrator->thirdPartyMMSTemplateReport($channel_id,$template_id);
+        $result = $this->app->administrator->thirdPartyMMSTemplateReport($channel_id, $template_id);
         return $result;
     }
 
@@ -837,7 +839,8 @@ class Administrator extends AdminController
      * @return array
      * @author rzc
      */
-    public function sflThirdPartyMMSTemplateReport(){
+    public function sflThirdPartyMMSTemplateReport()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -851,7 +854,7 @@ class Administrator extends AdminController
         if (empty($sfl_relation_id)) {
             return ['code' => '3002', 'msg' => '模板Id 为空'];
         }
-        $result = $this->app->administrator->sflThirdPartyMMSTemplateReport($channel_id,$sfl_relation_id);
+        $result = $this->app->administrator->sflThirdPartyMMSTemplateReport($channel_id, $sfl_relation_id);
         return $result;
     }
 
@@ -869,7 +872,8 @@ class Administrator extends AdminController
      * @return array
      * @author rzc
      */
-    public function addDeductWord(){
+    public function addDeductWord()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -905,7 +909,8 @@ class Administrator extends AdminController
      * @return array
      * @author rzc
      */
-    public function getDeductWord(){
+    public function getDeductWord()
+    {
         $business_id = trim($this->request->post('business_id'));
         if (empty($business_id) || intval($business_id) < 1 || !is_numeric($business_id)) {
             return ['code' => '3001', 'msg' => 'business_id为空'];
@@ -934,7 +939,8 @@ class Administrator extends AdminController
      * @return array
      * @author rzc
      */
-    public function updateDeductWord(){
+    public function updateDeductWord()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -953,7 +959,7 @@ class Administrator extends AdminController
         if (empty($word)) {
             return ['code' => '3003', 'msg' => '关键词不能为空'];
         } */
-        $result = $this->app->administrator->updateDeductWord($id,$business_id, $uid, $word);
+        $result = $this->app->administrator->updateDeductWord($id, $business_id, $uid, $word);
         return $result;
     }
 
@@ -982,7 +988,8 @@ class Administrator extends AdminController
      * @return array
      * @author rzc
      */
-    public function addSmsSendingChannel(){
+    public function addSmsSendingChannel()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -1006,27 +1013,27 @@ class Administrator extends AdminController
             return ['code' => '3001', 'msg' => 'cmpp类接口必填端口'];
         }
         if (empty($title)) {
-             return ['code' => '3002', 'msg' => '通道名称为空' ];
+            return ['code' => '3002', 'msg' => '通道名称为空'];
         }
         if (empty($channel_host)) {
-            return ['code' => '3003', 'msg' => '地址为空' ];
+            return ['code' => '3003', 'msg' => '地址为空'];
         }
         if (empty($channel_source)) {
-            return ['code' => '3004', 'msg' => '必须确认通道支持运营商范围' ];
+            return ['code' => '3004', 'msg' => '必须确认通道支持运营商范围'];
         }
         if (empty($business_id)) {
-            return ['code' => '3005', 'msg' => '必须确认通道支持服务' ];
+            return ['code' => '3005', 'msg' => '必须确认通道支持服务'];
         }
         if (empty($channel_source_addr)) {
-            return ['code' => '3006', 'msg' => '企业id,企业代码(账户)不能为空' ];
+            return ['code' => '3006', 'msg' => '企业id,企业代码(账户)不能为空'];
         }
         if (empty($channel_shared_secret)) {
-            return ['code' => '3007', 'msg' => '密码不能为空' ];
+            return ['code' => '3007', 'msg' => '密码不能为空'];
         }
         if (empty($channel_service_id)) {
-            return ['code' => '3009', 'msg' => '业务代码不能为空' ];
+            return ['code' => '3009', 'msg' => '业务代码不能为空'];
         }
-        $result = $this->app->administrator->addSmsSendingChannel($title,$channel_type, $channel_host, $channel_port,$channel_source,$business_id, $channel_price, $channel_postway, $channel_source_addr, $channel_shared_secret, $channel_service_id, $channel_template_id, $channel_dest_id, $channel_flow_velocity);
+        $result = $this->app->administrator->addSmsSendingChannel($title, $channel_type, $channel_host, $channel_port, $channel_source, $business_id, $channel_price, $channel_postway, $channel_source_addr, $channel_shared_secret, $channel_service_id, $channel_template_id, $channel_dest_id, $channel_flow_velocity);
         return $result;
     }
 
@@ -1073,7 +1080,8 @@ class Administrator extends AdminController
      * @return array
      * @author rzc
      */
-    public function getSmsSendingChannel(){
+    public function getSmsSendingChannel()
+    {
         $cmsConId = trim($this->request->post('cms_con_id'));
         $title = trim($this->request->post('title'));
         $channel_type = trim($this->request->post('channel_type'));
@@ -1096,7 +1104,7 @@ class Administrator extends AdminController
         $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
         intval($page);
         intval($pageNum);
-        $result = $this->app->administrator->getSmsSendingChannel($title,$channel_type, $channel_host, $channel_port,$channel_source,$business_id, $channel_price, $channel_postway, $channel_source_addr, $channel_shared_secret, $channel_service_id, $channel_template_id, $channel_dest_id, $channel_flow_velocity, $page, $pageNum);
+        $result = $this->app->administrator->getSmsSendingChannel($title, $channel_type, $channel_host, $channel_port, $channel_source, $business_id, $channel_price, $channel_postway, $channel_source_addr, $channel_shared_secret, $channel_service_id, $channel_template_id, $channel_dest_id, $channel_flow_velocity, $page, $pageNum);
         return $result;
     }
 
@@ -1126,7 +1134,8 @@ class Administrator extends AdminController
      * @return array
      * @author rzc
      */
-    public function editSmsSendingChannel(){
+    public function editSmsSendingChannel()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -1150,12 +1159,12 @@ class Administrator extends AdminController
         if (empty($id) || !is_numeric($id) || $id < 1) {
             return  ['code' => '3001', 'msg' => 'id格式错误'];
         }
-        $result = $this->app->administrator->editSmsSendingChannel($id,$title,$channel_type, $channel_host, $channel_port,$channel_source,$business_id, $channel_price, $channel_postway, $channel_source_addr, $channel_shared_secret, $channel_service_id, $channel_template_id, $channel_dest_id, $channel_flow_velocity);
+        $result = $this->app->administrator->editSmsSendingChannel($id, $title, $channel_type, $channel_host, $channel_port, $channel_source, $business_id, $channel_price, $channel_postway, $channel_source_addr, $channel_shared_secret, $channel_service_id, $channel_template_id, $channel_dest_id, $channel_flow_velocity);
         return $result;
     }
 
     /**
-     * @api              {post} / 配置客户侧CMPP账户
+     * @api              {post} / 配置客户侧CMPP账户(开通子账号方式)
      * @apiDescription   setUserAccountForCmpp
      * @apiGroup         admin_Administrator
      * @apiName          setUserAccountForCmpp
@@ -1171,7 +1180,8 @@ class Administrator extends AdminController
      * @return array
      * @author rzc
      */
-    public function setUserAccountForCmpp(){
+    public function setUserAccountForCmpp()
+    {
         $apiName  = classBasename($this) . '/' . __function__;
         $cmsConId = trim($this->request->post('cms_con_id'));
         if ($this->checkPermissions($cmsConId, $apiName) === false) {
@@ -1196,7 +1206,7 @@ class Administrator extends AdminController
         if (empty($yidong_channel_id) && empty($liantong_channel_id) && empty($dianxin_channel_id)) {
             return  ['code' => '3004', 'msg' => '至少分配一条有效通道'];
         }
-       /*  if (empty($account_source) || !in_array($account_source,[1,2,3,4,5,6,7])) {
+        /*  if (empty($account_source) || !in_array($account_source,[1,2,3,4,5,6,7])) {
             return  ['code' => '3005', 'msg' => 'channel_source格式错误'];
         } */
         $result = $this->app->administrator->setUserAccountForCmpp($uid, $cmpp_name, $yidong_channel_id, $liantong_channel_id, $dianxin_channel_id, $account_host);
