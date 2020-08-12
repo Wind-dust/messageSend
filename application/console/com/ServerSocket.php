@@ -15,23 +15,24 @@ class ServerSocket extends Pzlife
 
     public function Service($content)
     {
-        $contdata                 = $this->content($content);
+       
         $redis                    = Phpredis::getConn();
-        $content                  = 9; //绑定通道
+        // $content                  = 9; //绑定通道
         $redisMessageCodeSend     = 'index:meassage:code:send:waittask'; //验证码发送任务rediskey
         $redisMessageCodeSendReal = 'index:meassage:code:send:realtask'; //验证码发送任务rediskey
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-
-        $host          = $contdata['host']; //服务商ip
-        $port          = $contdata['port']; //短连接端口号   17890长连接端口号
+        // 'host'          => "47.106.127.182", //服务商ip
+        // 'port'          => "7890", //短连接端口号   17890长连接端口号
+        // $host          = '0.0.0.0'; //服务商ip
+        $host          = '127.0.0.1'; //服务商ip
+        $port          = "7890"; //短连接端口号   17890长连接端口号
+        $contdata                 = $this->getUserAccount($content);
         $Source_Addr   = $contdata['Source_Addr']; //企业id  企业代码
         $Shared_secret = $contdata['Shared_secret']; //网关登录密码
         $Service_Id    = $contdata['Service_Id'];
         $Dest_Id       = $contdata['Dest_Id']; //短信接入码 短信端口号
-        $Sequence_Id   = $contdata['Sequence_Id'];
         $SP_ID         = $contdata['SP_ID'];
         $bin_ip        = $contdata['bin_ip']; //客户端绑定IP
-        $free_trial    = $contdata['free_trial']; //是否需要审核 1:需要审核;2:无需审核
         $master_num    = $contdata['master_num']; //通道最大提交量
         $uid           = $contdata['uid']; //通道最大提交量
         // $security_coefficient = 0.8; //通道饱和系数
@@ -51,7 +52,7 @@ class ServerSocket extends Pzlife
         }
         /*接收客户端传过来的信息*/
         $i = 1;
-        // $Sequence_Id = 1;
+        $Sequence_Id = 1;
         $time = 0;
         // $status = 10;
         $clients = array($socket);
@@ -86,7 +87,8 @@ class ServerSocket extends Pzlife
                             try {
                                 // $bodyData = socket_read($accept_resource, $head['Total_Length'] - 12);
                                 $body = unpack("a6Source_Addr/a16AuthenticatorSource/CVersion/NTimestamp", $bodyData);
-                                // // print_r($body);
+                                // print_r($body);
+                                
                                 //ip地址绑定
                                 if (!in_array($addr, $bin_ip)) {
                                     $status       = 2;
@@ -275,6 +277,7 @@ class ServerSocket extends Pzlife
                                                 $sendData['send_msgid'][] = $value;
                                             }
                                             $sendData['message'] = join('', $has_message['message']);
+                                            $sendData['Submit_time']  = time();
                                             $redis->rpush($redisMessageCodeSendReal, json_encode($sendData));
                                             $redis->hdel($redisMessageCodeSend, $pos[1]);
                                         } else {
@@ -416,11 +419,12 @@ class ServerSocket extends Pzlife
                             $deliver = $redis->lpop('index:meassage:code:user:receive:' . $uid); //取出用户发送任务
                             if (!empty($deliver)) {
                                 $deliver            = json_decode($deliver, true);
+                                $deliver['develop_no'] = $deliver['develop_no'] ? $deliver['develop_no'] : '';
                                 $deliver_timestring = time();
                                 $deliver_num1       = substr($deliver_timestring, 0, 8);
                                 $deliver_num2       = substr($deliver_timestring, 8) . $this->combination($i);
                                 $deliver_bodyData   = pack("N", $deliver_num1) . pack("N", $deliver_num2);
-                                $deliver_bodyData .= pack('a21', $deliver['Src_Id']);
+                                $deliver_bodyData .= pack('a21',  $Dest_Id . $deliver['develop_no']);
                                 $deliver_bodyData .= pack('a10', $Service_Id);
                                 $deliver_bodyData .= pack('C', 0);
                                 $deliver_bodyData .= pack('C', 0);
@@ -536,6 +540,25 @@ class ServerSocket extends Pzlife
             //sleep($time);
         } while (true);
         // socket_close($socket);
+    }
+
+    public function getUserAccount($nick_name){
+        $user = Db::query("SELECT * FROM yx_users WHERE `nick_name` = '".$nick_name."' ");
+        if (empty($user)) {
+            return false;
+        }
+        $user = $user[0];
+        return [
+            'Source_Addr'   => $user['nick_name'], //企业id  企业代码 用户名
+            'Shared_secret' => $user['cmpp_password'], //网关登录密码
+            'Service_Id'    => $user['nick_name'],
+            'Dest_Id'       => $user['cmpp_dest_id'],//短信接入码 短信端口号
+            'SP_ID'         => "",
+            'bin_ip'        => explode(',',$user['account_host']), //客户端绑定IP
+            'free_trial'    => 2,
+            'master_num'    => 300,
+            'uid'           => $user['id'],
+        ];
     }
 
     public function content($content)

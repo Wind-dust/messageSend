@@ -1338,3 +1338,24 @@ CREATE TABLE `yx_user_multimedia_template_third_report` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `template_id` (`template_id`,`third_template_id`,`channel_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COMMENT='第三方彩信模板报备表';
+
+DROP TABLE IF EXISTS `yx_user_cmpp_account`;
+CREATE TABLE `yx_user_cmpp_account` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `nick_name` char(30) NOT NULL DEFAULT '' COMMENT '用户名',
+  `cmpp_name` char(30) NOT NULL DEFAULT '' COMMENT 'cmpp用户名',
+  `cmpp_account` char(6) NOT NULL DEFAULT '' COMMENT 'cmpp用户名',
+  `shared_secret` char(15) NOT NULL DEFAULT '' COMMENT '登录密码',
+  `account_host` varchar(255) NOT NULL DEFAULT '' COMMENT '通道连接主机或者域名',
+  `yidong_channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '移动通道ID',
+  `liantong_channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '联通通道id',
+  `dianxin_channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '电信通道id',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `uid` (`uid`,`cmpp_account`) USING BTREE,
+  KEY `channel_id` (`yidong_channel_id`,`liantong_channel_id`,`dianxin_channel_id`) USING BTREE,
+  KEY `nick_name` (`nick_name`) USING BTREE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='第三方彩信模板报备表';

@@ -1420,7 +1420,7 @@ class Administrator extends CommonIndex
     }
 
     //账户归属:1,中国移动;2,中国联通;3,中国电信;4,三网通;5,移动联通;6,移动电信;7,联通电信
-    public function setUserAccountForCmpp($pid, $cmpp_name, $account_host, $cmpp_dest_id)
+    public function setUserAccountForCmpp($pid, $cmpp_name, $account_host, $cmpp_dest_id, $business_id)
     {
 
         $user = DbUser::getUserInfo(['id' => $pid], 'id,nick_name', true);
@@ -1471,6 +1471,7 @@ class Administrator extends CommonIndex
             'account_host' => $account_host,
             'cmpp_dest_id' => $cmpp_dest_id,
             'cmpp_password' => $cmpp_password,
+            'business_id' => $business_id,
             'appid'     => uniqid(''),
             'appkey'     => md5(uniqid('')),
             'user_type' => 3,

@@ -418,6 +418,7 @@ class CmppJuMengLianDianMarketing extends Pzlife
                                                 $mesage['Submit_time'] = isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis', $mesage['my_submit_time']);
                                                 $mesage['Done_time']   = isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis', time());
                                                 $mesage['receive_time'] = time(); //回执时间戳
+                                                $mesage['develop_no'] = $receive_develop_no; //回执时间戳
                                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                                             } else { //不在记录中的回执存入缓存，
                                                 $mesage['Stat']        = isset($Msg_Content['Stat']) ? $Msg_Content['Stat'] : 'UNKNOWN';

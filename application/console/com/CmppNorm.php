@@ -38,10 +38,10 @@ class CmppNorm extends Pzlife
             return [
                 'channel_host'          => "127.0.0.1", //服务商ip
                 'channel_port'          => "7890", //短连接端口号   17890长连接端口号
-                'channel_source_addr'   => "101161", //企业id  企业代码
-                'channel_shared_secret' => '5hsey6u9', //网关登录密码
-                'channel_service_id'    => "101161",
-                'channel_dest_id'       => "1069280801592517", //短信接入码 短信端口号
+                'channel_source_addr'   => "C48515", //企业id  企业代码
+                'channel_shared_secret' => 'c6S2ENJj', //网关登录密码
+                'channel_service_id'    => "C48515",
+                'channel_dest_id'       => "10694406674719", //短信接入码 短信端口号
                 'Sequence_Id'   => 1,
                 'SP_ID'         => "",
                 'bin_ip'        => ["127.0.0.1", "47.103.200.251"], //客户端绑定IP
@@ -181,7 +181,7 @@ class CmppNorm extends Pzlife
                         }
                         //通道断口处理
                         if ($body['Status'] != 0) {
-                            exit("其他错误，错误代码：【" . $body['Result'] . "】\n");
+                            exit("其他错误，错误代码：【" . $body['Status'] . "】\n");
                         }
                     } else if ($head['Command_Id'] == 0x80000004) {
                         $body = unpack("N2Msg_Id/CResult", $bodyData);
@@ -472,6 +472,7 @@ class CmppNorm extends Pzlife
                                                 $mesage['Submit_time'] = isset($Msg_Content['Submit_time']) ? $Msg_Content['Submit_time'] : date('ymdHis', $mesage['my_submit_time']);
                                                 $mesage['Done_time']   = isset($Msg_Content['Done_time']) ? $Msg_Content['Done_time'] : date('ymdHis', time());
                                                 $mesage['receive_time'] = time(); //回执时间戳
+                                                $mesage['develop_no'] = $receive_develop_no; //回执时间戳
                                                 $redis->rpush($redisMessageCodeDeliver, json_encode($mesage));
                                                 // $redis->hdel($redisMessageCodeMsgId, $body['Msg_Id1'] . $body['Msg_Id2']);
                                                 $redis->hdel($redisMessageCodeMsgId, $message_id);
