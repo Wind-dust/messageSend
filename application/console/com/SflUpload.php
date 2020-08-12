@@ -1164,6 +1164,13 @@ class SflUpload extends Pzlife
             18019762207,
             13162248755,
         ];
+        $mms_id =  $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message  ORDER BY `id` DESC limit 1 ");
+        $task_id   = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task  ORDER BY `id` DESC limit 1 ");
+        if (empty($task_id)) {
+            $this_id = 1;
+        } else {
+            $this_id   = $task_id[0]['id'];
+        }
         try {
             foreach ($path_data as $key => $value) {
                 //进入二级目录 MMS 或者 SMS 等
@@ -1177,7 +1184,7 @@ class SflUpload extends Pzlife
                     $err_task_num = [];
                     $send_data    = [];
                     if ($son_path_data !== false) {
-
+                        
                         foreach ($son_path_data as $skey => $svalue) {
                             $son_path = '';
                             $son_path = $path . $value . "/" . $svalue;
