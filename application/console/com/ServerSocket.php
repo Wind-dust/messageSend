@@ -18,7 +18,7 @@ class ServerSocket extends Pzlife
         $contdata                 = $this->content($content);
         $redis                    = Phpredis::getConn();
         $content                  = 9; //绑定通道
-        $redisMessageCodeSend     = 'index:meassage:code:send:task'; //验证码发送任务rediskey
+        $redisMessageCodeSend     = 'index:meassage:code:send:waittask'; //验证码发送任务rediskey
         $redisMessageCodeSendReal = 'index:meassage:code:send:realtask'; //验证码发送任务rediskey
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
 
@@ -55,7 +55,9 @@ class ServerSocket extends Pzlife
         $time = 0;
         // $status = 10;
         $clients = array($socket);
-
+        // print_r($Dest_Id);
+        // die;
+        $redis->rpush("index:message:upriver:" . 1, json_encode(['mobile' => 15201926171, 'message_info' => 1, 'business_id' => 5, 'get_time' => date('Y-m-d H:i:s', time()), 'develop_no' => 2517]));
         $accept_resource = socket_accept($socket);
         socket_set_nonblock($accept_resource); //设置非阻塞模式
         do {
@@ -170,6 +172,9 @@ class ServerSocket extends Pzlife
                            } */
 
                             //    // print_r($body);
+                            // die;
+                            $develop_len = strlen($Dest_Id);
+                            $receive_develop_no = mb_substr(trim($body['Src_Id']), $develop_len);
                             if ($body['Pk_total'] > 1) { //长短信
 
                                 //DestUsr_tl接收用户数量
@@ -186,7 +191,13 @@ class ServerSocket extends Pzlife
                                 $Msg_Content = unpack("a" . $Msg_length . "Msg_Content", $bodyData2);
                                 $Msg_Content['Msg_Content'] = strval($Msg_Content['Msg_Content']);
                                 // // print_r($Msg_Content);die;
-                                $udh      = unpack('c/c/c/c/c/c', substr($Msg_Content['Msg_Content'], 0, 6));
+                                // $udh      = unpack('c/c/c/c/c/c', substr($Msg_Content['Msg_Content'], 0, 6));
+                                // print_r($udh);
+                                // die;
+                                $pos =  unpack('c', substr($Msg_Content['Msg_Content'], 3, 1)); //相同主键的短信
+                                $messagetotal =  unpack('c', substr($Msg_Content['Msg_Content'], 4, 1)); //拆分总条数
+                                $messageindex =  unpack('c', substr($Msg_Content['Msg_Content'], 5, 1)); //第几条
+                                // print_r($messageindex);
                                 $message  = substr($Msg_Content['Msg_Content'], 6, 140);
                                 $sendData = [];
                                 if ($body['Msg_Fmt'] == 15) {
@@ -207,16 +218,88 @@ class ServerSocket extends Pzlife
 
                                 $sendData = [
                                     'mobile'  => trim($mobile),
-                                    'message' => $message,
-                                    'Src_Id' => $body['Src_Id'], //拓展码
+                                    'messagetotal' => $messagetotal[1],
+                                    // 'Src_Id' => $body['Src_Id'], //拓展码
+                                    'develop_no' => $receive_develop_no, //拓展码
                                     'Service_Id' => trim($body['Service_Id']), //业务服务ID（企业代码）
                                     'Source_Addr' => trim($body['Msg_src']), //业务服务ID（企业代码）
                                 ];
+
+                                // die;
+                                $sendData['message'][$messageindex[1]] = $message;
+
                                 // // print_r($sendData);
+                                $timestring = time();
+
+                                $back_Command_Id = 0x80000004; //发送应答
+                                $num1            = substr($timestring, 0, 8);
+                                $num2            = substr($timestring, 8) . $this->combination($i);
+                                $new_bodyData    = pack("N", $num1) . pack("N", $num2);
+                                $new_bodyData    = $new_bodyData . pack('C', 0);
+                                // $Total_Length = strlen($CMPP_SUBMIT_RESP) + 12;
+                                // $RESP_headData     = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
+                                // socket_write($accept_resource, $RESP_headData . $CMPP_SUBMIT_RESP, $Total_Length);
+                                // // print_r($sendData['mobile'].":".$id.":".$sendData['message'].":".$num1.$num2);die;
+                                // $redis->rpush($redisMessageCodeSend,$uid.":".$sendData['mobile'].":".$sendData['message'].":".$num1.$num2.":".$addr); //三体营销通道
+                                $sendData['send_msgid'][$messageindex[1]] = $num1 . $num2;
+                                $sendData['uid']          = $uid;
+                                $sendData['Submit_time']  = time();
+                                // print_r($pos[1]);
+                                // die;
+                                // $redis->rpush($redisMessageCodeSendReal, json_encode($sendData));
+                                $has_message = $redis->hget($redisMessageCodeSend, $pos[1]);
+                                if ($has_message) {
+                                    if ($messageindex[1] == 1) {
+                                        $redis->hdel($redisMessageCodeSend, $pos[1]);
+                                        $redis->hset($redisMessageCodeSend, $pos[1], json_encode($sendData));
+                                    } else {
+                                        $has_message = json_decode($has_message, true);
+                                        $has_message['send_msgid'][$messageindex[1]] = $num1 . $num2;
+                                        $has_message['message'][$messageindex[1]] = $message;
+
+                                        // print_r($has_message);
+                                        if (count($has_message['message']) == $has_message['messagetotal']) {
+                                            // print_r($has_message);
+                                            $sendData = [];
+                                            $sendData = [
+                                                'mobile'  => trim($mobile),
+                                                'messagetotal' => $messagetotal[1],
+                                                // 'Src_Id' => $body['Src_Id'], //拓展码
+                                                'develop_no' => $receive_develop_no, //拓展码
+                                                'Service_Id' => trim($body['Service_Id']), //业务服务ID（企业代码）
+                                                'Source_Addr' => trim($body['Msg_src']), //业务服务ID（企业代码）
+                                            ];
+                                            ksort($has_message['send_msgid']);
+                                            ksort($has_message['message']);
+                                            foreach ($has_message['send_msgid'] as $key => $value) {
+                                                $sendData['send_msgid'][] = $value;
+                                            }
+                                            $sendData['message'] = join('', $has_message['message']);
+                                            $redis->rpush($redisMessageCodeSendReal, json_encode($sendData));
+                                            $redis->hdel($redisMessageCodeSend, $pos[1]);
+                                        } else {
+                                            $redis->hset($redisMessageCodeSend, $pos[1], json_encode($has_message));
+                                        }
+                                    }
+                                } else {
+                                    $redis->hset($redisMessageCodeSend, $pos[1], json_encode($sendData));
+
+                                    // $redis->hset($redisMessageCodeSend.":1",$head['Sequence_Id'],json_encode($sendData)); //三体营销通道
+                                }
+                                $Total_Length = strlen($new_bodyData) + 12;
+                                $new_headData = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
+                                // socket_write($socket, $headData . $bodyData, $Total_Length);
+
+                                // // print_r($back_Command_Id);
+                                // 向socket_accept的套接流写入信息，也就是回馈信息给socket_bind()所绑定的主机客户端
+                                // // echo $new_headData . $new_bodyData."\n";
+                                // // echo $back_Command_Id."\n";
+                                socket_write($accept_resource, $new_headData . $new_bodyData, $Total_Length);
                                 $residue = $head['Total_Length'] - 12 - 117 - $c_length - $Msg_length;
                                 if ($residue > 0) {
                                     socket_read($accept_resource, $residue);
                                 }
+
                                 // die;
                             } else {
                                 $Dest_terminal_Id = 21 * $body['DestUsr_tl']; //接收用户数量
@@ -251,7 +334,8 @@ class ServerSocket extends Pzlife
                                 $sendData = [
                                     'mobile'  => trim($mobile),
                                     'message' => $message,
-                                    'Src_Id' => trim($body['Src_Id']), //拓展码
+                                    // 'Src_Id' => trim($body['Src_Id']), //拓展码
+                                    'develop_no' => $receive_develop_no, //拓展码
                                     'Source_Addr' => trim($body['Msg_src']), //业务服务ID（企业代码）
                                 ];
                                 // // print_r($sendData);
@@ -259,55 +343,35 @@ class ServerSocket extends Pzlife
                                 if ($residue > 0) {
                                     socket_read($accept_resource, $residue);
                                 }
-                            }
-                            $timestring = time();
+                                $timestring = time();
 
-                            $back_Command_Id = 0x80000004; //发送应答
-                            $num1            = substr($timestring, 0, 8);
-                            $num2            = substr($timestring, 8) . $this->combination($i);
-                            $new_bodyData    = pack("N", $num1) . pack("N", $num2);
-                            $new_bodyData    = $new_bodyData . pack('C', 0);
-                            // $Total_Length = strlen($CMPP_SUBMIT_RESP) + 12;
-                            // $RESP_headData     = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
-                            // socket_write($accept_resource, $RESP_headData . $CMPP_SUBMIT_RESP, $Total_Length);
-                            // // print_r($sendData['mobile'].":".$id.":".$sendData['message'].":".$num1.$num2);die;
-                            // $redis->rpush($redisMessageCodeSend,$uid.":".$sendData['mobile'].":".$sendData['message'].":".$num1.$num2.":".$addr); //三体营销通道
-                            $sendData['send_msgid'][] = $num1 . $num2;
-                            $sendData['uid']          = $uid;
-                            $sendData['Submit_time']  = time();
+                                $back_Command_Id = 0x80000004; //发送应答
+                                $num1            = substr($timestring, 0, 8);
+                                $num2            = substr($timestring, 8) . $this->combination($i);
+                                $new_bodyData    = pack("N", $num1) . pack("N", $num2);
+                                $new_bodyData    = $new_bodyData . pack('C', 0);
+                                // $Total_Length = strlen($CMPP_SUBMIT_RESP) + 12;
+                                // $RESP_headData     = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
+                                // socket_write($accept_resource, $RESP_headData . $CMPP_SUBMIT_RESP, $Total_Length);
+                                // // print_r($sendData['mobile'].":".$id.":".$sendData['message'].":".$num1.$num2);die;
+                                // $redis->rpush($redisMessageCodeSend,$uid.":".$sendData['mobile'].":".$sendData['message'].":".$num1.$num2.":".$addr); //三体营销通道
+                                $sendData['send_msgid'][] = $num1 . $num2;
+                                $sendData['uid']          = $uid;
+                                $sendData['Submit_time']  = time();
+                                $redis->rpush($redisMessageCodeSendReal, json_encode($sendData));
+                                $Total_Length = strlen($new_bodyData) + 12;
+                                $new_headData = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
+                                // socket_write($socket, $headData . $bodyData, $Total_Length);
+
+                                // // print_r($back_Command_Id);
+                                // 向socket_accept的套接流写入信息，也就是回馈信息给socket_bind()所绑定的主机客户端
+                                // // echo $new_headData . $new_bodyData."\n";
+                                // // echo $back_Command_Id."\n";
+                                socket_write($accept_resource, $new_headData . $new_bodyData, $Total_Length);
+                            }
+
                             // $redis->rpush($redisMessageCodeSend.":1",json_encode($sendData)); //三体营销通道
-                            $has_message = $redis->hget($redisMessageCodeSend . ":1", $head['Sequence_Id']);
-                            if ($has_message) {
-                                $has_message = json_decode($has_message, true);
-                                $has_message['message'] .= $sendData['message'];
-                                $has_message['send_msgid'][] = $num1 . $num2;
-                                if ($Pk_total == $Pk_number) {
-                                    $redis->hdel($redisMessageCodeSend . ":1", $head['Sequence_Id']);
-                                    $redis->rpush($redisMessageCodeSendReal, json_encode($has_message));
-                                } else {
-                                    //三体营销通道
-                                    $redis->hset($redisMessageCodeSend . ":1", $head['Sequence_Id'], json_encode($has_message));
-                                }
-                            } else {
-                                if ($Pk_total == $Pk_number) {
-                                    $redis->hdel($redisMessageCodeSend . ":1", $head['Sequence_Id']);
-                                    $redis->rpush($redisMessageCodeSendReal, json_encode($sendData));
-                                } else {
-                                    //三体营销通道
-                                    $redis->hset($redisMessageCodeSend . ":1", $head['Sequence_Id'], json_encode($sendData));
-                                }
-                                // $redis->hset($redisMessageCodeSend.":1",$head['Sequence_Id'],json_encode($sendData)); //三体营销通道
-                            }
-                            // print_r($sendData);
-                            $Total_Length = strlen($new_bodyData) + 12;
-                            $new_headData = pack("NNN", $Total_Length, $back_Command_Id, $head['Sequence_Id']);
-                            // socket_write($socket, $headData . $bodyData, $Total_Length);
 
-                            // // print_r($back_Command_Id);
-                            // 向socket_accept的套接流写入信息，也就是回馈信息给socket_bind()所绑定的主机客户端
-                            // // echo $new_headData . $new_bodyData."\n";
-                            // // echo $back_Command_Id."\n";
-                            socket_write($accept_resource, $new_headData . $new_bodyData, $Total_Length);
                         } else if ($head['Command_Id'] == 0x00000008) { //激活测试
                             $bodyData        = socket_read($accept_resource, $head['Total_Length'] - 12);
                             $new_bodyData    = $new_bodyData    = pack("a1", '');
@@ -337,7 +401,7 @@ class ServerSocket extends Pzlife
                         }
                         // socket_close($socket);
 
-                        if ($status == 0) {
+                        if ($status == 0) { //回执
                             // $deliver = [];
                             // $deliver = [
                             //     'Stat'        => 'DELIVRD',
@@ -349,7 +413,7 @@ class ServerSocket extends Pzlife
                             //     ],
                             // ];
                             // $redis->rPush('index:meassage:code:cmppdeliver:'.$uid,json_encode($deliver));
-                            $deliver = $redis->lpop('index:meassage:code:cmppdeliver:' . $uid); //取出用户发送任务
+                            $deliver = $redis->lpop('index:meassage:code:user:receive:' . $uid); //取出用户发送任务
                             if (!empty($deliver)) {
                                 $deliver            = json_decode($deliver, true);
                                 $deliver_timestring = time();
@@ -394,6 +458,52 @@ class ServerSocket extends Pzlife
                                         // unset($deliver_Msg_Content);
                                     }
                                 }
+                            } else { //上行
+
+                                $upriver = $redis->lpop('index:message:upriver:' . $uid); //取出用户发送任务
+                                if (!empty($upriver)) {
+                                    $upriver            = json_decode($upriver, true);
+                                    $submittime = date('YmdHis', strtotime($upriver['get_time']));
+
+                                    $code = mb_convert_encoding($upriver['message_info'], 'UCS-2', 'UTF-8');
+                                    $len      = strlen($code);
+                                    $deliver_timestring = time();
+                                    $deliver_num1       = substr($deliver_timestring, 0, 8);
+                                    $deliver_num2       = substr($deliver_timestring, 8) . $this->combination($i);
+                                    $deliver_bodyData   = pack("N", $deliver_num1) . pack("N", $deliver_num2);
+                                    $deliver_bodyData .= pack('a21', $Dest_Id . $upriver['develop_no']);
+                                    $deliver_bodyData .= pack('a10', $Service_Id);
+                                    $deliver_bodyData .= pack('C', 0);
+                                    $deliver_bodyData .= pack('C', 0);
+                                    $deliver_bodyData .= pack('C', 8); //Msg_Fmt
+                                    $deliver_bodyData .= pack('a21', $upriver['mobile']);
+                                    $deliver_bodyData .= pack('C', 0);
+                                    // $send1 = substr($value, 0, 8);
+                                    // $send2 = substr($value, 8, 8);
+                                    $deliver_Msg_Content = '';
+                                    $deliver_Msg_Content = pack("N", $deliver_num1) . pack("N", $deliver_num2);
+                                    $deliver_Msg_Content .= pack("a" . $len, $code);
+                                    $deliver_Msg_Content .= pack("a10", $submittime);
+                                    $deliver_Msg_Content .= pack("a10", $submittime);
+                                    $deliver_Msg_Content .= pack("a21", $upriver['mobile']);
+                                    $deliver_Msg_Content .= pack("N", '');
+                                    $deliver_Msg_Content_len = strlen($deliver_Msg_Content);
+                                    $deliver_bodyData .= pack("C", $deliver_Msg_Content_len);
+                                    $deliver_bodyData .= pack("a" . $deliver_Msg_Content_len, $deliver_Msg_Content);
+                                    $deliver_bodyData .= pack("a8", '');
+                                    $Total_Length = 0;
+                                    $new_headData = '';
+                                    $Total_Length = strlen($deliver_bodyData) + 12;
+
+                                    $new_headData = pack("NNN", $Total_Length, 0x00000005, $Sequence_Id);
+                                    // socket_write($socket, $headData . $bodyData, $Total_Length);
+
+                                    // // print_r($back_Command_Id);
+                                    // 向socket_accept的套接流写入信息，也就是回馈信息给socket_bind()所绑定的主机客户端
+                                    // // echo $new_headData . $new_bodyData."\n";
+                                    // // echo $back_Command_Id."\n";
+                                    socket_write($accept_resource, $new_headData . $deliver_bodyData, $Total_Length);
+                                }
                             }
                             // die;
 
@@ -434,7 +544,7 @@ class ServerSocket extends Pzlife
             return [
                 'host'          => "127.0.0.1", //服务商ip
                 'port'          => "7890", //短连接端口号   17890长连接端口号
-                'Source_Addr'   => "101161", //企业id  企业代码
+                'Source_Addr'   => "101161", //企业id  企业代码 用户名
                 'Shared_secret' => '5hsey6u9', //网关登录密码
                 'Service_Id'    => "101161",
                 'Dest_Id'       => "106928080159", //短信接入码 短信端口号

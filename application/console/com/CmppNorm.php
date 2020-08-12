@@ -34,11 +34,29 @@ class CmppNorm extends Pzlife
             'SP_ID'         => "",
             'master_num'    => 160,
         ]; */
-        $channel = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `id` = " . $content . " AND channel_type = 2");
-        if (empty($channel)) {
-            return false;
+        if ($content == 'test') { //本机测试
+            return [
+                'channel_host'          => "127.0.0.1", //服务商ip
+                'channel_port'          => "7890", //短连接端口号   17890长连接端口号
+                'channel_source_addr'   => "101161", //企业id  企业代码
+                'channel_shared_secret' => '5hsey6u9', //网关登录密码
+                'channel_service_id'    => "101161",
+                'channel_dest_id'       => "1069280801592517", //短信接入码 短信端口号
+                'Sequence_Id'   => 1,
+                'SP_ID'         => "",
+                'bin_ip'        => ["127.0.0.1", "47.103.200.251"], //客户端绑定IP
+                'free_trial'    => 2,
+                'channel_flow_velocity'    => 300,
+                'uid'           => 1,
+                'title' => '本地测试样例'
+            ];
+        } else {
+            $channel = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `id` = " . $content . " AND channel_type = 2");
+            if (empty($channel)) {
+                return false;
+            }
+            return $channel[0];
         }
-        return $channel[0];
     }
 
     public function Send($content)
@@ -74,12 +92,12 @@ class CmppNorm extends Pzlife
             'content'     => '【施华洛世奇】亲爱的会员，感谢您一路以来的支持！您已获得2020年会员周年礼券，购买正价商品满1999元即可获得闪耀玫瑰金色简约吊坠一条，请于2020年10月19日前使用。可前往“施华洛世奇会员中心”小程序查看该券。详询4006901078。 回TD退订',
             // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
         ])); */
-        /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15821193682',
             'mar_task_id' => '',
             'content'     => '【施华洛世奇】亲爱的会员，感谢您一路以来的支持！您已获得2020年会员周年礼券，购买正价商品满1999元即可获得闪耀玫瑰金色简约吊坠一条，请于2020年10月19日前使用。可前往“施华洛世奇会员中心”小程序查看该券。详询4006901078。 回TD退订',
             // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
-        ])); */
+        ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
         $myfile = fopen($log_path, 'a+');
@@ -548,6 +566,7 @@ class CmppNorm extends Pzlife
                                         $bodyData .= pack("a" . $len, $newcode);
                                         $bodyData .= pack("a8", '');
                                         $Command_Id = 0x00000004; // 短信发送
+                                        // print_r($udh);
                                         $Total_Length = strlen($bodyData) + 12;
                                         $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                         $send_data['my_submit_time'] = time(); //发送时间戳

@@ -1420,17 +1420,17 @@ class Administrator extends CommonIndex
     }
 
     //账户归属:1,中国移动;2,中国联通;3,中国电信;4,三网通;5,移动联通;6,移动电信;7,联通电信
-    public function setUserAccountForCmppsetUserAccountForCmpp($uid, $cmpp_name, $yidong_channel_id = 0, $liantong_channel_id = 0, $dianxin_channel_id = 0, $account_host)
+    public function setUserAccountForCmppsetUserAccountForCmpp($pid, $cmpp_name, $yidong_channel_id = 0, $liantong_channel_id = 0, $dianxin_channel_id = 0, $account_host)
     {
 
-        $user = DbUser::getUserInfo(['id' => $uid], 'id,nick_name', true);
+        $user = DbUser::getUserInfo(['id' => $pid], 'id,nick_name', true);
         if (empty($user)) {
             return ['code' => '3006', 'msg' => '该用户不存在'];
         }
-        $cmpp_account = DbAdministrator::getUserCmppAccount(['cmpp_name' => $cmpp_name], 'id', true);
-        if (!empty($cmpp_account)) {
-            return ['code' => '3007', 'msg' => '命名重复'];
-        }
+        // $cmpp_account = DbAdministrator::getUserCmppAccount(['cmpp_name' => $cmpp_name], 'id', true);
+        // if (!empty($cmpp_account)) {
+        //     return ['code' => '3007', 'msg' => '命名重复'];
+        // }
         if (!empty($yidong_channel_id)) {
             $yd_channel = DbAdministrator::getSmsSendingChannel(['id' => $yidong_channel_id], '*', true);
             if (empty($yd_channel)) {
@@ -1458,20 +1458,34 @@ class Administrator extends CommonIndex
                 return ['code' => '3011', 'msg' => '分配的通道不支持电信号段'];
             }
         }
+        do {
+            $nick_name = "C" . mt_rand(10000, 99999);
+            $cmpp_user = DbUser::getUserInfo(['nick_name' => $nick_name], 'id', true);
+        } while (!$cmpp_user);
         $data = [];
         $data = [
-            'uid' => $uid,
-            'nick_name' => $user['nick_name'],
-            'cmpp_name' => $cmpp_name,
-            'yidong_channel_id' => $yidong_channel_id,
-            'liantong_channel_id' => $liantong_channel_id,
-            'dianxin_channel_id' => $dianxin_channel_id,
-            'account_host' => $account_host
+            'pid' => $pid,
+            'nick_name' => $nick_name,
+            'company_name' => $cmpp_name,
+            'account_host' => $account_host,
+            'appid'     => uniqid(''),
+            'appkey'     => md5(uniqid('')),
+            'user_type' => 3,
         ];
         Db::startTrans();
         try {
             // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
-            DbAdministrator::addUserCmppAccount($data);
+            $uid = DbUser::addUser($data); //添加后生成的uid
+            Dbuser::updateUser(['user_type' => 2], $pid);
+            $conId = $this->createConId();
+            DbUser::addUserCon(['uid' => $uid, 'con_id' => $conId]);
+            $this->redis->zAdd($this->redisConIdTime, time(), $conId);
+            $conUid = $this->redis->hSet($this->redisConIdUid, $conId, $uid);
+            if ($conUid === false) {
+                $this->redis->zRem($this->redisConIdTime, $conId);
+                $this->redis->hDel($this->redisConIdUid, $conId);
+                Db::rollback();
+            }
             Db::commit();
             return ['code' => '200'];
         } catch (\Exception $e) {
@@ -1479,5 +1493,16 @@ class Administrator extends CommonIndex
             exception($e);
             return ['code' => '3009']; //修改失败
         }
+    }
+
+    /**
+     * 创建唯一conId
+     * @author zyr
+     */
+    private function createConId()
+    {
+        $conId = uniqid(date('ymdHis'));
+        $conId = hash_hmac('ripemd128', $conId, '');
+        return $conId;
     }
 }

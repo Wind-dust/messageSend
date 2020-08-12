@@ -17,7 +17,7 @@ class CmppCreateCodeTask extends Pzlife
     { //CMPP创建单条任务营销
         $redis                    = Phpredis::getConn();
         $redisMessageCodeSend     = 'index:meassage:game:sendtask'; //游戏日志待发送通道
-        $redisMessageCodeSendReal = 'index:meassage:game:send:realtask'; //验证码发送真实任务rediskey CMPP接口 营销
+        $redisMessageCodeSendReal = 'index:meassage:code:send:realtask'; //验证码发送真实任务rediskey CMPP接口 营销
         // echo date('Y-m-d H:i:s')."\n";
         /*  for ($i=0; $i < 100000; $i++) {
         
