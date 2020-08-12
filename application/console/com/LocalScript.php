@@ -3107,4 +3107,28 @@ class LocalScript extends Pzlife
         $ratio = $success_num / $all_num * 100;
         return ['mobile_num' => $mobile_num, 'num' => $all_num, 'success' => $success_num, 'unknown' => $unknow_num, 'default' => $default_num, 'ratio' => $ratio];
     }
+
+    public function updateReceipt()
+    {
+        $nums = Db::query("SELECT COUNT(*) AS `num` FROM `yx_send_code_task_receipt`")[0]['num'];
+        // print_r($nums);
+        $page = ceil($nums / 100);
+        // print_r($page);
+        for ($i = 0; $i < $page; $i++) {
+            # code...
+            $ids = [];
+            $receipts =  Db::query("SELECT * FROM `yx_send_code_task_receipt` LIMIT " . $i . ",100 ");
+            foreach ($receipts as $key => $value) {
+
+                $task = Db::query("SELECT `task_no` FROM `yx_user_send_code_task` WHERE `id` = " . $value['task_id']);
+                if (empty($task)) {
+                    continue;
+                }
+                Db::table('yx_user_send_code_task_log')->where(['task_no' => $task[0]['task_no'], 'mobile' => $value['mobile']])->update(['status_message' => $value['status_message'], 'real_message' => $value['real_message'], 'update_time' => $value['create_time']]);
+                $ids[] = $value['id'];
+            }
+            $ids = join(',', $ids);
+            Db::table('yx_send_code_task_receipt')->where("id in ($ids)")->delete();
+        }
+    }
 }
