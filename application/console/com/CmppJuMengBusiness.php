@@ -78,11 +78,11 @@ class CmppJuMengBusiness extends Pzlife
             'mar_task_id' => '',
             'content'     => '【美丽田园】尊敬的顾客您好！即日起非会员只需支付212元即可尊享指定护理一折体验，每月前20位体验顾客加赠精美化妆包1个，10/22-12/31日我和万象城有个约会，万象城全体员工恭候您的体验，竭诚为您的皮肤保驾护航！详询：021-54700816 回T退订',
         ])); */
-            $send = $redis->rPush($redisMessageCodeSend, json_encode([
+          /*   $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'content'     => '【钰晰科技】😄您本次登录的验证码为0518，回复QX取消本次登录',
-        ]));
+        ])); */
 
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/85.log";
@@ -604,6 +604,19 @@ class CmppJuMengBusiness extends Pzlife
                             fclose($myfile);
                             //  exception($e);
                             sleep(20);
+                            $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                            $check_data = [];
+                            $check_data = [
+                                'msgtype' => "text",
+                                'text' => [
+                                    "content" => "Hi，错误提醒机器人\n您有一条通道出现故障\n通道编号【".$content."】",
+                                ],
+                            ];
+                            $headers = [
+                                'Content-Type:application/json'
+                            ];
+                            $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+                            sleep(20);
                             //重新创建连接
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                             if (socket_connect($socket, $host, $port) == false) {
@@ -611,7 +624,7 @@ class CmppJuMengBusiness extends Pzlife
                                 fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                                 fwrite($myfile,  "通道延迟5秒后再次连接失败，请联系通道方检查原因\n");
                                 fclose($myfile);
-                                $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
+                                /* $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
                                     'mobile'      => 15201926171,
                                     'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
                                 ])); //三体营销通道
@@ -622,7 +635,7 @@ class CmppJuMengBusiness extends Pzlife
                                 $redis->rpush('index:meassage:code:send' . ":" . 24, json_encode([
                                     'mobile'      => 15201926171,
                                     'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
-                                ])); //易信行业通道
+                                ])); //易信行业通道 */
                                 exit();
                             } else {
                                 $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
@@ -639,7 +652,7 @@ class CmppJuMengBusiness extends Pzlife
                                     fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                                     fwrite($myfile,  "通道延迟5秒后写入socket失败，请联系通道方检查原因\n");
                                     fclose($myfile);
-                                    $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
+                                   /*  $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
                                         'mobile'      => 15201926171,
                                         'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
                                     ])); //三体营销通道
@@ -650,7 +663,7 @@ class CmppJuMengBusiness extends Pzlife
                                     $redis->rpush('index:meassage:code:send' . ":" . 24, json_encode([
                                         'mobile'      => 15201926171,
                                         'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
-                                    ])); //易信行业通道
+                                    ])); //易信行业通道 */
                                     exit();
                                 }
                                 ++$i;
@@ -661,6 +674,37 @@ class CmppJuMengBusiness extends Pzlife
                 }
             }
         }
+    }
+
+    function sendRequest2($requestUrl, $method = 'get', $data = [],$headers)
+    {
+        $methonArr = ['get', 'post'];
+        if (!in_array(strtolower($method), $methonArr)) {
+            return [];
+        }
+        if ($method == 'post') {
+            if (!is_array($data) || empty($data)) {
+                return [];
+            }
+        }
+        $curl = curl_init(); // 初始化一个 cURL 对象
+        curl_setopt($curl, CURLOPT_URL, $requestUrl); // 设置你需要抓取的URL
+        curl_setopt($curl, CURLOPT_HEADER, 0); // 设置header 响应头是否输出
+        if ($method == 'post') {
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 60);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($curl, CURLOPT_USERAGENT, 'Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400'); // 模拟用户使用的浏览器
+        }
+        // 设置cURL 参数，要求结果保存到字符串中还是输出到屏幕上。
+        // 1如果成功只将结果返回，不自动输出任何内容。如果失败返回FALSE
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        $res = curl_exec($curl); // 运行cURL，请求网页
+        curl_close($curl); // 关闭URL请求
+        return $res; // 显示获得的数据
     }
 
     public function error_log($error_type)

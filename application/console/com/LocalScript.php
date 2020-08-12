@@ -2822,19 +2822,19 @@ class LocalScript extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         try {
             //code...
-            while(true){
+            while (true) {
                 $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
                 //行业
                 foreach ($uids as $key => $value) {
                     // continue;
-                    // $start_time = (int) strtotime('-7 days',strtotime(date('Y-m-d',time())));
-                    $start_time = (int) strtotime('2020-08-01');
+                    $start_time = (int) strtotime('-4 days', strtotime(date('Y-m-d', time())));
+                    // $start_time = (int) strtotime('2020-08-01');
                     // echo $start_time;die;
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_code_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
                         continue;
                     }
                     while (true) {
-    
+
                         $day_business_result = [];
                         $end_time            = $start_time + 86400;
                         $timekey             = date('Ymd', $start_time);
@@ -2868,14 +2868,14 @@ class LocalScript extends Pzlife
                                 break;
                             }
                             //
-    
+
                         }
-                        $day_business_result = $this->selectSendResultForBusiness($value['id'], $value['pid'],$start_time, $end_time);
+                        $day_business_result = $this->selectSendResultForBusiness($value['id'], $value['pid'], $start_time, $end_time);
                         if ($day_business_result == false) {
                             $start_time = $end_time;
                             continue;
                         }
-    
+
                         // die;
                         $day_business_result['uid']         = $value['id'];
                         $day_business_result['timekey']     = $timekey;
@@ -2902,8 +2902,8 @@ class LocalScript extends Pzlife
                 }
                 //营销
                 foreach ($uids as $key => $value) {
-                    // $start_time = (int) strtotime('-3 days',strtotime(date('Y-m-d',time())));
-                    $start_time = (int) strtotime('2020-08-01');
+                    $start_time = (int) strtotime('-3 days', strtotime(date('Y-m-d', time())));
+                    // $start_time = (int) strtotime('2020-08-01');
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
                         continue;
                     }
@@ -2940,7 +2940,7 @@ class LocalScript extends Pzlife
                             break;
                             //
                         }
-    
+
                         $day_marketing_result = $this->selectSendResultForMarketing($value['id'], $value['pid'], $start_time, $end_time);
                         if ($day_marketing_result == false) {
                             $start_time = $end_time;
@@ -2972,7 +2972,6 @@ class LocalScript extends Pzlife
                 }
                 sleep(900);
             }
-           
         } catch (\Exceptixon $th) {
             //throw $th;
             exception($th);
@@ -3021,7 +3020,8 @@ class LocalScript extends Pzlife
                 }
                 $mobile_num += $business_mobile_num;
                 $success_num += count($business_success_mobile_num) * ($i + 1);
-                if ($start_time >= 1595692800) {
+                // if ($start_time >= 1595692800) {
+                if (time() - $start_time >= 259200) {
                     $success_num += ($business_mobile_num - count($business_success_mobile_num) - count($business_default_mobile_num)) * ($i + 1);
                     $unknow_num = 0;
                 } else {
@@ -3039,10 +3039,10 @@ class LocalScript extends Pzlife
 
     public function SendResultForMarketingTest()
     {
-        $result = $this->selectSendResultForMarketing(156, 137,1594310400, 1594396800);
+        $result = $this->selectSendResultForMarketing(156, 137, 1594310400, 1594396800);
     }
 
-    private function selectSendResultForMarketing($uid, $pid,$start_time, $end_time)
+    private function selectSendResultForMarketing($uid, $pid, $start_time, $end_time)
     {
         $all_num        = 0;
         $mobile_num     = 0;
@@ -3090,7 +3090,8 @@ class LocalScript extends Pzlife
                 $mobile_num += $business_mobile_num;
                 $success_num += count($business_success_mobile_num) * ($i + 1);
                 // $unknow_num += ($business_mobile_num - count($business_success_mobile_num) - count($business_default_mobile_num)) * ($i + 1);
-                if ($start_time >= 1595692800) {
+                // if ($start_time >= 1595692800) {
+                if (time() - $start_time >= 259200) {
                     $success_num += ($business_mobile_num - count($business_success_mobile_num) - count($business_default_mobile_num)) * ($i + 1);
                     $unknow_num = 0;
                 } else {

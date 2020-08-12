@@ -58,12 +58,12 @@ class CmppRongHeYiDongMarketing extends Pzlife
 
         ])); */
 
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /* $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'content'     => 'Hi, 亲爱的会员，好久不见，您已经有三个月没来护理了，秋冬已近，换季当前，在肌肤需要“进补”的季节里，来美田即刻开启深度补水模式吧！联系您身边的专属客户经理或拨打预约热线 400-820-6142 回T退订【美丽田园】',
             // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
-        ]));
+        ])); */
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
         $myfile = fopen($log_path, 'a+');
@@ -96,6 +96,7 @@ class CmppRongHeYiDongMarketing extends Pzlife
             // echo 'connect fail massege:' . socket_strerror(socket_last_error());
         } else {
             socket_set_nonblock($socket); //设置非阻塞模式
+            $pos          = 0;
             $i           = 1;
             $Sequence_Id = 1;
             //先进行连接验证
@@ -417,7 +418,7 @@ class CmppRongHeYiDongMarketing extends Pzlife
                                             } else {
                                                 $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence", $body['Msg_Content']);
                                             }
-                                            print_r($Msg_Content);
+                                            // print_r($Msg_Content);
                                             $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
                                             if ($mesage) {
                                                 // $redis->rpush($redisMessageCodeDeliver,$mesage.":".$Msg_Content['Stat']);
@@ -438,7 +439,7 @@ class CmppRongHeYiDongMarketing extends Pzlife
                                                 $mesage['mobile']   = isset($Msg_Content['Dest_terminal_Id']) ? $Msg_Content['Dest_terminal_Id'] : '';
                                                 $mesage['receive_time'] = time(); //回执时间戳
                                                 $mesage['Msg_Id']   = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
-                                                $redis->rPush($redisMessageUnKownDeliver, json_encode($mesage));
+                                                // $redis->rPush($redisMessageUnKownDeliver, json_encode($mesage));
                                             }
                                         }
                                         // print_r($mesage);
@@ -486,7 +487,6 @@ class CmppRongHeYiDongMarketing extends Pzlife
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
                                 // // print_r($code);die;
                                 if (strlen($code) > 140) {
-                                    $pos          = mt_rand(0,99);
                                     $num_messages = ceil(strlen($code) / $max_len);
                                     for ($j = 0; $j < $num_messages; $j++) {
                                         $bodyData = pack("N", $num1) . pack("N", $num2);
@@ -536,6 +536,10 @@ class CmppRongHeYiDongMarketing extends Pzlife
                                     }
                                     if ($i > $security_master) {
                                         $i    = 0;
+                                    }
+                                    $pos ++;
+                                    if ($pos > 100) {
+                                        $pos = 0;
                                     }
                                     usleep(5000);
                                     continue;

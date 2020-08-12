@@ -378,7 +378,7 @@ class CmppJuMengLianDianMarketing extends Pzlife
                                         $Registered_Delivery = trim($body['Registered_Delivery']);
                                         // print_r($body);
                                         $develop_len = strlen($Dest_Id);
-                                        $receive_develop_no = mb_substr(trim($body['Dest_Id']),$develop_len);
+                                        $receive_develop_no = mb_substr(trim($body['Dest_Id']), $develop_len);
                                         // // echo "拓展码:".$receive_develop_no;
                                         // // echo "\n";  
                                         if ($Registered_Delivery == 0) { //上行
@@ -399,7 +399,7 @@ class CmppJuMengLianDianMarketing extends Pzlife
                                                 'develop_code' => $receive_develop_no,
                                             ];
                                             $redis->rpush($redisMessageUpRiver, json_encode($up_message));
-                                        }  elseif ($Registered_Delivery == 1) { //回执报告
+                                        } elseif ($Registered_Delivery == 1) { //回执报告
 
                                             $stalen = $body['Msg_Length'] - 20 - 8 - 21 - 4;
                                             if (strlen($body['Msg_Content']) < 60) {
@@ -433,7 +433,7 @@ class CmppJuMengLianDianMarketing extends Pzlife
                                         // print_r($mesage);
                                         $callback_Command_Id = 0x80000005;
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
-                                        
+
                                         $new_Total_Length = strlen($new_body) + 12;
                                         $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
@@ -578,7 +578,7 @@ class CmppJuMengLianDianMarketing extends Pzlife
                                 $Command_Id  = 0x00000008; //保持连接
                                 $Total_Length = 12;
                                 $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                if ( $receive != 2) {
+                                if ($receive != 2) {
                                     socket_write($socket, $headData, $Total_Length);
                                 }
                                 sleep(1);
@@ -592,7 +592,7 @@ class CmppJuMengLianDianMarketing extends Pzlife
                         }
                         //捕获异常
                         catch (Exception $e) {
-                            if (!empty($send_status) && $send_status == 1 ) {
+                            if (!empty($send_status) && $send_status == 1) {
                                 $redis->push($redisMessageCodeSend, $redisMessageCodeSend);
                                 $redis->hset($redisMessageCodeSequenceId, $Sequence_Id);
                             }
@@ -618,13 +618,14 @@ class CmppJuMengLianDianMarketing extends Pzlife
                             ++$Sequence_Id;
                             sleep(20);
                             //重新创建连接
+                            $this->writeToRobot($content, $e, '聚梦联电营销通道');
                             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
                             if (socket_connect($socket, $host, $port) == false) {
                                 $myfile = fopen($log_path, 'a+');
                                 fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                                 fwrite($myfile,  "通道延迟5秒后再次连接失败，请联系通道方检查原因\n");
                                 fclose($myfile);
-                                $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
+                                /* $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
                                     'mobile'      => 15201926171,
                                     'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
                                 ])); //三体营销通道
@@ -635,7 +636,7 @@ class CmppJuMengLianDianMarketing extends Pzlife
                                 $redis->rpush('index:meassage:code:send' . ":" . 24, json_encode([
                                     'mobile'      => 15201926171,
                                     'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,连接服务商失败，请紧急处理解决或者切换！！！",
-                                ])); //易信行业通道
+                                ])); //易信行业通道 */
                                 exit();
                             } else {
                                 $Version             = 0x20; //CMPP版本 0x20 2.0版本 0x30 3.0版本
@@ -652,7 +653,7 @@ class CmppJuMengLianDianMarketing extends Pzlife
                                     fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
                                     fwrite($myfile,  "通道延迟5秒后写入socket失败，请联系通道方检查原因\n");
                                     fclose($myfile);
-                                    $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
+                                    /* $redis->rpush('index:meassage:code:send' . ":" . 1, json_encode([
                                         'mobile'      => 15201926171,
                                         'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
                                     ])); //三体营销通道
@@ -663,7 +664,7 @@ class CmppJuMengLianDianMarketing extends Pzlife
                                     $redis->rpush('index:meassage:code:send' . ":" . 24, json_encode([
                                         'mobile'      => 15201926171,
                                         'content'     => "【钰晰科技】通道编号[" . $content . "] 出现故障,写入socket失败，请紧急处理解决或者切换！！！",
-                                    ])); //易信行业通道
+                                    ])); //易信行业通道 */
                                     exit();
                                 }
                                 ++$i;
@@ -674,6 +675,54 @@ class CmppJuMengLianDianMarketing extends Pzlife
                 }
             }
         }
+    }
+
+    function writeToRobot($content, $error_data, $title)
+    {
+        $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+        // $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa';
+        $check_data = [];
+        $check_data = [
+            'msgtype' => "text",
+            'text' => [
+                "content" => "Hi，错误提醒机器人\n您有一条通道出现故障\n通道编号【" . $content . "】\n【错误信息】：" . $error_data . "\n通道名称【" . $title . "】",
+            ],
+        ];
+        $headers = [
+            'Content-Type:application/json'
+        ];
+        $this->sendRequest2($api, 'post', $check_data, $headers);
+    }
+
+    function sendRequest2($requestUrl, $method = 'get', $data = [], $headers)
+    {
+        $methonArr = ['get', 'post'];
+        if (!in_array(strtolower($method), $methonArr)) {
+            return [];
+        }
+        if ($method == 'post') {
+            if (!is_array($data) || empty($data)) {
+                return [];
+            }
+        }
+        $curl = curl_init(); // 初始化一个 cURL 对象
+        curl_setopt($curl, CURLOPT_URL, $requestUrl); // 设置你需要抓取的URL
+        curl_setopt($curl, CURLOPT_HEADER, 0); // 设置header 响应头是否输出
+        if ($method == 'post') {
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 60);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($curl, CURLOPT_USERAGENT, 'Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400'); // 模拟用户使用的浏览器
+        }
+        // 设置cURL 参数，要求结果保存到字符串中还是输出到屏幕上。
+        // 1如果成功只将结果返回，不自动输出任何内容。如果失败返回FALSE
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        $res = curl_exec($curl); // 运行cURL，请求网页
+        curl_close($curl); // 关闭URL请求
+        return $res; // 显示获得的数据
     }
 
     public function error_log($error_type)
