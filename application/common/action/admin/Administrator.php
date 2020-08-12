@@ -1462,6 +1462,7 @@ class Administrator extends CommonIndex
             $nick_name = "C" . mt_rand(10000, 99999);
             $cmpp_user = DbUser::getUserInfo(['nick_name' => $nick_name], 'id', true);
         } while ($cmpp_user);
+        $cmpp_password = getRandomString(8);
         $data = [];
         $data = [
             'pid' => $pid,
@@ -1469,6 +1470,7 @@ class Administrator extends CommonIndex
             'company_name' => $cmpp_name,
             'account_host' => $account_host,
             'cmpp_dest_id' => $cmpp_dest_id,
+            'cmpp_password' => $cmpp_password,
             'appid'     => uniqid(''),
             'appkey'     => md5(uniqid('')),
             'user_type' => 3,
