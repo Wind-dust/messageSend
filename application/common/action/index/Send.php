@@ -697,7 +697,7 @@ return $result;
         foreach ($phone_data as $key => $value) {
             if (checkMobile($value)) { //手机号码符合规则
                 // $mobile_Source = DbMobile::getNumberSource(['mobile' => substr($value, 0, 7)], 'source', true);
-                $prefix = substr(trim($value['mobile']), 0, 7);
+                $prefix = substr(trim($value), 0, 7);
                 $newres = $redis->hget('index:mobile:source', $prefix);
                 $newres = json_decode($newres, true);
                 if (isset($newres['source'])) {
