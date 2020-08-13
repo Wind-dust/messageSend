@@ -205,7 +205,7 @@ return $result;
         }
         if ($user['marketing_free_trial'] == 2) {
             $data['free_trial'] = 2;
-            if (strpos($Content,'道信')) {
+            if (strpos($Content, '道信')) {
                 $data['free_trial'] = 1;
             }
             if ($user['marketing_free_credit'] > 0) {
@@ -243,8 +243,8 @@ return $result;
                 $data['dianxin_channel_id'] = 113;
             }
             if ($user['id'] >= 229) {
-                $channel = DbAdministrator::getUserChannel(['uid'=> $user['id'],'business_id' => 5],'*',true);
-                if (!empty($channel)){
+                $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
+                if (!empty($channel)) {
                     $data['yidong_channel_id'] = $channel['yidong_channel_id'];
                     $data['liantong_channel_id'] =  $channel['liantong_channel_id'];
                     $data['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
@@ -269,20 +269,20 @@ return $result;
                 $check_data = [
                     'msgtype' => "text",
                     'text' => [
-                        "content" => "Hi，审核机器人\n您有一条新的短信任务需要审核\n【任务类型】：营销短信\n【任务编号】:".$data['task_no']." \n 【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n【任务信息】：".$data['task_content'],
+                        "content" => "Hi，审核机器人\n您有一条新的短信任务需要审核\n【任务类型】：营销短信\n【任务编号】:" . $data['task_no'] . " \n 【用户信息】：uid[" . $user['id'] . "]用户昵称[" . $user['nick_name'] . "]\n【任务信息】：" . $data['task_content'],
                     ],
                 ];
                 $headers = [
                     'Content-Type:application/json'
                 ];
-                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+                $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
                 // print_r($audit_api);die;
             }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'task_no' => $data['task_no'], 'msg_id' => $msg_id];
             }
-            
-            
+
+
             return ['code' => '200', 'task_no' => $data['task_no']];
         } catch (\Exception $e) {
             // exception($e);
@@ -395,7 +395,7 @@ return $result;
         $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
         if ($user['free_trial'] == 2) {
             $data['free_trial'] = 2;
-            if (strpos($Content,'道信')) {
+            if (strpos($Content, '道信')) {
                 $data['free_trial'] = 1;
             }
             if ($user['business_free_credit'] > 0) {
@@ -497,8 +497,8 @@ return $result;
                 $data['dianxin_channel_id'] = 61;
             }
             if ($user['id'] >= 229) {
-                $channel = DbAdministrator::getUserChannel(['uid'=> $user['id'],'business_id' => 6],'*',true);
-                if (!empty($channel)){
+                $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
+                if (!empty($channel)) {
                     $data['yidong_channel_id'] = $channel['yidong_channel_id'];
                     $data['liantong_channel_id'] =  $channel['liantong_channel_id'];
                     $data['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
@@ -523,13 +523,13 @@ return $result;
                 $check_data = [
                     'msgtype' => "text",
                     'text' => [
-                        "content" => "Hi，审核机器人\n您有一条新的短信任务需要审核\n【任务类型】：行业短信\n【任务编号】:".$data['task_no']." \n 【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n【任务信息】：".$data['task_content'],
+                        "content" => "Hi，审核机器人\n您有一条新的短信任务需要审核\n【任务类型】：行业短信\n【任务编号】:" . $data['task_no'] . " \n 【用户信息】：uid[" . $user['id'] . "]用户昵称[" . $user['nick_name'] . "]\n【任务信息】：" . $data['task_content'],
                     ],
                 ];
                 $headers = [
                     'Content-Type:application/json'
                 ];
-                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+                $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
                 // print_r($audit_api);die;
             }
             if (!empty($msg_id)) {
@@ -673,6 +673,7 @@ return $result;
 
     public function getMobilesDetail($appid, $appkey, $phone_data)
     {
+        $redis = Phpredis::getConn();
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
@@ -695,7 +696,10 @@ return $result;
         $virtual_phone = [];
         foreach ($phone_data as $key => $value) {
             if (checkMobile($value)) { //手机号码符合规则
-                $mobile_Source = DbMobile::getNumberSource(['mobile' => substr($value, 0, 7)], 'source', true);
+                // $mobile_Source = DbMobile::getNumberSource(['mobile' => substr($value, 0, 7)], 'source', true);
+                $prefix = substr(trim($value['mobile']), 0, 7);
+                $newres = $redis->hget('index:mobile:source', $prefix);
+                $newres = json_decode($newres, true);
                 if (isset($mobile_Source['source'])) {
                     if ($mobile_Source['source'] == 1) { //移动
                         $mobile_num++;
@@ -769,15 +773,15 @@ return $result;
         $content_length           = 0;
         $max_length               = 102400; //最大字节长度
         $free_trial = 1;
-            $yidong_channel_id = 0;
-            $liantong_channel_id = 0;
-            $dianxin_channel_id = 0;
-            if ($user['mul_free_trial'] == 2) {
-                $free_trial = 2;
-            }
-            if (strpos($title,'道信')) {
-                $free_trial = 1;
-            }
+        $yidong_channel_id = 0;
+        $liantong_channel_id = 0;
+        $dianxin_channel_id = 0;
+        if ($user['mul_free_trial'] == 2) {
+            $free_trial = 2;
+        }
+        if (strpos($title, '道信')) {
+            $free_trial = 1;
+        }
         foreach ($content_data as $key => $value) {
             $frame = [];
             if (empty($value['image_path']) && empty($value['content'])) {
@@ -795,7 +799,7 @@ return $result;
                 } else {
                     $frame['content'] = $value['content'];
                 }
-                if (strpos($value['content'],'道信')) {
+                if (strpos($value['content'], '道信')) {
                     $free_trial = 1;
                 }
                 // $content_length+= strlen($value['content']);
@@ -849,7 +853,7 @@ return $result;
         if ($send_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3001'];
         }
-       /*  $channel_id = 0;
+        /*  $channel_id = 0;
         $free_trial = 1;
  */
 
@@ -870,7 +874,7 @@ return $result;
         if (!empty($send_time)) {
             $SmsMultimediaMessageTask['appointment_time'] = strtotime($send_time);
         }
-            
+
         if ($free_trial == 2) {
             $yidong_channel_id = 59;
             $liantong_channel_id = 59;
@@ -881,7 +885,7 @@ return $result;
                     $yidong_channel_id = 108;
                     $liantong_channel_id = 108;
                     $dianxin_channel_id = 108;
-                }else{
+                } else {
                     $free_trial = 1;
                     $yidong_channel_id = 0;
                     $liantong_channel_id = 0;
@@ -894,7 +898,7 @@ return $result;
                     $yidong_channel_id = 109;
                     $liantong_channel_id = 109;
                     $dianxin_channel_id = 109;
-                }else{
+                } else {
                     $free_trial = 1;
                     $yidong_channel_id = 0;
                     $liantong_channel_id = 0;
@@ -907,7 +911,7 @@ return $result;
                     $yidong_channel_id = 110;
                     $liantong_channel_id = 110;
                     $dianxin_channel_id = 110;
-                }else{
+                } else {
                     $free_trial = 1;
                     $yidong_channel_id = 0;
                     $liantong_channel_id = 0;
@@ -945,13 +949,13 @@ return $result;
                 $check_data = [
                     'msgtype' => "text",
                     'text' => [
-                        "content" => "Hi，审核机器人\n您有一条新的彩信任务需要审核\n【任务类型】：图文彩信\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                        "content" => "Hi，审核机器人\n您有一条新的彩信任务需要审核\n【任务类型】：图文彩信\n【用户信息】：uid[" . $user['id'] . "]用户昵称[" . $user['nick_name'] . "]\n",
                     ],
                 ];
                 $headers = [
                     'Content-Type:application/json'
                 ];
-                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+                $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
             }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no'], 'msg_id' => $msg_id];
@@ -1049,17 +1053,17 @@ return $result;
             DbSendMessage::addUserModel($user_model);
             Db::commit();
             $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
-                $check_data = [];
-                $check_data = [
-                    'msgtype' => "text",
-                    'text' => [
-                        "content" => "Hi，审核机器人\n您有一个新的文本模板需要审核\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n【模板名称】：".$title."\n【模板内容】：".$content,
-                    ],
-                ];
-                $headers = [
-                    'Content-Type:application/json'
-                ];
-                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+            $check_data = [];
+            $check_data = [
+                'msgtype' => "text",
+                'text' => [
+                    "content" => "Hi，审核机器人\n您有一个新的文本模板需要审核\n【用户信息】：uid[" . $user['id'] . "]用户昵称[" . $user['nick_name'] . "]\n【模板名称】：" . $title . "\n【模板内容】：" . $content,
+                ],
+            ];
+            $headers = [
+                'Content-Type:application/json'
+            ];
+            $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
             return ['code' => '200', 'template_id' => $template_id];
         } catch (\Exception $e) {
             Db::rollback();
@@ -1206,10 +1210,10 @@ return $result;
             }
             if ($user['free_trial'] == 2) {
                 $send_task['free_trial'] = 2;
-            }else{
+            } else {
                 $send_task['free_trial'] = 1;
             }
-           
+
             if (count($send_data_mobile[$key]) > 30) {
                 $send_task['free_trial'] = 1;
             }
@@ -1271,8 +1275,8 @@ return $result;
                             $send_task['dianxin_channel_id'] = 95;
                         }
                         if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid'=> $user['id'],'business_id' => 6],'*',true);
-                            if (!empty($channel)){
+                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
+                            if (!empty($channel)) {
                                 $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
                                 $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                                 $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
@@ -1332,8 +1336,8 @@ return $result;
                             }
                         }
                         if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid'=> $user['id'],'business_id' => 6],'*',true);
-                            if (!empty($channel)){
+                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
+                            if (!empty($channel)) {
                                 $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
                                 $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                                 $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
@@ -1375,7 +1379,7 @@ return $result;
                 if ($value['free_trial'] == 2) {
                     // $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $id, 'deduct' => $user['business_deduct']]));
                     $free_ids[] = $id;
-                }else{
+                } else {
                     $no_free[] = $id;
                 }
             }
@@ -1392,15 +1396,15 @@ return $result;
                 $check_data = [
                     'msgtype' => "text",
                     'text' => [
-                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核\n【任务类型】：行业短信\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核\n【任务类型】：行业短信\n【用户信息】：uid[" . $user['id'] . "]用户昵称[" . $user['nick_name'] . "]\n",
                     ],
                 ];
                 $headers = [
                     'Content-Type:application/json'
                 ];
-                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+                $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
             }
-           /*  if ($save) {
+            /*  if ($save) {
                 DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
                 Db::commit();
                 if (!empty($free_taskno)) {
@@ -1562,10 +1566,10 @@ return $result;
             }
             if ($user['free_trial'] == 2) {
                 $send_task['free_trial'] = 2;
-            }else{
+            } else {
                 $send_task['free_trial'] = 1;
             }
-           
+
             if (count($send_data_mobile[$key]) > 30) {
                 $send_task['free_trial'] = 1;
             }
@@ -1627,8 +1631,8 @@ return $result;
                             $send_task['dianxin_channel_id'] = 95;
                         }
                         if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid'=> $user['id'],'business_id' => 6],'*',true);
-                            if (!empty($channel)){
+                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
+                            if (!empty($channel)) {
                                 $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
                                 $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                                 $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
@@ -1688,8 +1692,8 @@ return $result;
                             }
                         }
                         if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid'=> $user['id'],'business_id' => 6],'*',true);
-                            if (!empty($channel)){
+                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
+                            if (!empty($channel)) {
                                 $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
                                 $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                                 $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
@@ -1731,7 +1735,7 @@ return $result;
                 if ($value['free_trial'] == 2) {
                     // $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $id, 'deduct' => $user['business_deduct']]));
                     $free_ids[] = $id;
-                }else{
+                } else {
                     $no_free[] = $id;
                 }
             }
@@ -1748,15 +1752,15 @@ return $result;
                 $check_data = [
                     'msgtype' => "text",
                     'text' => [
-                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核\n【任务类型】：行业短信\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核\n【任务类型】：行业短信\n【用户信息】：uid[" . $user['id'] . "]用户昵称[" . $user['nick_name'] . "]\n",
                     ],
                 ];
                 $headers = [
                     'Content-Type:application/json'
                 ];
-                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+                $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
             }
-           /*  if ($save) {
+            /*  if ($save) {
                 DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
                 Db::commit();
                 if (!empty($free_taskno)) {
@@ -1958,7 +1962,7 @@ return $result;
             // echo count($send_data_mobile[$key]);die;
             if ($user['marketing_free_trial'] == 2) {
                 $send_task['free_trial'] = 2;
-            }else{
+            } else {
                 $send_task['free_trial'] = 1;
             }
             if (count($send_data_mobile[$key]) > 30) {
@@ -2007,8 +2011,8 @@ return $result;
                             $send_task['dianxin_channel_id'] = 19;
                         }
                         if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid'=> $user['id'],'business_id' => 5],'*',true);
-                            if (!empty($channel)){
+                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
+                            if (!empty($channel)) {
                                 $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
                                 $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                                 $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
@@ -2046,8 +2050,8 @@ return $result;
                             $send_task['dianxin_channel_id'] = 107;
                         }
                         if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid'=> $user['id'],'business_id' => 5],'*',true);
-                            if (!empty($channel)){
+                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
+                            if (!empty($channel)) {
                                 $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
                                 $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                                 $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
@@ -2098,7 +2102,7 @@ return $result;
                 $id = DbAdministrator::addUserSendTask($value);
                 if ($value['free_trial'] == 2) {
                     $free_ids[] = $id;
-                }else{
+                } else {
                     $no_free[] = $id;
                 }
             }
@@ -2115,13 +2119,13 @@ return $result;
                 $check_data = [
                     'msgtype' => "text",
                     'text' => [
-                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核\n【任务类型】：营销短信\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核\n【任务类型】：营销短信\n【用户信息】：uid[" . $user['id'] . "]用户昵称[" . $user['nick_name'] . "]\n",
                     ],
                 ];
                 $headers = [
                     'Content-Type:application/json'
                 ];
-                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+                $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
             }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
@@ -2269,7 +2273,7 @@ return $result;
             // echo count($send_data_mobile[$key]);die;
             if ($user['marketing_free_trial'] == 2) {
                 $send_task['free_trial'] = 2;
-            }else{
+            } else {
                 $send_task['free_trial'] = 1;
             }
             if (count($send_data_mobile[$key]) > 30) {
@@ -2318,8 +2322,8 @@ return $result;
                             $send_task['dianxin_channel_id'] = 19;
                         }
                         if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid'=> $user['id'],'business_id' => 5],'*',true);
-                            if (!empty($channel)){
+                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
+                            if (!empty($channel)) {
                                 $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
                                 $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                                 $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
@@ -2357,8 +2361,8 @@ return $result;
                             $send_task['dianxin_channel_id'] = 107;
                         }
                         if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid'=> $user['id'],'business_id' => 5],'*',true);
-                            if (!empty($channel)){
+                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
+                            if (!empty($channel)) {
                                 $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
                                 $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                                 $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
@@ -2409,7 +2413,7 @@ return $result;
                 $id = DbAdministrator::addUserSendTask($value);
                 if ($value['free_trial'] == 2) {
                     $free_ids[] = $id;
-                }else{
+                } else {
                     $no_free[] = $id;
                 }
             }
@@ -2426,13 +2430,13 @@ return $result;
                 $check_data = [
                     'msgtype' => "text",
                     'text' => [
-                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核\n【任务类型】：营销短信\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                        "content" => "Hi，审核机器人\n您有一批新的短信任务需要审核\n【任务类型】：营销短信\n【用户信息】：uid[" . $user['id'] . "]用户昵称[" . $user['nick_name'] . "]\n",
                     ],
                 ];
                 $headers = [
                     'Content-Type:application/json'
                 ];
-                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+                $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
             }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
@@ -2481,13 +2485,13 @@ return $result;
             $check_data = [
                 'msgtype' => "text",
                 'text' => [
-                    "content" => "Hi，审核机器人\n您有一个新的签名需要审核\n【签名】：".$title."\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                    "content" => "Hi，审核机器人\n您有一个新的签名需要审核\n【签名】：" . $title . "\n【用户信息】：uid[" . $user['id'] . "]用户昵称[" . $user['nick_name'] . "]\n",
                 ],
             ];
             $headers = [
                 'Content-Type:application/json'
             ];
-            $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+            $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
             return ['code' => '200', 'signature_id' => $signature_id];
         } catch (\Exception $e) {
             Db::rollback();
@@ -2582,13 +2586,13 @@ return $result;
             $check_data = [
                 'msgtype' => "text",
                 'text' => [
-                    "content" => "Hi，审核机器人\n您有一个新的彩信模板需要审核\n【模板标题】：".$title."\n【模板别名】：".$name."\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                    "content" => "Hi，审核机器人\n您有一个新的彩信模板需要审核\n【模板标题】：" . $title . "\n【模板别名】：" . $name . "\n【用户信息】：uid[" . $user['id'] . "]用户昵称[" . $user['nick_name'] . "]\n",
                 ],
             ];
             $headers = [
                 'Content-Type:application/json'
             ];
-            $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+            $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
             return ['code' => '200', 'template_id' => $template_id];
         } catch (\Exception $e) {
             Db::rollback();
@@ -2638,7 +2642,7 @@ return $result;
         // $send_data = [];
         $send_data_mobile = [];
 
-        
+
         //有模板目前只支持有模板进行提交
         $MMS_data = [];
         $send_num = 0;
@@ -2656,7 +2660,7 @@ return $result;
             $son_MMS_data = [
                 'title' => $template['title']
             ];
-            
+
             $send_num++;
             // $the_frame = explode(',', $send_text[0]);
             foreach ($template['multimedia_frame'] as $mf => $mula) {
@@ -2701,9 +2705,9 @@ return $result;
                 $the_mula['image_type'] = $mula['image_type'];
                 $son_MMS_data['multimedia_frame'][] = $the_mula;
             }
-            
-           
-           /*  $the_mula['content'] = $mula['content'];
+
+
+            /*  $the_mula['content'] = $mula['content'];
             $the_mula['num'] = $mula['num'];
             $the_mula['name'] = $mula['name'];
             $the_mula['image_path'] = $mula['image_path'];
@@ -2777,8 +2781,8 @@ return $result;
                 $as_value['mobiles'] = $value;
                 $task_as_mobile[] = $as_value;
             }
-    
-            $real_num =$send_num;
+
+            $real_num = $send_num;
             if ($real_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
                 return ['code' => '3004'];
             }
@@ -2804,10 +2808,10 @@ return $result;
             $yidong_channel_id = 0;
             $liantong_channel_id = 0;
             $dianxin_channel_id = 0;
-            if  ($user['mul_free_trial'] == 2){
+            if ($user['mul_free_trial'] == 2) {
                 $free_trial = 2;
             }
-            $third_template = DbAdministrator::getUserMultimediaTemplateThirdReport(['channel_id'=> 103,'template_id' => $template_id],'id',true);
+            $third_template = DbAdministrator::getUserMultimediaTemplateThirdReport(['channel_id' => 103, 'template_id' => $template_id], 'id', true);
             if (empty($third_template)) {
                 $free_trial = 1;
             }
@@ -2822,7 +2826,7 @@ return $result;
                         $yidong_channel_id = 108;
                         $liantong_channel_id = 108;
                         $dianxin_channel_id = 108;
-                    }else{
+                    } else {
                         $free_trial = 1;
                         $yidong_channel_id = 0;
                         $liantong_channel_id = 0;
@@ -2835,7 +2839,7 @@ return $result;
                         $yidong_channel_id = 109;
                         $liantong_channel_id = 109;
                         $dianxin_channel_id = 109;
-                    }else{
+                    } else {
                         $free_trial = 1;
                         $yidong_channel_id = 0;
                         $liantong_channel_id = 0;
@@ -2848,7 +2852,7 @@ return $result;
                         $yidong_channel_id = 110;
                         $liantong_channel_id = 110;
                         $dianxin_channel_id = 110;
-                    }else{
+                    } else {
                         $free_trial = 1;
                         $yidong_channel_id = 0;
                         $liantong_channel_id = 0;
@@ -2861,10 +2865,10 @@ return $result;
             $send_task['yidong_channel_id'] = $yidong_channel_id;
             $send_task['liantong_channel_id'] = $liantong_channel_id;
             $send_task['dianxin_channel_id'] = $dianxin_channel_id;
-        }else{
-            return ["code" => '3005', 'beyond' =>  $beyond,'msg' => '本次提交有效彩信失败'];
+        } else {
+            return ["code" => '3005', 'beyond' =>  $beyond, 'msg' => '本次提交有效彩信失败'];
         }
-       
+
         // print_r($send_task);die;
         Db::startTrans();
         try {
@@ -2883,13 +2887,13 @@ return $result;
                 $check_data = [
                     'msgtype' => "text",
                     'text' => [
-                        "content" => "Hi，审核机器人\n您有一条新的模板变量彩信需要审核\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                        "content" => "Hi，审核机器人\n您有一条新的模板变量彩信需要审核\n【用户信息】：uid[" . $user['id'] . "]用户昵称[" . $user['nick_name'] . "]\n",
                     ],
                 ];
                 $headers = [
                     'Content-Type:application/json'
                 ];
-                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+                $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
             }
             /* foreach ($trial as $tr => $tal) {
                 $son = [];
@@ -2989,7 +2993,7 @@ return $result;
         } */
         if (empty($template)) {
             return ['code' => '3003'];
-        } 
+        }
         $multimedia_message_frame = DbSendMessage::getUserMultimediaTemplateFrame(['multimedia_template_id' => $template['id']], 'num,name,content,image_path,image_type,variable_len', false, ['num' => 'asc']);
         foreach ($multimedia_message_frame as $key => $value) {
             if ($value['variable_len'] > 0) {
@@ -3044,7 +3048,7 @@ return $result;
                     $yidong_channel_id = 108;
                     $liantong_channel_id = 108;
                     $dianxin_channel_id = 108;
-                }else{
+                } else {
                     $free_trial = 1;
                     $yidong_channel_id = 0;
                     $liantong_channel_id = 0;
@@ -3057,7 +3061,7 @@ return $result;
                     $yidong_channel_id = 109;
                     $liantong_channel_id = 109;
                     $dianxin_channel_id = 109;
-                }else{
+                } else {
                     $free_trial = 1;
                     $yidong_channel_id = 0;
                     $liantong_channel_id = 0;
@@ -3070,7 +3074,7 @@ return $result;
                     $yidong_channel_id = 110;
                     $liantong_channel_id = 110;
                     $dianxin_channel_id = 110;
-                }else{
+                } else {
                     $free_trial = 1;
                     $yidong_channel_id = 0;
                     $liantong_channel_id = 0;
@@ -3101,13 +3105,13 @@ return $result;
                 $check_data = [
                     'msgtype' => "text",
                     'text' => [
-                        "content" => "Hi，审核机器人\n您有一条新的非模板彩信需要审核\n【用户信息】：uid[".$user['id']."]用户昵称[".$user['nick_name']."]\n",
+                        "content" => "Hi，审核机器人\n您有一条新的非模板彩信需要审核\n【用户信息】：uid[" . $user['id'] . "]用户昵称[" . $user['nick_name'] . "]\n",
                     ],
                 ];
                 $headers = [
                     'Content-Type:application/json'
                 ];
-                $audit_api =   $this->sendRequest2($api,'post',$check_data,$headers);
+                $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
             }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no'], 'msg_id' => $msg_id];
@@ -3177,7 +3181,8 @@ return $result;
         }
     }
 
-    public function weigeMmsCallBack($receiptBack = []){
+    public function weigeMmsCallBack($receiptBack = [])
+    {
         if (empty($receiptBack)) {
             return 'error';
         }
@@ -3189,7 +3194,7 @@ return $result;
             if (!is_array($value)) {
                 return 'error';
             }
-            $task_id = $redis->hget($task_no,$value['taskid']);
+            $task_id = $redis->hget($task_no, $value['taskid']);
             if (empty($task_id)) {
                 continue;
             }
@@ -3200,7 +3205,6 @@ return $result;
                 'send_time'      => $value['time'],
             ];
             $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
-           
         }
         return 'SUCCESS';
     }
@@ -3485,8 +3489,8 @@ return $result;
             ];
             $this->redis->rPush('sftp:upriver:chuanglan', json_encode($insert_data));
             return 'OK';
-        }elseif ($account == 'C2431630_C4786051') {
-            $user = DbSendMessage::getUserMultimediaMessageLog(['mobile' => $phone,'uid' => 221], 'task_no,uid', true, ['id' => 'desc']);
+        } elseif ($account == 'C2431630_C4786051') {
+            $user = DbSendMessage::getUserMultimediaMessageLog(['mobile' => $phone, 'uid' => 221], 'task_no,uid', true, ['id' => 'desc']);
             $upgoing = [];
             $upgoing = [
                 'mobile' => $phone,
@@ -3514,7 +3518,7 @@ return $result;
                 return ['code' => '3007'];
             }
         } elseif ($account == 'C5304745_C4786051') {
-            $user = DbSendMessage::getUserMultimediaMessageLog(['mobile' => $phone,'uid' => 219], 'task_no,uid', true, ['id' => 'desc']);
+            $user = DbSendMessage::getUserMultimediaMessageLog(['mobile' => $phone, 'uid' => 219], 'task_no,uid', true, ['id' => 'desc']);
             $upgoing = [];
             $upgoing = [
                 'mobile' => $phone,
@@ -3542,7 +3546,7 @@ return $result;
                 return ['code' => '3007'];
             }
         } elseif ($account == 'C5427166_C4786051') {
-            $user = DbSendMessage::getUserMultimediaMessageLog(['mobile' => $phone,'uid' => 220], 'task_no,uid', true, ['id' => 'desc']);
+            $user = DbSendMessage::getUserMultimediaMessageLog(['mobile' => $phone, 'uid' => 220], 'task_no,uid', true, ['id' => 'desc']);
             $upgoing = [];
             $upgoing = [
                 'mobile' => $phone,
@@ -3569,10 +3573,11 @@ return $result;
                 exception($e);
                 return ['code' => '3007'];
             }
-        } 
+        }
     }
 
-    public function getSmsMultimediaMessageTaskNew($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title, $signature_id, $msg_id){
+    public function getSmsMultimediaMessageTaskNew($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title, $signature_id, $msg_id)
+    {
         $this->redis = Phpredis::getConn();
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial,mul_free_trial,multimedia_deduct,multimeda_free_credit', true);
         if (empty($user)) {
@@ -3605,42 +3610,41 @@ return $result;
         if ($user['mul_free_trial'] == 2) {
             $free_trial = 2;
         }
-        if (strpos($title,'道信')) {
+        if (strpos($title, '道信')) {
             $free_trial = 1;
         }
         $i = 0;
         foreach ($content_data as $key => $value) {
-           
+
             if (empty($value['paragraph'])) {
                 return ['code' => '3014'];
             }
             // print_r($value);die;
             foreach ($value['paragraph'] as $pkey => $pvalue) {
                 $frame = [];
-                if ($pvalue['type'] == 1) {//文本类
+                if ($pvalue['type'] == 1) { //文本类
                     if (!isset($pvalue['content'])) {
                         $frame['content'] = '';
                         // if (!empty($signature)) {
                         //     $frame['content'] = '' . $signature['title'];
                         // }
-                    }else{
+                    } else {
                         if (!empty($signature)) {
                             $frame['content'] = $signature['title'] . $pvalue['content'];
                             unset($signature);
                         } else {
                             $frame['content'] = $pvalue['content'];
                         }
-                        if (strpos($pvalue['content'],'道信')) {
+                        if (strpos($pvalue['content'], '道信')) {
                             $free_trial = 1;
                         }
                         // $content_length+= strlen($value['content']);
                         $content_length += (strlen($frame['content']) / 8);
                     }
-
-                }elseif ($pvalue['type'] == 2) {//图片类
+                } elseif ($pvalue['type'] == 2) { //图片类
                     if (!isset($pvalue['content']) || empty($pvalue['content'])) {
                         $frame['image_path'] = '';
-                    }else{
+                    } else {
                         stream_context_set_default([
                             'ssl' => [
                                 'verify_peer'      => false,
@@ -3668,15 +3672,13 @@ return $result;
                 }
                 $frame_num = 0;
                 $frame_num = $i + $pvalue['num'];
-                
+
                 // echo $i;die;
                 $frame['num'] = $frame_num;
-                $frame['name'] = "第".daxie($frame_num)."帧";
+                $frame['name'] = "第" . daxie($frame_num) . "帧";
                 $multimedia_message_frame[] = $frame;
-    
             }
             $i = count($value['paragraph']);
-           
         }
         if ($content_length > $max_length) {
             return ['code' => '3009'];
@@ -3693,7 +3695,7 @@ return $result;
         if ($send_num > $user_equities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3006'];
         }
-       /*  $channel_id = 0;
+        /*  $channel_id = 0;
         $free_trial = 1;
  */
 
@@ -3714,7 +3716,7 @@ return $result;
         if (!empty($send_time)) {
             $SmsMultimediaMessageTask['appointment_time'] = strtotime($send_time);
         }
-            
+
         if ($free_trial == 2) {
             $yidong_channel_id = 59;
             $liantong_channel_id = 59;
@@ -3725,7 +3727,7 @@ return $result;
                     $yidong_channel_id = 108;
                     $liantong_channel_id = 108;
                     $dianxin_channel_id = 108;
-                }else{
+                } else {
                     $free_trial = 1;
                     $yidong_channel_id = 0;
                     $liantong_channel_id = 0;
@@ -3738,7 +3740,7 @@ return $result;
                     $yidong_channel_id = 109;
                     $liantong_channel_id = 109;
                     $dianxin_channel_id = 109;
-                }else{
+                } else {
                     $free_trial = 1;
                     $yidong_channel_id = 0;
                     $liantong_channel_id = 0;
@@ -3751,7 +3753,7 @@ return $result;
                     $yidong_channel_id = 110;
                     $liantong_channel_id = 110;
                     $dianxin_channel_id = 110;
-                }else{
+                } else {
                     $free_trial = 1;
                     $yidong_channel_id = 0;
                     $liantong_channel_id = 0;
@@ -3778,7 +3780,7 @@ return $result;
                     if (!empty($frame['image_path'])) {
                         $frame['image_path'] = filtraImage(Config::get('qiniu.domain'), $frame['image_path']);
                     }
-                   
+
                     DbSendMessage::addUserMultimediaMessageFrame($frame); //添加后的商品id
                 }
             }
@@ -3797,7 +3799,8 @@ return $result;
         }
     }
 
-    public function multimediaTemplateSignatureReportForParagraph($appid, $appkey, $content_data, $title, $name){
+    public function multimediaTemplateSignatureReportForParagraph($appid, $appkey, $content_data, $title, $name)
+    {
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
@@ -3816,22 +3819,21 @@ return $result;
             }
             foreach ($value['paragraph'] as $pkey => $pvalue) {
                 $frame = [];
-                if ($pvalue['type'] == 1) {//文本类
+                if ($pvalue['type'] == 1) { //文本类
                     if (!isset($pvalue['content'])) {
                         $frame['content'] = '';
                         // if (!empty($signature)) {
                         //     $frame['content'] = '' . $signature['title'];
                         // }
-                    }else{
+                    } else {
                         $frame['content'] = $pvalue['content'];
                         // $content_length+= strlen($value['content']);
                         $content_length += (strlen($frame['content']) / 8);
                     }
-
-                }elseif ($pvalue['type'] == 2) {//图片类
+                } elseif ($pvalue['type'] == 2) { //图片类
                     if (!isset($pvalue['content']) || empty($pvalue['content'])) {
                         $frame['image_path'] = '';
-                    }else{
+                    } else {
                         stream_context_set_default([
                             'ssl' => [
                                 'verify_peer'      => false,
@@ -3859,12 +3861,11 @@ return $result;
                 }
                 $frame_num = 0;
                 $frame_num = $i + $pvalue['num'];
-                
+
                 // echo $i;die;
                 $frame['num'] = $frame_num;
-                $frame['name'] = "第".daxie($frame_num)."帧";
+                $frame['name'] = "第" . daxie($frame_num) . "帧";
                 $multimedia_message_frame[] = $frame;
-    
             }
             $i = count($value['paragraph']);
         }
