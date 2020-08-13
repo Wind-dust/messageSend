@@ -700,17 +700,17 @@ return $result;
                 $prefix = substr(trim($value['mobile']), 0, 7);
                 $newres = $redis->hget('index:mobile:source', $prefix);
                 $newres = json_decode($newres, true);
-                if (isset($mobile_Source['source'])) {
-                    if ($mobile_Source['source'] == 1) { //移动
+                if (isset($newres['source'])) {
+                    if ($newres['source'] == 1) { //移动
                         $mobile_num++;
                         $mobile_phone[] = $value;
-                    } elseif ($mobile_Source['source'] == 2) { //联通
+                    } elseif ($newres['source'] == 2) { //联通
                         $unicom_num++;
                         $unicom_phone[] = $value;
-                    } elseif ($mobile_Source['source'] == 3) { //电信
+                    } elseif ($newres['source'] == 3) { //电信
                         $telecom_num++;
                         $telecom_phone[] = $value;
-                    } elseif ($mobile_Source['source'] == 4) { //虚拟
+                    } elseif ($newres['source'] == 4) { //虚拟
                         $virtual_num++;
                         $virtual_phone[] = $value;
                     }
