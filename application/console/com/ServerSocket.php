@@ -15,7 +15,7 @@ class ServerSocket extends Pzlife
 
     public function Service($content)
     {
-       
+
         $redis                    = Phpredis::getConn();
         // $content                  = 9; //绑定通道
         $redisMessageCodeSend     = 'index:meassage:code:send:waittask'; //验证码发送任务rediskey
@@ -23,8 +23,8 @@ class ServerSocket extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // 'host'          => "47.106.127.182", //服务商ip
         // 'port'          => "7890", //短连接端口号   17890长连接端口号
-        // $host          = '0.0.0.0'; //服务商ip
-        $host          = '127.0.0.1'; //服务商ip
+        $host          = '0.0.0.0'; //服务商ip
+        // $host          = '127.0.0.1'; //服务商ip
         $port          = "7890"; //短连接端口号   17890长连接端口号
         $contdata                 = $this->getUserAccount($content);
         $Source_Addr   = $contdata['Source_Addr']; //企业id  企业代码
@@ -88,7 +88,7 @@ class ServerSocket extends Pzlife
                                 // $bodyData = socket_read($accept_resource, $head['Total_Length'] - 12);
                                 $body = unpack("a6Source_Addr/a16AuthenticatorSource/CVersion/NTimestamp", $bodyData);
                                 // print_r($body);
-                                
+
                                 //ip地址绑定
                                 if (!in_array($addr, $bin_ip)) {
                                     $status       = 2;
@@ -542,8 +542,9 @@ class ServerSocket extends Pzlife
         // socket_close($socket);
     }
 
-    public function getUserAccount($nick_name){
-        $user = Db::query("SELECT * FROM yx_users WHERE `nick_name` = '".$nick_name."' ");
+    public function getUserAccount($nick_name)
+    {
+        $user = Db::query("SELECT * FROM yx_users WHERE `nick_name` = '" . $nick_name . "' ");
         if (empty($user)) {
             return false;
         }
@@ -552,9 +553,9 @@ class ServerSocket extends Pzlife
             'Source_Addr'   => $user['nick_name'], //企业id  企业代码 用户名
             'Shared_secret' => $user['cmpp_password'], //网关登录密码
             'Service_Id'    => $user['nick_name'],
-            'Dest_Id'       => $user['cmpp_dest_id'],//短信接入码 短信端口号
+            'Dest_Id'       => $user['cmpp_dest_id'], //短信接入码 短信端口号
             'SP_ID'         => "",
-            'bin_ip'        => explode(',',$user['account_host']), //客户端绑定IP
+            'bin_ip'        => explode(',', $user['account_host']), //客户端绑定IP
             'free_trial'    => 2,
             'master_num'    => 300,
             'uid'           => $user['id'],
