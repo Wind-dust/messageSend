@@ -962,7 +962,7 @@ class SflUpload extends Pzlife
                         exception($e);
                     }
                 }
-                $deduct = ceil(6000000 / 9500656 * 100);
+                $deduct = ceil(658029 / 858029 * 100);
 
                 /* 扣量 */
                 // $all_num = [0,1,2,3,4];
@@ -1572,7 +1572,7 @@ class SflUpload extends Pzlife
                                 continue;
                             }
                             //  strpos($svalue, '2020071518') == false
-                            if (strpos($svalue, '2020081317') == false) {
+                            if (strpos($svalue, '2020081319') == false) {
                                 continue;
                             }
                             $start_time = strtotime("2020-06-18");
