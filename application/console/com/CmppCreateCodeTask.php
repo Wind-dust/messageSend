@@ -9242,35 +9242,10 @@ class CmppCreateCodeTask extends Pzlife
             13023216322,
             18616841500,
             15021417314,
-            15921904656,
             15000773110,
-            18121252120,
-            13636311653,
-            13611664019,
-            13472865840,
-            18013770122,
-            18800232095,
-            18521329177,
-            18501684687,
-            13918902911,
-            18521569417,
             18217584060,
-            13816091848,
-            18621720742,
-            13817515864,
-            16621181441,
-            13701789119,
-            13818181256,
-            15800815262,
-            13916292097,
-            13917823241,
             13585699417,
-            15800400970,
-            13801687321,
-            18621714497,
-            13764272451,
-            18019762207,
-            13162248755,
+            15800400970, 13472865840, 13611664019, 13636311653, 13701789119, 13764272451, 13801687321, 13816091848, 13817515864, 13818181256, 13916292097, 13917823241, 13918902911, 15000773110, 15800815262, 15921904656, 18800232095, 13918153000, 18817718456, 15000796805, 13681961185, 13681961185, 18817718456, 13918153000, 15000796805, 13162248755, 16621181441, 18501684687, 18521329177, 18521569417, 18621714497, 18621720742, 18618353064, 18618353064, 18013770122, 18019762207, 18121252120, 18918267758, 18918267758
         ];
         // echo "SELECT * FROM yx_sfl_send_task WHERE `mobile` IN (".join(',',$white_list).") ";die;
         // $tody_time = 1595491200;
@@ -9299,7 +9274,7 @@ class CmppCreateCodeTask extends Pzlife
         }
         // die;
         $deduct = 1; //1扣量,2不扣
-        $rate = 50;
+        $rate = 60;
 
         $ids = [];
         $j = 1;
@@ -9744,42 +9719,17 @@ class CmppCreateCodeTask extends Pzlife
             13023216322,
             18616841500,
             15021417314,
-            15921904656,
             15000773110,
-            18121252120,
-            13636311653,
-            13611664019,
-            13472865840,
-            18013770122,
-            18800232095,
-            18521329177,
-            18501684687,
-            13918902911,
-            18521569417,
             18217584060,
-            13816091848,
-            18621720742,
-            13817515864,
-            16621181441,
-            13701789119,
-            13818181256,
-            15800815262,
-            13916292097,
-            13917823241,
             13585699417,
-            15800400970,
-            13801687321,
-            18621714497,
-            13764272451,
-            18019762207,
-            13162248755,
+            15800400970, 13472865840, 13611664019, 13636311653, 13701789119, 13764272451, 13801687321, 13816091848, 13817515864, 13818181256, 13916292097, 13917823241, 13918902911, 15000773110, 15800815262, 15921904656, 18800232095, 13918153000, 18817718456, 15000796805, 13681961185, 13681961185, 18817718456, 13918153000, 15000796805, 13162248755, 16621181441, 18501684687, 18521329177, 18521569417, 18621714497, 18621720742, 18618353064, 18618353064, 18013770122, 18019762207, 18121252120, 18918267758, 18918267758
         ];
         $tody_time = strtotime(date("Ymd", time()));
         // $tody_time = 1594785600;
         try {
             /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
             // $mysql_connect->table('yx_sfl_multimedia_message')->where([['create_time', '>', $tody_time],['sfl_relation_id','IN','100181558,100181556,100181563,100177398']])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
-            // $mysql_connect->table('yx_sfl_multimedia_message')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94, 'update_time' => time()]);
+            $mysql_connect->table('yx_sfl_multimedia_message')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94, 'update_time' => time()]);
         } catch (\Exception $th) {
             exception($th);
         }
@@ -9803,7 +9753,7 @@ class CmppCreateCodeTask extends Pzlife
             // print_r($receipt_id);die;
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . " AND `sfl_relation_id`  IN ('100181913','82301','82309','100125372')");
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >  " . $tody_time  . " AND `sfl_relation_id` NOT IN ('100183153')");
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `sfl_relation_id`  IN ('100183188')");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . " ");
             foreach ($sendid as $key => $value) {
                 $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
             }
