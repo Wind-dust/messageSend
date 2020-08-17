@@ -3872,7 +3872,7 @@ return $result;
         if ($content_length > $max_length) {
             return ['code' => '3006'];
         }
-        print_r($);
+        print_r($multimedia_message_frame);die;
         do {
             $template_id = getRandomString(8);
             $has = DbSendMessage::getUserMultimediaTemplate(['template_id' => $template_id], 'id', true);
