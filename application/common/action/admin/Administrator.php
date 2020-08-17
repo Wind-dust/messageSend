@@ -1668,10 +1668,23 @@ class Administrator extends CommonIndex
                     ];
                     $mmsbody[] = $content_data;
                 } */
-                $content_data = [
-                    'content_data' => trim($value['content']),
-                    'content_type' => $value['content_type'],
-                ];
+                if ($value['type'] == 1) {
+                    $content_data = [
+                        'content_data' => trim($value['content']),
+                        'content_type' => $value['content_type'],
+                    ];
+                }elseif($value['type'] == 2){
+                    $content_data = [
+                        'content_data' =>  base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['content'])),
+                        'content_type' => $value['content_type'],
+                    ];
+                }else{
+                    $content_data = [
+                        'content_data' =>  base64_encode(file_get_contents(Config::get('qiniu.videodomain') . '/' . $value['content'])),
+                        'content_type' => $value['content_type'],
+                    ];
+                }
+               
                 $mmsbody[] = $content_data;
             }
             $data['mmsbody'] = $mmsbody;
@@ -1708,9 +1721,104 @@ class Administrator extends CommonIndex
             } else {
                 return ['code' => '3006', 'msg' => '该通道报备失败'];
             }
-        } elseif ($channel_id == 104) { //联麓彩信批量通道
+        } elseif ($channel_id == 134) { //创蓝视频短信通道
+            $appId = 'OutaQ7XImf';
+            $appSecret = 'c538bea5c5f141a0ba07965564bf723c'; 
+            $submitNo = $template_id;
+            $remark = $template['title'];
+            $sign = '【'.$template['signature'].'】';
+            $mmsbody = [];
+            foreach ($multimedia_message_frame as $key => $value) {
+
+            }
+            /* 
+            {
+            "appId": "n6fyZlGQxg",
+                "appSecret": "BADsEg3zeTfJle",
+            "submitNo": "20200509003",
+            "phones": ["18717950159"],
+            "title" : "测试图片15",
+            "sign" : "【上海创蓝文化】",
+            "remark" : "测试备注5",
+            "suffix" : "退订",
+            "videoInfo" : [{
+                    "type" : "image",
+                    "exType":"jpg",
+                    "content" : "/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAkGBwgHBgkIBwgKCgkLDR... "
+            }]
+            }
+ */
            
-        } elseif ($channel_id == 103) {
+
+        } elseif ($channel_id == 135) {//三体视频彩信通道
+            $appId = '12232';
+            $apikey = '42f66a29eb';
+            $title = $template['title'];
+            $name = $template['name'];
+            // $sign = md5('appId='.$appId.'&mobile=15821193682&'.'&apikey='.$apikey);
+            $context = [];
+            foreach ($multimedia_message_frame as $key => $value) {
+                if ($value['type'] == 1) {
+                    $content_data = [
+                        'content' => trim($value['content']),
+                        'type' => 'text',
+                    ];
+                }elseif($value['type'] == 2){
+                    $content_data = [
+                        'content' =>  Config::get('qiniu.domain') . '/' . $value['content'],
+                        'type' => 'image',
+                    ];
+                }elseif($value['type'] == 3){
+                    $content_data = [
+                        'content' =>  Config::get('qiniu.domain') . '/' . $value['content'],
+                        'type' => 'audio',
+                    ];
+                }elseif($value['type'] == 4){
+                    $content_data = [
+                        'content' =>  Config::get('qiniu.domain') . '/' . $value['content'],
+                        'type' => 'video',
+                    ];
+                }
+                $context[] = $content_data;
+            }
+            $timestamp = time();
+            $sign = md5(urlencode($apikey.$appId.$name.$title.json_encode($context).$timestamp));
+            $data = [];
+            $data = [
+                'appId' => $appId,
+                'title' => $title,
+                'name' => $name,
+                'context' => json_encode($context),
+                'timestamp' => $timestamp,
+                'sign' => $sign,
+            ];
+            $result = $this->sendRequest3('http://api.santiyun.com/api/vsmsMode/addMode', 'post', $data);
+            if (!empty($result)) {
+                $result = json_decode($result, true);
+                if ($result['code'] == 0) {
+                    $report_msg_id = $result['rets']['modeId'];
+
+                    $report_data = [];
+                    $report_data = [
+                        'channel_id' => $channel_id,
+                        'template_id' => $template_id,
+                        'third_template_id' => $report_msg_id,
+                    ];
+                    Db::startTrans();
+                    try {
+                        DbAdministrator::addUserSupMessageTemplateThirdReport($report_data);
+                        Db::commit();
+                        return ['code' => '200'];
+                    } catch (\Exception $th) {
+                        exception($th);
+                        Db::rollback();
+                        return ['code' => '3009']; //修改失败
+                    }
+                }
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
+            } else {
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
+            }
             
         } elseif ($channel_id == 122) {
 
@@ -1718,5 +1826,36 @@ class Administrator extends CommonIndex
         }elseif($channel_id == 123){
             
         }
+    }
+
+
+    function sendRequest3($requestUrl, $method = 'get', $data = [])
+    {
+        $methonArr = ['get', 'post'];
+        if (!in_array(strtolower($method), $methonArr)) {
+            return [];
+        }
+        if ($method == 'post') {
+            if (!is_array($data) || empty($data)) {
+                return [];
+            }
+        }
+        $curl = curl_init(); // 初始化一个 cURL 对象
+        curl_setopt($curl, CURLOPT_URL, $requestUrl); // 设置你需要抓取的URL
+        curl_setopt($curl, CURLOPT_HEADER, 0); // 设置header 响应头是否输出
+        if ($method == 'post') {
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 60);
+            curl_setopt($curl, CURLOPT_POSTFIELDS,json_encode($data));
+            curl_setopt($curl, CURLOPT_USERAGENT, 'Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400'); // 模拟用户使用的浏览器
+        }
+        // 设置cURL 参数，要求结果保存到字符串中还是输出到屏幕上。
+        // 1如果成功只将结果返回，不自动输出任何内容。如果失败返回FALSE
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        $res = curl_exec($curl); // 运行cURL，请求网页
+        curl_close($curl); // 关闭URL请求
+        return $res; // 显示获得的数据
     }
 }
