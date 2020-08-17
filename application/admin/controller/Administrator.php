@@ -1216,4 +1216,36 @@ class Administrator extends AdminController
         $result = $this->app->administrator->setUserAccountForCmpp($uid, $cmpp_name, $account_host, $cmpp_dest_id, $business_id);
         return $result;
     }
+
+    /**
+     * @api              {post} / 第三方彩信模板报备接口(视频短信)
+     * @apiDescription   thirdPartySupMessageTemplateReport
+     * @apiGroup         admin_Administrator
+     * @apiName          thirdPartySupMessageTemplateReport
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} template_id 模板id
+     * @apiParam (入参) {String} channel_id 通道ID
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:channel_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /admin/administrator/thirdPartySupMessageTemplateReport
+     * @return array
+     * @author rzc
+     */
+    public function thirdPartySupMessageTemplateReport()
+    {
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $channel_id = trim($this->request->post('channel_id'));
+        $template_id = trim($this->request->post('template_id'));
+        if (empty($channel_id) || intval($channel_id) < 1 || !is_numeric($channel_id)) {
+            return ['code' => '3001', 'msg' => '通道id为空'];
+        }
+        if (empty($template_id)) {
+            return ['code' => '3002', 'msg' => '模板Id 为空'];
+        }
+        $result = $this->app->administrator->thirdPartySupMessageTemplateReport($channel_id, $template_id);
+        return $result;
+    }
 }

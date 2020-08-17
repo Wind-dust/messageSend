@@ -50,7 +50,7 @@ class Message extends AdminController {
     }
 
     /**
-     * @api              {post} / 营销任务审核
+     * @api              {post} / 彩信任务审核
      * @apiDescription   auditMultimediaMessageTask
      * @apiGroup         admin_Message
      * @apiName          auditMultimediaMessageTask
@@ -966,6 +966,191 @@ class Message extends AdminController {
        
         // return $this->encrypt($mobile, $secret_id);
         $result = $this->app->message->numberDetection($mobile);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 获取所有用户模板（视频短信）
+     * @apiDescription   getUserSupMessageTemplate
+     * @apiGroup         admin_Message
+     * @apiName          getUserSupMessageTemplate
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
+     * @apiParam (入参) {String} business_id 业务服务id(服务类型)
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /admin/message/getUserSupMessageTemplate
+     * @return array
+     * @author rzc
+     */
+    public function getUserSupMessageTemplate() {
+        $ConId   = trim($this->request->post('cms_con_id'));
+        $page    = trim($this->request->post('page'));
+        $pageNum = trim($this->request->post('pageNum'));
+        $page    = is_numeric($page) ? $page : 1;
+        $pageNum = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        $result = $this->app->message->getUserSupMessageTemplate($page, $pageNum);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 审核用户彩信模板
+     * @apiDescription   auditUserSupMessageTemplate
+     * @apiGroup         admin_Message
+     * @apiName          auditUserSupMessageTemplate
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 模板Id
+     * @apiParam (入参) {String} status 状态:2,审核通过;3,审核不通过;
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:审核状态码错误 /
+     * @apiSampleRequest /admin/message/auditUserSupMessageTemplate
+     * @return array
+     * @author rzc
+     */
+    public function auditUserSupMessageTemplate() {
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id     = trim($this->request->post('id'));
+        $status = trim($this->request->post('status'));
+        if (empty($id) || intval($id) < 1 || !is_numeric($id)) {
+            return ['code' => '3001'];
+        }
+        if (!in_array($status, [2, 3])) {
+            return ['code' => '3002'];
+        }
+        $result = $this->app->message->auditUserSupMessageTemplate(intval($id), $status);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 获取视频短信任务
+     * @apiDescription   getSupMessageTask
+     * @apiGroup         admin_Message
+     * @apiName          getSupMessageTask
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 任务id
+     * @apiParam (入参) {String} free_trial 1:需要审核;2:审核通过;3:审核不通过
+     * @apiParam (入参) {String} send_status 1：待发送,2:已发送
+     * @apiParam (入参) {String} page 页码 默认1
+     * @apiParam (入参) {String} pageNum 条数 默认10
+     * @apiParam (入参) {String} [title] 任务名称
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误
+     * @apiSampleRequest /admin/message/getSupMessageTask
+     * @return array
+     * @author rzc
+     */
+    public function getSupMessageTask() {
+        $id       = trim($this->request->post('id'));
+        $free_trial       = trim($this->request->post('free_trial'));
+        $send_status       = trim($this->request->post('send_status'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        $title    = trim($this->request->post('title'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        $free_trial  = is_numeric($free_trial) ? $free_trial : 0;
+        $send_status  = is_numeric($send_status) ? $send_status : 0;
+        intval($page);
+        intval($pageNum);
+        intval($free_trial);
+        intval($send_status);
+        $result = $this->app->message->getSupMessageTask($page, $pageNum, $id, $title, $free_trial, $send_status);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 视频信任务审核
+     * @apiDescription   auditSupMessageTask
+     * @apiGroup         admin_Message
+     * @apiName          auditSupMessageTask
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
+     * @apiParam (入参) {String} free_trial 审核状态 2:审核通过;3:审核不通过
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:有效任务ID为空或者不能超过100个
+     * @apiSampleRequest /admin/message/auditSupMessageTask
+     * @return array
+     * @author rzc
+     */
+    public function auditSupMessageTask() {
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id           = trim($this->request->post('id'));
+        $free_trial   = trim($this->request->post('free_trial'));
+        $ids          = explode(',', $id);
+        $effective_id = [];
+        foreach ($ids as $key => $value) {
+            if (empty($value) || intval($value) < 1 || !is_numeric($value)) {
+                continue;
+            }
+            $effective_id[] = $value;
+        }
+        if (count($effective_id) > 100 || count($effective_id) < 1) {
+            return ['code' => '3001'];
+        }
+
+        if (!in_array($free_trial, [2, 3])) {
+            return ['code' => '3003'];
+        }
+        $result = $this->app->message->auditSupMessageTask($effective_id, $free_trial);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 分配任务通道
+     * @apiDescription   distributionSupMessageChannel
+     * @apiGroup         admin_Message
+     * @apiName          distributionSupMessageChannel
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
+     * @apiParam (入参) {String} business_id 业务服务id
+     * @apiParam (入参) {String} yidong_channel_id 移动通道ID
+     * @apiParam (入参) {String} liantong_channel_id 联通通道ID
+     * @apiParam (入参) {String} dianxin_channel_id 电信通道ID
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:channel_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /admin/message/distributionSupMessageChannel
+     * @return array
+     * @author rzc
+     */
+    public function distributionSupMessageChannel() {
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id                  = trim($this->request->post('id'));
+        $channel_id          = trim($this->request->post('channel_id'));
+        $business_id         = trim($this->request->post('business_id'));
+        $yidong_channel_id   = trim($this->request->post('yidong_channel_id'));
+        $liantong_channel_id = trim($this->request->post('liantong_channel_id'));
+        $dianxin_channel_id  = trim($this->request->post('dianxin_channel_id'));
+        $ids                 = explode(',', $id);
+        $effective_id        = [];
+        foreach ($ids as $key => $value) {
+            if (empty($value) || intval($value) < 1 || !is_numeric($value)) {
+                continue;
+            }
+            $effective_id[] = $value;
+        }
+        if (empty($yidong_channel_id) || intval($yidong_channel_id) < 1 || !is_numeric($yidong_channel_id)) {
+            return ['code' => '3002'];
+        }
+        if (empty($liantong_channel_id) || intval($liantong_channel_id) < 1 || !is_numeric($liantong_channel_id)) {
+            return ['code' => '3002'];
+        }
+        if (empty($dianxin_channel_id) || intval($dianxin_channel_id) < 1 || !is_numeric($dianxin_channel_id)) {
+            return ['code' => '3002'];
+        }
+        if (empty($business_id) || intval($business_id) < 1 || !is_numeric($business_id)) {
+            return ['code' => '3003'];
+        }
+        $result = $this->app->message->distributionSupMessageChannel($effective_id, intval($yidong_channel_id), intval($liantong_channel_id), intval($dianxin_channel_id), intval($business_id));
         return $result;
     }
 }

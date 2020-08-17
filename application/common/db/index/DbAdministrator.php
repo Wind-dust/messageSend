@@ -18,6 +18,7 @@ use app\common\model\UserSendTaskLog;
 use app\common\model\UserSendCodeTaskLog;
 use app\common\model\ThirdPartyMmsTemplateReport;
 use app\common\model\UserMultimediaTemplateThirdReport;
+use app\common\model\UserSupMessageTemplateThirdReport;
 use app\common\model\UserDeductWord;
 use app\common\model\UserCmppAccount;
 use think\Db;
@@ -450,6 +451,30 @@ class DbAdministrator
     public function countUserMultimediaTemplateThirdReport($where)
     {
         return UserMultimediaTemplateThirdReport::where($where)->count();
+    }
+
+    public function getUserSupMessageTemplateThirdReport($where, $field, $row = false, $orderBy = '', $limit = '')
+    {
+        $obj = UserSupMessageTemplateThirdReport::field($field)->where($where);
+        return $this->getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function addUserSupMessageTemplateThirdReport($data)
+    {
+        $UserSupMessageTemplateThirdReport = new UserSupMessageTemplateThirdReport;
+        $UserSupMessageTemplateThirdReport->save($data);
+        return $UserSupMessageTemplateThirdReport->id;
+    }
+
+    public function editUserSupMessageTemplateThirdReport($data, $id)
+    {
+        $UserSupMessageTemplateThirdReport = new UserSupMessageTemplateThirdReport;
+        return $UserSupMessageTemplateThirdReport->save($data, ['id' => $id]);
+    }
+
+    public function countUserSupMessageTemplateThirdReport($where)
+    {
+        return UserSupMessageTemplateThirdReport::where($where)->count();
     }
 
     public function getUserCmppAccount($where, $field, $row = false, $orderBy = '', $limit = '')

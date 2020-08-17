@@ -1592,4 +1592,131 @@ class Administrator extends CommonIndex
         $conId = hash_hmac('ripemd128', $conId, '');
         return $conId;
     }
+
+    public function thirdPartySupMessageTemplateReport($channel_id, $template_id)
+    {
+        $template =  DbSendMessage::getUserSupMessageTemplate(['template_id' => $template_id], '*', true);
+        if ($template['status'] != 2 || empty($template)) {
+            return ['code' => '3003', 'msg' => '模板未审核通过或者该模板不存在'];
+        }
+        $multimedia_message_frame = DbSendMessage::getUserSupMessageTemplateFrame(['multimedia_template_id' => $template['id']], 'num,content,type,content_type', false, ['num' => 'asc']);
+        $model_val = 0; //模板类型 0，普通彩信, 1 模板变量彩信
+       /*  foreach ($multimedia_message_frame as $key => $value) {
+            if (strpos($value['content'], '{{var') != false) {
+                $model_val = 1;
+                break;
+            }
+        } */
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id], 'id,title,business_id,channel_price', true);
+        if (empty($channel)) {
+            return ['code' => '3002'];
+        }
+        if ($channel['business_id'] != 11) {
+            return ['code' => '3004', '非视频短信通道不能使用此接口'];
+        }
+        $had_report = DbAdministrator::getUserSupMessageTemplateThirdReport(['channel_id' => $channel_id, 'template_id' => $template_id], 'id', true);
+        if (!empty($had_report)) {
+            return ['code' => '3007', 'msg' => '该模板已在该通道报备过'];
+        }
+        //创蓝
+        if ($channel_id == 133) {//上海田南 
+           $appid = '350393';
+           $apikey = 'c538bea5c5f141a0ba07965564bf723c';
+            $time = microtime(true);
+            //结果：1541053888.5911
+            //在经过处理得到最终结果:
+            $lastTime = (int)($time * 1000);
+            $sign = md5($apikey . $appid . $lastTime . $apikey); //数字签名参考sign生成规则 是
+            $report_api = 'http://47.101.30.221:8081/api/v2/mms/create?timestamp=' . $lastTime . '&appid=' . $appid . '&sign=' . $sign . '&mmstemplate=1';
+            $data = [];
+            $data['mms_title'] = $template['title'];
+            $data['mmsSign'] = $template['signature'];
+            $data['mms_type'] = 'multipart/mixed';
+            $data['mmstemplate'] = 0;
+
+            // print_r($multimedia_message_frame);die;
+            $mmsbody = [];
+            foreach ($multimedia_message_frame as $key => $value) {
+                # code...
+               /*  $content_data = [];
+                if (!empty($value['content'])) {
+                    if (strpos($value['content'],'{{var') == false) {
+                        return ['code' => '3010','msg' => '该通道无法报备非变量模板'];
+                    }
+                    $value['content'] = str_replace('{{var1}}', '{1}', $value['content']);
+                    $value['content'] = str_replace('{{var2}}', '{2}', $value['content']);
+                    $value['content'] = str_replace('{{var3}}', '{3}', $value['content']);
+                    $value['content'] = str_replace('{{var4}}', '{4}', $value['content']);
+                    $value['content'] = str_replace('{{var5}}', '{5}', $value['content']);
+                    $value['content'] = str_replace('{{var6}}', '{6}', $value['content']);
+                    $value['content'] = str_replace('{{var7}}', '{7}', $value['content']);
+                    $value['content'] = str_replace('{{var8}}', '{8}', $value['content']);
+                    $value['content'] = str_replace('{{var9}}', '{9}', $value['content']);
+                    $value['content'] = str_replace('{{var10}}', '{10}', $value['content']);
+                   
+                }
+                $content_data = [];
+                if (!empty($value['image_path'])) {
+
+                    $value['image_path'] = filtraImage(Config::get('qiniu.domain'), $value['image_path']);
+                    $type = explode('.', $value['image_path']);
+
+
+                    $content_data = [
+                        'content_data' => base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path'])),
+                        'content_type' => 'image/' . $type[1],
+                    ];
+                    $mmsbody[] = $content_data;
+                } */
+                $content_data = [
+                    'content_data' => trim($value['content']),
+                    'content_type' => $value['content_type'],
+                ];
+                $mmsbody[] = $content_data;
+            }
+            $data['mmsbody'] = $mmsbody;
+            $headers = [];
+            $headers = [
+                'Content-Type:text/plain'
+            ];
+            $result = $this->sendRequest2($report_api, 'post', $data, $headers);
+            // $result = '{"msg":"成功","code":"T","data":{"mms_id":"60226","status":"R"}}';
+            // print_r($result);die;
+            if (!empty($result)) {
+                $result = json_decode($result, true);
+                if ($result['msg'] == '成功') {
+                    $report_msg_id = $result['data']['mms_id'];
+
+                    $report_data = [];
+                    $report_data = [
+                        'channel_id' => $channel_id,
+                        'template_id' => $template_id,
+                        'third_template_id' => $report_msg_id,
+                    ];
+                    Db::startTrans();
+                    try {
+                        DbAdministrator::addUserSupMessageTemplateThirdReport($report_data);
+                        Db::commit();
+                        return ['code' => '200'];
+                    } catch (\Exception $th) {
+                        exception($th);
+                        Db::rollback();
+                        return ['code' => '3009']; //修改失败
+                    }
+                }
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
+            } else {
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
+            }
+        } elseif ($channel_id == 104) { //联麓彩信批量通道
+           
+        } elseif ($channel_id == 103) {
+            
+        } elseif ($channel_id == 122) {
+
+           
+        }elseif($channel_id == 123){
+            
+        }
+    }
 }

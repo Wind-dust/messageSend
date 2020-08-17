@@ -18,6 +18,12 @@ use app\common\model\SflMultimediaTemplateFrame;
 use app\common\model\SflMultimediaTemplate;
 use app\common\model\UserUpriver;
 use app\common\model\NumberSource;
+use app\common\model\UserSupMessage;
+use app\common\model\UserSupMessageFrame;
+use app\common\model\UserSupMessageLog;
+use app\common\model\UserSupMessageTemplate;
+use app\common\model\UserSupMessageTemplateFrame;
+use app\common\model\UserSupMessageTemplateThirdReport;
 use think\Db;
 
 class DbSendMessage extends Db
@@ -372,5 +378,179 @@ class DbSendMessage extends Db
         $NumberSource = new NumberSource;
         $obj = NumberSource::field($field)->where($where);
         return getResult($obj, $row, $orderBy, $limit);
+    }
+
+   /**
+     * 获取超级彩信（视频）
+     * @param $where
+     * @return array
+     */
+    public function getUserSupMessage($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = UserSupMessage::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function countUserSupMessage($where)
+    {
+        return UserSupMessage::where($where)->count();
+    }
+
+    public function addUserSupMessage($data)
+    {
+        $UserSupMessage = new UserSupMessage;
+        $UserSupMessage->save($data);
+        return $UserSupMessage->id;
+    }
+
+    public function editUserSupMessage($data, $id)
+    {
+        $UserSupMessage = new UserSupMessage;
+        return $UserSupMessage->save($data, ['id' => $id]);
+    }
+
+    /**
+     * 获取超级彩信（视频）内容
+     * @param $where
+     * @return array
+     */
+    public function getUserSupMessageFrame($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = UserSupMessageFrame::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function countUserSupMessageFrame($where)
+    {
+        return UserSupMessageFrame::where($where)->count();
+    }
+
+    public function addUserSupMessageFrame($data)
+    {
+        $UserSupMessageFrame = new UserSupMessageFrame;
+        $UserSupMessageFrame->save($data);
+        return $UserSupMessageFrame->id;
+    }
+
+    public function editUserSupMessageFrame($data, $id)
+    {
+        $UserSupMessageFrame = new UserSupMessageFrame;
+        return $UserSupMessageFrame->save($data, ['id' => $id]);
+    }
+
+    /**
+     * 获取超级彩信（视频）发送日志
+     * @param $where
+     * @return array
+     */
+    public function getUserSupMessageLog($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = UserSupMessageLog::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function countUserSupMessageLog($where)
+    {
+        return UserSupMessageLog::where($where)->count();
+    }
+
+    public function addUserSupMessageLog($data)
+    {
+        $UserSupMessageLog = new UserSupMessageLog;
+        $UserSupMessageLog->save($data);
+        return $UserSupMessageLog->id;
+    }
+
+    public function editUserSupMessageLog($data, $id)
+    {
+        $UserSupMessageLog = new UserSupMessageLog;
+        return $UserSupMessageLog->save($data, ['id' => $id]);
+    }
+
+    /**
+     * 获取超级彩信（视频）模板
+     * @param $where
+     * @return array
+     */
+    public function getUserSupMessageTemplate($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = UserSupMessageTemplate::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function countUserSupMessageTemplate($where)
+    {
+        return UserSupMessageTemplate::where($where)->count();
+    }
+
+    public function addUserSupMessageTemplate($data)
+    {
+        $UserSupMessageTemplate = new UserSupMessageTemplate;
+        $UserSupMessageTemplate->save($data);
+        return $UserSupMessageTemplate->id;
+    }
+
+    public function editUserSupMessageTemplate($data, $id)
+    {
+        $UserSupMessageTemplate = new UserSupMessageTemplate;
+        return $UserSupMessageTemplate->save($data, ['id' => $id]);
+    }
+
+    /**
+     * 获取超级彩信（视频）模板内容
+     * @param $where
+     * @return array
+     */
+    public function getUserSupMessageTemplateFrame($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = UserSupMessageTemplateFrame::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function countUserSupMessageTemplateFrame($where)
+    {
+        return UserSupMessageTemplateFrame::where($where)->count();
+    }
+
+    public function addUserSupMessageTemplateFrame($data)
+    {
+        $UserSupMessageTemplateFrame = new UserSupMessageTemplateFrame;
+        $UserSupMessageTemplateFrame->save($data);
+        return $UserSupMessageTemplateFrame->id;
+    }
+
+    public function editUserSupMessageTemplateFrame($data, $id)
+    {
+        $UserSupMessageTemplateFrame = new UserSupMessageTemplateFrame;
+        return $UserSupMessageTemplateFrame->save($data, ['id' => $id]);
+    }
+
+    /**
+     * 获取超级彩信（视频）通道报备
+     * @param $where
+     * @return array
+     */
+    public function getUserSupMessageTemplateThirdReport($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = UserSupMessageTemplateThirdReport::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function countUserSupMessageTemplateThirdReport($where)
+    {
+        return UserSupMessageTemplateThirdReport::where($where)->count();
+    }
+
+    public function addUserSupMessageTemplateThirdReport($data)
+    {
+        $UserSupMessageTemplateThirdReport = new UserSupMessageTemplateThirdReport;
+        $UserSupMessageTemplateThirdReport->save($data);
+        return $UserSupMessageTemplateThirdReport->id;
+    }
+
+    public function editUserSupMessageTemplateThirdReport($data, $id)
+    {
+        $UserSupMessageTemplateThirdReport = new UserSupMessageTemplateThirdReport;
+        return $UserSupMessageTemplateThirdReport->save($data, ['id' => $id]);
     }
 }

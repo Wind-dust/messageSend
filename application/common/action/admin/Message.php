@@ -143,7 +143,7 @@ class Message extends CommonIndex {
         if (empty($channel)) {
             return ['code' => '3012'];
         }
-        $usertask = DbSendMessage::getUserMultimediaMessage([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,free_trial,send_num,yidong_channel_id,liantong_channel_id,dianxin_channel_id', false);
+        $usertask = DbSendMessage::getUserMultimediaMessage([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,submit_content,free_trial,send_num,yidong_channel_id,liantong_channel_id,dianxin_channel_id', false);
         if (empty($usertask)) {
             return ['code' => '3001'];
         }
@@ -1033,5 +1033,235 @@ class Message extends CommonIndex {
 
     public function hasNumber(){
         
+    }
+
+    public function getUserSupMessageTemplate($page, $pageNum){
+        $offset = $pageNum * ($page - 1);
+        $result = DbSendMessage::getUserSupMessageTemplate([], '*', false, ['id' => 'desc'], $offset . ',' . $pageNum);
+        foreach ($result as $key => $value) {
+            $result[$key]['multimedia_frame'] = DbSendMessage::getUserSupMessageTemplateFrame(['multimedia_template_id' => $value['id']], '*', false, ['num' => 'asc']);
+        }
+        $totle = DbSendMessage::countUserSupMessageTemplate([]);
+        return ['code' => '200', 'totle' => $totle, 'result' => $result];
+    }
+
+
+
+    public function auditUserSupMessageTemplate($id, $status) {
+        $result = DbSendMessage::getUserSupMessageTemplate(['id' => $id], '*', true);
+        if (empty($result)) {
+            return ['code' => '3001'];
+        }
+        if ($result['status'] != 1) {
+            return ['code' => '3003'];
+        }
+        Db::startTrans();
+        try {
+            DbSendMessage::editUserSupMessageTemplate(['status' => $status], $id);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function getSupMessageTask($page, $pageNum, $id = 0, $title = '', $free_trial = 0, $send_status = 0) {
+        $offset = ($page - 1) * $pageNum;
+        $time = strtotime('-4 days',time());
+        // echo $time;die;
+        $where = [];
+        array_push($where,['create_time','>=',$time]);
+        $offset = ($page - 1) * $pageNum;
+        if ($free_trial) {
+            array_push($where,['free_trial','=',$free_trial]);
+        }
+        if ($send_status) {
+            array_push($where,['send_status','=',$send_status]);
+        }
+        $where  = [];
+        if (!empty($id)) {
+            $result            = DbSendMessage::getUserSupMessage(['id' => $id], '*', true);
+            $result['content'] = DbSendMessage::getUserSupMessageFrame(['multimedia_message_id' => $id], '*', false, ['num' => 'asc']);
+        } else {
+            if (empty($title)) {
+                array_push($where, ['title', 'like', '%' . $title . '%']);
+            }
+            $result = DbSendMessage::getUserSupMessage($where, '*', false, '', $offset . ',' . $pageNum);
+            foreach ($result as $key => $value) {
+                $result[$key]['content'] = DbSendMessage::getUserSupMessageFrame(['multimedia_message_id' => $value['id']], '*', false, ['num' => 'asc']);
+            }
+        }
+        $total = DbSendMessage::countUserSupMessageFrame($where);
+        if ($id) {
+            $total = 1;
+        }
+
+        return ['code' => '200', 'data' => $result, 'total' => $total];
+    }
+
+    public function auditSupMessageTask($effective_id = [], $free_trial) {
+        // print_r($effective_id);die;
+        $userchannel = DbSendMessage::getUserSupMessage([['id', 'in', join(',', $effective_id)]], 'id,task_no,send_msg_id,uid,mobile_content,real_num,free_trial,template_id,submit_content', false);
+
+        if (empty($userchannel)) {
+            return ['code' => '3001'];
+        }
+        $real_effective_id = [];
+        $INTERCEPT_num = [];
+        // $receipt = $redis->rPush('index:meassage:code:user:receive:168','{"task_no":"bus20063022452104364246","status_message":"NOROUTE","message_info":"\u53d1\u9001\u6210\u529f","mobile":"15103230163","msg_id":"70000500020200630224527169053","send_time":"2020-06-30 22:45:28","smsCount":1,"smsIndex":1}');
+        // print_r($userchannel);die;
+        $uids = [];
+        foreach ($userchannel as $key => $value) {
+            if ($value['free_trial'] > 1) {
+                continue;
+            }
+            $real_effective_id[] = $value['id'];
+            if ($free_trial == 3) {
+                // $INTERCEPT[] = $value['id'];
+                // $res = $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' =>$usertask['id'],'deduct' => $user['multimedia_deduct']]));
+                // $mobile = explode()
+                
+                if (!empty($value['submit_content'])) {
+                    $submit_content = json_decode($value['submit_content'],true);
+                    if (!empty($submit_content)) {
+                        foreach ($submit_content as $skey => $svalue) {
+                            // # code...
+                            $res = $this->redis->rpush("index:meassage:code:user:supreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"INTERCEPT","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $svalue['mobile']]));
+                        }
+                    }else{
+                        $res = $this->redis->rpush("index:meassage:code:user:supreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"INTERCEPT","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time())]));
+                    }
+                }else{
+                    $mobiles = explode(',',$value['mobile_content']);
+                    foreach ($mobiles as $mkey => $mvalue) {
+                        $res = $this->redis->rpush("index:meassage:code:user:supreceive:".$value['uid'], json_encode(['task_no' =>$value['task_no'],'msg_id' => $value['send_msg_id'],"status_message"=>"INTERCEPT","message_info" => "驳回","send_time" => date("Y-m-d H:i:s",time()),'mobile'=> $mvalue]));
+                    }
+                }
+                if (isset($INTERCEPT_num[$value['uid']])) {
+                    $INTERCEPT_num[$value['uid']] += $value['real_num'];
+                }else{
+                     $INTERCEPT_num[$value['uid']] = $value['real_num'];
+                     $uids[] = $value['uid'];
+                }
+                
+            }
+        }
+        if (empty($real_effective_id)) {
+            return ['code' => '3002', 'msg' => '没有需要审核的任务'];
+        }
+        $where_equitise = [
+            ['uid', 'IN', join(',', $uids)], ['business_id', '=', 11]
+        ];
+        $user_equities = DbAdministrator::getUserEquities($where_equitise, 'id,uid,num_balance', false);
+        /* print_r($user_equities);die;
+        foreach ($INTERCEPT_num as $rkey => $rvalue) {
+            
+        } */
+        Db::startTrans();
+        try {
+            foreach ($real_effective_id as $real => $efid) {
+                DbSendMessage::editUserSupMessage(['free_trial' => $free_trial], $efid);
+            }
+            if ($free_trial == 3) {
+                foreach ($user_equities as $key => $value) {
+                    DbAdministrator::modifyBalance($value['id'], $INTERCEPT_num[$value['uid']], 'inc');
+                }
+            }
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function distributionSupMessageChannel($effective_id = [], $yidong_channel_id, $liantong_channel_id, $dianxin_channel_id, $business_id) {
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $yidong_channel_id], 'id,title,channel_price', true);
+        if (empty($channel)) {
+            return ['code' => '3002'];
+        }
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $liantong_channel_id], 'id,title,channel_price', true);
+        if (empty($channel)) {
+            return ['code' => '3011'];
+        }
+        $channel = DbAdministrator::getSmsSendingChannel(['id' => $dianxin_channel_id], 'id,title,channel_price', true);
+        if (empty($channel)) {
+            return ['code' => '3012'];
+        }
+        $usertask = DbSendMessage::getUserSupMessage([['id', 'in', join(',', $effective_id)]], 'id,uid,mobile_content,submit_content,free_trial,send_num,yidong_channel_id,liantong_channel_id,dianxin_channel_id', false);
+        if (empty($usertask)) {
+            return ['code' => '3001'];
+        }
+        $num               = 0;
+        $uids              = [];
+        $real_effective_id = [];
+        $real_usertask     = [];
+        foreach ($usertask as $key => $value) {
+            if (empty($uids)) {
+                $uids[] = $value['uid'];
+            } elseif (!in_array($value['uid'], $uids)) {
+                $uids[] = $value['uid'];
+            }
+            // print_r($value);
+            if ($value['free_trial'] == 2 && !$value['yidong_channel_id']) {
+                $real_length     = 1;
+                $real_usertask[] = $value;
+                $mobilesend      = explode(',', $value['mobile_content']);
+                // $send_length     = mb_strlen($value['task_content'], 'utf8');
+                // if ($send_length > 70) {
+                //     $real_length = ceil($send_length / 67);
+                // }
+                $num += ($real_length * $value['send_num']);
+                // foreach ($mobilesend as $key => $kvalue) {
+
+                // }
+            }
+        }
+        // die;
+        // print_r($uids);die;
+        if (count($uids) > 1) {
+            return ['code' => '3008', 'msg' => '一批只能同时分配一个用户的营销任务'];
+        }
+        if (empty($real_usertask)) {
+            return ['code' => '3010', 'msg' => '待分配的批量任务未空（提交了一批未审核的批量任务）'];
+        }
+        $userEquities = DbAdministrator::getUserEquities(['uid' => $uids[0], 'business_id' => $business_id], 'id,agency_price,num_balance', true);
+        if (empty($userEquities)) {
+            return ['code' => '3005'];
+        }
+
+        $user = DbUser::getUserInfo(['id' => $uids[0]], 'id,reservation_service,user_status,supmessage_deduct', true);
+        if ($user['user_status'] != 2) {
+            return ['code' => '3006'];
+        }
+        // print_r($num);die;
+        /* if ($num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
+        return ['code' => '3007'];
+        } */
+        $free_trial = 2;
+        if ($userEquities['agency_price'] < $channel['channel_price']) {
+            $free_trial = 4;
+        }
+        Db::startTrans();
+        try {
+
+            // DbAdministrator::modifyBalance($userEquities['id'], $num, 'dec');
+            foreach ($real_usertask as $key => $value) {
+                DbSendMessage::editUserMultimediaMessage(['free_trial' => $free_trial, 'yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id, 'send_status' => 2], $value['id']);
+            }
+            if ($free_trial == 2) {
+                foreach ($real_usertask as $real => $usertask) {
+                    $res = $this->redis->rpush("index:meassage:supmessage:sendtask", json_encode(['id' =>$usertask['id'],'deduct' => $user['supmessage_deduct']]));
+                }
+            }
+
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            exception($e);
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
     }
 }

@@ -1359,3 +1359,131 @@ CREATE TABLE `yx_user_cmpp_account` (
   KEY `channel_id` (`yidong_channel_id`,`liantong_channel_id`,`dianxin_channel_id`) USING BTREE,
   KEY `nick_name` (`nick_name`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='第三方彩信模板报备表';
+
+DROP TABLE IF EXISTS `yx_user_sup_message`;
+CREATE TABLE `yx_user_sup_message` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `send_msg_id` varchar(255) NOT NULL DEFAULT '' COMMENT 'msg_id',
+  `develop_no` varchar(6) NOT NULL DEFAULT '',
+  `task_no` char(23) NOT NULL DEFAULT '' COMMENT '任务编号',
+  `template_id` char(8) NOT NULL DEFAULT '' COMMENT '彩信模板id',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `title` varchar(255) NOT NULL DEFAULT '' COMMENT '任务名称',
+  `signature` varchar(255) NOT NULL DEFAULT '' COMMENT '签名',
+  `mobile_content` longtext COMMENT '手机号集合',
+  `submit_content` longtext COMMENT '变量内容',
+  `source` varchar(50) NOT NULL DEFAULT '' COMMENT '请求源（ip）',
+  `log_path` varchar(255) NOT NULL DEFAULT '' COMMENT '日志地址',
+  `real_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '实际数量',
+  `send_num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发送数量',
+  `free_trial` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '1:需要审核;2:审核通过;3:审核不通过',
+  `yidong_channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '移动通道ID',
+  `liantong_channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '联通通道id',
+  `dianxin_channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '电信通道id',
+  `send_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '1：待发送,2:发送中;3:成功;4:失败',
+  `send_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '预约发送时间',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  `appointment_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '预约发送时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `task_no_uid_template_id` (`task_no`,`uid`,`template_id`) USING BTREE,
+  KEY `title` (`title`) USING BTREE,
+  KEY `send_status` (`send_status`) USING BTREE,
+  KEY `time` (`create_time`,`delete_time`,`update_time`) USING BTREE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='超级短信（视频短信）主表';
+DROP TABLE IF EXISTS `yx_user_sup_message_log`;
+CREATE TABLE `yx_user_sup_message_log` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `task_no` char(23) NOT NULL DEFAULT '' COMMENT '任务编号',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `task_id` char(23) NOT NULL DEFAULT '' COMMENT '任务id',
+  `template_id` char(8) NOT NULL DEFAULT '' COMMENT '彩信模板id',
+  `title` varchar(255) NOT NULL DEFAULT '' COMMENT '任务名称',
+  `mobile` char(20) NOT NULL DEFAULT '' COMMENT '接收手机',
+  `source` varchar(50) NOT NULL DEFAULT '' COMMENT '请求源（ip）',
+  `develop_no` varchar(6) NOT NULL DEFAULT '' COMMENT '拓展码',
+  `channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '通道id',
+  `send_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '短信发送状态1：待发送,2:已发送;3:成功;4:失败',
+  `source_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '网关状态1：待发送,2:已发送;3:成功;4:失败',
+  `user_query_status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '用户查询状态1:未获取;2:已获取',
+  `status_message` varchar(30) DEFAULT '' COMMENT '状态',
+  `message_info` varchar(20) NOT NULL DEFAULT '' COMMENT '回执状态说明',
+  `real_message` varchar(30) NOT NULL DEFAULT '' COMMENT '真实返回状态',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `task_no` (`task_no`,`task_id`) USING BTREE,
+  KEY `mobile` (`mobile`) USING BTREE,
+  KEY `time` (`create_time`,`delete_time`,`update_time`) USING BTREE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='彩信发送记录表';
+
+DROP TABLE IF EXISTS `yx_user_sup_message_frame`;
+CREATE TABLE `yx_user_sup_message_frame` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `multimedia_message_id` char(23) NOT NULL DEFAULT '' COMMENT '彩信id',
+  `num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '排序',
+  `content` text COMMENT '文字内容',
+  `type` tinyint(3) NOT NULL DEFAULT 1 COMMENT '类型 1,文本;2,图片;3,音频;4,视频',
+  `content_type`varchar(30) NOT NULL DEFAULT '' COMMENT '资源类型',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `multimedia_message_id_num` (`num`,`multimedia_message_id`) USING BTREE,
+  KEY `multimedia_message_id` (`multimedia_message_id`) USING BTREE,
+  KEY `time` (`create_time`,`delete_time`,`update_time`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='彩信副表（帧）';
+
+DROP TABLE IF EXISTS `yx_user_sup_message_template`;
+CREATE TABLE `yx_user_sup_message_template` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `template_id` char(23) NOT NULL DEFAULT '' COMMENT '短信模板id',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `title` varchar(255) NOT NULL DEFAULT '' COMMENT '模板名称',
+  `signature` varchar(255) NOT NULL DEFAULT '' COMMENT '签名',
+  `name` varchar(40) NOT NULL DEFAULT '' COMMENT '模板别名',
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '状态:1,提交申请;2,审核通过3,审核不通过;',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `template_id` (`template_id`,`uid`) USING BTREE,
+  KEY `title` (`title`) USING BTREE,
+  KEY `time` (`create_time`,`delete_time`,`update_time`) USING BTREE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='彩信模板主表';
+
+DROP TABLE IF EXISTS `yx_user_sup_message_template_frame`;
+CREATE TABLE `yx_user_sup_message_template_frame` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `multimedia_template_id` char(23) NOT NULL DEFAULT '' COMMENT '彩信模板id',
+  `num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '排序',
+  `content` text COMMENT '文字内容',
+  `type` tinyint(3) NOT NULL DEFAULT 1 COMMENT '类型 1,文本;2,图片;3,音频;4,视频',
+  `content_type`varchar(30) NOT NULL DEFAULT '' COMMENT '资源类型',
+  `variable_len` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '文字内容变量个数',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `multimedia_template_id_num` (`num`,`multimedia_template_id`) USING BTREE,
+  KEY `multimedia_template_id` (`multimedia_template_id`) USING BTREE,
+  KEY `time` (`create_time`,`delete_time`,`update_time`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='彩信模板副表（帧）';
+
+DROP TABLE IF EXISTS `yx_user_sup_message_template_third_report`;
+CREATE TABLE `yx_user_sup_message_template_third_report` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `template_id` char(23) NOT NULL DEFAULT '' COMMENT '彩信信模板id',
+  `channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '报备通道id',
+  `third_template_id` char(23) NOT NULL DEFAULT '' COMMENT '彩信信模板id',
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '状态:1,提交申请;2,审核通过3,审核不通过;',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `template_id` (`template_id`,`third_template_id`,`channel_id`) USING BTREE,
+  KEY `time` (`create_time`,`delete_time`,`update_time`) USING BTREE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='第三方彩信模板报备表';
+

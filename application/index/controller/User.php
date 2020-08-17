@@ -1010,4 +1010,34 @@ class User extends MyController
         $result = $this->app->user->getSflReportLog();
         return $result;
     }
+
+    /**
+     * @api              {post} / 获取所有用户模板（视频短信）
+     * @apiDescription   getUserSupMessageTemplate
+     * @apiGroup         index_user
+     * @apiName          getUserSupMessageTemplate
+     * @apiParam (入参) {String} con_id
+     * @apiParam (入参) {String} id 任务id,多个用半角,分隔开,一次最多100
+     * @apiParam (入参) {String} status 状态:1,提交申请;2,审核通过3,审核不通过;
+     * @apiParam (入参) {String} page 
+     * @apiParam (入参) {String} pageNum 
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /index/user/getUserSupMessageTemplate
+     * @return array
+     * @author rzc
+     */
+    public function getUserSupMessageTemplate()
+    {
+        $ConId = trim($this->request->post('con_id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $status  = trim($this->request->post('status'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        intval($page);
+        intval($pageNum);
+        intval($status);
+        $result = $this->app->user->getUserSupMessageTemplate($ConId, $page, $pageNum, $status);
+        return $result;
+    }
 }

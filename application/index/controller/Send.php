@@ -1525,4 +1525,93 @@ class Send extends MyController
             exit;
         }
     }
+
+    /**
+     * @api              {post} / 视频短信模板报备接口
+     * @apiDescription   supMessageTemplateSignatureReport
+     * @apiGroup         index_send
+     * @apiName          supMessageTemplateSignatureReport
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {Array} content_data 短信内容
+     * @apiParam (入参) {String} title 模板主题
+     * @apiParam (入参) {String} name 模板别名
+     * @apiParam (入参) {String} signature 签名
+     * @apiParam (content_data) {String} content 内容
+     * @apiParam (content_data) {String} type 类型 1,文本;2,图片;3,音频;4,视频
+     * @apiParam (content_data) {String} num 顺序 按自然数排列 从小到大 必传
+     * @apiSuccess (返回) {String} code 200:成功 / 3000:用户名或密码错误 / 3001:模板内容为空 / 3002:模板主题为空 / 3003:别名为空 / 3004:签名为空 / 3005:该账户没有此项服务 / 3006:余额不足 / 3007:title 短信标题不能为空 / 3008:资源内容为空 / 3009:彩信文件长度超过100KB或内容为空 / 3010 图片未上传过 / 3011:服务器错误
+     * @apiSampleRequest /index/send/supMessageTemplateSignatureReport
+     * @author rzc
+     */
+    public function supMessageTemplateSignatureReport()
+    {
+        $appid          = trim($this->request->post('appid')); //登录名
+        $appkey         = trim($this->request->post('appkey')); //登陆密码
+        $title          = trim($this->request->post('title')); //短信标题
+        $name          = trim($this->request->post('name')); //短信标题
+        $signature          = trim($this->request->post('signature')); //短信标题
+        $content_data   = $this->request->post('content_data'); //短信内容
+        // $content_data   = json_decode($content_data, true);
+        // print_r($content_data);die;
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        if (empty($content_data)) {
+            return ['code' => '3001'];
+        }
+        if (empty($title)) {
+            return ['code' => '3002'];
+        }
+        if (empty($signature)) {
+            return ['code' => '3004'];
+        }
+        if (empty($name)) {
+            return ['code' => '3003', 'msg' => '别名为空'];
+        }
+        $result = $this->app->send->supMessageTemplateSignatureReport($appid, $appkey, $content_data, $title, $signature, $name);
+        return $result;
+    }
+
+        /**
+     * @api              {post} / 模板视频短信提交
+     * @apiDescription   submitTemplateSupMessage
+     * @apiGroup         index_send
+     * @apiName          submitTemplateSupMessage
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {String} [msg_id] 客户提交msg_id非必填
+     * @apiParam (入参) {String} template_id 通过接口或者平台报备的template_id
+     * @apiParam (入参) {String} mobile_content 电话号码集合,多个用','，分开，最多支持50000
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误 / 3001:template_id为空 / 3002:手机号码为空
+     * @apiSampleRequest /index/send/submitTemplateSupMessage
+     * @author rzc
+     */
+    public function submitTemplateSupMessage()
+    {
+        $appid   = trim($this->request->post('appid')); //登录名
+        $appkey  = trim($this->request->post('appkey')); //登陆密码
+        $template_id  = trim($this->request->post('template_id'));
+        $mobile_content = trim($this->request->post('mobile_content')); //接收手机号码
+        $ip             = trim($this->request->ip());
+        $msg_id  = trim($this->request->post('msg_id'));
+        $mobile_content = explode(',', $mobile_content); //短信数组
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        if (empty($template_id)) {
+            return ['code' => '3001'];
+        }
+        if (empty($mobile_content)) {
+            return ['code' => '3002'];
+        }
+        $result = $this->app->send->submitTemplateSupMessage($appid, $appkey, $template_id, $mobile_content, $ip, $msg_id);
+        return $result;
+    }
 }

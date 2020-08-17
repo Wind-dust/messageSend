@@ -481,14 +481,18 @@ class Upload extends MyController
         if (empty($video)) {
             return ['code' => '3004'];
         }
+        
         $fileInfo = $video->getInfo();
         $fileType = explode('/', $fileInfo['type']);
-        if ($fileType[0] != 'video' || $fileType[0] != 'audio') { //音频或者视频
+        // print_r($fileType);die;
+        // if ($fileType[0] != 'video' || $fileType[0] != 'audio') { //音频或者视频
+        if (!in_array($fileType[0],['video','audio'])) { //音频或者视频
             return ['3001']; //上传的不是视频文件
         }
         /*  if ($fileInfo['size'] > 1024 * 1024 * 2) {
             return ['3002']; //上传图片不能超过2M
         } */
+        
         $result = $this->app->upload->uploadVideo($appid, $appkey, $fileInfo);
         // $this->apiLog($apiName, [$conId, $image], $result['code'], $conId);
         return $result;

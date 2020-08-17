@@ -1151,4 +1151,24 @@ class User extends CommonIndex
         }
         return ['code' =>200, 'data'=>$res];
     }
+
+    public function getUserSupMessageTemplate($ConId, $page, $pageNum, $status)
+    {
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $offset = ($page - 1) * $pageNum;
+        $where = [];
+        array_push($where, ['uid', '=', $uid]);
+        if (!empty($status)) {
+            array_push($where, ['status', '=', $status]);
+        }
+        $result =  DbSendMessage::getUserSupMessageTemplate($where, '*', false, ['id' => 'desc'], $offset . ',' . $pageNum);
+        foreach ($result as $key => $value) {
+            $result[$key]['multimedia_frame'] = DbSendMessage::getUserSupMessageTemplateFrame(['multimedia_template_id' => $value['id']], '*', false, ['num' => 'asc']);
+        }
+        $total = DbSendMessage::countUserSupMessageTemplate($where);
+        return ['code' => '200', 'total' => $total, 'result' => $result];
+    }
 }
