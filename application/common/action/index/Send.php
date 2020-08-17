@@ -3872,7 +3872,7 @@ return $result;
         if ($content_length > $max_length) {
             return ['code' => '3006'];
         }
-        print_r($multimedia_message_frame);die;
+       
         do {
             $template_id = getRandomString(8);
             $has = DbSendMessage::getUserMultimediaTemplate(['template_id' => $template_id], 'id', true);
@@ -3907,6 +3907,7 @@ return $result;
     }
 
     public function supMessageTemplateSignatureReport($appid, $appkey, $content_data, $title, $signature, $name){
+        print_r($content_data);die;
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,nick_name,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
