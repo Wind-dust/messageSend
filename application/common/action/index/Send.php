@@ -407,9 +407,9 @@ return $result;
         if ($data['free_trial'] == 2) {
             // $data['free_trial'] = 2;
             if ($user['pid'] == 10) {
-                $data['yidong_channel_id'] = 60;
-                $data['liantong_channel_id'] = 62;
-                $data['dianxin_channel_id'] = 61;
+                $data['yidong_channel_id'] = 129;
+                $data['liantong_channel_id'] = 130;
+                $data['dianxin_channel_id'] = 131;
             } elseif ($user['id'] == 91) {
                 $data['yidong_channel_id'] = 85;
                 $data['liantong_channel_id'] = 85;
@@ -3872,6 +3872,7 @@ return $result;
         if ($content_length > $max_length) {
             return ['code' => '3006'];
         }
+        print_r($);
         do {
             $template_id = getRandomString(8);
             $has = DbSendMessage::getUserMultimediaTemplate(['template_id' => $template_id], 'id', true);
@@ -3897,6 +3898,104 @@ return $result;
                 }
             }
             Db::commit();
+            return ['code' => '200', 'template_id' => $template_id];
+        } catch (\Exception $e) {
+            Db::rollback();
+            // exception($e);
+            return ['code' => '3007'];
+        }
+    }
+
+    public function supMessageTemplateSignatureReport($appid, $appkey, $content_data, $title, $signature, $name){
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,nick_name,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        $content_data             = array_filter($content_data);
+        $multimedia_message_frame = [];
+        $content_length           = 0;
+        // $max_length               = 102400; //最大字节长度
+
+        foreach ($content_data as $key => $value) {
+            $frame = [];
+            if (empty($value['content'])) {
+                return ['code' => '3008'];
+            }
+            if ($value['type'] == 1) {//文本
+                $frame['content'] = $value['content'];
+            }elseif ($value['type'] == 2) {//图片
+                stream_context_set_default([
+                    'ssl' => [
+                        'verify_peer'      => false,
+                        'verify_peer_name' => false,
+                    ],
+                ]);
+                $head = get_headers($value['content'], 1);
+                if ($head['Content-Type'] == 'image/jpeg') {
+                    $frame['image_type'] = 'jpg';
+                } elseif ($head['Content-Type'] == 'image/gif ') {
+                    $frame['image_type'] = 'gif';
+                }
+                if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['image/gif', 'image/jpeg', 'image/png'])) {
+                    return ['code' => '3005'];
+                }
+                $filename = filtraImage(Config::get('qiniu.domain'), $value['content']);
+                // print_r($value['image_path']);die;
+                $logfile  = DbImage::getLogImageAll($filename); //判断时候有未完成的图片
+                if (empty($logfile)) { //图片不存在
+                    return ['code' => '3006']; //图片没有上传过
+                }
+                $content_length += $head['Content-Length'];
+                $frame['content'] = $value['content'];
+            }elseif ($value['type'] == 3) {//音频
+
+            }
+            $content_length += (strlen($frame['content']) / 8);
+            $frame['num'] = $value['num'];
+            $multimedia_message_frame[] = $frame;
+        }
+        /* if ($content_length > $max_length) {
+            return ['code' => '3006'];
+        } */
+        do {
+            $template_id = getRandomString(8);
+            $has = DbSendMessage::getUserSupMessageTemplate(['template_id' => $template_id], 'id', true);
+        } while ($has);
+        $SmsMultimediaMessageTask = [];
+        $SmsMultimediaMessageTask = [
+            'template_id'        => $template_id,
+            'uid'            => $user['id'],
+            'title'          => $title,
+            'name'          => $name,
+            'signature' => $signature
+        ];
+
+        Db::startTrans();
+        try {
+            $bId = DbSendMessage::addUserSupMessageTemplate($SmsMultimediaMessageTask); //添加后的商品id
+            if ($bId) {
+                foreach ($multimedia_message_frame as $key => $frame) {
+                    $frame['multimedia_template_id'] = $bId;
+                    $frame['image_path'] = filtraImage(Config::get('qiniu.domain'), $frame['image_path']);
+                    DbSendMessage::addUserSupMessageTemplateFrame($frame); //添加后的商品id
+                }
+            }
+            Db::commit();
+            $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+            $check_data = [];
+            $check_data = [
+                'msgtype' => "text",
+                'text' => [
+                    "content" => "Hi，审核机器人\n您有一个新的视频短信模板需要审核\n【模板标题】：" . $title . "\n【模板别名】：" . $name . "\n【用户信息】：uid[" . $user['id'] . "]用户昵称[" . $user['nick_name'] . "]\n",
+                ],
+            ];
+            $headers = [
+                'Content-Type:application/json'
+            ];
+            $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
             return ['code' => '200', 'template_id' => $template_id];
         } catch (\Exception $e) {
             Db::rollback();
