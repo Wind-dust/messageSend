@@ -4054,14 +4054,14 @@ return $result;
 
     public function submitTemplateSupMessage($appid, $appkey, $template_id, $mobile_content, $ip, $msg_id = '')
     {
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,nick_name,appkey,user_type,user_status,reservation_service,sup_free_trial,supmessage_deduct', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,nick_name,appkey,user_type,user_status,reservation_service,sup_free_trial,supmessage_free_credit,supmessage_deduct', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
         if ($appkey != $user['appkey']) {
             return ['code' => '3000'];
         }
-        $template =  DbSendMessage::getUserSupMessageTemplate(['template_id' => $template_id], '*', true);
+        $template =  DbSendMessage::getUserSupMessageTemplate(['template_id' => $template_id,'uid' => $user['id']], '*', true);
         /* if ($template['status'] != 2 || empty($template)) {
             return ['code' => '3003'];
         } */
@@ -4112,18 +4112,23 @@ return $result;
         $yidong_channel_id = 0;
         $liantong_channel_id = 0;
         $dianxin_channel_id = 0;
-        if ($user['mul_free_trial'] == 2) {
+        if ($user['sup_free_trial'] == 2) {
             $free_trial = 2;
             $yidong_channel_id = 59;
             $liantong_channel_id = 59;
             $dianxin_channel_id = 59;
-            if ($user['multimeda_free_credit'] > 0 && $real_num <= $user['multimeda_free_credit']) {
+            if ($user['supmessage_free_credit'] > 0 && $real_num <= $user['supmessage_free_credit']) {
                 $free_trial = 2;
                 $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 11], '*', true);
                 if (!empty($channel)) {
                     $yidong_channel_id = $channel['yidong_channel_id'];
                     $liantong_channel_id =  $channel['liantong_channel_id'];
                     $dianxin_channel_id =  $channel['dianxin_channel_id'];
+                }else{
+                    $free_trial = 1;
+                    $yidong_channel_id = 0;
+                    $liantong_channel_id = 0;
+                    $dianxin_channel_id = 0;
                 }
             } else {
                 $free_trial = 1;
