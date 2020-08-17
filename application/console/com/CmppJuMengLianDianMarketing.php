@@ -121,7 +121,11 @@ class CmppJuMengLianDianMarketing extends Pzlife
         } else {
             socket_set_nonblock($socket); //设置非阻塞模式
             $i           = 1;
-            $Sequence_Id = 1;
+            $Sequence_Id = $redis->get('channel_'.$content);
+            if (empty($Sequence_Id)) {
+                $Sequence_Id = 1;
+               
+            }
             //先进行连接验证
             date_default_timezone_set('PRC');
             $time                = 0;
@@ -278,7 +282,13 @@ class CmppJuMengLianDianMarketing extends Pzlife
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
                     while (true) {
 
-                        // echo $Sequence_Id . "\n";
+                        $Sequence_Id = $redis->get('channel_' . $content);
+                        if ($Sequence_Id + 1 > 65536) {
+                            $Sequence_Id = 1;
+                            $redis->set('channel_' . $content, $Sequence_Id);
+                        } else {
+                            $redis->set('channel_' . $content, $Sequence_Id + 1);
+                        }
                         try {
                             $receive = 1;
                             //先接收
@@ -521,9 +531,9 @@ class CmppJuMengLianDianMarketing extends Pzlife
                                         $send_status = 2;
                                         ++$i;
                                     }
-                                    ++$Sequence_Id;
                                     if ($Sequence_Id > 65536) {
                                         $Sequence_Id = 1;
+                                        $redis->set('channel_'.$content,$Sequence_Id);
                                     }
                                     if ($i > $security_master) {
                                         $i    = 0;
