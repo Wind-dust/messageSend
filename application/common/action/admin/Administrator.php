@@ -1070,7 +1070,7 @@ class Administrator extends CommonIndex
                 # code...
                 $content_data = [];
                 if (!empty($value['content'])) {
-                    if (strpos($value['content'],'{{var' == false)) {
+                    if (strpos($value['content'],'{{var') == false) {
                         return ['code' => '3010','msg' => '该通道无法报备非变量模板'];
                     }
                     $value['content'] = str_replace('{{var1}}', '{1}', $value['content']);
