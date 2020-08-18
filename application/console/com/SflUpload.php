@@ -1173,9 +1173,9 @@ class SflUpload extends Pzlife
                             if (!strpos($svalue, date("Ymd"))) {
                                 continue;
                             }
-                            /* if (strpos($svalue, '2020062010') == false) {
+                            if (strpos($svalue, '2020081816') == false) {
                                 continue;
-                            } */
+                            }
                             $start_time = strtotime("2020-06-24");
                             // $end_time = $start_time+86400;
                             $expeort_time = $start_time + 43200 - mt_rand(0, 3000);
@@ -1532,7 +1532,7 @@ class SflUpload extends Pzlife
                         }
                     }
                 } elseif ($value == 'SMS') {
-                    // continue;
+                    continue;
                     $send_data    = [];
                     $SMS_model    = [];
                     $SMSmessage   = [];

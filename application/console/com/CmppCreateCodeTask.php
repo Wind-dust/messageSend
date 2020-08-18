@@ -10377,7 +10377,8 @@ class CmppCreateCodeTask extends Pzlife
             13585699417,
             15800400970, 13472865840, 13611664019, 13636311653, 13701789119, 13764272451, 13801687321, 13816091848, 13817515864, 13818181256, 13916292097, 13917823241, 13918902911, 15000773110, 15800815262, 15921904656, 18800232095, 13918153000, 18817718456, 15000796805, 13681961185, 13681961185, 18817718456, 13918153000, 15000796805, 13162248755, 16621181441, 18501684687, 18521329177, 18521569417, 18621714497, 18621720742, 18618353064, 18618353064, 18013770122, 18019762207, 18121252120, 18918267758, 18918267758
         ];
-        $tody_time = strtotime(date("Ymd", time()));
+        // $tody_time = strtotime(date("Ymd", time()));
+        $tody_time = strtotime('2020-08-18 16:00');
         // $tody_time = 1594785600;
         try {
             /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
@@ -10406,7 +10407,7 @@ class CmppCreateCodeTask extends Pzlife
             // print_r($receipt_id);die;
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . " AND `sfl_relation_id`  IN ('100181913','82301','82309','100125372')");
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >  " . $tody_time  . " AND `sfl_relation_id` NOT IN ('100183461')");
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . " AND `sfl_relation_id` NOT IN ('100182047') ");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . " AND `sfl_relation_id`  IN ('100183461') ");
             foreach ($sendid as $key => $value) {
                 $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
             }
@@ -10422,6 +10423,9 @@ class CmppCreateCodeTask extends Pzlife
                     $all_send_task = [];
                     $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (" . join(',', $ids) . ") ");
                     foreach ($all_send_task as $key => $value) {
+                        if (in_array(trim($value['mobile']), $white_list)) {
+                            continue;
+                        }
                         if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                             continue;
                         }
@@ -10542,6 +10546,7 @@ class CmppCreateCodeTask extends Pzlife
                                             ];
                                             $send_msg[] = $sendmessage;
                                         } else {
+                                            
                                             if ($num >= $rate || in_array(trim($value['mobile']), $white_list)) {
                                                 $prefix = '';
                                                 $prefix = substr(trim($value['mobile']), 0, 7);
@@ -10677,6 +10682,9 @@ class CmppCreateCodeTask extends Pzlife
             if (!empty($ids)) {
                 $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_multimedia_message WHERE `id` IN (" . join(',', $ids) . ") ");
                 foreach ($all_send_task as $key => $value) {
+                    if (in_array(trim($value['mobile']), $white_list)) {
+                        continue;
+                    }
                     if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                         continue;
                     }
