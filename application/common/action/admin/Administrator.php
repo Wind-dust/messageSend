@@ -1725,7 +1725,7 @@ class Administrator extends CommonIndex
             $appId = 'OutaQ7XImf';
             $appSecret = 'c538bea5c5f141a0ba07965564bf723c'; 
             $autoCheck = true;
-            $remark = $template['title'];
+            $templateName = $template['title'];
             $sign = '【'.$template['signature'].'】';
             $mmsbody = [];
             foreach ($multimedia_message_frame as $key => $value) {
@@ -1735,13 +1735,13 @@ class Administrator extends CommonIndex
                     $content_data = [
                         'content' => trim($value['content']),
                         'type' => 'text',
-                        'exType' => $type[1],
+                        'exType' => 'txt',
                         'name' => '文本',
                         'sort' => $value['num']
                     ];
                 }elseif($value['type'] == 2){
                     $content_data = [
-                        'content' =>  Config::get('qiniu.domain') . '/' . $value['content'],
+                        'content' =>  base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['content'])),
                         'type' => 'image',
                         'exType' => $type[1],
                         'name' => '图片',
@@ -1749,7 +1749,7 @@ class Administrator extends CommonIndex
                     ];
                 }elseif($value['type'] == 3){
                     $content_data = [
-                        'content' =>  Config::get('qiniu.videodomain') . '/' . $value['content'],
+                        'content' =>  base64_encode(file_get_contents(Config::get('qiniu.videodomain') . '/' . $value['content'])),
                         'type' => 'audio',
                         'exType' => $type[1],
                         'name' => '音频',
@@ -1757,7 +1757,7 @@ class Administrator extends CommonIndex
                     ];
                 }elseif($value['type'] == 4){
                     $content_data = [
-                        'content' =>  Config::get('qiniu.videodomain') . '/' . $value['content'],
+                        'content' =>  base64_encode(file_get_contents(Config::get('qiniu.videodomain') . '/' . $value['content'])),
                         'type' => 'video',
                         'exType' => $type[1],
                         'name' => '视频',
@@ -1766,9 +1766,10 @@ class Administrator extends CommonIndex
                 }
                 $context[] = $content_data;
             }
+            // print_r($context);die;
             /* 
             {
-                "appId": "ZaVfxkGf5Q",
+                "appId": "ZaVfxkGf5Q",  
                 "appSecret": "rXQpfGYXmoSOqA",
                 "autoCheck": false,
                 "body": [{"content":"","extType":"jpg","name":"API图片","sort":1,"type":"image"}],
@@ -1777,7 +1778,49 @@ class Administrator extends CommonIndex
             }
 
  */
-           
+            $headers = [];
+            $headers = [
+                'Content-Type:application/json'
+            ];
+            
+            $data = [
+                'appId' => $appId,
+                'appSecret' => $appSecret,
+                'templateName' => $templateName,
+                'autoCheck' => $autoCheck,
+                'body' => $context,
+                'sign' => $sign,
+            ];
+            // print_r(json_encode($data));die;
+            // $res = sendRequest('https://rcs.253.com/rcs/api/template/addVideo','post',$data);
+            $res = $this->sendRequest4('https://rcs.253.com/rcs/api/template/addVideo', 'post', $data, $headers);
+            print_r($res);die;
+            if (!empty($res)) {
+                $result = json_decode($res, true);
+                if ($result['code'] == 102000) {
+                    $report_msg_id = $result['data']['templateId'];
+
+                    $report_data = [];
+                    $report_data = [
+                        'channel_id' => $channel_id,
+                        'template_id' => $template_id,
+                        'third_template_id' => $report_msg_id,
+                    ];
+                    Db::startTrans();
+                    try {
+                        DbAdministrator::addUserSupMessageTemplateThirdReport($report_data);
+                        Db::commit();
+                        return ['code' => '200'];
+                    } catch (\Exception $th) {
+                        exception($th);
+                        Db::rollback();
+                        return ['code' => '3009']; //修改失败
+                    }
+                }
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
+            } else {
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
+            }
 
         } elseif ($channel_id == 135) {//三体视频彩信通道
             $appId = '12232';
@@ -1876,6 +1919,37 @@ class Administrator extends CommonIndex
             curl_setopt($curl, CURLOPT_POST, 1);
             curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 60);
             curl_setopt($curl, CURLOPT_POSTFIELDS,json_encode($data));
+            curl_setopt($curl, CURLOPT_USERAGENT, 'Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400'); // 模拟用户使用的浏览器
+        }
+        // 设置cURL 参数，要求结果保存到字符串中还是输出到屏幕上。
+        // 1如果成功只将结果返回，不自动输出任何内容。如果失败返回FALSE
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        $res = curl_exec($curl); // 运行cURL，请求网页
+        curl_close($curl); // 关闭URL请求
+        return $res; // 显示获得的数据
+    }
+
+    function sendRequest4($requestUrl, $method = 'get', $data = [], $headers)
+    {
+        $methonArr = ['get', 'post'];
+        if (!in_array(strtolower($method), $methonArr)) {
+            return [];
+        }
+        if ($method == 'post') {
+            if (!is_array($data) || empty($data)) {
+                return [];
+            }
+        }
+        $curl = curl_init(); // 初始化一个 cURL 对象
+        curl_setopt($curl, CURLOPT_URL, $requestUrl); // 设置你需要抓取的URL
+        curl_setopt($curl, CURLOPT_HEADER, 0); // 设置header 响应头是否输出
+        if ($method == 'post') {
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 60);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($curl, CURLOPT_USERAGENT, 'Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400'); // 模拟用户使用的浏览器
         }
         // 设置cURL 参数，要求结果保存到字符串中还是输出到屏幕上。

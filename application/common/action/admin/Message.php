@@ -12,6 +12,7 @@ use PHPExcel_Style_Alignment;
 use PHPExcel_Style_Fill;
 use PHPExcel_Writer_Excel2007;
 use think\Db;
+use Config;
 
 class Message extends CommonIndex {
     /**
@@ -1043,13 +1044,13 @@ class Message extends CommonIndex {
            $multimedia_frame = DbSendMessage::getUserSupMessageTemplateFrame(['multimedia_template_id' => $value['id']], '*', false, ['num' => 'asc']);
            foreach ($multimedia_frame as $mkey => $mvalue) {
                 if ($mvalue['type'] == 2) {
-                    $multimedia_frame[$mkey]['content'] = filtraImage(Config::get('qiniu.domain'), $mvalue['content']);
+                    $multimedia_frame[$mkey]['content'] = Config::get('qiniu.domain') . '/' . $mvalue['content'];
                 }
                 if ($mvalue['type'] == 3) {
-                    $multimedia_frame[$mkey]['content'] = filtraImage(Config::get('qiniu.videodomain'), $mvalue['content']);
+                    $multimedia_frame[$mkey]['content'] = Config::get('qiniu.videodomain') . '/' .  $mvalue['content'];
                 }
                 if ($mvalue['type'] == 4) {
-                    $multimedia_frame[$mkey]['content'] = filtraImage(Config::get('qiniu.videodomain'), $mvalue['content']);
+                    $multimedia_frame[$mkey]['content'] = Config::get('qiniu.videodomain') . '/' .  $mvalue['content'];
                 }
            }
            $result[$key]['multimedia_frame'] = $multimedia_frame;

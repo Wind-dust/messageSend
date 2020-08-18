@@ -1168,15 +1168,15 @@ class User extends CommonIndex
         foreach ($result as $key => $value) {
             $multimedia_frame = DbSendMessage::getUserSupMessageTemplateFrame(['multimedia_template_id' => $value['id']], '*', false, ['num' => 'asc']);
             foreach ($multimedia_frame as $mkey => $mvalue) {
-                 if ($mvalue['type'] == 2) {
-                     $multimedia_frame[$mkey]['content'] = filtraImage(Config::get('qiniu.domain'), $mvalue['content']);
-                 }
-                 if ($mvalue['type'] == 3) {
-                     $multimedia_frame[$mkey]['content'] = filtraImage(Config::get('qiniu.videodomain'), $mvalue['content']);
-                 }
-                 if ($mvalue['type'] == 4) {
-                     $multimedia_frame[$mkey]['content'] = filtraImage(Config::get('qiniu.videodomain'), $mvalue['content']);
-                 }
+                if ($mvalue['type'] == 2) {
+                    $multimedia_frame[$mkey]['content'] = Config::get('qiniu.domain') . '/' . $mvalue['content'];
+                }
+                if ($mvalue['type'] == 3) {
+                    $multimedia_frame[$mkey]['content'] = Config::get('qiniu.videodomain') . '/' .  $mvalue['content'];
+                }
+                if ($mvalue['type'] == 4) {
+                    $multimedia_frame[$mkey]['content'] = Config::get('qiniu.videodomain') . '/' .  $mvalue['content'];
+                }
             }
             $result[$key]['multimedia_frame'] = $multimedia_frame;
         }
