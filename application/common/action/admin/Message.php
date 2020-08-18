@@ -1103,7 +1103,20 @@ class Message extends CommonIndex {
             } */
             $result = DbSendMessage::getUserSupMessage($where, '*', false, '', $offset . ',' . $pageNum);
             foreach ($result as $key => $value) {
-                $result[$key]['content'] = DbSendMessage::getUserSupMessageFrame(['multimedia_message_id' => $value['id']], '*', false, ['num' => 'asc']);
+                
+                $content = DbSendMessage::getUserSupMessageFrame(['multimedia_message_id' => $value['id']], '*', false, ['num' => 'asc']);
+                foreach ($content as $mkey => $mvalue) {
+                    if ($mvalue['type'] == 2) {
+                        $content[$mkey]['content'] = Config::get('qiniu.domain') . '/' . $mvalue['content'];
+                    }
+                    if ($mvalue['type'] == 3) {
+                        $content[$mkey]['content'] = Config::get('qiniu.videodomain') . '/' .  $mvalue['content'];
+                    }
+                    if ($mvalue['type'] == 4) {
+                        $content[$mkey]['content'] = Config::get('qiniu.videodomain') . '/' .  $mvalue['content'];
+                    }
+               }
+               $result[$key]['content'] = $content;
             }
         }
         $total = DbSendMessage::countUserSupMessageFrame($where);
@@ -1133,7 +1146,7 @@ class Message extends CommonIndex {
             $real_effective_id[] = $value['id'];
             if ($free_trial == 3) {
                 // $INTERCEPT[] = $value['id'];
-                // $res = $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' =>$usertask['id'],'deduct' => $user['multimedia_deduct']]));
+                // $res = $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' =>$u`sertask['id'],'deduct' => $user['multimedia_deduct']]));
                 // $mobile = explode()
                 
                 if (!empty($value['submit_content'])) {
