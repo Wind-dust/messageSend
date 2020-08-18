@@ -1794,7 +1794,7 @@ class Administrator extends CommonIndex
             // print_r(json_encode($data));die;
             // $res = sendRequest('https://rcs.253.com/rcs/api/template/addVideo','post',$data);
             $res = $this->sendRequest4('https://rcs.253.com/rcs/api/template/addVideo', 'post', $data, $headers);
-            print_r($res);die;
+            
             if (!empty($res)) {
                 $result = json_decode($res, true);
                 if ($result['code'] == 102000) {
@@ -1828,13 +1828,23 @@ class Administrator extends CommonIndex
             $title = $template['title'];
             $name = $template['name'];
             // $sign = md5('appId='.$appId.'&mobile=15821193682&'.'&apikey='.$apikey);
+            $signature = '【'.$template['signature'].'】';
             $context = [];
             foreach ($multimedia_message_frame as $key => $value) {
                 if ($value['type'] == 1) {
-                    $content_data = [
-                        'content' => trim($value['content']),
-                        'type' => 'text',
-                    ];
+                    if (!empty($signature)) {
+                        $content_data = [
+                            'content' => $signature.trim($value['content']),
+                            'type' => 'text',
+                        ];
+                        unset($signature);
+                    }else{
+                        $content_data = [
+                            'content' => trim($value['content']),
+                            'type' => 'text',
+                        ];
+                    }
+                    
                 }elseif($value['type'] == 2){
                     $content_data = [
                         'content' =>  Config::get('qiniu.domain') . '/' . $value['content'],
@@ -1865,6 +1875,7 @@ class Administrator extends CommonIndex
                 'sign' => $sign,
             ];
             $result = $this->sendRequest3('http://api.santiyun.com/api/vsmsMode/addMode', 'post', $data);
+            // print_r($result);die;
             if (!empty($result)) {
                 $result = json_decode($result, true);
                 if ($result['code'] == 0) {
