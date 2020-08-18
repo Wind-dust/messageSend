@@ -9911,7 +9911,7 @@ class CmppCreateCodeTask extends Pzlife
             /* $where = [];
             $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
             $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  '" . $tody_time . "'    ");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  '" . $tody_time . "' AND `template_id`  <> '100183547'   ");
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100183187'   ");
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id`  IN ('100182791','100181685','100182168','100182172') AND  `create_time` >  '" . $tody_time . "' AND mobile IN (".join(',',$white_list).") ");
             // echo "SELECT * FROM yx_sfl_send_task WHERE `template_id`  IN ('100182791','100181685','100182168','100182172') AND  `create_time` >  '" . $tody_time . "' AND mobile IN (".join(',',$white_list).") ";die;
@@ -10406,7 +10406,7 @@ class CmppCreateCodeTask extends Pzlife
             // print_r($receipt_id);die;
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . " AND `sfl_relation_id`  IN ('100181913','82301','82309','100125372')");
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >  " . $tody_time  . " AND `sfl_relation_id` NOT IN ('100183461')");
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . " AND `sfl_relation_id` NOT IN ('100183461') ");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . " AND `sfl_relation_id` NOT IN ('100182047') ");
             foreach ($sendid as $key => $value) {
                 $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
             }
