@@ -995,7 +995,7 @@ class Message extends AdminController {
     }
 
     /**
-     * @api              {post} / 审核用户彩信模板
+     * @api              {post} / 审核用户视频短信模板
      * @apiDescription   auditUserSupMessageTemplate
      * @apiGroup         admin_Message
      * @apiName          auditUserSupMessageTemplate

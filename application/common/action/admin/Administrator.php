@@ -1791,7 +1791,7 @@ class Administrator extends CommonIndex
                 'body' => $context,
                 'sign' => $sign,
             ];
-            // print_r(json_encode($data));die;
+            print_r(json_encode($data));die;
             // $res = sendRequest('https://rcs.253.com/rcs/api/template/addVideo','post',$data);
             $res = $this->sendRequest4('https://rcs.253.com/rcs/api/template/addVideo', 'post', $data, $headers);
             print_r($res);die;
