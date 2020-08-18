@@ -1828,7 +1828,7 @@ class Administrator extends CommonIndex
             $title = $template['title'];
             $name = $template['name'];
             // $sign = md5('appId='.$appId.'&mobile=15821193682&'.'&apikey='.$apikey);
-            $signature = '【'.$template['signature'].'】';
+            $signature = $template['signature'];
             $context = [];
             foreach ($multimedia_message_frame as $key => $value) {
                 if ($value['type'] == 1) {
