@@ -10,19 +10,19 @@ use Exception;
 use think\Db;
 
 //http 通道,通道编号10
-class HttpChannelModelSupMessageLingDao extends Pzlife
+class HttpChannelModelSupMessageSanTi extends Pzlife
 {
 
     //创蓝
     public function content($content = 133)
     {
         return [
-            'account' => '350393',
-            'key' => 'c538bea5c5f141a0ba07965564bf723c',
+            'account' => '12232',
+            'key' => '42f66a29eb',
             'channel_dest_id' => '1',//接入码
             // 'send_var_api'    => 'http://caixin.253.com/open/sendVarByTemplate', //模板变量发送地址老接口地址
             // http://ip:port/api/v2/mms/send?appid=&timestamp=&sign= 
-            'send_var_api'    => 'http://47.101.30.221:8081/api/v2/mms/send?timestamp=', //新模板变量发送地址
+            'send_var_api'    => 'http://sms.santiyun.com/mt.php?', //新模板变量发送地址
             // 'send_model_api'    => 'http://caixin.253.com/open/sendByTemplate', //模板非变量发送地址
             'call_api'    => 'http://47.101.30.221:8081/api/v2/sms/moquery?', //上行地址
             'call_back'    => '', //回执回调地址
@@ -40,12 +40,13 @@ class HttpChannelModelSupMessageLingDao extends Pzlife
         // $a_time = 0;
 
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $content                 = 133;
+        $content                 = 135;
         $redisMessageCodeSend    = 'index:meassage:code:send:' . $content; //彩信发送任务rediskey
         $redisMessageCodeDeliver = 'index:meassage:multimediamessage:deliver:' . $content; //彩信MsgId
         $user_info               = $this->content();
-       /*  $redis->rpush($redisMessageCodeSend,'{"mobile":"15821193682","mar_task_id":5,"from":"yx_user_multimedia_message","send_msg_id":"2020052815400000","uid":1,"template_id":"60461"}');
-        $redis->rpush($redisMessageCodeSend,'{"mobile":"15172413692","mar_task_id":5,"from":"yx_user_multimedia_message","send_msg_id":"2020052815400000","uid":1,"template_id":"60461"}'); */
+        /* $redis->rpush($redisMessageCodeSend,'{"mobile":"15821193682","mar_task_id":5,"from":"yx_user_multimedia_message","send_msg_id":"2020052815400000","uid":1,"template_id":"222532"}');
+        $redis->rpush($redisMessageCodeSend,'{"mobile":"15172413692","mar_task_id":5,"from":"yx_user_multimedia_message","send_msg_id":"2020052815400000","uid":1,"template_id":"222532"}'); */
+        // $redis->rpush($redisMessageCodeSend,'{"mobile":"15201926171","mar_task_id":5,"from":"yx_user_multimedia_message","send_msg_id":"2020052815400000","uid":1,"template_id":"222532"}');
         /* 模板方式接口 */
         try {
             ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; GreenBrowser)');
@@ -88,35 +89,39 @@ class HttpChannelModelSupMessageLingDao extends Pzlife
                        
                     }
                     // print_r($roallback);
-                    if ($j > 10000) {
+                    if ($j > 500) {
                         foreach ($send_task as $key => $value) {
                             $request_data = [];
+                            /* $appid = '12232'; //appid由企业彩信平台提供 是
+                            $appkey = '42f66a29eb';
                             $request_data = [
-                                'mms_from' => 1,
-                                'mms_id' => $value['mms_id'],
-                                'phones' => join(',',$value['phones']),
-                            ];
+                                'appId' => '12232',
+                                'modeId' => $value['mms_id'],
+                                'mobile' => join(',',$value['phones']),
+                                'sign' => md5($appkey.$appid.join(',',$value['phones'])),
+                            ]; */
                             # code...
-                            $appid = '350393'; //appid由企业彩信平台提供 是
-                            $appkey = 'c538bea5c5f141a0ba07965564bf723c';
+                           
                             // $timestamp =  //时间戳访问接口时间 单位：毫秒 是
                         
-                            $timestamp = time();
-                            $time = microtime(true);
-                            //结果：1541053888.5911
-                            //在经过处理得到最终结果:
-                            $lastTime = (int)($time * 1000);
-                            $sign = md5($appkey.$appid.$lastTime.$appkey);//数字签名参考sign生成规则 是
-                            $report_api = $user_info['send_var_api'].$lastTime.'&appid='.$appid.'&sign='.$sign;
-                            $headers = [];
+                            
+                            /* $headers = [];
                             $headers = [
                                 'Content-Type:text/plain'
-                            ];
-                            $res = $this->sendRequest2($report_api,'post',$request_data,$headers);
+                            ]; */
+                            $appid = '12232'; //appid由企业彩信平台提供 是
+                            $appkey = '42f66a29eb';
+                            $send_reqest = 'appId=12232&modeId='.$value['mms_id'].'&mobile='. join(',',$value['phones']).'&sign='.md5($appkey.$appid.join(',',$value['phones']));
+                            $report_api = $user_info['send_var_api'].$send_reqest;
+                           /*  $headers = [];
+                            $headers = [
+                                'Content-Type:text/plain'
+                            ]; */
+                            $res = sendRequest($report_api,'get');
                             $result = json_decode($res,true);
-                            if ( isset($result['code'] ) && $result['code'] == 'T'){
-                                $redis->hset('index:meassage:code:back_taskno:' . $content, $result['data'], $key); 
-                                unset($send_task[$key]);
+                            if ( isset($result['code'] ) && $result['code'] == 0){
+                              /*   $redis->hset('index:meassage:code:back_taskno:' . $content, $result['data'], $key); 
+                                unset($send_task[$key]); */
                                 $j = 1;
                             }else{
                                 
@@ -125,7 +130,7 @@ class HttpChannelModelSupMessageLingDao extends Pzlife
                                         $redis->rpush($redisMessageCodeSend, $rvalue);
                                     }
                                 }
-                                $this->writeToRobot($content, $res, '领道视频短信通道');
+                                $this->writeToRobot($content, $res, '三体视频短信通道');
                                 exit();
                             }
                             // print_r(base64_encode(json_encode($request_data)));die;
@@ -143,32 +148,31 @@ class HttpChannelModelSupMessageLingDao extends Pzlife
                         if (!empty($send_task)) {
                             foreach ($send_task as $key => $value) {
                                 $request_data = [];
+                                
+                                /* 
                                 $request_data = [
-                                    'mms_from' => 1,
-                                    'mms_id' => $value['mms_id'],
-                                    'phones' => join(',',$value['phones']),
-                                ];
-                                # code...
-                                $appid = '350393'; //appid由企业彩信平台提供 是
-                                $appkey = 'c538bea5c5f141a0ba07965564bf723c';
+                                    'appId' => '12232',
+                                    'modeId' => $value['mms_id'],
+                                    'mobile' => join(',',$value['phones']),
+                                    'sign' => md5($appkey.$appid.join(',',$value['phones'])),
+                                ]; */
+                                $appid = '12232'; //appid由企业彩信平台提供 是
+                                $appkey = '42f66a29eb';
+                                $send_reqest = 'appId=12232&modeId='.$value['mms_id'].'&mobile='. join(',',$value['phones']).'&sign='.md5($appkey.$appid.join(',',$value['phones']));
                                 // $timestamp =  //时间戳访问接口时间 单位：毫秒 是
                             
-                                $timestamp = time();
-                                $time = microtime(true);
-                                //结果：1541053888.5911
-                                //在经过处理得到最终结果:
-                                $lastTime = (int)($time * 1000);
-                                $sign = md5($appkey.$appid.$lastTime.$appkey);//数字签名参考sign生成规则 是
-                                $report_api = $user_info['send_var_api'].$lastTime.'&appid='.$appid.'&sign='.$sign;
-                                $headers = [];
+                               
+                                $report_api = $user_info['send_var_api'].$send_reqest;
+                               /*  $headers = [];
                                 $headers = [
                                     'Content-Type:text/plain'
-                                ];
-                                $res = $this->sendRequest2($report_api,'post',$request_data,$headers);
+                                ]; */
+                                $res = sendRequest($report_api,'get');
                                 $result = json_decode($res,true);
-                                if ( isset($result['code'] ) && $result['code'] == 'T'){
-                                    $redis->hset('index:meassage:code:back_taskno:' . $content, $result['data'], $key); 
-                                    unset($send_task[$key]);
+                                print_r($result);
+                                if ( isset($result['code'] ) && $result['code'] == 0){
+                                    /* $redis->hset('index:meassage:code:back_taskno:' . $content, $result['data'], $key); 
+                                    unset($send_task[$key]); */
                                 }else{
                                     
                                     foreach ($roallback as $rkey => $rvalue) {
@@ -176,79 +180,14 @@ class HttpChannelModelSupMessageLingDao extends Pzlife
                                             $redis->rpush($redisMessageCodeSend, $rvalue);
                                         }
                                     }
-                                    $this->writeToRobot($content, $res, '领道视频短信通道');
+                                    $this->writeToRobot($content, $res, '三体视频短信通道');
                                     exit();
                                 }
                                 // print_r(base64_encode(json_encode($request_data)));die;
                                
                             }
                         }
-                        $appid = '350393'; //appid由企业彩信平台提供 是
-                        $appkey = 'c538bea5c5f141a0ba07965564bf723c';
-                        // $timestamp =  //时间戳访问接口时间 单位：毫秒 是
-                    
-                        $timestamp = time();
-                        $time = microtime(true);
-                        //结果：1541053888.5911
-                        //在经过处理得到最终结果:
-                        $lastTime = (int)($time * 1000);
-                        $sign = md5($appkey.$appid.$lastTime.$appkey);//数字签名参考sign生成规则 是
-                        $report_api = $user_info['call_api'].$lastTime.'&appid='.$appid.'&sign='.$sign;
-                        $headers = [];
-                        $headers = [
-                            'Content-Type:text/plain'
-                        ];
-                        $res = $this->sendRequest2($report_api,'get',[],$headers);
-                        
-                        /* $res = json_encode([
-                            'code' => 0,
-                            'data' => [
-                                [
-                                    'srcid' => '106904561527',
-                                    'mobile' => '15201926171',
-                                    'id' => '080580911290960321514971136',
-                                    'msgcontent' => '1',
-                                    'time' => '20200805183820',
-                                ]
-                            ],
-                            'msg' => '查询成功'
-                        ]); */
-                        $result = json_decode($res, true);
-                        
-                        if (!empty($result['data']))  {
-                            print_r($result);
-                            foreach ($result['data'] as $key => $value) {
-                                # code...
-                                $develop_len = strlen($user_info['channel_dest_id']);
-                                $receive_develop_no = mb_substr(trim($value['srcid']),$develop_len);
-                                $task_log = Db::query("SELECT `uid`,`task_no` FROM yx_user_multimedia_message_log WHERE `develop_no` = '".$receive_develop_no."' AND `mobile` = '".$value['mobile']."' ORDER BY id DESC LIMIT 1 ");
-                                if (empty($task_log)) {
-                                    $task_log = Db::query("SELECT `uid`,`task_no` FROM yx_user_multimedia_message_log WHERE `mobile` = '".$value['mobile']."' ORDER BY id DESC LIMIT 1 ");
-                                }
-                                if (!empty($task_log)) {
-                                    $upgoing = [
-                                        'mobile' => $value['mobile'],
-                                        'message_info' =>  $value['msgcontent'],
-                                        'get_time' => date('Y-m-d H:i:s',strtotime($value['time'])),
-                                    ];
-                                    $redis->rPush('index:message:Mmsupriver:' . $task_log[0]['uid'], json_encode($upgoing));
-                                    $insert_data = [];
-                                    $insert_data = [
-                                        'uid' => $task_log[0]['uid'],
-                                        'task_no' => $task_log[0]['task_no'],
-                                        'mobile' =>$value['mobile'],
-                                        'message_info' =>$value['msgcontent'],
-                                        'create_time' => strtotime($value['time']),
-                                        'business_id' => 8,
-                                    ];
-                                    Db::table('yx_user_upriver')->insert($insert_data);
-                                }
-                                
-                            }
-                           
-                        }else{
-                            sleep(1);
-                        }
+                        sleep(1);
                 }
                
                 
@@ -356,6 +295,36 @@ class HttpChannelModelSupMessageLingDao extends Pzlife
             curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 60);
             curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
             curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($curl, CURLOPT_USERAGENT, 'Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400'); // 模拟用户使用的浏览器
+        }
+        // 设置cURL 参数，要求结果保存到字符串中还是输出到屏幕上。
+        // 1如果成功只将结果返回，不自动输出任何内容。如果失败返回FALSE
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        $res = curl_exec($curl); // 运行cURL，请求网页
+        curl_close($curl); // 关闭URL请求
+        return $res; // 显示获得的数据
+    }
+
+    function sendRequest4($requestUrl, $method = 'get', $data = [])
+    {
+        $methonArr = ['get', 'post'];
+        if (!in_array(strtolower($method), $methonArr)) {
+            return [];
+        }
+        if ($method == 'post') {
+            if (!is_array($data) || empty($data)) {
+                return [];
+            }
+        }
+        $curl = curl_init(); // 初始化一个 cURL 对象
+        curl_setopt($curl, CURLOPT_URL, $requestUrl); // 设置你需要抓取的URL
+        curl_setopt($curl, CURLOPT_HEADER, 0); // 设置header 响应头是否输出
+        if ($method == 'post') {
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 60);
+            curl_setopt($curl, CURLOPT_POSTFIELDS,json_encode($data));
             curl_setopt($curl, CURLOPT_USERAGENT, 'Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400'); // 模拟用户使用的浏览器
         }
         // 设置cURL 参数，要求结果保存到字符串中还是输出到屏幕上。

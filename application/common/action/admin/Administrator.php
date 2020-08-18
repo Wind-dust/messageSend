@@ -1723,7 +1723,7 @@ class Administrator extends CommonIndex
             }
         } elseif ($channel_id == 134) { //创蓝视频短信通道
             $appId = 'OutaQ7XImf';
-            $appSecret = 'c538bea5c5f141a0ba07965564bf723c'; 
+            $appSecret = 'YDM7FY8uCYhbYg'; 
             $autoCheck = true;
             $templateName = $template['title'];
             $sign = '【'.$template['signature'].'】';
@@ -1791,7 +1791,7 @@ class Administrator extends CommonIndex
                 'body' => $context,
                 'sign' => $sign,
             ];
-            print_r(json_encode($data));die;
+            // print_r(json_encode($data));die;
             // $res = sendRequest('https://rcs.253.com/rcs/api/template/addVideo','post',$data);
             $res = $this->sendRequest4('https://rcs.253.com/rcs/api/template/addVideo', 'post', $data, $headers);
             print_r($res);die;

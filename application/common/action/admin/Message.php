@@ -1098,9 +1098,9 @@ class Message extends CommonIndex {
             $result            = DbSendMessage::getUserSupMessage(['id' => $id], '*', true);
             $result['content'] = DbSendMessage::getUserSupMessageFrame(['multimedia_message_id' => $id], '*', false, ['num' => 'asc']);
         } else {
-            if (empty($title)) {
+            /* if (!empty($title)) {
                 array_push($where, ['title', 'like', '%' . $title . '%']);
-            }
+            } */
             $result = DbSendMessage::getUserSupMessage($where, '*', false, '', $offset . ',' . $pageNum);
             foreach ($result as $key => $value) {
                 $result[$key]['content'] = DbSendMessage::getUserSupMessageFrame(['multimedia_message_id' => $value['id']], '*', false, ['num' => 'asc']);
