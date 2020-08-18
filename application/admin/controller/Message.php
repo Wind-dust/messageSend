@@ -1063,7 +1063,7 @@ class Message extends AdminController {
     }
 
     /**
-     * @api              {post} / 视频信任务审核
+     * @api              {post} / 视频短信任务审核
      * @apiDescription   auditSupMessageTask
      * @apiGroup         admin_Message
      * @apiName          auditSupMessageTask
@@ -1103,7 +1103,7 @@ class Message extends AdminController {
     }
 
     /**
-     * @api              {post} / 分配任务通道
+     * @api              {post} / 分配视频短信任务通道
      * @apiDescription   distributionSupMessageChannel
      * @apiGroup         admin_Message
      * @apiName          distributionSupMessageChannel
