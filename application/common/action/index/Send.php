@@ -4151,6 +4151,8 @@ return $result;
                     $frame['multimedia_message_id'] = $bId;
                     if ($frame['type'] == 4) {
                         $frame['content'] = filtraImage(Config::get('qiniu.videodomain'), $frame['content']);
+                    }if ($frame['type'] == 3) {
+                        $frame['content'] = filtraImage(Config::get('qiniu.videodomain'), $frame['content']);
                     }
                     if ($frame['type'] == 2) {
                         $frame['content'] = filtraImage(Config::get('qiniu.domain'), $frame['content']);

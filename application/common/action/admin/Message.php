@@ -1039,7 +1039,20 @@ class Message extends CommonIndex {
         $offset = $pageNum * ($page - 1);
         $result = DbSendMessage::getUserSupMessageTemplate([], '*', false, ['id' => 'desc'], $offset . ',' . $pageNum);
         foreach ($result as $key => $value) {
-            $result[$key]['multimedia_frame'] = DbSendMessage::getUserSupMessageTemplateFrame(['multimedia_template_id' => $value['id']], '*', false, ['num' => 'asc']);
+            // $result[$key]['multimedia_frame'] = DbSendMessage::getUserSupMessageTemplateFrame(['multimedia_template_id' => $value['id']], '*', false, ['num' => 'asc']);
+           $multimedia_frame = DbSendMessage::getUserSupMessageTemplateFrame(['multimedia_template_id' => $value['id']], '*', false, ['num' => 'asc']);
+           foreach ($multimedia_frame as $mkey => $mvalue) {
+                if ($mvalue['type'] == 2) {
+                    $multimedia_frame[$mkey]['content'] = filtraImage(Config::get('qiniu.domain'), $mvalue['content']);
+                }
+                if ($mvalue['type'] == 3) {
+                    $multimedia_frame[$mkey]['content'] = filtraImage(Config::get('qiniu.videodomain'), $mvalue['content']);
+                }
+                if ($mvalue['type'] == 4) {
+                    $multimedia_frame[$mkey]['content'] = filtraImage(Config::get('qiniu.videodomain'), $mvalue['content']);
+                }
+           }
+           $result[$key]['multimedia_frame'] = $multimedia_frame;
         }
         $totle = DbSendMessage::countUserSupMessageTemplate([]);
         return ['code' => '200', 'totle' => $totle, 'result' => $result];

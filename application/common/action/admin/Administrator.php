@@ -1619,7 +1619,7 @@ class Administrator extends CommonIndex
             return ['code' => '3007', 'msg' => '该模板已在该通道报备过'];
         }
         //创蓝
-        if ($channel_id == 133) {//上海田南 
+        if ($channel_id == 133) {//上海领道
            $appid = '350393';
            $apikey = 'c538bea5c5f141a0ba07965564bf723c';
             $time = microtime(true);
@@ -1724,29 +1724,58 @@ class Administrator extends CommonIndex
         } elseif ($channel_id == 134) { //创蓝视频短信通道
             $appId = 'OutaQ7XImf';
             $appSecret = 'c538bea5c5f141a0ba07965564bf723c'; 
-            $submitNo = $template_id;
+            $autoCheck = true;
             $remark = $template['title'];
             $sign = '【'.$template['signature'].'】';
             $mmsbody = [];
             foreach ($multimedia_message_frame as $key => $value) {
-
+                $type = explode('.',$value['content']);
+                // print_r($type);die;
+                if ($value['type'] == 1) {
+                    $content_data = [
+                        'content' => trim($value['content']),
+                        'type' => 'text',
+                        'exType' => $type[1],
+                        'name' => '文本',
+                        'sort' => $value['num']
+                    ];
+                }elseif($value['type'] == 2){
+                    $content_data = [
+                        'content' =>  Config::get('qiniu.domain') . '/' . $value['content'],
+                        'type' => 'image',
+                        'exType' => $type[1],
+                        'name' => '图片',
+                        'sort' => $value['num']
+                    ];
+                }elseif($value['type'] == 3){
+                    $content_data = [
+                        'content' =>  Config::get('qiniu.videodomain') . '/' . $value['content'],
+                        'type' => 'audio',
+                        'exType' => $type[1],
+                        'name' => '音频',
+                        'sort' => $value['num']
+                    ];
+                }elseif($value['type'] == 4){
+                    $content_data = [
+                        'content' =>  Config::get('qiniu.videodomain') . '/' . $value['content'],
+                        'type' => 'video',
+                        'exType' => $type[1],
+                        'name' => '视频',
+                        'sort' => $value['num']
+                    ];
+                }
+                $context[] = $content_data;
             }
             /* 
             {
-            "appId": "n6fyZlGQxg",
-                "appSecret": "BADsEg3zeTfJle",
-            "submitNo": "20200509003",
-            "phones": ["18717950159"],
-            "title" : "测试图片15",
-            "sign" : "【上海创蓝文化】",
-            "remark" : "测试备注5",
-            "suffix" : "退订",
-            "videoInfo" : [{
-                    "type" : "image",
-                    "exType":"jpg",
-                    "content" : "/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAkGBwgHBgkIBwgKCgkLDR... "
-            }]
+                "appId": "ZaVfxkGf5Q",
+                "appSecret": "rXQpfGYXmoSOqA",
+                "autoCheck": false,
+                "body": [{"content":"","extType":"jpg","name":"API图片","sort":1,"type":"image"}],
+                "templateName": "视频短信测试",
+                "sign":"【上海赛豪文化】"
             }
+
  */
            
 
@@ -1770,12 +1799,12 @@ class Administrator extends CommonIndex
                     ];
                 }elseif($value['type'] == 3){
                     $content_data = [
-                        'content' =>  Config::get('qiniu.domain') . '/' . $value['content'],
+                        'content' =>  Config::get('qiniu.videodomain') . '/' . $value['content'],
                         'type' => 'audio',
                     ];
                 }elseif($value['type'] == 4){
                     $content_data = [
-                        'content' =>  Config::get('qiniu.domain') . '/' . $value['content'],
+                        'content' =>  Config::get('qiniu.videodomain') . '/' . $value['content'],
                         'type' => 'video',
                     ];
                 }
