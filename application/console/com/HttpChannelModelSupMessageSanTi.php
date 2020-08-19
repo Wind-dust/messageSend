@@ -46,7 +46,7 @@ class HttpChannelModelSupMessageSanTi extends Pzlife
         $user_info               = $this->content();
         /* $redis->rpush($redisMessageCodeSend,'{"mobile":"15821193682","mar_task_id":5,"from":"yx_user_multimedia_message","send_msg_id":"2020052815400000","uid":1,"template_id":"222532"}');
         $redis->rpush($redisMessageCodeSend,'{"mobile":"15172413692","mar_task_id":5,"from":"yx_user_multimedia_message","send_msg_id":"2020052815400000","uid":1,"template_id":"222532"}'); */
-        $redis->rpush($redisMessageCodeSend,'{"mobile":"15201926171","mar_task_id":5,"from":"yx_user_multimedia_message","send_msg_id":"2020052815400000","uid":1,"template_id":"222532"}');
+        // $redis->rpush($redisMessageCodeSend,'{"mobile":"15201926171","mar_task_id":5,"from":"yx_user_multimedia_message","send_msg_id":"2020052815400000","uid":1,"template_id":"222532"}');
         /* 模板方式接口 */
         try {
             ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; GreenBrowser)');
