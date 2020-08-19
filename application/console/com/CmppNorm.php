@@ -313,10 +313,24 @@ class CmppNorm extends Pzlife
                         usleep(250);
                     } else if ($head['Command_Id'] == 0x00000008) {
                         // echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                        $Command_Id  = 0x80000008; //保持连接
+                        $Total_Length = 12;
+                        $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                        socket_write($socket, $headData, $Total_Length);
+                        $receive = 2;
+                        
                     } else if ($head['Command_Id'] == 0x80000008) {
                         // echo "激活测试应答" . "\n"; //激活测试,无消息体结构
-                    } else {
+                    } else if ($head['Command_Id'] == 0x00000002) {
                         // echo "未声明head['Command_Id']:" . $head['Command_Id'];
+                        $Command_Id  = 0x80000002; //关闭连接
+                        $Total_Length = 12;
+                        $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                        socket_write($socket, $headData, $Total_Length);
+                        socket_close($socket);
+                        $this->writeToRobot($content, '通道方关闭当前链接，通道关闭', $contdata['title']);
+                        exit;
+                        $receive = 2;
                     }
                 }
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
@@ -499,10 +513,24 @@ class CmppNorm extends Pzlife
                                         usleep(250);
                                     } else if ($head['Command_Id'] == 0x00000008) {
                                         // echo "心跳维持中" . "\n"; //激活测试,无消息体结构
+                                        $Command_Id  = 0x80000008; //保持连接
+                                        $Total_Length = 12;
+                                        $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                        socket_write($socket, $headData, $Total_Length);
+                                        $receive = 2;
+                                        
                                     } else if ($head['Command_Id'] == 0x80000008) {
                                         // echo "激活测试应答" . "\n"; //激活测试,无消息体结构
-                                    } else {
+                                    } else if ($head['Command_Id'] == 0x00000002) {
                                         // echo "未声明head['Command_Id']:" . $head['Command_Id'];
+                                        $Command_Id  = 0x80000002; //关闭连接
+                                        $Total_Length = 12;
+                                        $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                        socket_write($socket, $headData, $Total_Length);
+                                        socket_close($socket);
+                                        $this->writeToRobot($content, '通道方关闭当前链接，通道关闭', $contdata['title']);
+                                        exit;
+                                        $receive = 2;
                                     }
                                 } else {
                                     break;
