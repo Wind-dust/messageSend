@@ -407,9 +407,9 @@ return $result;
         if ($data['free_trial'] == 2) {
             // $data['free_trial'] = 2;
             if ($user['pid'] == 10) {
-                $data['yidong_channel_id'] = 129;
-                $data['liantong_channel_id'] = 130;
-                $data['dianxin_channel_id'] = 131;
+                $data['yidong_channel_id'] = 85;
+                $data['liantong_channel_id'] = 85;
+                $data['dianxin_channel_id'] = 85;
             } elseif ($user['id'] == 91) {
                 $data['yidong_channel_id'] = 85;
                 $data['liantong_channel_id'] = 85;
