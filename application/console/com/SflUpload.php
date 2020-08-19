@@ -1151,7 +1151,7 @@ class SflUpload extends Pzlife
                 //进入二级目录 MMS 或者 SMS 等
                 //跳过本地解压文件夹
                 if ($value == 'UnZip') {
-                    continue;
+                    // continue;
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
@@ -1532,7 +1532,7 @@ class SflUpload extends Pzlife
                         }
                     }
                 } elseif ($value == 'SMS') {
-                    continue;
+                    // continue;
                     $send_data    = [];
                     $SMS_model    = [];
                     $SMSmessage   = [];
@@ -1543,13 +1543,13 @@ class SflUpload extends Pzlife
                             // continue;
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
-                            if (!strpos($svalue, date("Ymd"))) {
-                                continue;
-                            }
-                            //  strpos($svalue, '2020071518') == false
-                            /*  if (strpos($svalue, '2020081410') !== false) {
+                           /*  if (!strpos($svalue, date("Ymd"))) {
                                 continue;
                             } */
+                            //  strpos($svalue, '2020071518') == false
+                             if (strpos($svalue, '2020081823') == false) {
+                                continue;
+                            }
 
                             $start_time = strtotime("2020-06-18");
                             $end_time = $start_time + 86400;
