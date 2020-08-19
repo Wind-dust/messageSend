@@ -636,6 +636,7 @@ class CmppNorm extends Pzlife
                                     $send_status = 2;
                                     usleep(5000);
                                 }
+                                unset($send_status);
                             } else { //心跳
                                 $Command_Id  = 0x00000008; //保持连接
                                 $Total_Length = 12;
@@ -654,7 +655,7 @@ class CmppNorm extends Pzlife
                         }
                         //捕获异常
                         catch (Exception $e) {
-                            if ($send_status == 1 && !isset($send_status)) {
+                            if (isset($send_status) && $send_status == 1) {
                                 $redis->push($redisMessageCodeSend, $redisMessageCodeSend);
                                 $redis->hset($redisMessageCodeSequenceId, $Sequence_Id);
                             }
