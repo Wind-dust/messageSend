@@ -1844,7 +1844,6 @@ class Administrator extends CommonIndex
                             'type' => 'text',
                         ];
                     }
-                    
                 }elseif($value['type'] == 2){
                     $content_data = [
                         'content' =>  Config::get('qiniu.domain') . '/' . $value['content'],
@@ -1863,6 +1862,7 @@ class Administrator extends CommonIndex
                 }
                 $context[] = $content_data;
             }
+            array_push($context,['content' => '此信息免流', 'type' => 'text']);
             // print_r($context);die;
             $timestamp = time();
             $sign = md5(urlencode($apikey.$appId.$name.$title.json_encode($context).$timestamp));
