@@ -1794,7 +1794,6 @@ class Administrator extends CommonIndex
             // print_r(json_encode($data));die;
             // $res = sendRequest('https://rcs.253.com/rcs/api/template/addVideo','post',$data);
             $res = $this->sendRequest4('https://rcs.253.com/rcs/api/template/addVideo', 'post', $data, $headers);
-            
             if (!empty($res)) {
                 $result = json_decode($res, true);
                 if ($result['code'] == 102000) {
@@ -1828,7 +1827,8 @@ class Administrator extends CommonIndex
             $title = $template['title'];
             $name = $template['name'];
             // $sign = md5('appId='.$appId.'&mobile=15821193682&'.'&apikey='.$apikey);
-            $signature = $template['signature'];
+            // $signature = $template['signature'];
+            $signature = '【'.$template['signature'].'】';
             $context = [];
             foreach ($multimedia_message_frame as $key => $value) {
                 if ($value['type'] == 1) {
@@ -1863,6 +1863,7 @@ class Administrator extends CommonIndex
                 }
                 $context[] = $content_data;
             }
+            // print_r($context);die;
             $timestamp = time();
             $sign = md5(urlencode($apikey.$appId.$name.$title.json_encode($context).$timestamp));
             $data = [];
