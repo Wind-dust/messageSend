@@ -46,7 +46,7 @@ class HttpChannelModelSupMessageSanTi extends Pzlife
         $user_info               = $this->content();
         /* $redis->rpush($redisMessageCodeSend,'{"mobile":"15821193682","mar_task_id":5,"from":"yx_user_multimedia_message","send_msg_id":"2020052815400000","uid":1,"template_id":"222532"}');
         $redis->rpush($redisMessageCodeSend,'{"mobile":"15172413692","mar_task_id":5,"from":"yx_user_multimedia_message","send_msg_id":"2020052815400000","uid":1,"template_id":"222532"}'); */
-        // $redis->rpush($redisMessageCodeSend,'{"mobile":"15201926171","mar_task_id":5,"from":"yx_user_multimedia_message","send_msg_id":"2020052815400000","uid":1,"template_id":"222532"}');
+        $redis->rpush($redisMessageCodeSend,'{"mobile":"15201926171","mar_task_id":5,"from":"yx_user_multimedia_message","send_msg_id":"2020052815400000","uid":1,"template_id":"222532"}');
         /* 模板方式接口 */
         try {
             ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; GreenBrowser)');
@@ -163,16 +163,24 @@ class HttpChannelModelSupMessageSanTi extends Pzlife
                             
                                
                                 $report_api = $user_info['send_var_api'].$send_reqest;
+
+
                                /*  $headers = [];
                                 $headers = [
                                     'Content-Type:text/plain'
                                 ]; */
+
                                 $res = sendRequest($report_api,'get');
                                 $result = json_decode($res,true);
-                                print_r($result);
+                                // print_r($result);
                                 if ( isset($result['code'] ) && $result['code'] == 0){
                                     /* $redis->hset('index:meassage:code:back_taskno:' . $content, $result['data'], $key); 
-                                    unset($send_task[$key]); */
+                                    */
+                                    $rets = $result['rets'];
+                                    foreach ($rets as $rekey => $revalue) {
+                                        $redis->hset('index:meassage:code:back_taskno:' . $content, $revalue['sendId'], $key); 
+                                    }
+                                    unset($send_task[$key]); 
                                 }else{
                                     
                                     foreach ($roallback as $rkey => $rvalue) {
