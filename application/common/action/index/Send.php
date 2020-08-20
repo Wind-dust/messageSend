@@ -4187,4 +4187,41 @@ return $result;
             return ['code' => '3007'];
         }
     }
+
+    public function sanTiSupMessageCallBack($sign, $report){
+        // print_r($report);die;
+        $redisMessageCodeDeliver = 'index:meassage:supmessage:deliver'; //创蓝彩信回执通道
+        $redis = Phpredis::getConn();
+        /* 
+        foreach ($receiptBack as $key => $value) {
+            if (!is_array($value)) {
+                return 'error';
+            }
+            $task_id = $redis->hget($task_no, $value['taskid']);
+            if (empty($task_id)) {
+                continue;
+            }
+            $send_task_log = [
+                'task_id'        => $task_id,
+                'mobile'         => $value['mobile'],
+                'status_message' => $value['code'],
+                'send_time'      => $value['time'],
+            ];
+            $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
+        } */
+        foreach ($report as $key => $value) {
+            // print_r($value);die;
+            $task_id = $redis->hget('index:meassage:code:back_taskno:135',$value['sendId']);
+           
+            $send_task_log = [
+                'task_id'        => $task_id,
+                'mobile'         => $value['mobile'],
+                'status_message' => $value['reportStatus'],
+                'send_time'      => strtotime($value['sendTime']),
+            ];
+            // print_r($send_task_log);die;
+            $redis->rpush($redisMessageCodeDeliver,json_encode($send_task_log));
+        }
+        return 'OK';
+    }
 }

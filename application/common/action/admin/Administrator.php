@@ -1631,7 +1631,7 @@ class Administrator extends CommonIndex
             $data = [];
             $data['mms_title'] = $template['title'];
             $data['mmsSign'] = $template['signature'];
-            $data['mms_type'] = 'multipart/mixed';
+            $data['mms_type'] = 'multipart/related';
             $data['mmstemplate'] = 0;
 
             // print_r($multimedia_message_frame);die;
