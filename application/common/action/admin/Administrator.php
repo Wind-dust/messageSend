@@ -1973,4 +1973,65 @@ class Administrator extends CommonIndex
         curl_close($curl); // 关闭URL请求
         return $res; // 显示获得的数据
     }
+
+    public function getThirdPartySupMessageTemplateReportInfo($template_id, $page, $pageNum){
+        $template =  DbSendMessage::getUserSupMessageTemplate(['template_id' => $template_id], '*', true);
+        if ($template['status'] != 2 || empty($template)) {
+            return ['code' => '3003', 'msg' => '模板未审核通过或者该模板不存在'];
+        }
+        $offect = ($page - 1) * $pageNum;
+        if ($offect < 0) {
+            return ['code' => 200, 'total' => 0, 'result' =>[]];
+        }
+        $had_report = DbAdministrator::getUserSupMessageTemplateThirdReport(['template_id' => $template_id], 'id', true);
+        $total = DbAdministrator::countUserSupMessageTemplateThirdReport(['template_id' => $template_id]);
+        return ['code' => 200, 'total' => $total, 'result' =>$had_report];
+    }
+
+    public function setThirdPartySupMessageTemplateReportInfo($id, $yd_report_status = 0, $lt_report_status = 0, $dx_report_status = 0){
+        $had_report =  DbAdministrator::getUserSupMessageTemplateThirdReport(['id' => $id], 'id,template_id', true);
+        if (empty($had_report)){
+            return ['code' => '3000', '该报备记录不存在'];
+        }
+        $template =  DbSendMessage::getUserSupMessageTemplate(['template_id' => $had_report['template_id']], 'id', true);
+        $data = [
+            'yd_report_status' => $yd_report_status,
+            'lt_report_status' => $lt_report_status,
+            'dx_report_status' => $dx_report_status,
+        ];
+        /* 获取全网报备状态 */
+        $templage_report_status = 1;
+        if ($yd_report_status == 2) {
+            $had_lt_report =  DbAdministrator::getUserSupMessageTemplateThirdReport(['lt_report_status' => 2,'template_id' => $had_report['template_id']], 'id,template_id', true);
+            $had_dx_report =  DbAdministrator::getUserSupMessageTemplateThirdReport(['dx_report_status' => 2,'template_id' => $had_report['template_id']], 'id,template_id', true);
+            if (!empty($had_lt_report) && !empty($had_dx_report)) {
+                $templage_report_status = 2;
+            }
+        }elseif($lt_report_status == 2) {
+            $had_yd_report =  DbAdministrator::getUserSupMessageTemplateThirdReport(['yd_report_status' => 2,'template_id' => $had_report['template_id']], 'id,template_id', true);
+            $had_dx_report =  DbAdministrator::getUserSupMessageTemplateThirdReport(['dx_report_status' => 2,'template_id' => $had_report['template_id']], 'id,template_id', true);
+            if (!empty($had_yd_report) && !empty($had_dx_report)) {
+                $templage_report_status = 2;
+            }
+        }elseif($dx_report_status == 2) {
+            $had_yd_report =  DbAdministrator::getUserSupMessageTemplateThirdReport(['yd_report_status' => 2,'template_id' => $had_report['template_id']], 'id,template_id', true);
+            $had_lt_report =  DbAdministrator::getUserSupMessageTemplateThirdReport(['lt_report_status' => 2,'template_id' => $had_report['template_id']], 'id,template_id', true);
+            if (!empty($had_yd_report) && !empty($had_lt_report)) {
+                $templage_report_status = 2;
+            }
+        }
+        Db::startTrans();
+        try {
+            DbAdministrator::editUserSupMessageTemplateThirdReport($data,$id);
+            if ($templage_report_status == 2) {
+                DbAdministrator::editUserSupMessageTemplate(['report_status'=>$templage_report_status],$template['id']);
+            }
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $th) {
+            exception($th);
+            Db::rollback();
+            return ['code' => '3009']; //修改失败
+        }
+    }
 }

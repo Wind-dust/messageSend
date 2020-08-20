@@ -4013,7 +4013,8 @@ return $result;
             'uid'            => $user['id'],
             'title'          => $title,
             'name'          => $name,
-            'signature' => $signature
+            'signature' => $signature,
+            'nick_name' => $user['nick_name'],
         ];
 
         Db::startTrans();

@@ -1248,4 +1248,71 @@ class Administrator extends AdminController
         $result = $this->app->administrator->thirdPartySupMessageTemplateReport($channel_id, $template_id);
         return $result;
     }
+
+    /**
+     * @api              {post} / 获取第三方彩信模板报备通道(视频短信)
+     * @apiDescription   getThirdPartySupMessageTemplateReportInfo
+     * @apiGroup         admin_Administrator
+     * @apiName          getThirdPartySupMessageTemplateReportInfo
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} template_id 模板id
+     * @apiParam (入参) {String} page 页码 默认1
+     * @apiParam (入参) {String} pageNum 条数 默认10
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:channel_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /admin/administrator/getThirdPartySupMessageTemplateReportInfo
+     * @return array
+     * @author rzc
+     */
+    public function getThirdPartySupMessageTemplateReportInfo(){
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $template_id = trim($this->request->post('template_id'));
+        if (empty($template_id)) {
+            return ['code' => '3002', 'msg' => '模板Id 为空'];
+        }
+        $result = $this->app->administrator->getThirdPartySupMessageTemplateReportInfo($template_id, $page, $pageNum);
+        return $result;
+    }
+
+     /**
+     * @api              {post} / 设置第三方彩信模板报备通道报备状态(视频短信)
+     * @apiDescription   setThirdPartySupMessageTemplateReportInfo
+     * @apiGroup         admin_Administrator
+     * @apiName          setThirdPartySupMessageTemplateReportInfo
+     * @apiParam (入参) {String} cms_con_id
+     * @apiParam (入参) {String} id 
+     * @apiParam (入参) {String} yd_report_status 移动报备状态：1,未通过；2:通过
+     * @apiParam (入参) {String} lt_report_status 联通报备状态：1,未通过；2:通过
+     * @apiParam (入参) {String} dx_report_status 电信报备状态：1,未通过；2:通过
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:报备状态不能都为空 / 3002:channel_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /admin/administrator/setThirdPartySupMessageTemplateReportInfo
+     * @return array
+     * @author rzc
+     */
+    public function setThirdPartySupMessageTemplateReportInfo(){
+        $apiName  = classBasename($this) . '/' . __function__;
+        $cmsConId = trim($this->request->post('cms_con_id'));
+        if ($this->checkPermissions($cmsConId, $apiName) === false) {
+            return ['code' => '3100'];
+        }
+        $id = trim($this->request->post('id'));
+        $yd_report_status = trim($this->request->post('yd_report_status'));
+        $lt_report_status = trim($this->request->post('lt_report_status'));
+        $dx_report_status = trim($this->request->post('dx_report_status'));
+        intval($yd_report_status);
+        intval($lt_report_status);
+        intval($dx_report_status);
+        if (empty($yd_report_status) && empty($lt_report_status) && empty($dx_report_status)) {
+            return ['code' => '3001'];
+        }
+        $result = $this->app->administrator->setThirdPartySupMessageTemplateReportInfo($id, $yd_report_status, $lt_report_status, $dx_report_status);
+        return $result;
+    }
 }
