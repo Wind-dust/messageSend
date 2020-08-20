@@ -4066,7 +4066,7 @@ return $result;
         /* if ($template['status'] != 2 || empty($template)) {
             return ['code' => '3003'];
         } */
-        if (empty($template) || $template['status'] != 2) {
+        if (empty($template) || $template['report_status'] != 2) {
             return ['code' => '3003'];
         }
         $multimedia_message_frame = DbSendMessage::getUserSupMessageTemplateFrame(['multimedia_template_id' => $template['id']], 'num,content,content_type,type', false, ['num' => 'asc']);
