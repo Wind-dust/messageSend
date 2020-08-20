@@ -1859,6 +1859,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'send_status'  => 2,
                                 'create_time'  => time(),
                                 'develop_no' => $sendTask['develop_no'],
+                                'template_id' => $sendTask['template_id']
                             ];
                             $sendmessage = [
                                 'mobile'      => $yidong_mobile[$i],
@@ -1919,6 +1920,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'send_status'  => 2,
                                 'create_time'  => time(),
                                 'develop_no' => $sendTask['develop_no'],
+                                'template_id' => $sendTask['template_id']
                             ];
                             $sendmessage = [
                                 'mobile'      => $liantong_mobile[$i],
@@ -1976,6 +1978,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'send_status'  => 2,
                                 'create_time'  => time(),
                                 'develop_no' => $sendTask['develop_no'],
+                                'template_id' => $sendTask['template_id']
                             ];
                             $sendmessage = [
                                 'mobile'      => $dianxin_mobile[$i],
@@ -2058,6 +2061,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'status_message' => 'DELIVRD',
                                 'real_message'   => 'DEDUCT:1',
                                 'develop_no' => $sendTask['develop_no'],
+                                'template_id' => $sendTask['template_id']
                             ];
                             $all_log[] = $send_log;
                             $sendmessage = [
@@ -2108,6 +2112,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'status_message' => 'DB:0101',
                                 'real_message'   => 'ERROR:1',
                                 'develop_no' => $sendTask['develop_no'],
+                                'template_id' => $sendTask['template_id']
                             ];
                             $all_log[] = $send_log;
                             $sendmessage = [
@@ -4908,7 +4913,7 @@ class CmppCreateCodeTask extends Pzlife
                         $allnum = ceil($strlen / 67);
                         if ($receipt['my_submit_time'] > $time) {
 
-                            if ($receipt['send_num'] > 10) {
+                            if ($receipt['send_num'] > 10) {//单批次超过10个号码
                                 if (in_array('DELIVRD', $receipt['Stat'])) {
                                     for ($a = 0; $a < $allnum; $a++) {
                                         $redis->rpush('index:meassage:code:user:receive:' . $receipt['uid'], json_encode([
@@ -4940,15 +4945,21 @@ class CmppCreateCodeTask extends Pzlife
                                 }
                             } else {
                                 $stat = array_unique($receipt['Stat']);
-                                if (count($stat) > 1) {
+                                if (count($stat) > 1) {//多条不同回执
                                     //   print_r($stat);die;
                                     $stat = array_diff($stat, ['DELIVRD']);
+                                    if ($stat[0] == 'MK:1006') {
+                                        $stat[0] = 'DELIVRD';
+                                        $message_info = '发送成功';
+                                    }else{
+                                        $message_info = '发送失败';
+                                    }
                                     // print_r($stat);die;
                                     for ($a = 0; $a < $allnum; $a++) {
                                         $redis->rpush('index:meassage:code:user:receive:' . $receipt['uid'], json_encode([
                                             'task_no'        => trim($receipt['task_no']),
                                             'status_message' => $stat[0],
-                                            'message_info'   => '发送失败',
+                                            'message_info'   => $message_info,
                                             'mobile'         => trim($receipt['mobile']),
                                             'msg_id'         => trim($receipt['send_msg_id']),
                                             // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),

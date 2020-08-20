@@ -3938,13 +3938,13 @@ return $result;
                 ]);
                 $head = get_headers($value['content'], 1);
                 if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['image/gif', 'image/jpeg', 'image/png'])) {
-                    return ['code' => '3005'];
+                    return ['code' => '3004'];
                 }
                 $filename = filtraImage(Config::get('qiniu.domain'), $value['content']);
                 // print_r($value['image_path']);die;
                 $logfile  = DbImage::getLogImageAll($filename); //判断时候有未完成的图片
                 if (empty($logfile)) { //图片不存在
-                    return ['code' => '3006']; //图片没有上传过
+                    return ['code' => '3005']; //图片没有上传过
                 }
                 $content_length += $head['Content-Length'];
                 $frame['content'] = $value['content'];
@@ -3960,13 +3960,13 @@ return $result;
                 $head = get_headers($value['content'], 1);
                 // print_r($head);die;
                 if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['audio/mp2', 'audio/mp1', 'audio/mp3','video/mpeg4'])) {
-                    return ['code' => '3008'];
+                    return ['code' => '3009'];
                 }
                 $filename = filtraImage(Config::get('qiniu.videodomain'), $value['content']);
                 // print_r($value['image_path']);die;
                 $logfile  = DbVideo::getLogVideoAll($filename); //判断时候有未完成的图片
                 if (empty($logfile)) { //图片不存在
-                    return ['code' => '3005']; //图片没有上传过
+                    return ['code' => '3010']; //图片没有上传过
                 }
                 $content_length += $head['Content-Length'];
                 $frame['content'] = $value['content'];
@@ -3982,13 +3982,13 @@ return $result;
                 $head = get_headers($value['content'], 1);
                 // print_r($head);die;
                 if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['video/mp4', 'video/mpeg', 'video/mpg','video/mpeg4'])) {
-                    return ['code' => '3008'];
+                    return ['code' => '3009'];
                 }
                 $filename = filtraImage(Config::get('qiniu.videodomain'), $value['content']);
                 // print_r($value['image_path']);die;
                 $logfile  = DbVideo::getLogVideoAll($filename); //判断时候有未完成的图片
                 if (empty($logfile)) { //图片不存在
-                    return ['code' => '3005']; //图片没有上传过
+                    return ['code' => '3010']; //图片没有上传过
                 }
                 $content_length += $head['Content-Length'];
                 $frame['content'] = $value['content'];
@@ -4065,7 +4065,7 @@ return $result;
         /* if ($template['status'] != 2 || empty($template)) {
             return ['code' => '3003'];
         } */
-        if (empty($template)) {
+        if (empty($template) || $template['status'] != 2) {
             return ['code' => '3003'];
         }
         $multimedia_message_frame = DbSendMessage::getUserSupMessageTemplateFrame(['multimedia_template_id' => $template['id']], 'num,content,content_type,type', false, ['num' => 'asc']);
@@ -4113,10 +4113,6 @@ return $result;
         $liantong_channel_id = 0;
         $dianxin_channel_id = 0;
         if ($user['sup_free_trial'] == 2) {
-            $free_trial = 2;
-            $yidong_channel_id = 59;
-            $liantong_channel_id = 59;
-            $dianxin_channel_id = 59;
             if ($user['supmessage_free_credit'] > 0 && $real_num <= $user['supmessage_free_credit']) {
                 $free_trial = 2;
                 $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 11], '*', true);
@@ -4183,7 +4179,7 @@ return $result;
             return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no']];
         } catch (\Exception $e) {
             Db::rollback();
-            exception($e);
+            // exception($e);
             return ['code' => '3007'];
         }
     }
@@ -4212,16 +4208,49 @@ return $result;
         foreach ($report as $key => $value) {
             // print_r($value);die;
             $task_id = $redis->hget('index:meassage:code:back_taskno:135',$value['sendId']);
-           
+            if ($value['status'] == 2) {
+                $stat = 'DELIVRD';
+            }else{
+                $stat = $value['reportStatus'];
+            }
             $send_task_log = [
                 'task_id'        => $task_id,
                 'mobile'         => $value['mobile'],
-                'status_message' => $value['reportStatus'],
+                'status_message' => $stat,
                 'send_time'      => strtotime($value['sendTime']),
             ];
             // print_r($send_task_log);die;
             $redis->rpush($redisMessageCodeDeliver,json_encode($send_task_log));
         }
         return 'OK';
+    }
+
+    public function supmessageReceive($appid, $appkey){
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        // $offset = ($page - 1) * $pagenum;
+        /* $result = DbAdministrator::getUserSendCodeTaskLog(['uid' => $user['id']], 'task_no,status_message,mobile,send_time', $row = false, '', $offset . ',' . $pagenum);
+        foreach ($result as $key => $value) {
+            $result[$key]['sendtime'] = date("Y-m-d H:i:s", $value['send_time']);
+            unset($result[$key]['send_time']);
+        }
+        $total = DbAdministrator::countUserSendCodeTaskLog(['uid' => $user['id']]); */
+        $result = [];
+        $this->redis = Phpredis::getConn();
+        $i = 0;
+        while ($i < 100) {
+            $userstat = $this->redis->lpop('index:meassage:code:user:supreceive:' . $user['id']);
+            $userstat = json_decode($userstat, true);
+            if (empty($userstat)) {
+                break;
+            }
+            $result[] = $userstat;
+        }
+        return ['code' => '200', 'data' => $result];
     }
 }
