@@ -1155,7 +1155,7 @@ class SflUpload extends Pzlife
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
-                    continue;
+                    // continue;
                     $err_task_num = [];
                     $send_data    = [];
                     if ($son_path_data !== false) {
@@ -1540,13 +1540,13 @@ class SflUpload extends Pzlife
                             // continue;
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
-                           /*  if (!strpos($svalue, date("Ymd"))) {
-                                continue;
-                            } */
-                            //  strpos($svalue, '2020071518') == false
-                             if (strpos($svalue, '2020081823') == false) {
+                            if (!strpos($svalue, date("Ymd"))) {
                                 continue;
                             }
+                            //  strpos($svalue, '2020071518') == false
+                             /* if (strpos($svalue, '2020081823') == false) {
+                                continue;
+                            } */
 
                             $start_time = strtotime("2020-06-18");
                             $end_time = $start_time + 86400;
