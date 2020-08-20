@@ -1162,7 +1162,7 @@ class User extends CommonIndex
         $where = [];
         array_push($where, ['uid', '=', $uid]);
         if (!empty($status)) {
-            array_push($where, ['status', '=', $status]);
+            array_push($where, ['report_status', '=', $status]);
         }
         $result =  DbSendMessage::getUserSupMessageTemplate($where, '*', false, ['id' => 'desc'], $offset . ',' . $pageNum);
         foreach ($result as $key => $value) {
