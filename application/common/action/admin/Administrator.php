@@ -1983,7 +1983,7 @@ class Administrator extends CommonIndex
         if ($offect < 0) {
             return ['code' => 200, 'total' => 0, 'result' =>[]];
         }
-        $had_report = DbAdministrator::getUserSupMessageTemplateThirdReport(['template_id' => $template_id], '*', true);
+        $had_report = DbAdministrator::getUserSupMessageTemplateThirdReport(['template_id' => $template_id], '*', false);
         $total = DbAdministrator::countUserSupMessageTemplateThirdReport(['template_id' => $template_id]);
         return ['code' => 200, 'total' => $total, 'result' =>$had_report];
     }
