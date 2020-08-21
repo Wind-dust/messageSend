@@ -1203,4 +1203,25 @@ class User extends CommonIndex
         $total = DbSendMessage::countUserSupMessageTemplate($where);
         return ['code' => '200', 'total' => $total, 'result' => $result];
     }
+
+    public function getUserSupMessageLog($ConId, $page, $pageNum){
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        
+        $offset = ($page - 1) * $pageNum;
+        if ($offset < 0) {
+            return ['code' => '200', 'total' => 0, 'logs' => []];
+        }
+        $result = DbSendMessage::getUserSupMessageLog(['uid' => $uid], '*', false, '', $offset.','.$pageNum);
+        foreach ($result as $key => $value) {
+            if (empty($value['status_message'])) {
+                $result[$key]['status_message'] = 'DELIVRD';
+                $result[$key]['send_status'] = '3';
+            }
+        }
+        $total = DbSendMessage::countUserSupMessageLog(['uid' => $uid]);
+        return ['code' => '200', 'total' => $total, 'logs' => $result];
+    }
 }
