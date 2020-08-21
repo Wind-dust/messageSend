@@ -1166,7 +1166,27 @@ class User extends CommonIndex
         }
         $result =  DbSendMessage::getUserSupMessageTemplate($where, '*', false, ['id' => 'desc'], $offset . ',' . $pageNum);
         foreach ($result as $key => $value) {
+            // print_r($value);die;
             $multimedia_frame = DbSendMessage::getUserSupMessageTemplateFrame(['multimedia_template_id' => $value['id']], '*', false, ['num' => 'asc']);
+            //获取报备状态
+            $yd_status = DbSendMessage::getUserSupMessageTemplateThirdReport(['template_id' => $value['template_id'],'yd_report_status' => 2],'id',true);
+            if ($yd_status) {
+                $result[$key]['yd_report_status'] = 'OK!';
+            }else{
+                $result[$key]['yd_report_status'] = 'DEFAULT!';
+            }
+            $lt_status = DbSendMessage::getUserSupMessageTemplateThirdReport(['template_id' => $value['template_id'],'lt_report_status' => 2],'id',true);
+            if ($lt_status) {
+                $result[$key]['lt_report_status'] = 'OK!';
+            }else{
+                $result[$key]['lt_report_status'] = 'DEFAULT!';
+            }
+            $dx_status = DbSendMessage::getUserSupMessageTemplateThirdReport(['template_id' => $value['template_id'],'dx_report_status' => 2],'id',true);
+            if ($dx_status) {
+                $result[$key]['dx_report_status'] = 'OK!';
+            }else{
+                $result[$key]['dx_report_status'] = 'DEFAULT!';
+            }
             foreach ($multimedia_frame as $mkey => $mvalue) {
                 if ($mvalue['type'] == 2) {
                     $multimedia_frame[$mkey]['content'] = Config::get('qiniu.domain') . '/' . $mvalue['content'];
