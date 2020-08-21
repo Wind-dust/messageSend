@@ -962,7 +962,7 @@ class SflUpload extends Pzlife
                         exception($e);
                     }
                 }
-                $deduct = ceil(1114415 / 1714415 * 100);
+                $deduct = ceil(800000 / 1120052 * 100);
 
                 /* 扣量 */
                 // $all_num = [0,1,2,3,4];
@@ -1155,7 +1155,7 @@ class SflUpload extends Pzlife
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
-                    // continue;
+                    continue;
                     $err_task_num = [];
                     $send_data    = [];
                     if ($son_path_data !== false) {
@@ -1545,9 +1545,9 @@ class SflUpload extends Pzlife
                                 continue;
                             }
                             //  strpos($svalue, '2020071518') == false
-                             /* if (strpos($svalue, '2020081823') == false) {
+                             if (strpos($svalue, '2020082120') == false) {
                                 continue;
-                            } */
+                            }
 
                             $start_time = strtotime("2020-06-18");
                             $end_time = $start_time + 86400;
@@ -1767,7 +1767,7 @@ class SflUpload extends Pzlife
                                         continue;
 
                                         } */
-                                        if ($save_type == 'redis' && $tvalue[2] == '100183611') {
+                                        if ($save_type == 'redis' && $tvalue[2] == '100183640') {
                                             if (in_array($tvalue[3], $white_list)) {
                                                 $redis->rpush('sftp:sfl:marketing:whitesendtask', json_encode($SMS_real_send));
                                             } else {
