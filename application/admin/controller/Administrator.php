@@ -533,6 +533,7 @@ class Administrator extends AdminController
      * @apiParam (入参) {String} uid 用户id
      * @apiParam (入参) {String} free_trial 1:需要审核;2:审核通过;3:审核不通过
      * @apiParam (入参) {String} send_status 1：待发送,2:已发送;
+     * @apiParam (入参) {String} channel_id 0 未分配通道 1 已分配通道
      * @apiParam (入参) {String} page 页码 默认1
      * @apiParam (入参) {String} pageNum 条数 默认10
      * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 
@@ -549,15 +550,18 @@ class Administrator extends AdminController
         $page     = trim($this->request->post('page'));
         $pageNum  = trim($this->request->post('pageNum'));
         $cmsConId = trim($this->request->post('cms_con_id'));
+        $channel_id       = trim($this->request->post('channel_id'));
         $page     = is_numeric($page) ? $page : 1;
         $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
         $free_trial  = is_numeric($free_trial) ? $free_trial : 0;
         $send_status  = is_numeric($send_status) ? $send_status : 0;
+        $channel_id  = is_numeric($channel_id) ? $channel_id : 0;
         intval($page);
         intval($pageNum);
         intval($free_trial);
         intval($free_trial);
-        $result = $this->app->administrator->getUserSendTask($page, $pageNum, $id, $free_trial, $send_status, $uid);
+        intval($channel_id);
+        $result = $this->app->administrator->getUserSendTask($page, $pageNum, $id, $free_trial, $send_status, $uid, $channel_id);
         return $result;
     }
 

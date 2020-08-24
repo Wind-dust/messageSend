@@ -374,7 +374,7 @@ class Administrator extends CommonIndex
         }
     }
 
-    public function getUserSendTask($page, $pageNum, $id, $free_trial = 0, $send_status = 0, $uid = 0)
+    public function getUserSendTask($page, $pageNum, $id, $free_trial = 0, $send_status = 0, $uid = 0, $channel_id = 0)
     {
         $time = strtotime('-4 days', time());
         // echo $time;die;
@@ -389,6 +389,9 @@ class Administrator extends CommonIndex
         }
         if ($uid) {
             array_push($where, ['uid', '=', $uid]);
+        }
+        if ($channel_id == 0) {
+            array_push($where, ['yidong_channel_id', '=', 0]);
         }
         if (!empty($id)) {
             $result = DbAdministrator::getUserSendTask(['id' => $id], '*', true);

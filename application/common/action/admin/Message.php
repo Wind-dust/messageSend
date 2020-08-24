@@ -21,7 +21,7 @@ class Message extends CommonIndex {
      * @return array
      * @author rzc
      */
-    public function getMultimediaMessageTask($page, $pageNum, $id = 0, $title = '', $free_trial = 0, $send_status = 0) {
+    public function getMultimediaMessageTask($page, $pageNum, $id = 0, $title = '', $free_trial = 0, $send_status = 0, $channel_id = 0) {
         $offset = ($page - 1) * $pageNum;
         $time = strtotime('-4 days',time());
         // echo $time;die;
@@ -33,6 +33,9 @@ class Message extends CommonIndex {
         }
         if ($send_status) {
             array_push($where,['send_status','=',$send_status]);
+        }
+        if ($channel_id == 0) {
+            array_push($where, ['yidong_channel_id', '=', 0]);
         }
         $where  = [];
         if (!empty($id)) {
@@ -1080,7 +1083,7 @@ class Message extends CommonIndex {
         }
     }
 
-    public function getSupMessageTask($page, $pageNum, $id = 0, $title = '', $free_trial = 0, $send_status = 0) {
+    public function getSupMessageTask($page, $pageNum, $id = 0, $title = '', $free_trial = 0, $send_status = 0, $channel_id = 0) {
         $offset = ($page - 1) * $pageNum;
         $time = strtotime('-4 days',time());
         // echo $time;die;
@@ -1092,6 +1095,9 @@ class Message extends CommonIndex {
         }
         if ($send_status) {
             array_push($where,['send_status','=',$send_status]);
+        }
+        if ($channel_id == 0) {
+            array_push($where, ['yidong_channel_id', '=', 0]);
         }
         $where  = [];
         if (!empty($id)) {
