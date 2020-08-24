@@ -7465,6 +7465,59 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
+    public function updateSupMessageReceipt()
+    {
+        try {
+            ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+            $redis = Phpredis::getConn();
+            // $redis->rpush('index:meassage:multimediamessage:deliver', '{"task_id":"210115","mobile":"15618356476","status_message":"DELIVRD","send_time":"20200807151956"}');
+            while (true) {
+                $Received = updateReceivedForMessage();
+                $sendlog = $redis->lpop('index:meassage:supmessage:deliver');
+                if (empty($sendlog)) {
+                    // exit('Send Log IS null');
+                    sleep(60);
+                    continue;
+                }
+                $sendlog = json_decode($sendlog, true);
+                $task = Db::query("SELECT `task_no`,`send_msg_id`,`uid` FROM yx_user_sup_message WHERE `id` = " . $sendlog['task_id']);
+                if (empty($task)) {
+                    continue;
+                }
+                $task = $task[0];
+                if (in_array(trim($sendlog['status_message']), $Received)) {
+                    $stat = 'DELIVRD';
+                } else {
+                    $stat = $sendlog['status_message'];
+                }
+                if ($stat == 'DELIVRD') {
+                    $message_info = '发送成功';
+                    $send_status = 3;
+                } else {
+                    $message_info = '发送失败';
+                    $send_status = 4;
+                }
+                Db::startTrans();
+                Db::table('yx_user_sup_message_log')->where(['task_no' => $task['task_no'], 'mobile' => trim($sendlog['mobile'])])->update(['real_message' => $sendlog['status_message'], 'status_message' => $stat,  'send_status' => $send_status, 'update_time' => strtotime(trim($sendlog['send_time']))]);
+                Db::commit();
+                $redis->rpush('index:meassage:code:user:supreceive:' . $task['uid'], json_encode([
+                    'task_no'        => $task['task_no'],
+                    'status_message' => $stat,
+                    'msg_id'         => trim($task['send_msg_id']),
+                    'message_info'   => $message_info,
+                    'mobile'         => trim($sendlog['mobile']),
+                    // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                    'send_time'      => isset($sendlog['send_time']) ? date('Y-m-d H:i:s', trim(strtotime($sendlog['send_time']))) : date('Y-m-d H:i:s', time()),
+                    'smsCount' => 1,
+                    'smsIndex' => 1,
+                ])); //写入用户带处理日志
+            }
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
+        }
+    }
+
     public function reciveSendMessageFoMlty()
     {
         while (true) {
