@@ -52,8 +52,8 @@ return [
     'httpchannelmodelcaixinchuanglan' => $commandPath . 'HttpChannelModelCaiXinChuangLan',
     'httpchannelcaixinmeilian' => $commandPath . 'HttpChannelCaiXinMeiLian', //美联软通彩信
     'httpchannelmodelcaixinweige' => $commandPath . 'HttpChannelModelCaiXinWeiGe',
-    'httpchannelmodelsupmessagelingdao' => $commandPath . 'HttpChannelModelSupMessageLingDao',
-    'httpchannelmodelsupmessagelingdaoliandian' => $commandPath . 'HttpChannelModelSupMessageLingDaoLianDian',
+    'httpchannelmodelsupmessagelingdao' => $commandPath . 'HttpChannelModelSupMessageLingDao',//领道视频短信移动通道
+    'httpchannelmodelsupmessagelingdaoliandian' => $commandPath . 'HttpChannelModelSupMessageLingDaoLianDian',//领道视频短信联电通道
     'httpchannelmodelsupmessagesanti' => $commandPath . 'HttpChannelModelSupMessageSanTi',
     'cmppmeilianruantongyidonggame' => $commandPath . 'CmppMeiLianRuanTongYiDongGame', //美联软通移动游戏
     'httpchannelcaixinbangzhixinyidong' => $commandPath . 'HttpChannelCaiXinBangZhiXinYiDong', //邦之信移动彩信
