@@ -371,7 +371,7 @@ class Send extends MyController
         // if (empty($Mobile) || checkMobile($Mobile) === false) {
         //     return ['code'=>'3001'];
         // }
-        if (empty($Content) || mb_strlen($Content) > 500) {
+        if (empty($Content) || mb_strlen($Content) > 1000) {
             return ['code' => '3002'];
         }
         // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
@@ -427,7 +427,7 @@ class Send extends MyController
         // if (empty($Mobile) || checkMobile($Mobile) === false) {
         //     return ['code'=>'3001'];
         // }
-        if (empty($Content) || mb_strlen($Content) > 500) {
+        if (empty($Content) || mb_strlen($Content) > 1000) {
             return ['code' => '3002'];
         }
         // echo mb_strpos($Content,'】') - mb_strpos($Content,'【');die;
