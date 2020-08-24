@@ -390,8 +390,13 @@ class Administrator extends CommonIndex
         if ($uid) {
             array_push($where, ['uid', '=', $uid]);
         }
-        if ($channel_id == 0) {
-            array_push($where, ['yidong_channel_id', '=', 0]);
+        if ($channel_id != 1) {
+            // array_push($where, ['yidong_channel_id', '=', 0]);
+            if ($channel_id == 2) {//未分配
+                array_push($where, ['yidong_channel_id', '=', 0]);
+            }elseif ($channel_id == 3) {
+                array_push($where, ['yidong_channel_id', '<>', 0]);
+            }
         }
         if (!empty($id)) {
             $result = DbAdministrator::getUserSendTask(['id' => $id], '*', true);
