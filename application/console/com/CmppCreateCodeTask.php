@@ -7470,7 +7470,7 @@ class CmppCreateCodeTask extends Pzlife
         try {
             ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
             $redis = Phpredis::getConn();
-            // $redis->rpush('index:meassage:multimediamessage:deliver', '{"task_id":"210115","mobile":"15618356476","status_message":"DELIVRD","send_time":"20200807151956"}');
+            $redis->rpush('index:meassage:multimediamessage:deliver', '{"task_id":"5","mobile":"15618356476","status_message":"DELIVRD","send_time":"20200807151956"}');
             while (true) {
                 $Received = updateReceivedForMessage();
                 $sendlog = $redis->lpop('index:meassage:supmessage:deliver');
@@ -7507,7 +7507,7 @@ class CmppCreateCodeTask extends Pzlife
                     'message_info'   => $message_info,
                     'mobile'         => trim($sendlog['mobile']),
                     // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                    'send_time'      => isset($sendlog['send_time']) ? date('Y-m-d H:i:s', trim(strtotime($sendlog['send_time']))) : date('Y-m-d H:i:s', time()),
+                    'send_time'      => isset($sendlog['send_time']) ? date('Y-m-d H:i:s', strtotime(trim($sendlog['send_time']))) : date('Y-m-d H:i:s', time()),
                     'smsCount' => 1,
                     'smsIndex' => 1,
                 ])); //写入用户带处理日志
