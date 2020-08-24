@@ -221,9 +221,9 @@ class HttpChannelModelSupMessageLingDao extends Pzlife
                                 # code...
                                 $develop_len = strlen($user_info['channel_dest_id']);
                                 $receive_develop_no = mb_substr(trim($value['srcid']),$develop_len);
-                                $task_log = Db::query("SELECT `uid`,`task_no` FROM yx_user_multimedia_message_log WHERE `develop_no` = '".$receive_develop_no."' AND `mobile` = '".$value['mobile']."' ORDER BY id DESC LIMIT 1 ");
+                                $task_log = Db::query("SELECT `uid`,`task_no` FROM yx_user_sup_message_log WHERE `develop_no` = '".$receive_develop_no."' AND `mobile` = '".$value['mobile']."' ORDER BY id DESC LIMIT 1 ");
                                 if (empty($task_log)) {
-                                    $task_log = Db::query("SELECT `uid`,`task_no` FROM yx_user_multimedia_message_log WHERE `mobile` = '".$value['mobile']."' ORDER BY id DESC LIMIT 1 ");
+                                    $task_log = Db::query("SELECT `uid`,`task_no` FROM yx_user_sup_message_log WHERE `mobile` = '".$value['mobile']."' ORDER BY id DESC LIMIT 1 ");
                                 }
                                 if (!empty($task_log)) {
                                     $upgoing = [
@@ -269,7 +269,7 @@ class HttpChannelModelSupMessageLingDao extends Pzlife
             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
             fwrite($myfile, $th . "\n");
             fclose($myfile);
-            $this->writeToRobot($content, $th, '领道视频短信通道');
+            $this->writeToRobot($content, $th, '领道视频短信移动通道');
            /*  $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
                 'mobile'      => 15201926171,
                 'content'     => "【钰晰科技】微格彩信通道出现异常"

@@ -1904,11 +1904,78 @@ class Administrator extends CommonIndex
                 return ['code' => '3006', 'msg' => '该通道报备失败'];
             }
             
-        } elseif ($channel_id == 122) {
-
+        } elseif ($channel_id == 136) {
+            $appid = '350394';
+            $apikey = 'c89c00a99999432faf35893786c10a48';
+             $time = microtime(true);
+             //结果：1541053888.5911
+             //在经过处理得到最终结果:
+             $lastTime = (int)($time * 1000);
+             $sign = md5($apikey . $appid . $lastTime . $apikey); //数字签名参考sign生成规则 是
+             $report_api = 'http://47.101.30.221:8081/api/v2/mms/create?timestamp=' . $lastTime . '&appid=' . $appid . '&sign=' . $sign . '&mmstemplate=1';
+             $data = [];
+             $data['mms_title'] = $template['title'];
+             $data['mmsSign'] = $template['signature'];
+             $data['mms_type'] = 'multipart/related';
+             $data['mmstemplate'] = 0;
+ 
+             // print_r($multimedia_message_frame);die;
+             $mmsbody = [];
+             foreach ($multimedia_message_frame as $key => $value) {
+                 if ($value['type'] == 1) {
+                     $content_data = [
+                         'content_data' => trim($value['content']),
+                         'content_type' => $value['content_type'],
+                     ];
+                 }elseif($value['type'] == 2){
+                     $content_data = [
+                         'content_data' =>  base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['content'])),
+                         'content_type' => $value['content_type'],
+                     ];
+                 }else{
+                     $content_data = [
+                         'content_data' =>  base64_encode(file_get_contents(Config::get('qiniu.videodomain') . '/' . $value['content'])),
+                         'content_type' => $value['content_type'],
+                     ];
+                 }
+                
+                 $mmsbody[] = $content_data;
+             }
+             $data['mmsbody'] = $mmsbody;
+             $headers = [];
+             $headers = [
+                 'Content-Type:text/plain'
+             ];
+             $result = $this->sendRequest2($report_api, 'post', $data, $headers);
+             // $result = '{"msg":"成功","code":"T","data":{"mms_id":"60226","status":"R"}}';
+             // print_r($result);die;
+             if (!empty($result)) {
+                 $result = json_decode($result, true);
+                 if ($result['msg'] == '成功') {
+                     $report_msg_id = $result['data']['mms_id'];
+ 
+                     $report_data = [];
+                     $report_data = [
+                         'channel_id' => $channel_id,
+                         'template_id' => $template_id,
+                         'third_template_id' => $report_msg_id,
+                     ];
+                     Db::startTrans();
+                     try {
+                         DbAdministrator::addUserSupMessageTemplateThirdReport($report_data);
+                         Db::commit();
+                         return ['code' => '200'];
+                     } catch (\Exception $th) {
+                         exception($th);
+                         Db::rollback();
+                         return ['code' => '3009']; //修改失败
+                     }
+                 }
+                 return ['code' => '3006', 'msg' => '该通道报备失败'];
+             } else {
+                 return ['code' => '3006', 'msg' => '该通道报备失败'];
+             }
            
-        }elseif($channel_id == 123){
-            
         }
     }
 
