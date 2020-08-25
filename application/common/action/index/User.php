@@ -1224,4 +1224,39 @@ class User extends CommonIndex
         $total = DbSendMessage::countUserSupMessageLog(['uid' => $uid]);
         return ['code' => '200', 'total' => $total, 'logs' => $result];
     }
+
+    public function getUserSupMessageTemplateStatus($appid, $appkey, $template_id){
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        if ($appkey != $user['appkey']) {
+            return ['code' => '3000'];
+        }
+        
+        $result =  DbSendMessage::getUserSupMessageTemplate(['uid' => $user['id'], 'template_id' => $template_id], '*', true);
+        if (empty($result)){
+            return ['code' => '3001'];
+        }
+        $yd_status = DbSendMessage::getUserSupMessageTemplateThirdReport(['template_id' => $template_id,'yd_report_status' => 2],'id',true);
+        if ($yd_status) {
+            $yd_report_status = 'OK!';
+        }else{
+            $yd_report_status = 'DEFAULT!';
+        }
+        $lt_status = DbSendMessage::getUserSupMessageTemplateThirdReport(['template_id' => $template_id,'lt_report_status' => 2],'id',true);
+        if ($lt_status) {
+            $lt_report_status = 'OK!';
+        }else{
+            $lt_report_status = 'DEFAULT!';
+        }
+        $dx_status = DbSendMessage::getUserSupMessageTemplateThirdReport(['template_id' => $template_id,'dx_report_status' => 2],'id',true);
+        if ($dx_status) {
+            $dx_report_status = 'OK!';
+        }else{
+            $dx_report_status = 'DEFAULT!';
+        }
+        // $result['code']  = 200;
+        return ['code' => 200, 'yd_report_status' => $yd_report_status, 'lt_report_status' => $lt_report_status, 'dx_report_status' => $dx_report_status];
+    }
 }

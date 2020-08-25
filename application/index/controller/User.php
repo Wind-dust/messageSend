@@ -8,7 +8,7 @@ class User extends MyController
 {
     protected $beforeActionList = [
         //        'isLogin',//所有方法的前置操作
-        'isLogin' => ['except' => 'login,quickLogin,userRegistered,resetPassword,sendVercode,wxaccredit,wxregister'], //除去getFirstCate其他方法都进行second前置操作
+        'isLogin' => ['except' => 'login,quickLogin,userRegistered,resetPassword,sendVercode,wxaccredit,wxregister,getUserSupMessageTemplateStatus'], //除去getFirstCate其他方法都进行second前置操作
         //        'three'  => ['only' => 'hello,data'],//只有hello,data方法进行three前置操作
     ];
 
@@ -1065,6 +1065,29 @@ class User extends MyController
         intval($page);
         intval($pageNum);
         $result = $this->app->user->getUserSupMessageLog($ConId, $page, $pageNum);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 获取用户模板报备情况
+     * @apiDescription   getUserSupMessageTemplate
+     * @apiGroup         index_user
+     * @apiName          getUserSupMessageTemplate
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {String} template_id 模板id
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:id格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /index/user/getUserSupMessageTemplate
+     * @return array
+     * @author rzc
+     */
+    public function getUserSupMessageTemplateStatus()
+    {
+        $appid = trim($this->request->post('appid'));
+        $appkey = trim($this->request->post('appkey'));
+        $template_id     = trim($this->request->post('template_id'));
+        // intval($status);
+        $result = $this->app->user->getUserSupMessageTemplateStatus($appid, $appkey, $template_id);
         return $result;
     }
 }
