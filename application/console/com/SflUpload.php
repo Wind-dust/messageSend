@@ -1155,7 +1155,7 @@ class SflUpload extends Pzlife
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
-                    continue;
+                    // continue;
                     $err_task_num = [];
                     $send_data    = [];
                     if ($son_path_data !== false) {
@@ -1746,7 +1746,7 @@ class SflUpload extends Pzlife
                                                 $content = $content . "/回T退订";
                                             }
                                         }
-                                        if (!in_array($tvalue[2], ['100183751','100183751'])) {
+                                        if (!in_array($tvalue[2], ['100183752'])) {
                                             continue;
                                         }
                                         // print_r($content);die;

@@ -1735,7 +1735,7 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
-    public function createSupMessageTskLog($type){
+    public function createSupMessageTaskLog($type){
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         while(true){
@@ -10061,7 +10061,7 @@ class CmppCreateCodeTask extends Pzlife
             /* $where = [];
             $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
             $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` NOT  IN ('100183751','100183752') AND  `create_time` >  '" . $tody_time . "' ");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id`  IN ('100183751') AND  `create_time` >  '" . $tody_time . "' ");
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100183187'   ");
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id`  IN ('100182791','100181685','100182168','100182172') AND  `create_time` >  '" . $tody_time . "' AND mobile IN (".join(',',$white_list).") ");
             // echo "SELECT * FROM yx_sfl_send_task WHERE `template_id`  IN ('100182791','100181685','100182168','100182172') AND  `create_time` >  '" . $tody_time . "' AND mobile IN (".join(',',$white_list).") ";die;
@@ -10077,7 +10077,7 @@ class CmppCreateCodeTask extends Pzlife
         }
         // die;
         $deduct = 1; //1扣量,2不扣
-        $rate = 65;
+        $rate = 53;
 
         $ids = [];
         $j = 1;
