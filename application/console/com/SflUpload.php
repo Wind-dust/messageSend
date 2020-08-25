@@ -1137,7 +1137,7 @@ class SflUpload extends Pzlife
             15000773110,
             18217584060,
             13585699417,
-            15800400970, 13472865840, 13611664019, 13636311653, 13701789119, 13764272451, 13801687321, 13816091848, 13817515864, 13818181256, 13916292097, 13917823241, 13918902911, 15000773110, 15800815262, 15921904656, 18800232095, 13918153000, 18817718456, 15000796805, 13681961185, 13681961185, 18817718456, 13918153000, 15000796805, 13162248755, 16621181441, 18501684687, 18521329177, 18521569417, 18621714497, 18621720742, 18618353064, 18618353064, 18013770122, 18019762207, 18121252120, 18918267758, 18918267758
+            15800400970, 13472865840, 13611664019, 13636311653, 13701789119, 13764272451, 13801687321, 13816091848, 13817515864, 13818181256, 13916292097, 13917823241, 13918902911, 15000773110, 15800815262, 15921904656, 18800232095, 13918153000, 18817718456, 15000796805, 13681961185, 13681961185, 18817718456, 13918153000, 15000796805, 13162248755, 16621181441, 18501684687, 18521329177, 18521569417, 18621714497, 18621720742, 18618353064, 18618353064, 18013770122, 18019762207, 18121252120, 18918267758, 18918267758,18817718456, 18618353064, 18602893299
         ];
         $mms_id =  $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message  ORDER BY `id` DESC limit 1 ");
         $task_id   = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task  ORDER BY `id` DESC limit 1 ");
@@ -1155,7 +1155,7 @@ class SflUpload extends Pzlife
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
-                    // continue;
+                    continue;
                     $err_task_num = [];
                     $send_data    = [];
                     if ($son_path_data !== false) {
@@ -1738,9 +1738,16 @@ class SflUpload extends Pzlife
                                                 $content = $content . " 回T退订";
                                             } elseif ($tvalue[2] == '100182791') {
                                                 $content = $content . " /回T退订";
+                                            } elseif ($tvalue[2] == '100183751') {
+                                                $content = $content . " /回T退订";
+                                            } elseif ($tvalue[2] == '100183752') {
+                                                $content = $content . " /回T退订";
                                             } else {
                                                 $content = $content . "/回T退订";
                                             }
+                                        }
+                                        if (!in_array($tvalue[2], ['100183751','100183751'])) {
+                                            continue;
                                         }
                                         // print_r($content);die;
                                         $send_length = mb_strlen($content, 'utf8');
@@ -1767,7 +1774,7 @@ class SflUpload extends Pzlife
                                         continue;
 
                                         } */
-                                        if ($save_type == 'redis' && $tvalue[2] == '100183640') {
+                                        if ($save_type == 'redis') {
                                             if (in_array($tvalue[3], $white_list)) {
                                                 $redis->rpush('sftp:sfl:marketing:whitesendtask', json_encode($SMS_real_send));
                                             } else {
