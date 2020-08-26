@@ -119,6 +119,7 @@ class HttpChannelModelSupMessageSanTi extends Pzlife
                             ]; */
                             $res = sendRequest($report_api,'get');
                             $result = json_decode($res,true);
+                            print_r($result);
                             if ( isset($result['code'] ) && $result['code'] == 0){
                               /*   $redis->hset('index:meassage:code:back_taskno:' . $content, $result['data'], $key); 
                                 unset($send_task[$key]); */
@@ -172,7 +173,7 @@ class HttpChannelModelSupMessageSanTi extends Pzlife
 
                                 $res = sendRequest($report_api,'get');
                                 $result = json_decode($res,true);
-                                // print_r($result);
+                                print_r($result);
                                 if ( isset($result['code'] ) && $result['code'] == 0){
                                     /* $redis->hset('index:meassage:code:back_taskno:' . $content, $result['data'], $key); 
                                     */
