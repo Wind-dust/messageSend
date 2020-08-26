@@ -230,13 +230,13 @@ class Upload extends MyController
     }
 
     /**
-     * @api              {post} / 上传单个本地表格文件
+     * @api              {post} / 号码详情
      * @apiDescription   uploadMobile
      * @apiGroup         index_upload
      * @apiName          uploadMobile
      * @apiParam (入参) {String} appid appid
      * @apiParam (入参) {String} appkey appkey
-     * @apiParam (入参) {file} filename 表格名称 支持文件格式 txt,xlsx,csv,xls
+     * @apiParam (入参) {file} phone 表格名称 支持文件格式 txt,xlsx,csv,xls
      * @apiSuccess (返回) {String} code 200:成功  / 3001:上传文件不能为空 / 3002:上传失败 / 3003:上传号码为空
      * @apiSuccess (data) {Number} submit_num 上传数量
      * @apiSuccess (data) {Number} real_num 真实有效数量
@@ -281,13 +281,11 @@ class Upload extends MyController
                 $error_mobile[] = $value;
                 continue;
             }
-            $phone_data[]= $value;
+            // $phone_data[]= $value;
         }
         $unique_mobile = array_unique($phone_data);
         $unique_num = count($phone_data) - count($unique_mobile);
-        if ($all_num == 1) {
-            $unique_num = 0;
-        }
+        
         // $result = $this->app->send->getMobilesDetail($phone_data);
         // echo count($unique_mobile);die;
         $real_num = count($unique_mobile);
