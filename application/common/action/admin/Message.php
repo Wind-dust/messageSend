@@ -1125,7 +1125,7 @@ class Message extends CommonIndex {
                $result[$key]['content'] = $content;
             }
         }
-        $total = DbSendMessage::countUserSupMessageFrame($where);
+        $total = DbSendMessage::countUserSupMessage($where);
         if ($id) {
             $total = 1;
         }
