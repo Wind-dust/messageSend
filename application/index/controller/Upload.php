@@ -56,6 +56,8 @@ class Upload extends MyController
         $fileType = explode('/', $fileInfo['type']);
         $error_num = 0;
         $unique_num = 0;
+        $real_num = 0;
+        $all_num = 0;
         $error_mobile = [];
         $unique_mobile = [];
         if ($fileType[0] == 'text') {
@@ -78,6 +80,7 @@ class Upload extends MyController
                 if (empty($mobile)) {
                     continue;
                 }
+                $all_num ++;
                 if (checkMobile($mobile) == false) {
                     $error_num ++;
                     $error_mobile[] = $mobile;
@@ -94,9 +97,10 @@ class Upload extends MyController
             // print_r($error_num);die;
             $unique_mobile = array_unique($phone_data);
             $unique_num = count($phone_data) - count($unique_mobile);
+            $real_num = count($unique_mobile);
             // $result = $this->app->send->getMobilesDetail($phone_data);
             // echo count($unique_mobile);die;
-            return ['code' => 200, 'error_num' => $error_num,'unique_num' => $unique_num, 'error_mobile' => join(',',$error_mobile),'phone' => join(',',$unique_mobile)];
+            return ['code' => 200, 'error_num' => $error_num,'unique_num' => $unique_num, 'real_num' => $real_num, 'all_num' => $all_num,'error_mobile' => join(',',$error_mobile),'phone' => join(',',$unique_mobile)];
         }
         if (!in_array($fileType[1], ['vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'vnd.ms-excel', 'csv'])) {
             return ['code' => '3004']; //上传的不是表格
@@ -214,7 +218,8 @@ class Upload extends MyController
             $unique_num = count($phone_data) - count($unique_mobile);
             // $result = $this->app->send->getMobilesDetail($phone_data);
             // echo count($unique_mobile);die;
-            return ['code' => 200, 'error_num' => $error_num,'unique_num' => $unique_num, 'error_mobile' => join(',',$error_mobile),'phone' => join(',',$unique_mobile)];
+            $real_num = count($unique_mobile);
+            return ['code' => 200, 'error_num' => $error_num,'unique_num' => $unique_num, 'real_num' => $real_num, 'all_num' => $all_num,'error_mobile' => join(',',$error_mobile),'phone' => join(',',$unique_mobile)];
         } else {
             return ['code' => '3002'];
         }
