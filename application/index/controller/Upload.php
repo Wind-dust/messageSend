@@ -176,8 +176,16 @@ class Upload extends MyController
                     $cellVal = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
                     // $phone_data[]= trim($cellVal);
                     if (!empty($cellVal)) {
-                        $phone .= $j . trim($cellVal);
-                        $j = ',';
+                        $mobile =  trim($cellVal);
+                        if (empty($mobile)) {
+                            continue;
+                        }
+                       /*  if (checkMobile($mobile) == false) {
+                            $error_num ++;
+                            $error_mobile[] = $mobile;
+                            continue;
+                        } */
+                        $phone_data[]= $mobile;
                     }
                     
                 }
