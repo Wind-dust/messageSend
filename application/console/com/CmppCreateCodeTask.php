@@ -1925,7 +1925,7 @@ class CmppCreateCodeTask extends Pzlife
                             $sendmessage = [
                                 'mobile'      => $liantong_mobile[$i],
                                 'mar_task_id' => $sendTask['id'],
-                                'channel_id'  => $yidong_channel_id,
+                                'channel_id'  => $liantong_channel_id,
                                 'from'        => 'yx_user_multimedia_message',
                                 'send_msg_id'        => $sendTask['send_msg_id'],
                                 'uid'          => $sendTask['uid'],
@@ -1983,7 +1983,7 @@ class CmppCreateCodeTask extends Pzlife
                             $sendmessage = [
                                 'mobile'      => $dianxin_mobile[$i],
                                 'mar_task_id' => $sendTask['id'],
-                                'channel_id'  => $yidong_channel_id,
+                                'channel_id'  => $dianxin_channel_id,
                                 'from'        => 'yx_user_multimedia_message',
                                 'send_msg_id'        => $sendTask['send_msg_id'],
                                 'uid'          => $sendTask['uid'],
