@@ -1650,6 +1650,38 @@ class Send extends MyController
     }
 
     /**
+     * @api              {post} / 三体视频短信回执回调接口
+     * @apiDescription   lingdaoSupMessageCallBack
+     * @apiGroup         index_send
+     * @apiName          lingdaoSupMessageCallBack
+     * @apiParam (入参) {String} code 返回码
+     * @apiParam (入参) {String} desc 状态说明
+     * @apiParam (入参) {String} ext_id 彩信任务id
+     * @apiParam (入参) {String} phone 号码
+     * @apiSuccess (返回) {String} code 200:成功  / 3000:用户名或密码错误
+     * @apiSampleRequest /index/send/lingdaoSupMessageCallBack
+     * @author rzc
+     */
+    public function lingdaoSupMessageCallBack()
+    {
+        $data   = $this->request->post(); //返回码
+        // $task_id  = trim($this->request->post('ext_id')); //登陆密码
+        // $phone  = trim($this->request->post('phone')); //登陆密码
+       if (empty($data)) {
+            echo 'FAIL';
+            exit;
+       }
+        $result = $this->app->send->lingdaoSupMessageCallBack($data);
+        if ($result == 'OK') {
+            echo 'SUCCESS';
+            exit;
+        } else {
+            echo 'FAIL';
+            exit;
+        }
+    }
+
+    /**
      * @api              {post} / 视频短信回执
      * @apiDescription   supmessageReceive
      * @apiGroup         index_send

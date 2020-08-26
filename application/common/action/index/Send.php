@@ -190,6 +190,7 @@ return $result;
         $data['source']       = $ip;
         $data['task_content'] = $Content;
 
+        $data['send_status']     = 1;
         $data['mobile_content'] = join(',', $Mobiles);
         $data['task_name']      = $task_name;
         $data['real_num']       = $real_num;
@@ -219,6 +220,7 @@ return $result;
         } */
         if ($data['free_trial'] == 2) {
             // $data['free_trial'] = 2;
+            $data['send_status']     = 2;
             $data['yidong_channel_id'] = 18;
             $data['liantong_channel_id'] = 19;
             $data['dianxin_channel_id'] = 19;
@@ -392,6 +394,7 @@ return $result;
         $data['real_num']       = $real_num;
         $data['send_length']    = mb_strlen($Content);
         $data['free_trial']     = 1;
+        $data['send_status']     = 1;
         $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
         if ($user['free_trial'] == 2) {
             $data['free_trial'] = 2;
@@ -405,6 +408,7 @@ return $result;
             }
         }
         if ($data['free_trial'] == 2) {
+            $data['send_status']     = 2;
             // $data['free_trial'] = 2;
             if ($user['pid'] == 10) {
                 $data['yidong_channel_id'] = 85;
@@ -875,6 +879,7 @@ return $result;
             $SmsMultimediaMessageTask['appointment_time'] = strtotime($send_time);
         }
 
+        $SmsMultimediaMessageTask['send_status']     = 1;
         if ($free_trial == 2) {
             $yidong_channel_id = 59;
             $liantong_channel_id = 59;
@@ -927,7 +932,9 @@ return $result;
         if (!empty($msg_id)) {
             $SmsMultimediaMessageTask['send_msg_id'] = $msg_id;
         }
-
+        if ($free_trial == 2) {
+            $SmsMultimediaMessageTask['send_status']     = 2;
+        }
         Db::startTrans();
         try {
             DbAdministrator::modifyBalance($user_equities['id'], $send_num, 'dec');
@@ -4226,6 +4233,29 @@ return $result;
         return 'OK';
     }
 
+    public function lingdaoSupMessageCallBack($data){
+        // print_r($report);die;
+        $redisMessageCodeDeliver = 'index:meassage:supmessage:deliver'; //创蓝彩信回执通道
+        $redis = Phpredis::getConn();
+        foreach ($data as $key => $value) {
+            // print_r($value);die;
+            $task_id = $redis->hget('index:meassage:code:back_taskno:lingdao',$value['taskid']);
+            /* if ($value['status'] == 2) {
+                $stat = 'DELIVRD';
+            }else{
+                $stat = $value['reportStatus'];
+            } */
+            $send_task_log = [
+                'task_id'        => $task_id,
+                'mobile'         => $value['mobile'],
+                'status_message' => $value['code'],
+                'send_time'      => strtotime($value['time']),
+            ];
+            // print_r($send_task_log);die;
+            $redis->rpush($redisMessageCodeDeliver,json_encode($send_task_log));
+        }
+        return 'OK';
+    }
     public function supmessageReceive($appid, $appkey){
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {

@@ -831,7 +831,7 @@ class Administrator extends CommonIndex
         }
         $channel = DbAdministrator::getSmsSendingChannel(['id' => $channel_id], 'id,title,business_id,channel_price', true);
         if (empty($channel)) {
-            return ['code' => '3002'];
+            return ['code' => '3008'];
         }
         if ($channel['business_id'] != 8) {
             return ['code' => '3004', '非彩信通道不能使用此接口'];
@@ -1225,6 +1225,182 @@ class Administrator extends CommonIndex
             } else {
                 return ['code' => '3006', 'msg' => '该通道报备失败'];
             }
+        }elseif ($channel_id == 137) {//非变量
+            // token：7100048530454063
+            // http://www.wemediacn.net/webservice/mmsservice.asmx
+            // print_r($multimedia_message_frame);die;
+            header("Content-type: text/xml");
+            $html ='';
+            // $html .= "<?xml version='1.0' encoding='utf-8'>";
+            $html .="<mms>";
+            $html .="<subject>".$template['title']."</subject>";
+           
+            $html .='<pages>';
+            foreach($multimedia_message_frame as $key=>$value){
+                $html .='<page dur="50">';
+                if (!empty($value['image_path'])) {
+                    $value['image_path'] = filtraImage(Config::get('qiniu.domain'), $value['image_path']);
+                    $type = explode('.', $value['image_path']);
+                    $html .='<img  type="image/'.$type[1].'">';
+                    $html .= base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                    /* $content_data = [
+                        'content_data' => base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path'])),
+                        'content_type' => 'image/' . $type[1],
+                    ]; */
+
+                    $html .='</img>';
+                }
+                if (!empty($value['content'])) {
+                    // $value['content'] = str_replace('{{var10}}', '{10}', $value['content']);
+                    $html .='<text>'.$value['content'].'</text>';
+                }
+                $html .='</page>';
+                // $html .=' <changefreq>Always</changefreq>';
+                // $html .='  <priority>0.8</priority>';
+               
+            }
+            // $result =  xml($html,200,[],['root_node'=>'xml']); 
+ 
+	        // echo $html;die;
+
+           
+            $html .='</pages>';
+            $html .='</mms>';
+            $mmsPack = $html;
+            $sToken = '7100455520709585';
+            $data = [];
+            $data = [
+                'mmsPack' => $mmsPack,
+                'sToken' => $sToken,
+            ];
+            $res = sendRequest('http://www.wemediacn.net/webservice/mmsservice.asmx/PostMMSMessage', 'post', $data);
+            // print_r($res);die;
+            $receive_data = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true); 
+            // echo $res;die;
+            // print_r($receive_data);die;
+            $report_msg_id = $receive_data[0];
+            if (strpos($report_msg_id,'ERROR') !== false) {
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
+            }
+            if (!empty($template_id)) {
+                $report_data = [];
+                $report_data = [
+                    'channel_id' => $channel_id,
+                    'template_id' => $template_id,
+                    'third_template_id' => $report_msg_id,
+                ];
+                Db::startTrans();
+                try {
+                    DbAdministrator::addUserMultimediaTemplateThirdReport($report_data);
+                    Db::commit();
+                    return ['code' => '200'];
+                } catch (\Exception $th) {
+                    exception($th);
+                    Db::rollback();
+                    return ['code' => '3009']; //修改失败
+                }
+            }else{
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
+            }
+                //最后一个参数是去掉tp字典的根节点，只输出自己的内容
+            // $result =  xml($html,200,[],['root_node'=>'xml']); 
+        
+            // return($html);
+            // echo $html;die;
+        }elseif ($channel_id == 138) {//变量
+            // token：7100048530454063
+            // http://www.wemediacn.net/webservice/mmsservice.asmx
+            // print_r($multimedia_message_frame);die;
+            header("Content-type: text/xml");
+            $html ='';
+            // $html .= "<?xml version='1.0' encoding='utf-8'>";
+            $html .="<mms>";
+            $html .="<subject>".$template['title']."</subject>";
+           
+            $html .='<pages>';
+            foreach($multimedia_message_frame as $key=>$value){
+                $html .='<page dur="50">';
+                if (!empty($value['image_path'])) {
+                    $value['image_path'] = filtraImage(Config::get('qiniu.domain'), $value['image_path']);
+                    $type = explode('.', $value['image_path']);
+                    $html .='<img  type="image/'.$type[1].'">';
+                    $html .= base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+                    /* $content_data = [
+                        'content_data' => base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path'])),
+                        'content_type' => 'image/' . $type[1],
+                    ]; */
+
+                    $html .='</img>';
+                }
+                if (!empty($value['content'])) {
+                    $value['content'] = str_replace('{{var1}}', '[[param01]]', $value['content']);
+                    $value['content'] = str_replace('{{var2}}', '[[param02]]', $value['content']);
+                    $value['content'] = str_replace('{{var3}}', '[[param03]]', $value['content']);
+                    $value['content'] = str_replace('{{var4}}', '[[param04]]', $value['content']);
+                    $value['content'] = str_replace('{{var5}}', '[[param05]]', $value['content']);
+                    $value['content'] = str_replace('{{var6}}', '[[param06]]', $value['content']);
+                    $value['content'] = str_replace('{{var7}}', '[[param07]]', $value['content']);
+                    $value['content'] = str_replace('{{var8}}', '[[param08]]', $value['content']);
+                    $value['content'] = str_replace('{{var9}}', '[[param09]]', $value['content']);
+                    // $value['content'] = str_replace('{{var10}}', '{10}', $value['content']);
+                    $html .='<text>'.$value['content'].'</text>';
+                }
+                $html .='</page>';
+                // $html .=' <changefreq>Always</changefreq>';
+                // $html .='  <priority>0.8</priority>';
+               
+            }
+            // $result =  xml($html,200,[],['root_node'=>'xml']); 
+ 
+	        // echo $html;die;
+
+           
+            $html .='</pages>';
+            $html .='</mms>';
+            $mmsPack = $html;
+            $sToken = '7100455520709585';
+            $data = [];
+            $data = [
+                'mmsPack' => $mmsPack,
+                'sToken' => $sToken,
+            ];
+            $res = sendRequest('http://www.wemediacn.net/webservice/mmsservice.asmx/PostMMSMessage', 'post', $data);
+           
+            $receive_data = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true); 
+            // print_r($res);die;
+            
+            // echo $res;die;
+            
+            $report_msg_id = $receive_data[0];
+            // print_r($report_msg_id);die;
+            if (strpos($report_msg_id,'ERROR') !== false) {
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
+            }
+            if (!empty($template_id)) {
+                $report_data = [];
+                $report_data = [
+                    'channel_id' => $channel_id,
+                    'template_id' => $template_id,
+                    'third_template_id' => $report_msg_id,
+                ];
+                Db::startTrans();
+                try {
+                    DbAdministrator::addUserMultimediaTemplateThirdReport($report_data);
+                    Db::commit();
+                    return ['code' => '200'];
+                } catch (\Exception $th) {
+                    exception($th);
+                    Db::rollback();
+                    return ['code' => '3009']; //修改失败
+                }
+            }else{
+                return ['code' => '3006', 'msg' => '该通道报备失败'];
+            }
+                //最后一个参数是去掉tp字典的根节点，只输出自己的内容
+            // $result =  xml($html,200,[],['root_node'=>'xml']); 
+        
+            // return($html);
+            // echo $html;die;
         }
     }
 

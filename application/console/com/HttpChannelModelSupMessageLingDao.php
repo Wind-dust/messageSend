@@ -115,7 +115,7 @@ class HttpChannelModelSupMessageLingDao extends Pzlife
                             $res = $this->sendRequest2($report_api,'post',$request_data,$headers);
                             $result = json_decode($res,true);
                             if ( isset($result['code'] ) && $result['code'] == 'T'){
-                                $redis->hset('index:meassage:code:back_taskno:' . $content, $result['data'], $key); 
+                                $redis->hset('index:meassage:code:back_taskno:lingdao', $result['data'], $key); 
                                 unset($send_task[$key]);
                                 $j = 1;
                             }else{
@@ -167,7 +167,7 @@ class HttpChannelModelSupMessageLingDao extends Pzlife
                                 $res = $this->sendRequest2($report_api,'post',$request_data,$headers);
                                 $result = json_decode($res,true);
                                 if ( isset($result['code'] ) && $result['code'] == 'T'){
-                                    $redis->hset('index:meassage:code:back_taskno:' . $content, $result['data'], $key); 
+                                    $redis->hset('index:meassage:code:back_taskno:lingdao', $result['data'], $key); 
                                     unset($send_task[$key]);
                                 }else{
                                     
