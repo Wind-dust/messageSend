@@ -3864,7 +3864,11 @@ class CmppCreateCodeTask extends Pzlife
                                                 $channel_id = $liantong_channel_id;
                                             } elseif ($newres['source'] == 3) {
                                                 $channel_id = $dianxin_channel_id;
+                                            }else{
+                                                $channel_id = $yidong_channel_id;
                                             }
+                                        }else{
+                                            $channel_id = $yidong_channel_id;
                                         }
 
                                         $send_log = [
