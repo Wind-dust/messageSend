@@ -81,11 +81,11 @@ class Upload extends MyController
                     continue;
                 }
                 $all_num ++;
-                if (checkMobile($mobile) == false) {
+               /*  if (checkMobile($mobile) == false) {
                     $error_num ++;
                     $error_mobile[] = $mobile;
                     continue;
-                }
+                } */
                 // $phone .= $j . trim(fgets($file)); //fgets()函数从文件指针中读取一行
                 // print_r($phone);die;
                 $phone_data[]= $mobile;
@@ -95,12 +95,13 @@ class Upload extends MyController
             }
             fclose($file);
             // print_r($error_num);die;
-            $unique_mobile = array_unique($phone_data);
+           /*  $unique_mobile = array_unique($phone_data);
             $unique_num = count($phone_data) - count($unique_mobile);
-            $real_num = count($unique_mobile);
+            $real_num = count($unique_mobile); */
             // $result = $this->app->send->getMobilesDetail($phone_data);
             // echo count($unique_mobile);die;
-            return ['code' => 200, 'error_num' => $error_num,'unique_num' => $unique_num, 'real_num' => $real_num, 'all_num' => $all_num,'error_mobile' => join(',',$error_mobile),'phone' => join(',',$unique_mobile)];
+            // return ['code' => 200, 'error_num' => $error_num,'unique_num' => $unique_num, 'real_num' => $real_num, 'all_num' => $all_num,'error_mobile' => join(',',$error_mobile),'phone' => join(',',$unique_mobile)];
+            return ['code' => 200, 'phone' => join(',',$phone_data)];
         }
         if (!in_array($fileType[1], ['vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'vnd.ms-excel', 'csv'])) {
             return ['code' => '3004']; //上传的不是表格
@@ -153,11 +154,11 @@ class Upload extends MyController
                         if (empty($mobile)) {
                             continue;
                         }
-                        if (checkMobile($mobile) == false) {
+                        /* if (checkMobile($mobile) == false) {
                             $error_num ++;
                             $error_mobile[] = $mobile;
                             continue;
-                        }
+                        } */
                         $phone_data[]= $mobile;
                     }
                    
@@ -200,29 +201,86 @@ class Upload extends MyController
                         if (empty($mobile)) {
                             continue;
                         }
-                        if (checkMobile($mobile) == false) {
+                       /*  if (checkMobile($mobile) == false) {
                             $error_num ++;
                             $error_mobile[] = $mobile;
                             continue;
-                        }
+                        } */
                         $phone_data[]= $mobile;
                     }
                 }
             }
-            if (empty($phone)) {
+            if (empty($phone_data)) {
                 return ['code' => '3003'];
             }
             // $result = $this->app->send->getMobilesDetail($phone_data);
-            // return ['code' => 200, 'phone' => $phone];
-            $unique_mobile = array_unique($phone_data);
-            $unique_num = count($phone_data) - count($unique_mobile);
-            // $result = $this->app->send->getMobilesDetail($phone_data);
-            // echo count($unique_mobile);die;
-            $real_num = count($unique_mobile);
-            return ['code' => 200, 'error_num' => $error_num,'unique_num' => $unique_num, 'real_num' => $real_num, 'all_num' => $all_num,'error_mobile' => join(',',$error_mobile),'phone' => join(',',$unique_mobile)];
+          
+            return ['code' => 200, 'phone' => join(',',$phone_data)];
         } else {
             return ['code' => '3002'];
         }
+    }
+
+    /**
+     * @api              {post} / 上传单个本地表格文件
+     * @apiDescription   uploadMobile
+     * @apiGroup         index_upload
+     * @apiName          uploadMobile
+     * @apiParam (入参) {String} appid appid
+     * @apiParam (入参) {String} appkey appkey
+     * @apiParam (入参) {file} filename 表格名称 支持文件格式 txt,xlsx,csv,xls
+     * @apiSuccess (返回) {String} code 200:成功  / 3001:上传文件不能为空 / 3002:上传失败 / 3003:上传号码为空
+     * @apiSuccess (data) {Number} submit_num 上传数量
+     * @apiSuccess (data) {Number} real_num 真实有效数量
+     * @apiSuccess (data) {Number} mobile_num 移动手机号数量
+     * @apiSuccess (data) {Number} unicom_num 联通手机号数量
+     * @apiSuccess (data) {Number} telecom_num 电信手机号数量
+     * @apiSuccess (data) {Number} virtual_num 虚拟运营商手机号数量
+     * @apiSuccess (data) {Number} unknown_num 未知归属运营商手机号数量
+     * @apiSuccess (data) {Number} mobile_phone 移动手机号码包
+     * @apiSuccess (data) {Number} unicom_phone 联通手机号码包
+     * @apiSuccess (data) {Number} telecom_phone 电信手机号码包
+     * @apiSuccess (data) {Number} virtual_phone 虚拟运营商手机号码包
+     * @apiSuccess (data) {Number} error_phone 错号包
+     * @apiSuccess (data) {String} phone 真实手机号结果
+     * @apiSampleRequest /index/upload/uploadMobile
+     * @author rzc
+     */
+    public function uploadMobile(){
+        $appid      = trim($this->request->post('appid')); //登录名
+        $appkey     = trim($this->request->post('appkey')); //登陆密码
+        $phone      = trim($this->request->post('phone')); //登陆密码
+        $phone_data = explode(',', $phone);
+        if (empty($appid)) {
+            return ['code' => '3000'];
+        }
+        if (empty($appkey)) {
+            return ['code' => '3000'];
+        }
+        if (empty($phone_data)) {
+            return ['code' => '3001'];
+        }
+        $error_num = 0;
+        $unique_num = 0;
+        $real_num = 0;
+        $all_num = 0;
+        $error_mobile = [];
+        $unique_mobile = [];
+        foreach ($phone_data as $key => $value) {
+            $all_num++;
+            if (checkMobile($value) == false) {
+                $error_num ++;
+                $error_mobile[] = $value;
+                continue;
+            }
+            $phone_data[]= $value;
+        }
+        $unique_mobile = array_unique($phone_data);
+        $unique_num = count($phone_data) - count($unique_mobile);
+        // $result = $this->app->send->getMobilesDetail($phone_data);
+        // echo count($unique_mobile);die;
+        $real_num = count($unique_mobile);
+        return ['code' => 200, 'error_num' => $error_num,'unique_num' => $unique_num, 'real_num' => $real_num, 'all_num' => $all_num,'error_mobile' => join(',',$error_mobile),'phone' => join(',',$unique_mobile)];
     }
 
     /**
