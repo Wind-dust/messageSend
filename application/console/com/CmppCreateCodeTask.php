@@ -4134,6 +4134,9 @@ class CmppCreateCodeTask extends Pzlife
         $result = json_decode($result, true);
         if ($result['code'] == 0) { //接口请求成功
             $mobiles = $result['mobiles'];
+            if (!is_array($mobiles)) {
+                return false;
+            }
             foreach ($mobiles as $key => $value) {
                 $mobile = decrypt($value['mobile'], $secret_id);
                 $check_result = $value['mobileStatus'];
