@@ -4076,6 +4076,16 @@ return $result;
         if (empty($template) || $template['report_status'] != 2) {
             return ['code' => '3003'];
         }
+        /* if ($template['report_status'] != 2){
+            $yd_status = DbSendMessage::getUserSupMessageTemplateThirdReport(['template_id' => $template_id,'yd_report_status' => 2],'id',true);
+           
+            $lt_status = DbSendMessage::getUserSupMessageTemplateThirdReport(['template_id' => $template_id,'lt_report_status' => 2],'id',true);
+           
+            $dx_status = DbSendMessage::getUserSupMessageTemplateThirdReport(['template_id' => $template_id,'dx_report_status' => 2],'id',true);
+            foreach ($mobile_content as $key => $value) {
+                # code...
+            }
+        } */
         $multimedia_message_frame = DbSendMessage::getUserSupMessageTemplateFrame(['multimedia_template_id' => $template['id']], 'num,content,content_type,type', false, ['num' => 'asc']);
         /* foreach ($multimedia_message_frame as $key => $value) {
             if ($value['variable_len'] > 0) {
@@ -4216,6 +4226,9 @@ return $result;
         foreach ($report as $key => $value) {
             // print_r($value);die;
             $task_id = $redis->hget('index:meassage:code:back_taskno:135',$value['sendId']);
+            if (empty($task_id)) {
+                return 'ERROR';
+            }
             if ($value['status'] == 2) {
                 $stat = 'DELIVRD';
             }else{
@@ -4240,6 +4253,9 @@ return $result;
         foreach ($data as $key => $value) {
             // print_r($value);die;
             $task_id = $redis->hget('index:meassage:code:back_taskno:lingdao',$value['taskid']);
+            if (empty($task_id)) {
+                return 'ERROR';
+            }
             /* if ($value['status'] == 2) {
                 $stat = 'DELIVRD';
             }else{
