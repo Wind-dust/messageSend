@@ -1729,7 +1729,7 @@ class CmppCreateCodeTask extends Pzlife
 
     public function pushSupMessageSendTask(){
         $this->redis = Phpredis::getConn();
-        $taskid = [5];
+        $taskid = [12];
         foreach ($taskid as $key => $value) {
             $this->redis->rpush("index:meassage:supmessage:sendtask", json_encode(['id' => $value, 'deduct' => 0]));
         }
@@ -2023,6 +2023,7 @@ class CmppCreateCodeTask extends Pzlife
                             }
                         }
                     }
+                    // print_r($push_messages);die;
                     if (!empty($true_log)) {
                         Db::startTrans();
                         try {
@@ -7477,7 +7478,7 @@ class CmppCreateCodeTask extends Pzlife
         try {
             ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
             $redis = Phpredis::getConn();
-            $redis->rpush('index:meassage:multimediamessage:deliver', '{"task_id":"5","mobile":"15618356476","status_message":"DELIVRD","send_time":"20200807151956"}');
+            // $redis->rpush('index:meassage:multimediamessage:deliver', '{"task_id":false,"mobile":"15821193682","status_message":"DELIVRD","send_time":1598439923}');
             while (true) {
                 $Received = updateReceivedForMessage();
                 $sendlog = $redis->lpop('index:meassage:supmessage:deliver');
@@ -7487,7 +7488,13 @@ class CmppCreateCodeTask extends Pzlife
                     continue;
                 }
                 $sendlog = json_decode($sendlog, true);
-                $task = Db::query("SELECT `task_no`,`send_msg_id`,`uid` FROM yx_user_sup_message WHERE `id` = " . $sendlog['task_id']);
+                if (!is_numeric($sendlog['task_id'])) {
+                    // $task = Db::query("SELECT `task_no`,`send_msg_id`,`uid` FROM yx_user_sup_message WHERE `id` = " . $sendlog['task_id']);
+                    continue;
+                }else{
+                    $task = Db::query("SELECT `task_no`,`send_msg_id`,`uid` FROM yx_user_sup_message WHERE `id` = " . $sendlog['task_id']);
+                }
+                
                 if (empty($task)) {
                     continue;
                 }
