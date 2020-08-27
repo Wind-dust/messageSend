@@ -962,7 +962,7 @@ class SflUpload extends Pzlife
                         exception($e);
                     }
                 }
-                $deduct = ceil(800000 / 1120052 * 100);
+                $deduct = ceil(630000 / 888307 * 100);
 
                 /* 扣量 */
                 // $all_num = [0,1,2,3,4];
