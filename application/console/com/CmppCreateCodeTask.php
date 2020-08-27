@@ -934,7 +934,7 @@ class CmppCreateCodeTask extends Pzlife
         foreach ($task_id as $key => $value) {
             $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $value['id'], 'deduct' => 60]));
         } */
-        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 206345, 'deduct' => 0]));
+        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 287775, 'deduct' => 0]));
         // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 150394, 'deduct' => 0]));
     }
 
@@ -2183,30 +2183,7 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
-    public function pushBusinessMessageSendTask()
-    {
-        $this->redis = Phpredis::getConn();
-        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        /* 
-                                    1321785 1322036
-                                    */
 
-        // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        /* $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_code_task WHERE  `id` = 1326264 ");
-        foreach ($task_id as $key => $value) {
-            if ($value['uid'] == 91) {
-                $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value['id'], 'deduct' => 50]));
-            } else {
-                $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value['id'], 'deduct' => 0]));
-            }
-        } */
-        // echo strtotime('-6 months');die;
-
-        $taskid = [2444024];
-        foreach ($taskid as $key => $value) {
-            $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value, 'deduct' => 0]));
-        }
-    }
 
     /*号码清洗 */
     public function SecondMobilesFiltrate($mobile, $uid, $deduct)
@@ -3548,6 +3525,8 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
+
+
     public function setMobileSource()
     {
         $this->redis = Phpredis::getConn();
@@ -3564,6 +3543,31 @@ class CmppCreateCodeTask extends Pzlife
             ];
             $this->redis->hset("index:mobile:source", $source['mobile'], json_encode($mobile_source));
         }
+    }
+
+    public function pushBusinessMessageSendTask()
+    {
+        $this->redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        /* 
+                                    1321785 1322036
+                                    */
+
+        // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
+        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_code_task WHERE  `id` > 1977004 ");
+        foreach ($task_id as $key => $value) {
+            if ($value['uid'] == 91) {
+                $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value['id'], 'deduct' => 50]));
+            } else {
+                $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value['id'], 'deduct' => 0]));
+            }
+        }
+        // echo strtotime('-6 months');die;
+
+       /*  $taskid = [2444024];
+        foreach ($taskid as $key => $value) {
+            $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value, 'deduct' => 0]));
+        } */
     }
 
     //书写行业通知任务日志并写入通道
@@ -3593,6 +3597,7 @@ class CmppCreateCodeTask extends Pzlife
             try {
                 // echo time() . "\n";
                 while (true) {
+                    $real_length = 1;
                     $send = $this->redis->lpop('index:meassage:business:sendtask');
                     // $send = 15745;
                     if (empty($send)) {
@@ -3619,7 +3624,12 @@ class CmppCreateCodeTask extends Pzlife
                             }
                         }
                     }
-
+                    $send_length = mb_strlen($sendTask['task_content'], 'utf8');
+                    if ($send_length > 70) {
+                        $real_length = ceil($send_length / 67);
+                    }
+                    $real_num = 0;
+                    $real_num += $real_length * $sendTask['send_num'];
 
                     $rollback[]  = $send;
                     $mobilesend  = [];
@@ -3636,437 +3646,398 @@ class CmppCreateCodeTask extends Pzlife
                     // if (empty($channel_id)) {
                     //     continue;
                     // }
-                    for ($i = 0; $i < count($mobilesend); $i++) {
-                        // $channel_id    = 0;
-                        $send_log    = [];
-                        $sendmessage = [];
-                        if (checkMobile(trim($mobilesend[$i])) == true) {
-                            //开启扣量模式
-                            $whitelist = Db::query("SELECT `id` FROM yx_whitelist WHERE `mobile` = " . $mobilesend[$i]);
-                            if (isset($real_send['deduct']) && $real_send['deduct'] > 0 && strpos($sendTask['task_content'], '验证码') == false && empty($whitelist)) {
-                                $num = 0;
-                                $num = mt_rand(0, 10000);
-                                //先过空号检测
-                                if ($this->mobileCheck($mobilesend[$i]) == true) { //空号
-                                    /* $send_log = [
-                                        'task_no'        => $sendTask['task_no'],
-                                        'uid'            => $sendTask['uid'],
-                                        // 'title'          => $sendTask['task_name'],
-                                        'task_content'   => $sendTask['task_content'],
-                                        'source'         => $sendTask['source'],
-                                        'mobile'         => $mobilesend[$i],
-                                        'send_length'    => $send_length,
-                                        'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
-                                        'send_status'    => 4,
-                                        'create_time'    => time(),
-                                        'status_message' => 'MI:0001', //无效号码
-                                        'real_message'   => 'MI:0001',
-                                    ];
-                                    if (in_array($sendTask['uid'], [47, 49, 51, 52, 53, 54, 55])) { //推送给美丽田园
-                                        // https://zhidao.baidu.com/question/412076997.html
-                                        $request_url = "http://116.228.60.189:15901/rtreceive?";
-                                        $request_url .= 'task_no=' . $sendTask['task_no'] . "&status_message=" . $send_log['status_message'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['create_time'];
-                                        sendRequest($request_url);
-                                    }else{
-                                        $user = Db::query("SELECT `pid` FROM yx_users WHERE `id` = " . $sendTask['uid']);
-                                        if ($user[0]['pid'] == 137) {
-                                            $send_len = 0;
-                                            $send_len = mb_strlen($sendTask['task_content']);
-                                            $s_num = 1;
-                                            if ($send_len > 70) {
-                                                $s_num = ceil($send_len / 67);
-                                            }
-                                            for ($a = 0; $a < $s_num; $a++) {
-                                                $this->redis->rpush('index:meassage:code:user:receive:' . $sendTask['uid'], json_encode([
-                                                    'task_no'        => trim($sendTask['task_no']),
-                                                    'status_message' => 'MI:0001',
-                                                    'message_info'   => '发送失败',
-                                                    'mobile'         => trim($mobilesend[$i]),
-                                                    'msg_id'         => trim($sendTask['send_msg_id']),
-                                                    // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                                                    'send_time'      => date('Y-m-d H:i:s', time()),
-                                                    'smsCount' => $s_num,
-                                                    'smsIndex' => $a + 1,
-                                                ])); //写入用户带处理日志
-                                            }
-                                        } else {
-                                            $this->redis->rpush('index:meassage:code:user:receive:' . $sendTask['uid'], json_encode([
-                                                'task_no'        => trim($sendTask['task_no']),
-                                                'status_message' => 'MI:0001',
-                                                'message_info'   => '发送失败',
-                                                'mobile'         => trim($mobilesend[$i]),
-                                                // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                                                'send_time'      =>  date('Y-m-d H:i:s', time()),
-                                            ])); //写入用户带处理日志
-                                        } 
+                    if (strpos($sendTask['task_content'], '验证码')  !== false || strpos($sendTask['task_content'], '生日')) {
+                        $real_send['deduct'] = 0;
+                    }
+                    $real_send['deduct'] = isset($real_send['deduct']) ? $real_send['deduct'] : 0;
+                    $mobile_result = [];
+                    $yidong_mobile = [];
+                    $liantong_mobile = [];
+                    $dianxin_mobile = [];
+                    $error_mobile = [];
+                    $deduct_mobile = [];
+                    // $mobile_result = $this->mobilesFiltrate($sendTask['mobile_content'], $sendTask['uid'], $real_send['deduct']);
+                    $mobile_result = $this->SecondMobilesFiltrate($sendTask['mobile_content'], $sendTask['uid'], $real_send['deduct']);
+
+                    // print_r($mobile_result);die;
+                    /*  return ['error_mobile' => $error_mobile, 'yidong_mobile' => $yidong_mobile,'liantong_mobile' => $liantong_mobile, 'dianxin_mobile' => $dianxin_mobile, 'deduct_mobile' => $deduct_mobile]; */
+                    /* 实际发送号码 */
+                    $yidong_mobile = $mobile_result['yidong_mobile'];
+                    $liantong_mobile = $mobile_result['liantong_mobile'];
+                    $dianxin_mobile = $mobile_result['dianxin_mobile'];
+                    /* 错号和扣量号码 */
+                    $error_mobile = $mobile_result['error_mobile'];
+                    $deduct_mobile = $mobile_result['deduct_mobile'];
+                    // print_r($mobile_result);die;
+                    /* echo "黑名单:".count($error_mobile);
+                    echo "扣量名单:".count($deduct_mobile);
+                    echo "移动:".count($yidong_mobile);
+                    echo "联通:".count($liantong_mobile);
+                    echo "电信:".count($dianxin_mobile);
+                    die; */
+                    $j = 1;
+                    if (!empty($yidong_mobile)) {
+                        for ($i = 0; $i < count($yidong_mobile); $i++) {
+                            $send_log = [
+                                'task_no'      => $sendTask['task_no'],
+                                'uid'          => $sendTask['uid'],
+                                'source'       => $sendTask['source'],
+                                'task_content' => $sendTask['task_content'],
+                                'mobile'       => $yidong_mobile[$i],
+                                'channel_id'   => $yidong_channel_id,
+                                'send_length'  => $send_length,
+                                'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
+                                'send_status'  => 2,
+                                'create_time'  => time(),
+                            ];
+                            $sendmessage = [
+                                'mobile'      => $yidong_mobile[$i],
+                                'mar_task_id' => $sendTask['id'],
+                                'content'     => $sendTask['task_content'],
+                                'channel_id'  => $yidong_channel_id,
+                                'from'        => 'yx_user_send_task',
+                                'send_msg_id'        => $sendTask['send_msg_id'],
+                                'uid'          => $sendTask['uid'],
+                                'send_num'          => $sendTask['send_num'],
+                                'task_no'      => $sendTask['task_no'],
+                            ];
+                            if (!empty($sendTask['develop_no'])) {
+                                $sendmessage['develop_code'] = $sendTask['develop_no'];
+                            }
+
+                            // fwrite($myfile, $txt);
+                            $push_messages[] = $sendmessage;
+                            $true_log[]      = $send_log;
+                            $j++;
+                            if ($j > 100) {
+                                Db::startTrans();
+                                try {
+                                    Db::table('yx_user_send_code_task_log')->insertAll($true_log);
+
+                                    Db::commit();
+                                    foreach ($push_messages as $key => $value) {
+                                        $send_channelid = $value['channel_id'];
+                                        unset($value['channel_id']);
+                                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
                                     }
-                                    $all_log[] = $send_log; */
-                                    $prefix = substr(trim($mobilesend[$i]), 0, 7);
-                                    $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
-                                    $newres = array_shift($res);
-                                    if ($newres) {
-                                        if ($newres['source'] == 1) {
-                                            $channel_id = $yidong_channel_id;
-                                        } elseif ($newres['source'] == 2) {
-                                            $channel_id = $liantong_channel_id;
-                                        } elseif ($newres['source'] == 3) {
-                                            $channel_id = $dianxin_channel_id;
+                                } catch (\Exception $e) {
+                                    // $this->redis->rPush('index:meassage:business:sendtask', $send);
+                                    if (!empty($rollback)) {
+                                        foreach ($rollback as $key => $value) {
+                                            $this->redis->rPush('index:meassage:business:sendtask', $value);
                                         }
                                     }
-                                    $send_log = [
-                                        'task_no'      => $sendTask['task_no'],
-                                        'uid'          => $sendTask['uid'],
-                                        'source'       => $sendTask['source'],
-                                        'task_content' => $sendTask['task_content'],
-                                        'mobile'       => $mobilesend[$i],
-                                        'channel_id'   => $channel_id,
-                                        'send_length'  => $send_length,
-                                        'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
-                                        'send_status'  => 2,
-                                        'create_time'  => time(),
-                                    ];
-                                    $sendmessage = [
-                                        'mobile'      => $mobilesend[$i],
-                                        'mar_task_id' => $sendTask['id'],
-                                        'content'     => $sendTask['task_content'],
-                                        'channel_id'  => $channel_id,
-                                        'from'        => 'yx_user_send_code_task',
-                                        'send_msg_id'        => $sendTask['send_msg_id'],
-                                        'uid'          => $sendTask['uid'],
-                                        'send_num'          => $sendTask['send_num'],
-                                        'task_no'      => $sendTask['task_no'],
-                                    ];
-                                    if (!empty($sendTask['develop_no'])) {
-                                        $sendmessage['develop_code'] = $sendTask['develop_no'];
-                                    }
 
-                                    // fwrite($myfile, $txt);
-                                    $push_messages[] = $sendmessage;
-                                    $true_log[]      = $send_log;
-
-                                    /* 
-                                    1321785 1322036
-                                    */
-                                } else {
-                                    if ($num <= $real_send['deduct'] * 100) {
-
-                                        /* 
-                                          'task_no'        => $sendTask['task_no'],
-                                            'uid'            => $sendTask['uid'],
-                                            // 'title'          => $sendTask['task_name'],
-                                            'task_content'   => $sendTask['task_content'],
-                                            'source'         => $sendTask['source'],
-                                            'mobile'         => $mobilesend[$i],
-                                            'send_length'    => $send_length,
-                                            'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
-                                            'send_status'    => 4,
-                                            'create_time'    => time(),
-                                            'status_message' => 'DB:0101', //无效号码
-                                            'real_message'   => 'DB:0101',
-                                             */
-                                        $send_log = [
-                                            'task_no'        => $sendTask['task_no'],
-                                            'uid'            => $sendTask['uid'],
-                                            // 'title'          => $sendTask['task_name'],
-                                            'task_content'   => $sendTask['task_content'],
-                                            'source'         => $sendTask['source'],
-                                            'mobile'         => $mobilesend[$i],
-                                            'send_length'    => $send_length,
-                                            'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
-                                            'send_status'    => 4,
-                                            'create_time'    => time(),
-                                            'status_message' => 'DELIVRD',
-                                            'real_message'   => 'DEDUCT:1',
-                                        ];
-                                        $all_log[] = $send_log;
-                                        $this->redis->rpush('index:message:code:deduct:deliver', json_encode([
-                                            'task_no' => $sendTask['task_no'],
-                                            'mar_task_id' => $sendTask['id'],
-                                            'uid'            => $sendTask['uid'],
-                                            'msg_id'            => $sendTask['send_msg_id'],
-                                            'Stat' => 'DELIVRD',
-                                            'mobile' =>  $mobilesend[$i],
-                                            'content'   => $sendTask['task_content'],
-                                            'from'   => 'yx_user_send_code_task',
-                                            'Submit_time'   => time(),
-                                        ]));
-                                    } else {
-                                        $prefix = substr(trim($mobilesend[$i]), 0, 7);
-                                        $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
-                                        $newres = array_shift($res);
-                                        if ($newres) {
-                                            if ($newres['source'] == 1) {
-                                                $channel_id = $yidong_channel_id;
-                                            } elseif ($newres['source'] == 2) {
-                                                $channel_id = $liantong_channel_id;
-                                            } elseif ($newres['source'] == 3) {
-                                                $channel_id = $dianxin_channel_id;
-                                            }
-                                        }
-                                        $send_log = [
-                                            'task_no'      => $sendTask['task_no'],
-                                            'uid'          => $sendTask['uid'],
-                                            'source'       => $sendTask['source'],
-                                            'task_content' => $sendTask['task_content'],
-                                            'mobile'       => $mobilesend[$i],
-                                            'channel_id'   => $channel_id,
-                                            'send_length'  => $send_length,
-                                            'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
-                                            'send_status'  => 2,
-                                            'create_time'  => time(),
-                                        ];
-                                        $sendmessage = [
-                                            'mobile'      => $mobilesend[$i],
-                                            'mar_task_id' => $sendTask['id'],
-                                            'content'     => $sendTask['task_content'],
-                                            'channel_id'  => $channel_id,
-                                            'from'        => 'yx_user_send_code_task',
-                                            'send_msg_id'        => $sendTask['send_msg_id'],
-                                            'uid'          => $sendTask['uid'],
-                                            'send_num'          => $sendTask['send_num'],
-                                            'task_no'      => $sendTask['task_no'],
-                                        ];
-                                        if (!empty($sendTask['develop_no'])) {
-                                            $sendmessage['develop_code'] = $sendTask['develop_no'];
-                                        }
-
-                                        // fwrite($myfile, $txt);
-                                        $push_messages[] = $sendmessage;
-                                        $true_log[]      = $send_log;
-                                    }
+                                    Db::rollback();
+                                    exception($e);
                                 }
+                                $j = 1;
+                                $push_messages = [];
+                                $true_log = [];
+                            }
+                        }
+                    }
+                    if (!empty($liantong_mobile)) {
+                        for ($i = 0; $i < count($liantong_mobile); $i++) {
+                            $send_log = [
+                                'task_no'      => $sendTask['task_no'],
+                                'uid'          => $sendTask['uid'],
+                                'source'       => $sendTask['source'],
+                                'task_content' => $sendTask['task_content'],
+                                'mobile'       => $liantong_mobile[$i],
+                                'channel_id'   => $liantong_channel_id,
+                                'send_length'  => $send_length,
+                                'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
+                                'send_status'  => 2,
+                                'create_time'  => time(),
+                            ];
+                            $sendmessage = [
+                                'mobile'      => $liantong_mobile[$i],
+                                'mar_task_id' => $sendTask['id'],
+                                'content'     => $sendTask['task_content'],
+                                'channel_id'  => $liantong_channel_id,
+                                'from'        => 'yx_user_send_task',
+                                'send_msg_id'        => $sendTask['send_msg_id'],
+                                'uid'          => $sendTask['uid'],
+                                'send_num'          => $sendTask['send_num'],
+                                'task_no'      => $sendTask['task_no'],
+                            ];
+                            if (!empty($sendTask['develop_no'])) {
+                                $sendmessage['develop_code'] = $sendTask['develop_no'];
+                            }
 
-                                //再进行扣量
+                            // fwrite($myfile, $txt);
+                            $push_messages[] = $sendmessage;
+                            $true_log[]      = $send_log;
+                            $j++;
+                            if ($j > 100) {
+                                Db::startTrans();
+                                try {
+                                    Db::table('yx_user_send_code_task_log')->insertAll($true_log);
 
-                                // if () {}
-                            } else {
-                                if (!in_array($sendTask['uid'], [47, 49, 51, 52, 53, 54, 55])) {
-                                    $end_num = substr($mobilesend[$i], -6);
-                                    //按无效号码计算
-                                    if (!in_array($end_num, ['000000', '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999'])) {
-                                        $prefix = '';
-                                        $prefix = substr(trim($mobilesend[$i]), 0, 7);
-                                        $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
-                                        // print_r($res);
-                                        if ($res) {
-                                            $newres = array_shift($res);
-                                            /*  if ($newres['source'] == 2 && $channel_id == 24) { //易信联通
-                                                $channel_id = 26;
-                                            } else if ($newres['source'] == 1 && $channel_id == 24) { //移动易信
-                                                $channel_id = 24;
-                                            } else if ($newres['source'] == 3 && $channel_id == 24) { //易信电信
-                                                $channel_id = 26;
-                                            } else if ($newres['source'] == 2 && $sendTask['uid'] == 91) {
-                                                $channel_id = 9; //蓝鲸营销
-                                            } */
-                                            if ($newres['source'] == 1) {
-                                                $channel_id = $yidong_channel_id;
-                                            } elseif ($newres['source'] == 2) {
-                                                $channel_id = $liantong_channel_id;
-                                            } elseif ($newres['source'] == 3) {
-                                                $channel_id = $dianxin_channel_id;
-                                            }else{
-                                                $channel_id = $yidong_channel_id;
-                                            }
-                                        }else{
-                                            $channel_id = $yidong_channel_id;
-                                        }
-
-                                        $send_log = [
-                                            'task_no'      => $sendTask['task_no'],
-                                            'uid'          => $sendTask['uid'],
-                                            'source'       => $sendTask['source'],
-                                            'task_content' => $sendTask['task_content'],
-                                            'mobile'       => $mobilesend[$i],
-                                            'channel_id'   => $channel_id,
-                                            'send_length'  => $send_length,
-                                            'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
-                                            'send_status'  => 2,
-                                            'create_time'  => time(),
-                                        ];
-                                        $sendmessage = [
-                                            'mobile'      => $mobilesend[$i],
-                                            'title'       => $sendTask['task_name'],
-                                            'mar_task_id' => $sendTask['id'],
-                                            'content'     => $sendTask['task_content'],
-                                            'channel_id'  => $channel_id,
-                                            'from'        => 'yx_user_send_code_task',
-                                            'send_msg_id'        => $sendTask['send_msg_id'],
-                                            'uid'          => $sendTask['uid'],
-                                            'send_num'          => $sendTask['send_num'],
-                                            'task_no'      => $sendTask['task_no'],
-                                        ];
-                                        if (!empty($sendTask['develop_no'])) {
-                                            $sendmessage['develop_code'] = $sendTask['develop_no'];
-                                        }
-                                        // $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
-                                        $push_messages[] = $sendmessage;
-                                        $true_log[]      = $send_log;
-                                    } else {
-                                        $send_log = [
-                                            'task_no'        => $sendTask['task_no'],
-                                            'uid'            => $sendTask['uid'],
-                                            // 'title'          => $sendTask['task_name'],
-                                            'task_content'   => $sendTask['task_content'],
-                                            'source'         => $sendTask['source'],
-                                            'mobile'         => $mobilesend[$i],
-                                            'send_length'    => $send_length,
-                                            'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
-                                            'send_status'    => 4,
-                                            'create_time'    => time(),
-                                            'status_message' => 'DB:0101', //无效号码
-                                            'real_message'   => 'DB:0101',
-                                        ];
-                                        $all_log[] = $send_log;
+                                    Db::commit();
+                                    foreach ($push_messages as $key => $value) {
+                                        $send_channelid = $value['channel_id'];
+                                        unset($value['channel_id']);
+                                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
                                     }
-                                } else {
-                                    $prefix = '';
-                                    $prefix = substr(trim($mobilesend[$i]), 0, 7);
-                                    $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
-                                    // print_r($res);
-                                    if ($res) {
-                                        $newres = array_shift($res);
-                                        if ($newres['source'] == 1) {
-                                            $channel_id = $yidong_channel_id;
-                                        } elseif ($newres['source'] == 2) {
-                                            $channel_id = $liantong_channel_id;
-                                        } elseif ($newres['source'] == 3) {
-                                            $channel_id = $dianxin_channel_id;
+                                } catch (\Exception $e) {
+                                    // $this->redis->rPush('index:meassage:business:sendtask', $send);
+                                    if (!empty($rollback)) {
+                                        foreach ($rollback as $key => $value) {
+                                            $this->redis->rPush('index:meassage:business:sendtask', $value);
                                         }
                                     }
 
-                                    $send_log = [
-                                        'task_no'      => $sendTask['task_no'],
-                                        'uid'          => $sendTask['uid'],
-                                        'source'       => $sendTask['source'],
-                                        'task_content' => $sendTask['task_content'],
-                                        'mobile'       => $mobilesend[$i],
-                                        'channel_id'   => $channel_id,
-                                        'send_length'  => $send_length,
-                                        'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
-                                        'send_status'  => 2,
-                                        'create_time'  => time(),
-                                    ];
-                                    $sendmessage = [
-                                        'mobile'      => $mobilesend[$i],
-                                        'title'       => $sendTask['task_name'],
-                                        'mar_task_id' => $sendTask['id'],
-                                        'content'     => $sendTask['task_content'],
-                                        'channel_id'  => $channel_id,
-                                        'from'        => 'yx_user_send_code_task',
-                                        'send_msg_id'        => $sendTask['send_msg_id'],
-                                        'uid'          => $sendTask['uid'],
-                                        'send_num'          => $sendTask['send_num'],
-                                        'task_no'      => $sendTask['task_no'],
-                                    ];
-                                    if (!empty($sendTask['develop_no'])) {
-                                        $sendmessage['develop_code'] = $sendTask['develop_no'];
+                                    Db::rollback();
+                                    exception($e);
+                                }
+                                $j = 1;
+                                $push_messages = [];
+                                $true_log = [];
+                            }
+                        }
+                    }
+                    if (!empty($dianxin_mobile)) {
+                        for ($i = 0; $i < count($dianxin_mobile); $i++) {
+                            $send_log = [
+                                'task_no'      => $sendTask['task_no'],
+                                'uid'          => $sendTask['uid'],
+                                'source'       => $sendTask['source'],
+                                'task_content' => $sendTask['task_content'],
+                                'mobile'       => $dianxin_mobile[$i],
+                                'channel_id'   => $dianxin_channel_id,
+                                'send_length'  => $send_length,
+                                'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
+                                'send_status'  => 2,
+                                'create_time'  => time(),
+                            ];
+                            $sendmessage = [
+                                'mobile'      => $dianxin_mobile[$i],
+                                'mar_task_id' => $sendTask['id'],
+                                'content'     => $sendTask['task_content'],
+                                'channel_id'  => $dianxin_channel_id,
+                                'from'        => 'yx_user_send_task',
+                                'send_msg_id'        => $sendTask['send_msg_id'],
+                                'uid'          => $sendTask['uid'],
+                                'send_num'          => $sendTask['send_num'],
+                                'task_no'      => $sendTask['task_no'],
+                            ];
+                            if (!empty($sendTask['develop_no'])) {
+                                $sendmessage['develop_code'] = $sendTask['develop_no'];
+                            }
+
+                            // fwrite($myfile, $txt);
+                            $push_messages[] = $sendmessage;
+                            $true_log[]      = $send_log;
+                            $j++;
+                            if ($j > 100) {
+                                Db::startTrans();
+                                try {
+                                    Db::table('yx_user_send_code_task_log')->insertAll($true_log);
+
+                                    Db::commit();
+                                    foreach ($push_messages as $key => $value) {
+                                        $send_channelid = $value['channel_id'];
+                                        unset($value['channel_id']);
+                                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
                                     }
-                                    // $res = $this->redis->rpush($redisMessageMarketingSend . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道
-                                    $push_messages[] = $sendmessage;
-                                    $true_log[]      = $send_log;
+                                } catch (\Exception $e) {
+                                    // $this->redis->rPush('index:meassage:business:sendtask', $send);
+                                    if (!empty($rollback)) {
+                                        foreach ($rollback as $key => $value) {
+                                            $this->redis->rPush('index:meassage:business:sendtask', $value);
+                                        }
+                                    }
+
+                                    Db::rollback();
+                                    exception($e);
+                                }
+                                $j = 1;
+                                $push_messages = [];
+                                $true_log = [];
+                            }
+                        }
+                    }
+                    if (!empty($true_log)) {
+                        Db::startTrans();
+                        try {
+                            Db::table('yx_user_send_code_task_log')->insertAll($true_log);
+
+                            Db::commit();
+                            foreach ($push_messages as $key => $value) {
+                                $send_channelid = $value['channel_id'];
+                                unset($value['channel_id']);
+                                $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                            }
+                            $j = 1;
+                            $push_messages = [];
+                            $true_log = [];
+                        } catch (\Exception $e) {
+                            // $this->redis->rPush('index:meassage:business:sendtask', $send);
+                            if (!empty($rollback)) {
+                                foreach ($rollback as $key => $value) {
+                                    $this->redis->rPush('index:meassage:business:sendtask', $value);
                                 }
                             }
-                        } else {
+
+                            Db::rollback();
+                            exception($e);
+                        }
+                    }
+                    /* 错号及扣量 */
+                    // $error_mobile = $mobile_result['error_mobile'];
+                    // $deduct_mobile = $mobile_result['deduct_mobile'];
+                    if (!empty($deduct_mobile)) {
+                        for ($i = 0; $i < count($deduct_mobile); $i++) {
                             $send_log = [
                                 'task_no'        => $sendTask['task_no'],
                                 'uid'            => $sendTask['uid'],
                                 // 'title'          => $sendTask['task_name'],
                                 'task_content'   => $sendTask['task_content'],
                                 'source'         => $sendTask['source'],
-                                'mobile'         => $mobilesend[$i],
-                                'send_length'    => $send_length,
+                                'mobile'         => $deduct_mobile[$i],
                                 'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
                                 'send_status'    => 4,
                                 'create_time'    => time(),
-                                'status_message' => 'DB:0101', //无效号码
-                                'real_message'   => 'DB:0101',
+                                'send_length'    => $send_length,
+                                'status_message' => 'DELIVRD', //无效号码
+                                'real_message'   => 'DEDUCT:1',
                             ];
-                            if (in_array($sendTask['uid'], [47, 49, 51, 52, 53, 54, 55])) { //推送给美丽田园
-                                // https://zhidao.baidu.com/question/412076997.html
-                                $request_url = "http://116.228.60.189:15901/rtreceive?";
-                                $request_url .= 'task_no=' . $sendTask['task_no'] . "&status_message=" . $send_log['status_message'] . "&mobile=" . $send_log['mobile'] . "&send_time=" . $send_log['create_time'];
-                                sendRequest($request_url);
-                            }
                             $all_log[] = $send_log;
-                        }
-                        $j++;
-                        if ($j > 100) {
-                            $j = 1;
-                            // print_r($true_log);
-                            // print_r($all_log);
-                            Db::startTrans();
-                            try {
-                                /* foreach($true_log as $tkey => $tvalue){
-                                    Db::table('yx_user_send_code_task_log')->insert($tvalue);
-                                } */
-                                if (!empty($true_log)) {
-                                    Db::table('yx_user_send_code_task_log')->insertAll($true_log);
-                                }
-                                if (!empty($all_log)) {
-                                    Db::table('yx_user_send_code_task_log')->insertAll($all_log);
-                                }
-                                Db::commit();
-                                if (!empty($push_messages)) {
-                                    foreach ($push_messages as $key => $value) {
-                                        $send_channelid = $value['channel_id'];
-                                        unset($value['channel_id']);
-                                        $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
-                                    }
-                                }
-                            } catch (\Exception $e) {
-                                // $this->redis->rPush('index:meassage:business:sendtask', $send);
-                                if (!empty($rollback)) {
-                                    foreach ($rollback as $key => $value) {
-                                        $this->redis->rPush('index:meassage:business:sendtask', $value);
-                                    }
-                                }
+                            $sendmessage = [
+                                'task_no' => $sendTask['task_no'],
+                                'mar_task_id' => $sendTask['id'],
+                                'uid'            => $sendTask['uid'],
+                                'msg_id'            => $sendTask['send_msg_id'],
+                                'Stat' => 'DELIVRD',
+                                'mobile' =>  $deduct_mobile[$i],
+                                'content'   => $sendTask['task_content'],
+                                'from'   => 'yx_user_send_task',
+                                'send_msg_id'        => $sendTask['send_msg_id'],
+                                'Submit_time'   => time(),
+                            ];
+                            // $this->redis->rpush('index:message:code:deduct:deliver', json_encode());
 
-                                Db::rollback();
-                                exception($e);
+                            // fwrite($myfile, $txt);
+                            $push_messages[] = $sendmessage;
+                            $j++;
+                            if ($j > 100) {
+                                Db::startTrans();
+                                try {
+                                    Db::table('yx_user_send_code_task_log')->insertAll($all_log);
+
+                                    Db::commit();
+                                    foreach ($push_messages as $key => $value) {
+                                        $res = $this->redis->rpush('index:message:code:deduct:deliver', json_encode($value)); //三体营销通道
+                                    }
+                                    $j = 1;
+                                    $push_messages = [];
+                                    $all_log = [];
+                                } catch (\Exception $e) {
+                                    // $this->redis->rPush('index:meassage:business:sendtask', $send);
+                                    if (!empty($rollback)) {
+                                        foreach ($rollback as $key => $value) {
+                                            $this->redis->rPush('index:meassage:business:sendtask', $value);
+                                        }
+                                    }
+
+                                    Db::rollback();
+                                    exception($e);
+                                }
                             }
-                            unset($all_log);
-                            unset($true_log);
-                            unset($push_messages);
-                            // echo time() . "\n";
-                            unset($rollback);
                         }
                     }
-                }
-                if (!empty($true_log)) {
-                    Db::startTrans();
-                    try {
-                        if (!empty($true_log)) {
-                            Db::table('yx_user_send_code_task_log')->insertAll($true_log);
+                    if (!empty($error_mobile)) {
+                        for ($i = 0; $i < count($error_mobile); $i++) {
+                            $send_log = [
+                                'task_no'        => $sendTask['task_no'],
+                                'uid'            => $sendTask['uid'],
+                                // 'title'          => $sendTask['task_name'],
+                                'task_content'   => $sendTask['task_content'],
+                                'source'         => $sendTask['source'],
+                                'mobile'         => $error_mobile[$i],
+                                'develop_no'  => $sendTask['develop_no'] ? $sendTask['develop_no'] : 1,
+                                'send_status'    => 4,
+                                'create_time'    => time(),
+                                'send_length'    => $send_length,
+                                'status_message' => 'DB:0101', //无效号码
+                                'real_message'   => 'ERROR:1',
+                            ];
+                            $all_log[] = $send_log;
+                            $sendmessage = [
+                                'task_no' => $sendTask['task_no'],
+                                'mar_task_id' => $sendTask['id'],
+                                'uid'            => $sendTask['uid'],
+                                'msg_id'            => $sendTask['send_msg_id'],
+                                'Stat' => 'DB:0101',
+                                'mobile' =>  $error_mobile[$i],
+                                'content'   => $sendTask['task_content'],
+                                'from'   => 'yx_user_send_task',
+                                'Submit_time'   => time(),
+                                'send_msg_id'        => $sendTask['send_msg_id'],
+                            ];
+                            // $this->redis->rpush('index:message:code:deduct:deliver', json_encode());
+
+                            // fwrite($myfile, $txt);
+                            $push_messages[] = $sendmessage;
+                            $j++;
+                            if ($j > 100) {
+                                Db::startTrans();
+                                try {
+                                    Db::table('yx_user_send_code_task_log')->insertAll($all_log);
+
+                                    Db::commit();
+                                    foreach ($push_messages as $key => $value) {
+                                        $res = $this->redis->rpush('index:message:code:deduct:deliver', json_encode($value)); //三体营销通道
+                                    }
+                                    $j = 1;
+                                    $push_messages = [];
+                                    $all_log = [];
+                                } catch (\Exception $e) {
+                                    // $this->redis->rPush('index:meassage:business:sendtask', $send);
+                                    if (!empty($rollback)) {
+                                        foreach ($rollback as $key => $value) {
+                                            $this->redis->rPush('index:meassage:business:sendtask', $value);
+                                        }
+                                    }
+
+                                    Db::rollback();
+                                    exception($e);
+                                }
+                            }
                         }
-                        if (!empty($all_log)) {
+                    }
+                    if (!empty($all_log)) {
+                        Db::startTrans();
+                        try {
                             Db::table('yx_user_send_code_task_log')->insertAll($all_log);
-                        }
-                        Db::commit();
-                        if (!empty($push_messages)) {
+
+                            Db::commit();
                             foreach ($push_messages as $key => $value) {
-                                $send_channelid = $value['channel_id'];
-                                unset($value['channel_id']);
-                                $res = $this->redis->rpush('index:meassage:code:send' . ":" . $send_channelid, json_encode($value)); //三体营销通道
+                                $res = $this->redis->rpush('index:message:code:deduct:deliver', json_encode($value)); //三体营销通道
                             }
-                        }
-                    } catch (\Exception $e) {
-                        // $this->redis->rPush('index:meassage:business:sendtask', $send);
-                        if (!empty($rollback)) {
-                            foreach ($rollback as $key => $value) {
-                                $this->redis->rPush('index:meassage:business:sendtask', $value);
+                            $j = 1;
+                            $push_messages = [];
+                            $all_log = [];
+                        } catch (\Exception $e) {
+                            // $this->redis->rPush('index:meassage:business:sendtask', $send);
+                            if (!empty($rollback)) {
+                                foreach ($rollback as $key => $value) {
+                                    $this->redis->rPush('index:meassage:business:sendtask', $value);
+                                }
                             }
+
+                            Db::rollback();
+                            exception($e);
                         }
-                        Db::rollback();
-                        exception($e);
                     }
                     unset($all_log);
                     unset($true_log);
                     unset($push_messages);
                     unset($rollback);
                 }
-                // echo time() . "\n";
-                // exit('success');
+               
             } catch (\Exception $e) {
                 /* $this->redis->rpush('index:meassage:code:send' . ":" . 85, json_encode([
                     'mobile'  => 15201926171,
