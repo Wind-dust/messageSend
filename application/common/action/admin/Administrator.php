@@ -1225,11 +1225,12 @@ class Administrator extends CommonIndex
             } else {
                 return ['code' => '3006', 'msg' => '该通道报备失败'];
             }
-        }elseif ($channel_id == 137) {//非变量
+        }elseif ($channel_id == 138) {//非变量
             // token：7100048530454063
             // http://www.wemediacn.net/webservice/mmsservice.asmx
             // print_r($multimedia_message_frame);die;
-            header("Content-type: text/xml");
+           
+            
             $html ='';
             // $html .= "<?xml version='1.0' encoding='utf-8'>";
             $html .="<mms>";
@@ -1273,8 +1274,16 @@ class Administrator extends CommonIndex
                 'mmsPack' => $mmsPack,
                 'sToken' => $sToken,
             ];
+            $headers = [
+                'Content-Type:text/xml',"version: 1.0"
+            ];
+            // print_r($data);die;
+          
+            // $res = sendRequestHeader('http://www.wemediacn.net/webservice/mmsservice.asmx/PostMMSMessage', 'post', $data,$headers);
+            header("Content-type: text/xml");
+            // print_r($data);die;
             $res = sendRequest('http://www.wemediacn.net/webservice/mmsservice.asmx/PostMMSMessage', 'post', $data);
-            // print_r($res);die;
+           
             $receive_data = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true); 
             // echo $res;die;
             // print_r($receive_data);die;
@@ -1307,7 +1316,7 @@ class Administrator extends CommonIndex
         
             // return($html);
             // echo $html;die;
-        }elseif ($channel_id == 138) {//变量
+        }elseif ($channel_id == 139) {//变量
             // token：7100048530454063
             // http://www.wemediacn.net/webservice/mmsservice.asmx
             // print_r($multimedia_message_frame);die;
