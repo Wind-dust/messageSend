@@ -9990,11 +9990,11 @@ class CmppCreateCodeTask extends Pzlife
                     if ($res) {
                         $newres = array_shift($res);
                         if ($newres['source'] == 1) {
-                            $channel_id = 129;
+                            $channel_id = 132;
                         } elseif ($newres['source'] == 2) {
-                            $channel_id = 130;
+                            $channel_id = 132;
                         } elseif ($newres['source'] == 3) {
-                            $channel_id = 131;
+                            $channel_id = 132;
                         }
                     } else {
                         $channel_id = 18;
