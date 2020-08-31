@@ -95,7 +95,7 @@ class CmppNorm extends Pzlife
          $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
-            'content'     => '【阿斯顿·马丁】欢迎光临',
+            'content'     => '【阿斯顿·马丁中国】欢迎光临',
             // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
         ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);

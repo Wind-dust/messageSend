@@ -549,20 +549,21 @@ function getExpressList()
  */
 function updateReceivedForMessage(){
     $Received = [
-        'REJECTD', 
-        'REJECT', 
-        'MA:0001', 
-        'DB:0141',
-        'MA:0001',
+        // 'REJECTD', 
+        // 'REJECT', 
+        'MK:1006', 
+        // 'MA:0001', 
+        // 'DB:0141',
+        // 'MA:0001',
         // 'MK:100D',
         // 'MK:100C',
-        'IC:0151',
-        'EXPIRED',
-        '-1012',
-        '-1013',
-        '4442',
-        '4446',
-        '4014'
+        // 'IC:0151',
+        // 'EXPIRED',
+        // '-1012',
+        // '-1013',
+        // '4442',
+        // '4446',
+        // '4014'
     ];
     return $Received;
 }
