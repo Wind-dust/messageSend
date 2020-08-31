@@ -129,7 +129,10 @@ class HttpChannelCaiXinZhongLan extends Pzlife {
                         if (empty($send_task)) {
                             $send_task[]                           = $send_data['mar_task_id'];
                             $send_title[$send_data['mar_task_id']] = $send_data['title'];
-                            $send_develop_code[$send_data['mar_task_id']] = $send_data['develop_code'];
+                            if (!empty($send_data['develop_code'])) {
+                                $send_develop_code[$send_data['mar_task_id']] = $send_data['develop_code'];
+                            }
+                           
                             // $send_content[$send_data['mar_task_id']] = $send_data['content'];
                             $send_content[$send_data['mar_task_id']] = $send_data['content'];
                         } elseif (!in_array($send_data['mar_task_id'], $send_task)) {
@@ -137,7 +140,9 @@ class HttpChannelCaiXinZhongLan extends Pzlife {
                             $send_title[$send_data['mar_task_id']] = $send_data['title'];
                             //处理内容
                             // $send_content[$send_data['mar_task_id']] = $send_data['content'];
-                            $send_develop_code[$send_data['mar_task_id']] = $send_data['develop_code'];
+                            if (!empty($send_data['develop_code'])) {
+                                $send_develop_code[$send_data['mar_task_id']] = $send_data['develop_code'];
+                            }
                             $send_content[$send_data['mar_task_id']] = $send_data['content'];
                         }
                         $send_num[$send_data['mar_task_id']][] = $send_data['mobile'];
