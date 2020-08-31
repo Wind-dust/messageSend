@@ -221,36 +221,13 @@ return $result;
         if ($data['free_trial'] == 2) {
             // $data['free_trial'] = 2;
             $data['send_status']     = 2;
-            $data['yidong_channel_id'] = 18;
-            $data['liantong_channel_id'] = 19;
-            $data['dianxin_channel_id'] = 19;
-            if ($user['id'] == '185') {
-                $data['yidong_channel_id'] = 107;
-                $data['liantong_channel_id'] = 107;
-                $data['dianxin_channel_id'] = 107;
-            }
-            if ($user['id'] == '187') {
-                $data['yidong_channel_id'] = 107;
-                $data['liantong_channel_id'] = 107;
-                $data['dianxin_channel_id'] = 107;
-            }
-            if ($user['id'] == '206') {
-                $data['yidong_channel_id'] = 107;
-                $data['liantong_channel_id'] = 107;
-                $data['dianxin_channel_id'] = 107;
-            }
-            if ($user['id'] == '222') {
-                $data['yidong_channel_id'] = 113;
-                $data['liantong_channel_id'] = 113;
-                $data['dianxin_channel_id'] = 113;
-            }
-            if ($user['id'] >= 229) {
-                $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
-                if (!empty($channel)) {
-                    $data['yidong_channel_id'] = $channel['yidong_channel_id'];
-                    $data['liantong_channel_id'] =  $channel['liantong_channel_id'];
-                    $data['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
-                }
+            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
+            if (!empty($channel)) {
+                $data['yidong_channel_id'] = $channel['yidong_channel_id'];
+                $data['liantong_channel_id'] =  $channel['liantong_channel_id'];
+                $data['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+            }else{
+                $data['free_trial'] = 1;
             }
         }
         if (!empty($msg_id)) {
@@ -409,104 +386,13 @@ return $result;
         }
         if ($data['free_trial'] == 2) {
             $data['send_status']     = 2;
-            // $data['free_trial'] = 2;
-            if ($user['pid'] == 10) {
-                $data['yidong_channel_id'] = 85;
-                $data['liantong_channel_id'] = 85;
-                $data['dianxin_channel_id'] = 85;
-            } elseif ($user['id'] == 91) {
-                $data['yidong_channel_id'] = 85;
-                $data['liantong_channel_id'] = 85;
-                $data['dianxin_channel_id'] = 85;
-                // $data['yidong_channel_id'] = 9;
-                // $data['liantong_channel_id'] = 9;
-                // $data['dianxin_channel_id'] = 9;
-            } elseif ($user['id'] == 110) { //快递
-                $data['yidong_channel_id'] = 85;
-                $data['liantong_channel_id'] = 85;
-                $data['dianxin_channel_id'] = 85;
-                // $data['yidong_channel_id'] = 9;
-                // $data['liantong_channel_id'] = 9;
-                // $data['dianxin_channel_id'] = 9;
-            } elseif ($user['pid'] == 137) {
-                if ($user['id'] == 133) {
-                    $data['yidong_channel_id'] = 85;
-                    $data['liantong_channel_id'] = 85;
-                    $data['dianxin_channel_id'] = 85;
-                } elseif ($user['id'] == 134) {
-                    $data['yidong_channel_id'] = 85;
-                    $data['liantong_channel_id'] = 85;
-                    $data['dianxin_channel_id'] = 85;
-                } else {
-                    $data['yidong_channel_id'] = 85;
-                    $data['liantong_channel_id'] = 85;
-                    $data['dianxin_channel_id'] = 85;
-                }
-                if ($user['id'] == 172) {
-                    $data['yidong_channel_id'] = 95;
-                    $data['liantong_channel_id'] = 95;
-                    $data['dianxin_channel_id'] = 95;
-                }
-                if ($user['id'] == 187) {
-                    $data['yidong_channel_id'] = 95;
-                    $data['liantong_channel_id'] = 95;
-                    $data['dianxin_channel_id'] = 95;
-                }
-                if ($user['id'] == 200) {
-                    $data['yidong_channel_id'] = 95;
-                    $data['liantong_channel_id'] = 95;
-                    $data['dianxin_channel_id'] = 95;
-                }
-                if ($user['id'] == 217) {
-                    $data['yidong_channel_id'] = 95;
-                    $data['liantong_channel_id'] = 95;
-                    $data['dianxin_channel_id'] = 95;
-                }
-                if ($user['id'] == 218) {
-                    $data['yidong_channel_id'] = 95;
-                    $data['liantong_channel_id'] = 95;
-                    $data['dianxin_channel_id'] = 95;
-                }
-                if ($user['id'] == 224) {
-                    $data['yidong_channel_id'] = 95;
-                    $data['liantong_channel_id'] = 95;
-                    $data['dianxin_channel_id'] = 95;
-                }
-                // $data['yidong_channel_id'] = 9;
-                // $data['liantong_channel_id'] = 9;
-                // $data['dianxin_channel_id'] = 9;
-            } else {
-                if (strpos($Content, '亲爱的美田会员') !== false) {
-                    $data['yidong_channel_id'] = 60;
-                    $data['liantong_channel_id'] = 62;
-                    $data['dianxin_channel_id'] = 61;
-                } elseif (strpos($Content, '问卷') !== false) {
-                    $data['yidong_channel_id'] = 60;
-                    $data['liantong_channel_id'] = 62;
-                    $data['dianxin_channel_id'] = 61;
-                } else {
-                    $data['yidong_channel_id'] = 85;
-                    $data['liantong_channel_id'] = 85;
-                    $data['dianxin_channel_id'] = 85;
-                }
-            }
-            if ($user['id'] == 213) {
-                $data['yidong_channel_id'] = 85;
-                $data['liantong_channel_id'] = 85;
-                $data['dianxin_channel_id'] = 85;
-            }
-            if ($user['id'] == 112) {
-                $data['yidong_channel_id'] = 60;
-                $data['liantong_channel_id'] = 62;
-                $data['dianxin_channel_id'] = 61;
-            }
-            if ($user['id'] >= 229) {
-                $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
-                if (!empty($channel)) {
-                    $data['yidong_channel_id'] = $channel['yidong_channel_id'];
-                    $data['liantong_channel_id'] =  $channel['liantong_channel_id'];
-                    $data['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
-                }
+            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
+            if (!empty($channel)) {
+                $data['yidong_channel_id'] = $channel['yidong_channel_id'];
+                $data['liantong_channel_id'] =  $channel['liantong_channel_id'];
+                $data['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+            }else{
+                $data['free_trial'] = 1;
             }
         }
 
@@ -1248,112 +1134,36 @@ return $result;
                     } else {
                         // array_push($task_no, $free_taskno);
                         $send_task['free_trial'] = 2;
-                        if ($user['pid'] == 137 || $user['id'] == 110) {
-                            $send_task['yidong_channel_id'] = 85;
-                            $send_task['liantong_channel_id'] = 85;
-                            $send_task['dianxin_channel_id'] = 85;
-                        } elseif ($user['id'] == 134) {
-                            $send_task['yidong_channel_id'] = 85;
-                            $send_task['liantong_channel_id'] = 85;
-                            $send_task['dianxin_channel_id'] = 85;
-                        } else {
-                            $send_task['yidong_channel_id'] = 85;
-                            $send_task['liantong_channel_id'] = 85;
-                            $send_task['dianxin_channel_id'] = 85;
-                        }
-                        if ($user['id'] == 172) {
-                            $send_task['yidong_channel_id'] = 95;
-                            $send_task['liantong_channel_id'] = 95;
-                            $send_task['dianxin_channel_id'] = 95;
-                        }
-                        if ($user['id'] == 187) {
-                            $send_task['yidong_channel_id'] = 95;
-                            $send_task['liantong_channel_id'] = 95;
-                            $send_task['dianxin_channel_id'] = 95;
-                        }
-                        if ($user['id'] == 200) {
-                            $send_task['yidong_channel_id'] = 95;
-                            $send_task['liantong_channel_id'] = 95;
-                            $send_task['dianxin_channel_id'] = 95;
-                        }
-                        if ($user['id'] == 217) {
-                            $send_task['yidong_channel_id'] = 95;
-                            $send_task['liantong_channel_id'] = 95;
-                            $send_task['dianxin_channel_id'] = 95;
-                        }
-                        if ($user['id'] == 218) {
-                            $send_task['yidong_channel_id'] = 95;
-                            $send_task['liantong_channel_id'] = 95;
-                            $send_task['dianxin_channel_id'] = 95;
-                        }
-                        if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
+                        $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
                             if (!empty($channel)) {
                                 $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
                                 $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                                 $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                                $free_taskno[] = $task_no;
+                            }else{
+                                $send_task['free_trial'] = 1;
+                                $send_task['yidong_channel_id'] = 0;
+                                $send_task['liantong_channel_id'] = 0;
+                                $send_task['dianxin_channel_id'] = 0;
                             }
-                        }
-                        $free_taskno[] = $task_no;
+                       
                         // array_push($free_trial, $send_task);
                     }
                 } else {
                     if (!empty($value)) {
-                        $free_taskno[] = $task_no;
+                       
                         $send_task['free_trial'] = 2;
-                        if ($user['pid'] == 137) {
-
-                            $send_task['yidong_channel_id'] = 85;
-                            $send_task['liantong_channel_id'] = 85;
-                            $send_task['dianxin_channel_id'] = 85;
-                            if ($user['id'] == 187) {
-                                $send_task['yidong_channel_id'] = 95;
-                                $send_task['liantong_channel_id'] = 95;
-                                $send_task['dianxin_channel_id'] = 95;
-                            }
-                            if ($user['id'] == 172) {
-                                $send_task['yidong_channel_id'] = 95;
-                                $send_task['liantong_channel_id'] = 95;
-                                $send_task['dianxin_channel_id'] = 95;
-                            }
-                            if ($user['id'] == 200) {
-                                $send_task['yidong_channel_id'] = 95;
-                                $send_task['liantong_channel_id'] = 95;
-                                $send_task['dianxin_channel_id'] = 95;
-                            }
-                            if ($user['id'] == 217) {
-                                $send_task['yidong_channel_id'] = 95;
-                                $send_task['liantong_channel_id'] = 95;
-                                $send_task['dianxin_channel_id'] = 95;
-                            }
-                            if ($user['id'] == 218) {
-                                $send_task['yidong_channel_id'] = 95;
-                                $send_task['liantong_channel_id'] = 95;
-                                $send_task['dianxin_channel_id'] = 95;
-                            }
-                            if ($user['id'] == 224) {
-                                $send_task['yidong_channel_id'] = 95;
-                                $send_task['liantong_channel_id'] = 95;
-                                $send_task['dianxin_channel_id'] = 95;
-                            }
-                        } else {
-                            if ($user['id'] == 110) {
-                                $send_task['yidong_channel_id'] = 85;
-                                $send_task['liantong_channel_id'] = 85;
-                                $send_task['dianxin_channel_id'] = 85;
-                            } else {
-                                $send_task['yidong_channel_id'] = 85;
-                                $send_task['liantong_channel_id'] = 85;
-                                $send_task['dianxin_channel_id'] = 85;
-                            }
-                        }
-                        if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
-                            if (!empty($channel)) {
-                                $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
-                                $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
-                                $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
-                            }
+                        $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
+                        if (!empty($channel)) {
+                            $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
+                            $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
+                            $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                            $free_taskno[] = $task_no;
+                        }else{
+                            $send_task['free_trial'] = 1;
+                            $send_task['yidong_channel_id'] = 0;
+                            $send_task['liantong_channel_id'] = 0;
+                            $send_task['dianxin_channel_id'] = 0;
                         }
                         // array_push($free_trial, $send_task);
                     }
@@ -1604,51 +1414,16 @@ return $result;
                     } else {
                         // array_push($task_no, $free_taskno);
                         $send_task['free_trial'] = 2;
-                        if ($user['pid'] == 137 || $user['id'] == 110) {
-                            $send_task['yidong_channel_id'] = 85;
-                            $send_task['liantong_channel_id'] = 85;
-                            $send_task['dianxin_channel_id'] = 85;
-                        } elseif ($user['id'] == 134) {
-                            $send_task['yidong_channel_id'] = 85;
-                            $send_task['liantong_channel_id'] = 85;
-                            $send_task['dianxin_channel_id'] = 85;
-                        } else {
-                            $send_task['yidong_channel_id'] = 85;
-                            $send_task['liantong_channel_id'] = 85;
-                            $send_task['dianxin_channel_id'] = 85;
-                        }
-                        if ($user['id'] == 172) {
-                            $send_task['yidong_channel_id'] = 95;
-                            $send_task['liantong_channel_id'] = 95;
-                            $send_task['dianxin_channel_id'] = 95;
-                        }
-                        if ($user['id'] == 187) {
-                            $send_task['yidong_channel_id'] = 95;
-                            $send_task['liantong_channel_id'] = 95;
-                            $send_task['dianxin_channel_id'] = 95;
-                        }
-                        if ($user['id'] == 200) {
-                            $send_task['yidong_channel_id'] = 95;
-                            $send_task['liantong_channel_id'] = 95;
-                            $send_task['dianxin_channel_id'] = 95;
-                        }
-                        if ($user['id'] == 217) {
-                            $send_task['yidong_channel_id'] = 95;
-                            $send_task['liantong_channel_id'] = 95;
-                            $send_task['dianxin_channel_id'] = 95;
-                        }
-                        if ($user['id'] == 218) {
-                            $send_task['yidong_channel_id'] = 95;
-                            $send_task['liantong_channel_id'] = 95;
-                            $send_task['dianxin_channel_id'] = 95;
-                        }
-                        if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
-                            if (!empty($channel)) {
-                                $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
-                                $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
-                                $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
-                            }
+                        $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
+                        if (!empty($channel)) {
+                            $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
+                            $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
+                            $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                        }else{
+                            $send_task['free_trial'] = 1;
+                            $send_task['yidong_channel_id'] = 0;
+                            $send_task['liantong_channel_id'] = 0;
+                            $send_task['dianxin_channel_id'] = 0;
                         }
                         $free_taskno[] = $task_no;
                         // array_push($free_trial, $send_task);
@@ -1657,60 +1432,17 @@ return $result;
                     if (!empty($value)) {
                         $free_taskno[] = $task_no;
                         $send_task['free_trial'] = 2;
-                        if ($user['pid'] == 137) {
-
-                            $send_task['yidong_channel_id'] = 85;
-                            $send_task['liantong_channel_id'] = 85;
-                            $send_task['dianxin_channel_id'] = 85;
-                            if ($user['id'] == 187) {
-                                $send_task['yidong_channel_id'] = 95;
-                                $send_task['liantong_channel_id'] = 95;
-                                $send_task['dianxin_channel_id'] = 95;
-                            }
-                            if ($user['id'] == 172) {
-                                $send_task['yidong_channel_id'] = 95;
-                                $send_task['liantong_channel_id'] = 95;
-                                $send_task['dianxin_channel_id'] = 95;
-                            }
-                            if ($user['id'] == 200) {
-                                $send_task['yidong_channel_id'] = 95;
-                                $send_task['liantong_channel_id'] = 95;
-                                $send_task['dianxin_channel_id'] = 95;
-                            }
-                            if ($user['id'] == 217) {
-                                $send_task['yidong_channel_id'] = 95;
-                                $send_task['liantong_channel_id'] = 95;
-                                $send_task['dianxin_channel_id'] = 95;
-                            }
-                            if ($user['id'] == 218) {
-                                $send_task['yidong_channel_id'] = 95;
-                                $send_task['liantong_channel_id'] = 95;
-                                $send_task['dianxin_channel_id'] = 95;
-                            }
-                            if ($user['id'] == 224) {
-                                $send_task['yidong_channel_id'] = 95;
-                                $send_task['liantong_channel_id'] = 95;
-                                $send_task['dianxin_channel_id'] = 95;
-                            }
-                        } else {
-                            if ($user['id'] == 110) {
-                                $send_task['yidong_channel_id'] = 85;
-                                $send_task['liantong_channel_id'] = 85;
-                                $send_task['dianxin_channel_id'] = 85;
-                            } else {
-                                $send_task['yidong_channel_id'] = 85;
-                                $send_task['liantong_channel_id'] = 85;
-                                $send_task['dianxin_channel_id'] = 85;
-                            }
-                        }
-                        if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
+                         $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
                             if (!empty($channel)) {
                                 $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
                                 $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                                 $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                            }else{
+                                $send_task['free_trial'] = 1;
+                                $send_task['yidong_channel_id'] = 0;
+                                $send_task['liantong_channel_id'] = 0;
+                                $send_task['dianxin_channel_id'] = 0;
                             }
-                        }
                         // array_push($free_trial, $send_task);
                     }
                 }
@@ -2001,35 +1733,17 @@ return $result;
                     } else {
                         // array_push($task_no, $free_taskno);
                         $send_task['free_trial'] = 2;
-                        if ($user['id'] == 133) {
-                            $send_task['yidong_channel_id'] = 73;
-                            $send_task['liantong_channel_id'] = 75;
-                            $send_task['dianxin_channel_id'] = 76;
-                        } elseif ($user['id'] == 185) {
-                            $send_task['yidong_channel_id'] = 107;
-                            $send_task['liantong_channel_id'] = 107;
-                            $send_task['dianxin_channel_id'] = 107;
-                        } elseif ($user['id'] == 187) {
-                            $send_task['yidong_channel_id'] = 107;
-                            $send_task['liantong_channel_id'] = 107;
-                            $send_task['dianxin_channel_id'] = 107;
-                        } elseif ($user['id'] == 206) {
-                            $send_task['yidong_channel_id'] = 107;
-                            $send_task['liantong_channel_id'] = 107;
-                            $send_task['dianxin_channel_id'] = 107;
-                        } else {
-                            $send_task['yidong_channel_id'] = 18;
-                            $send_task['liantong_channel_id'] = 19;
-                            $send_task['dianxin_channel_id'] = 19;
-                        }
-                        if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
+                        $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
                             if (!empty($channel)) {
                                 $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
                                 $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                                 $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                            }else{
+                                $send_task['free_trial'] = 1;
+                                $send_task['yidong_channel_id'] = 0;
+                                $send_task['liantong_channel_id'] = 0;
+                                $send_task['dianxin_channel_id'] = 0;
                             }
-                        }
                         $free_taskno[] = $task_no;
                         // array_push($free_trial, $send_task);
                     }
@@ -2037,38 +1751,17 @@ return $result;
                     if (!empty($value)) {
                         $free_taskno[] = $task_no;
                         $send_task['free_trial'] = 2;
-                        if ($user['id'] == 133) {
-                            $send_task['yidong_channel_id'] = 73;
-                            $send_task['liantong_channel_id'] = 75;
-                            $send_task['dianxin_channel_id'] = 76;
-                        } else {
-                            $send_task['yidong_channel_id'] = 18;
-                            $send_task['liantong_channel_id'] = 19;
-                            $send_task['dianxin_channel_id'] = 19;
-                        }
-                        if ($user['id'] == 185) {
-                            $send_task['yidong_channel_id'] = 107;
-                            $send_task['liantong_channel_id'] = 107;
-                            $send_task['dianxin_channel_id'] = 107;
-                        }
-                        if ($user['id'] == 187) {
-                            $send_task['yidong_channel_id'] = 107;
-                            $send_task['liantong_channel_id'] = 107;
-                            $send_task['dianxin_channel_id'] = 107;
-                        }
-                        if ($user['id'] == 206) {
-                            $send_task['yidong_channel_id'] = 107;
-                            $send_task['liantong_channel_id'] = 107;
-                            $send_task['dianxin_channel_id'] = 107;
-                        }
-                        if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
+                       $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
                             if (!empty($channel)) {
                                 $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
                                 $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                                 $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                            }else{
+                                $send_task['free_trial'] = 1;
+                                $send_task['yidong_channel_id'] = 0;
+                                $send_task['liantong_channel_id'] = 0;
+                                $send_task['dianxin_channel_id'] = 0;
                             }
-                        }
                         // array_push($free_trial, $send_task);
                     }
                 }
@@ -2312,73 +2005,36 @@ return $result;
                     } else {
                         // array_push($task_no, $free_taskno);
                         $send_task['free_trial'] = 2;
-                        if ($user['id'] == 133) {
-                            $send_task['yidong_channel_id'] = 73;
-                            $send_task['liantong_channel_id'] = 75;
-                            $send_task['dianxin_channel_id'] = 76;
-                        } elseif ($user['id'] == 185) {
-                            $send_task['yidong_channel_id'] = 107;
-                            $send_task['liantong_channel_id'] = 107;
-                            $send_task['dianxin_channel_id'] = 107;
-                        } elseif ($user['id'] == 187) {
-                            $send_task['yidong_channel_id'] = 107;
-                            $send_task['liantong_channel_id'] = 107;
-                            $send_task['dianxin_channel_id'] = 107;
-                        } elseif ($user['id'] == 206) {
-                            $send_task['yidong_channel_id'] = 107;
-                            $send_task['liantong_channel_id'] = 107;
-                            $send_task['dianxin_channel_id'] = 107;
-                        } else {
-                            $send_task['yidong_channel_id'] = 18;
-                            $send_task['liantong_channel_id'] = 19;
-                            $send_task['dianxin_channel_id'] = 19;
+                        $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
+                        if (!empty($channel)) {
+                            $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
+                            $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
+                            $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                            $free_taskno[] = $task_no;
+                        }else{
+                            $send_task['free_trial'] = 1;
+                            $send_task['yidong_channel_id'] = 0;
+                            $send_task['liantong_channel_id'] = 0;
+                            $send_task['dianxin_channel_id'] = 0;
                         }
-                        if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
-                            if (!empty($channel)) {
-                                $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
-                                $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
-                                $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
-                            }
-                        }
-                        $free_taskno[] = $task_no;
+                        
                         // array_push($free_trial, $send_task);
                     }
                 } else {
                     if (!empty($value)) {
-                        $free_taskno[] = $task_no;
+                       
                         $send_task['free_trial'] = 2;
-                        if ($user['id'] == 133) {
-                            $send_task['yidong_channel_id'] = 73;
-                            $send_task['liantong_channel_id'] = 75;
-                            $send_task['dianxin_channel_id'] = 76;
-                        } else {
-                            $send_task['yidong_channel_id'] = 18;
-                            $send_task['liantong_channel_id'] = 19;
-                            $send_task['dianxin_channel_id'] = 19;
-                        }
-                        if ($user['id'] == 185) {
-                            $send_task['yidong_channel_id'] = 107;
-                            $send_task['liantong_channel_id'] = 107;
-                            $send_task['dianxin_channel_id'] = 107;
-                        }
-                        if ($user['id'] == 187) {
-                            $send_task['yidong_channel_id'] = 107;
-                            $send_task['liantong_channel_id'] = 107;
-                            $send_task['dianxin_channel_id'] = 107;
-                        }
-                        if ($user['id'] == 206) {
-                            $send_task['yidong_channel_id'] = 107;
-                            $send_task['liantong_channel_id'] = 107;
-                            $send_task['dianxin_channel_id'] = 107;
-                        }
-                        if ($user['id'] >= 229) {
-                            $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
-                            if (!empty($channel)) {
-                                $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
-                                $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
-                                $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
-                            }
+                        $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
+                        if (!empty($channel)) {
+                            $free_taskno[] = $task_no;
+                            $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
+                            $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
+                            $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                        }else{
+                            $send_task['free_trial'] = 1;
+                            $send_task['yidong_channel_id'] = 0;
+                            $send_task['liantong_channel_id'] = 0;
+                            $send_task['dianxin_channel_id'] = 0;
                         }
                         // array_push($free_trial, $send_task);
                     }
