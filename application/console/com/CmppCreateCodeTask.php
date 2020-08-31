@@ -6867,7 +6867,7 @@ class CmppCreateCodeTask extends Pzlife
             while (true) {
                 $channels = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `delete_time` = 0 ");
                 foreach ($channels as $key => $value) {
-                    if (in_array($value['id'], [83, 84, 86, 87, 88, 94, 140])) {
+                    if (in_array($value['id'], [83, 84, 86, 87, 88, 94])) {
                         continue;
                     }
                     $redisMessageUpRiver = 'index:message:code:upriver:' . $value['id'];
@@ -6968,24 +6968,37 @@ class CmppCreateCodeTask extends Pzlife
                                 }
                             }
                         } else {
-                            $sql                  = "SELECT `uid`,`id`,`task_no` FROM ";
-                            if ($value['business_id'] == 5) { //营销
-                                $sql .= " yx_user_send_task_log  WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'";
-                                $business_id = 5;
-                            } elseif ($value['business_id'] == 6) { // 行业
-                                $sql .= " yx_user_send_code_task_log WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "' ";
-                                $business_id = 6;
-                            } elseif ($value['business_id'] == 9) { //游戏
-                                $sql .= " yx_user_send_game_task WHERE `mobile_content` = '" . $encodemessageupriver['mobile'] . "' ";
-                                $business_id = 9;
-                            } elseif ($value['business_id'] == 7) { //高投诉网贷
-                                $sql .= " yx_user_send_task_log WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'";
-                                $business_id = 7;
-                            } elseif ($value['business_id'] == 8) { //彩信
-                                $sql .= " yx_user_multimedia_message_log WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'";
-                                $business_id = 8;
+                            if ($value['id'] == 140) {
+                                $sql                  = "SELECT `uid`,`id`,`task_no` FROM ";
+                                if ($value['business_id'] == 5) { //营销
+                                    $sql .= " yx_user_send_task_log  WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "' AND `uid` = 270 ";
+                                    $business_id = 5;
+                                } elseif ($value['business_id'] == 6) { // 行业
+                                    $sql .= " yx_user_send_code_task_log WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'  AND `uid` = 270  ";
+                                    $business_id = 6;
+                                } 
+                                $sql .= "  AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ";
+                            }else{
+                                $sql                  = "SELECT `uid`,`id`,`task_no` FROM ";
+                                if ($value['business_id'] == 5) { //营销
+                                    $sql .= " yx_user_send_task_log  WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'";
+                                    $business_id = 5;
+                                } elseif ($value['business_id'] == 6) { // 行业
+                                    $sql .= " yx_user_send_code_task_log WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "' ";
+                                    $business_id = 6;
+                                } elseif ($value['business_id'] == 9) { //游戏
+                                    $sql .= " yx_user_send_game_task WHERE `mobile_content` = '" . $encodemessageupriver['mobile'] . "' ";
+                                    $business_id = 9;
+                                } elseif ($value['business_id'] == 7) { //高投诉网贷
+                                    $sql .= " yx_user_send_task_log WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'";
+                                    $business_id = 7;
+                                } elseif ($value['business_id'] == 8) { //彩信
+                                    $sql .= " yx_user_multimedia_message_log WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'";
+                                    $business_id = 8;
+                                }
+                                $sql .= "  AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ";
                             }
-                            $sql .= "  AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ";
+                           
                             $message = Db::query($sql);
                             if (!empty($message)) {
                                 //上行入库
