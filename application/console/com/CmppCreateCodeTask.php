@@ -6867,7 +6867,7 @@ class CmppCreateCodeTask extends Pzlife
             while (true) {
                 $channels = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `delete_time` = 0 ");
                 foreach ($channels as $key => $value) {
-                    if (in_array($value['id'], [83, 84, 86, 87, 88, 94])) {
+                    if (in_array($value['id'], [83, 84, 86, 87, 88, 94, 140])) {
                         continue;
                     }
                     $redisMessageUpRiver = 'index:message:code:upriver:' . $value['id'];
