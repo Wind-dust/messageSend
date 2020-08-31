@@ -860,7 +860,11 @@ return $result;
         /*  $channel_id = 0;
         $free_trial = 1;
  */
-
+        $develop_no = '';
+        $develop_no_mes = Dbuser::getUserDevelopCode(['business_id' => 8, 'uid' => $user['id']], 'id,uid,business_id,source,develop_no', true);
+        if (!empty($develop_no_mes)) {
+            $develop_no = $develop_no_mes['develop_no'];
+        }
         $SmsMultimediaMessageTask = [];
         $SmsMultimediaMessageTask = [
             'task_no'        => 'mul' . date('ymdHis') . substr(uniqid('', true), 15, 8),
@@ -870,6 +874,7 @@ return $result;
             'source'         => $ip,
             'send_num'       => $send_num,
             'real_num'       => $real_num,
+            'develop_no'       => $develop_no,
             // 'channel_id'     => $channel_id,
             // 'yidong_channel_id'     => $yidong_channel_id,
             // 'liantong_channel_id'     => $liantong_channel_id,
@@ -3705,7 +3710,11 @@ return $result;
         /*  $channel_id = 0;
         $free_trial = 1;
  */
-
+        $develop_no = '';
+        $develop_no_mes = Dbuser::getUserDevelopCode(['business_id' => 8, 'uid' => $user['id']], 'id,uid,business_id,source,develop_no', true);
+        if (!empty($develop_no_mes)) {
+            $develop_no = $develop_no_mes['develop_no'];
+        }
         $SmsMultimediaMessageTask = [];
         $SmsMultimediaMessageTask = [
             'task_no'        => 'mul' . date('ymdHis') . substr(uniqid('', true), 15, 8),
@@ -3715,6 +3724,7 @@ return $result;
             'source'         => $ip,
             'send_num'       => $send_num,
             'real_num'       => $real_num,
+            'develop_no'       => $develop_no,
             // 'channel_id'     => $channel_id,
             // 'yidong_channel_id'     => $yidong_channel_id,
             // 'liantong_channel_id'     => $liantong_channel_id,
