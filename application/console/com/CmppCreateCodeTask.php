@@ -7468,6 +7468,8 @@ class CmppCreateCodeTask extends Pzlife
                     'smsCount' => 1,
                     'smsIndex' => 1,
                 ])); //写入用户带处理日志
+                echo Db::getLastSQL();
+                echo "\n";
             }
         } catch (\Exception $th) {
             //throw $th;
