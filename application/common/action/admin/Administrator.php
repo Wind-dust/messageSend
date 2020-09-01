@@ -640,8 +640,13 @@ class Administrator extends CommonIndex
         if ($free_trial) {
             array_push($where, ['free_trial', '=', $free_trial]);
         }
-        if ($channel_id == 0) {
-            array_push($where, ['yidong_channel_id', '=', 0]);
+        if ($channel_id != 1) {
+            // array_push($where, ['yidong_channel_id', '=', 0]);
+            if ($channel_id == 2) {//未分配
+                array_push($where, ['yidong_channel_id', '=', 0]);
+            }elseif ($channel_id == 3) {
+                array_push($where, ['yidong_channel_id', '<>', 0]);
+            }
         }
         if ($send_status) {
             array_push($where, ['send_status', '=', $send_status]);

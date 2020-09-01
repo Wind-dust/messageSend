@@ -34,8 +34,13 @@ class Message extends CommonIndex {
         if ($send_status) {
             array_push($where,['send_status','=',$send_status]);
         }
-        if ($channel_id == 0) {
-            array_push($where, ['yidong_channel_id', '=', 0]);
+        if ($channel_id != 1) {
+            // array_push($where, ['yidong_channel_id', '=', 0]);
+            if ($channel_id == 2) {//未分配
+                array_push($where, ['yidong_channel_id', '=', 0]);
+            }elseif ($channel_id == 3) {
+                array_push($where, ['yidong_channel_id', '<>', 0]);
+            }
         }
         $where  = [];
         if (!empty($id)) {
@@ -1096,8 +1101,13 @@ class Message extends CommonIndex {
         if ($send_status) {
             array_push($where,['send_status','=',$send_status]);
         }
-        if ($channel_id == 0) {
-            array_push($where, ['yidong_channel_id', '=', 0]);
+        if ($channel_id != 1) {
+            // array_push($where, ['yidong_channel_id', '=', 0]);
+            if ($channel_id == 2) {//未分配
+                array_push($where, ['yidong_channel_id', '=', 0]);
+            }elseif ($channel_id == 3) {
+                array_push($where, ['yidong_channel_id', '<>', 0]);
+            }
         }
         $where  = [];
         if (!empty($id)) {
