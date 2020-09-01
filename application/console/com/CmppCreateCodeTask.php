@@ -7452,6 +7452,7 @@ class CmppCreateCodeTask extends Pzlife
                     $message_info = '发送失败';
                     $send_status = 4;
                 }
+                print_r(['real_message' => $sendlog['status_message'], 'status_message' => $stat,  'send_status' => $send_status, 'update_time' => strtotime(trim($sendlog['send_time']))]);
                 Db::startTrans();
                 Db::table('yx_user_multimedia_message_log')->where(['task_no' => $task['task_no'], 'mobile' => trim($sendlog['mobile'])])->update(['real_message' => $sendlog['status_message'], 'status_message' => $stat,  'send_status' => $send_status, 'update_time' => strtotime(trim($sendlog['send_time']))]);
                 Db::commit();
