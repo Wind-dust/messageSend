@@ -12529,4 +12529,95 @@ class CmppCreateCodeTask extends Pzlife
 
         return join('', $arr);
     }
+
+    public function zhonglanSmsUpGoing(){
+        $redis = Phpredis::getConn();
+        while(true){
+            $MinID = $redis->get('index:meassage:code:receipt:zhonglan:upriver:MinID');
+            $MinID = $MinID ? $MinID : 0;
+            // $MinID = 0;
+            $receive = sendRequest('http://www.wemediacn.net/webservice/smsservice.asmx/QuerySMSUP','post',['TokenID' => '7100455520709585', 'MinID' => $MinID, 'Count' => 0, 'externCode' => '']);
+            $receive_data = json_decode(json_encode(simplexml_load_string($receive, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+            $codelen = strlen('106900294555');
+           
+            if (!empty($receive_data['result'])) {
+                $MinID = $receive_data['@attributes']['nextID'];
+                $redis->set('index:meassage:code:receipt:zhonglan:upriver:MinID',$MinID);
+                foreach ($receive_data['result'] as $key => $value) {
+                    $upgoing = [];
+                    if (is_array($value)) {
+                        $develop_code = mb_substr($value['DestNumber'],$codelen);
+                        $mobile = $value['mobile'];
+                        $message_info = $value['MsgFormat'];
+                        $get_time = $value['ReceiveTime'];
+                        $upgoing = [
+                            'mobile' => $mobile,
+                            'message_info' => $message_info,
+                            'get_time' => $get_time,
+                        ];
+                        $sql = "SELECT `uid`,`task_no` FROM yx_user_multimedia_message_log WHERE `mobile` = '".$mobile."' ";
+                        if (!empty($develop_code)) {
+                            $sql.= " AND `develop_no` = '".$develop_code."'";
+                        }
+                        $sql.= ' ORDER BY `id` DESC LIMIT 1';
+                        $task_log = Db::query($sql);
+                        // 
+                        if (!empty($task_log)) {
+                            $task_log = $task_log[0];
+                            // print_r($task_log);die;
+                            $redis->rPush('index:message:Mmsupriver:' . $task_log['uid'], json_encode($upgoing));
+                            $insert_data = [];
+                            $insert_data = [
+                                'uid' => $task_log['uid'],
+                                'task_no' => $task_log['task_no'],
+                                'mobile' => $mobile,
+                                'message_info' => $message_info,
+                                'create_time' => strtotime($get_time),
+                                'business_id' => 8,
+                            ]; 
+                            DB::table('yx_user_upriver')->insert($insert_data);
+                        }
+                        // print_r($codelen);
+                    }else{
+                        $develop_code = mb_substr($receive_data['result']['DestNumber'],$codelen);
+                        $mobile = $receive_data['result']['mobile'];
+                        $message_info = $receive_data['result']['MsgFormat'];
+                        $get_time = $receive_data['result']['ReceiveTime'];
+                        $upgoing = [
+                            'mobile' => $mobile,
+                            'message_info' => $message_info,
+                            'get_time' => $get_time,
+                        ];
+                        $sql = "SELECT `uid`,`task_no` FROM yx_user_multimedia_message_log WHERE `mobile` = '".$mobile."' ";
+                        if (!empty($develop_code)) {
+                            $sql.= " AND `develop_no` = '".$develop_code."'";
+                        }
+                        $sql.= ' ORDER BY `id` DESC LIMIT 1';
+                        $task_log = Db::query($sql);
+                        // 
+                        if (!empty($task_log)) {
+                            $task_log = $task_log[0];
+                            // print_r($task_log);die;
+                            $redis->rPush('index:message:Mmsupriver:' . $task_log['uid'], json_encode($upgoing));
+                            $insert_data = [];
+                            $insert_data = [
+                                'uid' => $task_log['uid'],
+                                'task_no' => $task_log['task_no'],
+                                'mobile' => $mobile,
+                                'message_info' => $message_info,
+                                'create_time' => strtotime($get_time),
+                                'business_id' => 8,
+                            ]; 
+                            DB::table('yx_user_upriver')->insert($insert_data);
+                        }
+                        break;
+                    }
+                    // print_r($develop_code);
+                   
+                }
+            }
+            sleep(30);
+        }
+                    
+    }
 }
