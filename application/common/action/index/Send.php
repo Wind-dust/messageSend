@@ -3247,7 +3247,7 @@ return $result;
     public function getSmsMultimediaMessageTaskNew($appid, $appkey, $content_data, $mobile_content, $send_time, $ip, $title, $signature_id, $msg_id)
     {
         $this->redis = Phpredis::getConn();
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial,mul_free_trial,multimedia_deduct,multimeda_free_credit', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,nick_name,user_type,user_status,reservation_service,free_trial,mul_free_trial,multimedia_deduct,multimeda_free_credit', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
