@@ -7464,7 +7464,7 @@ class CmppCreateCodeTask extends Pzlife
                     'message_info'   => $message_info,
                     'mobile'         => trim($sendlog['mobile']),
                     // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                    'send_time'      => isset($sendlog['send_time']) ? date('Y-m-d H:i:s', trim(strtotime($sendlog['send_time']))) : date('Y-m-d H:i:s', time()),
+                    'send_time'      => isset($sendlog['send_time']) ? date('Y-m-d H:i:s', trim($sendlog['send_time'])) : date('Y-m-d H:i:s', time()),
                     'smsCount' => 1,
                     'smsIndex' => 1,
                 ])); //写入用户带处理日志
