@@ -191,7 +191,7 @@ class HttpChannelModelVarCaiXinZhongLan extends Pzlife
                         }
                     }
 
-                    
+                    usleep(1150);
                 }else {
                     # code...
                     //获取上行
