@@ -553,7 +553,7 @@ function updateReceivedForMessage(){
         // 'REJECT', 
         'MK:1006', 
         // 'MA:0001', 
-        // 'DB:0141',
+        'DB:0141',
         // 'MA:0001',
         // 'MK:100D',
         // 'MK:100C',
