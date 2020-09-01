@@ -934,7 +934,9 @@ class CmppCreateCodeTask extends Pzlife
         foreach ($task_id as $key => $value) {
             $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $value['id'], 'deduct' => 60]));
         } */
-        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 326561, 'deduct' => 0]));
+        // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 326561, 'deduct' => 0]));
+        // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 287775, 'deduct' => 0]));
+        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 286906, 'deduct' => 0]));
         // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 150394, 'deduct' => 0]));
     }
 

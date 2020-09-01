@@ -249,7 +249,7 @@ class HttpChannelCaiXinZhongLan extends Pzlife {
                                 $report_task_id = $report_msg_data[1];
                                 $report_task_id = trim($report_task_id,'[');
                                 $report_task_id = trim($report_task_id,']');
-                                $redis->hset('index:meassage:code:back_taskno:zhonglan', $report_task_id, $send_data['mar_task_id']);
+                                $redis->hset('index:meassage:code:back_taskno:zhonglan', $report_task_id, $send_taskid);
                             }
                                 /*  $result = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
                                 if ($result['returnstatus'] == 'Success') { //成功
@@ -376,7 +376,7 @@ class HttpChannelCaiXinZhongLan extends Pzlife {
                             $report_task_id = $report_msg_data[1];
                             $report_task_id = trim($report_task_id,'[');
                             $report_task_id = trim($report_task_id,']');
-                            $redis->hset('index:meassage:code:back_taskno:zhonglan', $report_task_id, $send_data['mar_task_id']);
+                            $redis->hset('index:meassage:code:back_taskno:zhonglan', $report_task_id, $send_taskid);
                         }
                        
                         unset($send_num[$send_taskid]);
