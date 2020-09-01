@@ -7431,10 +7431,11 @@ class CmppCreateCodeTask extends Pzlife
                     sleep(60);
                     continue;
                 }
-                print_r($sendlog);
-                if (empty($sendlog['task_id'])){
+                //
+                if ($sendlog['task_id'] == false){
                     continue;
                 }
+                print_r($sendlog);
                 $sendlog = json_decode($sendlog, true);
                 $task = Db::query("SELECT `task_no`,`send_msg_id`,`uid` FROM yx_user_multimedia_message WHERE `id` = " . $sendlog['task_id']);
                 if (empty($task)) {
