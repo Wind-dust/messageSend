@@ -7455,7 +7455,7 @@ class CmppCreateCodeTask extends Pzlife
                 }
                 
                 Db::startTrans();
-                Db::table('yx_user_multimedia_message_log')->where(['task_no' => $task['task_no'], 'mobile' => trim($sendlog['mobile'])])->update(['real_message' => $sendlog['status_message'], 'status_message' => $stat,  'send_status' => $send_status, 'update_time' => strtotime(trim($sendlog['send_time']))]);
+                Db::table('yx_user_multimedia_message_log')->where(['task_no' => $task['task_no'], 'mobile' => trim($sendlog['mobile'])])->update(['real_message' => $sendlog['status_message'], 'status_message' => $stat,  'send_status' => $send_status, 'update_time' => trim($sendlog['send_time'])]);
                 Db::commit();
                 $redis->rpush('index:meassage:code:user:mulreceive:' . $task['uid'], json_encode([
                     'task_no'        => $task['task_no'],
@@ -7468,8 +7468,8 @@ class CmppCreateCodeTask extends Pzlife
                     'smsCount' => 1,
                     'smsIndex' => 1,
                 ])); //写入用户带处理日志
-                echo Db::getLastSQL();
-                echo "\n";
+                // echo Db::getLastSQL();
+                // echo "\n";
             }
         } catch (\Exception $th) {
             //throw $th;
