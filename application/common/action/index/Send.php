@@ -3461,6 +3461,20 @@ return $result;
             if ($free_trial == 2) {
                 $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $bId, 'deduct' => $user['multimedia_deduct']]));
             }
+            if ($free_trial == 1) {
+                $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                $check_data = [];
+                $check_data = [
+                    'msgtype' => "text",
+                    'text' => [
+                        "content" => "Hi，审核机器人\n您有一条新的彩信任务需要审核\n【任务类型】：图文彩信\n【用户信息】：uid[" . $user['id'] . "]用户昵称[" . $user['nick_name'] . "]\n",
+                    ],
+                ];
+                $headers = [
+                    'Content-Type:application/json'
+                ];
+                $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
+            }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no'], 'msg_id' => $msg_id];
             }
