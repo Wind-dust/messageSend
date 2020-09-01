@@ -97,7 +97,7 @@ class User extends Pzlife
         try {
             $redis = Phpredis::getConn();
             // $MinID = $redis->get('index:meassage:code:receipt:zhonglan:MinID');
-                    $MinID = $MinID ? $MinID : 0;
+                    // $MinID = $MinID ? $MinID : 0;
                     $MinID = 0;
                     $receive = sendRequest('http://www.wemediacn.net/webservice/mmsservice.asmx/QueryMMSSeqReport','post',['TokenID' => '7100455520709585', 'MinID' => $MinID]);
                     $receive_data = json_decode(json_encode(simplexml_load_string($receive, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
