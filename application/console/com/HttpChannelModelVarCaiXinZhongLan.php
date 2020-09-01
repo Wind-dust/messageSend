@@ -21,7 +21,7 @@ class HttpChannelModelVarCaiXinZhongLan extends Pzlife
             'sToken' => '',
             'channel_dest_id' => '10690456',//接入码
             // 'send_var_api'    => 'http://caixin.253.com/open/sendVarByTemplate', //模板变量发送地址老接口地址
-            'send_var_api'    => 'http://www.wemediacn.net/webservice/mmsservice.asmx/SendMMS', //发送地址
+            'send_var_api'    => 'http://www.wemediacn.net/webservice/mmsservice.asmx/SendPersonMMS', //发送地址
             // 'send_model_api'    => 'http://caixin.253.com/open/sendByTemplate', //模板非变量发送地址
             'call_api'    => '', //上行地址
             'call_back'    => '', //回执回调地址
@@ -168,11 +168,12 @@ class HttpChannelModelVarCaiXinZhongLan extends Pzlife
                             'parameter08' => isset($send_data['variable']['{{var8}}']) ? $send_data['variable']['{{var8}}'] : '',
                             'parameter09' => isset($send_data['variable']['{{var9}}']) ? $send_data['variable']['{{var9}}'] : '',
                         ];
-                        
+                        //  
                         $res = $this->sendRequestXwww($user_info['send_var_api'], $data);
-                        // print_r($res);die;
+                       
                         $receive_data = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
                         $report_msg_id = $receive_data[0]; //模板id
+                        // print_r($report_msg_id);
                         if (strpos($report_msg_id, 'ERROR') !== false) {
                             $redis->rpush($redisMessageCodeSend, $send);
                             $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
@@ -244,14 +245,14 @@ class HttpChannelModelVarCaiXinZhongLan extends Pzlife
                 
             }
         } catch (\Exception $th) {
-            //throw $th;
-            if (!empty($roallback)) {
+            exception($th) ;
+           /*  if (!empty($roallback)) {
                 foreach ($roallback as $key => $value) {
                     foreach ($value as $ne => $val) {
                         $redis->rpush($redisMessageCodeSend, $val);
                     }
                 }
-            }
+            } */
             
 
             $log_path = realpath("") . "/error/".$content.".log";
