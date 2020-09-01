@@ -12555,7 +12555,7 @@ class CmppCreateCodeTask extends Pzlife
                     if (is_array($value)) {
                         $develop_code = mb_substr($value['DestNumber'],$codelen);
                         $mobile = $value['mobile'];
-                        $message_info = $value['MsgFormat'];
+                        $message_info = $value['MsgContent'];
                         $get_time = $value['ReceiveTime'];
                         $upgoing = [
                             'mobile' => $mobile,
@@ -12588,7 +12588,7 @@ class CmppCreateCodeTask extends Pzlife
                     }else{
                         $develop_code = mb_substr($receive_data['result']['DestNumber'],$codelen);
                         $mobile = $receive_data['result']['mobile'];
-                        $message_info = $receive_data['result']['MsgFormat'];
+                        $message_info = $receive_data['result']['MsgContent'];
                         $get_time = $receive_data['result']['ReceiveTime'];
                         $upgoing = [
                             'mobile' => $mobile,
