@@ -240,6 +240,7 @@ class HttpChannelModelVarCaiXinZhongLan extends Pzlife
                             $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
                         }
                     }
+                    sleep(1);
                 }
                
                 
