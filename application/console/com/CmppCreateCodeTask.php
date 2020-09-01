@@ -12179,7 +12179,7 @@ class CmppCreateCodeTask extends Pzlife
     {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M');
-        // $redis->rpush("index:meassage:multimediamessage:buffersendtask", json_encode(['id' => 92556, 'deduct' => 10]));
+        $redis->rpush("index:meassage:business:buffersendtask", '{"id":"2617147","deduct":"60.00"}');
         try {
             while (true) {
                 $send = $redis->lpop('index:meassage:business:buffersendtask');
@@ -12232,17 +12232,18 @@ class CmppCreateCodeTask extends Pzlife
                     // print_r($sendTask);die;
                     $day = date('Ymd', $sendTask['update_time']);
                     $sendday = 0;
-                    // echo $dayTime;die;
+                    
                     $mobile_content = explode(',', $sendTask['mobile_content']);
                     if (date('H', $sendTask['update_time']) >= 20) {
                         $sendday = $day + 1;
                         $dayTime = $sendday . '100000';
                         // $send_time = 
                         // $dayTime = strtotime($dayTime);
-                    }
-                    if (date('H', $sendTask['update_time']) <= 10) {
+                    }else if (date('H', $sendTask['update_time']) <= 10) {
                         $sendday = $day;
                         $dayTime = $sendday . '100000';
+                    }else{
+                        $dayTime = $sendTask['update_time'];
                     }
                     $dayTime = strtotime($dayTime);
                     $dayTime = intval($dayTime) + mt_rand(10, 300);
