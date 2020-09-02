@@ -3148,6 +3148,7 @@ class LocalScript extends Pzlife
         // echo "SELECT `mobile`,`task_no` FROM `yx_user_multimedia_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_no`";die;
         // print_r(count($mul_default_mobile_num));
         // die;
+        $success_num = count($mul_success_mobile_num);
         $all_num = $mobile_num[0]['all_num'];
         if ($uid == 223) {
             $unknow_num = $all_num - count($mul_success_mobile_num) - count($mul_default_mobile_num);
