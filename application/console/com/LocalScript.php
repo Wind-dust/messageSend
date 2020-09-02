@@ -687,7 +687,8 @@ class LocalScript extends Pzlife
             }
             //    // print_r($all_mobiles);die;
         }
-        // // print_r($all_mobiles);die;
+        print_r($all_mobiles);
+        // die;
         $mobile_times = [];
         foreach ($all_mobiles as $key => $value) {
             foreach ($value as $ukey => $uvalue) {
@@ -3122,6 +3123,31 @@ class LocalScript extends Pzlife
         $ratio = $success_num / $all_num * 100;
         return ['mobile_num' => $mobile_num, 'num' => $all_num, 'success' => $success_num, 'unknown' => $unknow_num, 'default' => $default_num, 'ratio' => $ratio];
     }
+
+    public function SendResultForMultimediaTest()
+    {
+        $result = $this->selectSendResultForMultimedia(91, 0, 1594310400, 1594396800);
+    }
+
+    public function selectSendResultForMultimedia($uid, $pid, $start_time, $end_time){
+        $all_num        = 0;
+        $mobile_num     = 0;
+        $success_num    = 0;
+        $unknow_num     = 0;
+        $default_num    = 0;
+        $settlement_num = 1;
+        $mul_success_mobile_num = Db::query("SELECT `mobile`,`task_no` FROM `yx_user_multimedia_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_no`");
+        $mul_default_mobile_num = Db::query("SELECT `mobile`,`task_no` FROM `yx_user_multimedia_message_log` WHERE `task_id` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message NOT IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_no`");
+        $mobile_num =  Db::query("SELECT SUM(`real_num`) FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ");
+        // print_r($mobile_num);
+        echo "SELECT `mobile`,`task_no` FROM `yx_user_multimedia_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_no`";die;
+        print_r(count($mul_success_mobile_num));
+        die;
+        if ($uid == 223) {
+
+        }
+    }
+
 
     public function updateReceipt()
     {
