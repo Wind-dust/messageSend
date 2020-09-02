@@ -3136,10 +3136,14 @@ class LocalScript extends Pzlife
         $unknow_num     = 0;
         $default_num    = 0;
         $settlement_num = 1;
+        $max_len = Db::query("SELECT id FROM `yx_user_multimedia_message` WHERE `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "' ");
+        if (empty($max_len)) {
+            return false;
+        }
         $mul_success_mobile_num = Db::query("SELECT `mobile`,`task_no` FROM `yx_user_multimedia_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_no`");
         $mul_default_mobile_num = Db::query("SELECT `mobile`,`task_no` FROM `yx_user_multimedia_message_log` WHERE `task_id` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message NOT IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_no`");
         $mobile_num =  Db::query("SELECT SUM(`real_num`) AS all_num FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ");
-        print_r($mobile_num);
+        // print_r("SELECT SUM(`real_num`) AS all_num FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ");
         // echo "\n";
         // echo "SELECT `mobile`,`task_no` FROM `yx_user_multimedia_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_no`";die;
         // print_r(count($mul_default_mobile_num));
@@ -3152,7 +3156,7 @@ class LocalScript extends Pzlife
             $unknow_num = 0;
         }
         $ratio = $success_num / $all_num * 100;
-        return ['mobile_num' => $mobile_num, 'num' => $all_num, 'success' => $success_num, 'unknown' => $unknow_num, 'default' => $default_num, 'ratio' => $ratio];
+        return ['mobile_num' => $all_num, 'num' => $all_num, 'success' => $success_num, 'unknown' => $unknow_num, 'default' => $default_num, 'ratio' => $ratio];
     }
 
     public function checkMultimediaSendStatus(){
