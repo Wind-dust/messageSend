@@ -671,7 +671,7 @@ class LocalScript extends Pzlife
         $mobile      = Db::query("SELECT `uid`,`task_no`,`mobile` FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) GROUP BY `uid`,`task_no`,`mobile`  ");
         $all_mobiles = [];
         foreach ($mobile as $key => $value) {
-            // // print_r($value);die;
+            print_r($value);die;
             $time_key = mb_substr($value['task_no'], 3, 6);
             // // print_r($time_key);die;
             if (isset($all_mobiles[$value['uid']][$value['mobile']])) {
@@ -687,7 +687,7 @@ class LocalScript extends Pzlife
             }
             //    // print_r($all_mobiles);die;
         }
-        print_r($all_mobiles);
+        // print_r($all_mobiles);
         // die;
         $mobile_times = [];
         foreach ($all_mobiles as $key => $value) {
