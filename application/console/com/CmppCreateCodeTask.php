@@ -5076,17 +5076,7 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:' . $channel_id; //验证码发送任务rediskey
         $channel              = $this->getChannelinfo($channel_id);
-/*            $redis->rpush($redisMessageCodeSend, json_encode([
-        'mobile' => '13564869264',
-        'title' => '美丽田园营销短信',
-        'mar_task_id' => '4',
-        'content' => '感谢您对于美丽田园的信赖和支持，为了给您带来更好的服务体验，特邀您针对本次服务进行评价http://crmapp.beautyfarm.com.cn/questionNaire1/api/qnnaire/refct?id=534478，请您在24小时内提交此问卷，谢谢配合。期待您的反馈！如需帮助，敬请致电400-8206-142，回T退订【美丽田园】',
-        'Msg_Id' => '',
-        'Stat' => 'DELIVRD',
-        'Submit_time' => '191224164036',
-        'Done_time' => '191224164236',
-        'from' => 'yx_user_send_code_task',
-        ])); */
+        $redis->rpush($redisMessageCodeSend, '{"mobile":"15201926171","title":"\u3010\u4e1d\u8299\u5170\u3011\u60a8\u672c\u6b21\u9a8c\u8bc1\u7801\u4e3a0215","mar_task_id":3241123,"content":"\u3010\u4e1d\u8299\u5170\u3011\u60a8\u672c\u6b21\u9a8c\u8bc1\u7801\u4e3a0215","from":"yx_user_send_code_task","send_msg_id":"","uid":185,"send_num":1,"task_no":"bus20090210021910957383","develop_code":"90963","my_submit_time":1599012223,"Msg_Id":"24353329926634139","Stat":"DB:0141","Submit_time":"2009021003","Done_time":"2009021003","receive_time":1599012227,"develop_no":"90963"}');
 
         // $request_url = 'http://116.228.60.189:15901/rtreceive?task_no=bus19123111560308152071&status_message=E:CHAN&mobile=18643198590&send_time=1912311333';
         // sendRequest($request_url);
@@ -5097,9 +5087,11 @@ class CmppCreateCodeTask extends Pzlife
                     if (empty($send_log)) {
                         continue;
                     }
+                    $stat = '';
+                    $Received = updateReceivedForMessage();
                     // $redis->rpush($redisMessageCodeSend, $send_log);
                     $send_log = json_decode($send_log, true);
-                    // print_r($send_log);die;
+                    // print_r($Received);die;
                     //获取通道属性
                     if (!isset($send_log['mar_task_id']) || empty($send_log['mar_task_id'])) {
                         continue;
@@ -5144,6 +5136,7 @@ class CmppCreateCodeTask extends Pzlife
                         if (strpos($send_log['content'], '评价') !== false) {
                             $request_url = "http://116.228.60.189:15901/rtreceive?";
                             $request_url .= 'task_no=' . trim($task[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($send_log['mobile']) . "&send_time=" . trim($send_log['Submit_time']);
+                            $stat = 'DELIVRD';
                         } else {
                             $stat = trim($send_log['Stat']);
                             if (strpos($send_log['Stat'], 'DB:0141') !== false || strpos($send_log['Stat'], 'MBBLACK') !== false || strpos($send_log['Stat'], 'BLACK') !== false) {
@@ -5188,6 +5181,10 @@ class CmppCreateCodeTask extends Pzlife
                         }
                         $user = Db::query("SELECT `pid`,`need_receipt_cmpp` FROM yx_users WHERE `id` = " . $task[0]['uid']);
                         if ($user[0]['pid'] == 137) {
+                            // print_r($stat);die;
+                            if (in_array($stat, $Received)) {
+                                $stat = 'DELIVRD';
+                            }
                             $send_len = 0;
                             $send_len = mb_strlen($send_log['content']);
                             $s_num = 1;
@@ -5231,6 +5228,8 @@ class CmppCreateCodeTask extends Pzlife
                             }
                         }
                     }
+                    $send_log['stat'] = $stat;
+                    // print_r($send_log);
                     $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode($send_log)); //写入通道处理日志
                 }
             }
@@ -6636,7 +6635,7 @@ class CmppCreateCodeTask extends Pzlife
         if (empty($channel_id)) {
             exit("channel_id IS Null");
         }
-        // $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode($send_log)); //写入通道处理日志
+        $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, '{"mobile":"15201926171","title":"\u3010\u4e1d\u8299\u5170\u3011\u60a8\u672c\u6b21\u9a8c\u8bc1\u7801\u4e3a0215","mar_task_id":3241123,"content":"\u3010\u4e1d\u8299\u5170\u3011\u60a8\u672c\u6b21\u9a8c\u8bc1\u7801\u4e3a0215","from":"yx_user_send_code_task","send_msg_id":"","uid":185,"send_num":1,"task_no":"bus20090210021910957383","develop_code":"90963","my_submit_time":1599012223,"Msg_Id":"24353329926634139","Stat":"DELIVRD","Submit_time":"2009021003","Done_time":"2009021003","receive_time":1599012227,"develop_no":"90963","stat":"DELIVRD"}'); //写入通道处理日志
         /* for ($i = 0; $i < 1650; $i++) {
         $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode(array(
         'mobile' => '15045451231',
@@ -11869,7 +11868,7 @@ class CmppCreateCodeTask extends Pzlife
                             //  print_r($all_report);die;
                             $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
                             //推送失败
-                            print_r($res);
+                            // print_r($res);
                             if ($res != 'SUCCESS') {
                                 usleep(300);
                                 $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
