@@ -3156,6 +3156,7 @@ class LocalScript extends Pzlife
             $success_num += $all_num - count($mul_success_mobile_num) - count($mul_default_mobile_num);
             $unknow_num = 0;
         }
+        $default_num = count($mul_default_mobile_num);
         $ratio = $success_num / $all_num * 100;
         return ['mobile_num' => $all_num, 'num' => $all_num, 'success' => $success_num, 'unknown' => $unknow_num, 'default' => $default_num, 'ratio' => $ratio];
     }
