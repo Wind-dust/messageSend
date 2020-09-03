@@ -116,7 +116,7 @@ class CmppNorm extends Pzlife
         $Dest_Id              = $contdata['channel_dest_id']; //短信接入码 短信端口号
         $Sequence_Id          = 1;
         // $SP_ID                = $contdata['SP_ID'];
-        $master_num           = $contdata['channel_flow_velocity']; //通道最大提交量
+        $master_num           = isset($contdata['channel_flow_velocity']) ? $contdata['channel_flow_velocity']: 300; //通道最大提交量
         $security_coefficient = 1; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
         $miao = 1000000;
