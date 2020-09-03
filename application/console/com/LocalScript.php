@@ -667,8 +667,8 @@ class LocalScript extends Pzlife
     public function getMarketingMobile()
     {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
-
-        $mobile      = Db::query("SELECT `uid`,`task_no`,`mobile` FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) GROUP BY `uid`,`task_no`,`mobile`  ");
+        try {
+            $mobile      = Db::query("SELECT `uid`,`task_no`,`mobile` FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) GROUP BY `uid`,`task_no`,`mobile`  ");
         $all_mobiles = [];
         foreach ($mobile as $key => $value) {
             // print_r($value);die;
@@ -705,6 +705,11 @@ class LocalScript extends Pzlife
                 Db::table('yx_mobile_times')->insert($mobile_times);
             }
         }
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
+        }
+        
     }
 
     public function newRedisConnect()
