@@ -676,7 +676,7 @@ class CmppNorm extends Pzlife
                                 if ($receive != 2) {
                                     socket_write($socket, $headData, $Total_Length);
                                 }
-                                usleep(998800);
+                                usleep(998600);
                             }
 
                             ++$i;
