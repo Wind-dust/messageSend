@@ -92,19 +92,19 @@ class CmppNorm extends Pzlife
             'content'     => '【施华洛世奇】亲爱的会员，感谢您一路以来的支持！您已获得2020年会员周年礼券，购买正价商品满1999元即可获得闪耀玫瑰金色简约吊坠一条，请于2020年10月19日前使用。可前往“施华洛世奇会员中心”小程序查看该券。详询4006901078。 回TD退订',
             // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
         ])); */
-        /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
+         $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
-            'content'     => '【阿斯顿·马丁中国】欢迎光临',
+            'content'     => '【丝芙兰】本次验证码为0815',
             // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
-        ])); */
+        ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
         $myfile = fopen($log_path, 'a+');
         fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
         fwrite($myfile, " Begin" . "\n");
         fclose($myfile);
-
+        
         // $content = 0;
 
         // // print_r($contdata);die;
@@ -117,9 +117,11 @@ class CmppNorm extends Pzlife
         $Sequence_Id          = 1;
         // $SP_ID                = $contdata['SP_ID'];
         $master_num           = $contdata['channel_flow_velocity']; //通道最大提交量
-        $security_coefficient = 0.8; //通道饱和系数
+        $security_coefficient = 1; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
-
+        $miao = 1000000;
+        $sleep_time = ceil($miao / $security_master);
+        // echo $sleep_time;die;
         $log_path = realpath("") . "/error/" . $content . ".log";
         $myfile = fopen($log_path, 'a+');
         fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
@@ -335,7 +337,8 @@ class CmppNorm extends Pzlife
                 }
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
                     while (true) {
-
+                        echo microtime(true);
+                        echo "\n";
                         // echo $Sequence_Id . "\n";
                         try {
                             $receive = 1;
@@ -510,7 +513,7 @@ class CmppNorm extends Pzlife
                                         $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
                                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
                                         $receive = 2;
-                                        usleep(250);
+                                        usleep(50);
                                     } else if ($head['Command_Id'] == 0x00000008) {
                                         // echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                                         $Command_Id  = 0x80000008; //保持连接
@@ -616,7 +619,7 @@ class CmppNorm extends Pzlife
                                     if ($pos > 100) {
                                         $pos = 0;
                                     }
-                                    usleep(5000);
+                                    usleep(2500);
                                     continue;
                                 } else { //单条短信
 
@@ -662,7 +665,7 @@ class CmppNorm extends Pzlife
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
 
                                     $send_status = 2;
-                                    usleep(5000);
+                                    usleep(2500);
                                 }
                                 unset($send_status);
                             } else { //心跳
