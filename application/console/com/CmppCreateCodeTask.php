@@ -5125,8 +5125,21 @@ class CmppCreateCodeTask extends Pzlife
                     $task = Db::query($sql);
                     // print_r($task);die;
                     if (empty($task)) {
-                        $redis->rpush($redisMessageCodeSend, json_encode($send_log));
-                        // continue;
+                        $sql = "SELECT `send_msg_id`,`task_no`,`uid`,`create_time` FROM ";
+                        if ($channel['business_id'] == 5) { //营销
+                            $sql .= " yx_user_send_task ";
+                        } elseif ($channel['business_id'] == 6) { // 行业
+                            $sql .= " yx_user_send_code_task ";
+                            // $sql .= " yx_user_send_code_task ";
+                        } elseif ($channel['business_id'] == 9) { //游戏
+                            $sql .= " yx_user_send_game_task ";
+                            // $sql .= " yx_user_send_game_task ";
+                        }
+                        $sql .= "WHERE `id` = " . $send_log['mar_task_id'];
+                        $task = Db::query($sql);
+                        if (empty($task)) {
+                            $redis->rpush($redisMessageCodeSend, json_encode($send_log));
+                        }
                     }
                     // $redis->rpush($redisMessageCodeSend, json_encode($send_log));
                     // $request_url = "http://116.228.60.189:15902/rtreceive?";
