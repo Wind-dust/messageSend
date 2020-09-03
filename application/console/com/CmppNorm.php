@@ -120,6 +120,7 @@ class CmppNorm extends Pzlife
         $security_coefficient = 1; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
         $miao = 1000000;
+        // echo $miao * 0.0051;die;
         $sleep_time = ceil($miao / $security_master);
         // echo $sleep_time;die;
         $log_path = realpath("") . "/error/" . $content . ".log";
@@ -665,7 +666,7 @@ class CmppNorm extends Pzlife
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
 
                                     $send_status = 2;
-                                    usleep(2500);
+                                    // usleep(2500);
                                 }
                                 unset($send_status);
                             } else { //心跳
