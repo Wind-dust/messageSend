@@ -95,7 +95,7 @@ class CmppNorm extends Pzlife
          $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
-            'content'     => '【丝芙兰】本次验证码为0815',
+            'content'     => '【丝芙兰】1张9折券已飞奔向您！亲爱的于思佳会员，您所获赠的九折券自2020-09-01起生效，有效期截止2021-03-01，请在有效期间内前往丝芙兰官网sephora.cn、App、小程序或门店选购。(在官网购物时需与官网账号绑定。累积消费积分1500分或四次不同日消费即自动兑换1张九折劵)/回T退订',
             // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
         ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -604,7 +604,7 @@ class CmppNorm extends Pzlife
                                         $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                         $send_data['my_submit_time'] = time(); //发送时间戳
                                         $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, json_encode($send_data));
-                                        usleep(300);
+                                        // usleep(300);
                                         socket_write($socket, $headData . $bodyData, $Total_Length);
                                         $send_status = 2;
                                         ++$i;
@@ -620,7 +620,7 @@ class CmppNorm extends Pzlife
                                     if ($pos > 100) {
                                         $pos = 0;
                                     }
-                                    usleep(2500);
+                                    // usleep(2500);
                                     continue;
                                 } else { //单条短信
 
