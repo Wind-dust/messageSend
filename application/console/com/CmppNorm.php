@@ -338,8 +338,8 @@ class CmppNorm extends Pzlife
                 }
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
                     while (true) {
-                        echo microtime(true);
-                        echo "\n";
+                        // echo microtime(true);
+                        // echo "\n";
                         // echo $Sequence_Id . "\n";
                         try {
                             $receive = 1;
