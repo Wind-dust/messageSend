@@ -3697,7 +3697,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'mar_task_id' => $sendTask['id'],
                                 'content'     => $sendTask['task_content'],
                                 'channel_id'  => $yidong_channel_id,
-                                'from'        => 'yx_user_send_task',
+                                'from'        => 'yx_user_send_code_task',
                                 'send_msg_id'        => $sendTask['send_msg_id'],
                                 'uid'          => $sendTask['uid'],
                                 'send_num'          => $sendTask['send_num'],
@@ -3758,7 +3758,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'mar_task_id' => $sendTask['id'],
                                 'content'     => $sendTask['task_content'],
                                 'channel_id'  => $liantong_channel_id,
-                                'from'        => 'yx_user_send_task',
+                                'from'        => 'yx_user_send_code_task',
                                 'send_msg_id'        => $sendTask['send_msg_id'],
                                 'uid'          => $sendTask['uid'],
                                 'send_num'          => $sendTask['send_num'],
@@ -3819,7 +3819,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'mar_task_id' => $sendTask['id'],
                                 'content'     => $sendTask['task_content'],
                                 'channel_id'  => $dianxin_channel_id,
-                                'from'        => 'yx_user_send_task',
+                                'from'        => 'yx_user_send_code_task',
                                 'send_msg_id'        => $sendTask['send_msg_id'],
                                 'uid'          => $sendTask['uid'],
                                 'send_num'          => $sendTask['send_num'],
@@ -3915,7 +3915,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'Stat' => 'DELIVRD',
                                 'mobile' =>  $deduct_mobile[$i],
                                 'content'   => $sendTask['task_content'],
-                                'from'   => 'yx_user_send_task',
+                                'from'   => 'yx_user_send_code_task',
                                 'send_msg_id'        => $sendTask['send_msg_id'],
                                 'Submit_time'   => time(),
                             ];
@@ -3975,7 +3975,7 @@ class CmppCreateCodeTask extends Pzlife
                                 'Stat' => 'DB:0101',
                                 'mobile' =>  $error_mobile[$i],
                                 'content'   => $sendTask['task_content'],
-                                'from'   => 'yx_user_send_task',
+                                'from'   => 'yx_user_send_code_task',
                                 'Submit_time'   => time(),
                                 'send_msg_id'        => $sendTask['send_msg_id'],
                             ];
@@ -5076,7 +5076,7 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:' . $channel_id; //验证码发送任务rediskey
         $channel              = $this->getChannelinfo($channel_id);
-        // $redis->rpush($redisMessageCodeSend, '{"mobile":"15201926171","title":"\u3010\u4e1d\u8299\u5170\u3011\u60a8\u672c\u6b21\u9a8c\u8bc1\u7801\u4e3a0215","mar_task_id":3241123,"content":"\u3010\u4e1d\u8299\u5170\u3011\u60a8\u672c\u6b21\u9a8c\u8bc1\u7801\u4e3a0215","from":"yx_user_send_code_task","send_msg_id":"","uid":185,"send_num":1,"task_no":"bus20090210021910957383","develop_code":"90963","my_submit_time":1599012223,"Msg_Id":"24353329926634139","Stat":"DB:0141","Submit_time":"2009021003","Done_time":"2009021003","receive_time":1599012227,"develop_no":"90963"}');
+        $redis->rpush($redisMessageCodeSend, '{"mobile":"15172413692","mar_task_id":3270165,"content":"\u3010\u5954\u9a70\u91d1\u878d\u3011\u5c0a\u656c\u7684\u5ba2\u6237\uff0c\u8bf7\u70b9\u51fb\u4ee5\u4e0b\u94fe\u63a5\u8fdb\u884c\u7533\u8bf7\u4fe1\u606f\u7684\u786e\u8ba4:\u00a0https:\/\/mbfs-jinrongtong-prod.i.daimler.com\/Mobile\/e-app\/#\/****\u00a0\u3002\u5982\u6709\u95ee\u9898\uff0c\u8bf7\u8054\u7cfb\u60a8\u7684\u91d1\u878d\u987e\u95ee\u5f20** 158********","from":"yx_user_send_task","send_msg_id":"","uid":1,"send_num":1,"task_no":"bus20090318033787230830","develop_code":"42219","my_submit_time":1599127445,"Msg_Id":"24458206221828038676","Stat":"DELIVRD","Submit_time":"2009031804","Done_time":"2009031804","receive_time":1599127450,"develop_no":"42219"}');
 
         // $request_url = 'http://116.228.60.189:15901/rtreceive?task_no=bus19123111560308152071&status_message=E:CHAN&mobile=18643198590&send_time=1912311333';
         // sendRequest($request_url);
@@ -5234,7 +5234,7 @@ class CmppCreateCodeTask extends Pzlife
                 }
             }
         } catch (\Exception $th) {
-            $redis->rpush($redisMessageCodeSend, $send_log);
+            $redis->rpush($redisMessageCodeSend, json_encode($send_log));
             exception($th);
         }
 
