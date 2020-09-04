@@ -286,7 +286,7 @@ class Upload extends MyController
             // $phone_data[]= $value;
         }
         $unique_mobile = array_unique($real_num);
-        $unique_num = count($phone_data) - count($unique_mobile);
+        $unique_num = count($real_num) - count($unique_mobile);
         
         // $result = $this->app->send->getMobilesDetail($phone_data);
         // echo count($unique_mobile);die;
