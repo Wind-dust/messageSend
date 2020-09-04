@@ -274,6 +274,7 @@ class Upload extends MyController
         $all_num = 0;
         $error_mobile = [];
         $unique_mobile = [];
+        $real_num = [];
         foreach ($phone_data as $key => $value) {
             $all_num++;
             if (checkMobile($value) == false) {
@@ -281,9 +282,10 @@ class Upload extends MyController
                 $error_mobile[] = $value;
                 continue;
             }
+            $real_num[] = $value;
             // $phone_data[]= $value;
         }
-        $unique_mobile = array_unique($phone_data);
+        $unique_mobile = array_unique($real_num);
         $unique_num = count($phone_data) - count($unique_mobile);
         
         // $result = $this->app->send->getMobilesDetail($phone_data);
