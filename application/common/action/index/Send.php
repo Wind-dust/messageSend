@@ -124,6 +124,7 @@ return $result;
     public function getSmsMarketingTask($Username, $Password, $Content, $Mobiles, $Dstime, $ip, $task_name, $signature_id = '', $develop_no = '', $msg_id = '')
     {
         $Mobiles = array_unique(array_filter($Mobiles));
+        $Content = htmlspecialchars_decode($Content);
         // $Password = md5($Password);
         $user = DbUser::getUserOne(['appid' => $Username], 'id,pid,nick_name,appkey,user_type,user_status,reservation_service,marketing_free_trial,marketing_free_credit,market_deduct', true);
         if (empty($user)) {
@@ -139,15 +140,17 @@ return $result;
         if ($user['user_status'] != 2) {
             return ['code' => '3009'];
         }
-        $send_num = count(array_filter($Mobiles));
+        // $send_num = count(array_filter($Mobiles));
 
         $effective_mobile = [];
         foreach ($Mobiles as $key => $value) {
-            if (checkMobile($value) == true) {
-                $effective_mobile[] = $value;
+            if (checkMobile($value) == false) {
+                continue;
             }
+            $effective_mobile[] = $value;
         }
-
+        $effective_mobile = array_unique($effective_mobile);
+        $send_num = count($effective_mobile);
         if (!empty($signature_id)) {
             $signature =  DbSendMessage::getUserSignature(['uid' => $user['id'], 'signature_id' => $signature_id], '*', true);
             if (empty($signature)) {
@@ -164,9 +167,9 @@ return $result;
             return ['code' => '3010', 'msg' => '有效手机号为空'];
         }
         if (mb_strlen($Content) > 70) {
-            $real_num = ceil(mb_strlen($Content) / 67) * count($effective_mobile);
+            $real_num = ceil(mb_strlen($Content) / 67) * $send_num;
         } else {
-            $real_num = count($effective_mobile);
+            $real_num = $send_num;
         }
         if ($real_num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
             return ['code' => '3007'];
@@ -2870,7 +2873,7 @@ return $result;
                 'task_id'        => $task_id,
                 'mobile'         => $value['mobile'],
                 'status_message' => $value['code'],
-                'send_time'      => $value['time'],
+                'send_time'      => strtotime($value['time']),
             ];
             $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
         }
