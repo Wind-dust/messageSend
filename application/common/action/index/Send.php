@@ -303,6 +303,7 @@ return $result;
         // $redisMessageMarketingSend = Config::get('rediskey.message.redisMessageCodeSend');
 
         // print_r($res);die;
+        $Content = htmlspecialchars_decode($Content);
         $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 6], 'id,num_balance', true);
         if (empty($user_equities)) {
             return ['code' => '3006'];
@@ -396,6 +397,7 @@ return $result;
                 $data['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
             }else{
                 $data['free_trial'] = 1;
+                $data['send_status']     = 1;
             }
         }
 
