@@ -668,12 +668,68 @@ class LocalScript extends Pzlife
     {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
         try {
-            $start_time = strtotime('2020-06-01');
+            $start_time = strtotime('2020-08-01');
             // $end_time = time();
             while(true){
-                $$start_time  = $start_time;
+                $all_mobiles = [];
+                $start_time  = $start_time;
                 $end_time = $start_time + 86400;
+                // echo "SELECT `uid`,`task_no`,`mobile` FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `create_time` >= '".$start_time."' AND `create_time` < '".$end_time."' GROUP BY `uid`,`task_no`,`mobile`  ";die;
+                $mobile      = Db::query("SELECT `uid`,`task_no`,`mobile` FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `create_time` >= '".$start_time."' AND `create_time` < '".$end_time."' GROUP BY `uid`,`task_no`,`mobile`  ");
+                $start_time = $end_time;
+                foreach ($mobile as $key => $value) {
+                    // print_r($value);die;
+                    $time_key = mb_substr($value['task_no'], 3, 6);
+                    // print_r($time_key);die;
+                    if (isset($all_mobiles[$value['uid']][$value['mobile']])) {
+                        if (in_array($time_key, $all_mobiles[$value['uid']][$value['mobile']]['date'])) {
+                            $all_mobiles[$value['uid']][$value['mobile']]['day_times'][$time_key]++;
+                        } else {
+                            $all_mobiles[$value['uid']][$value['mobile']]['date'][]               = $time_key;
+                            $all_mobiles[$value['uid']][$value['mobile']]['day_times'][$time_key] = 1;
+                        }
+                    } else {
+                        $all_mobiles[$value['uid']][$value['mobile']]['date'][]               = $time_key;
+                        $all_mobiles[$value['uid']][$value['mobile']]['day_times'][$time_key] = 1;
+                    }
+                    //    // print_r($all_mobiles);die;
+                }
+                // print_r($all_mobiles);
+                // die;
+                $mobile_times = [];
+                foreach ($all_mobiles as $key => $value) {
+                    foreach ($value as $ukey => $uvalue) {
+                        $mobile_times = [];
+                        $mobile_times = [
+                            'uid'       => $key,
+                            'mobile'    => $ukey,
+                            'day_times' => count($uvalue['date']),
+                            'max_times' => max($uvalue['day_times']),
+                            'all_times' => array_sum($uvalue['day_times']),
+                            'timekey' => date('Ym',$start_time),
+                        ];
+                        // print_r($mobile_times);die;
+                        $log = Db::query("SELECT `*` FROM yx_mobile_times WHERE `mobile` = '".$ukey."' AND `uid` = '".$key."' AND `timekey` = '".$mobile_times['timekey']."' ");
+                        // Db::table('yx_mobile_times')->where(['mobile' => $ukey, 'uid' => $key])->delete();
+                        // print_r($log);die;
+                        
+                        if ($log) {
+                            $new_max_times = $log[0]['max_times'] + $mobile_times['max_times'];
+                            $new_all_times = $log[0]['all_times'] + $mobile_times['all_times'];
+                            $new_day_times = $log[0]['day_times'] + $mobile_times['day_times'];
+                            Db::table('yx_mobile_times')->where(['id' => $log[0]['id']])->update([
+                                'day_times' => $new_day_times,
+                                'all_times' => $new_all_times,
+                                'max_times' => $new_max_times,
+                            ]);
+                        }else{
+                            Db::table('yx_mobile_times')->insert($mobile_times);
+                        }
+                        
+                    }
+                }
             }
+            die;
             $mobile      = Db::query("SELECT `uid`,`task_no`,`mobile` FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) GROUP BY `uid`,`task_no`,`mobile`  ");
             $all_mobiles = [];
             foreach ($mobile as $key => $value) {
@@ -2839,8 +2895,8 @@ class LocalScript extends Pzlife
                 //行业
                 foreach ($uids as $key => $value) {
                     // continue;
-                    $start_time = (int) strtotime('-4 days', strtotime(date('Y-m-d', time())));
-                    // $start_time = (int) strtotime('2020-08-01');
+                    // $start_time = (int) strtotime('-4 days', strtotime(date('Y-m-d', time())));
+                    $start_time = (int) strtotime('2020-09-01');
                     // echo $start_time;die;
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_code_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
                         continue;
