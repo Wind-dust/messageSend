@@ -12640,4 +12640,37 @@ class CmppCreateCodeTask extends Pzlife
         }
                     
     }
+
+    public function channelSendInfo(){
+        $redis = Phpredis::getConn();
+        $redis->rpush('index:meassage:code:send:147','{"mobile":"18610956962","mar_task_id":3460842,"content":"\u3010\u5954\u9a70\u91d1\u878d\u3011\u60a8\u7684\u9a8c\u8bc1\u7801\u4e3a593000\uff0c\u8bf7\u60a8\u572820\u5206\u949f\u5185\u5b8c\u6210\u9a8c\u8bc1\u3002","from":"yx_user_send_code_task","send_msg_id":"21000630020200907112852169410","uid":264,"send_num":1,"task_no":"bus20090711284465711920","develop_code":"8662"}');
+        while(true){
+            $message = $redis->lpop('index:meassage:code:send:147');
+            if (empty($message)) {
+                exit('退出');
+            }
+            $message = json_decode($message,true);
+            /* foreach ($mobiles as $mkey => $mvalue) {
+                $res = $this->redis->rpush("index:meassage:code:user:mulreceive:" . $value['uid'], json_encode(['task_no' => $value['task_no'], 'msg_id' => $value['send_msg_id'], "status_message" => "INTERCEPT", "message_info" => "驳回", "send_time" => date("Y-m-d H:i:s", time()), 'mobile' => $mvalue]));
+            } */
+            
+           /*  $len = 0;
+            $len = mb_strlen($message['content']);
+            if ($len > 70) {
+                $num = ceil($len / 67);
+            }else{
+                $num = 1;
+            } */
+            // print_r($num);die;
+            /* for($i = 0; $i < $num; $i++){
+                $res = $redis->rpush("index:meassage:code:user:receive:" . $message['uid'], json_encode(['task_no' => $message['task_no'], 'msg_id' => $message['send_msg_id'], "status_message" => "INTERCEPT", "message_info" => "驳回", "send_time" => date("Y-m-d H:i:s", time()), 'mobile' => $message['mobile']]));
+            } */
+            $message['Stat'] = 'INTERCEPT';
+            $message['Done_time'] = '2009071224';
+            $message['Done_time'] = '2009071224';
+            $message['receive_time'] = time();
+            $message['my_submit_time'] = '1599449679';
+            $redis->rpush('index:meassage:code:new:deliver:147', json_encode($message));
+        }
+    }
 }
