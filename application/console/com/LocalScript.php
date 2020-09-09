@@ -3328,7 +3328,7 @@ class LocalScript extends Pzlife
         $unknow_num     = 0;
         $default_num    = 0;
         $settlement_num = 1;
-        $max_len = Db::query("SELECT id FROM `yx_user_sup_message`  AND yidong_channel_id <> 0  WHERE `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "' ");
+        $max_len = Db::query("SELECT id FROM `yx_user_sup_message`  WHERE `uid` = " . $uid . " AND yidong_channel_id <> 0  AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "' ");
         if (empty($max_len)) {
             return false;
         }
