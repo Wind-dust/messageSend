@@ -667,7 +667,7 @@ class Administrator extends CommonIndex
     public function auditUserSendCodeTask($effective_id = [], $free_trial)
     {
         // print_r($effective_id);die;
-        $userchannel = DbAdministrator::getUserSendCodeTask([['id', 'in', join(',', $effective_id)]], 'task_no,id,uid,real_num,mobile_content,free_trial', false);
+        $userchannel = DbAdministrator::getUserSendCodeTask([['id', 'in', join(',', $effective_id)]], 'task_no,id,uid,real_num,mobile_content,send_msg_id,free_trial', false);
 
         if (empty($userchannel)) {
             return ['code' => '3001'];
@@ -702,7 +702,7 @@ class Administrator extends CommonIndex
             $mobiles = explode(',', $value['mobile_content']);
             if ($free_trial == 3) {
                 foreach ($mobiles as $mkey => $mvalue) {
-                    $res = $this->redis->rpush("index:meassage:code:user:mulreceive:" . $value['uid'], json_encode(['task_no' => $value['task_no'], 'msg_id' => $value['send_msg_id'], "status_message" => "INTERCEPT", "message_info" => "驳回", "send_time" => date("Y-m-d H:i:s", time()), 'mobile' => $mvalue]));
+                    $res = $this->redis->rpush("index:meassage:code:user:receive:" . $value['uid'], json_encode(['task_no' => $value['task_no'], 'msg_id' => $value['send_msg_id'], "status_message" => "INTERCEPT", "message_info" => "驳回", "send_time" => date("Y-m-d H:i:s", time()), 'mobile' => $mvalue]));
                 }
             }
         }
