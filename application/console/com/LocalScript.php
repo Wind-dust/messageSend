@@ -3332,8 +3332,8 @@ class LocalScript extends Pzlife
         if (empty($max_len)) {
             return false;
         }
-        $mul_success_mobile_num = Db::query("SELECT `mobile`,`task_no` FROM `yx_user_sup_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message IN ('DELIVRD') GROUP BY `mobile`,`task_no`");
-        $mul_default_mobile_num = Db::query("SELECT `mobile`,`task_no` FROM `yx_user_sup_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message NOT IN ('DELIVRD') GROUP BY `mobile`,`task_no`");
+        $mul_success_mobile_num = Db::query("SELECT `mobile`,`task_no` FROM `yx_user_sup_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_sup_message` WHERE  `uid` = " . $uid . " AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message IN ('DELIVRD') GROUP BY `mobile`,`task_no`");
+        $mul_default_mobile_num = Db::query("SELECT `mobile`,`task_no` FROM `yx_user_sup_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_sup_message` WHERE  `uid` = " . $uid . " AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message NOT IN ('DELIVRD') GROUP BY `mobile`,`task_no`");
         $mobile_num =  Db::query("SELECT SUM(`real_num`) AS all_num FROM `yx_user_sup_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ");
         // print_r("SELECT SUM(`real_num`) AS all_num FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ");
         // echo "\n";
