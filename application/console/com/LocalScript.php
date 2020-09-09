@@ -3203,7 +3203,7 @@ class LocalScript extends Pzlife
         $unknow_num     = 0;
         $default_num    = 0;
         $settlement_num = 1;
-        $max_len = Db::query("SELECT id FROM `yx_user_multimedia_message` WHERE `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "' ");
+        $max_len = Db::query("SELECT id FROM `yx_user_multimedia_message`  AND yidong_channel_id <> 0  WHERE `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "' ");
         if (empty($max_len)) {
             return false;
         }
@@ -3291,6 +3291,131 @@ class LocalScript extends Pzlife
                         $day_business_result['update_time'] = time();
                         // print_r($day_business_result);
                         $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 8 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                        if ($has) {
+                            Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                                'success'     => $day_business_result['success'],
+                                'unknown'     => $day_business_result['unknown'],
+                                'default'     => $day_business_result['default'],
+                                'num'         => $day_business_result['num'],
+                                'mobile_num'  => $day_business_result['mobile_num'],
+                                'ratio'       => $day_business_result['ratio'],
+                                'update_time' => time(),
+                            ]);
+                        } else {
+                            Db::table('yx_statistics_day')->insert($day_business_result);
+                        }
+                        $start_time = $end_time;
+                    }
+                }
+                sleep(900);
+            }
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
+        }
+        
+    }
+
+    public function SendResultForSupmessageTest()
+    {
+        $result = $this->selectSendResultForSupMessage(91, 0, 1596211200, 1596297600);
+    }
+
+    public function selectSendResultForSupMessage($uid, $pid, $start_time, $end_time){
+        $all_num        = 0;
+        $mobile_num     = 0;
+        $success_num    = 0;
+        $unknow_num     = 0;
+        $default_num    = 0;
+        $settlement_num = 1;
+        $max_len = Db::query("SELECT id FROM `yx_user_sup_message`  AND yidong_channel_id <> 0  WHERE `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "' ");
+        if (empty($max_len)) {
+            return false;
+        }
+        $mul_success_mobile_num = Db::query("SELECT `mobile`,`task_no` FROM `yx_user_sup_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_no`");
+        $mul_default_mobile_num = Db::query("SELECT `mobile`,`task_no` FROM `yx_user_sup_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message NOT IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_no`");
+        $mobile_num =  Db::query("SELECT SUM(`real_num`) AS all_num FROM `yx_user_sup_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ");
+        // print_r("SELECT SUM(`real_num`) AS all_num FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ");
+        // echo "\n";
+        // echo "SELECT `mobile`,`task_no` FROM `yx_user_multimedia_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_no`";die;
+        // print_r(count($mul_default_mobile_num));
+        // die;
+        $success_num = count($mul_success_mobile_num);
+        $all_num = $mobile_num[0]['all_num'];
+        if ($uid == 223) {
+            $unknow_num = $all_num - count($mul_success_mobile_num) - count($mul_default_mobile_num);
+        }else{
+            $success_num += $all_num - count($mul_success_mobile_num) - count($mul_default_mobile_num);
+            $unknow_num = 0;
+        }
+        $default_num = count($mul_default_mobile_num);
+        $ratio = $success_num / $all_num * 100;
+        return ['mobile_num' => $all_num, 'num' => $all_num, 'success' => $success_num, 'unknown' => $unknow_num, 'default' => $default_num, 'ratio' => $ratio];
+    }
+
+    public function checkSupMessageSendStatus(){
+        try {
+            while (true) {
+                $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
+                //行业
+                foreach ($uids as $key => $value) {
+                    // continue;
+                    // $start_time = (int) strtotime('-4 days', strtotime(date('Y-m-d', time())));
+                     $start_time = (int) strtotime('2020-08-01');
+                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_sup_message WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
+                        continue;
+                    }
+                    while (true) {
+    
+                        $day_business_result = [];
+                        $end_time            = $start_time + 86400;
+                        $timekey             = date('Ymd', $start_time);
+                        // echo "uid:" . $value['id'] . "" . "timekey:" . $timekey;
+                        // echo "\n";
+                        $business_id = 11;
+                        if ($end_time > time()) {
+                            // break;
+                            $end_time            = time();
+                            $day_business_result = $this->selectSendResultForSupMessage($value['id'], $value['pid'], $start_time, $end_time);
+                            if ($day_business_result == false) {
+                                break;
+                            } else {
+                                $day_business_result['uid']         = $value['id'];
+                                $day_business_result['timekey']     = $timekey;
+                                $day_business_result['business_id'] = $business_id;
+                                $has                                = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 11 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                                if ($has) {
+                                    Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                                        'success'     => $day_business_result['success'],
+                                        'unknown'     => $day_business_result['unknown'],
+                                        'default'     => $day_business_result['default'],
+                                        'num'         => $day_business_result['num'],
+                                        'mobile_num'  => $day_business_result['mobile_num'],
+                                        'ratio'       => $day_business_result['ratio'],
+                                        'update_time' => time(),
+                                    ]);
+                                } else {
+                                    Db::table('yx_statistics_day')->insert($day_business_result);
+                                }
+                                break;
+                            }
+                            //
+    
+                        }
+                        $day_business_result = $this->selectSendResultForSupMessage($value['id'], $value['pid'], $start_time, $end_time);
+                        if ($day_business_result == false) {
+                            $start_time = $end_time;
+                            continue;
+                        }
+    
+                        // die;
+                        $day_business_result['uid']         = $value['id'];
+                        $day_business_result['timekey']     = $timekey;
+                        $day_business_result['business_id'] = $business_id;
+                        $day_business_result['create_time'] = time();
+                        $day_business_result['update_time'] = time();
+                        // print_r($day_business_result);
+                        $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 11 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                         if ($has) {
                             Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
                                 'success'     => $day_business_result['success'],
