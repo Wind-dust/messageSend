@@ -370,7 +370,7 @@ return $result;
         $data['task_content'] = $Content;
 
         $data['mobile_content'] = join(',', $effective_mobile);
-        $data['task_name']      = $Content;
+        // $data['task_name']      = '';
         $data['send_num']       = $send_num;
         $data['real_num']       = $real_num;
         $data['send_length']    = mb_strlen($Content);
