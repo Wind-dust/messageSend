@@ -24,6 +24,8 @@ class CmppCreateCodeTask extends Pzlife
         } */
         //  $redis->rpush($redisMessageCodeSendReal,'{"mobile":"15821193682","messagetotal":2,"develop_no":"4719","Service_Id":"C48515","Source_Addr":"C48515","send_msgid":["1597212930000514","1597212931000515"],"message":"\u3010\u65bd\u534e\u6d1b\u4e16\u5947\u3011\u4eb2\u7231\u7684\u4f1a\u5458\uff0c\u611f\u8c22\u60a8\u4e00\u8def\u4ee5\u6765\u7684\u652f\u6301\uff01\u60a8\u5df2\u83b7\u5f972020\u5e74\u4f1a\u5458\u5468\u5e74\u793c\u5238\uff0c\u8d2d\u4e70\u6b63\u4ef7\u5546\u54c1\u6ee11999\u5143\u5373\u53ef\u83b7\u5f97\u95ea\u8000\u73ab\u7470\u91d1\u8272\u7b80\u7ea6\u540a\u5760\u4e00\u6761\uff0c\u8bf7\u4e8e2020\u5e7410\u670819\u65e5\u524d\u4f7f\u7528\u3002\u53ef\u524d\u5f80\u201c\u65bd\u534e\u6d1b\u4e16\u5947\u4f1a\u5458\u4e2d\u5fc3\u201d\u5c0f\u7a0b\u5e8f\u67e5\u770b\u8be5\u5238\u3002\u8be6\u8be24006901078\u3002 \u56deTD\u9000\u8ba2","Submit_time":1597212931}');
         // echo date('Y-m-d H:i:s')."\n";die;
+
+        //写入失败加上机器人提醒
         while (true) {
             $SendText = $redis->lPop($redisMessageCodeSendReal);
             if (empty($SendText)) {
@@ -159,8 +161,9 @@ class CmppCreateCodeTask extends Pzlife
                     $redis->rPush($rediskey, json_encode(['id' => $task_id, 'send_time' => 0, 'deduct' => 0]));
                 } catch (\Exception $e) {
                     $redis->rPush($redisMessageCodeSendReal, $SendText);
-                    exception($e);
                     Db::rollback();
+                    exception($e);
+                    
                 }
             } elseif ($send_code_task['free_trial'] == 1) { //需审核用户
                 Db::startTrans();
@@ -200,8 +203,10 @@ class CmppCreateCodeTask extends Pzlife
                         $audit_api =   $this->sendRequestRebort($api, 'post', $check_data, $headers);
                     }
                 } catch (\Exception $e) {
-                    exception($e);
                     Db::rollback();
+                    $redis->rPush($redisMessageCodeSendReal, $SendText);
+                    exception($e);
+                   
                 }
             }
             // print_r($user);die;
@@ -2188,8 +2193,9 @@ class CmppCreateCodeTask extends Pzlife
 
 
     /*号码清洗 */
-    public function SecondMobilesFiltrate($mobile, $uid, $deduct)
+    public function SecondMobilesFiltrate($mobile, $uid, $deduct, $is_cool_city = 0)
     {
+        //is_cool_city 是否只扣冷门城市 默认 1否 2 是
         $mobileredis = PhpredisNew::getConn();
         $this->redis = Phpredis::getConn();
         try {
@@ -2582,86 +2588,109 @@ class CmppCreateCodeTask extends Pzlife
                             }
                         }
                     } else {
-                        foreach ($cool_city_mobile as $key => $value) {
-                            $deduct_mobile[] = $value['mobile'];
-                        }
-                        $host_proportion = $deduct - $proportion * 100;
-                        // print_r($host_proportion);die;
-                        $section =  100;
-                        $section_data = [];
-                        $j = 1;
-                        for ($i = 0; $i < count($host_city_mobile); $i++) {
-                            $section_data[] = $host_city_mobile[$i];
-                            $j++;
-                            if ($j > $section) {
-                                $deduct_key = array_rand($section_data, $host_proportion);
-
-                                foreach ($section_data as $key => $value) {
-                                    if (is_array($deduct_key) && in_array($key, $deduct_key)) {
-                                        $deduct_mobile[] = $value['mobile'];
-                                    } else {
-                                        if ($value['source'] == 1) { //移动
-                                            // $channel_id = $yidong_channel_id;
-                                            $yidong_mobile[] = $value['mobile'];
-                                        } elseif ($value['source'] == 2) { //联通
-                                            // $channel_id = $liantong_channel_id;
-                                            $liantong_mobile[] = $value['mobile'];
-                                        } elseif ($value['source'] == 3) { //电信
-                                            // $channel_id = $dianxin_channel_id;
-                                            $dianxin_mobile[] = $value['mobile'];
-                                        } else {
-                                            $yidong_mobile[] = $value['mobile'];
-                                        }
-                                    }
-                                }
-                                $section_data = [];
-                                $j = 1;
+                        if ( isset($is_cool_city) && $is_cool_city == 2) {
+                            //冷门全扣
+                            foreach ($cool_city_mobile as $key => $value) {
+                                $deduct_mobile[] = $value['mobile'];
                             }
-                        }
-
-
-                        if (!empty($section_data)) {
-                            // print_r($section_data);die;
-                            $deduct_key = array_rand($section_data, ceil($host_proportion / $section));
-                            // print_r($deduct_key);die;
-                            foreach ($section_data as $key => $value) {
-                                if (!empty($deduct_key) && is_array($deduct_key)) {
-                                    if (in_array($key, $deduct_key)) {
-                                        $deduct_mobile[] = $value['mobile'];
-                                    } else {
-                                        if ($value['source'] == 1) { //移动
-                                            // $channel_id = $yidong_channel_id;
-                                            $yidong_mobile[] = $value['mobile'];
-                                        } elseif ($value['source'] == 2) { //联通
-                                            // $channel_id = $liantong_channel_id;
-                                            $liantong_mobile[] = $value['mobile'];
-                                        } elseif ($value['source'] == 3) { //电信
-                                            // $channel_id = $dianxin_channel_id;
-                                            $dianxin_mobile[] = $value['mobile'];
-                                        } else {
-                                            $yidong_mobile[] = $value['mobile'];
-                                        }
-                                    }
+                            //热门城市放出
+                            foreach ($host_city_mobile as $key => $value) {
+                                if ($value['source'] == 1) { //移动
+                                    // $channel_id = $yidong_channel_id;
+                                    $yidong_mobile[] = $value['mobile'];
+                                } elseif ($value['source'] == 2) { //联通
+                                    // $channel_id = $liantong_channel_id;
+                                    $liantong_mobile[] = $value['mobile'];
+                                } elseif ($value['source'] == 3) { //电信
+                                    // $channel_id = $dianxin_channel_id;
+                                    $dianxin_mobile[] = $value['mobile'];
                                 } else {
-                                    if ($key == $deduct_key) {
-                                        $deduct_mobile[] = $value['mobile'];
-                                    } else {
-                                        if ($value['source'] == 1) { //移动
-                                            // $channel_id = $yidong_channel_id;
-                                            $yidong_mobile[] = $value['mobile'];
-                                        } elseif ($value['source'] == 2) { //联通
-                                            // $channel_id = $liantong_channel_id;
-                                            $liantong_mobile[] = $value['mobile'];
-                                        } elseif ($value['source'] == 3) { //电信
-                                            // $channel_id = $dianxin_channel_id;
-                                            $dianxin_mobile[] = $value['mobile'];
+                                    $yidong_mobile[] = $value['mobile'];
+                                }
+                            }
+                        }else{
+                            foreach ($cool_city_mobile as $key => $value) {
+                                $deduct_mobile[] = $value['mobile'];
+                            }
+                            $host_proportion = $deduct - $proportion * 100;
+                            // print_r($host_proportion);die;
+                            $section =  100;
+                            $section_data = [];
+                            $j = 1;
+                            for ($i = 0; $i < count($host_city_mobile); $i++) {
+                                $section_data[] = $host_city_mobile[$i];
+                                $j++;
+                                if ($j > $section) {
+                                    $deduct_key = array_rand($section_data, $host_proportion);
+    
+                                    foreach ($section_data as $key => $value) {
+                                        if (is_array($deduct_key) && in_array($key, $deduct_key)) {
+                                            $deduct_mobile[] = $value['mobile'];
                                         } else {
-                                            $yidong_mobile[] = $value['mobile'];
+                                            if ($value['source'] == 1) { //移动
+                                                // $channel_id = $yidong_channel_id;
+                                                $yidong_mobile[] = $value['mobile'];
+                                            } elseif ($value['source'] == 2) { //联通
+                                                // $channel_id = $liantong_channel_id;
+                                                $liantong_mobile[] = $value['mobile'];
+                                            } elseif ($value['source'] == 3) { //电信
+                                                // $channel_id = $dianxin_channel_id;
+                                                $dianxin_mobile[] = $value['mobile'];
+                                            } else {
+                                                $yidong_mobile[] = $value['mobile'];
+                                            }
+                                        }
+                                    }
+                                    $section_data = [];
+                                    $j = 1;
+                                }
+                            }
+    
+    
+                            if (!empty($section_data)) {
+                                // print_r($section_data);die;
+                                $deduct_key = array_rand($section_data, ceil($host_proportion / $section));
+                                // print_r($deduct_key);die;
+                                foreach ($section_data as $key => $value) {
+                                    if (!empty($deduct_key) && is_array($deduct_key)) {
+                                        if (in_array($key, $deduct_key)) {
+                                            $deduct_mobile[] = $value['mobile'];
+                                        } else {
+                                            if ($value['source'] == 1) { //移动
+                                                // $channel_id = $yidong_channel_id;
+                                                $yidong_mobile[] = $value['mobile'];
+                                            } elseif ($value['source'] == 2) { //联通
+                                                // $channel_id = $liantong_channel_id;
+                                                $liantong_mobile[] = $value['mobile'];
+                                            } elseif ($value['source'] == 3) { //电信
+                                                // $channel_id = $dianxin_channel_id;
+                                                $dianxin_mobile[] = $value['mobile'];
+                                            } else {
+                                                $yidong_mobile[] = $value['mobile'];
+                                            }
+                                        }
+                                    } else {
+                                        if ($key == $deduct_key) {
+                                            $deduct_mobile[] = $value['mobile'];
+                                        } else {
+                                            if ($value['source'] == 1) { //移动
+                                                // $channel_id = $yidong_channel_id;
+                                                $yidong_mobile[] = $value['mobile'];
+                                            } elseif ($value['source'] == 2) { //联通
+                                                // $channel_id = $liantong_channel_id;
+                                                $liantong_mobile[] = $value['mobile'];
+                                            } elseif ($value['source'] == 3) { //电信
+                                                // $channel_id = $dianxin_channel_id;
+                                                $dianxin_mobile[] = $value['mobile'];
+                                            } else {
+                                                $yidong_mobile[] = $value['mobile'];
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+                       
                     }
                     // echo count($error_mobile) + count($yidong_mobile)+ count($liantong_mobile)+ count($dianxin_mobile)+ count($deduct_mobile);
                     // die;
@@ -7003,6 +7032,16 @@ class CmppCreateCodeTask extends Pzlife
                                     $business_id = 6;
                                 } 
                                 $sql .= "  AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ";
+                            }elseif ($value['id'] == 150) {
+                                $sql                  = "SELECT `uid`,`id`,`task_no` FROM ";
+                                if ($value['business_id'] == 5) { //营销
+                                    $sql .= " yx_user_send_task_log  WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "' AND `uid` = 270 ";
+                                    $business_id = 5;
+                                } elseif ($value['business_id'] == 6) { // 行业
+                                    $sql .= " yx_user_send_code_task_log WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'  AND `uid` = 270  ";
+                                    $business_id = 6;
+                                } 
+                                $sql .= "  AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ";
                             }else{
                                 $sql                  = "SELECT `uid`,`id`,`task_no` FROM ";
                                 if ($value['business_id'] == 5) { //营销
@@ -10089,6 +10128,7 @@ class CmppCreateCodeTask extends Pzlife
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73755);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73764); */
         $white_list = [
+            13918001944,
             13023216322,
             18616841500,
             15021417314,
@@ -10142,9 +10182,9 @@ class CmppCreateCodeTask extends Pzlife
                 $all_send_task = [];
                 $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (" . join(',', $ids) . ") ");
                 foreach ($all_send_task as $key => $value) {
-                    if (in_array(trim($value['mobile']), $white_list)) {
+                   /*  if (in_array(trim($value['mobile']), $white_list)) {
                         continue;
-                    }
+                    } */
                     $sendmessage = [];
                     if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                         continue;
@@ -10352,9 +10392,9 @@ class CmppCreateCodeTask extends Pzlife
                 if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                     continue;
                 }
-                if (in_array(trim($value['mobile']), $white_list)) {
+               /*  if (in_array(trim($value['mobile']), $white_list)) {
                     continue;
-                }
+                } */
                 if (checkMobile($value['mobile']) != false) {
                     $end_num = substr($value['mobile'], -6);
                     //按无效号码计算
@@ -10574,6 +10614,7 @@ class CmppCreateCodeTask extends Pzlife
         // print_r($data);die;
         $white_list = [
             13023216322,
+            13918001944,
             18616841500,
             15021417314,
             15000773110,

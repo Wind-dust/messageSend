@@ -98,7 +98,7 @@ class User extends Pzlife
             $redis = Phpredis::getConn();
             // $MinID = $redis->get('index:meassage:code:receipt:zhonglan:MinID');
                     // $MinID = $MinID ? $MinID : 0;
-                    $MinID = 0;
+                    /* $MinID = 0;
                     $receive = sendRequest('http://www.wemediacn.net/webservice/mmsservice.asmx/QueryMMSSeqReport','post',['TokenID' => '7100455520709585', 'MinID' => $MinID]);
                     $receive_data = json_decode(json_encode(simplexml_load_string($receive, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
                     print_r($receive_data);
@@ -141,13 +141,14 @@ class User extends Pzlife
                             $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
                         }
                     }
-                    die;
+                    die; */
                     $MinID = $redis->get('index:meassage:code:receipt:zhonglan:upriver:MinID');
                     $MinID = $MinID ? $MinID : 0;
                     $MinID = 0;
                     $receive = sendRequest('http://www.wemediacn.net/webservice/smsservice.asmx/QuerySMSUP','post',['TokenID' => '7100455520709585', 'MinID' => $MinID, 'Count' => 0, 'externCode' => '']);
                     $receive_data = json_decode(json_encode(simplexml_load_string($receive, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
                     $codelen = strlen('106900294555');
+                    $liandian = strlen('106904854555');
                     /* $upgoing = [];
                     $upgoing = [
                         'mobile' => $phone,
@@ -155,15 +156,17 @@ class User extends Pzlife
                         'get_time' => $moTime,
                     ];
                    */
+                    print_r($receive_data);
                     if (!empty($receive_data['result'])) {
                         $MinID = $receive_data['@attributes']['nextID'];
                         // $redis->set('index:meassage:code:receipt:zhonglan:upriver:MinID',$MinID);
                         foreach ($receive_data['result'] as $key => $value) {
                             $upgoing = [];
                             if (is_array($value)) {
+                                // 判断号码归属
                                 $develop_code = mb_substr($value['DestNumber'],$codelen);
                                 $mobile = $value['mobile'];
-                                $message_info = $value['MsgFormat'];
+                                $message_info = $value['MsgContent'];
                                 $get_time = $value['ReceiveTime'];
                                 $upgoing = [
                                     'mobile' => $mobile,
@@ -175,6 +178,8 @@ class User extends Pzlife
                                     $sql.= " AND `develop_no` = '".$develop_code."'";
                                 }
                                 $sql.= ' ORDER BY `id` DESC LIMIT 1';
+                                echo $sql;
+                                echo "\n";
                                 $task_log = Db::query($sql);
                                 // 
                                 if (!empty($task_log)) {
@@ -192,11 +197,11 @@ class User extends Pzlife
                                     ]; 
                                     DB::table('yx_user_upriver')->insert($insert_data);
                                 }
-                                // print_r($codelen);
+                               
                             }else{
                                 $develop_code = mb_substr($receive_data['result']['DestNumber'],$codelen);
                                 $mobile = $receive_data['result']['mobile'];
-                                $message_info = $receive_data['result']['MsgFormat'];
+                                $message_info = $receive_data['result']['MsgContent'];
                                 $get_time = $receive_data['result']['ReceiveTime'];
                                 $upgoing = [
                                     'mobile' => $mobile,

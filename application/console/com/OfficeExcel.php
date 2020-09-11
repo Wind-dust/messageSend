@@ -4260,17 +4260,18 @@ class OfficeExcel extends Pzlife
 
     public function extractMobile()
     {
-        $file_path = realpath("./uploads\SFL\UnZip\MMS\Communication_targets_MMS_1_20200829083609") . "/Communication_targets_MMS_1_20200829083609.txt";
+        $file_path = realpath("./uploads\SFL\UnZip\MMS\Communication_targets_MMS_1_20200910221114") . "/Communication_targets_MMS_1_20200910221114.txt";
         // $model_path = realpath("./") . "/0624.txt";
         $file       = fopen($file_path, "r");
-        $white_receipt_path = realpath("./") . "/100183782_0829white.txt";
+        $white_receipt_path = realpath("./") . "/100183782_0911white.txt";
         $white_receipt_file       = fopen($white_receipt_path, "w");
-        $deduct_receipt_path = realpath("./") . "/100183782_0829.txt";
+        $deduct_receipt_path = realpath("./") . "/100183782_0911.txt";
         $deduct_receipt_file       = fopen($deduct_receipt_path, "w");
         $j = 1;
         $mobiles = [];
         $send_mobiles = [];
         $white_list = [
+            13918001944,
             13023216322,
             18616841500,
             15021417314,
@@ -4279,7 +4280,7 @@ class OfficeExcel extends Pzlife
             13585699417,
             15800400970, 13472865840, 13611664019, 13636311653, 13701789119, 13764272451, 13801687321, 13816091848, 13817515864, 13818181256, 13916292097, 13917823241, 13918902911, 15000773110, 15800815262, 15921904656, 18800232095, 13918153000, 18817718456, 15000796805, 13681961185, 13681961185, 18817718456, 13918153000, 15000796805, 13162248755, 16621181441, 18501684687, 18521329177, 18521569417, 18621714497, 18621720742, 18618353064, 18618353064, 18013770122, 18019762207, 18121252120, 18918267758, 18918267758,18817718456, 18618353064, 18602893299
         ];
-        $deduct = ceil(200000 / 692015 * 100);
+        $deduct = ceil(153871 / 453871 * 100);
 
         while (!feof($file)) {
             $cellVal = trim(fgets($file));
@@ -4293,7 +4294,7 @@ class OfficeExcel extends Pzlife
                 if (checkMobile($value[3]) == false || strlen($value[3]) > 11) {
                     continue;
                 }
-                if ($value[2] != '100183782') {
+                if ($value[2] != '100183890') {
                     continue;
                 }
                 $mobiles[] = $value[3];

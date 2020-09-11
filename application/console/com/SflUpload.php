@@ -1131,6 +1131,7 @@ class SflUpload extends Pzlife
         }
         $all_models = [];
         $white_list = [
+            13918001944,
             13023216322,
             18616841500,
             15021417314,
@@ -1435,35 +1436,35 @@ class SflUpload extends Pzlife
                                         if (checkMobile($tvalue[3]) == false) {
                                             continue;
                                         }
-                                        $MMSmessage[] = $MMS_real_send;
-                                        // if ($save_type == 'redis') {
-                                        //     if (in_array($tvalue[3], $white_list)) {
-                                        //         $redis->rpush('sftp:sfl:MMS:whitesendtask', json_encode($MMS_real_send));
-                                        //     } else {
-                                        //         if (strpos($tvalue[3], '000000') !== false || strpos($tvalue[3], '111111') || strpos($tvalue[3], '222222') || strpos($tvalue[3], '333333') || strpos($tvalue[3], '444444') || strpos($tvalue[3], '555555') || strpos($tvalue[3], '666666') || strpos($tvalue[3], '777777') || strpos($tvalue[3], '888888') || strpos($tvalue[3], '999999')) {
-                                        //             $redis->rpush('sftp:sfl:MMS:errorsendtask', json_encode($MMS_real_send));
-                                        //         } else {
-                                        //             $redis->rpush('sftp:sfl:MMS:sendtask', json_encode($MMS_real_send));
-                                        //         }
-                                        //     }
-                                        // } else {
-                                        //     $MMSmessage[] = $MMS_real_send;
-                                        //     // print_r($content);die;
-                                        //     // $j++;
-                                        //     /* if ($j > 100) {
-                                        //         $mysql_connect->startTrans();
-                                        //         try {
-                                        //             $mysql_connect->table('yx_sfl_send_task')->insertAll($MMSmessage);
-                                        //             unset($MMSmessage);
-                                        //             $j = 1;
-                                        //             $mysql_connect->commit();
-                                        //         } catch (\Exception $e) {
-                                        //             exception($e);
-                                        //         }
-                                        //         // $this->redis->rPush('index:meassage:business:sendtask', $send);
+                                        // $MMSmessage[] = $MMS_real_send;
+                                        if ($save_type == 'redis') {
+                                            if (in_array($tvalue[3], $white_list)) {
+                                                $redis->rpush('sftp:sfl:MMS:whitesendtask', json_encode($MMS_real_send));
+                                            } else {
+                                                if (strpos($tvalue[3], '000000') !== false || strpos($tvalue[3], '111111') || strpos($tvalue[3], '222222') || strpos($tvalue[3], '333333') || strpos($tvalue[3], '444444') || strpos($tvalue[3], '555555') || strpos($tvalue[3], '666666') || strpos($tvalue[3], '777777') || strpos($tvalue[3], '888888') || strpos($tvalue[3], '999999')) {
+                                                    $redis->rpush('sftp:sfl:MMS:errorsendtask', json_encode($MMS_real_send));
+                                                } else {
+                                                    $redis->rpush('sftp:sfl:MMS:sendtask', json_encode($MMS_real_send));
+                                                }
+                                            }
+                                        } else {
+                                            $MMSmessage[] = $MMS_real_send;
+                                            // print_r($content);die;
+                                            $j++;
+                                            if ($j > 100) {
+                                                $mysql_connect->startTrans();
+                                                try {
+                                                    $mysql_connect->table('yx_sfl_multimedia_message')->insertAll($MMSmessage);
+                                                    unset($MMSmessage);
+                                                    $j = 1;
+                                                    $mysql_connect->commit();
+                                                } catch (\Exception $e) {
+                                                    exception($e);
+                                                }
+                                                // $this->redis->rPush('index:meassage:business:sendtask', $send);
 
-                                        //     } */
-                                        // }
+                                            }
+                                        }
                                         /*  if ($tvalue[3] == "") {
 
                                         if (isset($err_task_num['The Mobile IS NULL'])) {
