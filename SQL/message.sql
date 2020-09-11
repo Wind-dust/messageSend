@@ -1293,6 +1293,7 @@ CREATE TABLE `yx_mobile_times` (
   `day_times` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '号码发送天/次',
   `max_times` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '号码单日最大次数',
   `all_times` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '号码总发送次数',
+  `timekey` int(6) unsigned NOT NULL DEFAULT '0' COMMENT '时间标记',
   `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
@@ -1486,4 +1487,12 @@ CREATE TABLE `yx_user_sup_message_template_third_report` (
   KEY `template_id` (`template_id`,`third_template_id`,`channel_id`) USING BTREE,
   KEY `time` (`create_time`,`delete_time`,`update_time`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='第三方彩信模板报备表';
+
+
+
+ALTER TABLE `messagesend`.`yx_user_sup_message_template_third_report` 
+ADD COLUMN `report_status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '报备状态 1:报备未通过;2:报备通过' AFTER `status`,
+ADD COLUMN `yd_report_status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '移动报备状态：1,未通过；2:通过' AFTER `status`,
+ADD COLUMN `lt_report_status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '联通报备状态：1,未通过；2:通过' AFTER `yd_report_status`,
+ADD COLUMN `dx_report_status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '电信报备状态：1,未通过；2:通过' AFTER `lt_report_status`;
 
