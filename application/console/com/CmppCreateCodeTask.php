@@ -6952,6 +6952,16 @@ class CmppCreateCodeTask extends Pzlife
                                     $business_id = 6;
                                 } 
                                 $sql .= "  AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ";
+                            }elseif ($value['id'] == 150) {
+                                $sql                  = "SELECT `uid`,`id`,`task_no` FROM ";
+                                if ($value['business_id'] == 5) { //营销
+                                    $sql .= " yx_user_send_task_log  WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "' AND `uid` = 270 ";
+                                    $business_id = 5;
+                                } elseif ($value['business_id'] == 6) { // 行业
+                                    $sql .= " yx_user_send_code_task_log WHERE `mobile` = '" . $encodemessageupriver['mobile'] . "'  AND `uid` = 270  ";
+                                    $business_id = 6;
+                                } 
+                                $sql .= "  AND `channel_id` = " . $value['id'] . " ORDER BY `id` DESC LIMIT 1 ";
                             }
                             $message = Db::query($sql);
                             // echo $sql;
