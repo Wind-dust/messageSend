@@ -3134,4 +3134,139 @@ class LocalScript extends Pzlife
             Db::table('yx_send_code_task_receipt')->where("id in ($ids)")->delete();
         }
     }
+
+    public function getMobileSource()
+    {
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        try {
+            $start_time = strtotime('2020-06');
+            $end_time = strtotime('2020-07');
+            $redis  = Phpredis::getConn();
+            $mobilesource = [];
+            $task = Db::query("SELECT `mobile_content` FROM yx_user_send_task WHERE `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "'");
+            foreach ($task as $key => $value) {
+                $mobiles = explode(',', $value['mobile_content']);
+                foreach ($mobiles as $mkey => $mvalue) {
+                    $prefix = substr(trim($mvalue), 0, 7);
+                    // 13001001850
+                    $newres = $redis->hget('index:mobile:source', $prefix);
+                    $newres = json_decode($newres, true);
+                    if (empty($newres)) {
+                        continue;
+                    }
+                    if (isset($mobilesource[$newres['city_id']])) {
+                        $mobilesource[$newres['city_id']]++;
+                    } else {
+                        $mobilesource[$newres['city_id']] = 1;
+                    }
+                }
+            }
+            $task = Db::query("SELECT `mobile_content` FROM yx_user_send_code_task WHERE `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "'");
+            foreach ($task as $key => $value) {
+                $mobiles = explode(',', $value['mobile_content']);
+                foreach ($mobiles as $mkey => $mvalue) {
+                    $prefix = substr(trim($mvalue), 0, 7);
+                    // 13001001850
+                    $newres = $redis->hget('index:mobile:source', $prefix);
+                    $newres = json_decode($newres, true);
+                    if (empty($newres)) {
+                        continue;
+                    }
+                    if (isset($mobilesource[$newres['city_id']])) {
+                        $mobilesource[$newres['city_id']]++;
+                    } else {
+                        $mobilesource[$newres['city_id']] = 1;
+                    }
+                }
+            }
+            $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
+            $mysql_connect->query("set names utf8mb4");
+            $task = $mysql_connect->query("SELECT `mobile` FROM yx_sfl_send_task2 WHERE `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "'");
+            foreach ($task as $key => $value) {
+                $prefix = substr(trim($value['mobile']), 0, 7);
+                // 13001001850
+                $newres = $redis->hget('index:mobile:source', $prefix);
+                $newres = json_decode($newres, true);
+                if (empty($newres)) {
+                    continue;
+                }
+                if (isset($mobilesource[$newres['city_id']])) {
+                    $mobilesource[$newres['city_id']]++;
+                } else {
+                    $mobilesource[$newres['city_id']] = 1;
+                }
+            }
+            $task = $mysql_connect->query("SELECT `mobile` FROM yx_sfl_multimedia_message WHERE `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "'");
+            foreach ($task as $key => $value) {
+                $prefix = substr(trim($value['mobile']), 0, 7);
+                // 13001001850
+                $newres = $redis->hget('index:mobile:source', $prefix);
+                $newres = json_decode($newres, true);
+                if (empty($newres)) {
+                    continue;
+                }
+                if (isset($mobilesource[$newres['city_id']])) {
+                    $mobilesource[$newres['city_id']]++;
+                } else {
+                    $mobilesource[$newres['city_id']] = 1;
+                }
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
+
+    public function getMobileSflMMS()
+    {
+        // $path = realpath('./') . '\uploads\SFL\UnZip\MMS\Communication_targets_MMS_1_20200813103508\Communication_targets_MMS_1_20200813103508.txt';
+        $path = realpath('./081702.txt');
+        $file       = fopen($path, "r");
+        $black_error_mobile = [];
+        $white_list = [
+            13023216322,
+            18616841500,
+            15021417314,
+            15000773110,
+            18217584060,
+            13585699417,
+            15800400970, 13472865840, 13611664019, 13636311653, 13701789119, 13764272451, 13801687321, 13816091848, 13817515864, 13818181256, 13916292097, 13917823241, 13918902911, 15000773110, 15800815262, 15921904656, 18800232095, 13918153000, 18817718456, 15000796805, 13681961185, 13681961185, 18817718456, 13918153000, 15000796805, 13162248755, 16621181441, 18501684687, 18521329177, 18521569417, 18621714497, 18621720742, 18618353064, 18618353064, 18013770122, 18019762207, 18121252120, 18918267758, 18918267758
+        ];
+        $send_mobile = [];
+        $white_receipt_path = realpath("./") . "/bwhite.txt";
+        $white_receipt_file       = fopen($white_receipt_path, "w");
+        $deduct_receipt_path = realpath("./") . "/bdeduct.txt";
+        $deduct_receipt_file       = fopen($deduct_receipt_path, "w");
+        $j = 1;
+        while (!feof($file)) {
+            $cellVal = trim(fgets($file));
+            if (!empty($cellVal)) {
+                /*  $cellVal = explode('",', $cellVal);
+                $value = [];
+                foreach ($cellVal as $key => $v) {
+                    $v = str_replace('"', '', $v);
+                    $value[] = $v;
+                }
+                if ($value[2] != '100183360') {
+                    continue;
+                } */
+                if (in_array($cellVal, $white_list)) {
+                    fwrite($white_receipt_file, $cellVal . "\n");
+                } else {
+                    $num = mt_rand(0, 100);
+                    if ($num >= 75) {
+                        fwrite($deduct_receipt_file, $cellVal . "\n");
+                    }
+                }
+                // $black_error_mobile[] = $cellVal;
+            }
+        }
+        fclose($file);
+        fclose($white_receipt_file);
+        fclose($deduct_receipt_file);
+    }
+
+    public function jsontest()
+    {
+        print_r(json_decode('{"task_id":"5","mobile":"15000022861","status_message":"\u6210\u529f","send_time":1597895793}', true));
+    }
 }
