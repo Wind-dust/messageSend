@@ -5167,7 +5167,18 @@ class CmppCreateCodeTask extends Pzlife
                         $sql .= "WHERE `id` = " . $send_log['mar_task_id'];
                         $task = Db::query($sql);
                         if (empty($task)) {
-                            $redis->rpush($redisMessageCodeSend, json_encode($send_log));
+                            if (!empty($send_log['task_no'])) {
+                                if (strpos($send_log['task_no'], 'bus') !== false) {
+                                    $sql = "SELECT `send_msg_id`,`task_no`,`uid`,`create_time` FROM  yx_user_send_code_task WHERE `task_no` = '" . $send_log['mar_task_id'] ."'";
+                                }elseif (strpos($send_log['task_no'], 'mar') !== false) {
+                                    $sql = "SELECT `send_msg_id`,`task_no`,`uid`,`create_time` FROM  yx_user_send_task WHERE `task_no` = '" . $send_log['mar_task_id'] ."'";
+                                }
+                                $task = Db::query($sql);
+                            }else{
+                                // $redis->rpush($redisMessageCodeSend, json_encode($send_log));
+                                continue;
+                            }
+                            
                         }
                     }
                     // $redis->rpush($redisMessageCodeSend, json_encode($send_log));
@@ -10138,14 +10149,7 @@ class CmppCreateCodeTask extends Pzlife
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73755);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73764); */
         $white_list = [
-            13918001944,
-            13023216322,
-            18616841500,
-            15021417314,
-            15000773110,
-            18217584060,
-            13585699417,
-            15800400970, 13472865840, 13611664019, 13636311653, 13701789119, 13764272451, 13801687321, 13816091848, 13817515864, 13818181256, 13916292097, 13917823241, 13918902911, 15000773110, 15800815262, 15921904656, 18800232095, 13918153000, 18817718456, 15000796805, 13681961185, 13681961185, 18817718456, 13918153000, 15000796805, 13162248755, 16621181441, 18501684687, 18521329177, 18521569417, 18621714497, 18621720742, 18618353064, 18618353064, 18013770122, 18019762207, 18121252120, 18918267758, 18918267758,18817718456, 18618353064, 18602893299
+            13918001944,13023216322,18616841500,15021417314,15000773110,18217584060,13585699417,15800400970, 13472865840, 13611664019, 13636311653, 13701789119, 13764272451, 13801687321, 13816091848, 13817515864, 13818181256, 13916292097, 13917823241, 13918902911, 15000773110, 15800815262, 15921904656, 18800232095, 13918153000, 18817718456, 15000796805, 13681961185, 13681961185, 18817718456, 13918153000, 15000796805, 13162248755, 16621181441, 18501684687, 18521329177, 18521569417, 18621714497, 18621720742, 18618353064, 18618353064, 18013770122, 18019762207, 18121252120, 18918267758, 18918267758,18817718456, 18618353064, 18602893299
         ];
         // echo "SELECT * FROM yx_sfl_send_task WHERE `mobile` IN (".join(',',$white_list).") ";die;
         // $tody_time = 1595491200;
