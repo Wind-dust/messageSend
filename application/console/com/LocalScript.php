@@ -3481,7 +3481,7 @@ class LocalScript extends Pzlife
                 'remark' => '发送频次超过3次',
                 'create_time' => time()
             ];
-            Db::table('yx_whitelist')->inserty($insert_data);
+            Db::table('yx_whitelist')->insert($insert_data);
         }
     }
 }
