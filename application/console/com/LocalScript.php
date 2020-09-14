@@ -3464,4 +3464,24 @@ class LocalScript extends Pzlife
             Db::table('yx_send_code_task_receipt')->where("id in ($ids)")->delete();
         }
     }
+
+    public function updateMobileForWhite(){
+        $mobiles = Db::query("SELECT `mobile` FROM `messagesend`.`yx_mobile_times` WHERE `max_times` >= '3' GROUP BY `mobile`");
+        if (empty($mobiles)) {
+            exit();
+        }
+        foreach ($mobiles as $key => $value) {
+            if (Db::query("SELECT `mobile` FROM yx_whitelist WHERE `mobile` = '".$value['mobile']."'")) {
+                continue;
+            }
+            $insert_data = [];
+            $insert_data = [
+                'mobile' => $value['mobile'],
+                'source' => 2,
+                'remark' => '发送频次超过3次',
+                'create_time' => time()
+            ];
+            Db::table('yx_whitelist')->inserty($insert_data);
+        }
+    }
 }
