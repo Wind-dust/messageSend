@@ -3046,6 +3046,207 @@ class LocalScript extends Pzlife
         }
     }
 
+    public function checkSendFreeForMonth(){
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        try {
+            //code...
+            while (true) {
+                $i = 0;
+                $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
+                //行业
+                foreach ($uids as $key => $value) {
+                    // continue;
+                    
+                    $start_time = (int) strtotime('-'.$i.' month', strtotime(date('Y-m-d', time())));
+                    $business_id = 5;//营销
+                    $timekey = date('Ym',$start_time);
+                    // echo $timekey;die;
+                    $mobile_num = Db::query("SELECT SUM(`mobile_num`) as mobile_num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    // print_r($mobile_num);
+                    if (empty($mobile_num[0]['mobile_num'])) {
+                        continue;
+                    }
+                    $num = Db::query("SELECT SUM(`num`) as num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    $success = Db::query("SELECT SUM(`success`) as success FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    $unknown = Db::query("SELECT SUM(`unknown`) as unknown FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    $default_num = Db::query("SELECT SUM(`default`) as default_num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    // echo "\n";
+                    // print_r("SELECT SUM(`num`) as num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    $ratio =  $success[0]['success'] /$num[0]['num'] * 100;
+                    $data = [];
+                    $data = [
+                        'mobile_num' => $mobile_num[0]['mobile_num'],
+                        'num' => $num[0]['num'],
+                        'success' => $success[0]['success'],
+                        'unknown' => $unknown[0]['unknown'],
+                        'default' => $default_num[0]['default_num'],
+                        'timekey' => $timekey,
+                        'ratio' => $ratio,
+                        'business_id' => $business_id,
+                        'uid' => $value['id'],
+                        'create_time' => time(),
+                    ];
+                    $has                                 = Db::query('SELECT * FROM `yx_statistics_month` WHERE `business_id` = '.$business_id.' AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                    if ($has) {
+                        Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                            'success'     => $success[0]['success'],
+                            'unknown'     => $unknown[0]['unknown'],
+                            'default'     => $default_num[0]['default_num'],
+                            'num'         => $num[0]['num'],
+                            'mobile_num'  =>  $mobile_num[0]['mobile_num'],
+                            'ratio'       => $ratio,
+                            'update_time' => time(),
+                        ]);
+                    } else {
+                        Db::table('yx_statistics_month')->insert($data);
+                    }
+                    // print_r($data);die;
+                    // $mobile_num =$mobile_num[0]['mobile_num'];
+
+                    $business_id = 6;//营销
+                    $timekey = date('Ym',$start_time);
+                    // echo $timekey;die;
+                    $mobile_num = Db::query("SELECT SUM(`mobile_num`) as mobile_num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    // print_r($mobile_num);
+                    if (empty($mobile_num[0]['mobile_num'])) {
+                        continue;
+                    }
+                    $num = Db::query("SELECT SUM(`num`) as num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    $success = Db::query("SELECT SUM(`success`) as success FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    $unknown = Db::query("SELECT SUM(`unknown`) as unknown FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    $default_num = Db::query("SELECT SUM(`default`) as default_num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    // echo "\n";
+                    // print_r("SELECT SUM(`num`) as num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    $ratio =  $success[0]['success'] /$num[0]['num'] * 100;
+                    $data = [];
+                    $data = [
+                        'mobile_num' => $mobile_num[0]['mobile_num'],
+                        'num' => $num[0]['num'],
+                        'success' => $success[0]['success'],
+                        'unknown' => $unknown[0]['unknown'],
+                        'default' => $default_num[0]['default_num'],
+                        'timekey' => $timekey,
+                        'ratio' => $ratio,
+                        'business_id' => $business_id,
+                        'uid' => $value['id'],
+                        'create_time' => time(),
+                    ];
+                    $has                                 = Db::query('SELECT * FROM `yx_statistics_month` WHERE `business_id` = '.$business_id.' AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                    if ($has) {
+                        Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                            'success'     => $success[0]['success'],
+                            'unknown'     => $unknown[0]['unknown'],
+                            'default'     => $default_num[0]['default_num'],
+                            'num'         => $num[0]['num'],
+                            'mobile_num'  =>  $mobile_num[0]['mobile_num'],
+                            'ratio'       => $ratio,
+                            'update_time' => time(),
+                        ]);
+                    } else {
+                        Db::table('yx_statistics_month')->insert($data);
+                    }
+
+                    $business_id = 8;//营销
+                    $timekey = date('Ym',$start_time);
+                    // echo $timekey;die;
+                    $mobile_num = Db::query("SELECT SUM(`mobile_num`) as mobile_num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    // print_r($mobile_num);
+                    if (empty($mobile_num[0]['mobile_num'])) {
+                        continue;
+                    }
+                    $num = Db::query("SELECT SUM(`num`) as num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    $success = Db::query("SELECT SUM(`success`) as success FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    $unknown = Db::query("SELECT SUM(`unknown`) as unknown FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    $default_num = Db::query("SELECT SUM(`default`) as default_num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    // echo "\n";
+                    // print_r("SELECT SUM(`num`) as num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                    $ratio =  $success[0]['success'] /$num[0]['num'] * 100;
+                    $data = [];
+                    $data = [
+                        'mobile_num' => $mobile_num[0]['mobile_num'],
+                        'num' => $num[0]['num'],
+                        'success' => $success[0]['success'],
+                        'unknown' => $unknown[0]['unknown'],
+                        'default' => $default_num[0]['default_num'],
+                        'timekey' => $timekey,
+                        'ratio' => $ratio,
+                        'business_id' => $business_id,
+                        'uid' => $value['id'],
+                        'create_time' => time(),
+                    ];
+                    $has                                 = Db::query('SELECT * FROM `yx_statistics_month` WHERE `business_id` = '.$business_id.' AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                    if ($has) {
+                        Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                            'success'     => $success[0]['success'],
+                            'unknown'     => $unknown[0]['unknown'],
+                            'default'     => $default_num[0]['default_num'],
+                            'num'         => $num[0]['num'],
+                            'mobile_num'  =>  $mobile_num[0]['mobile_num'],
+                            'ratio'       => $ratio,
+                            'update_time' => time(),
+                        ]);
+                    } else {
+                        Db::table('yx_statistics_month')->insert($data);
+                    }
+
+                    $i ++;
+                    if ($i > 12) {
+                        $i = 0;
+                    }
+                }
+
+                $business_id = 11;//营销
+                $timekey = date('Ym',$start_time);
+                // echo $timekey;die;
+                $mobile_num = Db::query("SELECT SUM(`mobile_num`) as mobile_num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                // print_r($mobile_num);
+                if (empty($mobile_num[0]['mobile_num'])) {
+                    continue;
+                }
+                $num = Db::query("SELECT SUM(`num`) as num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                $success = Db::query("SELECT SUM(`success`) as success FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                $unknown = Db::query("SELECT SUM(`unknown`) as unknown FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                $default_num = Db::query("SELECT SUM(`default`) as default_num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                // echo "\n";
+                // print_r("SELECT SUM(`num`) as num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$value['id']."' AND business_id = ".$business_id);
+                $ratio =  $success[0]['success'] /$num[0]['num'] * 100;
+                $data = [];
+                $data = [
+                    'mobile_num' => $mobile_num[0]['mobile_num'],
+                    'num' => $num[0]['num'],
+                    'success' => $success[0]['success'],
+                    'unknown' => $unknown[0]['unknown'],
+                    'default' => $default_num[0]['default_num'],
+                    'timekey' => $timekey,
+                    'ratio' => $ratio,
+                    'business_id' => $business_id,
+                    'uid' => $value['id'],
+                    'create_time' => time(),
+                ];
+                $has                                 = Db::query('SELECT * FROM `yx_statistics_month` WHERE `business_id` = '.$business_id.' AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                if ($has) {
+                    Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                        'success'     => $success[0]['success'],
+                        'unknown'     => $unknown[0]['unknown'],
+                        'default'     => $default_num[0]['default_num'],
+                        'num'         => $num[0]['num'],
+                        'mobile_num'  =>  $mobile_num[0]['mobile_num'],
+                        'ratio'       => $ratio,
+                        'update_time' => time(),
+                    ]);
+                } else {
+                    Db::table('yx_statistics_month')->insert($data);
+                }
+
+                sleep(86400);
+            }
+        } catch (\Exceptixon $th) {
+            //throw $th;
+           
+            exception($th);
+        }
+    }
+
     private function selectSendResultForBusiness($uid, $pid, $start_time, $end_time)
     {
         $all_num        = 0;
