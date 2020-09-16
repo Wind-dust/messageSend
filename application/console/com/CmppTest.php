@@ -672,6 +672,7 @@ class CmppTest extends Pzlife
 
                                     $send_status = 2;
                                     // usleep(2500);
+                                    unset($send);
                                 }
                                 unset($send_status);
                             } else { //心跳
