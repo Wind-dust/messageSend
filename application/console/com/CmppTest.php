@@ -99,6 +99,14 @@ class CmppTest extends Pzlife
             // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
         ])); */
         $send = $this->getSendTask(371408);
+        $redis->rPush($redisMessageCodeSend, json_encode($send));
+        $code = $send['task_content']; //带签名
+        // iconv('UTF-8','UCS-2',$code);
+        $code = iconv('UCS-2','UTF-8',$code);
+        // print_r($code);die;
+        // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
+        // $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
+        
         // $send = $send[0];
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
@@ -563,7 +571,8 @@ class CmppTest extends Pzlife
                                 $num1 = substr($timestring, 0, 8);
                                 $num2 = substr($timestring, 8) . $this->combination($i);
                                 // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
-                                $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
+                                $code = iconv('UCS-2','UTF-8',$code);
+                                // $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
                                 // iconv("UTF-8","gbk",$code);
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
                                 // // print_r($code);die;
