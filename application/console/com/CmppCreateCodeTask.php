@@ -935,13 +935,13 @@ class CmppCreateCodeTask extends Pzlife
                                     */
 
         // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        /*  $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_multimedia_message WHERE  `id` >= 214200  ");
+         $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_multimedia_message WHERE  `id` >= 365214  ");
         foreach ($task_id as $key => $value) {
-            $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $value['id'], 'deduct' => 60]));
-        } */
+            $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $value['id'], 'deduct' => 35]));
+        }
         // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 326561, 'deduct' => 0]));
         // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 287775, 'deduct' => 0]));
-        $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 328078, 'deduct' => 0]));
+        // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 328078, 'deduct' => 0]));
         // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 150394, 'deduct' => 0]));
     }
 
@@ -1060,7 +1060,7 @@ class CmppCreateCodeTask extends Pzlife
                     $error_mobile = [];
                     $deduct_mobile = [];
                     $mobile_result = $this->SecondMobilesFiltrate($sendTask['mobile_content'], $sendTask['uid'], $real_send['deduct']);
-                    // print_r($sendTask['template_id']);die;
+                    // print_r($mobile_result);
 
                     /*  return ['error_mobile' => $error_mobile, 'yidong_mobile' => $yidong_mobile,'liantong_mobile' => $liantong_mobile, 'dianxin_mobile' => $dianxin_mobile, 'deduct_mobile' => $deduct_mobile]; */
                     /* 实际发送号码 */
@@ -1416,7 +1416,7 @@ class CmppCreateCodeTask extends Pzlife
                     if (!empty($all_log)) {
                         Db::startTrans();
                         try {
-                            Db::table('yx_user_multimedia_message_log')->insertAll($true_log);
+                            Db::table('yx_user_multimedia_message_log')->insertAll($all_log);
 
                             Db::commit();
                             foreach ($push_messages as $key => $value) {
@@ -3585,20 +3585,20 @@ class CmppCreateCodeTask extends Pzlife
                                     */
 
         // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_code_task WHERE  `id` > 1977004 ");
+        /* $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_send_code_task WHERE  `id` > 1977004 ");
         foreach ($task_id as $key => $value) {
             if ($value['uid'] == 91) {
                 $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value['id'], 'deduct' => 50]));
             } else {
                 $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value['id'], 'deduct' => 0]));
             }
-        }
+        } */
         // echo strtotime('-6 months');die;
 
-       /*  $taskid = [2444024];
+        $taskid = [3773909];
         foreach ($taskid as $key => $value) {
             $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value, 'deduct' => 0]));
-        } */
+        }
     }
 
     //书写行业通知任务日志并写入通道
