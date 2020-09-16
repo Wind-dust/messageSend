@@ -1336,7 +1336,7 @@ class CmppCreateCodeTask extends Pzlife
                             if ($j > 100) {
                                 Db::startTrans();
                                 try {
-                                    Db::table('yx_user_multimedia_message_log')->insertAll($true_log);
+                                    Db::table('yx_user_multimedia_message_log')->insertAll($all_log);
 
                                     Db::commit();
                                     foreach ($push_messages as $key => $value) {
@@ -1390,7 +1390,7 @@ class CmppCreateCodeTask extends Pzlife
                             if ($j > 100) {
                                 Db::startTrans();
                                 try {
-                                    Db::table('yx_user_multimedia_message_log')->insertAll($true_log);
+                                    Db::table('yx_user_multimedia_message_log')->insertAll($all_log);
 
                                     Db::commit();
                                     foreach ($push_messages as $key => $value) {
