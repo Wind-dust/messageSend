@@ -23,10 +23,10 @@ function checkMobile($mobile)
     if (strlen($mobile) != 11) {
         return false;
     }
-    if (in_array(substr(trim($mobile), 0, 3),['141','142','143','144','145','146','148','149','154'])) {
+    if (in_array(substr(trim($mobile), 0, 3), ['141', '142', '143', '144', '145', '146', '148', '149', '154'])) {
         return false;
     }
-    
+
     if (!empty($mobile) && preg_match('/^1[3-9]{1}\d{9}$/', $mobile)) {
         return true;
     }
@@ -273,7 +273,7 @@ function sendRequest($requestUrl, $method = 'get', $data = [])
  * @return array|mixed
  * @author zyr
  */
-function sendRequestHeader($requestUrl, $method = 'get', $data = [],$headers)
+function sendRequestHeader($requestUrl, $method = 'get', $data = [], $headers)
 {
     $methonArr = ['get', 'post'];
     if (!in_array(strtolower($method), $methonArr)) {
@@ -350,7 +350,7 @@ function sendRequestJson($requestUrl, $method = 'get', $data = [])
  * @return array|mixed
  * @author zyr
  */
-function sendRequestText($requestUrl, $method = 'get', $text )
+function sendRequestText($requestUrl, $method = 'get', $text)
 {
     $methonArr = ['get', 'post'];
     if (!in_array(strtolower($method), $methonArr)) {
@@ -547,13 +547,14 @@ function getExpressList()
  * @return array
  * @author rzc
  */
-function updateReceivedForMessage(){
+function updateReceivedForMessage()
+{
     $Received = [
         // 'REJECTD', 
         // 'REJECT', 
-        'MK:1006', 
+        // 'MK:1006', 
         // 'MA:0001', 
-        'DB:0141',
+        // 'DB:0141',
         // 'MA:0001',
         // 'MK:100D',
         // 'MK:100C',
@@ -750,84 +751,87 @@ function getRandomString($len, $chars = null)
 }
 
 
- /**
-     * 返回数组的维度
-     * @param  [type] $arr [description]
-     * @return [type]      [description]
-     */
-    function arrayLevel($arr) {
-        $al = array(0);
-        function aL($arr, &$al, $level = 0) {
-            if (is_array($arr)) {
-                $level++;
-                $al[] = $level;
-                foreach ($arr as $v) {
-                    aL($v, $al, $level);
-                }
+/**
+ * 返回数组的维度
+ * @param  [type] $arr [description]
+ * @return [type]      [description]
+ */
+function arrayLevel($arr)
+{
+    $al = array(0);
+    function aL($arr, &$al, $level = 0)
+    {
+        if (is_array($arr)) {
+            $level++;
+            $al[] = $level;
+            foreach ($arr as $v) {
+                aL($v, $al, $level);
             }
         }
-        aL($arr, $al);
-        return max($al);
     }
+    aL($arr, $al);
+    return max($al);
+}
 
-        /**
-    * @param string $string 需要解密的字符串
-    * @param string $key 密钥
-    * @return string
-    */
-    function decrypt($string, $key)
-    {
+/**
+ * @param string $string 需要解密的字符串
+ * @param string $key 密钥
+ * @return string
+ */
+function decrypt($string, $key)
+{
 
-        // 对接java，服务商做的AES加密通过SHA1PRNG算法（只要password一样，每次生成的数组都是一样的），Java的加密源码翻译php如下：
-        $key = substr(openssl_digest(openssl_digest($key, 'sha1', true), 'sha1', true), 0, 16);
+    // 对接java，服务商做的AES加密通过SHA1PRNG算法（只要password一样，每次生成的数组都是一样的），Java的加密源码翻译php如下：
+    $key = substr(openssl_digest(openssl_digest($key, 'sha1', true), 'sha1', true), 0, 16);
 
-        $decrypted = openssl_decrypt(hex2bin($string), 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
+    $decrypted = openssl_decrypt(hex2bin($string), 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
 
-        return $decrypted;
-    }
+    return $decrypted;
+}
 
-       /**
-    *
-    * @param string $string 需要加密的字符串
-    * @param string $key 密钥
-    * @return string
-    */
-    function encrypt($string, $key)
-    {
-        // 对接java，服务商做的AES加密通过SHA1PRNG算法（只要password一样，每次生成的数组都是一样的），Java的加密源码翻译php如下：
-        $key = substr(openssl_digest(openssl_digest($key, 'sha1', true), 'sha1', true), 0, 16);
+/**
+ *
+ * @param string $string 需要加密的字符串
+ * @param string $key 密钥
+ * @return string
+ */
+function encrypt($string, $key)
+{
+    // 对接java，服务商做的AES加密通过SHA1PRNG算法（只要password一样，每次生成的数组都是一样的），Java的加密源码翻译php如下：
+    $key = substr(openssl_digest(openssl_digest($key, 'sha1', true), 'sha1', true), 0, 16);
 
-        // openssl_encrypt 加密不同Mcrypt，对秘钥长度要求，超出16加密结果不变
-        $data = openssl_encrypt($string, 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
+    // openssl_encrypt 加密不同Mcrypt，对秘钥长度要求，超出16加密结果不变
+    $data = openssl_encrypt($string, 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
 
-        $data = strtoupper(bin2hex($data));
-        // print_r($data);
-        return $data;
-    }
-    /**
-    *
-    * @param string $string 需要加密的字符串
-    * @param string $key 密钥
-    * @return string
-    */
-    function daxie($number){
-        $number=substr($number,0,2);
-        $arr=array("零","一","二","三","四","五","六","七","八","九");
-        if(strlen($number)==1){
-            $result=$arr[$number];
-        }else{
-            if($number==10){
-                $result="十";
-            }else{
-                if($number<20){
-                    $result="十";
-                }else{
-                    $result=$arr[substr($number,0,1)]."十";
-                }
-                if(substr($number,1,1)!="0"){
-                    $result.=$arr[substr($number,1,1)];
-                }
+    $data = strtoupper(bin2hex($data));
+    // print_r($data);
+    return $data;
+}
+/**
+ *
+ * @param string $string 需要加密的字符串
+ * @param string $key 密钥
+ * @return string
+ */
+function daxie($number)
+{
+    $number = substr($number, 0, 2);
+    $arr = array("零", "一", "二", "三", "四", "五", "六", "七", "八", "九");
+    if (strlen($number) == 1) {
+        $result = $arr[$number];
+    } else {
+        if ($number == 10) {
+            $result = "十";
+        } else {
+            if ($number < 20) {
+                $result = "十";
+            } else {
+                $result = $arr[substr($number, 0, 1)] . "十";
+            }
+            if (substr($number, 1, 1) != "0") {
+                $result .= $arr[substr($number, 1, 1)];
             }
         }
-        return $result;
     }
+    return $result;
+}
