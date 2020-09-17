@@ -6919,7 +6919,7 @@ class CmppCreateCodeTask extends Pzlife
             while (true) {
                 $channels = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `delete_time` = 0 ");
                 foreach ($channels as $key => $value) {
-                    if (in_array($value['id'], [83, 84, 86, 87, 88, 94])) {
+                    if (in_array($value['id'], [83, 84, 86, 87, 88, 94, 153, 154, 155])) {
                         continue;
                     }
                     $redisMessageUpRiver = 'index:message:code:upriver:' . $value['id'];
@@ -10155,7 +10155,7 @@ class CmppCreateCodeTask extends Pzlife
         // $tody_time = 1596189600;// 时间下午16点3条 已发第一条
         // $tody_time = 1596877200; // 时间下午17点20
         try {
-            $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84, 'update_time' => time()]);
+            $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 153, 'liantong_channel_id' => 154, 'dianxin_channel_id' => 155, 'update_time' => time()]);
             // $mysql_connect->table('yx_sfl_send_task')->where([['template_id', '=', '100183639']])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84, 'update_time' => time()]);
             // $mysql_connect->table('yx_sfl_send_task')->where([['template_id', '=', '100183187']])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84, 'update_time' => time()]);
             /* $where = [];
