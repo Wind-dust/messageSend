@@ -910,7 +910,7 @@ class SflUpload extends Pzlife
                         exception($e);
                     }
                 }
-                // die;
+                die;
                 // print_r($this_id);
                 // die;
                 $task_receipt_all = [];
@@ -1743,7 +1743,9 @@ class SflUpload extends Pzlife
                                                 $content = $content . " /回T退订";
                                             } elseif ($tvalue[2] == '100183752') {
                                                 $content = $content . " /回T退订";
-                                            } else {
+                                            }  elseif ($tvalue[2] == '100184475') {
+                                                $content = $content . " /回T退订";
+                                            }else {
                                                 $content = $content . "/回T退订";
                                             }
                                         }

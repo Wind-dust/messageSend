@@ -12189,12 +12189,12 @@ class CmppCreateCodeTask extends Pzlife
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M');
         // $redis->rpush("index:meassage:multimediamessage:buffersendtask", json_encode(['id' =>94348, 'deduct' => 10]));
-        $redis->rpush("index:meassage:multimediamessage:sendtask", '{"id":"412089","deduct":"35.00"}');
+        // $redis->rpush("index:meassage:multimediamessage:sendtask", '{"id":"412089","deduct":"35.00"}');
         // {"id":"412089","deduct":"35.00"}
         try {
             while (true) {
-                // $send = $redis->lpop('index:meassage:multimediamessage:buffersendtask');
-                $send = $redis->lpop('index:meassage:multimediamessage:sendtask');
+                $send = $redis->lpop('index:meassage:multimediamessage:buffersendtask');
+                // $send = $redis->lpop('index:meassage:multimediamessage:sendtask');
                 if (empty($send)) {
                     break;
                 }
