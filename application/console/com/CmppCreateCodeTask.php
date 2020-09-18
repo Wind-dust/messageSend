@@ -6918,7 +6918,6 @@ class CmppCreateCodeTask extends Pzlife
         try {
             while (true) {
                 $channels = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `delete_time` = 0 ");
-                print_r($channels);die;
                 foreach ($channels as $key => $value) {
                     if (in_array($value['id'], [83, 84, 86, 87, 88, 94, 153, 154, 155, 156, 157])) {
                         continue;
@@ -6929,6 +6928,7 @@ class CmppCreateCodeTask extends Pzlife
                         if (empty($messageupriver)) {
                             break;
                         }
+                        print_r($messageupriver);
                         $business_id          = 0;
                         $encodemessageupriver = json_decode($messageupriver, true);
                         $sql                  = '';
