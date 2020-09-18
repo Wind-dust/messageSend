@@ -6928,7 +6928,7 @@ class CmppCreateCodeTask extends Pzlife
                         if (empty($messageupriver)) {
                             break;
                         }
-                        print_r($value['id']);
+                        // print_r($value['id']);
                         $business_id          = 0;
                         $encodemessageupriver = json_decode($messageupriver, true);
                         $sql                  = '';
