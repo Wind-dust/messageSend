@@ -1090,4 +1090,122 @@ class User extends MyController
         $result = $this->app->user->getUserSupMessageTemplateStatus($appid, $appkey, $template_id);
         return $result;
     }
+
+    /**
+     * @api              {post} / 设置余额提醒额度
+     * @apiDescription   setUserBalance
+     * @apiGroup         index_user
+     * @apiName          setUserBalance
+     * @apiParam (入参) {String} con_id con_id
+     * @apiParam (入参) {String} appkey balance
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:balance不是数字 / 3002:business_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /index/user/setUserBalance
+     * @return array
+     * @author rzc
+     */
+    public function setUserBalance(){
+        $ConId = trim($this->request->post('con_id'));
+        $balance = trim($this->request->post('balance'));
+        if (!is_numeric($balance) || $balance < 0) {
+            return ['code' => '3001'];
+        }
+        $result = $this->app->user->setUserBalance($ConId, $balance);
+        return $result;
+    
+    }
+
+    /**
+     * @api              {post} / 添加提醒手机号
+     * @apiDescription   setNotifications
+     * @apiGroup         index_user
+     * @apiName          setNotifications
+     * @apiParam (入参) {String} con_id con_id
+     * @apiParam (入参) {String} mobile mobile
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:mobile格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /index/user/setNotifications
+     * @return array
+     * @author rzc
+     */
+    public function setNotifications(){
+        $ConId = trim($this->request->post('con_id'));
+        $mobile = trim($this->request->post('mobile'));
+        if (checkMobile($mobile) == false) {
+            return ['code' => '3001'];
+        }
+        $result = $this->app->user->setNotifications($ConId, $mobile);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 获取已设置提醒手机号
+     * @apiDescription   getNotifications
+     * @apiGroup         index_user
+     * @apiName          getNotifications
+     * @apiParam (入参) {String} con_id con_id
+     * @apiParam (入参) {String} page 
+     * @apiParam (入参) {String} pageNum 
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:mobile格式错误 / 3002:business_id格式错误 / 3003:business_id格式错误
+     * @apiSampleRequest /index/user/getNotifications
+     * @return array
+     * @author rzc
+     */
+    public function getNotifications(){
+        $ConId = trim($this->request->post('con_id'));
+        $page     = trim($this->request->post('page'));
+        $pageNum  = trim($this->request->post('pageNum'));
+        $page     = is_numeric($page) ? $page : 1;
+        $pageNum  = is_numeric($pageNum) ? $pageNum : 10;
+        $result = $this->app->user->getNotifications($ConId, $page, $pageNum);
+        return $result;
+    }
+
+
+    /**
+     * @api              {post} / 修改提醒手机号
+     * @apiDescription   updateNotifications
+     * @apiGroup         index_user
+     * @apiName          updateNotifications
+     * @apiParam (入参) {String} con_id con_id
+     * @apiParam (入参) {String} mobile mobile
+     * @apiParam (入参) {String} id 
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:mobile格式错误 / 3002:id格式错误 / 3003:数据不存在
+     * @apiSampleRequest /index/user/updateNotifications
+     * @return array
+     * @author rzc
+     */
+    public function updateNotifications(){
+        $ConId = trim($this->request->post('con_id'));
+        $mobile = trim($this->request->post('mobile'));
+        $id = trim($this->request->post('id'));
+        if (checkMobile($mobile) == false) {
+            return ['code' => '3001'];
+        }
+        if (!is_numeric($id) || $id < 0) {
+            return ['code' => '3002'];
+        }
+        $result = $this->app->user->updateNotifications($ConId, $mobile , $id);
+        return $result;
+    }
+
+    /**
+     * @api              {post} / 删除提醒手机号
+     * @apiDescription   delNotifications
+     * @apiGroup         index_user
+     * @apiName          delNotifications
+     * @apiParam (入参) {String} con_id con_id
+     * @apiParam (入参) {String} id 
+     * @apiSuccess (返回) {String} code 200:成功 / 3001:mobile格式错误 / 3002:id格式错误 / 3003:数据不存在
+     * @apiSampleRequest /index/user/delNotifications
+     * @return array
+     * @author rzc
+     */
+    public function delNotifications() {
+        $ConId = trim($this->request->post('con_id'));
+        $id = trim($this->request->post('id'));
+        if (!is_numeric($id) || $id < 0) {
+            return ['code' => '3002'];
+        }
+        $result = $this->app->user->delNotifications($ConId,  $id);
+        return $result;
+    }
 }

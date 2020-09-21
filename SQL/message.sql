@@ -1496,3 +1496,18 @@ ADD COLUMN `yd_report_status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '�
 ADD COLUMN `lt_report_status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '联通报备状态：1,未通过；2:通过' AFTER `yd_report_status`,
 ADD COLUMN `dx_report_status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '电信报备状态：1,未通过；2:通过' AFTER `lt_report_status`;
 
+
+
+DROP TABLE IF EXISTS `yx_notifications_settings`;
+CREATE TABLE `yx_notifications_settings` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `mobile` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '通知号码',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `mobile` (`mobile`,`uid`) USING BTREE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='用户通知设置表';
+
+NotificationsSettings

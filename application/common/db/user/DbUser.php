@@ -12,6 +12,7 @@ use app\common\model\StatisticsDay;
 use app\common\model\LogTrading;
 use app\common\model\UserUpriver;
 use app\common\model\SflReportLog;
+use app\common\model\NotificationsSettings;
 use think\Db;
 
 class DbUser
@@ -281,5 +282,33 @@ class DbUser
     public function editSflReportLog($update){
         $res = Db::table('yx_sfl_report_log')->update($update);
         return $res;
+    }
+
+    public function getNotificationsSettings($where, $field, $row = false, $orderBy = '', $limit = '', $sc = '')
+    {
+        $obj = NotificationsSettings::field($field)->where($where);
+        return getResult($obj, $row, $orderBy, $limit);
+    }
+
+    public function updateNotificationsSettings($data, $id)
+    {
+        $NotificationsSettings = new NotificationsSettings();
+        return $NotificationsSettings->save($data, ['id' => $id]);
+    }
+
+    public function addNotificationsSettings($data)
+    {
+        $NotificationsSettings = new NotificationsSettings();
+        return $NotificationsSettings->save($data);
+    }
+
+    public function countNotificationsSettings($where){
+        $NotificationsSettings = new NotificationsSettings();
+        return $NotificationsSettings->where()->count();
+    }
+
+    public function delcountNotificationsSettings($id)
+    {
+        return NotificationsSettings::destroy($id);
     }
 }

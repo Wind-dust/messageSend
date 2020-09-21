@@ -1259,4 +1259,123 @@ class User extends CommonIndex
         // $result['code']  = 200;
         return ['code' => 200, 'yd_report_status' => $yd_report_status, 'lt_report_status' => $lt_report_status, 'dx_report_status' => $dx_report_status];
     }
+
+    public function setUserBalance($ConId, $balance){
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3003'];
+        }
+        $user = DbUser::getUserOne(['id' => $uid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+
+        Db::startTrans();
+        try {
+            // DbUser::updateUser(['logo' => $image, 'businesslicense' => $bimage], $uid);
+            DbUser::updateUser(['balance' => $balance], $uid);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            // exception($e);
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function setNotifications($ConId, $mobile){
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3000'];
+        }
+        $user = DbUser::getUserOne(['id' => $uid], 'id', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        $settings = DbUser::getNotificationsSettings(['uid' => $uid, 'mobile' => $mobile],'id', true);
+        if (!empty($settings)) {
+            return ['code' => '3002'];
+        }
+        Db::startTrans();
+        try {
+            // DbUser::updateUser(['logo' => $image, 'businesslicense' => $bimage], $uid);
+            DbUser::addNotificationsSettings(['mobile' => $mobile, 'uid' => $uid]);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            // exception($e);
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function getNotifications($ConId, $page, $pageNum){
+        $offset = ($page - 1) * $pageNum;
+        if ($offset < 0){
+            return ['code' => '200', 'settings' => []];
+        }
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3000'];
+        }
+        $user = DbUser::getUserOne(['id' => $uid], 'id', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        $settings = DbUser::getNotificationsSettings(['uid' => $uid],'id', false,'',$offset.','.$pageNum);
+        return ['code' => '200', 'settings' => $settings];
+    }
+
+    public function updateNotifications($ConId, $mobile , $id){
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3000'];
+        }
+        $user = DbUser::getUserOne(['id' => $uid], 'id', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        $settings = DbUser::getNotificationsSettings(['id' => $id],'id', true);
+        if (!empty($settings)) {
+            return ['code' => '3002'];
+        }
+
+        Db::startTrans();
+        try {
+            // DbUser::updateUser(['logo' => $image, 'businesslicense' => $bimage], $uid);
+            DbUser::updateNotificationsSettings(['mobile' => $mobile, 'uid' => $uid], $id);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            // exception($e);
+            return ['code' => '3009']; //修改失败
+        }
+    }
+
+    public function delNotifications($ConId,  $id){
+        $uid = $this->getUidByConId($ConId);
+        if (empty($uid)) { //用户不存在
+            return ['code' => '3000'];
+        }
+        $user = DbUser::getUserOne(['id' => $uid], 'id', true);
+        if (empty($user)) {
+            return ['code' => '3000'];
+        }
+        $settings = DbUser::getNotificationsSettings(['id' => $id],'id', true);
+        if (!empty($settings)) {
+            return ['code' => '3002'];
+        }
+        Db::startTrans();
+        try {
+            // DbUser::updateUser(['logo' => $image, 'businesslicense' => $bimage], $uid);
+            DbUser::delcountNotificationsSettings( $id);
+            Db::commit();
+            return ['code' => '200'];
+        } catch (\Exception $e) {
+            Db::rollback();
+            // exception($e);
+            return ['code' => '3009']; //修改失败
+        }
+    }
 }
