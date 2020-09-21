@@ -120,7 +120,6 @@ class CmppNorm extends Pzlife
         $security_coefficient = 1; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
         $miao = 1000000;
-        $redis->set('channel_'.$content,$Sequence_Id);
         // echo $miao- $miao * 0.0012;die;
         $sleep_time = ceil($miao / $security_master);
         // echo $sleep_time;die;
@@ -136,12 +135,7 @@ class CmppNorm extends Pzlife
             socket_set_nonblock($socket); //设置非阻塞模式
             $pos          = 0;
             $i           = 1;
-            $Sequence_Id = $redis->get('channel_'.$content);
-            if (empty($Sequence_Id)) {
-                $Sequence_Id = 1;
-               
-            }
-            $redis->set('channel_'.$content,$Sequence_Id+1);
+            $Sequence_Id = 1;
             //先进行连接验证
             date_default_timezone_set('PRC');
             $time                = 0;
@@ -319,6 +313,7 @@ class CmppNorm extends Pzlife
                         $new_Total_Length = strlen($new_body) + 12;
                         $new_headData     = pack("NNN", $new_Total_Length, $callback_Command_Id, $head['Sequence_Id']);
                         socket_write($socket, $new_headData . $new_body, $new_Total_Length);
+                        usleep(20);
                     } else if ($head['Command_Id'] == 0x00000008) {
                         // echo "心跳维持中" . "\n"; //激活测试,无消息体结构
                         $Command_Id  = 0x80000008; //保持连接
@@ -343,11 +338,9 @@ class CmppNorm extends Pzlife
                 }
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
                     while (true) {
-                        // echo microtime(true);
+                        echo microtime(true);
                         // echo "\n";
                         // echo $Sequence_Id . "\n";
-                        $Sequence_Id = $redis->get('channel_'.$content);
-                        $redis->set('channel_'.$content,$Sequence_Id+1);
                         try {
                             $receive = 1;
                             //先接收
@@ -618,7 +611,6 @@ class CmppNorm extends Pzlife
                                         ++$Sequence_Id;
                                         if ($Sequence_Id > 65536) {
                                             $Sequence_Id = 1;
-                                            $redis->set('channel_'.$content,$Sequence_Id);
                                         }
                                     }
                                     if ($i > $security_master) {
@@ -689,10 +681,8 @@ class CmppNorm extends Pzlife
 
                             ++$i;
                             ++$Sequence_Id;
-                            // $redis->set('channel_'.$content,$Sequence_Id);
                             if ($Sequence_Id > 65536) {
                                 $Sequence_Id = 1;
-                                $redis->set('channel_'.$content,$Sequence_Id);
                             }
                         }
                         //捕获异常
