@@ -2971,8 +2971,8 @@ class LocalScript extends Pzlife
                 }
                 //营销
                 foreach ($uids as $key => $value) {
-                    $start_time = (int) strtotime('-3 days', strtotime(date('Y-m-d', time())));
-                    // $start_time = (int) strtotime('2020-08-01');
+                    // $start_time = (int) strtotime('-3 days', strtotime(date('Y-m-d', time())));
+                    $start_time = (int) strtotime('2020-09-01');
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
                         continue;
                     }
@@ -3636,4 +3636,34 @@ class LocalScript extends Pzlife
             Db::table('yx_whitelist')->insert($insert_data);
         }
     }
+
+    public function balanceRemind(){
+        try {
+            $user_equities = Db::query('SELECT * FROM  yx_user_equities WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `reservation_service` = 1) AND `balance` > `num_balance`');
+            if (!empty($user_equities)) {
+                foreach ($user_equities as $key => $value) {
+                    $Content = '';
+                    if ($value['business_id'] == 5) {
+
+                    }
+                    $data['uid']          = 295;
+                    $data['source']       = '127.0.0.1';
+                    $data['task_content'] = $Content;
+                    $data['mobile_content'] =  $value['mobile'];
+                    $data['send_num']       = count(explode(',',$value['mobile']));
+                    $data['real_num']       = count(explode(',',$value['mobile']));
+                    $data['send_length']    = mb_strlen($Content);
+                    $data['free_trial']     = 2;
+                    $data['send_status']     = 2;
+                    $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+                }
+            }
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
+        }
+        
+    }
+
+    
 }
