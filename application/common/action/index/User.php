@@ -1269,7 +1269,9 @@ class User extends CommonIndex
         if (empty($user)) {
             return ['code' => '3000'];
         }
-
+        if ($user['reservation_service'] == 2) {
+            return ['code' => '3004','msg' =>'后付费用户无需设置'];
+        }
         Db::startTrans();
         try {
             // DbUser::updateUser(['logo' => $image, 'businesslicense' => $bimage], $uid);
