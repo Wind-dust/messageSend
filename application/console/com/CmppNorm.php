@@ -4,6 +4,7 @@ namespace app\console\com;
 
 use app\console\Pzlife;
 use cache\Phpredis;
+use cache\PhpredisNew;
 use Config;
 use Env;
 use Exception;
@@ -67,7 +68,8 @@ class CmppNorm extends Pzlife
         if (empty($contdata)) {
             exit("CHANNEL IS NOT SET !");
         }
-        $redis = Phpredis::getConn();
+        // $redis = Phpredis::getConn();
+        $redis = PhpredisNew::getConn();
         date_default_timezone_set('PRC');
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         // $content                    = 73;
