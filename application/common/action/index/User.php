@@ -1260,7 +1260,7 @@ class User extends CommonIndex
         return ['code' => 200, 'yd_report_status' => $yd_report_status, 'lt_report_status' => $lt_report_status, 'dx_report_status' => $dx_report_status];
     }
 
-    public function setUserBalance($ConId, $balance, $new_mobile, $id){
+    public function setUserBalance($ConId, $balance, $new_mobile, $business_id){
         $uid = $this->getUidByConId($ConId);
         if (empty($uid)) { //用户不存在
             return ['code' => '3003'];
@@ -1273,14 +1273,14 @@ class User extends CommonIndex
             return ['code' => '3004','msg' =>'后付费用户无需设置'];
         }
         
-        $equitise = DbAdministrator::getUserEquities(['id' => $id], '*', true);
+        $equitise = DbAdministrator::getUserEquities(['business_id' => $business_id, 'uid' => $uid], '*', true);
         if (empty($equitise)) {
             return ['code' => '3002'];
         }
         Db::startTrans();
         try {
             // DbUser::updateUser(['logo' => $image, 'businesslicense' => $bimage], $uid);
-            DbAdministrator::editUserEquities(['balance' => $balance, 'mobile' => join(',',$new_mobile)], $id);
+            DbAdministrator::editUserEquities(['balance' => $balance, 'mobile' => join(',',$new_mobile)], $equitise['id']);
             Db::commit();
             return ['code' => '200'];
         } catch (\Exception $e) {

@@ -1099,7 +1099,7 @@ class User extends MyController
      * @apiParam (入参) {String} con_id con_id
      * @apiParam (入参) {String} balance balance
      * @apiParam (入参) {String} mobile mobile 多个用,隔开
-     * @apiParam (入参) {String} id equities id 多个用,隔开
+     * @apiParam (入参) {String} business_id business_id
      * @apiSuccess (返回) {String} code 200:成功 / 3001:balance不是数字 / 3002:equities id格式错误 / 3003:business_id格式错误
      * @apiSampleRequest /index/user/setUserBalance
      * @return array
@@ -1109,11 +1109,11 @@ class User extends MyController
         $ConId = trim($this->request->post('con_id'));
         $balance = trim($this->request->post('balance'));
         $mobile = trim($this->request->post('mobile'));
-        $id = trim($this->request->post('id'));
+        $business_id = trim($this->request->post('business_id'));
         if (!is_numeric($balance) || $balance < 0) {
             return ['code' => '3001'];
         }
-        if (!is_numeric($id) || $id < 0) {
+        if (!is_numeric($business_id) || $business_id < 0) {
             return ['code' => '3002'];
         }
         $mobile = explode(',', $mobile);
@@ -1127,7 +1127,7 @@ class User extends MyController
         if (empty($new_mobile) ) {
             return ['code' => '3002'];
         }
-        $result = $this->app->user->setUserBalance($ConId, $balance, $new_mobile, $id);
+        $result = $this->app->user->setUserBalance($ConId, $balance, $new_mobile, $business_id);
         return $result;
     
     }
