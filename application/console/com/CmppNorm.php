@@ -120,6 +120,7 @@ class CmppNorm extends Pzlife
         $security_coefficient = 1; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
         $miao = 1000000;
+        $redis->set('channel_'.$content,$Sequence_Id);
         // echo $miao- $miao * 0.0012;die;
         $sleep_time = ceil($miao / $security_master);
         // echo $sleep_time;die;
@@ -135,7 +136,12 @@ class CmppNorm extends Pzlife
             socket_set_nonblock($socket); //设置非阻塞模式
             $pos          = 0;
             $i           = 1;
-            $Sequence_Id = 1;
+            $Sequence_Id = $redis->get('channel_'.$content);
+            if (empty($Sequence_Id)) {
+                $Sequence_Id = 1;
+               
+            }
+            $redis->set('channel_'.$content,$Sequence_Id+1);
             //先进行连接验证
             date_default_timezone_set('PRC');
             $time                = 0;
@@ -341,6 +347,8 @@ class CmppNorm extends Pzlife
                         // echo microtime(true);
                         // echo "\n";
                         // echo $Sequence_Id . "\n";
+                        $Sequence_Id = $redis->get('channel_'.$content);
+                        $redis->set('channel_'.$content,$Sequence_Id+1);
                         try {
                             $receive = 1;
                             //先接收
@@ -611,6 +619,7 @@ class CmppNorm extends Pzlife
                                         ++$Sequence_Id;
                                         if ($Sequence_Id > 65536) {
                                             $Sequence_Id = 1;
+                                            $redis->set('channel_'.$content,$Sequence_Id);
                                         }
                                     }
                                     if ($i > $security_master) {
@@ -681,8 +690,10 @@ class CmppNorm extends Pzlife
 
                             ++$i;
                             ++$Sequence_Id;
+                            // $redis->set('channel_'.$content,$Sequence_Id);
                             if ($Sequence_Id > 65536) {
                                 $Sequence_Id = 1;
+                                $redis->set('channel_'.$content,$Sequence_Id);
                             }
                         }
                         //捕获异常

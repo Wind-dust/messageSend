@@ -910,7 +910,7 @@ class SflUpload extends Pzlife
                         exception($e);
                     }
                 }
-                die;
+                // die;
                 // print_r($this_id);
                 // die;
                 $task_receipt_all = [];
@@ -962,7 +962,7 @@ class SflUpload extends Pzlife
                         exception($e);
                     }
                 }
-                $deduct = ceil(950000 / 1307939 * 100);
+                $deduct = ceil(9545373 / 13545753 * 100);
 
                 /* 扣量 */
                 // $all_num = [0,1,2,3,4];
@@ -1011,14 +1011,14 @@ class SflUpload extends Pzlife
                             if ($res) {
                                 $newres = array_shift($res);
                                 if ($newres['source'] == 1) {
-                                    $channel_id = 83;
+                                    $channel_id = 156;
                                 } elseif ($newres['source'] == 2) {
-                                    $channel_id = 84;
+                                    $channel_id = 157;
                                 } elseif ($newres['source'] == 3) {
-                                    $channel_id = 84;
+                                    $channel_id = 157;
                                 }
                             } else {
-                                $channel_id = 83;
+                                $channel_id = 156;
                             }
                             $sendmessage = [
                                 'mseeage_id'  => $value['mseeage_id'],
@@ -1049,14 +1049,14 @@ class SflUpload extends Pzlife
                         if ($res) {
                             $newres = array_shift($res);
                             if ($newres['source'] == 1) {
-                                $channel_id = 83;
+                                $channel_id = 156;
                             } elseif ($newres['source'] == 2) {
-                                $channel_id = 84;
+                                $channel_id = 157;
                             } elseif ($newres['source'] == 3) {
-                                $channel_id = 84;
+                                $channel_id = 157;
                             }
                         } else {
-                            $channel_id = 83;
+                            $channel_id = 156;
                         }
                         $sendmessage = [
                             'mseeage_id'  => $value['mseeage_id'],
@@ -1078,9 +1078,9 @@ class SflUpload extends Pzlife
                         break;
                     }
                     $white_task = json_decode($white_task, true);
-                    $white_task['yidong_channel_id'] = 83;
-                    $white_task['liantong_channel_id'] = 83;
-                    $white_task['dianxin_channel_id'] = 84;
+                    $white_task['yidong_channel_id'] = 156;
+                    $white_task['liantong_channel_id'] = 157;
+                    $white_task['dianxin_channel_id'] = 157;
                     $send_task[]      = $white_task;
                     $i++;
                     if ($i > 100) {
@@ -1156,7 +1156,7 @@ class SflUpload extends Pzlife
                 }
                 $son_path_data = $this->getDirContent($path . $value);
                 if ($value == 'MMS') {
-                    // continue;
+                    continue;
                     $err_task_num = [];
                     $send_data    = [];
                     if ($son_path_data !== false) {
@@ -1542,13 +1542,13 @@ class SflUpload extends Pzlife
                             // continue;
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
-                            if (!strpos($svalue, date("Ymd"))) {
-                                continue;
-                            }
-                            //  strpos($svalue, '2020071518') == false
-                             /* if (strpos($svalue, '2020082818') == false) {
+                            /* if (!strpos($svalue, date("Ymd"))) {
                                 continue;
                             } */
+                            //  strpos($svalue, '2020071518') == false
+                             if (strpos($svalue, '2020091822') == false) {
+                                continue;
+                            }
 
                             $start_time = strtotime("2020-06-18");
                             $end_time = $start_time + 86400;
