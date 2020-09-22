@@ -12781,7 +12781,7 @@ class CmppCreateCodeTask extends Pzlife
                     // print_r($stat);die;
 
                     $send_len = 0;
-                    $send_len = mb_strlen($send_log['content']);
+                    $send_len = mb_strlen($task[0]['task_content']);
                     $s_num = 1;
                     if ($send_len > 70) {
                         $s_num = ceil($send_len / 67);
