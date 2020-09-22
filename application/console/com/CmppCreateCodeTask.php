@@ -12740,7 +12740,7 @@ class CmppCreateCodeTask extends Pzlife
             /* for($i = 0; $i < $num; $i++){
                 $res = $redis->rpush("index:meassage:code:user:receive:" . $message['uid'], json_encode(['task_no' => $message['task_no'], 'msg_id' => $message['send_msg_id'], "status_message" => "INTERCEPT", "message_info" => "驳回", "send_time" => date("Y-m-d H:i:s", time()), 'mobile' => $message['mobile']]));
             } */
-            if ($message['uid'] == 190 || $message['uid'] == 191 || $message['uid'] == 245 || $message['uid'] == 287) {
+            if ($message['uid'] == 190 || $message['uid'] == 191 || $message['uid'] == 287) {
                 $message['Stat'] = 'INTERCEPT';
                 $message['Done_time'] = '2009071224';
                 $message['Done_time'] = '2009071224';
@@ -12750,6 +12750,107 @@ class CmppCreateCodeTask extends Pzlife
             } else {
                 $redis->rpush('index:meassage:code:send:' . $channel_id, json_encode($message));
             }
+        }
+    }
+
+    public function unkonwnDeliver($channel_id)
+    {
+        try {
+            //code...
+            // $redis->rpush('index:meassage:code:send:147', '{"Stat":"DELIVRD","Submit_time":"0101010000","Done_time":"2009221424","mobile":"15290776560\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000","receive_time":1600755904,"Msg_Id":"260423712030751016"}');
+            $redis = Phpredis::getConn();
+            while (true) {
+                $message = $redis->lpop('index:meassage:code:unknow:deliver:' . $channel_id);
+                if (empty($message)) {
+                    exit('退出');
+                }
+                $message = json_decode($message, true);
+                $mobile = trim($mesage['mobile']);
+                $task_log = Db::query("SELECT `task_no` FROM  `yx_user_send_task_log` WHERE `mobile` = '" . $mobile . "' ORDER BY `id` DESC LIMIT 1 ");
+                if (empty($task_log)) {
+                    continue;
+                }
+                $task_no = $task_log[0]['task_no'];
+                $task =  Db::query("SELECT `*` FROM  `yx_user_send_task` WHERE `task_no` = '" . $task_no . "' LIMIT 1 ");
+                $user = Db::query("SELECT `pid`,`need_receipt_cmpp` FROM yx_users WHERE `id` = " . $task[0]['uid']);
+                if (Db::query("SELECT `id` FROM yx_send_task_receipt WHERE  `mobile` = '" . $mobile . "' AND `task_id` = '" . $task[0]['id'] . "' ")) {
+                    continue;
+                }
+                $stat = $message['Stat'];
+                if ($user[0]['pid'] == 137) {
+                    // print_r($stat);die;
+
+                    $send_len = 0;
+                    $send_len = mb_strlen($send_log['content']);
+                    $s_num = 1;
+                    if ($send_len > 70) {
+                        $s_num = ceil($send_len / 67);
+                    }
+                    for ($a = 0; $a < $s_num; $a++) {
+                        $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
+                            'task_no'        => trim($task[0]['task_no']),
+                            'status_message' => $stat,
+                            'message_info'   => $message_info,
+                            'mobile'         => trim($message['mobile']),
+                            'msg_id'         => trim($task[0]['send_msg_id']),
+                            // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                            'send_time'      => isset($message['receive_time']) ? date('Y-m-d H:i:s', trim($message['receive_time'])) : date('Y-m-d H:i:s', time()),
+                            'smsCount' => $s_num,
+                            'smsIndex' => $a + 1,
+                        ])); //写入用户带处理日志
+                    }
+                } else {
+                    if ($user[0]['need_receipt_cmpp'] == 2) {
+                        $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
+                            'Stat'        => trim($task[0]['task_no']),
+                            'send_msgid'        => trim($task[0]['send_msg_id']),
+                            'status_message' => $stat,
+                            'mobile'         => trim($message['mobile']),
+                            'develop_no' => trim($task[0]['develop_no']) ? $task[0]['develop_no'] : '',
+                            // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                            'Done_time'      => isset($message['receive_time']) ? date('Y-m-d H:i:s', trim($message['receive_time'])) : date('Y-m-d H:i:s', time()),
+                            'Submit_time'      => isset($task[0]['create_time']) ? date('Y-m-d H:i:s', trim($task[0]['create_time'])) : date('Y-m-d H:i:s', time()),
+                        ])); //写入用户带处理日志
+                    } else {
+                        $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
+                            'task_no'        => trim($task[0]['task_no']),
+                            'status_message' => $stat,
+                            'message_info'   => $message_info,
+                            'mobile'         => trim($message['mobile']),
+                            // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                            'send_time'      => isset($message['receive_time']) ? date('Y-m-d H:i:s', trim($message['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        ])); //写入用户带处理日志
+                    }
+                }
+                // $send_log['stat'] = $stat;
+                // print_r($send_log);
+
+                // {"mobile":"13637077496","mar_task_id":401771,"content":"\u3010\u5170\u853b\u4f1a\u5458\u5c0f\u52a9\u624b\u3011\u79cb\u5206\u65f6\u8282\uff0c\u7a7a\u6c14\u6108\u53d1\u5e72\u71e5\uff0c\u6ce8\u610f\u4fdd\u6e7f\u5f88\u91cd\u8981\uff01\n\u5c0f\u52a9\u624b\u6e29\u99a8\u63d0\u9192\uff0c\u4e0d\u4ec5\u6bcf\u5929\u8981\u559d8\u676f\u6c34\uff0c\u808c\u80a4\u4e5f\u8981\u6ce8\u610f\u8865\u6c34\u54e6~\u5170\u853b\u613f\u60a8\u62e5\u6709\u6c34\u6da6\u808c\u80a4\uff0c\u4e50\u4eab\u79cb\u5929\uff01","from":"yx_user_send_task","send_msg_id":"03000620020200922133406169555","uid":278,"send_num":100,"task_no":"mar20092213340439853926","develop_code":"3647","my_submit_time":1600760315,"Msg_Id":"260455910423723120","Stat":"DELIVRD","Submit_time":"0101010000","Done_time":"2009221538","receive_time":1600760321,"develop_no":"","stat":"DELIVRD"}
+                $send_log = [];
+                $send_log = [
+                    'mobile' => trim($message['mobile']),
+                    'mar_task_id' => $task[0]['id'],
+                    'content' => $task[0]['task_content'],
+                    'from' => "yx_user_send_task",
+                    'send_msgid'        => $task[0]['send_msg_id'],
+                    'uid'        => $task[0]['uid'],
+                    'send_num'        => $task[0]['send_num'],
+                    'task_no'        => $task[0]['task_no'],
+                    'develop_code'        => $task[0]['develop_code'],
+                    'my_submit_time'        => time() - mt_rand(0, 30),
+                    'Msg_Id'        => $message['Msg_Id'],
+                    'Stat'        => $message['Stat'],
+                    'Submit_time'        => $message['Submit_time'],
+                    'Done_time'        => $message['receive_time'],
+                    'develop_no'        => $task[0]['develop_code'],
+                    'stat'        => $message['Stat'],
+                ];
+                $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode($send_log)); //写入通道处理日志
+            }
+        } catch (\Exception $th) {
+            //throw $th;
+            $redis->rpush('index:meassage:code:unknow:deliver:' . $channel_id, json_encode($message));
+            exception($th);
         }
     }
 }
