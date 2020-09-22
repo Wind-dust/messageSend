@@ -104,7 +104,7 @@ class CmppNorm extends Pzlife
         fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
         fwrite($myfile, " Begin" . "\n");
         fclose($myfile);
-        
+
         // $content = 0;
 
         // // print_r($contdata);die;
@@ -116,11 +116,11 @@ class CmppNorm extends Pzlife
         $Dest_Id              = $contdata['channel_dest_id']; //短信接入码 短信端口号
         $Sequence_Id          = 1;
         // $SP_ID                = $contdata['SP_ID'];
-        $master_num           = isset($contdata['channel_flow_velocity']) ? $contdata['channel_flow_velocity']: 300; //通道最大提交量
+        $master_num           = isset($contdata['channel_flow_velocity']) ? $contdata['channel_flow_velocity'] : 300; //通道最大提交量
         $security_coefficient = 1; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
         $miao = 1000000;
-        $redis->set('channel_'.$content,$Sequence_Id);
+        $redis->set('channel_' . $content, $Sequence_Id);
         // echo $miao- $miao * 0.0012;die;
         $sleep_time = ceil($miao / $security_master);
         // echo $sleep_time;die;
@@ -136,12 +136,11 @@ class CmppNorm extends Pzlife
             socket_set_nonblock($socket); //设置非阻塞模式
             // $pos          = 0;
             $i           = 1;
-            $Sequence_Id = $redis->get('channel_'.$content);
+            $Sequence_Id = $redis->get('channel_' . $content);
             if (empty($Sequence_Id)) {
                 $Sequence_Id = 1;
-               
             }
-            $redis->set('channel_'.$content,$Sequence_Id+1);
+            $redis->set('channel_' . $content, $Sequence_Id + 1);
             //先进行连接验证
             date_default_timezone_set('PRC');
             $time                = 0;
@@ -326,7 +325,6 @@ class CmppNorm extends Pzlife
                         $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                         socket_write($socket, $headData, $Total_Length);
                         $receive = 2;
-                        
                     } else if ($head['Command_Id'] == 0x80000008) {
                         // echo "激活测试应答" . "\n"; //激活测试,无消息体结构
                     } else if ($head['Command_Id'] == 0x00000002) {
@@ -343,8 +341,8 @@ class CmppNorm extends Pzlife
                 }
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
                     while (true) {
-                        $Sequence_Id = $redis->get('channel_'.$content);
-                        $redis->set('channel_'.$content,$Sequence_Id+1);
+                        $Sequence_Id = $redis->get('channel_' . $content);
+                        $redis->set('channel_' . $content, $Sequence_Id + 1);
                         try {
                             $receive = 1;
                             //先接收
@@ -526,7 +524,6 @@ class CmppNorm extends Pzlife
                                         $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                         socket_write($socket, $headData, $Total_Length);
                                         $receive = 2;
-                                        
                                     } else if ($head['Command_Id'] == 0x80000008) {
                                         // echo "激活测试应答" . "\n"; //激活测试,无消息体结构
                                     } else if ($head['Command_Id'] == 0x00000002) {
@@ -569,11 +566,11 @@ class CmppNorm extends Pzlife
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
                                 // // print_r($code);die;
                                 if (strlen($code) > 140) {
-                                    $pos = $redis->get('channel_pos_'.$content);
+                                    $pos = $redis->get('channel_pos_' . $content);
                                     $pos = isset($pos) ? $pos : 0;
-                                    $redis->set('channel_pos_'.$content, $pos+1);
+                                    $redis->set('channel_pos_' . $content, $pos + 1);
                                     if ($pos + 1 > 100) {
-                                        $redis->set('channel_pos_'.$content, 0);
+                                        $redis->set('channel_pos_' . $content, 0);
                                     }
                                     $num_messages = ceil(strlen($code) / $max_len);
                                     for ($j = 0; $j < $num_messages; $j++) {
@@ -618,16 +615,17 @@ class CmppNorm extends Pzlife
                                         socket_write($socket, $headData . $bodyData, $Total_Length);
                                         $send_status = 2;
                                         ++$i;
-                                        ++$Sequence_Id;
-                                        if ($Sequence_Id > 65536) {
+                                        $Sequence_Id = $redis->get('channel_' . $content);
+                                        $redis->set('channel_' . $content, $Sequence_Id + 1);
+                                        if ($Sequence_Id + 1 > 65536) {
                                             $Sequence_Id = 1;
-                                            $redis->set('channel_'.$content,$Sequence_Id);
+                                            $redis->set('channel_' . $content, $Sequence_Id);
                                         }
                                     }
                                     if ($i > $security_master) {
                                         $i    = 0;
                                     }
-                                   
+
                                     // usleep(2500);
                                     continue;
                                 } else { //单条短信
@@ -692,7 +690,7 @@ class CmppNorm extends Pzlife
                             // $redis->set('channel_'.$content,$Sequence_Id);
                             if ($Sequence_Id > 65536) {
                                 $Sequence_Id = 1;
-                                $redis->set('channel_'.$content,$Sequence_Id);
+                                $redis->set('channel_' . $content, $Sequence_Id);
                             }
                         }
                         //捕获异常
