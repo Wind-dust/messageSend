@@ -12748,7 +12748,7 @@ class CmppCreateCodeTask extends Pzlife
                 $message['my_submit_time'] = '1599449679';
                 $redis->rpush('index:meassage:code:new:deliver:' . $channel_id, json_encode($message));
             } else {
-                $redis->rpush('index:meassage:code:new:deliver:' . $channel_id, json_encode($message));
+                $redis->rpush('index:meassage:code:send:' . $channel_id, json_encode($message));
             }
         }
     }
