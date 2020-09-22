@@ -12765,7 +12765,7 @@ class CmppCreateCodeTask extends Pzlife
                     exit('退出');
                 }
                 $message = json_decode($message, true);
-                $mobile = trim($mesage['mobile']);
+                $mobile = trim($message['mobile']);
                 $task_log = Db::query("SELECT `task_no` FROM  `yx_user_send_task_log` WHERE `mobile` = '" . $mobile . "' ORDER BY `id` DESC LIMIT 1 ");
                 if (empty($task_log)) {
                     continue;
