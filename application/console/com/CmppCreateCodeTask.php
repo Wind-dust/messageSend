@@ -12777,6 +12777,11 @@ class CmppCreateCodeTask extends Pzlife
                     continue;
                 }
                 $stat = $message['Stat'];
+                if (trim($stat) == 'DELIVRD') {
+                    $message_info = '发送成功';
+                } else {
+                    $message_info = '发送失败';
+                }
                 if ($user[0]['pid'] == 137) {
                     // print_r($stat);die;
 
