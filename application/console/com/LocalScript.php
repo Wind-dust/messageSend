@@ -2882,8 +2882,8 @@ class LocalScript extends Pzlife
         return $newres;
     }
 
-    // 计费核对
-    public function checkSendStatus()
+    // 行业计费核对
+    public function checkSendStatusForBusiness()
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         try {
@@ -3044,6 +3044,94 @@ class LocalScript extends Pzlife
             exception($th);
         }
     }
+
+    public function checkSendStatusForMarketing()
+    {
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        try {
+            //code...
+            while (true) {
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (190,191) "); //道信核对
+                $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
+
+                //营销
+                foreach ($uids as $key => $value) {
+                    // $start_time = (int) strtotime('-3 days', strtotime(date('Y-m-d', time())));
+                    $start_time = (int) strtotime('2020-09-01');
+                    if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
+                        continue;
+                    }
+                    while (true) {
+                        $end_time    = $start_time + 86400;
+                        $timekey     = date('Ymd', $start_time);
+                        $business_id = 5;
+                        // echo "uid:" . $value['id'] . "" . "timekey:" . $timekey;
+                        // echo "\n";
+                        if ($end_time > time()) {
+                            // break;
+                            $end_time             = time();
+                            $day_marketing_result = $this->selectSendResultForMarketing($value['id'], $value['pid'], $start_time, $end_time);
+                            if ($day_marketing_result == false) {
+                                break;
+                            }
+                            $day_marketing_result['uid']         = $value['id'];
+                            $day_marketing_result['timekey']     = $timekey;
+                            $day_marketing_result['business_id'] = $business_id;
+                            $has                                 = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                            if ($has) {
+                                Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                                    'success'     => $day_marketing_result['success'],
+                                    'unknown'     => $day_marketing_result['unknown'],
+                                    'default'     => $day_marketing_result['default'],
+                                    'num'         => $day_marketing_result['num'],
+                                    'mobile_num'  => $day_marketing_result['mobile_num'],
+                                    'ratio'       => $day_marketing_result['ratio'],
+                                    'update_time' => time(),
+                                ]);
+                            } else {
+                                Db::table('yx_statistics_day')->insert($day_marketing_result);
+                            }
+                            break;
+                            //
+                        }
+
+                        $day_marketing_result = $this->selectSendResultForMarketing($value['id'], $value['pid'], $start_time, $end_time);
+                        if ($day_marketing_result == false) {
+                            $start_time = $end_time;
+                            continue;
+                        }
+                        $day_marketing_result['uid']         = $value['id'];
+                        $day_marketing_result['timekey']     = $timekey;
+                        $day_marketing_result['business_id'] = $business_id;
+                        $day_marketing_result['create_time'] = time();
+                        $day_marketing_result['update_time'] = time();
+                        $has                                 = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                        if ($has) {
+                            Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                                'success'     => $day_marketing_result['success'],
+                                'unknown'     => $day_marketing_result['unknown'],
+                                'default'     => $day_marketing_result['default'],
+                                'num'         => $day_marketing_result['num'],
+                                'mobile_num'  => $day_marketing_result['mobile_num'],
+                                'ratio'       => $day_marketing_result['ratio'],
+                                'update_time' => time(),
+                            ]);
+                        } else {
+                            Db::table('yx_statistics_day')->insert($day_marketing_result);
+                        }
+                        // print_r($day_marketing_result);
+                        // die;
+                        $start_time = $end_time;
+                    }
+                }
+                sleep(900);
+            }
+        } catch (\Exceptixon $th) {
+            //throw $th;
+            exception($th);
+        }
+    }
+
 
     public function checkSendFreeForMonth()
     {
@@ -3630,7 +3718,7 @@ class LocalScript extends Pzlife
             $insert_data = [
                 'mobile' => $value['mobile'],
                 'source' => 2,
-                'remark' => '发送频次超过3次',
+                'remark' => '发送频次超过2次',
                 'create_time' => time()
             ];
             Db::table('yx_whitelist')->insert($insert_data);
