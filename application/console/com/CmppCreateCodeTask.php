@@ -12841,13 +12841,13 @@ class CmppCreateCodeTask extends Pzlife
                     'uid'        => $task[0]['uid'],
                     'send_num'        => $task[0]['send_num'],
                     'task_no'        => $task[0]['task_no'],
-                    'develop_code'        => $task[0]['develop_code'],
+                    'develop_code'        => $task[0]['develop_no'],
                     'my_submit_time'        => time() - mt_rand(0, 30),
                     'Msg_Id'        => $message['Msg_Id'],
                     'Stat'        => $message['Stat'],
                     'Submit_time'        => $message['Submit_time'],
                     'Done_time'        => $message['receive_time'],
-                    'develop_no'        => $task[0]['develop_code'],
+                    'develop_no'        => $task[0]['develop_no'],
                     'stat'        => $message['Stat'],
                 ];
                 $redis->rpush('index:meassage:code:cms:deliver:' . $channel_id, json_encode($send_log)); //写入通道处理日志
