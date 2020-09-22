@@ -505,7 +505,7 @@ class CmppNorm extends Pzlife
                                                 $mesage['mobile']   = isset($Msg_Content['Dest_terminal_Id']) ? $Msg_Content['Dest_terminal_Id'] : '';
                                                 $mesage['receive_time'] = time(); //回执时间戳
                                                 $mesage['Msg_Id']   = $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2'];
-                                                // $redis->rPush($redisMessageUnKownDeliver, json_encode($mesage));
+                                                $redis->rPush($redisMessageUnKownDeliver, json_encode($mesage));
                                             }
                                         }
                                         // print_r($mesage);
