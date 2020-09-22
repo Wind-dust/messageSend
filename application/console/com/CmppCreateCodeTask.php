@@ -10148,7 +10148,7 @@ class CmppCreateCodeTask extends Pzlife
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73755);
         $this->redis->rpush('index:meassage:sflmessage:sendtask', 73764); */
         $white_list = [
-            13918001944, 13023216322, 18616841500, 15021417314, 15000773110, 18217584060, 13585699417, 15800400970, 13472865840, 13611664019, 13636311653, 13701789119, 13764272451, 13801687321, 13816091848, 13817515864, 13818181256, 13916292097, 13917823241, 13918902911, 15000773110, 15800815262, 15921904656, 18800232095, 13918153000, 18817718456, 15000796805, 13681961185, 13681961185, 18817718456, 13918153000, 15000796805, 13162248755, 16621181441, 18501684687, 18521329177, 18521569417, 18621714497, 18621720742, 18618353064, 18618353064, 18013770122, 18019762207, 18121252120, 18918267758, 18918267758, 18817718456, 18618353064, 18602893299,15099630574,15150180286,15105518868,15852736815,15189366366
+            13918001944, 13023216322, 18616841500, 15021417314, 15000773110, 18217584060, 13585699417, 15800400970, 13472865840, 13611664019, 13636311653, 13701789119, 13764272451, 13801687321, 13816091848, 13817515864, 13818181256, 13916292097, 13917823241, 13918902911, 15000773110, 15800815262, 15921904656, 18800232095, 13918153000, 18817718456, 15000796805, 13681961185, 13681961185, 18817718456, 13918153000, 15000796805, 13162248755, 16621181441, 18501684687, 18521329177, 18521569417, 18621714497, 18621720742, 18618353064, 18618353064, 18013770122, 18019762207, 18121252120, 18918267758, 18918267758, 18817718456, 18618353064, 18602893299, 15099630574, 15150180286, 15105518868, 15852736815, 15189366366
         ];
         // echo "SELECT * FROM yx_sfl_send_task WHERE `mobile` IN (".join(',',$white_list).") ";die;
         // $tody_time = 1595491200;
@@ -10195,7 +10195,7 @@ class CmppCreateCodeTask extends Pzlife
                 $all_send_task = [];
                 $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (" . join(',', $ids) . ") ");
                 foreach ($all_send_task as $key => $value) {
-                     if (in_array(trim($value['mobile']), $white_list)) {
+                    if (in_array(trim($value['mobile']), $white_list)) {
                         continue;
                     }
                     $sendmessage = [];
@@ -10405,7 +10405,7 @@ class CmppCreateCodeTask extends Pzlife
                 if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                     continue;
                 }
-                 if (in_array(trim($value['mobile']), $white_list)) {
+                if (in_array(trim($value['mobile']), $white_list)) {
                     continue;
                 }
                 if (checkMobile($value['mobile']) != false) {
@@ -10633,7 +10633,7 @@ class CmppCreateCodeTask extends Pzlife
             15000773110,
             18217584060,
             13585699417,
-            15800400970, 13472865840, 13611664019, 13636311653, 13701789119, 13764272451, 13801687321, 13816091848, 13817515864, 13818181256, 13916292097, 13917823241, 13918902911, 15000773110, 15800815262, 15921904656, 18800232095, 13918153000, 18817718456, 15000796805, 13681961185, 13681961185, 18817718456, 13918153000, 15000796805, 13162248755, 16621181441, 18501684687, 18521329177, 18521569417, 18621714497, 18621720742, 18618353064, 18618353064, 18013770122, 18019762207, 18121252120, 18918267758, 18918267758, 18817718456, 18618353064, 18602893299, 15099630574, 15150180286, 15105518868,15852736815, 15189366366
+            15800400970, 13472865840, 13611664019, 13636311653, 13701789119, 13764272451, 13801687321, 13816091848, 13817515864, 13818181256, 13916292097, 13917823241, 13918902911, 15000773110, 15800815262, 15921904656, 18800232095, 13918153000, 18817718456, 15000796805, 13681961185, 13681961185, 18817718456, 13918153000, 15000796805, 13162248755, 16621181441, 18501684687, 18521329177, 18521569417, 18621714497, 18621720742, 18618353064, 18618353064, 18013770122, 18019762207, 18121252120, 18918267758, 18918267758, 18817718456, 18618353064, 18602893299, 15099630574, 15150180286, 15105518868, 15852736815, 15189366366
         ];
         $tody_time = strtotime(date("Ymd", time()));
         // $tody_time = strtotime('2020-08-18 16:00');
@@ -12715,12 +12715,12 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
-    public function channelSendInfo()
+    public function channelSendInfo($channel_id)
     {
         $redis = Phpredis::getConn();
-        $redis->rpush('index:meassage:code:send:147', '{"mobile":"18610956962","mar_task_id":3460842,"content":"\u3010\u5954\u9a70\u91d1\u878d\u3011\u60a8\u7684\u9a8c\u8bc1\u7801\u4e3a593000\uff0c\u8bf7\u60a8\u572820\u5206\u949f\u5185\u5b8c\u6210\u9a8c\u8bc1\u3002","from":"yx_user_send_code_task","send_msg_id":"21000630020200907112852169410","uid":264,"send_num":1,"task_no":"bus20090711284465711920","develop_code":"8662"}');
+        // $redis->rpush('index:meassage:code:send:147', '{"mobile":"18610956962","mar_task_id":3460842,"content":"\u3010\u5954\u9a70\u91d1\u878d\u3011\u60a8\u7684\u9a8c\u8bc1\u7801\u4e3a593000\uff0c\u8bf7\u60a8\u572820\u5206\u949f\u5185\u5b8c\u6210\u9a8c\u8bc1\u3002","from":"yx_user_send_code_task","send_msg_id":"21000630020200907112852169410","uid":264,"send_num":1,"task_no":"bus20090711284465711920","develop_code":"8662"}');
         while (true) {
-            $message = $redis->lpop('index:meassage:code:send:147');
+            $message = $redis->lpop('index:meassage:code:send:' . $channel_id);
             if (empty($message)) {
                 exit('退出');
             }
@@ -12740,12 +12740,16 @@ class CmppCreateCodeTask extends Pzlife
             /* for($i = 0; $i < $num; $i++){
                 $res = $redis->rpush("index:meassage:code:user:receive:" . $message['uid'], json_encode(['task_no' => $message['task_no'], 'msg_id' => $message['send_msg_id'], "status_message" => "INTERCEPT", "message_info" => "驳回", "send_time" => date("Y-m-d H:i:s", time()), 'mobile' => $message['mobile']]));
             } */
-            $message['Stat'] = 'INTERCEPT';
-            $message['Done_time'] = '2009071224';
-            $message['Done_time'] = '2009071224';
-            $message['receive_time'] = time();
-            $message['my_submit_time'] = '1599449679';
-            $redis->rpush('index:meassage:code:new:deliver:147', json_encode($message));
+            if ($message['uid'] == 190 || $message['uid'] == 191 || $message['uid'] == 245 || $message['uid'] == 287) {
+                $message['Stat'] = 'INTERCEPT';
+                $message['Done_time'] = '2009071224';
+                $message['Done_time'] = '2009071224';
+                $message['receive_time'] = time();
+                $message['my_submit_time'] = '1599449679';
+                $redis->rpush('index:meassage:code:new:deliver:' . $channel_id, json_encode($message));
+            } else {
+                $redis->rpush('index:meassage:code:new:deliver:' . $channel_id, json_encode($message));
+            }
         }
     }
 }
