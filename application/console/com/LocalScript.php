@@ -3128,6 +3128,7 @@ class LocalScript extends Pzlife
             }
         } catch (\Exceptixon $th) {
             //throw $th;
+            echo Db::getLastSQL();
             exception($th);
         }
     }
