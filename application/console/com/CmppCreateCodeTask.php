@@ -12859,4 +12859,56 @@ class CmppCreateCodeTask extends Pzlife
             exception($th);
         }
     }
+
+    public function unkonwnDeliverTest($channel_id)
+    {
+        try {
+            //code...
+            $redis = Phpredis::getConn();
+            $redis->rpush('index:meassage:code:unknow:deliver:145', '{"Stat":"DELIVRD","Submit_time":"0101010000","Done_time":"2009221445","mobile":"13810041198\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000","receive_time":1600757136,"Msg_Id":"260432473667660"}');
+
+            $i = 1;
+            $insert_data = [];
+            // die;
+            while (true) {
+                $message = $redis->lpop('index:meassage:code:unknow:deliver:' . $channel_id);
+                if (empty($message)) {
+                    // exit('退出');
+                    break;
+                }
+                $message = json_decode($message, true);
+                $mobile = trim($message['mobile']);
+
+
+
+                $stat = trim($message['Stat']);
+                $data = [];
+                $data = [
+                    'mobile' => $mobile,
+                    'status_message' => $stat,
+                ];
+                $insert_data[] = $data;
+                $i++;
+                if ($i > 100) {
+                    Db::table('yx_mobile_test')->insertAll($insert_data);
+                    $i = 1;
+                    $insert_data = [];
+                };
+                /* if (trim($stat) == 'DELIVRD') {
+                    $message_info = '发送成功';
+                } else {
+                    $message_info = '发送失败';
+                } */
+            }
+            // print_r($insert_data);
+            // die;
+            if (!empty($insert_data)) {
+                Db::table('yx_mobile_test')->insertAll($insert_data);
+            }
+        } catch (\Exception $th) {
+            //throw $th;
+            $redis->rpush('index:meassage:code:unknow:deliver:' . $channel_id, json_encode($message));
+            exception($th);
+        }
+    }
 }
