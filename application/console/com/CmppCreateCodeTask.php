@@ -12894,11 +12894,6 @@ class CmppCreateCodeTask extends Pzlife
                     $i = 1;
                     $insert_data = [];
                 };
-                /* if (trim($stat) == 'DELIVRD') {
-                    $message_info = '发送成功';
-                } else {
-                    $message_info = '发送失败';
-                } */
             }
             // print_r($insert_data);
             // die;
@@ -12908,6 +12903,58 @@ class CmppCreateCodeTask extends Pzlife
         } catch (\Exception $th) {
             //throw $th;
             $redis->rpush('index:meassage:code:unknow:deliver:' . $channel_id, json_encode($message));
+            exception($th);
+        }
+    }
+
+    public function sendDeliverStatus()
+    {
+        try {
+            ini_set('memory_limit', '3072M');
+            $redis = Phpredis::getConn();
+            $status = Db::query('SELECT `mobile`,`status_message` FROM yx_mobile_test GROUP BY `mobile`,`status_message`');
+            $mobile = [];
+            $mobile_status = [];
+            foreach ($status as $key => $value) {
+                $mobile[] = $value['mobile'];
+                $mobile_status[$value['mobile']] = $value['status_message'];
+            }
+
+            $task = Db::query("SELECT * FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '278' AND `id` >= '378548'");
+            foreach ($task as $key => $value) {
+                $send_len = 0;
+                $send_len = mb_strlen($value['task_content']);
+                $s_num = 1;
+                if ($send_len > 70) {
+                    $s_num = ceil($send_len / 67);
+                }
+                $mobile_content = [];
+                $mobile_content = explode(',', $value['mobile_content']);
+                foreach ($mobile_content as $mkey => $mvalue) {
+                    if (in_array($mvalue, $mobile)) {
+                        $stat = $mobile_status[$mvalue];
+                        if (trim($stat) == 'DELIVRD') {
+                            $message_info = '发送成功';
+                        } else {
+                            $message_info = '发送失败';
+                        }
+                        for ($a = 0; $a < $s_num; $a++) {
+                            $redis->rpush('index:meassage:code:user:receive:' . $value['uid'], json_encode([
+                                'task_no'        => trim($value['task_no']),
+                                'status_message' => $stat,
+                                'message_info'   => $message_info,
+                                'mobile'         => trim($mvalue),
+                                'msg_id'         => trim($value['send_msg_id']),
+                                // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                'send_time'      =>  date('Y-m-d H:i:s', $value['create_time'] + mt_rand(20, 1800)),
+                                'smsCount' => $s_num,
+                                'smsIndex' => $a + 1,
+                            ])); //写入用户带处理日志
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $th) {
             exception($th);
         }
     }
