@@ -465,11 +465,11 @@ class CmppCreateCodeTask extends Pzlife
                     }
                     $real_num = 0;
                     $real_num += $real_length * $sendTask['send_num'];
-                    $yidong_channel_id   = 0;
+                    // $yidong_channel_id   = 0;
                     $yidong_channel_id   = $sendTask['yidong_channel_id'];
-                    $liantong_channel_id = 0;
+                    // $liantong_channel_id = 0;
                     $liantong_channel_id = $sendTask['liantong_channel_id'];
-                    $dianxin_channel_id  = 0;
+                    // $dianxin_channel_id  = 0;
                     $dianxin_channel_id  = $sendTask['dianxin_channel_id'];
                     // $error_mobile        = [];
                     if (strpos($sendTask['task_content'], '验证码')  !== false || strpos($sendTask['task_content'], '生日')) {
@@ -994,11 +994,11 @@ class CmppCreateCodeTask extends Pzlife
                     // }
                     $real_num = 0;
                     $real_num += $real_length * $sendTask['send_num'];
-                    $yidong_channel_id   = 0;
+                    // $yidong_channel_id   = 0;
                     $yidong_channel_id   = $sendTask['yidong_channel_id'];
-                    $liantong_channel_id = 0;
+                    // $liantong_channel_id = 0;
                     $liantong_channel_id = $sendTask['liantong_channel_id'];
-                    $dianxin_channel_id  = 0;
+                    // $dianxin_channel_id  = 0;
                     $dianxin_channel_id  = $sendTask['dianxin_channel_id'];
                     $send_content  = '';
                     // if (file_exists(realpath("") . '/tasklog/multimedia/' . $sendTask['task_no'] . ".txt")) {
@@ -3667,11 +3667,11 @@ class CmppCreateCodeTask extends Pzlife
                     $mobilesend  = array_filter($mobilesend);
                     $send_length = mb_strlen($sendTask['task_content'], 'utf8');
                     // $channel_id    = 0;
-                    $yidong_channel_id   = 0;
+                    // $yidong_channel_id   = 0;
                     $yidong_channel_id   = $sendTask['yidong_channel_id'];
-                    $liantong_channel_id = 0;
+                    // $liantong_channel_id = 0;
                     $liantong_channel_id = $sendTask['liantong_channel_id'];
-                    $dianxin_channel_id  = 0;
+                    // $dianxin_channel_id  = 0;
                     $dianxin_channel_id  = $sendTask['dianxin_channel_id'];
                     // if (empty($channel_id)) {
                     //     continue;
