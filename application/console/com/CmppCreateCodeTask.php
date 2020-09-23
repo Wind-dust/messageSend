@@ -11651,7 +11651,7 @@ class CmppCreateCodeTask extends Pzlife
             $all_report = '';
             $receipt_reports = [];
             $j = 1;
-            $Received =  [
+            /*  $Received =  [
                 'REJECTD',
                 'REJECT',
                 'MA:0001',
@@ -11666,7 +11666,7 @@ class CmppCreateCodeTask extends Pzlife
                 '4442',
                 '4446',
                 '4014'
-            ];
+            ]; */
             $task_receipt = Db::query("SELECT `*` FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `create_time` >= " . $time . " AND `create_time` <= " . $end_time . ")  ORDER BY `task_id` DESC");
             /* echo "SELECT `*` FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM yx_user_send_task WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `create_time` >= ".$time." AND `create_time` <= ".$end_time."  ORDER BY `id` DESC)";die; */
             foreach ($task_receipt as $key => $value) {
@@ -12772,10 +12772,11 @@ class CmppCreateCodeTask extends Pzlife
                 }
                 $task_no = $task_log[0]['task_no'];
                 $task =  Db::query("SELECT `*` FROM  `yx_user_send_task` WHERE `task_no` = '" . $task_no . "' LIMIT 1 ");
-                $user = Db::query("SELECT `pid`,`need_receipt_cmpp` FROM yx_users WHERE `id` = " . $task[0]['uid']);
                 if (Db::query("SELECT `id` FROM yx_send_task_receipt WHERE  `mobile` = '" . $mobile . "' AND `task_id` = '" . $task[0]['id'] . "' ")) {
                     continue;
                 }
+                $user = Db::query("SELECT `pid`,`need_receipt_cmpp` FROM yx_users WHERE `id` = " . $task[0]['uid']);
+
                 $stat = $message['Stat'];
                 if (trim($stat) == 'DELIVRD') {
                     $message_info = '发送成功';
