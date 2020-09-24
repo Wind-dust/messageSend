@@ -962,7 +962,7 @@ class SflUpload extends Pzlife
                         exception($e);
                     }
                 }
-                $deduct = ceil(9545373 / 13545753 * 100);
+                $deduct = ceil(3000000 / 4143015 * 100);
 
                 /* 扣量 */
                 // $all_num = [0,1,2,3,4];
@@ -1437,7 +1437,7 @@ class SflUpload extends Pzlife
                                             continue;
                                         }
                                         // $MMSmessage[] = $MMS_real_send;
-                                        if ($save_type == 'redis') {
+                                        /*    if ($save_type == 'redis') {
                                             if (in_array($tvalue[3], $white_list)) {
                                                 $redis->rpush('sftp:sfl:MMS:whitesendtask', json_encode($MMS_real_send));
                                             } else {
@@ -1448,22 +1448,23 @@ class SflUpload extends Pzlife
                                                 }
                                             }
                                         } else {
-                                            $MMSmessage[] = $MMS_real_send;
-                                            // print_r($content);die;
-                                            $j++;
-                                            if ($j > 100) {
-                                                $mysql_connect->startTrans();
-                                                try {
-                                                    $mysql_connect->table('yx_sfl_multimedia_message')->insertAll($MMSmessage);
-                                                    unset($MMSmessage);
-                                                    $j = 1;
-                                                    $mysql_connect->commit();
-                                                } catch (\Exception $e) {
-                                                    exception($e);
-                                                }
-                                                // $this->redis->rPush('index:meassage:business:sendtask', $send);
-
+                                           
+                                        } */
+                                        $MMSmessage[] = $MMS_real_send;
+                                        // print_r($content);die;
+                                        $j++;
+                                        if ($j > 100) {
+                                            $mysql_connect->startTrans();
+                                            try {
+                                                $mysql_connect->table('yx_sfl_multimedia_message')->insertAll($MMSmessage);
+                                                unset($MMSmessage);
+                                                $j = 1;
+                                                $mysql_connect->commit();
+                                            } catch (\Exception $e) {
+                                                exception($e);
                                             }
+                                            // $this->redis->rPush('index:meassage:business:sendtask', $send);
+
                                         }
                                         /*  if ($tvalue[3] == "") {
 
@@ -1741,7 +1742,7 @@ class SflUpload extends Pzlife
                                                 $content = $content . " /回T退订";
                                             } elseif ($tvalue[2] == '100183751') {
                                                 $content = $content . " /回T退订";
-                                            } elseif ($tvalue[2] == '100183752') {
+                                            } elseif ($tvalue[2] == '100184586') {
                                                 $content = $content . " /回T退订";
                                             } elseif ($tvalue[2] == '100184475') {
                                                 $content = $content . " /回T退订";
