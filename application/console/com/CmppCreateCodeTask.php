@@ -12866,9 +12866,10 @@ class CmppCreateCodeTask extends Pzlife
             ini_set('memory_limit', '3072M');
             //code...
             $redis = Phpredis::getConn();
-            // $redis->rpush('index:meassage:code:unknow:deliver:145', '{"Stat":"DELIVRD","Submit_time":"0101010000","Done_time":"2009221445","mobile":"13810041198\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000","receive_time":1600757136,"Msg_Id":"260432473667660"}');
-           /*  $status = Db::query("SELECT `mobile`,`status_message` FROM `messagesend`.`yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '278' AND `id` >= '378548') GROUP BY `mobile`,`status_message`");
             $i = 1;
+            // $redis->rpush('index:meassage:code:unknow:deliver:145', '{"Stat":"DELIVRD","Submit_time":"0101010000","Done_time":"2009221445","mobile":"13810041198\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000","receive_time":1600757136,"Msg_Id":"260432473667660"}');
+            /*  $status = Db::query("SELECT `mobile`,`status_message` FROM `messagesend`.`yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '278' AND `id` >= '378548') GROUP BY `mobile`,`status_message`");
+           
             $insert_data = [];
             // die;
             foreach ($status as $key => $value) {
@@ -12950,14 +12951,13 @@ class CmppCreateCodeTask extends Pzlife
                 $mobile_content = explode(',', $value['mobile_content']);
                 foreach ($mobile_content as $mkey => $mvalue) {
                     if (!in_array($mvalue, $mobile)) {
-                        $num = mt_rand(0,45);
+                        $num = mt_rand(0, 45);
                         if ($num < 2) {
                             continue;
-                           
-                        }elseif($num >= 2 && $num <6){
+                        } elseif ($num >= 2 && $num < 6) {
                             $stat = 'UNDELIV';
                             $message_info = '发送失败';
-                        }else{
+                        } else {
                             $stat = 'DELIVRD';
                             $message_info = '发送成功';
                         }
@@ -12988,17 +12988,18 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
-    public function sendChenckMobile (){
+    public function sendChenckMobile()
+    {
         ini_set('memory_limit', '3072M');
         $redis = Phpredis::getConn();
         // $redis->rpush('index:meassage:code:send:0','{"mobile":"13527862529","mar_task_id":3988226,"content":"\u3010\u5170\u853b\u4eac\u4e1c\u81ea\u8425\u65d7\u8230\u5e97\u3011\u611f\u8c22\u60a8\u9009\u62e9\u5170\u853b\u4eac\u4e1c\u81ea\u8425\u65d7\u8230\u5e97\uff01\u4e3a\u4e86\u7ed9\u60a8\u63d0\u4f9b\u66f4\u597d\u7684\u670d\u52a1\uff0c\u8bda\u9080\u60a8\u5bf9\u672c\u6b21\u8d2d\u7269\u4f53\u9a8c\u505a\u51fa\u8bc4\u4ef7\uff1a10\u6ee1\u610f 8\u4e00\u822c 6\u4e0d\u6ee1\u610f\uff1b\u56de\u590d\u6570\u5b57\u53ca\u5177\u4f53\u610f\u89c1\uff0c\u5373\u53ef\u53c2\u4e0e\u8bc4\u4ef7\u3002\n\n\u5173\u6ce8\u5170\u853b\u4eac\u4e1c\u81ea\u8425\u65d7\u8230\u5e97\uff0c\u66f4\u591a\u4e13\u5c5e\u6743\u76ca\u7b49\u4f60\u89e3\u9501\uff01\u56deTD\u9000\u8ba2","from":"yx_user_send_code_task","send_msg_id":"03000420020200923151533169599","uid":276,"send_num":100,"task_no":"bus20092315152892704859","develop_code":"2863"}');
         try {
-            while(true){
+            while (true) {
                 $send = $redis->lpop('index:meassage:code:send:0');
                 if (empty($send)) {
-                break;
+                    break;
                 }
-                $send = json_decode($send,true);
+                $send = json_decode($send, true);
                 if ($send['mar_task_id'] < 3988238) {
                     continue;
                 }
@@ -13011,16 +13012,16 @@ class CmppCreateCodeTask extends Pzlife
                 if ($newres) {
                     if ($newres['source'] == 1) { //移动
                         // $channel_id = $yidong_channel_id;
-                       $redis->rpush('index:meassage:code:send:143',json_encode($send));
+                        $redis->rpush('index:meassage:code:send:143', json_encode($send));
                     } elseif ($newres['source'] == 2) { //联通
                         // $channel_id = $liantong_channel_id;
-                        $redis->rpush('index:meassage:code:send:144',json_encode($send));
+                        $redis->rpush('index:meassage:code:send:144', json_encode($send));
                     } elseif ($newres['source'] == 3) { //电信
                         // $channel_id = $dianxin_channel_id;
-                        $redis->rpush('index:meassage:code:send:144',json_encode($send));
+                        $redis->rpush('index:meassage:code:send:144', json_encode($send));
                     }
                 } else {
-                    $redis->rpush('index:meassage:code:send:143',json_encode($send));
+                    $redis->rpush('index:meassage:code:send:143', json_encode($send));
                 }
             }
         } catch (\EXception $th) {
