@@ -12867,7 +12867,7 @@ class CmppCreateCodeTask extends Pzlife
             //code...
             $redis = Phpredis::getConn();
             // $redis->rpush('index:meassage:code:unknow:deliver:145', '{"Stat":"DELIVRD","Submit_time":"0101010000","Done_time":"2009221445","mobile":"13810041198\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000","receive_time":1600757136,"Msg_Id":"260432473667660"}');
-            $status = Db::query("SELECT `mobile`,`status_message` FROM `messagesend`.`yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '278' AND `id` >= '378548') GROUP BY `mobile`,`status_message`");
+           /*  $status = Db::query("SELECT `mobile`,`status_message` FROM `messagesend`.`yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '278' AND `id` >= '378548') GROUP BY `mobile`,`status_message`");
             $i = 1;
             $insert_data = [];
             // die;
@@ -12887,7 +12887,7 @@ class CmppCreateCodeTask extends Pzlife
             }
             if (!empty($insert_data)) {
                 Db::table('yx_mobile_test')->insertAll($insert_data);
-            }
+            } */
             while (true) {
                 $message = $redis->lpop('index:meassage:code:unknow:deliver:' . $channel_id);
                 if (empty($message)) {
