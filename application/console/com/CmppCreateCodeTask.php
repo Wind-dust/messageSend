@@ -12398,9 +12398,9 @@ class CmppCreateCodeTask extends Pzlife
         try {
             while (true) {
                 // $time = strtotime(date('Y-m-d 0:00:00', time()));
-                // $start_time = strtotime('2020-02-05 0:00:00');
+                $start_time = strtotime('2020-09-14 0:00:00');
 
-                $start_time   = strtotime("-3 day");
+                // $start_time   = strtotime("-3 day");
                 $start_time = $start_time + 60;
                 $end_time = $start_time + 300;
                 //行业
