@@ -12998,7 +12998,7 @@ class CmppCreateCodeTask extends Pzlife
                 if (empty($send)) {
                 break;
                 }
-                $send = json_decode($send);
+                $send = json_decode($send,true);
                 if ($send['mar_task_id'] < 3988238) {
                     continue;
                 }
