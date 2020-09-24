@@ -13023,8 +13023,9 @@ class CmppCreateCodeTask extends Pzlife
                     $redis->rpush('index:meassage:code:send:143',json_encode($send));
                 }
             }
-        } catch (\Throwable $th) {
+        } catch (\EXception $th) {
             //throw $th;
+            exception($th);
         }
     }
 }
