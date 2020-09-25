@@ -5095,7 +5095,203 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
+    public function insertInToTableBusiness()
+    {
+        $redis = Phpredis::getConn();
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        /*  $redis->rpush('index:message:receipt:yx_user_send_task', '{"mobile":"15201926171","task_no":"mar20073110021507111729","uid":"1","from":"yx_user_send_task","mar_task_id":"1","content":"Hi, \u4eb2\u7231\u7684\u4f1a\u5458\uff0c\u597d\u4e45\u4e0d\u89c1\uff0c\u60a8\u5df2\u7ecf\u6709\u4e09\u4e2a\u6708\u6ca1\u6765\u62a4\u7406\u4e86\uff0c\u79cb\u51ac\u5df2\u8fd1\uff0c\u6362\u5b63\u5f53\u524d\uff0c\u5728\u808c\u80a4\u9700\u8981\u201c\u8fdb\u8865\u201d\u7684\u5b63\u8282\u91cc\uff0c\u6765\u7f8e\u7530\u5373\u523b\u5f00\u542f\u6df1\u5ea6\u8865\u6c34\u6a21\u5f0f\u5427\uff01\u8054\u7cfb\u60a8\u8eab\u8fb9\u7684\u4e13\u5c5e\u5ba2\u6237\u7ecf\u7406\u6216\u62e8\u6253\u9884\u7ea6\u70ed\u7ebf 400-820-6142 \u56deT\u9000\u8ba2\u3010\u7f8e\u4e3d\u7530\u56ed\u3011","my_submit_time":1597427516,"Submit_time":"2007211521","Done_time":"2007211521","receive_time":1595316110,"develop_no":"","send_msg_id":"J343300020200731100217169012","Stat":["DELIVRD","DELIVRD"],"send_num":0,"channel_id":"18"}'); */
+        try {
+            $time = strtotime('2020-08-15');
+            while (true) {
+                $receipt = $redis->lpop('index:message:receipt:yx_user_send_code_task');
+                if (empty($receipt)) {
+                    sleep(1);
+                    continue;
+                }
 
+                $receipt = json_decode($receipt, true);
+                if (isset($receipt['send_msg_id']) && !empty($receipt['send_msg_id'])) {
+
+                    $strlen = 0;
+                    $strlen = mb_strlen($receipt['content']);
+                    if ($strlen > 70) {
+                        $allnum = 0;
+                        $allnum = ceil($strlen / 67);
+                        if ($receipt['my_submit_time'] > $time) {
+
+                            if ($receipt['send_num'] > 10) { //单批次超过10个号码
+                                if (in_array('DELIVRD', $receipt['Stat'])) {
+                                    for ($a = 0; $a < $allnum; $a++) {
+                                        $redis->rpush('index:meassage:code:user:receive:' . $receipt['uid'], json_encode([
+                                            'task_no'        => trim($receipt['task_no']),
+                                            'status_message' => 'DELIVRD',
+                                            'message_info'   => '发送成功',
+                                            'mobile'         => trim($receipt['mobile']),
+                                            'msg_id'         => trim($receipt['send_msg_id']),
+                                            // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                            'send_time'      => isset($receipt['receive_time']) ? date('Y-m-d H:i:s', trim($receipt['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                            'smsCount' => $allnum,
+                                            'smsIndex' => $a + 1,
+                                        ])); //写入用户带处理日志
+                                    }
+                                } else {
+                                    for ($a = 0; $a < $allnum; $a++) {
+                                        $redis->rpush('index:meassage:code:user:receive:' . $receipt['uid'], json_encode([
+                                            'task_no'        => trim($receipt['task_no']),
+                                            'status_message' => $receipt['Stat'][0],
+                                            'message_info'   => '发送失败',
+                                            'mobile'         => trim($receipt['mobile']),
+                                            'msg_id'         => trim($receipt['send_msg_id']),
+                                            // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                            'send_time'      => isset($receipt['receive_time']) ? date('Y-m-d H:i:s', trim($receipt['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                            'smsCount' => $allnum,
+                                            'smsIndex' => $a + 1,
+                                        ])); //写入用户带处理日志
+                                    }
+                                }
+                            } else {
+                                $stat = array_unique($receipt['Stat']);
+                                if (count($stat) > 1) { //多条不同回执
+                                    //   print_r($stat);die;
+                                    $stat = array_diff($stat, ['DELIVRD']);
+                                    if ($stat[0] == 'MK:1006') {
+                                        $stat[0] = 'DELIVRD';
+                                        $message_info = '发送成功';
+                                    } else {
+                                        $message_info = '发送失败';
+                                    }
+                                    // print_r($stat);die;
+                                    for ($a = 0; $a < $allnum; $a++) {
+                                        $redis->rpush('index:meassage:code:user:receive:' . $receipt['uid'], json_encode([
+                                            'task_no'        => trim($receipt['task_no']),
+                                            'status_message' => $stat[0],
+                                            'message_info'   => $message_info,
+                                            'mobile'         => trim($receipt['mobile']),
+                                            'msg_id'         => trim($receipt['send_msg_id']),
+                                            // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                            'send_time'      => isset($receipt['receive_time']) ? date('Y-m-d H:i:s', trim($receipt['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                            'smsCount' => $allnum,
+                                            'smsIndex' => $a + 1,
+                                        ])); //写入用户带处理日志
+                                    }
+                                } else {
+                                    if ($stat[0] == 'DELIVRD') {
+                                        $message_info = '发送成功';
+                                    } else {
+                                        $message_info = '发送失败';
+                                    }
+                                    for ($a = 0; $a < $allnum; $a++) {
+                                        $redis->rpush('index:meassage:code:user:receive:' . $receipt['uid'], json_encode([
+                                            'task_no'        => trim($receipt['task_no']),
+                                            'status_message' => $stat[0],
+                                            'message_info'   => $message_info,
+                                            'mobile'         => trim($receipt['mobile']),
+                                            'msg_id'         => trim($receipt['send_msg_id']),
+                                            // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                            'send_time'      => isset($receipt['receive_time']) ? date('Y-m-d H:i:s', trim($receipt['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                            'smsCount' => $allnum,
+                                            'smsIndex' => $a + 1,
+                                        ])); //写入用户带处理日志
+                                    }
+                                }
+                            }
+                        } else {
+                            $strlen = 0;
+                            $strlen = mb_strlen($receipt['content']);
+                            $allnum = 1;
+                            if ($strlen > 70) {
+                                $allnum = 0;
+                                $allnum = ceil($strlen / 67);
+                            }
+                            if (in_array('DELIVRD', $receipt['Stat'])) {
+                                for ($a = 0; $a < $allnum; $a++) {
+                                    $redis->rpush('index:meassage:code:user:receive:' . $receipt['uid'], json_encode([
+                                        'task_no'        => trim($receipt['task_no']),
+                                        'status_message' => 'DELIVRD',
+                                        'message_info'   => '发送成功',
+                                        'mobile'         => trim($receipt['mobile']),
+                                        'msg_id'         => trim($receipt['send_msg_id']),
+                                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                        'send_time'      => isset($receipt['receive_time']) ? date('Y-m-d H:i:s', trim($receipt['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                        'smsCount' => $allnum,
+                                        'smsIndex' => $a + 1,
+                                    ])); //写入用户带处理日志
+                                }
+                            } else {
+                                for ($a = 0; $a < $allnum; $a++) {
+                                    $redis->rpush('index:meassage:code:user:receive:' . $receipt['uid'], json_encode([
+                                        'task_no'        => trim($receipt['task_no']),
+                                        'status_message' => $receipt['Stat'][0],
+                                        'message_info'   => '发送失败',
+                                        'mobile'         => trim($receipt['mobile']),
+                                        'msg_id'         => trim($receipt['send_msg_id']),
+                                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                        'send_time'      => isset($receipt['receive_time']) ? date('Y-m-d H:i:s', trim($receipt['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                        'smsCount' => $allnum,
+                                        'smsIndex' => $a + 1,
+                                    ])); //写入用户带处理日志
+                                }
+                            }
+                        }
+                    } else {
+                        if (in_array('DELIVRD', $receipt['Stat'])) {
+                            $redis->rpush('index:meassage:code:user:receive:' . $receipt['uid'], json_encode([
+                                'task_no'        => trim($receipt['task_no']),
+                                'status_message' => 'DELIVRD',
+                                'message_info'   => '发送成功',
+                                'mobile'         => trim($receipt['mobile']),
+                                'msg_id'         => trim($receipt['send_msg_id']),
+                                // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                'send_time'      => isset($receipt['receive_time']) ? date('Y-m-d H:i:s', trim($receipt['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                'smsCount' => 1,
+                                'smsIndex' => 1,
+                            ])); //写入用户带处理日志
+                        } else {
+                            $redis->rpush('index:meassage:code:user:receive:' . $receipt['uid'], json_encode([
+                                'task_no'        => trim($receipt['task_no']),
+                                'status_message' => 'DELIVRD',
+                                'message_info'   => '发送成功',
+                                'mobile'         => trim($receipt['mobile']),
+                                'msg_id'         => trim($receipt['send_msg_id']),
+                                // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                'send_time'      => isset($receipt['receive_time']) ? date('Y-m-d H:i:s', trim($receipt['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                'smsCount' => 1,
+                                'smsIndex' => 1,
+                            ])); //写入用户带处理日志
+                        }
+                    }
+                } else {
+                    // in_array(trim($send_log['Stat']), ['REJECTD', 'REJECT', 'MA:0001', 'DB:0141'])
+                    if (in_array('DELIVRD', $receipt['Stat']) || in_array('DELIVRD', $receipt['Stat'])) {
+                        $redis->rpush('index:meassage:code:user:receive:' . $receipt['uid'], json_encode([
+                            'task_no'        => trim($receipt['task_no']),
+                            'status_message' => 'DELIVRD',
+                            'message_info'   => '发送成功',
+                            'mobile'         => trim($receipt['mobile']),
+                            'msg_id'         => trim($receipt['send_msg_id']) ? trim($receipt['send_msg_id']) : '',
+                            // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                            'send_time'      => isset($receipt['receive_time']) ? date('Y-m-d H:i:s', trim($receipt['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        ])); //写入用户带处理日志
+                    } else {
+                        $redis->rpush('index:meassage:code:user:receive:' . $receipt['uid'], json_encode([
+                            'task_no'        => trim($receipt['task_no']),
+                            'status_message' => 'DELIVRD',
+                            'message_info'   => '发送成功',
+                            'mobile'         => trim($receipt['mobile']),
+                            'msg_id'         =>  trim($receipt['send_msg_id']) ? trim($receipt['send_msg_id']) : '',
+                            // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                            'send_time'      => isset($receipt['receive_time']) ? date('Y-m-d H:i:s', trim($receipt['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        ])); //写入用户带处理日志
+                    }
+                }
+                /*  {"mobile":"13564869264","title":"\u7f8e\u4e3d\u7530\u56ed\u8425\u9500\u77ed\u4fe1","mar_task_id":"1599","content":"\u611f\u8c22\u60a8\u5bf9\u4e8e\u7f8e\u4e3d\u7530\u56ed\u7684\u4fe1\u8d56\u548c\u652f\u6301\uff0c\u4e3a\u4e86\u7ed9\u60a8\u5e26\u6765\u66f4\u597d\u7684\u670d\u52a1\u4f53\u9a8c\uff0c\u7279\u9080\u60a8\u9488\u5bf9\u672c\u6b21\u670d\u52a1\u8fdb\u884c\u8bc4\u4ef7http:\/\/crmapp.beautyfarm.com.cn\/questionNaire1\/api\/qnnaire\/refct?id=534478\uff0c\u8bf7\u60a8\u572824\u5c0f\u65f6\u5185\u63d0\u4ea4\u6b64\u95ee\u5377\uff0c\u8c22\u8c22\u914d\u5408\u3002\u671f\u5f85\u60a8\u7684\u53cd\u9988\uff01\u5982\u9700\u5e2e\u52a9\uff0c\u656c\u8bf7\u81f4\u7535400-8206-142\uff0c\u56deT\u9000\u8ba2\u3010\u7f8e\u4e3d\u7530\u56ed\u3011","Msg_Id":"","Stat":"DELIVER","Submit_time":"191224164036","Done_time":"191224164236","from":"yx_user_send_code_task"} */
+                $redis->rpush('index:meassage:code:cms:yx_user_send_task:deliver:', json_encode($receipt)); //写入通道处理日志
+            }
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
+        }
+    }
 
     public function updateLog($channel_id)
     {
@@ -9961,7 +10157,22 @@ class CmppCreateCodeTask extends Pzlife
 
     public function Bufa()
     {
-
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
+        $black_error_path = realpath("./") . "/newc.txt";
+        $black_error_file       = fopen($black_error_path, "r");
+        $black_error_mobile = [];
+        while (!feof($black_error_file)) {
+            $cellVal = trim(fgets($black_error_file));
+            if (!empty($cellVal)) {
+                $cellVal = str_replace('"', '', $cellVal);
+                $cellVal = trim($cellVal);
+                // print_r($cellVal);die;
+                $black_error_mobile[] = $cellVal;
+            }
+        }
+        // print_r(count($black_error_mobile))
+        fclose($black_error_file);
+        // print_r($black_error_mobile);die;
         $this->redis = Phpredis::getConn();
         /*  $res = $this->redis->rpush('index:meassage:code:send' . ":" . 145, json_encode([
             'mobile'      => 18335103753,
@@ -9972,14 +10183,14 @@ class CmppCreateCodeTask extends Pzlife
             'from'        => 'yx_user_send_task',
         ])); */
         try {
-            $bufa = Db::query("SELECT * FROM `yx_user_send_code_task` WHERE `id` >= '4010741' AND `uid` = '276' ");
+            $bufa = Db::query("SELECT * FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '291' AND `id` >= '406453'  ");
 
             foreach ($bufa as $key => $value) {
                 # code...
                 $mobile_content = explode(',', $value['mobile_content']);
 
                 foreach ($mobile_content as $mkey => $mvalue) {
-                    if (Db::query("SELECT * FROM `yx_send_code_task_receipt` WHERE `task_id` = '" . $value['id'] . "' AND `mobile` = '" . $mvalue . "' AND `status_message` = 'UNDELIV' ")) {
+                    if (in_array($mvalue,$black_error_mobile)) {
                         $prefix = '';
                         $prefix = substr(trim($mvalue), 0, 7);
                         $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
@@ -9988,14 +10199,14 @@ class CmppCreateCodeTask extends Pzlife
                         if ($res) {
                             $newres = array_shift($res);
                             if ($newres['source'] == 1) {
-                                $channel_id = 143;
+                                $channel_id = 145;
                             } elseif ($newres['source'] == 2) {
-                                $channel_id = 144;
+                                $channel_id = 146;
                             } elseif ($newres['source'] == 3) {
-                                $channel_id = 144;
+                                $channel_id = 146;
                             }
                         } else {
-                            $channel_id = 143;
+                            $channel_id = 145;
                         }
                         $sendmessage = [];
                         $sendmessage = [
@@ -10003,8 +10214,9 @@ class CmppCreateCodeTask extends Pzlife
                             'title'      => $value['task_name'],
                             'mobile'      => $mvalue,
                             'mar_task_id' => $value['id'],
+                            'uid' => $value['uid'],
                             'content'     => $value['task_content'],
-                            'from'        => 'yx_user_send_code_task',
+                            'from'        => 'yx_user_send_task',
                         ];
                         $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道 
                     }
