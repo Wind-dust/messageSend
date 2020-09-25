@@ -9964,7 +9964,7 @@ class CmppCreateCodeTask extends Pzlife
 
         $this->redis = Phpredis::getConn();
         $res = $this->redis->rpush('index:meassage:code:send' . ":" . 145, json_encode([
-            'mobile'      => 13818880899,
+            'mobile'      => 18335103753,
             'title'       => '【驰加汽车服务中心】尊敬的驰加会员，您的299元缤纷抵扣券包中还有礼券尚未使用。登录微信公众号“驰加汽车服务中心”查看礼券详情。点击 http://mrw.so/6r5hHO 即刻预约门店，退订回TD',
             'mar_task_id' => 406431,
             'content'     => '【驰加汽车服务中心】尊敬的驰加会员，您的299元缤纷抵扣券包中还有礼券尚未使用。登录微信公众号“驰加汽车服务中心”查看礼券详情。点击 http://mrw.so/6r5hHO 即刻预约门店，退订回TD',
