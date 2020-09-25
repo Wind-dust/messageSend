@@ -9963,15 +9963,15 @@ class CmppCreateCodeTask extends Pzlife
     {
 
         $this->redis = Phpredis::getConn();
-        $res = $this->redis->rpush('index:meassage:code:send' . ":" . 145, json_encode([
+        /*  $res = $this->redis->rpush('index:meassage:code:send' . ":" . 145, json_encode([
             'mobile'      => 18335103753,
             'title'       => '【驰加汽车服务中心】尊敬的驰加会员，您的299元缤纷抵扣券包中还有礼券尚未使用。登录微信公众号“驰加汽车服务中心”查看礼券详情。点击 http://mrw.so/6r5hHO 即刻预约门店，退订回TD',
             'mar_task_id' => 406431,
             'content'     => '【驰加汽车服务中心】尊敬的驰加会员，您的299元缤纷抵扣券包中还有礼券尚未使用。登录微信公众号“驰加汽车服务中心”查看礼券详情。点击 http://mrw.so/6r5hHO 即刻预约门店，退订回TD',
             'msg_id'        => '13000710020200925111943169151',
             'from'        => 'yx_user_send_task',
-        ]));
-        /*  try {
+        ])); */
+        try {
             $bufa = Db::query("SELECT * FROM `yx_user_send_code_task` WHERE `id` >= '4010741' AND `uid` = '276' ");
 
             foreach ($bufa as $key => $value) {
@@ -9979,7 +9979,7 @@ class CmppCreateCodeTask extends Pzlife
                 $mobile_content = explode(',', $value['mobile_content']);
 
                 foreach ($mobile_content as $mkey => $mvalue) {
-                    if (Db::query("SELECT `*` FROM `yx_send_code_task_receipt` WHERE `task_id` = '" . $value['id'] . "' AND `mobile` = '" . $mvalue . "' AND `status_message` = 'UNDELIV' ")) {
+                    if (Db::query("SELECT * FROM `yx_send_code_task_receipt` WHERE `task_id` = '" . $value['id'] . "' AND `mobile` = '" . $mvalue . "' AND `status_message` = 'UNDELIV' ")) {
                         $prefix = '';
                         $prefix = substr(trim($mvalue), 0, 7);
                         $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
@@ -9999,10 +9999,10 @@ class CmppCreateCodeTask extends Pzlife
                         }
                         $sendmessage = [];
                         $sendmessage = [
-                            'msg_id'      => $value['msg_id'],
-                            'title'      => $value['title'],
+                            'msg_id'      => $value['send_msg_id'],
+                            'title'      => $value['task_name'],
                             'mobile'      => $mvalue,
-                            'mar_task_id' => $value['mar_task_id'],
+                            'mar_task_id' => $value['id'],
                             'content'     => $value['task_content'],
                             'from'        => 'yx_user_send_code_task',
                         ];
@@ -10013,7 +10013,7 @@ class CmppCreateCodeTask extends Pzlife
         } catch (\EXception $th) {
             //throw $th;
             exception($th);
-        } */
+        }
     }
 
     /* SFL sftp 独立发送体系 */
