@@ -4747,7 +4747,7 @@ class CmppCreateCodeTask extends Pzlife
             exit;
         }
         $channel              = $this->getChannelinfo($channel_id);
-       /*  $redis->rpush($redisMessageCodeSend, '{"mobile":"15201926171","mar_task_id":"1","content":"Hi, \u4eb2\u7231\u7684\u4f1a\u5458\uff0c\u597d\u4e45\u4e0d\u89c1\uff0c\u60a8\u5df2\u7ecf\u6709\u4e09\u4e2a\u6708\u6ca1\u6765\u62a4\u7406\u4e86\uff0c\u79cb\u51ac\u5df2\u8fd1\uff0c\u6362\u5b63\u5f53\u524d\uff0c\u5728\u808c\u80a4\u9700\u8981\u201c\u8fdb\u8865\u201d\u7684\u5b63\u8282\u91cc\uff0c\u6765\u7f8e\u7530\u5373\u523b\u5f00\u542f\u6df1\u5ea6\u8865\u6c34\u6a21\u5f0f\u5427\uff01\u8054\u7cfb\u60a8\u8eab\u8fb9\u7684\u4e13\u5c5e\u5ba2\u6237\u7ecf\u7406\u6216\u62e8\u6253\u9884\u7ea6\u70ed\u7ebf 400-820-6142 \u56deT\u9000\u8ba2\u3010\u7f8e\u4e3d\u7530\u56ed\u3011","my_submit_time":1597248000,"Msg_Id":"2059229824357040145","Stat":"REJECTD","Submit_time":"2007211521","Done_time":"2007211521","receive_time":1595316110,"from":"yx_user_send_task","uid":"1","send_msg_id":"J343300020200731100217169012"}');
+        /*  $redis->rpush($redisMessageCodeSend, '{"mobile":"15201926171","mar_task_id":"1","content":"Hi, \u4eb2\u7231\u7684\u4f1a\u5458\uff0c\u597d\u4e45\u4e0d\u89c1\uff0c\u60a8\u5df2\u7ecf\u6709\u4e09\u4e2a\u6708\u6ca1\u6765\u62a4\u7406\u4e86\uff0c\u79cb\u51ac\u5df2\u8fd1\uff0c\u6362\u5b63\u5f53\u524d\uff0c\u5728\u808c\u80a4\u9700\u8981\u201c\u8fdb\u8865\u201d\u7684\u5b63\u8282\u91cc\uff0c\u6765\u7f8e\u7530\u5373\u523b\u5f00\u542f\u6df1\u5ea6\u8865\u6c34\u6a21\u5f0f\u5427\uff01\u8054\u7cfb\u60a8\u8eab\u8fb9\u7684\u4e13\u5c5e\u5ba2\u6237\u7ecf\u7406\u6216\u62e8\u6253\u9884\u7ea6\u70ed\u7ebf 400-820-6142 \u56deT\u9000\u8ba2\u3010\u7f8e\u4e3d\u7530\u56ed\u3011","my_submit_time":1597248000,"Msg_Id":"2059229824357040145","Stat":"REJECTD","Submit_time":"2007211521","Done_time":"2007211521","receive_time":1595316110,"from":"yx_user_send_task","uid":"1","send_msg_id":"J343300020200731100217169012"}');
         $redis->rpush($redisMessageCodeSend, '{"mobile":"15201926171","mar_task_id":"1","content":"Hi, \u4eb2\u7231\u7684\u4f1a\u5458\uff0c\u597d\u4e45\u4e0d\u89c1\uff0c\u60a8\u5df2\u7ecf\u6709\u4e09\u4e2a\u6708\u6ca1\u6765\u62a4\u7406\u4e86\uff0c\u79cb\u51ac\u5df2\u8fd1\uff0c\u6362\u5b63\u5f53\u524d\uff0c\u5728\u808c\u80a4\u9700\u8981\u201c\u8fdb\u8865\u201d\u7684\u5b63\u8282\u91cc\uff0c\u6765\u7f8e\u7530\u5373\u523b\u5f00\u542f\u6df1\u5ea6\u8865\u6c34\u6a21\u5f0f\u5427\uff01\u8054\u7cfb\u60a8\u8eab\u8fb9\u7684\u4e13\u5c5e\u5ba2\u6237\u7ecf\u7406\u6216\u62e8\u6253\u9884\u7ea6\u70ed\u7ebf 400-820-6142 \u56deT\u9000\u8ba2\u3010\u7f8e\u4e3d\u7530\u56ed\u3011","my_submit_time":1597248000,"Msg_Id":"2059229824357040146","Stat":"DELIVRD","Submit_time":"2007211521","Done_time":"2007211521","receive_time":1595316110,"from":"yx_user_send_task","uid":"1","send_msg_id":"J343300020200731100217169012"}'); */
         if ($channel['channel_type'] != 2) {
             exit;
@@ -10190,7 +10190,7 @@ class CmppCreateCodeTask extends Pzlife
                 $mobile_content = explode(',', $value['mobile_content']);
 
                 foreach ($mobile_content as $mkey => $mvalue) {
-                    if (in_array($mvalue,$black_error_mobile)) {
+                    if (in_array($mvalue, $black_error_mobile)) {
                         $prefix = '';
                         $prefix = substr(trim($mvalue), 0, 7);
                         $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
@@ -12576,7 +12576,7 @@ class CmppCreateCodeTask extends Pzlife
                         // usleep(3);
                     }
                 } else {
-                    $code_task_log = Db::query("SELECT * FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `status_message` = '' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' LIMIT 1 ");
+                    $code_task_log = Db::query("SELECT * FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137 AND `id` <> 278) AND `status_message` = '' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' LIMIT 1 ");
                     if (!empty($code_task_log)) {
                         $task         = Db::query("SELECT `id`,`send_msg_id` FROM yx_user_send_task WHERE `task_no` = '" . $code_task_log[0]['task_no'] . "' ");
                         $task_receipt = Db::query("SELECT * FROM yx_send_task_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $code_task_log[0]['mobile'] . "' ");
@@ -13200,22 +13200,22 @@ class CmppCreateCodeTask extends Pzlife
                         ])); //写入用户带处理日志
                     } */
                 } else {
-                    $real_un_known ++;
+                    $real_un_known++;
                     $num = mt_rand(0, 45);
                     if ($num < 2) {
                         $nuknown++;
-                        $message = $redis->rpush('index:meassage:code:mobile',json_encode(['mobile' => $message['mobile'],'status_message' => 'UNKNOWN']));
+                        $message = $redis->rpush('index:meassage:code:mobile', json_encode(['mobile' => $message['mobile'], 'status_message' => 'UNKNOWN']));
                         // continue;
                     } elseif ($num >= 2 && $num < 6) {
                         $nuknown_default++;
                         $stat = 'UNDELIV';
                         $message_info = '发送失败';
-                        $message = $redis->rpush('index:meassage:code:mobile',json_encode(['mobile' => $message['mobile'],'status_message' => 'UNDELIV']));
+                        $message = $redis->rpush('index:meassage:code:mobile', json_encode(['mobile' => $message['mobile'], 'status_message' => 'UNDELIV']));
                     } else {
-                        $nuknown_success ++;
+                        $nuknown_success++;
                         $stat = 'DELIVRD';
                         $message_info = '发送成功';
-                        $message = $redis->rpush('index:meassage:code:mobile',json_encode(['mobile' => $message['mobile'],'status_message' => 'DELIVRD']));
+                        $message = $redis->rpush('index:meassage:code:mobile', json_encode(['mobile' => $message['mobile'], 'status_message' => 'DELIVRD']));
                     }
                     /* for ($a = 0; $a < $s_num; $a++) {
                         $redis->rpush('index:meassage:code:user:receive:278', json_encode([
