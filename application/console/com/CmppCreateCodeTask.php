@@ -4900,6 +4900,7 @@ class CmppCreateCodeTask extends Pzlife
             }
         } catch (\Exception $th) {
             //throw $th;
+            $redis->rpush($redisMessageCodeSend, json_encode($send_log));
             exception($th);
         }
     }
