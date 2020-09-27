@@ -12375,9 +12375,9 @@ class CmppCreateCodeTask extends Pzlife
         // $time = strtotime('2020-06-27 00:00:00');
         // echo $time;die;
         $redis = Phpredis::getConn();
-        $redis->rPush('index:meassage:code:receive_for_future_default','{"task_no":"mar20092516421310521553","status_message":"DELIVRD","message_info":"\u53d1\u9001\u6210\u529f","mobile":"13623658038","msg_id":"13000710020200925164213169499","send_time":"2020-09-25 17:35:55","smsCount":2,"smsIndex":1}');
-        $redis->rPush('index:meassage:code:receive_for_future_default','"{\"task_no\":\"mar20092516414401362237\",\"status_message\":\"DB:Blac\",\"message_info\":\"\\u53d1\\u9001\\u5931\\u8d25\",\"mobile\":\"13523728253\",\"msg_id\":\"13000710020200925164144169229\",\"send_time\":\"2020-09-25 17:44:12\",\"smsCount\":2,\"smsIndex\":2}"');
-        $redis = Phpredis::getConn();
+        // $redis->rPush('index:meassage:code:receive_for_future_default','{"task_no":"mar20092516421310521553","status_message":"DELIVRD","message_info":"\u53d1\u9001\u6210\u529f","mobile":"13623658038","msg_id":"13000710020200925164213169499","send_time":"2020-09-25 17:35:55","smsCount":2,"smsIndex":1}');
+        // $redis->rPush('index:meassage:code:receive_for_future_default','"{\"task_no\":\"mar20092516414401362237\",\"status_message\":\"DB:Blac\",\"message_info\":\"\\u53d1\\u9001\\u5931\\u8d25\",\"mobile\":\"13523728253\",\"msg_id\":\"13000710020200925164144169229\",\"send_time\":\"2020-09-25 17:44:12\",\"smsCount\":2,\"smsIndex\":2}"');
+        // $redis = Phpredis::getConn();
         try{
             $i = 1;
             $receipt_report = [];
