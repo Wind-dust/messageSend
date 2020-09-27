@@ -4747,7 +4747,7 @@ class CmppCreateCodeTask extends Pzlife
             exit;
         }
         $channel              = $this->getChannelinfo($channel_id);
-         $redis->rpush($redisMessageCodeSend, '{"msg_id":"13000710020200925164103169853","title":"","mobile":"13236800231","mar_task_id":406591,"uid":291,"content":"\u3010\u9a70\u52a0\u6c7d\u8f66\u670d\u52a1\u4e2d\u5fc3\u3011\u5c0a\u656c\u7684\u9a70\u52a0\u4f1a\u5458\uff0c\u60a8\u7684299\u5143\u7f24\u7eb7\u62b5\u6263\u5238\u5305\u4e2d\u8fd8\u6709\u793c\u5238\u5c1a\u672a\u4f7f\u7528\u3002\u767b\u5f55\u5fae\u4fe1\u516c\u4f17\u53f7\u201c\u9a70\u52a0\u6c7d\u8f66\u670d\u52a1\u4e2d\u5fc3\u201d\u67e5\u770b\u793c\u5238\u8be6\u60c5\u3002\u70b9\u51fb http:\/\/mrw.so\/6r5hHO \u5373\u523b\u9884\u7ea6\u95e8\u5e97\uff0c\u9000\u8ba2\u56deTD","from":"yx_user_send_task","my_submit_time":1601031821,"Msg_Id":"26306304647135634","Stat":"REJECT\u0000","Submit_time":"0101010000","Done_time":"2009251904","receive_time":1601031842,"develop_no":""}');
+        //  $redis->rpush($redisMessageCodeSend, '{"msg_id":"13000710020200925164103169853","title":"","mobile":"13236800231","mar_task_id":406591,"uid":291,"content":"\u3010\u9a70\u52a0\u6c7d\u8f66\u670d\u52a1\u4e2d\u5fc3\u3011\u5c0a\u656c\u7684\u9a70\u52a0\u4f1a\u5458\uff0c\u60a8\u7684299\u5143\u7f24\u7eb7\u62b5\u6263\u5238\u5305\u4e2d\u8fd8\u6709\u793c\u5238\u5c1a\u672a\u4f7f\u7528\u3002\u767b\u5f55\u5fae\u4fe1\u516c\u4f17\u53f7\u201c\u9a70\u52a0\u6c7d\u8f66\u670d\u52a1\u4e2d\u5fc3\u201d\u67e5\u770b\u793c\u5238\u8be6\u60c5\u3002\u70b9\u51fb http:\/\/mrw.so\/6r5hHO \u5373\u523b\u9884\u7ea6\u95e8\u5e97\uff0c\u9000\u8ba2\u56deTD","from":"yx_user_send_task","my_submit_time":1601031821,"Msg_Id":"26306304647135634","Stat":"REJECT\u0000","Submit_time":"0101010000","Done_time":"2009251904","receive_time":1601031842,"develop_no":""}');
         // $redis->rpush($redisMessageCodeSend, '{"mobile":"15201926171","mar_task_id":"1","content":"Hi, \u4eb2\u7231\u7684\u4f1a\u5458\uff0c\u597d\u4e45\u4e0d\u89c1\uff0c\u60a8\u5df2\u7ecf\u6709\u4e09\u4e2a\u6708\u6ca1\u6765\u62a4\u7406\u4e86\uff0c\u79cb\u51ac\u5df2\u8fd1\uff0c\u6362\u5b63\u5f53\u524d\uff0c\u5728\u808c\u80a4\u9700\u8981\u201c\u8fdb\u8865\u201d\u7684\u5b63\u8282\u91cc\uff0c\u6765\u7f8e\u7530\u5373\u523b\u5f00\u542f\u6df1\u5ea6\u8865\u6c34\u6a21\u5f0f\u5427\uff01\u8054\u7cfb\u60a8\u8eab\u8fb9\u7684\u4e13\u5c5e\u5ba2\u6237\u7ecf\u7406\u6216\u62e8\u6253\u9884\u7ea6\u70ed\u7ebf 400-820-6142 \u56deT\u9000\u8ba2\u3010\u7f8e\u4e3d\u7530\u56ed\u3011","my_submit_time":1597248000,"Msg_Id":"2059229824357040146","Stat":"DELIVRD","Submit_time":"2007211521","Done_time":"2007211521","receive_time":1595316110,"from":"yx_user_send_task","uid":"1","send_msg_id":"J343300020200731100217169012"}');
         if ($channel['channel_type'] != 2) {
             exit;
@@ -4767,7 +4767,9 @@ class CmppCreateCodeTask extends Pzlife
                     continue;
                 }
                 if (!isset($send_log['task_no'])) {
-                    $task = Db::query("SELECT `task_no` FROM '".$send_log['from']."' WHERE `id` =  ".$send_log['mar_task_id']);
+                    // echo "SELECT `task_no` FROM '".$send_log['from']."' WHERE `id` =  ".$send_log['mar_task_id'];
+                    $task = Db::query("SELECT `task_no` FROM ".$send_log['from']." WHERE `id` =  ".$send_log['mar_task_id']);
+                    
                     if (empty($task)) {
                         continue;
                     }
