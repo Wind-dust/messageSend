@@ -12895,6 +12895,159 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
+    public function reciveSendMessageFoFuture()
+    {
+        ini_set('memory_limit', '3072M');
+        $redis = Phpredis::getConn();
+        try {
+            $start_time = strtotime('2020-09-17 0:00:00');
+
+                // $start_time   = strtotime("-3 day");
+                $start_time = $start_time + 60;
+                $end_time = $start_time + 300;
+                //行业
+                $code_task_log = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `status_message` = '' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' LIMIT 1 ");
+                // echo "SELECT * FROM yx_user_send_code_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `status_message` = '' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' LIMIT 1 ";die;
+                if (!empty($code_task_log)) {
+                    $task         = Db::query("SELECT `id`,`send_msg_id`,`task_no` FROM yx_user_send_code_task WHERE `task_no` = '" . $code_task_log[0]['task_no'] . "' ");
+                    $task_receipt = Db::query("SELECT * FROM yx_send_code_task_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $code_task_log[0]['mobile'] . "' ");
+                    /* $request_url = "http://116.228.60.189:15901/rtreceive?";
+                    $request_url .= 'task_no=' . trim($code_task_log[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($code_task_log[0]['mobile']) . "&send_time=" . trim(date('YmdHis', time() + mt_rand(0, 500)));
+                    // print_r($request_url);
+                    sendRequest($request_url); */
+                    if (empty($task_receipt) && empty($code_task_log[0]['status_message'])) {
+                        $receipt = [];
+                        $receipt = [];
+                        $send_len = 0;
+                        $send_len = mb_strlen($code_task_log[0]['task_content']);
+                        $s_num = 1;
+                        if ($send_len > 70) {
+                            $s_num = ceil($send_len / 67);
+                        }
+                        $stat = 'DELIVRD';
+                        $message_info = '发送成功';
+                        for ($a = 0; $a < $s_num; $a++) {
+                            $receipt_report = [];
+                            $receipt_report = [
+                                'task_no'        => trim($task[0]['task_no']),
+                                'status_message' => $stat,
+                                'message_info'   => $message_info,
+                                'mobile'         => trim($code_task_log[0]['mobile']),
+                                'msg_id'         => trim($task[0]['send_msg_id']),
+                                // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                'send_time'      => date('YmdHis', time() - mt_rand(0, 500)),
+                                'smsCount' => $s_num,
+                                'smsIndex' => $a + 1,
+                            ];
+                            $all_report = json_encode($receipt_report);
+                            // print_r(json_encode($receipt_report));die;
+                            $receipt_reports[] = $receipt_report;
+                            $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                            //推送失败
+                            // print_r($res);
+                            if ($res != 'SUCCESS') {
+                                usleep(300);
+                                $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                                if ($res != 'SUCCESS') {
+                                    usleep(300);
+                                    $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                                    if ($res != 'SUCCESS') {
+                                        $redis->rpush('index:meassage:code:receive_for_future_default', $all_report); //写入用户带处理日志
+                                    }
+                                }
+                            }
+                        }
+                        // print_r($request_url);
+                        // sendRequest($request_url);
+                        // $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                        Db::startTrans();
+                        try {
+                            Db::table('yx_user_send_code_task_log')->where('id', $code_task_log[0]['id'])->update(['status_message' => 'DELIVRD', 'send_status' => 3, 'update_time' => time()]);
+                            Db::commit();
+                        } catch (\Exception $e) {
+                            Db::rollback();
+                            exception($e);
+                        }
+                        // usleep(3);
+                    }
+                } else {
+                    $code_task_log = Db::query("SELECT * FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137 AND `id` <> 278) AND `status_message` = '' AND `create_time` >= '" . $start_time . "' AND  `create_time` <= '" . $end_time . "' LIMIT 1 ");
+                    if (!empty($code_task_log)) {
+                        $task         = Db::query("SELECT `id`,`send_msg_id` FROM yx_user_send_task WHERE `task_no` = '" . $code_task_log[0]['task_no'] . "' ");
+                        $task_receipt = Db::query("SELECT * FROM yx_send_task_receipt WHERE `task_id` = '" . $task[0]['id'] . "' AND `mobile` = '" . $code_task_log[0]['mobile'] . "' ");
+                        /* $request_url = "http://116.228.60.189:15901/rtreceive?";
+                        $request_url .= 'task_no=' . trim($code_task_log[0]['task_no']) . "&status_message=" . "DELIVRD" . "&mobile=" . trim($code_task_log[0]['mobile']) . "&send_time=" . trim(date('YmdHis', time() + mt_rand(0, 500)));
+                        // print_r($request_url);
+                        sendRequest($request_url); */
+                        if (empty($task_receipt) && empty($code_task_log[0]['status_message'])) {
+                            $send_len = 0;
+                            $send_len = mb_strlen($code_task_log[0]['task_content']);
+                            $s_num = 1;
+                            if ($send_len > 70) {
+                                $s_num = ceil($send_len / 67);
+                            }
+                            $stat = 'DELIVRD';
+                            $message_info = '发送成功';
+                            for ($a = 0; $a < $s_num; $a++) {
+                                $receipt_report = [];
+                                $receipt_report = [
+                                    'task_no'        => trim($task[0]['task_no']),
+                                    'status_message' => $stat,
+                                    'message_info'   => $message_info,
+                                    'mobile'         => trim($code_task_log[0]['mobile']),
+                                    'msg_id'         => trim($task[0]['send_msg_id']),
+                                    // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                                    'send_time'      => date('YmdHis', time() - mt_rand(0, 500)),
+                                    'smsCount' => $s_num,
+                                    'smsIndex' => $a + 1,
+                                ];
+                                $all_report = json_encode($receipt_report);
+                                // print_r(json_encode($receipt_report));die;
+                                // $receipt_reports[] = $receipt_report;
+                                $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                                //推送失败
+                                // print_r($res);
+                                if ($res != 'SUCCESS') {
+                                    usleep(300);
+                                    $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                                    if ($res != 'SUCCESS') {
+                                        usleep(300);
+                                        $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                                        if ($res != 'SUCCESS') {
+                                            $redis->rpush('index:meassage:code:receive_for_future_default', $all_report); //写入用户带处理日志
+                                        }
+                                    }
+                                }
+                            }
+                            // print_r($request_url);
+                            // sendRequest($request_url);
+                            // $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                            Db::startTrans();
+                            try {
+                                Db::table('yx_user_send_code_task_log')->where('id', $code_task_log[0]['id'])->update(['status_message' => 'DELIVRD', 'send_status' => 3, 'update_time' => time()]);
+                                Db::commit();
+                            } catch (\Exception $e) {
+                                Db::rollback();
+                                exception($e);
+                            }
+                            // usleep(3);
+                        }
+                    }
+                    /*  if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
+                        $redis->rpush('index:meassage:code:send:85', json_encode([
+                            'mobile'  => 15201926171,
+                            'content' => "【钰晰科技】客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time())
+                        ]));
+                    } */
+                    // echo 'Over' . "\n";
+                   
+                }
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
+        }
+    }
+
     public function mmsReceipt()
     {
         $rediskey = 'index:meassage:multimediamessage:deliver';
