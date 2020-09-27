@@ -12895,7 +12895,7 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
-    public function reciveSendMessageFoFuture()
+    public function newReciveSendMessageFoFuture()
     {
         ini_set('memory_limit', '3072M');
         $redis = Phpredis::getConn();
