@@ -4901,7 +4901,7 @@ class CmppCreateCodeTask extends Pzlife
     {
         $redis = Phpredis::getConn();
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
-        $redis->hset('index:message:receipt', 'yx_user_send_task:406886:13505118288', '{"mobile":"13505118288","task_no":"mar20092516414017553850","uid":291,"from":"yx_user_send_task","mar_task_id":406886,"content":"\u3010\u9a70\u52a0\u6c7d\u8f66\u670d\u52a1\u4e2d\u5fc3\u3011\u5c0a\u656c\u7684\u9a70\u52a0\u4f1a\u5458\uff0c\u60a8\u7684299\u5143\u7f24\u7eb7\u62b5\u6263\u5238\u5305\u4e2d\u8fd8\u6709\u793c\u5238\u5c1a\u672a\u4f7f\u7528\u3002\u767b\u5f55\u5fae\u4fe1\u516c\u4f17\u53f7\u201c\u9a70\u52a0\u6c7d\u8f66\u670d\u52a1\u4e2d\u5fc3\u201d\u67e5\u770b\u793c\u5238\u8be6\u60c5\u3002\u70b9\u51fb http:\/\/mrw.so\/6r5hHO \u5373\u523b\u9884\u7ea6\u95e8\u5e97\uff0c\u9000\u8ba2\u56deTD","my_submit_time":1601026996,"Submit_time":"0101010000","Done_time":"2009251743","receive_time":1601026999,"develop_no":"","send_msg_id":"13000710020200925164140169184","Stat":["DELIVRD"],"send_num":100,"channel_id":"145"}');
+        // $redis->hset('index:message:receipt', 'yx_user_send_task:406886:13505118288', '{"mobile":"13505118288","task_no":"mar20092516414017553850","uid":291,"from":"yx_user_send_task","mar_task_id":406886,"content":"\u3010\u9a70\u52a0\u6c7d\u8f66\u670d\u52a1\u4e2d\u5fc3\u3011\u5c0a\u656c\u7684\u9a70\u52a0\u4f1a\u5458\uff0c\u60a8\u7684299\u5143\u7f24\u7eb7\u62b5\u6263\u5238\u5305\u4e2d\u8fd8\u6709\u793c\u5238\u5c1a\u672a\u4f7f\u7528\u3002\u767b\u5f55\u5fae\u4fe1\u516c\u4f17\u53f7\u201c\u9a70\u52a0\u6c7d\u8f66\u670d\u52a1\u4e2d\u5fc3\u201d\u67e5\u770b\u793c\u5238\u8be6\u60c5\u3002\u70b9\u51fb http:\/\/mrw.so\/6r5hHO \u5373\u523b\u9884\u7ea6\u95e8\u5e97\uff0c\u9000\u8ba2\u56deTD","my_submit_time":1601026996,"Submit_time":"0101010000","Done_time":"2009251743","receive_time":1601026999,"develop_no":"","send_msg_id":"13000710020200925164140169184","Stat":["DELIVRD"],"send_num":100,"channel_id":"145"}');
         try {
             while (true) {
                 $receipts = $redis->HGETALL('index:message:receipt');
@@ -4945,7 +4945,7 @@ class CmppCreateCodeTask extends Pzlife
                         }
                     }
                 }
-                  // die;
+                // die;
             }
         } catch (\Exception $th) {
             //throw $th;
@@ -11872,7 +11872,7 @@ class CmppCreateCodeTask extends Pzlife
                         //  print_r($all_report);die;
                         $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
                         //推送失败
-                        print_r($res);
+                        // print_r($res);
                         if ($res != 'SUCCESS') {
                             usleep(300);
                             $res = sendRequestText('https://www.futurersms.com/api/callback/xjy/report', 'post', $all_report);
@@ -11995,10 +11995,24 @@ class CmppCreateCodeTask extends Pzlife
             }
 
             if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
-                $redis->rpush('index:meassage:code:send:85', json_encode([
+                /* $redis->rpush('index:meassage:code:send:85', json_encode([
                     'mobile'  => 15201926171,
                     'content' => "【钰晰科技】客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time())
-                ]));
+                ])); */
+                $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                // $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa';
+                $check_data = [];
+                $check_data = [
+                    'msgtype' => "text",
+                    'text' => [
+                        "content" => "Hi，错误提醒机器人\n客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time()),
+                    ],
+                ];
+                $headers = [
+                    'Content-Type:application/json'
+                ];
+                $this->sendRequestRebort($api, 'post', $check_data, $headers);
+                die;
             }
             // echo count($task_receipt);die;
         } catch (\Exception $th) {
@@ -12140,10 +12154,24 @@ class CmppCreateCodeTask extends Pzlife
                     $j = 1;
                 }
                 if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
-                    $redis->rpush('index:meassage:code:send:85', json_encode([
+                    /* $redis->rpush('index:meassage:code:send:85', json_encode([
                         'mobile'  => 15201926171,
                         'content' => "【钰晰科技】客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time())
-                    ]));
+                    ])); */
+                    $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                    // $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa';
+                    $check_data = [];
+                    $check_data = [
+                        'msgtype' => "text",
+                        'text' => [
+                            "content" => "Hi，错误提醒机器人\n客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time()),
+                        ],
+                    ];
+                    $headers = [
+                        'Content-Type:application/json'
+                    ];
+                    $this->sendRequestRebort($api, 'post', $check_data, $headers);
+                    die;
                 }
                 sleep(1);
             }
@@ -12171,54 +12199,6 @@ class CmppCreateCodeTask extends Pzlife
                 $all_report = '';
                 $receipt_report = [];
                 $j = 1;
-                /*  $base_receipt = Db::query("SELECT * FROM yx_user_multimedia_message_log WHERE `uid` = 223 ");
-                foreach ($base_receipt as $bkey => $bvalue) {
-                    $receipt = [];
-                    if (in_array($bvalue['status_message'], $Received)) {
-                        $receipt['status_message'] = 'DELIVRD';
-                        $receipt['message_info'] = '发送成功';
-                    } elseif ($bvalue['status_message'] == 'DELIVRD') {
-                        $receipt['status_message'] = 'DELIVRD';
-                        $receipt['message_info'] = '发送成功';
-                    } elseif (!empty($bvalue['status_message'])) {
-                        $receipt['status_message'] = $bvalue['status_message'];
-                        $receipt['message_info'] = '发送失败';
-                    } else {
-                        continue;
-                    }
-                    $mul_task = Db::query("SELECT `send_msg_id` FROM yx_user_multimedia_message WHERE `task_no` = '" . $bvalue['task_no'] . "' ")[0];
-                    $receipt['msg_id'] = $mul_task['send_msg_id'];
-                    $receipt['mobile'] = $bvalue['mobile'];
-                    $receipt['send_time'] = date('Y-m-d H:i:s', $bvalue['update_time']);
-                    $receipt['smsCount'] = 1;
-                    $receipt['smsIndex'] = 1;
-                    $receipt = json_encode($receipt);
-                    $all_report = $all_report . $receipt . "\n";
-                    $receipt_report[] = $receipt;
-                    $j++;
-                    if ($j > 100) {
-                        //  print_r($all_report);die;
-                        $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
-                        //推送失败
-                        // print_r($res);
-                        if ($res != 'SUCCESS') {
-                            usleep(300);
-                            $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
-                            if ($res != 'SUCCESS') {
-                                usleep(300);
-                                $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
-                                foreach ($receipt_report as $akey => $avalue) {
-                                    // # code...
-                                    // print_r($avalue);die;
-                                    $redis->rpush('index:meassage:code:receive_for_future_default', $avalue); //写入用户带处理日志
-                                }
-                            }
-                        }
-                        $all_report = '';
-                        $receipt_report = [];
-                        $j = 1;
-                    }
-                } */
 
                 while (true) {
                     $receipt = $redis->lpop('index:meassage:code:user:mulreceive:' . $uid);
@@ -12284,10 +12264,20 @@ class CmppCreateCodeTask extends Pzlife
                     $j = 1;
                 }
                 if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
-                    $redis->rpush('index:meassage:code:send:85', json_encode([
-                        'mobile'  => 15201926171,
-                        'content' => "【钰晰科技】客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time())
-                    ]));
+                    $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                    // $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa';
+                    $check_data = [];
+                    $check_data = [
+                        'msgtype' => "text",
+                        'text' => [
+                            "content" => "Hi，错误提醒机器人\n客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time()),
+                        ],
+                    ];
+                    $headers = [
+                        'Content-Type:application/json'
+                    ];
+                    $this->sendRequestRebort($api, 'post', $check_data, $headers);
+                    die;
                 }
                 sleep(1);
             }
