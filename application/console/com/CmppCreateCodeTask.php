@@ -12153,11 +12153,11 @@ class CmppCreateCodeTask extends Pzlife
                     $receipt_report = [];
                     $j = 1;
                 }
-                if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
-                    /* $redis->rpush('index:meassage:code:send:85', json_encode([
-                        'mobile'  => 15201926171,
-                        'content' => "【钰晰科技】客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time())
-                    ])); */
+                /* if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
+                    // $redis->rpush('index:meassage:code:send:85', json_encode([
+                    //     'mobile'  => 15201926171,
+                    //     'content' => "【钰晰科技】客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time())
+                    // ]));
                     $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
                     // $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa';
                     $check_data = [];
@@ -12172,7 +12172,7 @@ class CmppCreateCodeTask extends Pzlife
                     ];
                     $this->sendRequestRebort($api, 'post', $check_data, $headers);
                     die;
-                }
+                } */
                 sleep(1);
             }
 
@@ -12263,7 +12263,7 @@ class CmppCreateCodeTask extends Pzlife
                     $receipt_report = [];
                     $j = 1;
                 }
-                if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
+                /* if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
                     $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
                     // $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa';
                     $check_data = [];
@@ -12277,8 +12277,8 @@ class CmppCreateCodeTask extends Pzlife
                         'Content-Type:application/json'
                     ];
                     $this->sendRequestRebort($api, 'post', $check_data, $headers);
-                    die;
-                }
+                    // die;
+                } */
                 sleep(1);
             }
         } catch (\Throwable $th) {
