@@ -5151,6 +5151,52 @@ class CmppCreateCodeTask extends Pzlife
         }
     }
 
+    public function deliverToReceiptForMarketing()
+    {
+        $redis = Phpredis::getConn();
+        // $redis->rPush('index:meassage:code:cms:yx_user_send_task:deliver:','{"mobile":"13559319152","task_no":"mar20092516414541082566","uid":291,"from":"yx_user_send_task","mar_task_id":406942,"content":"\u3010\u9a70\u52a0\u6c7d\u8f66\u670d\u52a1\u4e2d\u5fc3\u3011\u5c0a\u656c\u7684\u9a70\u52a0\u4f1a\u5458\uff0c\u60a8\u7684299\u5143\u7f24\u7eb7\u62b5\u6263\u5238\u5305\u4e2d\u8fd8\u6709\u793c\u5238\u5c1a\u672a\u4f7f\u7528\u3002\u767b\u5f55\u5fae\u4fe1\u516c\u4f17\u53f7\u201c\u9a70\u52a0\u6c7d\u8f66\u670d\u52a1\u4e2d\u5fc3\u201d\u67e5\u770b\u793c\u5238\u8be6\u60c5\u3002\u70b9\u51fb http:\/\/mrw.so\/6r5hHO \u5373\u523b\u9884\u7ea6\u95e8\u5e97\uff0c\u9000\u8ba2\u56deTD","my_submit_time":1601026791,"Submit_time":"0101010000","Done_time":"2009251740","receive_time":1601026795,"develop_no":"","send_msg_id":"13000710020200925164146169245","Stat":["DELIVRD","DELIVRD"],"send_num":100,"channel_id":"145"}');
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        try {
+            while(true){
+                $i = 1;
+                $inserts = [];
+                while(true){
+                    $deliver_message = $redis->lpop('index:meassage:code:cms:yx_user_send_task:deliver:');
+                    if (empty($deliver_message)) {
+                        break;
+                    }
+                    $deliver_message = json_decode($deliver_message,true);
+                    foreach($deliver_message['Stat'] as $key => $value){
+                        $data = [
+                            'task_id'        => $deliver_message['mar_task_id'],
+                            'mobile'         => $deliver_message['mobile'],
+                            'real_message'   => $value,
+                            'status_message' => $value,
+                            'create_time'    => isset($deliver_message['receive_time']) ? $deliver_message['receive_time'] : time(),
+                        ];
+                        $inserts[] = $data;
+                        $i++;
+                        if ($i > 100) {
+                            Db::table('yx_send_task_receipt')->insertAll($inserts);
+                            $inserts = [];
+                            $i = 1;                        }
+                    }
+                    
+                }
+                if (!empty($inserts)) {
+                    Db::table('yx_send_task_receipt')->insertAll($inserts);
+                            $inserts = [];
+                            $i = 1;                
+                }
+                sleep(1);
+            }
+           
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
+        }
+    }
+
     public function insertInToTableBusiness()
     {
         $redis = Phpredis::getConn();
@@ -12684,7 +12730,7 @@ class CmppCreateCodeTask extends Pzlife
                             // usleep(3);
                         }
                     }
-                   /*  if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
+                    /*  if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
                         $redis->rpush('index:meassage:code:send:85', json_encode([
                             'mobile'  => 15201926171,
                             'content' => "【钰晰科技】客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time())
