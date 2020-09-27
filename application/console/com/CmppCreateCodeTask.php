@@ -12684,12 +12684,12 @@ class CmppCreateCodeTask extends Pzlife
                             // usleep(3);
                         }
                     }
-                    if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
+                   /*  if ($redis->LLEN('index:meassage:code:receive_for_future_default') > 0) {
                         $redis->rpush('index:meassage:code:send:85', json_encode([
                             'mobile'  => 15201926171,
                             'content' => "【钰晰科技】客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time())
                         ]));
-                    }
+                    } */
                     // echo 'Over' . "\n";
                     sleep(10);
                 }
