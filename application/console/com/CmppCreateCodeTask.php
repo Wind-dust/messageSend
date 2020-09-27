@@ -12287,6 +12287,20 @@ class CmppCreateCodeTask extends Pzlife
                                     // print_r($avalue);die;
                                     $redis->rpush('index:meassage:code:receive_for_future_default', $avalue); //写入用户带处理日志
                                 }
+                                $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                                // $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa';
+                                $check_data = [];
+                                $check_data = [
+                                    'msgtype' => "text",
+                                    'text' => [
+                                        "content" => "Hi，错误提醒机器人\n客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time()),
+                                    ],
+                                ];
+                                $headers = [
+                                    'Content-Type:application/json'
+                                ];
+                                $this->sendRequestRebort($api, 'post', $check_data, $headers);
+                                die;
                             }
                         }
                         $all_report = '';
@@ -12308,6 +12322,20 @@ class CmppCreateCodeTask extends Pzlife
                                 // print_r($avalue);die;
                                 $redis->rpush('index:meassage:code:receive_for_future_default', json_encode($avalue)); //写入用户带处理日志
                             }
+                            $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                            // $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa';
+                            $check_data = [];
+                            $check_data = [
+                                'msgtype' => "text",
+                                'text' => [
+                                    "content" => "Hi，错误提醒机器人\n客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time()),
+                                ],
+                            ];
+                            $headers = [
+                                'Content-Type:application/json'
+                            ];
+                            $this->sendRequestRebort($api, 'post', $check_data, $headers);
+                            die;
                         }
                     }
                     print_r($res);
@@ -12339,6 +12367,117 @@ class CmppCreateCodeTask extends Pzlife
             }
         } catch (\Throwable $th) {
             //throw $th;
+        }
+    }
+
+    public function futureReceiptSendSecond(){
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        // $time = strtotime('2020-06-27 00:00:00');
+        // echo $time;die;
+        $redis = Phpredis::getConn();
+        $redis->rPush('index:meassage:code:receive_for_future_default','{"task_no":"mar20092516421310521553","status_message":"DELIVRD","message_info":"\u53d1\u9001\u6210\u529f","mobile":"13623658038","msg_id":"13000710020200925164213169499","send_time":"2020-09-25 17:35:55","smsCount":2,"smsIndex":1}');
+        $redis->rPush('index:meassage:code:receive_for_future_default','"{\"task_no\":\"mar20092516414401362237\",\"status_message\":\"DB:Blac\",\"message_info\":\"\\u53d1\\u9001\\u5931\\u8d25\",\"mobile\":\"13523728253\",\"msg_id\":\"13000710020200925164144169229\",\"send_time\":\"2020-09-25 17:44:12\",\"smsCount\":2,\"smsIndex\":2}"');
+        $redis = Phpredis::getConn();
+        try{
+            $i = 1;
+            $receipt_report = [];
+            $all_report = '';
+            while(true){
+                $receipt = $redis->lpop('index:meassage:code:receive_for_future_default'); //写入用户带处理日志
+                if (empty($receipt)){
+                    break;
+                }
+                // $receipt = json_encode($receipt);
+                $new_receipt= json_decode($receipt,true);
+                if (is_array($new_receipt)) {
+                    $all_report = $all_report . $receipt . "\n";
+                    $receipt_report[] = $receipt;
+                    $i++;
+                }else{
+                    $all_report = $all_report . $new_receipt . "\n";
+                    $receipt_report[] = $new_receipt;
+                    $i++;
+                }
+                if ($i > 100) {
+                    //  print_r($all_report);die;
+                    $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                    //推送失败
+                    // print_r($res);
+                    if ($res != 'SUCCESS') {
+                        usleep(300);
+                        $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                        if ($res != 'SUCCESS') {
+                            usleep(300);
+                            $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                            foreach ($receipt_report as $akey => $avalue) {
+                                // # code...
+                                // print_r($avalue);die;
+                                $redis->rpush('index:meassage:code:receive_for_future_default', $avalue); //写入用户带处理日志
+                            }
+                            $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                            // $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa';
+                            $check_data = [];
+                            $check_data = [
+                                'msgtype' => "text",
+                                'text' => [
+                                    "content" => "Hi，错误提醒机器人\n客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time()),
+                                ],
+                            ];
+                            $headers = [
+                                'Content-Type:application/json'
+                            ];
+                            $this->sendRequestRebort($api, 'post', $check_data, $headers);
+                            die;
+                        }
+                    }
+                    $all_report = '';
+                    $receipt_report = [];
+                    $i = 1;
+                }
+            }
+            // print_r($all_report);die;
+            if (!empty($all_report)) {
+                $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                //推送失败
+                if ($res != 'SUCCESS') {
+                    usleep(300);
+                    $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                    if ($res != 'SUCCESS') {
+                        usleep(300);
+                        $res = sendRequestText('http://test.futurersms.com/api/callback/xjy/report', 'post', $all_report);
+                        foreach ($receipt_report as $akey => $avalue) {
+                            // # code...
+                            // print_r($avalue);die;
+                            $redis->rpush('index:meassage:code:receive_for_future_default', json_encode($avalue)); //写入用户带处理日志
+                        }
+                        $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+                        // $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa';
+                        $check_data = [];
+                        $check_data = [
+                            'msgtype' => "text",
+                            'text' => [
+                                "content" => "Hi，错误提醒机器人\n客户[future]回执推送失败请紧急查看并协调解决！！！时间" . date("Y-m-d H:i:s", time()),
+                            ],
+                        ];
+                        $headers = [
+                            'Content-Type:application/json'
+                        ];
+                        $this->sendRequestRebort($api, 'post', $check_data, $headers);
+                        die;
+                    }
+                }
+                /* print_r($res);
+                echo "\n";
+                print_r($all_report);
+                echo "\n";
+                print_r("http://test.futurersms.com/api/callback/xjy/report"); */
+                $all_report = '';
+                $receipt_report = [];
+                $j = 1;
+            }
+        } catch (\Exception $th) {
+            //throw $th;
+            exception($th);
         }
     }
 
