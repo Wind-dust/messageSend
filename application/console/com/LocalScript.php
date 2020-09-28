@@ -3041,6 +3041,7 @@ class LocalScript extends Pzlife
             }
         } catch (\Exceptixon $th) {
             //throw $th;
+            print_r($day_business_result);
             exception($th);
         }
     }
