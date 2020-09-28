@@ -2968,7 +2968,7 @@ class LocalScript extends Pzlife
                     }
                 }
                 //营销
-                foreach ($uids as $key => $value) {
+               /*  foreach ($uids as $key => $value) {
                     // $start_time = (int) strtotime('-3 days', strtotime(date('Y-m-d', time())));
                     $start_time = (int) strtotime('2020-09-01');
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
@@ -3036,7 +3036,7 @@ class LocalScript extends Pzlife
                         // die;
                         $start_time = $end_time;
                     }
-                }
+                } */
                 sleep(900);
             }
         } catch (\Exceptixon $th) {
