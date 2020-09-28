@@ -2968,7 +2968,7 @@ class LocalScript extends Pzlife
                     }
                 }
                 //营销
-               /*  foreach ($uids as $key => $value) {
+                /*  foreach ($uids as $key => $value) {
                     // $start_time = (int) strtotime('-3 days', strtotime(date('Y-m-d', time())));
                     $start_time = (int) strtotime('2020-09-01');
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
@@ -3129,7 +3129,7 @@ class LocalScript extends Pzlife
             }
         } catch (\Exceptixon $th) {
             //throw $th;
-            echo Db::getLastSQL();
+            // echo Db::getLastSQL();
             exception($th);
         }
     }
@@ -3353,7 +3353,7 @@ class LocalScript extends Pzlife
 
     public function SendResultForMarketingTest()
     {
-        $result = $this->selectSendResultForMarketing(156, 137, 1594310400, 1594396800);
+        $result = $this->selectSendResultForMarketing(156, 137, 1598889600, 1598976000);
     }
 
     private function selectSendResultForMarketing($uid, $pid, $start_time, $end_time)
@@ -3367,6 +3367,7 @@ class LocalScript extends Pzlife
         //行业计费
 
         $max_len = Db::query("SELECT  send_length FROM `yx_user_send_task` WHERE `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "'  ORDER BY `send_length` DESC LIMIT 1");
+        print_r($max_len);
         if (empty($max_len)) {
             return false;
         } else {
