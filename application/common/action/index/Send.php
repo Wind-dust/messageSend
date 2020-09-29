@@ -229,7 +229,7 @@ return $result;
                 $data['yidong_channel_id'] = $channel['yidong_channel_id'];
                 $data['liantong_channel_id'] =  $channel['liantong_channel_id'];
                 $data['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
-            }else{
+            } else {
                 $data['free_trial'] = 1;
             }
         }
@@ -395,7 +395,7 @@ return $result;
                 $data['yidong_channel_id'] = $channel['yidong_channel_id'];
                 $data['liantong_channel_id'] =  $channel['liantong_channel_id'];
                 $data['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
-            }else{
+            } else {
                 $data['free_trial'] = 1;
                 $data['send_status']     = 1;
             }
@@ -1140,23 +1140,23 @@ return $result;
                         // array_push($task_no, $free_taskno);
                         $send_task['free_trial'] = 2;
                         $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
-                            if (!empty($channel)) {
-                                $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
-                                $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
-                                $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
-                                $free_taskno[] = $task_no;
-                            }else{
-                                $send_task['free_trial'] = 1;
-                                $send_task['yidong_channel_id'] = 0;
-                                $send_task['liantong_channel_id'] = 0;
-                                $send_task['dianxin_channel_id'] = 0;
-                            }
-                       
+                        if (!empty($channel)) {
+                            $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
+                            $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
+                            $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                            $free_taskno[] = $task_no;
+                        } else {
+                            $send_task['free_trial'] = 1;
+                            $send_task['yidong_channel_id'] = 0;
+                            $send_task['liantong_channel_id'] = 0;
+                            $send_task['dianxin_channel_id'] = 0;
+                        }
+
                         // array_push($free_trial, $send_task);
                     }
                 } else {
                     if (!empty($value)) {
-                       
+
                         $send_task['free_trial'] = 2;
                         $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
                         if (!empty($channel)) {
@@ -1164,7 +1164,7 @@ return $result;
                             $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                             $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
                             $free_taskno[] = $task_no;
-                        }else{
+                        } else {
                             $send_task['free_trial'] = 1;
                             $send_task['yidong_channel_id'] = 0;
                             $send_task['liantong_channel_id'] = 0;
@@ -1424,7 +1424,7 @@ return $result;
                             $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
                             $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                             $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
-                        }else{
+                        } else {
                             $send_task['free_trial'] = 1;
                             $send_task['yidong_channel_id'] = 0;
                             $send_task['liantong_channel_id'] = 0;
@@ -1437,17 +1437,17 @@ return $result;
                     if (!empty($value)) {
                         $free_taskno[] = $task_no;
                         $send_task['free_trial'] = 2;
-                         $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
-                            if (!empty($channel)) {
-                                $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
-                                $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
-                                $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
-                            }else{
-                                $send_task['free_trial'] = 1;
-                                $send_task['yidong_channel_id'] = 0;
-                                $send_task['liantong_channel_id'] = 0;
-                                $send_task['dianxin_channel_id'] = 0;
-                            }
+                        $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 6], '*', true);
+                        if (!empty($channel)) {
+                            $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
+                            $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
+                            $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                        } else {
+                            $send_task['free_trial'] = 1;
+                            $send_task['yidong_channel_id'] = 0;
+                            $send_task['liantong_channel_id'] = 0;
+                            $send_task['dianxin_channel_id'] = 0;
+                        }
                         // array_push($free_trial, $send_task);
                     }
                 }
@@ -1739,16 +1739,16 @@ return $result;
                         // array_push($task_no, $free_taskno);
                         $send_task['free_trial'] = 2;
                         $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
-                            if (!empty($channel)) {
-                                $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
-                                $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
-                                $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
-                            }else{
-                                $send_task['free_trial'] = 1;
-                                $send_task['yidong_channel_id'] = 0;
-                                $send_task['liantong_channel_id'] = 0;
-                                $send_task['dianxin_channel_id'] = 0;
-                            }
+                        if (!empty($channel)) {
+                            $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
+                            $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
+                            $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                        } else {
+                            $send_task['free_trial'] = 1;
+                            $send_task['yidong_channel_id'] = 0;
+                            $send_task['liantong_channel_id'] = 0;
+                            $send_task['dianxin_channel_id'] = 0;
+                        }
                         $free_taskno[] = $task_no;
                         // array_push($free_trial, $send_task);
                     }
@@ -1756,17 +1756,17 @@ return $result;
                     if (!empty($value)) {
                         $free_taskno[] = $task_no;
                         $send_task['free_trial'] = 2;
-                       $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
-                            if (!empty($channel)) {
-                                $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
-                                $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
-                                $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
-                            }else{
-                                $send_task['free_trial'] = 1;
-                                $send_task['yidong_channel_id'] = 0;
-                                $send_task['liantong_channel_id'] = 0;
-                                $send_task['dianxin_channel_id'] = 0;
-                            }
+                        $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
+                        if (!empty($channel)) {
+                            $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
+                            $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
+                            $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
+                        } else {
+                            $send_task['free_trial'] = 1;
+                            $send_task['yidong_channel_id'] = 0;
+                            $send_task['liantong_channel_id'] = 0;
+                            $send_task['dianxin_channel_id'] = 0;
+                        }
                         // array_push($free_trial, $send_task);
                     }
                 }
@@ -2016,18 +2016,18 @@ return $result;
                             $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                             $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
                             $free_taskno[] = $task_no;
-                        }else{
+                        } else {
                             $send_task['free_trial'] = 1;
                             $send_task['yidong_channel_id'] = 0;
                             $send_task['liantong_channel_id'] = 0;
                             $send_task['dianxin_channel_id'] = 0;
                         }
-                        
+
                         // array_push($free_trial, $send_task);
                     }
                 } else {
                     if (!empty($value)) {
-                       
+
                         $send_task['free_trial'] = 2;
                         $channel = DbAdministrator::getUserChannel(['uid' => $user['id'], 'business_id' => 5], '*', true);
                         if (!empty($channel)) {
@@ -2035,7 +2035,7 @@ return $result;
                             $send_task['yidong_channel_id'] = $channel['yidong_channel_id'];
                             $send_task['liantong_channel_id'] =  $channel['liantong_channel_id'];
                             $send_task['dianxin_channel_id'] =  $channel['dianxin_channel_id'];
-                        }else{
+                        } else {
                             $send_task['free_trial'] = 1;
                             $send_task['yidong_channel_id'] = 0;
                             $send_task['liantong_channel_id'] = 0;
@@ -3564,7 +3564,7 @@ return $result;
         if ($content_length > $max_length) {
             return ['code' => '3006'];
         }
-       
+
         do {
             $template_id = getRandomString(8);
             $has = DbSendMessage::getUserMultimediaTemplate(['template_id' => $template_id], 'id', true);
@@ -3598,8 +3598,9 @@ return $result;
         }
     }
 
-    public function supMessageTemplateSignatureReport($appid, $appkey, $content_data, $title, $signature, $name){
-        
+    public function supMessageTemplateSignatureReport($appid, $appkey, $content_data, $title, $signature, $name)
+    {
+
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,nick_name,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
@@ -3617,11 +3618,11 @@ return $result;
             if (empty($value['content'])) {
                 return ['code' => '3008'];
             }
-            if ($value['type'] == 1) {//文本
+            if ($value['type'] == 1) { //文本
                 $frame['content'] = $value['content'];
                 $content_length += (strlen($frame['content']) / 8);
                 $frame['content_type'] = 'text/plain';
-            }elseif ($value['type'] == 2) {//图片
+            } elseif ($value['type'] == 2) { //图片
                 stream_context_set_default([
                     'ssl' => [
                         'verify_peer'      => false,
@@ -3641,17 +3642,17 @@ return $result;
                 $content_length += $head['Content-Length'];
                 $frame['content'] = $value['content'];
                 $frame['content_type'] = $head['Content-Type'];
-            }elseif ($value['type'] == 3) {//音频
+            } elseif ($value['type'] == 3) { //音频
                 stream_context_set_default([
                     'ssl' => [
                         'verify_peer'      => false,
                         'verify_peer_name' => false,
                     ],
-                ]); 
-                
+                ]);
+
                 $head = get_headers($value['content'], 1);
                 // print_r($head);die;
-                if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['audio/mp2', 'audio/mp1', 'audio/mp3','video/mpeg4'])) {
+                if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['audio/mp2', 'audio/mp1', 'audio/mp3', 'video/mpeg4'])) {
                     return ['code' => '3009'];
                 }
                 $filename = filtraImage(Config::get('qiniu.videodomain'), $value['content']);
@@ -3663,17 +3664,17 @@ return $result;
                 $content_length += $head['Content-Length'];
                 $frame['content'] = $value['content'];
                 $frame['content_type'] = $head['Content-Type'];
-            }elseif ($value['type'] == 4) {//视频
+            } elseif ($value['type'] == 4) { //视频
                 stream_context_set_default([
                     'ssl' => [
                         'verify_peer'      => false,
                         'verify_peer_name' => false,
                     ],
-                ]); 
-                
+                ]);
+
                 $head = get_headers($value['content'], 1);
                 // print_r($head);die;
-                if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['video/mp4', 'video/mpeg', 'video/mpg','video/mpeg4'])) {
+                if (!isset($head['Content-Type']) || !in_array($head['Content-Type'], ['video/mp4', 'video/mpeg', 'video/mpg', 'video/mpeg4'])) {
                     return ['code' => '3009'];
                 }
                 $filename = filtraImage(Config::get('qiniu.videodomain'), $value['content']);
@@ -3754,7 +3755,7 @@ return $result;
         if ($appkey != $user['appkey']) {
             return ['code' => '3000'];
         }
-        $template =  DbSendMessage::getUserSupMessageTemplate(['template_id' => $template_id,'uid' => $user['id']], '*', true);
+        $template =  DbSendMessage::getUserSupMessageTemplate(['template_id' => $template_id, 'uid' => $user['id']], '*', true);
         /* if ($template['status'] != 2 || empty($template)) {
             return ['code' => '3003'];
         } */
@@ -3823,7 +3824,7 @@ return $result;
                     $yidong_channel_id = $channel['yidong_channel_id'];
                     $liantong_channel_id =  $channel['liantong_channel_id'];
                     $dianxin_channel_id =  $channel['dianxin_channel_id'];
-                }else{
+                } else {
                     $free_trial = 1;
                     $yidong_channel_id = 0;
                     $liantong_channel_id = 0;
@@ -3850,7 +3851,8 @@ return $result;
                     $frame['multimedia_message_id'] = $bId;
                     if ($frame['type'] == 4) {
                         $frame['content'] = filtraImage(Config::get('qiniu.videodomain'), $frame['content']);
-                    }if ($frame['type'] == 3) {
+                    }
+                    if ($frame['type'] == 3) {
                         $frame['content'] = filtraImage(Config::get('qiniu.videodomain'), $frame['content']);
                     }
                     if ($frame['type'] == 2) {
@@ -3873,8 +3875,8 @@ return $result;
                     'Content-Type:application/json'
                 ];
                 $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
-            }else{
-                $res = $this->redis->rpush("index:meassage:supmessage:sendtask", json_encode(['id' =>$bId,'deduct' => $user['supmessage_deduct']]));
+            } else {
+                $res = $this->redis->rpush("index:meassage:supmessage:sendtask", json_encode(['id' => $bId, 'deduct' => $user['supmessage_deduct']]));
             }
             if (!empty($msg_id)) {
                 return ['code' => '200', 'task_no' => $SmsMultimediaMessageTask['task_no'], 'msg_id' => $msg_id];
@@ -3887,7 +3889,8 @@ return $result;
         }
     }
 
-    public function sanTiSupMessageCallBack($sign, $report){
+    public function sanTiSupMessageCallBack($sign, $report)
+    {
         // print_r($report);die;
         $redisMessageCodeDeliver = 'index:meassage:supmessage:deliver'; //创蓝彩信回执通道
         $redis = Phpredis::getConn();
@@ -3910,13 +3913,13 @@ return $result;
         } */
         foreach ($report as $key => $value) {
             // print_r($value);die;
-            $task_id = $redis->hget('index:meassage:code:back_taskno:135',$value['sendId']);
+            $task_id = $redis->hget('index:meassage:code:back_taskno:135', $value['sendId']);
             if (empty($task_id)) {
                 return 'ERROR';
             }
             if ($value['status'] == 2) {
                 $stat = 'DELIVRD';
-            }else{
+            } else {
                 $stat = $value['reportStatus'];
             }
             $send_task_log = [
@@ -3926,18 +3929,19 @@ return $result;
                 'send_time'      => strtotime($value['sendTime']),
             ];
             // print_r($send_task_log);die;
-            $redis->rpush($redisMessageCodeDeliver,json_encode($send_task_log));
+            $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
         }
         return 'OK';
     }
 
-    public function lingdaoSupMessageCallBack($data){
+    public function lingdaoSupMessageCallBack($data)
+    {
         // print_r($report);die;
         $redisMessageCodeDeliver = 'index:meassage:supmessage:deliver'; //创蓝彩信回执通道
         $redis = Phpredis::getConn();
         foreach ($data as $key => $value) {
             // print_r($value);die;
-            $task_id = $redis->hget('index:meassage:code:back_taskno:lingdao',$value['taskid']);
+            $task_id = $redis->hget('index:meassage:code:back_taskno:lingdao', $value['taskid']);
             if (empty($task_id)) {
                 return 'ERROR';
             }
@@ -3953,11 +3957,12 @@ return $result;
                 'send_time'      => strtotime($value['time']),
             ];
             // print_r($send_task_log);die;
-            $redis->rpush($redisMessageCodeDeliver,json_encode($send_task_log));
+            $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
         }
         return 'OK';
     }
-    public function supmessageReceive($appid, $appkey){
+    public function supmessageReceive($appid, $appkey)
+    {
         $user = DbUser::getUserOne(['appid' => $appid], 'id,appkey,user_type,user_status,reservation_service,free_trial', true);
         if (empty($user)) {
             return ['code' => '3000'];
@@ -3986,3 +3991,5 @@ return $result;
         return ['code' => '200', 'data' => $result];
     }
 }
+
+// {"mobile":"18562738557","message_info":"\u597d\u7684\u8c22\u8c22","business_id":6,"get_time":"2020-08-02 12:09:05"}
