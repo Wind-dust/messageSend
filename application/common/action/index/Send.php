@@ -1122,12 +1122,13 @@ return $result;
             }
             if ($send_task['free_trial'] == 2) {
                 //短信内容分词
-                $search_analyze = $this->search_analyze($value);
-                $search_result = json_decode($search_analyze, true);
                 $words = [];
+                /*  $search_analyze = $this->search_analyze($value);
+                $search_result = json_decode($search_analyze, true);
+               
                 if ($search_result['code'] == 20000) {
                     $words = $search_result['data']['tokens'];
-                }
+                } */
                 if (!empty($words)) { //敏感词
                     $analyze_value = DbSendMessage::getSensitiveWord([['word', 'IN', join(',', $words)]], 'id', false);
                     if (!empty($analyze_value)) {
@@ -1402,12 +1403,13 @@ return $result;
             }
             if ($send_task['free_trial'] == 2) {
                 //短信内容分词
-                $search_analyze = $this->search_analyze($value);
-                $search_result = json_decode($search_analyze, true);
                 $words = [];
+                /*  $search_analyze = $this->search_analyze($value);
+                $search_result = json_decode($search_analyze, true);
+               
                 if ($search_result['code'] == 20000) {
                     $words = $search_result['data']['tokens'];
-                }
+                } */
                 if (!empty($words)) { //敏感词
                     $analyze_value = DbSendMessage::getSensitiveWord([['word', 'IN', join(',', $words)]], 'id', false);
                     if (!empty($analyze_value)) {
@@ -1721,12 +1723,13 @@ return $result;
             // $send_task['free_trial'] = 1;
             if ($send_task['free_trial'] == 2) {
                 //短信内容分词
-                $search_analyze = $this->search_analyze($value);
-                $search_result = json_decode($search_analyze, true);
                 $words = [];
+                /* $search_analyze = $this->search_analyze($value);
+                $search_result = json_decode($search_analyze, true);
+               
                 if ($search_result['code'] == 20000) {
                     $words = $search_result['data']['tokens'];
-                }
+                } */
                 if (!empty($words)) { //敏感词
                     $analyze_value = DbSendMessage::getSensitiveWord([['word', 'IN', join(',', $words)]], 'id', false);
                     if (!empty($analyze_value)) {
@@ -1993,12 +1996,13 @@ return $result;
             // $send_task['free_trial'] = 1;
             if ($send_task['free_trial'] == 2) {
                 //短信内容分词
-                $search_analyze = $this->search_analyze($value);
-                $search_result = json_decode($search_analyze, true);
                 $words = [];
+                /*  $search_analyze = $this->search_analyze($value);
+                $search_result = json_decode($search_analyze, true);
+                
                 if ($search_result['code'] == 20000) {
                     $words = $search_result['data']['tokens'];
-                }
+                } */
                 if (!empty($words)) { //敏感词
                     $analyze_value = DbSendMessage::getSensitiveWord([['word', 'IN', join(',', $words)]], 'id', false);
                     if (!empty($analyze_value)) {
