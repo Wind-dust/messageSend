@@ -10860,7 +10860,7 @@ class CmppCreateCodeTask extends Pzlife
             /* $mysql_connect->query("UPDATE yx_sfl_multimedia_message SET `free_trial` = 2 AND `yidong_channel_id` = 94 AND `liantong_channel_id` = 94 AND `dianxin_channel_id` = 94 WHERE `create_time` >  ".$tody_time); */
             // $mysql_connect->table('yx_sfl_multimedia_message')->where([['create_time', '>', $tody_time],['sfl_relation_id','IN','100181558,100181556,100181563,100177398']])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94]);
             // $mysql_connect->table('yx_sfl_multimedia_message')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94, 'update_time' => time()]);
-            $mysql_connect->table('yx_sfl_multimedia_message')->where([['sfl_relation_id', '=', '100184615']])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94, 'update_time' => time()]);
+            $mysql_connect->table('yx_sfl_multimedia_message')->where([['sfl_relation_id', '=', '100184671']])->update(['free_trial' => 2, 'yidong_channel_id' => 94, 'liantong_channel_id' => 94, 'dianxin_channel_id' => 94, 'update_time' => time()]);
         } catch (\Exception $th) {
             exception($th);
         }
@@ -10868,8 +10868,8 @@ class CmppCreateCodeTask extends Pzlife
         $j = 1;
         $receipt = [];
         $send_msg = [];
-        $deduct = 1; //1扣量,2不扣
-        $rate = 65;
+        $deduct = 2; //1扣量,2不扣
+        $rate = 20;
         /*    $all_task = 
         while (true) {
             $task_id = $this->redis->lpop('index:meassage:sflmulmessage:sendtask');
@@ -10885,7 +10885,7 @@ class CmppCreateCodeTask extends Pzlife
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . " AND `sfl_relation_id`  IN ('100181913','82301','82309','100125372')");
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE   `create_time` >  " . $tody_time  . " AND `sfl_relation_id` NOT IN ('100183548','100183549')");
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE `create_time` >  " . $tody_time  . "  ");
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $tody_time  . " AND `sfl_relation_id`  <> 100184671 ");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `sfl_relation_id`  = 100184671 ");
             foreach ($sendid as $key => $value) {
                 $this->redis->rpush('index:meassage:sflmulmessage:sendtask', $value['id']);
             }
@@ -13371,7 +13371,9 @@ class CmppCreateCodeTask extends Pzlife
             $redis = Phpredis::getConn();
             $i = 1;
             // $redis->rpush('index:meassage:code:unknow:deliver:145', '{"Stat":"DELIVRD","Submit_time":"0101010000","Done_time":"2009221445","mobile":"13810041198\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000","receive_time":1600757136,"Msg_Id":"260432473667660"}');
-            $status = Db::query("SELECT `mobile`,`status_message` FROM `messagesend`.`yx_send_task_receipt` WHERE `task_id` IN (SELECT id FROM `messagesend`.`yx_user_send_task` WHERE `create_time` >= '1600272000' AND `uid` IN (291,274,251,276) AND `create_time` <= '1601049600') GROUP BY `mobile`,`status_message`");
+            $status = Db::query("SELECT `mobile`,`status_message` FROM `messagesend`.`yx_send_code_task_receipt` WHERE `task_id` IN (SELECT id FROM `messagesend`.`yx_user_send_code_task` WHERE `create_time` >= '1600272000' AND `uid` IN (291,274,251,276) AND `create_time` <= '1601049600') GROUP BY `mobile`,`status_message`");
+            // echo count($status);
+            // die;
 
             $insert_data = [];
             // die;
@@ -13526,7 +13528,7 @@ class CmppCreateCodeTask extends Pzlife
             ini_set('memory_limit', '10240M');
             $redis = Phpredis::getConn();
             // $task = Db::query("SELECT * FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '278' AND `id` >= '378548' ");
-            $task = Db::query("SELECT * FROM `messagesend`.`yx_user_send_task` WHERE `create_time` >= '1600272000' AND `uid` IN (291,274,251,276) AND `create_time` <= '1601049600'");
+            $task = Db::query("SELECT * FROM  `messagesend`.`yx_user_send_code_task` WHERE `create_time` >= '1600272000' AND `uid` IN (291,274,251,276) AND `create_time` <= '1601049600'");
             foreach ($task as $key => $value) {
                 $mobile = explode(',', $value['mobile_content']);
                 $data = [];
@@ -13567,9 +13569,9 @@ class CmppCreateCodeTask extends Pzlife
             $nuknown_success = 0;
             $nuknown_default = 0;
             while (true) {
-                $message = $redis->lpop('index:meassage:code:mobile:msg_id:251');
+                $message = $redis->lpop('index:meassage:code:mobile:msg_id:274');
                 if (empty($message)) {
-                    $message = $redis->lpop('index:meassage:code:mobile:msg_id:291');
+                    $message = $redis->lpop('index:meassage:code:mobile:msg_id:276');
                     if (empty($message)) {
                         break;
                     }
