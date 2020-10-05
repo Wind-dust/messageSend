@@ -2889,7 +2889,7 @@ class LocalScript extends Pzlife
         try {
             //code...
             while (true) {
-                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (110) "); //道信核对
+                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (91) "); //道信核对
                 // $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
                 //行业
                 foreach ($uids as $key => $value) {
@@ -3052,7 +3052,7 @@ class LocalScript extends Pzlife
         try {
             //code...
             while (true) {
-                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (190,191) "); //道信核对
+                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (92) "); //道信核对
                 // $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
 
                 //营销
@@ -3134,6 +3134,189 @@ class LocalScript extends Pzlife
         }
     }
 
+
+
+    public function checkSendStatusForBusinessChannel()
+    {
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        try {
+            //code...
+            while (true) {
+                $uids = Db::query("SELECT `id` FROM yx_sms_sending_channel  "); //道信核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
+                //行业
+                foreach ($uids as $key => $value) {
+                    // continue;
+                    // $start_time = (int) strtotime('-4 days', strtotime(date('Y-m-d', time())));
+                    $start_time = (int) strtotime('2020-03-01');
+                    // echo $start_time;die;
+                    if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_code_task WHERE yidong_channel_id  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
+                        continue;
+                    }
+                    while (true) {
+
+                        $day_business_result = [];
+                        $end_time            = $start_time + 86400;
+                        $timekey             = date('Ymd', $start_time);
+                        // echo "uid:" . $value['id'] . "" . "timekey:" . $timekey;
+                        // echo "\n";
+                        $business_id = 6;
+                        if ($end_time > time()) {
+                            // break;
+                            $end_time            = time();
+                            $day_business_result = $this->selectSendResultForBusinessChannel($value['id'], $start_time, $end_time);
+                            if ($day_business_result == false) {
+                                break;
+                            } else {
+                                $day_business_result['uid']         = $value['id'];
+                                $day_business_result['timekey']     = $timekey;
+                                $day_business_result['business_id'] = $business_id;
+                                $has                                = Db::query('SELECT * FROM `yx_statistics_day_channel` WHERE `business_id` = 6 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                                if ($has) {
+                                    Db::table('yx_statistics_day_channel')->where('id', $has[0]['id'])->update([
+                                        'success'     => $day_business_result['success'],
+                                        'unknown'     => $day_business_result['unknown'],
+                                        'default'     => $day_business_result['default'],
+                                        'num'         => $day_business_result['num'],
+                                        'mobile_num'  => $day_business_result['mobile_num'],
+                                        'ratio'       => $day_business_result['ratio'],
+                                        'update_time' => time(),
+                                    ]);
+                                } else {
+                                    Db::table('yx_statistics_day_channel')->insert($day_business_result);
+                                }
+                                break;
+                            }
+                            //
+
+                        }
+                        $day_business_result = $this->selectSendResultForBusinessChannel($value['id'],  $start_time, $end_time);
+                        if ($day_business_result == false) {
+                            $start_time = $end_time;
+                            continue;
+                        }
+
+                        // die;
+                        $day_business_result['channel_id']         = $value['id'];
+                        $day_business_result['timekey']     = $timekey;
+                        $day_business_result['business_id'] = $business_id;
+                        $day_business_result['create_time'] = time();
+                        $day_business_result['update_time'] = time();
+                        // print_r($day_business_result);
+                        $has = Db::query('SELECT * FROM `yx_statistics_day_channel` WHERE `business_id` = 6 AND `timekey` = ' . $timekey . ' AND `channel_id` = ' . $value['id']);
+                        if ($has) {
+                            Db::table('yx_statistics_day_channel')->where('id', $has[0]['id'])->update([
+                                'success'     => $day_business_result['success'],
+                                'unknown'     => $day_business_result['unknown'],
+                                'default'     => $day_business_result['default'],
+                                'num'         => $day_business_result['num'],
+                                'mobile_num'  => $day_business_result['mobile_num'],
+                                'ratio'       => $day_business_result['ratio'],
+                                'update_time' => time(),
+                            ]);
+                        } else {
+                            Db::table('yx_statistics_day_channel')->insert($day_business_result);
+                        }
+                        $start_time = $end_time;
+                    }
+                }
+
+                sleep(900);
+            }
+        } catch (\Exceptixon $th) {
+            //throw $th;
+            print_r($day_business_result);
+            exception($th);
+        }
+    }
+
+    public function checkSendStatusForMarketingChannel()
+    {
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        try {
+            //code...
+            while (true) {
+                $uids = Db::query("SELECT `id` FROM yx_sms_sending_channel  "); //道信核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
+
+                //营销
+                foreach ($uids as $key => $value) {
+                    // $start_time = (int) strtotime('-3 days', strtotime(date('Y-m-d', time())));
+                    $start_time = (int) strtotime('2020-03-01');
+                    if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_task WHERE `yidong_channel_id`   = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
+                        continue;
+                    }
+                    while (true) {
+                        $end_time    = $start_time + 86400;
+                        $timekey     = date('Ymd', $start_time);
+                        $business_id = 5;
+                        // echo "uid:" . $value['id'] . "" . "timekey:" . $timekey;
+                        // echo "\n";
+                        if ($end_time > time()) {
+                            // break;
+                            $end_time             = time();
+                            $day_marketing_result = $this->selectSendResultForMarketingChannel($value['id'],  $start_time, $end_time);
+                            if ($day_marketing_result == false) {
+                                break;
+                            }
+                            $day_marketing_result['channel_id']         = $value['id'];
+                            $day_marketing_result['timekey']     = $timekey;
+                            $day_marketing_result['business_id'] = $business_id;
+                            $has                                 = Db::query('SELECT * FROM `yx_statistics_day_channel  ` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `channel_id` = ' . $value['id']);
+                            if ($has) {
+                                Db::table('yx_statistics_day_channel')->where('id', $has[0]['id'])->update([
+                                    'success'     => $day_marketing_result['success'],
+                                    'unknown'     => $day_marketing_result['unknown'],
+                                    'default'     => $day_marketing_result['default'],
+                                    'num'         => $day_marketing_result['num'],
+                                    'mobile_num'  => $day_marketing_result['mobile_num'],
+                                    'ratio'       => $day_marketing_result['ratio'],
+                                    'update_time' => time(),
+                                ]);
+                            } else {
+                                Db::table('yx_statistics_day_channel')->insert($day_marketing_result);
+                            }
+                            break;
+                            //
+                        }
+
+                        $day_marketing_result = $this->selectSendResultForMarketingChannel($value['id'], $start_time, $end_time);
+                        if ($day_marketing_result == false) {
+                            $start_time = $end_time;
+                            continue;
+                        }
+                        $day_marketing_result['channel_id']         = $value['id'];
+                        $day_marketing_result['timekey']     = $timekey;
+                        $day_marketing_result['business_id'] = $business_id;
+                        $day_marketing_result['create_time'] = time();
+                        $day_marketing_result['update_time'] = time();
+                        $has                                 = Db::query('SELECT * FROM `yx_statistics_day_channel` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `channel_id` = ' . $value['id']);
+                        if ($has) {
+                            Db::table('yx_statistics_day_channel')->where('id', $has[0]['id'])->update([
+                                'success'     => $day_marketing_result['success'],
+                                'unknown'     => $day_marketing_result['unknown'],
+                                'default'     => $day_marketing_result['default'],
+                                'num'         => $day_marketing_result['num'],
+                                'mobile_num'  => $day_marketing_result['mobile_num'],
+                                'ratio'       => $day_marketing_result['ratio'],
+                                'update_time' => time(),
+                            ]);
+                        } else {
+                            Db::table('yx_statistics_day_channel')->insert($day_marketing_result);
+                        }
+                        // print_r($day_marketing_result);
+                        // die;
+                        $start_time = $end_time;
+                    }
+                }
+                sleep(900);
+            }
+        } catch (\Exceptixon $th) {
+            //throw $th;
+            print_r($day_marketing_result);
+            exception($th);
+        }
+    }
 
     public function checkSendFreeForMonth()
     {
@@ -3350,6 +3533,58 @@ class LocalScript extends Pzlife
         return ['mobile_num' => $mobile_num, 'num' => $all_num, 'success' => $success_num, 'unknown' => $unknow_num, 'default' => $default_num, 'ratio' => $ratio];
     }
 
+    private function selectSendResultForBusinessChannel($uid, $start_time, $end_time)
+    {
+        $all_num        = 0;
+        $mobile_num     = 0;
+        $success_num    = 0;
+        $unknow_num     = 0;
+        $default_num    = 0;
+        $settlement_num = 1;
+        //行业计费
+
+        $max_len = Db::query("SELECT  send_length FROM `yx_user_send_code_task` WHERE `yidong_channel_id` = " . $uid . " AND yidong_channel_id <> 0  AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "'  ORDER BY `send_length` DESC LIMIT 1");
+        if (empty($max_len)) {
+            return false;
+        } else {
+            $max_len = $max_len[0]['send_length'];
+            if ($max_len > 70) {
+                $settlement_num = ceil($max_len / 67);
+            }
+        }
+        for ($i = 0; $i < $settlement_num; $i++) {
+            # code...
+            if ($i == 0) {
+                $min_length = 0;
+                $max_length = 70;
+            } else {
+                $min_length = 67 * $i;
+                if ($i == 1) {
+                    $min_length = 70;
+                }
+                $max_length = 67 * ($i + 1);
+            }
+            $business_mobile_num = Db::query("SELECT SUM(`send_num`) AS send_num FROM `yx_user_send_code_task` WHERE `yidong_channel_id` = " . $uid . " AND yidong_channel_id <> 0 AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length)[0]['send_num'];
+            if (!empty($business_mobile_num)) {
+                $business_success_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_code_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_code_task` WHERE  `yidong_channel_id` = " . $uid . " AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "'  AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND status_message IN ('DELIVRD') GROUP BY `mobile`,`task_id`");
+                $business_default_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_code_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_code_task` WHERE  `yidong_channel_id` = " . $uid . " AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND status_message NOT IN ('DELIVRD') GROUP BY `mobile`,`task_id`");
+                $mobile_num += $business_mobile_num;
+                $success_num += count($business_success_mobile_num) * ($i + 1);
+                // if ($start_time >= 1595692800) {
+                $unknow_num += ($business_mobile_num - count($business_success_mobile_num) - count($business_default_mobile_num)) * ($i + 1);
+                $default_num += count($business_default_mobile_num) * ($i + 1);
+            }
+        }
+
+        $all_num = $success_num + $unknow_num + $default_num;
+        if ($all_num == 0) {
+            echo "SELECT  send_length FROM `yx_user_send_code_task` WHERE `yidong_channel_id` = " . $uid . " AND yidong_channel_id <> 0  AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "'  ORDER BY `send_length` DESC LIMIT 1";
+            die;
+        }
+        $ratio   = $success_num / $all_num * 100;
+        return ['mobile_num' => $mobile_num, 'num' => $all_num, 'success' => $success_num, 'unknown' => $unknow_num, 'default' => $default_num, 'ratio' => $ratio];
+    }
+
 
     public function SendResultForMarketingTest()
     {
@@ -3367,7 +3602,7 @@ class LocalScript extends Pzlife
         //行业计费
 
         $max_len = Db::query("SELECT  send_length FROM `yx_user_send_task` WHERE `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "'  ORDER BY `send_length` DESC LIMIT 1");
-        print_r($max_len);
+        // print_r($max_len);
         if (empty($max_len)) {
             return false;
         } else {
@@ -3426,6 +3661,71 @@ class LocalScript extends Pzlife
             }
         }
         $all_num = $success_num + $unknow_num + $default_num;
+        // return ['mobile_num' => $mobile_num, 'all_num' => $all_num, 'success_num' => $success_num, 'unknow_num' => $unknow_num, 'default_num' => $default_num];
+        $ratio = $success_num / $all_num * 100;
+        return ['mobile_num' => $mobile_num, 'num' => $all_num, 'success' => $success_num, 'unknown' => $unknow_num, 'default' => $default_num, 'ratio' => $ratio];
+    }
+
+
+    private function selectSendResultForMarketingChannel($uid,  $start_time, $end_time)
+    {
+        $all_num        = 0;
+        $mobile_num     = 0;
+        $success_num    = 0;
+        $unknow_num     = 0;
+        $default_num    = 0;
+        $settlement_num = 1;
+        //行业计费
+
+        $max_len = Db::query("SELECT  send_length FROM `yx_user_send_task` WHERE `yidong_channel_id` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "'  ORDER BY `send_length` DESC LIMIT 1");
+        // print_r($max_len);
+        if (empty($max_len)) {
+            return false;
+        } else {
+            $max_len = $max_len[0]['send_length'];
+
+            if ($max_len > 70) {
+                $settlement_num = ceil($max_len / 67);
+            }
+        }
+        for ($i = 0; $i < $settlement_num; $i++) {
+            # code...
+            if ($i == 0) {
+                $min_length = 0;
+                $max_length = 70;
+            } else {
+                $min_length = 67 * $i;
+                if ($i == 1) {
+                    $min_length = 70;
+                }
+                $max_length = 67 * ($i + 1);
+            }
+            $business_mobile_num = 0;
+            $business_success_mobile_num = 0;
+            $business_default_mobile_num = 0;
+            $business_mobile_num = Db::query("SELECT SUM(`send_num`) AS send_num FROM `yx_user_send_task` WHERE `yidong_channel_id` = " . $uid . " AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length)[0]['send_num'];
+
+            if (!empty($business_mobile_num)) {
+                $business_success_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_task` WHERE  `yidong_channel_id` = " . $uid . " AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "'  AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND real_message IN ('DELIVRD') GROUP BY `mobile`,`task_id`");
+                $business_default_mobile_num = Db::query("SELECT `mobile`,`task_id` FROM `yx_send_task_receipt` WHERE `task_id` IN (SELECT `id` FROM `yx_user_send_task` WHERE  `yidong_channel_id` = " . $uid . " AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' AND send_length > " . $min_length . " AND send_length <= " . $max_length . " ) AND real_message NOT IN ('DELIVRD') GROUP BY `mobile`,`task_id`");
+                $mobile_num += $business_mobile_num;
+                $success_num += count($business_success_mobile_num) * ($i + 1);
+                // $unknow_num += ($business_mobile_num - count($business_success_mobile_num) - count($business_default_mobile_num)) * ($i + 1);
+                // if ($start_time >= 1595692800) {
+                $unknow_num += ($business_mobile_num - count($business_success_mobile_num) - count($business_default_mobile_num)) * ($i + 1);
+                $default_num += count($business_default_mobile_num) * ($i + 1);
+                // echo count($business_success_mobile_num);
+                // echo "\n";
+                // echo count($business_default_mobile_num);
+                // echo "\n";
+                // die;
+            }
+        }
+        $all_num = $success_num + $unknow_num + $default_num;
+        if ($all_num == 0) {
+            echo "SELECT  send_length FROM `yx_user_send_code_task` WHERE `yidong_channel_id` = " . $uid . " AND yidong_channel_id <> 0  AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "'  ORDER BY `send_length` DESC LIMIT 1";
+            die;
+        }
         // return ['mobile_num' => $mobile_num, 'all_num' => $all_num, 'success_num' => $success_num, 'unknow_num' => $unknow_num, 'default_num' => $default_num];
         $ratio = $success_num / $all_num * 100;
         return ['mobile_num' => $mobile_num, 'num' => $all_num, 'success' => $success_num, 'unknown' => $unknow_num, 'default' => $default_num, 'ratio' => $ratio];
