@@ -10623,7 +10623,7 @@ class CmppCreateCodeTask extends Pzlife
                 if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                     continue;
                 }
-              /*   if (in_array(trim($value['mobile']), $white_list)) {
+                /*   if (in_array(trim($value['mobile']), $white_list)) {
                     continue;
                 } */
                 if (checkMobile($value['mobile']) != false) {
