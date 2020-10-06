@@ -2889,7 +2889,7 @@ class LocalScript extends Pzlife
         try {
             //code...
             while (true) {
-                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (91) "); //道信核对
+                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (SELECT id FROM `messagesend`.`yx_users` WHERE `pid` = '137') "); //道信核对
                 // $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
                 //行业
                 foreach ($uids as $key => $value) {
@@ -3052,7 +3052,7 @@ class LocalScript extends Pzlife
         try {
             //code...
             while (true) {
-                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (92) "); //道信核对
+                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (SELECT id FROM `messagesend`.`yx_users` WHERE `pid` = '137') "); //道信核对
                 // $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
 
                 //营销
