@@ -10413,9 +10413,9 @@ class CmppCreateCodeTask extends Pzlife
                 $all_send_task = [];
                 $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (" . join(',', $ids) . ") ");
                 foreach ($all_send_task as $key => $value) {
-                    if (in_array(trim($value['mobile']), $white_list)) {
+                    /*  if (in_array(trim($value['mobile']), $white_list)) {
                         continue;
-                    }
+                    } */
                     $sendmessage = [];
                     if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                         continue;
@@ -10623,9 +10623,9 @@ class CmppCreateCodeTask extends Pzlife
                 if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                     continue;
                 }
-                if (in_array(trim($value['mobile']), $white_list)) {
+              /*   if (in_array(trim($value['mobile']), $white_list)) {
                     continue;
-                }
+                } */
                 if (checkMobile($value['mobile']) != false) {
                     $end_num = substr($value['mobile'], -6);
                     //按无效号码计算
