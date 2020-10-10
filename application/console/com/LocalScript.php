@@ -3054,13 +3054,13 @@ class LocalScript extends Pzlife
             //code...
             while (true) {
                 // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (SELECT id FROM `messagesend`.`yx_users` WHERE `pid` = '137') "); //道信核对
-                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (279) "); //道信核对
+                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (301) "); //道信核对
                 // $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
 
                 //营销
                 foreach ($uids as $key => $value) {
                     // $start_time = (int) strtotime('-3 days', strtotime(date('Y-m-d', time())));
-                    $start_time = (int) strtotime('2020-09-01');
+                    $start_time = (int) strtotime('2020-10-01');
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
                         continue;
                     }
