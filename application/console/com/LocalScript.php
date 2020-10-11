@@ -2896,7 +2896,7 @@ class LocalScript extends Pzlife
                 foreach ($uids as $key => $value) {
                     // continue;
                     // $start_time = (int) strtotime('-4 days', strtotime(date('Y-m-d', time())));
-                    $start_time = (int) strtotime('2020-09-01');
+                    $start_time = (int) strtotime('2020-09-20');
                     // echo $start_time;die;
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_code_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
                         continue;
