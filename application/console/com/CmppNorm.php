@@ -92,12 +92,12 @@ class CmppNorm extends Pzlife
             'content'     => '【施华洛世奇】亲爱的会员，感谢您一路以来的支持！您已获得2020年会员周年礼券，购买正价商品满1999元即可获得闪耀玫瑰金色简约吊坠一条，请于2020年10月19日前使用。可前往“施华洛世奇会员中心”小程序查看该券。详询4006901078。 回TD退订',
             // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
         ])); */
-        /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15201926171',
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15821193682',
             'mar_task_id' => '',
-            'content'     => '【丝芙兰】1张9折券已飞奔向您！亲爱的于思佳会员，您所获赠的九折券自2020-09-01起生效，有效期截止2021-03-01，请在有效期间内前往丝芙兰官网sephora.cn、App、小程序或门店选购。(在官网购物时需与官网账号绑定。累积消费积分1500分或四次不同日消费即自动兑换1张九折劵)/回T退订',
+            'content'     => '【富泷科技】本次验证码为1815',
             // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
-        ])); */
+        ]));
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
         $myfile = fopen($log_path, 'a+');
@@ -343,6 +343,8 @@ class CmppNorm extends Pzlife
                     while (true) {
                         $Sequence_Id = $redis->get('channel_' . $content);
                         $redis->set('channel_' . $content, $Sequence_Id + 1);
+                        $pos = $redis->get('channel_pos_' . $content);
+                        $pos = isset($pos) ? $pos : 0;
                         try {
                             $receive = 1;
                             //先接收
@@ -447,7 +449,7 @@ class CmppNorm extends Pzlife
                                         }
                                         $body        = unpack("N2Msg_Id/a21Dest_Id/a10Service_Id/CTP_pid/CTP_udhi/CMsg_Fmt/a21Src_terminal_Id/CRegistered_Delivery/CMsg_Length/a" . $contentlen . "Msg_Content/", $bodyData);
                                         $Registered_Delivery = trim($body['Registered_Delivery']);
-                                        // print_r($body);
+                                        print_r($body);
                                         $develop_len = strlen($Dest_Id);
                                         $receive_develop_no = mb_substr(trim($body['Dest_Id']), $develop_len);
                                         // // echo "拓展码:".$receive_develop_no;
@@ -479,7 +481,7 @@ class CmppNorm extends Pzlife
                                             } else {
                                                 $Msg_Content = unpack("N2Msg_Id/a" . $stalen . "Stat/a10Submit_time/a10Done_time/a21Dest_terminal_Id/NSMSC_sequence", $body['Msg_Content']);
                                             }
-                                            // print_r($Msg_Content);
+                                            print_r($Msg_Content);
                                             $message_id = '';
                                             $message_id = strval($Msg_Content['Msg_Id1']) . strval($Msg_Content['Msg_Id2']);
                                             // $mesage = $redis->hget($redisMessageCodeMsgId, $Msg_Content['Msg_Id1'] . $Msg_Content['Msg_Id2']);
@@ -566,12 +568,11 @@ class CmppNorm extends Pzlife
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));
                                 // // print_r($code);die;
                                 if (strlen($code) > 140) {
-                                    $pos = $redis->get('channel_pos_' . $content);
-                                    $pos = isset($pos) ? $pos : 0;
-                                    $redis->set('channel_pos_' . $content, $pos + 1);
+
+                                    /* $redis->set('channel_pos_' . $content, $pos + 1);
                                     if ($pos + 1 > 100) {
                                         $redis->set('channel_pos_' . $content, 0);
-                                    }
+                                    } */
                                     $num_messages = ceil(strlen($code) / $max_len);
                                     for ($j = 0; $j < $num_messages; $j++) {
                                         $bodyData = pack("N", $num1) . pack("N", $num2);
@@ -625,7 +626,10 @@ class CmppNorm extends Pzlife
                                     if ($i > $security_master) {
                                         $i    = 0;
                                     }
-
+                                    $pos++;
+                                    if ($pos + 1 > 100) {
+                                        $pos = 0;
+                                    }
                                     // usleep(2500);
                                     continue;
                                 } else { //单条短信
