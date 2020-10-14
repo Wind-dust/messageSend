@@ -511,6 +511,7 @@ class CmppNorm extends Pzlife
                                             }
                                         }
                                         // print_r($mesage);
+                                        die;
                                         $callback_Command_Id = 0x80000005;
 
                                         $new_body         = pack("N", $body['Msg_Id1']) . pack("N", $body['Msg_Id2']) . pack("C", $Result);
