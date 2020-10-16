@@ -10229,20 +10229,23 @@ class CmppCreateCodeTask extends Pzlife
         // print_r($id_num);die;
         $del_ids = [];
         try {
-
+            $j = 1;
             for ($i = 0; $i < $id_num; $i++) {
                 $this_id = $i + 1;
                 $task_code_receipt = Db::query("SELECT * FROM yx_send_code_task_receipt WHERE `id` = " . $this_id);
+                if (empty($task_code_receipt)) {
+                    continue;
+                }
                 $task = Db::query("SELECT `task_no` FROM yx_user_send_code_task WHERE `id` = " . $task_code_receipt[0]['task_id']);
                 if (!empty($task)) {
                     $task_log = Db::query("SELECT * FROM  yx_user_send_code_task_log WHERE `task_no` = '" . $task[0]['task_no'] . "'");
                     if (!empty($task_log)) {
-                        if (strpos($task_log[0]['status_message'], 'DB:0141') !== false || strpos($task_log[0]['status_message'], 'MBBLACK') !== false || strpos($task_log[0]['status_message'], 'BLACK') !== false) {
+                        if (strpos($task_code_receipt[0]['status_message'], 'DB:0141') !== false || strpos($task_code_receipt[0]['status_message'], 'MBBLACK') !== false || strpos($task_code_receipt[0]['status_message'], 'BLACK') !== false) {
                             $message_info = '黑名单';
-                        } else if (trim($task_log[0]['status_message'] == 'DELIVRD')) {
+                        } else if (trim($task_code_receipt[0]['status_message'] == 'DELIVRD')) {
                             $message_info = '发送成功';
-                        } else if (in_array(trim($task_log[0]['status_message']), ['REJECTD', 'REJECT', 'MA:0001'])) {
-                            $message_info = '发送成功';
+                        } else if (in_array(trim($task_code_receipt[0]['status_message']), ['REJECTD', 'REJECT', 'MA:0001'])) {
+                            $message_info = '发送失败';
                         } else {
                             $message_info = '发送失败';
                         }
@@ -10254,13 +10257,77 @@ class CmppCreateCodeTask extends Pzlife
                                 'message_info' => $message_info,
                             ]
                         );
-                        $del_ids[] = $i;
+                        /*  $del_ids[] = $i;
+                        $j++;
+                        if ($j > 100) {
+                            $ids = join(',', $del_ids);
+                            Db::table('yx_send_code_task_receipt')->where("id in ($ids)")->delete();
+                            $j = 1;
+                            $del_ids = [];
+                        } */
                     }
                 }
             }
-            die;
-            $ids = join(',', $del_ids);
-            Db::table('yx_user_send_code_task_log')->where("id in ($ids)")->delete();
+            // die;
+            /*   $ids = join(',', $del_ids);
+            Db::table('yx_send_code_task_receipt')->where("id in ($ids)")->delete(); */
+        } catch (\Exception $th) {
+            exception($th);
+        }
+    }
+
+    public function taskReceiptMarketing()
+    {
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $num = Db::query("SELECT count(`id`) FROM yx_send_task_receipt ");
+        $id_num = $num[0]['count(`id`)'];
+        // print_r($id_num);die;
+        $del_ids = [];
+        try {
+            $j = 1;
+            for ($i = 0; $i < $id_num; $i++) {
+                $this_id = $i + 1;
+                $task_code_receipt = Db::query("SELECT * FROM yx_send_task_receipt WHERE `id` = " . $this_id);
+                // print_r($task_code_receipt);die;
+                if (empty($task_code_receipt)) {
+                    continue;
+                }
+                $task = Db::query("SELECT `task_no` FROM yx_user_send_task WHERE `id` = " . $task_code_receipt[0]['task_id']);
+                if (!empty($task)) {
+                    $task_log = Db::query("SELECT * FROM  yx_user_send_task_log WHERE `task_no` = '" . $task[0]['task_no'] . "'");
+                    if (!empty($task_log)) {
+                        $message_info = '';
+                        if (strpos($task_code_receipt[0]['status_message'], 'DB:0141') !== false || strpos($task_code_receipt[0]['status_message'], 'MBBLACK') !== false || strpos($task_code_receipt[0]['status_message'], 'BLACK') !== false) {
+                            $message_info = '黑名单';
+                        } else if (trim($task_code_receipt[0]['status_message'] == 'DELIVRD')) {
+                            $message_info = '发送成功';
+                        } else if (in_array(trim($task_code_receipt[0]['status_message']), ['REJECTD', 'REJECT', 'MA:0001'])) {
+                            $message_info = '发送成功';
+                        } else {
+                            $message_info = '发送失败';
+                        }
+                        Db::table('yx_user_send_task_log')->where('id', $task_log[0]['id'])->update(
+                            [
+                                'status_message' => $task_code_receipt[0]['status_message'],
+                                'real_message' => $task_code_receipt[0]['real_message'],
+                                'update_time' => $task_code_receipt[0]['create_time'],
+                                'message_info' => $message_info,
+                            ]
+                        );
+                        /*  $del_ids[] = $i;
+                        $j++;
+                        if ($j > 100) {
+                            $ids = join(',', $del_ids);
+                            Db::table('yx_send_task_receipt')->where("id in ($ids)")->delete();
+                            $j = 1;
+                            $del_ids = [];
+                        } */
+                    }
+                }
+            }
+            // die;
+            /*  $ids = join(',', $del_ids);
+            Db::table('yx_send_task_receipt')->where("id in ($ids)")->delete(); */
         } catch (\Exception $th) {
             exception($th);
         }
@@ -13697,6 +13764,22 @@ class CmppCreateCodeTask extends Pzlife
         } catch (\EXception $th) {
             //throw $th;
             exception($th);
+        }
+    }
+
+    public function receiptCallBackTest()
+    {
+        ini_set('memory_limit', '3072M');
+        $redis = Phpredis::getConn();
+        $callback = [
+            '{"task_no":"mar20101514411932792120","status_message":"DELIVRD","message_info":"\u53d1\u9001\u6210\u529f","mobile":"13998412914","send_time":"2020-10-15 14:42:35"}',
+            '{"task_no":"mar20101515215821429037","status_message":"DELIVRD","message_info":"\u53d1\u9001\u6210\u529f","mobile":"13998412914","send_time":"2020-10-15 15:27:58"}',
+            '{"task_no":"mar20101515535151266970","status_message":"DELIVRD","message_info":"\u53d1\u9001\u6210\u529f","mobile":"13704081841","send_time":"2020-10-15 15:54:50"}',
+            '{"task_no":"mar20101515562495642912","status_message":"DELIVRD","message_info":"\u53d1\u9001\u6210\u529f","mobile":"15942854072","send_time":"2020-10-15 15:57:12"}',
+            '{"task_no":"mar20101516044620220118","status_message":"DELIVRD","message_info":"\u53d1\u9001\u6210\u529f","mobile":"13904097392","send_time":"2020-10-15 16:05:38"}',
+        ];
+        foreach ($callback as $key => $value) {
+            $redis->rpush('index:meassage:code:user:receive:191', $value);
         }
     }
 }
