@@ -10364,8 +10364,8 @@ class CmppCreateCodeTask extends Pzlife
             // $bufa = Db::query("SELECT * FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '291' AND `id` >= '406453'  ");
             $bufa = Db::query("SELECT * FROM `messagesend`.`yx_user_send_task` WHERE `id` IN (SELECT `task_id` FROM `messagesend`.`yx_send_task_receipt` WHERE `task_id` IN (SELECT id FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '191' AND `id` > '416765' AND `id` < '425670' ) AND `status_message` = 'DB:0107')");
             $ids = Db::query("SELECT `id` FROM `messagesend`.`yx_send_task_receipt` WHERE `task_id` IN (SELECT id FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '191' AND `id` > '416765' AND `id` < '425670' ) AND `status_message` = 'DB:0107'");
-            print_r(count($bufa));
-            die;
+            // print_r(count($bufa));
+            // die;
             Db::table('yx_user_send_task')->where(`id`, `IN`, $ids)->delete();
             foreach ($bufa as $key => $value) {
                 # code...
