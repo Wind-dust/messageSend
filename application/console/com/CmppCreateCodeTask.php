@@ -10336,7 +10336,7 @@ class CmppCreateCodeTask extends Pzlife
     public function Bufa()
     {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
-        $black_error_path = realpath("./") . "/newc.txt";
+        /*  $black_error_path = realpath("./") . "/newc.txt";
         $black_error_file       = fopen($black_error_path, "r");
         $black_error_mobile = [];
         while (!feof($black_error_file)) {
@@ -10349,7 +10349,7 @@ class CmppCreateCodeTask extends Pzlife
             }
         }
         // print_r(count($black_error_mobile))
-        fclose($black_error_file);
+        fclose($black_error_file); */
         // print_r($black_error_mobile);die;
         $this->redis = Phpredis::getConn();
         /*  $res = $this->redis->rpush('index:meassage:code:send' . ":" . 145, json_encode([
@@ -10361,43 +10361,48 @@ class CmppCreateCodeTask extends Pzlife
             'from'        => 'yx_user_send_task',
         ])); */
         try {
-            $bufa = Db::query("SELECT * FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '291' AND `id` >= '406453'  ");
-
+            // $bufa = Db::query("SELECT * FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '291' AND `id` >= '406453'  ");
+            $bufa = Db::query("SELECT * FROM `messagesend`.`yx_user_send_task` WHERE `id` IN (SELECT `task_id` FROM `messagesend`.`yx_send_task_receipt` WHERE `task_id` IN (SELECT id FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '191' AND `id` > '416765' AND `id` < '425670' ) AND `status_message` = 'DB:0107')");
+            $ids = Db::query("SELECT `id` FROM `messagesend`.`yx_send_task_receipt` WHERE `task_id` IN (SELECT id FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '191' AND `id` > '416765' AND `id` < '425670' ) AND `status_message` = 'DB:0107'");
+            print_r(count($bufa));
+            die;
+            Db::table('yx_user_send_task')->where(`id`, `IN`, $ids)->delete();
             foreach ($bufa as $key => $value) {
                 # code...
                 $mobile_content = explode(',', $value['mobile_content']);
 
                 foreach ($mobile_content as $mkey => $mvalue) {
-                    if (in_array($mvalue, $black_error_mobile)) {
-                        $prefix = '';
-                        $prefix = substr(trim($mvalue), 0, 7);
-                        $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
-                        // print_r($res);
-                        $channel_id = 0;
-                        if ($res) {
-                            $newres = array_shift($res);
-                            if ($newres['source'] == 1) {
-                                $channel_id = 145;
-                            } elseif ($newres['source'] == 2) {
-                                $channel_id = 146;
-                            } elseif ($newres['source'] == 3) {
-                                $channel_id = 146;
-                            }
-                        } else {
-                            $channel_id = 145;
+                    /* if (in_array($mvalue, $black_error_mobile)) {
+                        
+                    } */
+                    $prefix = '';
+                    $prefix = substr(trim($mvalue), 0, 7);
+                    $res    = Db::query("SELECT `source`,`province_id`,`province` FROM `yx_number_source` WHERE `mobile` = '" . $prefix . "'");
+                    // print_r($res);
+                    $channel_id = 0;
+                    if ($res) {
+                        $newres = array_shift($res);
+                        if ($newres['source'] == 1) {
+                            $channel_id = 126;
+                        } elseif ($newres['source'] == 2) {
+                            $channel_id = 127;
+                        } elseif ($newres['source'] == 3) {
+                            $channel_id = 128;
                         }
-                        $sendmessage = [];
-                        $sendmessage = [
-                            'msg_id'      => $value['send_msg_id'],
-                            'title'      => $value['task_name'],
-                            'mobile'      => $mvalue,
-                            'mar_task_id' => $value['id'],
-                            'uid' => $value['uid'],
-                            'content'     => $value['task_content'],
-                            'from'        => 'yx_user_send_task',
-                        ];
-                        $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道 
+                    } else {
+                        $channel_id = 126;
                     }
+                    $sendmessage = [];
+                    $sendmessage = [
+                        'msg_id'      => $value['send_msg_id'],
+                        'title'      => $value['task_name'],
+                        'mobile'      => $mvalue,
+                        'mar_task_id' => $value['id'],
+                        'uid' => $value['uid'],
+                        'content'     => $value['task_content'],
+                        'from'        => 'yx_user_send_task',
+                    ];
+                    $this->redis->rpush('index:meassage:code:send' . ":" . $channel_id, json_encode($sendmessage)); //三体营销通道 
                 }
             }
         } catch (\EXception $th) {
