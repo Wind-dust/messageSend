@@ -1377,7 +1377,7 @@ class SflUpload extends Pzlife
                                         $MMS_real_send['send_status']  = 1;
                                         $MMS_real_send['sfl_model_id'] = 1;
                                         $MMS_real_send['create_time']  = time();
-                                        $MMS_real_send['create_time']  = $expeort_time + ceil($key / 7000);
+                                        // $MMS_real_send['create_time']  = $expeort_time + ceil($key / 7000);
                                         if (isset($model_check[$tvalue[2]])) {
                                             $model_check[$tvalue[2]]++;
                                         } else {
@@ -1715,7 +1715,7 @@ class SflUpload extends Pzlife
                                         $SMS_real_send['send_status'] = 1;
                                         $SMS_real_send['template_id'] = $tvalue[2];
                                         $SMS_real_send['create_time'] = time();
-                                        $SMS_real_send['create_time'] =  $expeort_time + ceil($key / 7000);
+                                        // $SMS_real_send['create_time'] =  $expeort_time + ceil($key / 7000);
 
                                         $content                      = $SMS_model[$tvalue[2]]['content'];
                                         $content                      = str_replace('{FULL_NAME}', $tvalue[4], $content);
