@@ -278,13 +278,13 @@ class HttpChannelCaiXinChuangShi extends Pzlife
 
             //回执
            
-            // $getreceiptrequest = [];
-            // $getreceiptrequest = [
-            //     'account' => 'xd001768',
-            //     'password' => 'B7BF78F9FFF98594387B4B932442C801',
-            // ];
-            // $getreceiptrequest = sendRequest($user_info['call_back'], 'post', $getreceiptrequest);
-            $receipt_info = '{"error":"1","remark":"成功","statusbox":[{"mobile":"15201926171","taskid":"2010283347066108","receivetime":"2020-10-28 09:47:07","errorcode":"MY:0001"},{"mobile":"15821193682","taskid":"2010283428129746","receivetime":"2020-10-28 10:30:39","errorcode":"DELIVRD"},{"mobile":"15172413692","taskid":"2010283428129746","receivetime":"2020-10-28 10:30:39","errorcode":"DELIVRD"},{"mobile":"15201926171","taskid":"2010283402254813","receivetime":"2020-10-28 10:25:38","errorcode":"DELIVRD"},{"mobile":"15201926171","taskid":"2010283731447233","receivetime":"2020-10-28 13:50:32","errorcode":"DELIVRD"}]}';
+            $getreceiptrequest = [];
+            $getreceiptrequest = [
+                'account' => 'xd001768',
+                'password' => 'B7BF78F9FFF98594387B4B932442C801',
+            ];
+            $receipt_info = sendRequest($user_info['call_back'], 'post', $getreceiptrequest);
+            // $receipt_info = '{"error":"1","remark":"成功","statusbox":[{"mobile":"15201926171","taskid":"2010283347066108","receivetime":"2020-10-28 09:47:07","errorcode":"MY:0001"},{"mobile":"15821193682","taskid":"2010283428129746","receivetime":"2020-10-28 10:30:39","errorcode":"DELIVRD"},{"mobile":"15172413692","taskid":"2010283428129746","receivetime":"2020-10-28 10:30:39","errorcode":"DELIVRD"},{"mobile":"15201926171","taskid":"2010283402254813","receivetime":"2020-10-28 10:25:38","errorcode":"DELIVRD"},{"mobile":"15201926171","taskid":"2010283731447233","receivetime":"2020-10-28 13:50:32","errorcode":"DELIVRD"}]}';
             $receipt_info_array = [];
             $receipt_info_array = json_decode($receipt_info,true);
             if ($receipt_info_array['statusbox']){
