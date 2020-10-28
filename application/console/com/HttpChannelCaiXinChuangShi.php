@@ -49,6 +49,7 @@ class HttpChannelCaiXinChuangShi extends Pzlife
         $redisMessageCodeDeliver = 'index:meassage:multimediamessage:deliver:' . $content; //彩信MsgId
         $user_info               = $this->content();
         // $send                 = $redis->rPush($redisMessageCodeSend, '{"mobile":"15201926171","title":"\u3010YSL\u5723\u7f57\u5170\u3011YSL \u730e\u5ba0\u6d3e\u300c\u5151\u300d\u5012\u8ba1\u65f65\u5929\uff0c\u5373\u5c06\u71c3\u60c5\u5f00\u573a","mar_task_id":92221,"content":[{"id":184229,"content":"","num":1,"image_path":"20200608\/6475740968addfecf66cf682ecfdeccd5ede0950e0dfa.jpg","image_type":"jpg"},{"id":184230,"content":"YSL\u3010\u9996\u6b21\u3011\u53cc\u500d\u79ef\u5206\u5373\u5c06\u5f00\u542f\uff0c\u591a\u6b3e\u6b63\u88c5\u661f\u54c1\u7b49\u4f60\u62a2\u5151\uff01\n\u5173\u6ce8\u5e76\u7ed1\u5b9aysl\u5b98\u65b9\u5fae\u4fe1\uff08yslbeauty\uff09\uff0c\u5f00\u542f\u60ca\u559c\u9650\u65f6\u5151\u793c\u3002\n\u5962\u793c\u730e\u5fc3\uff0c\u53ea\u4e3a\u6781\u81f4\u5ba0\u7231\uff0c\u66f4\u591a\u60ca\u559c\u7b49\u60a8\u8385\u4e34\u89e3\u9501\u3002\/\u56deTD\u9000\u8ba2 ","num":2,"image_path":"","image_type":""}],"from":"yx_user_multimedia_message","send_msg_id":"","uid":1}');
+        // $send                 = $redis->rPush($redisMessageCodeSend, '{"mobile":"15172413692","title":"\u3010YSL\u5723\u7f57\u5170\u3011YSL \u730e\u5ba0\u6d3e\u300c\u5151\u300d\u5012\u8ba1\u65f65\u5929\uff0c\u5373\u5c06\u71c3\u60c5\u5f00\u573a","mar_task_id":92221,"content":[{"id":184229,"content":"","num":1,"image_path":"20200608\/6475740968addfecf66cf682ecfdeccd5ede0950e0dfa.jpg","image_type":"jpg"},{"id":184230,"content":"YSL\u3010\u9996\u6b21\u3011\u53cc\u500d\u79ef\u5206\u5373\u5c06\u5f00\u542f\uff0c\u591a\u6b3e\u6b63\u88c5\u661f\u54c1\u7b49\u4f60\u62a2\u5151\uff01\n\u5173\u6ce8\u5e76\u7ed1\u5b9aysl\u5b98\u65b9\u5fae\u4fe1\uff08yslbeauty\uff09\uff0c\u5f00\u542f\u60ca\u559c\u9650\u65f6\u5151\u793c\u3002\n\u5962\u793c\u730e\u5fc3\uff0c\u53ea\u4e3a\u6781\u81f4\u5ba0\u7231\uff0c\u66f4\u591a\u60ca\u559c\u7b49\u60a8\u8385\u4e34\u89e3\u9501\u3002\/\u56deTD\u9000\u8ba2 ","num":2,"image_path":"","image_type":""}],"from":"yx_user_multimedia_message","send_msg_id":"","uid":1}');
         // $message =  '{"mobile":"15172413692,15821193682","title":"\u3010YSL\u5723\u7f57\u5170\u3011YSL \u730e\u5ba0\u6d3e\u300c\u5151\u300d\u5012\u8ba1\u65f65\u5929\uff0c\u5373\u5c06\u71c3\u60c5\u5f00\u573a","mar_task_id":92221,"content":[{"id":184229,"content":"","num":1,"image_path":"20200608\/6475740968addfecf66cf682ecfdeccd5ede0950e0dfa.jpg","image_type":"jpg"},{"id":184230,"content":"YSL\u3010\u9996\u6b21\u3011\u53cc\u500d\u79ef\u5206\u5373\u5c06\u5f00\u542f\uff0c\u591a\u6b3e\u6b63\u88c5\u661f\u54c1\u7b49\u4f60\u62a2\u5151\uff01\n\u5173\u6ce8\u5e76\u7ed1\u5b9aysl\u5b98\u65b9\u5fae\u4fe1\uff08yslbeauty\uff09\uff0c\u5f00\u542f\u60ca\u559c\u9650\u65f6\u5151\u793c\u3002\n\u5962\u793c\u730e\u5fc3\uff0c\u53ea\u4e3a\u6781\u81f4\u5ba0\u7231\uff0c\u66f4\u591a\u60ca\u559c\u7b49\u60a8\u8385\u4e34\u89e3\u9501\u3002\/\u56deTD\u9000\u8ba2 ","num":2,"image_path":"","image_type":""}],"from":"yx_user_multimedia_message","send_msg_id":"","uid":1}';
 
         $callback = [];
@@ -243,8 +244,8 @@ class HttpChannelCaiXinChuangShi extends Pzlife
                         // 'extno' => '6579',
                     ];
                     // print_r($real_send);
-                    $res = sendRequest($user_info['send_api'], 'post', $real_send);
-                   /*  $res = '<?xml version="1.0" encoding="utf-8" ?>
+                    // $res = sendRequest($user_info['send_api'], 'post', $real_send);
+                    $res = '<?xml version="1.0" encoding="utf-8" ?>
                     <returnsms>
                         <returnstatus>Success</returnstatus>
                         <message>操作成功</message>
@@ -252,7 +253,7 @@ class HttpChannelCaiXinChuangShi extends Pzlife
                         <taskID>2010283731447233</taskID>
                         <successCounts>1</successCounts>
                     </returnsms>
-                    '; */
+                    ';
                     // print_r($callback);
                     $receive_data = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
                     if ($receive_data['returnstatus'] == 'Success') {//发送成功
@@ -260,7 +261,7 @@ class HttpChannelCaiXinChuangShi extends Pzlife
                         unset($SendTitle[$key]);
                         unset($sendTask[$key]);
                         unset($callback[$key]);
-                        $redis->hset('index:meassage:code:back_taskno:' . $content, $receive_data['taskID'], $SendMobile['mar_task_id']);
+                        $redis->hset('index:meassage:code:back_taskno:' . $content, $receive_data['taskID'],$key);
                     }else{
                         foreach ($callback as $key => $value) {
                             foreach ($value as $ne => $val) {
@@ -284,7 +285,7 @@ class HttpChannelCaiXinChuangShi extends Pzlife
                 'password' => 'B7BF78F9FFF98594387B4B932442C801',
             ];
             $receipt_info = sendRequest($user_info['call_back'], 'post', $getreceiptrequest);
-            // $receipt_info = '{"error":"1","remark":"成功","statusbox":[{"mobile":"15201926171","taskid":"2010283347066108","receivetime":"2020-10-28 09:47:07","errorcode":"MY:0001"},{"mobile":"15821193682","taskid":"2010283428129746","receivetime":"2020-10-28 10:30:39","errorcode":"DELIVRD"},{"mobile":"15172413692","taskid":"2010283428129746","receivetime":"2020-10-28 10:30:39","errorcode":"DELIVRD"},{"mobile":"15201926171","taskid":"2010283402254813","receivetime":"2020-10-28 10:25:38","errorcode":"DELIVRD"},{"mobile":"15201926171","taskid":"2010283731447233","receivetime":"2020-10-28 13:50:32","errorcode":"DELIVRD"}]}';
+           /*  $receipt_info = '{"error":"1","remark":"成功","statusbox":[{"mobile":"15201926171","taskid":"2010283347066108","receivetime":"2020-10-28 09:47:07","errorcode":"MY:0001"},{"mobile":"15821193682","taskid":"2010283428129746","receivetime":"2020-10-28 10:30:39","errorcode":"DELIVRD"},{"mobile":"15172413692","taskid":"2010283428129746","receivetime":"2020-10-28 10:30:39","errorcode":"DELIVRD"},{"mobile":"15201926171","taskid":"2010283402254813","receivetime":"2020-10-28 10:25:38","errorcode":"DELIVRD"},{"mobile":"15201926171","taskid":"2010283731447233","receivetime":"2020-10-28 13:50:32","errorcode":"DELIVRD"}]}'; */
             $receipt_info_array = [];
             $receipt_info_array = json_decode($receipt_info,true);
             if ($receipt_info_array['statusbox']){
@@ -317,7 +318,7 @@ class HttpChannelCaiXinChuangShi extends Pzlife
         
         } catch (\Exception $th) {
             //throw $th;
-            // exception($th);
+            exception($th);
             foreach ($callback as $key => $value) {
                 foreach ($value as $ne => $val) {
                     $redis->rpush($redisMessageCodeSend, $val);
