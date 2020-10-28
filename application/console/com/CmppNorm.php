@@ -61,6 +61,14 @@ class CmppNorm extends Pzlife
 
     public function Send($content)
     {
+        /*  $code = '【施华洛世奇】亲爱的会员，感谢您一路以来的支持！您已获得2020年会员周年礼券，购买正价商品满1999元即可获得闪耀玫瑰金色简约吊坠一条，请于2020年10月19日前使用。可前往“施华洛世奇会员中心”小程序查看该券。详询4006901078。 回TD退订'; //带签名
+        $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
+        $udh     = pack("cccccc", 5, 0, 3, 1, 2, 1);
+        $newcode = $udh . substr($code, 0 * 134, 134);
+        print_r(substr($code, 0 * 134, 134));
+        // print_r($newcode);
+        die; */
+
         // $this->clientSocketInit();
         $contdata = $this->content($content);
         // print_r($contdata);die;
@@ -86,17 +94,17 @@ class CmppNorm extends Pzlife
 
         ])); */
 
-        /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'content'     => '【施华洛世奇】亲爱的会员，感谢您一路以来的支持！您已获得2020年会员周年礼券，购买正价商品满1999元即可获得闪耀玫瑰金色简约吊坠一条，请于2020年10月19日前使用。可前往“施华洛世奇会员中心”小程序查看该券。详询4006901078。 回TD退订',
             // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
-        ])); */
-        /*   $send = $redis->rPush($redisMessageCodeSend, json_encode([
-            'mobile'      => '15821193682',
+        ]));
+        /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
+            'mobile'      => '15201926171',
             'mar_task_id' => '',
             'content'     => '【富泷科技】本次验证码为1815',
-            // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
+            // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。', 
         ])); */
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
