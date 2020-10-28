@@ -933,9 +933,9 @@ class CmppCreateCodeTask extends Pzlife
                                     */
 
         // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_multimedia_message WHERE  `id` >= 365214  ");
+        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_multimedia_message WHERE  `id` = 92221  ");
         foreach ($task_id as $key => $value) {
-            $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $value['id'], 'deduct' => 35]));
+            $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $value['id'], 'deduct' => 0]));
         }
         // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 326561, 'deduct' => 0]));
         // $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => 287775, 'deduct' => 0]));
@@ -10452,14 +10452,14 @@ class CmppCreateCodeTask extends Pzlife
         // $tody_time = 1596189600;// 时间下午16点3条 已发第一条
         // $tody_time = 1596877200; // 时间下午17点20
         try {
-            $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 156, 'liantong_channel_id' => 157, 'dianxin_channel_id' => 157, 'update_time' => time()]);
-            // $mysql_connect->table('yx_sfl_send_task')->where([['template_id', '=', '100184672']])->update(['free_trial' => 2, 'yidong_channel_id' => 156, 'liantong_channel_id' => 157, 'dianxin_channel_id' => 157, 'update_time' => time()]);
+            // $mysql_connect->table('yx_sfl_send_task')->where([['create_time', '>', $tody_time]])->update(['free_trial' => 2, 'yidong_channel_id' => 156, 'liantong_channel_id' => 157, 'dianxin_channel_id' => 157, 'update_time' => time()]);
+            $mysql_connect->table('yx_sfl_send_task')->where([['template_id', '=', '100185486']])->update(['free_trial' => 2, 'yidong_channel_id' => 156, 'liantong_channel_id' => 157, 'dianxin_channel_id' => 157, 'update_time' => time()]);
             // $mysql_connect->table('yx_sfl_send_task')->where([['template_id', '=', '100183187']])->update(['free_trial' => 2, 'yidong_channel_id' => 83, 'liantong_channel_id' => 84, 'dianxin_channel_id' => 84, 'update_time' => time()]);
             /* $where = [];
             $where = [['create_time','>',$tody_time],['template_id', '<>','100150821']];
             $mysql_connect->table('yx_sfl_send_task')->where($where)->update(['free_trial' => 2, 'yidong_channel_id' => 86, 'liantong_channel_id' => 88, 'dianxin_channel_id' => 87]);*/
-            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  '" . $tody_time . "' AND `template_id` NOT IN ('100184476','100184475')  ");
-            // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100184672'   ");
+            // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `create_time` >  '" . $tody_time . "' AND `template_id` NOT IN ('100184476','100184475')  ");
+            $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id` = '100185486'   ");
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id`  IN ('100182791','100181685','100182168','100182172') AND  `create_time` >  '" . $tody_time . "' AND mobile IN (".join(',',$white_list).") ");
             // echo "SELECT * FROM yx_sfl_send_task WHERE `template_id`  IN ('100182791','100181685','100182168','100182172') AND  `create_time` >  '" . $tody_time . "' AND mobile IN (".join(',',$white_list).") ";die;
             // $sendid = $mysql_connect->query("SELECT `id` FROM yx_sfl_send_task WHERE `template_id`  IN ('100182166','100182575') AND  `create_time` >  '" . $tody_time . "' ");
@@ -10473,7 +10473,7 @@ class CmppCreateCodeTask extends Pzlife
             exception($th);
         }
         // die;
-        $deduct = 1; //1扣量,2不扣
+        $deduct = 2; //1扣量,2不扣
         $rate = 60;
 
         $ids = [];
@@ -10491,9 +10491,9 @@ class CmppCreateCodeTask extends Pzlife
                 $all_send_task = [];
                 $all_send_task = $mysql_connect->query("SELECT *  FROM yx_sfl_send_task WHERE `id` IN (" . join(',', $ids) . ") ");
                 foreach ($all_send_task as $key => $value) {
-                    /*  if (in_array(trim($value['mobile']), $white_list)) {
+                     if (in_array(trim($value['mobile']), $white_list)) {
                         continue;
-                    } */
+                    }
                     $sendmessage = [];
                     if (!$value['yidong_channel_id'] || !$value['liantong_channel_id'] || !$value['dianxin_channel_id']) {
                         continue;
@@ -13783,14 +13783,10 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M');
         $redis = Phpredis::getConn();
         $callback = [
-            '{"task_no":"mar20101514411932792120","status_message":"DELIVRD","message_info":"\u53d1\u9001\u6210\u529f","mobile":"13998412914","send_time":"2020-10-15 14:42:35"}',
-            '{"task_no":"mar20101515215821429037","status_message":"DELIVRD","message_info":"\u53d1\u9001\u6210\u529f","mobile":"13998412914","send_time":"2020-10-15 15:27:58"}',
-            '{"task_no":"mar20101515535151266970","status_message":"DELIVRD","message_info":"\u53d1\u9001\u6210\u529f","mobile":"13704081841","send_time":"2020-10-15 15:54:50"}',
-            '{"task_no":"mar20101515562495642912","status_message":"DELIVRD","message_info":"\u53d1\u9001\u6210\u529f","mobile":"15942854072","send_time":"2020-10-15 15:57:12"}',
-            '{"task_no":"mar20101516044620220118","status_message":"DELIVRD","message_info":"\u53d1\u9001\u6210\u529f","mobile":"13904097392","send_time":"2020-10-15 16:05:38"}',
+            '{"task_no":"bus20102614293195827633","status_message":"DELIVRD","message_info":"\u53d1\u9001\u6210\u529f","mobile":"18096633693","send_time":"2020-10-26 14:29:38"}',
         ];
         foreach ($callback as $key => $value) {
-            $redis->rpush('index:meassage:code:user:receive:191', $value);
+            $redis->rpush('index:meassage:code:user:receive:190', $value);
         }
     }
 }
