@@ -1167,13 +1167,13 @@ class SflUpload extends Pzlife
                             // $file = fopen($path.$value."/".$svalue,"r");
                             // print_r($svalue);die;
 
-                            /*  if (!strpos($svalue, '20200930')) {
-                                continue;
-                            } */
-                            // print_r($svalue);die;
-                            if (!strpos($svalue, date("Ymd"))) {
+                             if (!strpos($svalue, '20201027')) {
                                 continue;
                             }
+                            // print_r($svalue);die;
+                            /* if (!strpos($svalue, date("Ymd"))) {
+                                continue;
+                            } */
                             $start_time = strtotime("2020-09-30");
                             // $end_time = $start_time+86400;
                             $expeort_time = $start_time + 43200 - mt_rand(0, 3000);
@@ -1543,13 +1543,13 @@ class SflUpload extends Pzlife
                             // continue;
                             $son_path = $path . $value . "/" . $svalue;
                             // $file = fopen($path.$value."/".$svalue,"r");
-                            if (!strpos($svalue, date("Ymd"))) {
-                                continue;
-                            }
-                            //  strpos($svalue, '2020071518') == false
-                            /* if (strpos($svalue, '20201018') == false) {
+                           /*  if (!strpos($svalue, date("Ymd"))) {
                                 continue;
                             } */
+                            //  strpos($svalue, '2020071518') == false
+                            if (strpos($svalue, '20201027') == false) {
+                                continue;
+                            }
 
                             $start_time = strtotime("2020-09-11");
                             $end_time = $start_time + 86400;
@@ -1778,7 +1778,7 @@ class SflUpload extends Pzlife
                                         continue;
 
                                         } */
-                                        if ($save_type == 'redis') {
+                                        if ($save_type == 'redis' && in_array($tvalue[2],['100185443'])) {
                                             if (in_array($tvalue[3], $white_list)) {
                                                 $redis->rpush('sftp:sfl:marketing:whitesendtask', json_encode($SMS_real_send));
                                             } else {
