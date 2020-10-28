@@ -244,8 +244,8 @@ class HttpChannelCaiXinChuangShi extends Pzlife
                         // 'extno' => '6579',
                     ];
                     // print_r($real_send);
-                    // $res = sendRequest($user_info['send_api'], 'post', $real_send);
-                    $res = '<?xml version="1.0" encoding="utf-8" ?>
+                    $res = sendRequest($user_info['send_api'], 'post', $real_send);
+                  /*   $res = '<?xml version="1.0" encoding="utf-8" ?>
                     <returnsms>
                         <returnstatus>Success</returnstatus>
                         <message>操作成功</message>
@@ -253,7 +253,7 @@ class HttpChannelCaiXinChuangShi extends Pzlife
                         <taskID>2010283731447233</taskID>
                         <successCounts>1</successCounts>
                     </returnsms>
-                    ';
+                    '; */
                     // print_r($callback);
                     $receive_data = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
                     if ($receive_data['returnstatus'] == 'Success') {//发送成功
