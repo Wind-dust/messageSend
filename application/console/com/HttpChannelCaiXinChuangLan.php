@@ -368,7 +368,7 @@ class HttpChannelCaiXinChuangLan extends Pzlife
                 }
             }
 
-            $log_path = realpath("") . "/error/59.log";
+           /*  $log_path = realpath("") . "/error/59.log";
             $myfile = fopen($log_path, 'a+');
             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
             fwrite($myfile, $th . "\n");
@@ -376,9 +376,58 @@ class HttpChannelCaiXinChuangLan extends Pzlife
             $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
                 'mobile'      => 15201926171,
                 'content'     => "【钰晰科技】创蓝彩信通道出现异常"
-            ])); //三体营销通道
+            ])); //三体营销通道 */
+            $this->writeToRobot($content,$th,'创蓝彩信通道');
 
         }
+    }
+
+    function writeToRobot($content, $error_data, $title)
+    {
+        $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
+        // $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa';
+        $check_data = [];
+        $check_data = [
+            'msgtype' => "text",
+            'text' => [
+                "content" => "Hi，错误提醒机器人\n您有一条通道出现故障\n通道编号【" . $content . "】\n【错误信息】：" . $error_data . "\n通道名称【" . $title . "】",
+            ],
+        ];
+        $headers = [
+            'Content-Type:application/json'
+        ];
+        $this->sendRequest2($api, 'post', $check_data, $headers);
+    }
+
+    function sendRequest2($requestUrl, $method = 'get', $data = [], $headers)
+    {
+        $methonArr = ['get', 'post'];
+        if (!in_array(strtolower($method), $methonArr)) {
+            return [];
+        }
+        if ($method == 'post') {
+            if (!is_array($data) || empty($data)) {
+                return [];
+            }
+        }
+        $curl = curl_init(); // 初始化一个 cURL 对象
+        curl_setopt($curl, CURLOPT_URL, $requestUrl); // 设置你需要抓取的URL
+        curl_setopt($curl, CURLOPT_HEADER, 0); // 设置header 响应头是否输出
+        if ($method == 'post') {
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 60);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($curl, CURLOPT_USERAGENT, 'Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400'); // 模拟用户使用的浏览器
+        }
+        // 设置cURL 参数，要求结果保存到字符串中还是输出到屏幕上。
+        // 1如果成功只将结果返回，不自动输出任何内容。如果失败返回FALSE
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        $res = curl_exec($curl); // 运行cURL，请求网页
+        curl_close($curl); // 关闭URL请求
+        return $res; // 显示获得的数据
     }
 
     public function getSendTask($id)
