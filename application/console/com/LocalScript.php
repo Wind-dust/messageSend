@@ -2889,14 +2889,14 @@ class LocalScript extends Pzlife
         try {
             //code...
             while (true) {
-                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (SELECT id FROM `messagesend`.`yx_users` WHERE `pid` = '10') "); //道信核对
-                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (93) "); //道信核对
+                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (SELECT id FROM `messagesend`.`yx_users` WHERE `pid` = '137') "); //道信核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (93) "); //道信核对
                 // $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
                 //行业
                 foreach ($uids as $key => $value) {
                     // continue;
                     // $start_time = (int) strtotime('-4 days', strtotime(date('Y-m-d', time())));
-                    $start_time = (int) strtotime('2020-09-01');
+                    $start_time = (int) strtotime('2020-10-01');
                     // echo $start_time;die;
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_code_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
                         continue;
@@ -3054,7 +3054,7 @@ class LocalScript extends Pzlife
             //code...
             while (true) {
                 // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (SELECT id FROM `messagesend`.`yx_users` WHERE `pid` = '137') "); //道信核对
-                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (301) "); //道信核对
+                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (256) "); //道信核对
                 // $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
 
                 //营销
@@ -3780,7 +3780,7 @@ class LocalScript extends Pzlife
                 foreach ($uids as $key => $value) {
                     // continue;
                     // $start_time = (int) strtotime('-4 days', strtotime(date('Y-m-d', time())));
-                    $start_time = (int) strtotime('2020-08-01');
+                    $start_time = (int) strtotime('2020-10-01');
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_multimedia_message WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
                         continue;
                     }

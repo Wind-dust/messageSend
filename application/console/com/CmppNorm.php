@@ -94,12 +94,12 @@ class CmppNorm extends Pzlife
 
         ])); */
 
-        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        /*   $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
             'content'     => '【施华洛世奇】亲爱的会员，感谢您一路以来的支持！您已获得2020年会员周年礼券，购买正价商品满1999元即可获得闪耀玫瑰金色简约吊坠一条，请于2020年10月19日前使用。可前往“施华洛世奇会员中心”小程序查看该券。详询4006901078。 回TD退订',
             // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
-        ]));
+        ])); */
         /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
             'mobile'      => '15201926171',
             'mar_task_id' => '',
@@ -172,10 +172,13 @@ class CmppNorm extends Pzlife
                 if ($headData != false) {
                     // echo "连接成功..." . "\n";
                     $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
+                    // print_r($head);
                     $bodyData = socket_read($socket, $head['Total_Length'] - 12);
+
                     if ($head['Command_Id'] == 0x80000001) {
                         $body = unpack("CStatus/a16AuthenticatorSource/CVersion", $bodyData);
                         $verify_status = $body['Status'];
+
                         switch ($body['Status']) {
                             case 0:
                                 break;
@@ -348,11 +351,13 @@ class CmppNorm extends Pzlife
                     }
                 }
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
+                    //
                     while (true) {
                         $Sequence_Id = $redis->get('channel_' . $content);
                         $redis->set('channel_' . $content, $Sequence_Id + 1);
                         $pos = $redis->get('channel_pos_' . $content);
                         $pos = isset($pos) ? $pos : 0;
+                        // print_r($Sequence_Id);
                         try {
                             $receive = 1;
                             //先接收
@@ -533,6 +538,11 @@ class CmppNorm extends Pzlife
                                         $Total_Length = 12;
                                         $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                         socket_write($socket, $headData, $Total_Length);
+
+                                        // $new_body         = pack("C", 0) . pack("N", $Sequence_Id);
+                                        // $new_Total_Length = strlen($new_body) + 12;
+                                        // socket_write($socket, $headData . $new_body, $new_Total_Length);
+
                                         $receive = 2;
                                     } else if ($head['Command_Id'] == 0x80000008) {
                                         // echo "激活测试应答" . "\n"; //激活测试,无消息体结构
@@ -544,7 +554,7 @@ class CmppNorm extends Pzlife
                                         socket_write($socket, $headData, $Total_Length);
                                         socket_close($socket);
                                         $this->writeToRobot($content, '通道方关闭当前链接，通道关闭', $contdata['title']);
-                                        exit;
+                                        exit('通道方关闭当前链接，通道关闭');
                                         $receive = 2;
                                     }
                                 } else {

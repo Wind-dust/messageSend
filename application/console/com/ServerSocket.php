@@ -58,7 +58,7 @@ class ServerSocket extends Pzlife
         $clients = array($socket);
         // print_r($Dest_Id);
         // die;
-        $redis->rpush("index:message:upriver:" . 1, json_encode(['mobile' => 15201926171, 'message_info' => 1, 'business_id' => 5, 'get_time' => date('Y-m-d H:i:s', time()), 'develop_no' => 2517]));
+        // $redis->rpush("index:message:upriver:" . 1, json_encode(['mobile' => 15201926171, 'message_info' => 1, 'business_id' => 5, 'get_time' => date('Y-m-d H:i:s', time()), 'develop_no' => 2517]));
         $accept_resource = socket_accept($socket);
         socket_set_nonblock($accept_resource); //设置非阻塞模式
         do {

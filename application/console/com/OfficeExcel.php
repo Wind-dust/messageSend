@@ -3297,7 +3297,7 @@ class OfficeExcel extends Pzlife
         // $error_path = realpath("./")."/error.txt";
         // $error_file = fopen($error_path, "w");
         //黑卡
-        $black_error_path = realpath("./") . "/0808.txt";
+        $black_error_path = realpath("./") . "/921.txt";
         $black_error_file       = fopen($black_error_path, "r");
         $black_error_mobile = [];
         $receive_alls = [];
@@ -3328,10 +3328,10 @@ class OfficeExcel extends Pzlife
         $white_receipt_path = realpath("./")."/100180396_receipt.txt";
         $white_receipt_file       = fopen($white_receipt_path, "w"); */
         // echo count($black_error_mobile);die;
-        $start_time = strtotime('2020-08-08 10:00');
+        $start_time = strtotime('2020-09-21 09:30');
         $i = 1;
         $j = 1;
-        $model_path = realpath("./uploads\SFL\UnZip\SMS\Communication_targets_SMS_1_20200807153020") . "/Communication_targets_SMS_1_20200807153020.txt";
+        $model_path = realpath("./uploads\SFL\UnZip\SMS\Communication_targets_SMS_1_20200918224357") . "/Communication_targets_SMS_1_20200918224357.txt";
         // $model_path = realpath("./") . "/0624.txt";
         $file       = fopen($model_path, "r");
         while (!feof($file)) {
@@ -3403,7 +3403,7 @@ class OfficeExcel extends Pzlife
 
                 $i++;
                 if ($i > 200000) {
-                    $name = "imp_mobile_status_report_mms_" . $j . "_20200623.xlsx";
+                    $name = "imp_mobile_status_report_sms_" . $j . "_20200921.xlsx";
                     $this->derivedTables($receive_alls, $name);
                     $j++;
                     $receive_alls = [];
@@ -3416,7 +3416,7 @@ class OfficeExcel extends Pzlife
         // fclose($white_receipt_file);
         // fclose($error_file);
         if (!empty($receive_alls)) {
-            $name = "imp_mobile_status_report_mms_" . $j . "_20200623.xlsx";
+            $name = "imp_mobile_status_report_mms_" . $j . "_20200921.xlsx";
             $this->derivedTables($receive_alls, $name);
         }
     }
@@ -4260,12 +4260,12 @@ class OfficeExcel extends Pzlife
 
     public function extractMobile()
     {
-        $file_path = realpath("./uploads\SFL\UnZip\MMS\Communication_targets_MMS_1_20200910221114") . "/Communication_targets_MMS_1_20200910221114.txt";
+        $file_path = realpath("./uploads\SFL\UnZip\SMS\Communication_targets_SMS_1_20201108090145") . "/Communication_targets_SMS_1_20201108090145.txt";
         // $model_path = realpath("./") . "/0624.txt";
         $file       = fopen($file_path, "r");
-        $white_receipt_path = realpath("./") . "/100183782_0911white.txt";
+        $white_receipt_path = realpath("./") . "/100185707_1022white.txt";
         $white_receipt_file       = fopen($white_receipt_path, "w");
-        $deduct_receipt_path = realpath("./") . "/100183782_0911.txt";
+        $deduct_receipt_path = realpath("./") . "/100185707_1022.txt";
         $deduct_receipt_file       = fopen($deduct_receipt_path, "w");
         $j = 1;
         $mobiles = [];
@@ -4278,9 +4278,37 @@ class OfficeExcel extends Pzlife
             15000773110,
             18217584060,
             13585699417,
-            15800400970, 13472865840, 13611664019, 13636311653, 13701789119, 13764272451, 13801687321, 13816091848, 13817515864, 13818181256, 13916292097, 13917823241, 13918902911, 15000773110, 15800815262, 15921904656, 18800232095, 13918153000, 18817718456, 15000796805, 13681961185, 13681961185, 18817718456, 13918153000, 15000796805, 13162248755, 16621181441, 18501684687, 18521329177, 18521569417, 18621714497, 18621720742, 18618353064, 18618353064, 18013770122, 18019762207, 18121252120, 18918267758, 18918267758,18817718456, 18618353064, 18602893299
+            15800400970, 13472865840, 13611664019, 13636311653, 13701789119, 13764272451, 13801687321, 13816091848, 13817515864, 13818181256, 13916292097, 13917823241, 13918902911, 15000773110, 15800815262, 15921904656, 18800232095, 13918153000, 18817718456, 15000796805, 13681961185, 13681961185, 18817718456, 13918153000, 15000796805, 13162248755, 16621181441, 18501684687, 18521329177, 18521569417, 18621714497, 18621720742, 18618353064, 18618353064, 18013770122, 18019762207, 18121252120, 18918267758, 18918267758, 18817718456, 18618353064, 18602893299, 18521569417, 13162248755,
+            18501684687,
+            15618985205,
+            16621181441,
+            18521329177,
+            18618353064,
+            18019762207,
+            18013770122,
+            18621720742,
+            18918267758,
+            18121252120,
+            13818181256,
+            13816091848,
+            15800815262,
+            13472865840,
+            13764272451,
+            13801687321,
+            13636311653,
+            13916010567,
+            13916292097,
+            15000773110,
+            13817515864,
+            13918902911,
+            13611664019,
+            18800232095,
+            15000796805,
+            13917823241,
+            18817718456
         ];
-        $deduct = ceil(153871 / 453871 * 100);
+        // $deduct = ceil(16826 / 31653 * 100);
+        $deduct = 50;
 
         while (!feof($file)) {
             $cellVal = trim(fgets($file));
@@ -4294,7 +4322,7 @@ class OfficeExcel extends Pzlife
                 if (checkMobile($value[3]) == false || strlen($value[3]) > 11) {
                     continue;
                 }
-                if ($value[2] != '100183890') {
+                if ($value[2] != '100185707') {
                     continue;
                 }
                 $mobiles[] = $value[3];
@@ -4305,7 +4333,7 @@ class OfficeExcel extends Pzlife
                     foreach ($mobiles as $key => $value) {
                         if (in_array($value, $white_list)) {
                             fwrite($white_receipt_file, $value . "\n");
-                        }elseif (in_array($key, $deduct_mobile)) {
+                        } elseif (in_array($key, $deduct_mobile)) {
                             fwrite($deduct_receipt_file, $value . "\n");
                         }
                     }
@@ -4322,7 +4350,7 @@ class OfficeExcel extends Pzlife
             foreach ($mobiles as $key => $value) {
                 if (in_array($value, $white_list)) {
                     fwrite($white_receipt_file, $value . "\n");
-                }elseif (in_array($key, $deduct_mobile)) {
+                } elseif (in_array($key, $deduct_mobile)) {
                     fwrite($deduct_receipt_file, $value . "\n");
                 }
             }
@@ -4331,17 +4359,18 @@ class OfficeExcel extends Pzlife
         fclose($deduct_receipt_file);;
     }
 
-    public function mobileSource(){
-         $model_path = realpath("./") . "/20200902.txt";
-         $file       = fopen($model_path, "r");
-         $export_data = [];
-         while (!feof($file)) {
+    public function mobileSource()
+    {
+        $model_path = realpath("./") . "/20200902.txt";
+        $file       = fopen($model_path, "r");
+        $export_data = [];
+        while (!feof($file)) {
             $data = [];
             $mobile = trim(fgets($file));
             if (!empty($mobile)) {
                 $prefix = substr(trim($mobile), 0, 7);
                 // print_r($prefix);die;
-                $source = Db::query("SELECT * FROM yx_number_source WHERE `mobile` = '".$prefix."' LIMIT 1 ");
+                $source = Db::query("SELECT * FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                 $data = [
                     'mobile' => $mobile,
                     'province' => isset($source[0]['province']) ? $source[0]['province'] : '',
@@ -4350,7 +4379,6 @@ class OfficeExcel extends Pzlife
                 // print_r($source);die;
                 array_push($export_data, $data);
             }
-            
         }
         fclose($file);
         $objExcel = new PHPExcel();

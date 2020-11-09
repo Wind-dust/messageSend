@@ -1543,7 +1543,7 @@ return $result;
 
         $sign = md5('{"client_id":' . $client_id . ',"nonce":"' . $nonce . '","secret":"VPNDYgDb7mTv2KuDTwWkAwRnDQtWj97E","timestamp":' . $time . '}');
         $jy_token = base64_encode('{"client_id":' . $client_id . ',"nonce":"' . $nonce . '","sign":"' . $sign . '","timestamp":' . $time . '}');
-        $request_url = 'https://api-sit.itingluo.com/apiv1/openapi/search/analyze?text=' . $value;
+        $request_url = 'https://api.itingluo.com/apiv1/openapi/search/analyze?text=' . $value;
         $header  = array(
             'client_id:' . $client_id,
             'secret:' . $secret,
