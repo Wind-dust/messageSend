@@ -24,7 +24,8 @@ class CmppCreateCodeTask extends Pzlife
         } */
         // $redis->rpush($redisMessageCodeSendReal,'{"mobile":"15821193682","messagetotal":2,"develop_no":"4719","Service_Id":"C48515","Source_Addr":"C48515","send_msgid":["1597212930000514","1597212931000515"],"message":"\u3010\u65bd\u534e\u6d1b\u4e16\u5947\u3011\u4eb2\u7231\u7684\u4f1a\u5458\uff0c\u611f\u8c22\u60a8\u4e00\u8def\u4ee5\u6765\u7684\u652f\u6301\uff01\u60a8\u5df2\u83b7\u5f972020\u5e74\u4f1a\u5458\u5468\u5e74\u793c\u5238\uff0c\u8d2d\u4e70\u6b63\u4ef7\u5546\u54c1\u6ee11999\u5143\u5373\u53ef\u83b7\u5f97\u95ea\u8000\u73ab\u7470\u91d1\u8272\u7b80\u7ea6\u540a\u5760\u4e00\u6761\uff0c\u8bf7\u4e8e2020\u5e7410\u670819\u65e5\u524d\u4f7f\u7528\u3002\u53ef\u524d\u5f80\u201c\u65bd\u534e\u6d1b\u4e16\u5947\u4f1a\u5458\u4e2d\u5fc3\u201d\u5c0f\u7a0b\u5e8f\u67e5\u770b\u8be5\u5238\u3002\u8be6\u8be24006901078\u3002 \u56deTD\u9000\u8ba2","Submit_time":1597212931}');
         // $redis->rpush($redisMessageCodeSendReal, '{"mobile":"15201926171","messagetotal":4,"develop_no":"1069999589","Service_Id":"HELP","Source_Addr":"C67253","Submit_time":1604714984,"message":"【NARS】亲爱的NARS会员，感谢您打卡ORGASM X领样机，多重惊喜有没有俘获你的心呢：\n\n★“王牌”颊彩ORGASM，独一无二的蜜桃金闪色，气色提升，时髦女孩必备~\n★“魔方”唇膏12色体验卡，多色多变应对各种妆容，回柜完成试色互动即可轻松获得！\n★持券回柜购买指定产品即享“霸霸”唇液体验装，轻薄持色不沾杯，一抹就爱上！\n★NARS经典四大彩妆服务等着给你新的惊喜，即刻前往“NARS会员中心”微信小程序预约吧～\n\n全新ORGASM X惊喜上市，愉悦升级更暖更显白！更多活动，请询当地专柜。回复TD退订。","send_msgid":["16047149843882959","16047149843882960","16047149843882961","16047149843882962"]}');
-     //   $redis->rpush($redisMessageCodeSendReal, '{"mobile":"15201926171","messagetotal":3,"develop_no":"106944066747195498","Service_Id":"C48515","Source_Addr":"C48515","Submit_time":1604760349,"message":"【丝芙兰】1张9折券已飞奔向您！亲爱的于思佳会员，您所获赠的九折券自2020-09-01起生效，有效期截止2021-03-01，请在有效期间内前往丝芙兰官网sephora.cn、App、小程序或门店选购。(在官网购物时需与官网账号绑定。累积消费积分1500分或四次不同日消费即自动兑换1张九折劵)/回T退订","send_msgid":["1604760349000001","1604760349000002","1604760349000003"]}');
+    //    $redis->rpush($redisMessageCodeSendReal, '{"mobile":"15355426385","messagetotal":1,"develop_no":"10699958","Service_Id":"","Source_Addr":"C67253","Submit_time":1604893150,"message":"【火信科技】不止5折！第2件低至69！高定爆款湿巾！抢到就是惊喜！限时抢→{tb1.cn/Kt8OWA}-回复T退订","send_msgid":["16048931501370496758"]}');
+    //    $redis->rpush($redisMessageCodeSendReal, '{"mobile":"15355426385","messagetotal":1,"develop_no":"10699924","Service_Id":"","Source_Addr":"C75631","Submit_time":1604893106,"message":"【火信科技】您的验证码为：880615，有效期为5分钟。如非本人操作，请忽略。","send_msgid":["16048931061370496241"]}');
         // 16047149843882959,16047149843882960,16047149843882961,16047149843882962
         // echo date('Y-m-d H:i:s')."\n";die;
 
@@ -119,11 +120,14 @@ class CmppCreateCodeTask extends Pzlife
                 $table = 'yx_user_send_task';
                 $rediskey = 'index:meassage:marketing:sendtask';
             
-            } elseif ($user['free_trial'] == 2 && $business_id == 6) {
+            } elseif ( $business_id == 6) {
+            //     &&
                 if ($userEquities['num_balance'] < 1) {
                     $send_code_task['free_trial'] = 1;
                 } else {
-                    $send_code_task['free_trial'] = 2;
+                    if ($user['free_trial'] == 2){
+                        $send_code_task['free_trial'] = 2;
+                    } 
                 }
                 $send_code_task['task_no'] = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
                 $table = 'yx_user_send_code_task';
@@ -4557,7 +4561,7 @@ class CmppCreateCodeTask extends Pzlife
         //  $redis->rpush($redisMessageCodeSend, '{"msg_id":"13000710020200925164103169853","title":"","mobile":"13236800231","mar_task_id":406591,"uid":291,"content":"\u3010\u9a70\u52a0\u6c7d\u8f66\u670d\u52a1\u4e2d\u5fc3\u3011\u5c0a\u656c\u7684\u9a70\u52a0\u4f1a\u5458\uff0c\u60a8\u7684299\u5143\u7f24\u7eb7\u62b5\u6263\u5238\u5305\u4e2d\u8fd8\u6709\u793c\u5238\u5c1a\u672a\u4f7f\u7528\u3002\u767b\u5f55\u5fae\u4fe1\u516c\u4f17\u53f7\u201c\u9a70\u52a0\u6c7d\u8f66\u670d\u52a1\u4e2d\u5fc3\u201d\u67e5\u770b\u793c\u5238\u8be6\u60c5\u3002\u70b9\u51fb http:\/\/mrw.so\/6r5hHO \u5373\u523b\u9884\u7ea6\u95e8\u5e97\uff0c\u9000\u8ba2\u56deTD","from":"yx_user_send_task","my_submit_time":1601031821,"Msg_Id":"26306304647135634","Stat":"REJECT\u0000","Submit_time":"0101010000","Done_time":"2009251904","receive_time":1601031842,"develop_no":""}');
         // $redis->rpush($redisMessageCodeSend, '{"mobile":"15201926171","mar_task_id":"1","content":"Hi, \u4eb2\u7231\u7684\u4f1a\u5458\uff0c\u597d\u4e45\u4e0d\u89c1\uff0c\u60a8\u5df2\u7ecf\u6709\u4e09\u4e2a\u6708\u6ca1\u6765\u62a4\u7406\u4e86\uff0c\u79cb\u51ac\u5df2\u8fd1\uff0c\u6362\u5b63\u5f53\u524d\uff0c\u5728\u808c\u80a4\u9700\u8981\u201c\u8fdb\u8865\u201d\u7684\u5b63\u8282\u91cc\uff0c\u6765\u7f8e\u7530\u5373\u523b\u5f00\u542f\u6df1\u5ea6\u8865\u6c34\u6a21\u5f0f\u5427\uff01\u8054\u7cfb\u60a8\u8eab\u8fb9\u7684\u4e13\u5c5e\u5ba2\u6237\u7ecf\u7406\u6216\u62e8\u6253\u9884\u7ea6\u70ed\u7ebf 400-820-6142 \u56deT\u9000\u8ba2\u3010\u7f8e\u4e3d\u7530\u56ed\u3011","my_submit_time":1597248000,"Msg_Id":"2059229824357040146","Stat":"DELIVRD","Submit_time":"2007211521","Done_time":"2007211521","receive_time":1595316110,"from":"yx_user_send_task","uid":"1","send_msg_id":"J343300020200731100217169012"}');
         // $redis->rpush($redisMessageCodeSend, ' {"mobile":"15201926171","mar_task_id":5209588,"content":"\u3010\u5bcc\u6cf7\u79d1\u6280\u3011\u672c\u6b21\u9a8c\u8bc1\u780103351155","from":"yx_user_send_code_task","send_msg_id":"1604760349000003","uid":257,"send_num":1,"task_no":"bus20110811035212706504","isneed_receipt":2,"need_receipt_type":2,"my_submit_time":1604804744,"Msg_Id":"30228140903356295229","Stat":"DELIVRD","Submit_time":"2011081105","Done_time":"2011081105","receive_time":1604804752,"develop_no":""}');
-
+        $redis->rpush($redisMessageCodeSend, '{"mobile":"15201926171","mar_task_id":"448395","content":"【火信科技】不止5折！第2件低至69！高定爆款湿巾！抢到就是惊喜！限时抢→{tb1.cn/Kt8OWA}-回复T退订","my_submit_time":1604903695,"Msg_Id":"2059229824357040146","Stat":"DELIVRD","Submit_time":"2007211521","Done_time":"2007211521","receive_time":1604903920,"from":"yx_user_send_task","uid":"309","send_msg_id":"16049036951370939133","isneed_receipt":2,"need_receipt_type":2}');
        
         if ($channel['channel_type'] != 2) {
             exit;
@@ -4791,7 +4795,7 @@ class CmppCreateCodeTask extends Pzlife
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         /*  $redis->rpush('index:message:receipt:yx_user_send_task', '{"mobile":"15201926171","task_no":"mar20073110021507111729","uid":"1","from":"yx_user_send_task","mar_task_id":"1","content":"Hi, \u4eb2\u7231\u7684\u4f1a\u5458\uff0c\u597d\u4e45\u4e0d\u89c1\uff0c\u60a8\u5df2\u7ecf\u6709\u4e09\u4e2a\u6708\u6ca1\u6765\u62a4\u7406\u4e86\uff0c\u79cb\u51ac\u5df2\u8fd1\uff0c\u6362\u5b63\u5f53\u524d\uff0c\u5728\u808c\u80a4\u9700\u8981\u201c\u8fdb\u8865\u201d\u7684\u5b63\u8282\u91cc\uff0c\u6765\u7f8e\u7530\u5373\u523b\u5f00\u542f\u6df1\u5ea6\u8865\u6c34\u6a21\u5f0f\u5427\uff01\u8054\u7cfb\u60a8\u8eab\u8fb9\u7684\u4e13\u5c5e\u5ba2\u6237\u7ecf\u7406\u6216\u62e8\u6253\u9884\u7ea6\u70ed\u7ebf 400-820-6142 \u56deT\u9000\u8ba2\u3010\u7f8e\u4e3d\u7530\u56ed\u3011","my_submit_time":1597427516,"Submit_time":"2007211521","Done_time":"2007211521","receive_time":1595316110,"develop_no":"","send_msg_id":"J343300020200731100217169012","Stat":["DELIVRD","DELIVRD"],"send_num":0,"channel_id":"18"}'); */
         // $redis->rpush('index:message:receipt:yx_user_send_task', '{"mobile":"15201926171","task_no":"mar20110711264651198260","uid":309,"from":"yx_user_send_task","mar_task_id":445322,"content":"\u3010KOLON\u3011\u5c0a\u656c\u4f1a\u5458\uff0c\u60a8\u7684\u53ef\u9686\u5b9a\u5236\u62c9\u6746\u7bb1\u5df2\u5230\u5e97\u3002\u51ed\u6b64\u6d88\u606f\u81f3\u9884\u7ea6\u95e8\u5e97\uff0c\u51fa\u793a\u793c\u54c1\u5238\u7801\u5373\u53ef\u9886\u53d6\u3002\u793c\u5238\u8be6\u60c5\u8bf7\u81f3\u4f1a\u5458\u4e2d\u5fc3-\u6211\u7684\u4f18\u60e0\u5238\u67e5\u770b\u3002\u56deT\u9000\u8ba2","my_submit_time":1604719688,"Submit_time":"0101010000","Done_time":"2011071128","receive_time":1604719692,"send_msg_id":"16047196063895624","Stat":["DELIVRD"],"send_num":1,"channel_id":"145","need_receipt_type": 2, "isneed_receipt":2}');
-        // $redis->rpush('index:message:receipt:yx_user_send_task', '{"mobile":"15201926171","task_no":"mar20110712213004826153","uid":309,"from":"yx_user_send_task","mar_task_id":445359,"content":"\u3010NARS\u3011\u4eb2\u7231\u7684NARS\u4f1a\u5458\uff0c\u611f\u8c22\u60a8\u6253\u5361ORGASM X\u9886\u6837\u673a\uff0c\u591a\u91cd\u60ca\u559c\u6709\u6ca1\u6709\u4fd8\u83b7\u4f60\u7684\u5fc3\u5462\uff1a\n\n\u2605\u201c\u738b\u724c\u201d\u988a\u5f69ORGASM\uff0c\u72ec\u4e00\u65e0\u4e8c\u7684\u871c\u6843\u91d1\u95ea\u8272\uff0c\u6c14\u8272\u63d0\u5347\uff0c\u65f6\u9ae6\u5973\u5b69\u5fc5\u5907~\n\u2605\u201c\u9b54\u65b9\u201d\u5507\u818f12\u8272\u4f53\u9a8c\u5361\uff0c\u591a\u8272\u591a\u53d8\u5e94\u5bf9\u5404\u79cd\u5986\u5bb9\uff0c\u56de\u67dc\u5b8c\u6210\u8bd5\u8272\u4e92\u52a8\u5373\u53ef\u8f7b\u677e\u83b7\u5f97\uff01\n\u2605\u6301\u5238\u56de\u67dc\u8d2d\u4e70\u6307\u5b9a\u4ea7\u54c1\u5373\u4eab\u201c\u9738\u9738\u201d\u5507\u6db2\u4f53\u9a8c\u88c5\uff0c\u8f7b\u8584\u6301\u8272\u4e0d\u6cbe\u676f\uff0c\u4e00\u62b9\u5c31\u7231\u4e0a\uff01\n\u2605NARS\u7ecf\u5178\u56db\u5927\u5f69\u5986\u670d\u52a1\u7b49\u7740\u7ed9\u4f60\u65b0\u7684\u60ca\u559c\uff0c\u5373\u523b\u524d\u5f80\u201cNARS\u4f1a\u5458\u4e2d\u5fc3\u201d\u5fae\u4fe1\u5c0f\u7a0b\u5e8f\u9884\u7ea6\u5427\uff5e\n\n\u5168\u65b0ORGASM X\u60ca\u559c\u4e0a\u5e02\uff0c\u6109\u60a6\u5347\u7ea7\u66f4\u6696\u66f4\u663e\u767d\uff01\u66f4\u591a\u6d3b\u52a8\uff0c\u8bf7\u8be2\u5f53\u5730\u4e13\u67dc\u3002\u56de\u590dTD\u9000\u8ba2\u3002","my_submit_time":1604722956,"Submit_time":"0101010000","Done_time":"2011071222","receive_time":1604722960,"develop_no":"","send_msg_id":"1604760349000001,1604760349000002,1604760349000003","Stat":["DELIVRD","DELIVRD","DELIVRD","DELIVRD"],"send_num":1,"channel_id":"145","need_receipt_type": 2, "isneed_receipt":2}');
+        $redis->rpush('index:message:receipt:yx_user_send_task', '{"mobile":"15201926171","task_no":"mar20110914375876422769","uid":"309","from":"yx_user_send_task","mar_task_id":"448395","content":"\u3010\u706b\u4fe1\u79d1\u6280\u3011\u4e0d\u6b625\u6298\uff01\u7b2c2\u4ef6\u4f4e\u81f369\uff01\u9ad8\u5b9a\u7206\u6b3e\u6e7f\u5dfe\uff01\u62a2\u5230\u5c31\u662f\u60ca\u559c\uff01\u9650\u65f6\u62a2\u2192{tb1.cn\/Kt8OWA}-\u56de\u590dT\u9000\u8ba2","my_submit_time":1604903695,"Submit_time":"2007211521","Done_time":"2007211521","receive_time":1604903920,"send_msg_id":"16049036951370939133","Stat":["DELIVRD"],"send_num":0,"channel_id":"146","isneed_receipt":2,"need_receipt_type":2}');
         try {
 
             while (true) {
@@ -5589,7 +5593,7 @@ class CmppCreateCodeTask extends Pzlife
         $redisMessageCodeSend = 'index:meassage:code:new:deliver:' . $channel_id; //验证码发送任务rediskey
         $channel              = $this->getChannelinfo($channel_id);
         // $redis->rpush($redisMessageCodeSend, '{"mobile":"15201926171","mar_task_id":5209588,"content":"\u3010\u5bcc\u6cf7\u79d1\u6280\u3011\u672c\u6b21\u9a8c\u8bc1\u780103351155","from":"yx_user_send_code_task","send_msg_id":"1604760349000003","uid":257,"send_num":1,"task_no":"bus20110811035212706504","isneed_receipt":2,"need_receipt_type":2,"my_submit_time":1604804744,"Msg_Id":"30228140903356295229","Stat":"DELIVRD","Submit_time":"2011081105","Done_time":"2011081105","receive_time":1604804752,"develop_no":""}');
-
+        // $redis->rpush($redisMessageCodeSend, '{"mobile":"17721160630","mar_task_id":5233743,"content":"【丝芙兰】1张9折券已飞奔向您","from":"yx_user_send_code_task","send_msg_id":"1604905173000001","uid":311,"send_num":1,"task_no":"bus20110914593108957085","develop_code":"245498","my_submit_time":1604905173,"Msg_Id":"24458206221828038676","Stat":"DELIVRD","Submit_time":"2009031804","Done_time":"2009031804","receive_time":1604905177,"develop_no":"245498"}');
         // $request_url = 'http://116.228.60.189:15901/rtreceive?task_no=bus19123111560308152071&status_message=E:CHAN&mobile=18643198590&send_time=1912311333';
         // sendRequest($request_url);
         try {
@@ -5603,7 +5607,7 @@ class CmppCreateCodeTask extends Pzlife
                     $Received = updateReceivedForMessage();
                     // $redis->rpush($redisMessageCodeSend, $send_log);
                     $send_log = json_decode($send_log, true);
-                    // print_r($Received);die;
+                    // print_r($send_log);die;
                     //获取通道属性
                     if (!isset($send_log['mar_task_id']) || empty($send_log['mar_task_id'])) {
                         continue;
@@ -5756,12 +5760,13 @@ class CmppCreateCodeTask extends Pzlife
                             }
                         } else {
                             if ($user[0]['need_receipt_cmpp'] == 2) {
+                                // print_r($send_log['develop_no']);die;
                                 $redis->rpush('index:meassage:code:user:receive:' . $task[0]['uid'], json_encode([
                                     // 'Stat'        => trim($task[0]['task_no']),
                                     'send_msgid'        => trim($task[0]['send_msg_id']),
                                     'status_message' => $stat,
                                     'mobile'         => trim($send_log['mobile']),
-                                    'develop_no' => trim($send_log['develop_no']) ? $send_log['develop_no'] : '',
+                                    'develop_no' => isset($send_log['develop_no']) ? trim($send_log['develop_no']) : '',
                                     // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
                                     'Done_time'      => isset($send_log['receive_time']) ? date('ymdHi', trim($send_log['receive_time'])) : date('ymdHi', time()),
                                     'Submit_time'      => isset($task[0]['create_time']) ? date('ymdHi', trim($task[0]['create_time'])) : date('ymdHi', time()),

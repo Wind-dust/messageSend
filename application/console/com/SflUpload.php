@@ -1798,11 +1798,12 @@ class SflUpload extends Pzlife
                                         // if (!in_array($tvalue[2], ['514', '529', '100107992', '100150820', '100150821', '100150822', '100182845', '100150970', '100182846', '100182847', '100182848', '100182849', '100182850', '100183948', '100183978'])) {
                                         //     continue;
                                         // }
+                                        //100185876 先不发
 
-                                        if (in_array($tvalue[2], ['100185820', '100185819', '100185817'])) {
+                                        if (in_array($tvalue[2], ['100185820', '100185819', '100185817','100185876'])) {
                                             continue;
                                         }
-                                        if ($save_type == 'redis' && in_array($tvalue[2],['100185875','100185876'])) {
+                                        if ($save_type == 'redis' && in_array($tvalue[2],['100185875'])) {
                                             if (in_array($tvalue[3], $white_list)) {
                                                 $redis->rpush('sftp:sfl:marketing:whitesendtask', json_encode($SMS_real_send));
                                             } else {

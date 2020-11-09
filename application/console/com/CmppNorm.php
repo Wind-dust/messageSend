@@ -352,11 +352,12 @@ class CmppNorm extends Pzlife
                 }
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
                     //
+                       $pos = $redis->get('channel_pos_' . $content);
+                        $pos = isset($pos) ? $pos : 0;
                     while (true) {
                         $Sequence_Id = $redis->get('channel_' . $content);
                         $redis->set('channel_' . $content, $Sequence_Id + 1);
-                        $pos = $redis->get('channel_pos_' . $content);
-                        $pos = isset($pos) ? $pos : 0;
+                     
                         // print_r($Sequence_Id);
                         try {
                             $receive = 1;
@@ -565,7 +566,7 @@ class CmppNorm extends Pzlife
 
                             $send = $redis->lPop($redisMessageCodeSend);
                             if (!empty($send)) { //正式使用从缓存中读取数据并且有待发送数据
-
+                               
                                 $send_status = 1;
                                 $send_data = [];
                                 $send_data = json_decode($send, true);
