@@ -1149,7 +1149,7 @@ class SflUpload extends Pzlife
             $this_id   = $task_id[0]['id'];
         }
         $time_key = date('Ymd', time());
-        $time_key = '20201108';
+        // $time_key = '20201109';
         // $time_key = date('Ymd', time());
         try {
             foreach ($path_data as $key => $value) {
@@ -1800,10 +1800,10 @@ class SflUpload extends Pzlife
                                         // }
                                         //100185876 先不发
 
-                                        if (in_array($tvalue[2], ['100185820', '100185819', '100185817','100185876'])) {
+                                        /*  if (!in_array($tvalue[2], ['100185876'])) {
                                             continue;
-                                        }
-                                        if ($save_type == 'redis' && in_array($tvalue[2],['100185875'])) {
+                                        } */
+                                        if ($save_type == 'redis' && in_array($tvalue[2], ['100185876'])) {
                                             if (in_array($tvalue[3], $white_list)) {
                                                 $redis->rpush('sftp:sfl:marketing:whitesendtask', json_encode($SMS_real_send));
                                             } else {
@@ -2669,7 +2669,7 @@ class SflUpload extends Pzlife
             if (empty($expeort_time)) {
                 $expeort_time = $start_time + 46800 - mt_rand(0, 180);
             }
-           
+
             // $expeort_time = 1593421200;
             // $expeort_time = strtotime("2020-09-25 10:00");
             // $mul_task_ids = $mysql_connect->query("SELECT `id` FROM yx_sfl_multimedia_message WHERE  `create_time` >  " . $start_time . " AND   `create_time` <  " . $end_time . " AND `sfl_relation_id` IN ('100181712','100181717','100181722') ");
@@ -2840,7 +2840,7 @@ class SflUpload extends Pzlife
         }
     }
 
-    public function sflSftpTaskReceiptForExcel( $time_key, $expeort_time = '')
+    public function sflSftpTaskReceiptForExcel($time_key, $expeort_time = '')
     {
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
@@ -2851,7 +2851,7 @@ class SflUpload extends Pzlife
         if (empty($expeort_time)) {
             $expeort_time = $start_time + 43200 - mt_rand(0, 3000);
         }
-      
+
         // $expeort_time = 1592884416;
         // $expeort_time = strtotime("2020-10-07 14:19:00");
         try {
@@ -2921,7 +2921,7 @@ class SflUpload extends Pzlife
                  */
 
                 // $receipts    = $mysql_connect->query("SELECT * FROM yx_sfl_send_task_receipt WHERE `task_id` = " . $value['id']);
-                $receipts    =[];
+                $receipts    = [];
                 $task        = $mysql_connect->query("SELECT * FROM yx_sfl_send_task WHERE `id` = " . $value['id']);
                 $receive_all = [];
                 if (strpos($task[0]['task_content'], 'test')) {

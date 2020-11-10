@@ -4260,7 +4260,7 @@ class OfficeExcel extends Pzlife
 
     public function extractMobile()
     {
-        $file_path = realpath("./uploads\SFL\UnZip\SMS\Communication_targets_SMS_1_20201108090145") . "/Communication_targets_SMS_1_20201108090145.txt";
+        $file_path = realpath("./uploads\SFL\UnZip\MMS\Communication_targets_MMS_1_20201109093103") . "/Communication_targets_MMS_1_20201109093103.txt";
         // $model_path = realpath("./") . "/0624.txt";
         $file       = fopen($file_path, "r");
         $white_receipt_path = realpath("./") . "/100185707_1022white.txt";
@@ -4308,7 +4308,7 @@ class OfficeExcel extends Pzlife
             18817718456
         ];
         // $deduct = ceil(16826 / 31653 * 100);
-        $deduct = 50;
+        $deduct = 100;
 
         while (!feof($file)) {
             $cellVal = trim(fgets($file));
@@ -4322,7 +4322,7 @@ class OfficeExcel extends Pzlife
                 if (checkMobile($value[3]) == false || strlen($value[3]) > 11) {
                     continue;
                 }
-                if ($value[2] != '100185707') {
+                if ($value[2] != '100185760') {
                     continue;
                 }
                 $mobiles[] = $value[3];

@@ -11,7 +11,7 @@
 $commandPath = \think\facade\Config::get('console.command_path');
 return [
     'curl'                             => $commandPath . 'Curl',
-    'cmppnorm'                         => $commandPath .'CmppNorm',
+    'cmppnorm'                         => $commandPath . 'CmppNorm',
     'user'                             => $commandPath . 'User',
     'areas'                            => $commandPath . 'Areas',
     'cmpp'                             => $commandPath . 'Cmpp',
@@ -49,14 +49,15 @@ return [
     'httpchannelcaixinhuaxingtongxun'  => $commandPath . 'HttpChannelCaiXinHuaxingtongxun',
     'httpchannelcaixinhangzhoumaiyuan' => $commandPath . 'HttpChannelCaiXinHangZhouMaiYuan',
     'httpchannelcaixinchuanglan' => $commandPath . 'HttpChannelCaiXinChuangLan',
+    'httpchannelmodelsupmessageaiqi' => $commandPath . 'HttpChannelModelSupMessageAiQi',
     'httpchannelcaixinchuanglanlankouone' => $commandPath . 'HttpChannelCaiXinChuangLanLanKouOne',
     'httpchannelcaixinchuanglanlankoutwo' => $commandPath . 'HttpChannelCaiXinChuangLanLanKouTwo',
     'httpchannelcaixinchuanglanlankouthree' => $commandPath . 'HttpChannelCaiXinChuangLanLanKouThree',
     'httpchannelmodelcaixinchuanglan' => $commandPath . 'HttpChannelModelCaiXinChuangLan',
     'httpchannelcaixinmeilian' => $commandPath . 'HttpChannelCaiXinMeiLian', //美联软通彩信
     'httpchannelmodelcaixinweige' => $commandPath . 'HttpChannelModelCaiXinWeiGe',
-    'httpchannelmodelsupmessagelingdao' => $commandPath . 'HttpChannelModelSupMessageLingDao',//领道视频短信移动通道
-    'httpchannelmodelsupmessagelingdaoliandian' => $commandPath . 'HttpChannelModelSupMessageLingDaoLianDian',//领道视频短信联电通道
+    'httpchannelmodelsupmessagelingdao' => $commandPath . 'HttpChannelModelSupMessageLingDao', //领道视频短信移动通道
+    'httpchannelmodelsupmessagelingdaoliandian' => $commandPath . 'HttpChannelModelSupMessageLingDaoLianDian', //领道视频短信联电通道
     'httpchannelmodelsupmessagesanti' => $commandPath . 'HttpChannelModelSupMessageSanTi',
     'cmppmeilianruantongyidonggame' => $commandPath . 'CmppMeiLianRuanTongYiDongGame', //美联软通移动游戏
     'httpchannelcaixinbangzhixinyidong' => $commandPath . 'HttpChannelCaiXinBangZhiXinYiDong', //邦之信移动彩信
