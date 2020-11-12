@@ -42,27 +42,27 @@ class CmppCreateCodeTask extends Pzlife
             // print_r($send);die;
             // $user = $this->getUserInfo($send[0]);
             $channel_id = 0;
-           
+
             $user = Db::query("SELECT * FROM yx_users WHERE `nick_name` = '" . trim($send['Source_Addr']) . "' ");
             $user = $user[0];
-            
+
             if (empty($user)) {
                 continue;
             }
             $uid = $user['id'];
             if ($user['user_status'] == 1) {
                 $send_msgid_data = [];
-                $send_msgid_data =  $send['send_msgid'];
+                $send_msgid_data = $send['send_msgid'];
                 foreach ($send_msgid_data as $key => $value) {
                     $redis->rPush('index:meassage:code:user:receive:' . $uid, json_encode(['Stat' => 'REFUSE', 'Submit_time' => date('YMDHM', time()), 'Done_time' => date('YMDHM', time()), 'send_msgid' => $value, 'develop_no' => $send['develop_no']]));
                 }
-                
+
                 continue;
             }
-           
+
             if (strpos($send['message'], '淘口令') || strpos($send['message'], '红包') || strpos($send['message'], '加微信') || strpos($send['message'], '+v') || strpos($send['message'], '加微') || strpos($send['message'], '加群') || strpos($send['message'], '加Q') || strpos($send['message'], '加q') || strpos($send['message'], '+q') || strpos($send['message'], '+Q') || strpos($send['message'], '理财') || strpos($send['message'], '网贷') || strpos($send['message'], '金融') || strpos($send['message'], '借款') || strpos($send['message'], '还款') || strpos($send['message'], 'p2p') || strpos($send['message'], 'P2P')) {
                 $send_msgid_data = [];
-                $send_msgid_data =  $send['send_msgid'];
+                $send_msgid_data = $send['send_msgid'];
                 foreach ($send_msgid_data as $key => $value) {
                     $redis->rPush('index:meassage:code:user:receive:' . $uid, json_encode(['Stat' => 'REFUSE', 'Submit_time' => date('YMDHM', time()), 'Done_time' => date('YMDHM', time()), 'send_msgid' => $value, 'develop_no' => $send['develop_no']]));
                 }
@@ -7953,10 +7953,11 @@ class CmppCreateCodeTask extends Pzlife
 
     /* {"task_no":"mul20020515503481449866","uid":1,"mobile":"18616279075","status_message":"DELIVRD","send_status":3,"send_time":1580889993} */
 
-    public function receiptMultimediaInfoToBase(){
+    public function receiptMultimediaInfoToBase()
+    {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         $redis = Phpredis::getConn();
-        while(true){
+        while (true) {
             try {
                 $sendlog = $redis->lpop('index:meassage:multimediamessage:deliver:');
                 if (empty($sendlog)) {
@@ -8035,7 +8036,7 @@ class CmppCreateCodeTask extends Pzlife
                 $redis->rpush('index:meassage:multimediamessage:deliver:', json_encode($send_log));
                 exception($th);
             }
-        }  
+        }
     }
 
     public function receiptMultimediaToBase($channel_id)
