@@ -166,7 +166,7 @@ class HttpChannelCaiXinKuaiLeWangShiModelVarLianDian extends Pzlife
                         'title' => $send_data['title'],
                         // 'content'   => $send_content[$send_taskid],
                         'content' => $real_send_content,
-                        'extno' => $send_data['develop_code'],
+                        'extno' => isset($send_data['develop_code']) ? $send_data['develop_code'] : "",
                         'action' => 'send',
                     ];
 
@@ -184,92 +184,12 @@ class HttpChannelCaiXinKuaiLeWangShiModelVarLianDian extends Pzlife
                     }
 
                 }
-                //剩下的号码再做提交
-                // // print_r($send_num);die;
-
-                // $receive_id = [
-                //     '866214' => '15745'
-                // ];
-                // // print_r($receive_id);
-                // die;
-                // $receive = sendRequest($user_info['receive_api'], 'post', ['accesskey' => $user_info['accesskey'], 'secret' => $user_info['secret']]);
-                // if (empty($receive)) {
-                //     sleep(60);
-                //     continue;
-                // }
-                // $receive_data = json_decode($receive, true);
-                // // print_r($receive_data);
-                // $receive = '1016497,15201926171,DELIVRD,2019-11-21 17:39:42';
-                // $receive_data = explode(';', $receive);
-                /*   $receive_data = [
-                'code' => 0,
-                'msg'  => '',
-                'data' => [
-                [
-                'smUuid' => '26175_12_0_15172413692_0_tejrsVO_1',
-                'deliverTime' => '2019-12-10 17:27:16',
-                'mobile' => '15172413692',
-                'smUuid' => '26175_12_0_15172413692_0_tejrsVO_1',
-                'deliverResult' => 'REJECT',
-                'batchId' => 'o0ULmxE'
-                ],
-                ],
-                ]; */
-                // $send_status = 2;
-                // if ($receive_data['code'] == 0) {
-                //     $real_receive_data = $receive_data['data'];
-                //     foreach ($real_receive_data as $key => $value) {
-                //         // $receive_info = [];
-                //         // $receive_info = explode(',', $value);
-                //         // $task_id      = $receive_id[$value['taskid']];
-                //         if (isset($value['batchId'])) {
-                //             $task_id = $redis->hget('index:meassage:code:back_taskno:' . $content, $value['batchId']);
-                //             if (empty($task_id)) {
-                //                 continue;
-                //             }
-                //             $task = $this->getSendTask($task_id);
-                //             if ($task == false) {
-                //                 // echo "error task_id" . "\n";
-                //             }
-                //             $send_task_log = [];
-                //             if ($value['deliverResult'] == 'DELIVRD') {
-                //                 $send_status = 3;
-                //             } else {
-                //                 $send_status = 4;
-                //             }
-                //             $send_task_log = [
-                //                 'task_no' => $task['task_no'],
-                //                 'uid' => $task['uid'],
-                //                 'mobile' => $value['mobile'],
-                //                 'status_message' => $value['deliverResult'],
-                //                 'send_status' => $send_status,
-                //                 'send_time' => strtotime($value['deliverTime']),
-                //             ];
-                //             // // print_r($send_task_log);
-                //             $redis->rpush($redisMessageCodeDeliver, json_encode($send_task_log));
-                //             // Db::startTrans();
-                //             // try {
-                //             //     Db::table('yx_user_send_task_log')->insert($send_task_log);
-                //             //     Db::commit();
-                //             // } catch (\Exception $e) {
-                //             //     Db::rollback();
-                //             //     return ['code' => '3009']; //修改失败
-                //             // }
-                //             unset($send_status);
-                //         }
-                //     }
-                // }
-                // // // print_r($receive_data);die;
-                // sleep(60);
-
-                // unset($send_num);
-                // unset($send_content);
-                // unset($receive_id);
-                // echo "success";
+               
             }
         } catch (\Exception $th) {
             //throw $th;
-            $this->writeToRobot($content, "彩信通道报错,错误原因" . $res, '快乐网视彩信模板变量通道');
+            $redis->rpush($redisMessageCodeSend, $send);
+            $this->writeToRobot($content, "彩信通道报错,错误原因" . $th, '快乐网视彩信模板变量通道');
             exception($th);
         }
 
