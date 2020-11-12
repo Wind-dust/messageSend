@@ -65,7 +65,12 @@ return [
     'cmppmeilianruantongyidonggame' => $commandPath . 'CmppMeiLianRuanTongYiDongGame', //美联软通移动游戏
     'httpchannelcaixinbangzhixinyidong' => $commandPath . 'HttpChannelCaiXinBangZhiXinYiDong', //邦之信移动彩信
     'httpchannelcaixinbangzhixinliandian' => $commandPath . 'HttpChannelCaiXinBangZhiXinLianDian', //邦之信移动彩信
+    'httpchannelcaixinkuailewangshi' => $commandPath . 'HttpChannelCaiXinKuaiLeWangShi', //快乐网视移动彩信自定义通道
+    'httpchannelcaixinkuailewangshimodelvar' => $commandPath . 'HttpChannelCaiXinKuaiLeWangShiModelVar', //快乐网视移动彩信模板变量
+    'httpchannelcaixinkuailewangshiliandian' => $commandPath . 'HttpChannelCaiXinKuaiLeWangShiLianDian', //快乐网视联电彩信自定义通道
+    'httpchannelcaixinkuailewangshimodelvarliandian' => $commandPath . 'HttpChannelCaiXinKuaiLeWangShiModelVarLianDian', //快乐网视联电彩信模板变量
     'httpchannelcaixinchuangshi' => $commandPath . 'HttpChannelCaiXinChuangShi', //创世华信信移动彩信
+    'httpchannelcaixinchuangshimodelvar' => $commandPath . 'HttpChannelCaiXinChuangShiModelVar', //创世华信信移动彩信
     'cmppmijiadianxinmarketing' => $commandPath . 'CmppMiJiaDianXinMarketing',
     'cmppmijialiantongmarketing' => $commandPath . 'CmppMiJiaLianTongMarketing',
     'cmppmijiayidongmarketing' => $commandPath . 'CmppMiJiaYiDongMarketing',

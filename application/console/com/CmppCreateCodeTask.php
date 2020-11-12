@@ -1006,7 +1006,7 @@ class CmppCreateCodeTask extends Pzlife
          */
 
         // $task_id = Db::query("SELECT `id` FROM yx_user_send_code_task WHERE  `uid` = 91 AND `create_time` >= 1591272000 ");
-        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_multimedia_message WHERE  `id` = 328030  ");
+        $task_id = Db::query("SELECT `id`,`uid` FROM yx_user_multimedia_message WHERE  `id` = 328568  ");
         foreach ($task_id as $key => $value) {
             $this->redis->rpush("index:meassage:multimediamessage:sendtask", json_encode(['id' => $value['id'], 'deduct' => 0]));
         }
@@ -7952,6 +7952,92 @@ class CmppCreateCodeTask extends Pzlife
     }
 
     /* {"task_no":"mul20020515503481449866","uid":1,"mobile":"18616279075","status_message":"DELIVRD","send_status":3,"send_time":1580889993} */
+
+    public function receiptMultimediaInfoToBase(){
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $redis = Phpredis::getConn();
+        while(true){
+            try {
+                $sendlog = $redis->lpop('index:meassage:multimediamessage:deliver:');
+                if (empty($sendlog)) {
+                    // exit('Send Log IS null');
+                    sleep(60);
+                    continue;
+                }
+                $send_log = json_decode($sendlog, true);
+                $sendtasklog = Db::query("SELECT `id`,`create_time`,`uid`,`real_message`,`status_message` FROM `yx_user_multimedia_message_log` WHERE `task_no` = '" . $send_log['task_no'] . "' AND `mobile` = '" . $send_log['mobile'] . "' ");
+                // die;
+                $task = Db::query("SELECT `id`,`create_time`,`update_time`,`source`,`send_msg_id` FROM `yx_user_multimedia_message` WHERE `task_no` = '" . $send_log['task_no'] . "' ");
+                if (empty($sendtasklog)) {
+                    Db::startTrans();
+
+                    Db::table('yx_user_multimedia_message_log')->insert([
+                        'uid' => $send_log['uid'],
+                        'task_no' => $send_log['task_no'],
+                        'mobile' => $send_log['mobile'],
+                        'send_status' => $send_log['send_status'],
+                        'create_time' => $task[0]['update_time'],
+                        'update_time' => $send_log['send_time'],
+                        'real_message' => $send_log['status_message'],
+                        'status_message' => $send_log['status_message'],
+                        'task_id' => $task[0]['id'],
+                        'source' => $task[0]['source'],
+                    ]);
+                    Db::commit();
+
+                    $redis->rpush('index:meassage:multimediamessage:deliver:', json_encode($send_log));
+                } else {
+                    if (!empty($sendtasklog[0]['real_message'])) {
+                        continue;
+                    }
+                    Db::startTrans();
+                    Db::table('yx_user_multimedia_message_log')->where('id', $sendtasklog[0]['id'])->update(['real_message' => $send_log['status_message'], 'status_message' => $send_log['status_message'], 'send_status' => $send_log['send_status'], 'update_time' => $send_log['send_time']]);
+                    Db::commit();
+                    if (!empty($sendtasklog[0]['status_message'])) {
+                        continue;
+                    }
+                }
+                if (strpos($send_log['status_message'], 'DB:0141') !== false || strpos($send_log['status_message'], 'MBBLACK') !== false || strpos($send_log['status_message'], 'BLACK') !== false) {
+                    $message_info = '黑名单';
+                } else if ($send_log['status_message'] == 'DELIVRD') {
+                    $message_info = '发送成功';
+                } else if (in_array(trim($send_log['status_message']), ['REJECTD', 'REJECT', 'MA:0001', '4442'])) {
+                    $send_log['status_message'] = 'DELIVRD';
+                    $message_info = '发送成功';
+                } else {
+                    $message_info = '发送失败';
+                }
+                $user = Db::query("SELECT `pid` FROM yx_users WHERE `id` = " . $send_log['uid']);
+                if ($user[0]['pid'] == 137) {
+                    $redis->rpush('index:meassage:code:user:mulreceive:' . $send_log['uid'], json_encode([
+                        'task_no' => $send_log['task_no'],
+                        'status_message' => trim($send_log['status_message']),
+                        'msg_id' => trim($task[0]['send_msg_id']),
+                        'message_info' => $message_info,
+                        'mobile' => trim($send_log['mobile']),
+                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        'send_time' => isset($send_log['send_time']) ? date('Y-m-d H:i:s', trim($send_log['send_time'])) : date('Y-m-d H:i:s', time()),
+                        'smsCount' => 1,
+                        'smsIndex' => 1,
+                    ])); //写入用户带处理日志
+                } else {
+                    $redis->rpush('index:meassage:code:user:mulreceive:' . $send_log['uid'], json_encode([
+                        'task_no' => $send_log['task_no'],
+                        'status_message' => trim($send_log['status_message']),
+                        'message_info' => $message_info,
+                        'mobile' => trim($send_log['mobile']),
+                        // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
+                        'send_time' => isset($send_log['send_time']) ? date('Y-m-d H:i:s', trim($send_log['send_time'])) : date('Y-m-d H:i:s', time()),
+                    ])); //写入用户带处理日志
+                }
+            } catch (\Exception $th) {
+                Db::rollback();
+                $redis->rpush('index:meassage:multimediamessage:deliver:', json_encode($send_log));
+                exception($th);
+            }
+        }  
+    }
+
     public function receiptMultimediaToBase($channel_id)
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
