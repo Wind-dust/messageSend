@@ -8,11 +8,11 @@ use Config;
 use think\Db;
 
 //http 通道,通道编号10
-class HttpChannelCaiXinKuaiLeWangShiModelVar extends Pzlife
+class HttpChannelCaiXinKuaiLeWangShiModelVarLianDian extends Pzlife
 {
 
     //杭州迈远
-    public function HttpChannelCaiXinKuaiLeWangShiModelVarLianDian($content = 13)
+    public function content($content = 13)
     {
         return [
             'userid' => '446',
