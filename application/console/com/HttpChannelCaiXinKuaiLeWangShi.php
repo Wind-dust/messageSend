@@ -178,7 +178,7 @@ class HttpChannelCaiXinKuaiLeWangShi extends Pzlife
                                     'title' => $send_title[$send_taskid],
                                     // 'content'   => $send_content[$send_taskid],
                                     'content' => $send_content[$send_taskid],
-                                    'extno' => $send_extno[$send_taskid],
+                                    'extno' => isset($send_extno[$send_taskid]) ? $send_extno[$send_taskid] : "",
                                     'action' => 'send',
                                 ];
 
@@ -296,6 +296,9 @@ class HttpChannelCaiXinKuaiLeWangShi extends Pzlife
                         if (is_array($value)) {
                             $task_id = $redis->hget('index:meassage:code:back_taskno:kuailewangshi_multimediamessage', trim($value['taskid']));
                             // print_r($value);die;
+                            if (!$task_id) {
+                                continue;
+                            }
                             $task = $this->getSendTask($task_id);
                             if ($task == false) {
                                 echo "error task_id" . "\n";
@@ -329,7 +332,9 @@ class HttpChannelCaiXinKuaiLeWangShi extends Pzlife
                             unset($send_status);
                         } else {
                             $task_id = $redis->hget('index:meassage:code:back_taskno:kuailewangshi_multimediamessage', trim($receive_data['statusbox']['taskid']));
-
+                            if (!$task_id) {
+                                break;
+                            }
                             $task = $this->getSendTask($task_id);
                             if ($task == false) {
                                 echo "error task_id" . "\n";

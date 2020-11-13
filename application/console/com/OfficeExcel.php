@@ -6,7 +6,6 @@ use app\console\Pzlife;
 use cache\Phpredis;
 use cache\PhpredisNew;
 use Config;
-use Env;
 use Exception;
 use PHPExcel;
 use PHPExcel_Cell;
@@ -32,23 +31,23 @@ class OfficeExcel extends Pzlife
         $objPHPExcel = $objReader->load(realpath("./") . "\yt_area_mobile.csv");
         // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
         //选择标签页
-        $sheet            = $objPHPExcel->getSheet(0); //获取行数与列数,注意列数需要转换
-        $highestRowNum    = $sheet->getHighestRow();
-        $highestColumn    = $sheet->getHighestColumn();
+        $sheet = $objPHPExcel->getSheet(0); //获取行数与列数,注意列数需要转换
+        $highestRowNum = $sheet->getHighestRow();
+        $highestColumn = $sheet->getHighestColumn();
         $highestColumnNum = PHPExcel_Cell::columnIndexFromString($highestColumn); //取得字段，这里测试表格中的第一行为数据的字段，因此先取出用来作后面数组的键名
-        $filed            = array();
+        $filed = array();
         for ($i = 0; $i < $highestColumnNum; $i++) {
             $cellName = PHPExcel_Cell::stringFromColumnIndex($i) . '1';
-            $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
-            $filed[]  = $cellVal;
+            $cellVal = $sheet->getCell($cellName)->getValue(); //取得列内容
+            $filed[] = $cellVal;
         } //开始取出数据并存入数组
         $data = array();
         for ($i = 2; $i <= $highestRowNum; $i++) {
             //ignore row 1
             $row = array();
             for ($j = 0; $j < $highestColumnNum; $j++) {
-                $cellName        = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
-                $cellVal         = $sheet->getCell($cellName)->getValue();
+                $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
+                $cellVal = $sheet->getCell($cellName)->getValue();
                 $row[$filed[$j]] = trim($cellVal);
             }
             if (Db::query("SELECT * FROM yx_number_source WHERE mobile = " . $row['mobile'])) {
@@ -59,9 +58,9 @@ class OfficeExcel extends Pzlife
                 echo $row['mobile'] . 'is not found';
                 die;
             }
-            $mobile_new                = [];
-            $mobile_new                = $row;
-            $mobile_new['source']      = $mobileowner['source'];
+            $mobile_new = [];
+            $mobile_new = $row;
+            $mobile_new['source'] = $mobileowner['source'];
             $mobile_new['source_name'] = $mobileowner['name'];
             if ($row['province'] != $row['city']) {
                 $a = "省";
@@ -75,7 +74,7 @@ class OfficeExcel extends Pzlife
                 die;
             }
             $mobile_new['province_id'] = $mobile_province['id'];
-            $mobile_new['province']    = $mobile_province['area_name'];
+            $mobile_new['province'] = $mobile_province['area_name'];
             if ($row['city'] == '克州') {
                 $row['city'] = '克孜勒苏柯尔克孜自治州';
             } else if ($row['city'] == '阿盟') {
@@ -90,7 +89,7 @@ class OfficeExcel extends Pzlife
             if ($row['city'] != '江汉（天门/仙桃/潜江）区') {
                 $mobile_city = $this->getCity($row['city']);
             } else {
-                $mobile_city['id']        = 1917;
+                $mobile_city['id'] = 1917;
                 $mobile_city['area_name'] = '江汉（天门/仙桃/潜江）区';
             }
 
@@ -99,7 +98,7 @@ class OfficeExcel extends Pzlife
                 die;
             }
             $mobile_new['city_id'] = $mobile_city['id'];
-            $mobile_new['city']    = $mobile_city['area_name'];
+            $mobile_new['city'] = $mobile_city['area_name'];
             // Db::table('yx_number_source')->insert($mobile_new);
             // print_r($mobile_new);die;
             // $data[] = $row;
@@ -144,7 +143,7 @@ class OfficeExcel extends Pzlife
         $path = realpath("./") . "/191111.txt";
         $file = fopen($path, "r");
         $data = array();
-        $i    = 0;
+        $i = 0;
         // $phone = '';
         // $j     = '';
         while (!feof($file)) {
@@ -153,19 +152,19 @@ class OfficeExcel extends Pzlife
             // // print_r($phone);die;
             // $j = ',';
             if (!empty($cellVal)) {
-                $prefix          = substr(trim($cellVal), 0, 7);
-                $res             = Db::query("SELECT `source_name`,`province`,`city` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
-                $newres          = array_shift($res);
-                $value           = [];
+                $prefix = substr(trim($cellVal), 0, 7);
+                $res = Db::query("SELECT `source_name`,`province`,`city` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                $newres = array_shift($res);
+                $value = [];
                 $value['mobile'] = trim($cellVal);
                 if ($newres) {
                     $value['source_name'] = $newres['source_name'];
-                    $value['province']    = $newres['province'];
-                    $value['city']        = $newres['city'];
+                    $value['province'] = $newres['province'];
+                    $value['city'] = $newres['city'];
                 } else {
                     $value['source_name'] = '未知';
-                    $value['province']    = '';
-                    $value['city']        = '';
+                    $value['province'] = '';
+                    $value['city'] = '';
                 }
                 $data[] = $value;
                 $i++;
@@ -213,7 +212,7 @@ class OfficeExcel extends Pzlife
             $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
         }
         $outputFileName = "金卡1.xlsx";
-        $i              = 0;
+        $i = 0;
         foreach ($data as $key => $orderdata) {
             //行
             $col = $key + 2;
@@ -242,14 +241,14 @@ class OfficeExcel extends Pzlife
     public function OfficeExcelWriteDatabase($name1)
     {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
-        $file  = explode('.', $name1);
+        $file = explode('.', $name1);
         $data1 = array();
-        $type  = $file[1];
+        $type = $file[1];
         if ($type == 'txt') {
             $path = realpath("./") . "/" . $name1;
             $file = fopen($path, "r");
             $data = array();
-            $i    = 0;
+            $i = 0;
             // $phone = '';
             // $j     = '';
             while (!feof($file)) {
@@ -324,9 +323,9 @@ class OfficeExcel extends Pzlife
         }
         fclose($myfile);
         die; */
-        $date  = date('Y-m-d H:i:s', time());
+        $date = date('Y-m-d H:i:s', time());
         $time1 = strtotime('2020-02-13 18:30:55');
-        $i     = 0;
+        $i = 0;
         // $CellList = array(
         //     array('title', '标题'),
         //     array('model', '模板账户'),
@@ -366,17 +365,17 @@ class OfficeExcel extends Pzlife
         ];
         asort($send_status);
         $max = max($send_status);
-        $j   = 1;
-        $n   = 0;
+        $j = 1;
+        $n = 0;
         // echo  count($data1);die;
         // $data1 = array_diff($data1, $data2);
         foreach ($data1 as $key => $value) {
             $new_value = [];
             if (strpos($value, '00000') || strpos($value, '111111') || strpos($value, '222222') || strpos($value, '333333') || strpos($value, '444444') || strpos($value, '555555') || strpos($value, '666666') || strpos($value, '777777') || strpos($value, '888888') || strpos($value, '999999')) {
                 $status_info = '空号';
-                $status      = 'MK:0001';
+                $status = 'MK:0001';
             } else {
-                $num     = mt_rand(1, $max);
+                $num = mt_rand(1, $max);
                 $sendNum = 0;
                 foreach ($send_status as $sk => $sl) {
                     if ($num <= $sl) {
@@ -384,15 +383,15 @@ class OfficeExcel extends Pzlife
                         break;
                     }
                 }
-                $status      = $send_status_count[$sendNum];
+                $status = $send_status_count[$sendNum];
                 $status_info = $send_info_count[$sendNum];
             }
             $new_value = [
-                'mobile'      => $value,
-                'title'       => '特殊时期，如何提升孕妈和宝宝的抵抗力',
+                'mobile' => $value,
+                'title' => '特殊时期，如何提升孕妈和宝宝的抵抗力',
                 'status_info' => $status_info,
-                'status'      => $status,
-                'send_time'   => date("Y/m/d H:i:s", $time1 + ceil($n / 1000)),
+                'status' => $status,
+                'send_time' => date("Y/m/d H:i:s", $time1 + ceil($n / 1000)),
             ];
             $putdata[] = $new_value;
             $i++;
@@ -435,7 +434,7 @@ class OfficeExcel extends Pzlife
                     // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
                 }
                 $outputFileName = "金卡1.csv";
-                $i              = 0;
+                $i = 0;
                 foreach ($putdata as $key => $orderdata) {
                     //行
                     $col = $key + 2;
@@ -497,7 +496,7 @@ class OfficeExcel extends Pzlife
                 // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
             }
             $outputFileName = $j . ".xlsx";
-            $i              = 0;
+            $i = 0;
             foreach ($putdata as $key => $orderdata) {
                 //行
                 $col = $key + 2;
@@ -523,7 +522,7 @@ class OfficeExcel extends Pzlife
 
     }
 
-    function officeReader($types, $name, $cell = 'A')
+    public function officeReader($types, $name, $cell = 'A')
     { //第一行数据
         $objReader = PHPExcel_IOFactory::createReader($types);
         // print_r(realpath("../"). "\yt_area_mobile.csv");die;
@@ -531,13 +530,13 @@ class OfficeExcel extends Pzlife
         $objPHPExcel = $objReader->load(realpath("./") . "/" . $name . "");
         // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
         //选择标签页
-        $sheet      = $objPHPExcel->getSheet(0); //取得sheet(0)表
+        $sheet = $objPHPExcel->getSheet(0); //取得sheet(0)表
         $highestRow = $sheet->getHighestRow(); // 取得总行数
         for ($i = 1; $i < $highestRow; $i++) {
-            $cellVal     = $objPHPExcel->getActiveSheet()->getCell($cell . $i)->getValue();
+            $cellVal = $objPHPExcel->getActiveSheet()->getCell($cell . $i)->getValue();
             $inser_value = [];
             $inser_value = [
-                'word'        => trim($cellVal),
+                'word' => trim($cellVal),
                 'create_time' => time(),
             ];
             $data[] = $inser_value;
@@ -551,7 +550,7 @@ class OfficeExcel extends Pzlife
         $path = realpath("./") . "/minganci.txt";
         $file = fopen($path, "r");
         $data = array();
-        $i    = 0;
+        $i = 0;
         // $phone = '';
         // $j     = '';
         while (!feof($file)) {
@@ -569,17 +568,17 @@ class OfficeExcel extends Pzlife
     } */
     }
 
-    function uploadingFarend($value)
+    public function uploadingFarend($value)
     {
         $client_id = '10000001';
-        $secret    = 'VPNDYgDb7mTv2KuDTwWkAwRnDQtWj97E';
-        $nonce     = $this->getRandomString(8);
-        $time      = time();
+        $secret = 'VPNDYgDb7mTv2KuDTwWkAwRnDQtWj97E';
+        $nonce = $this->getRandomString(8);
+        $time = time();
 
-        $sign        = md5('{"client_id":' . $client_id . ',"nonce":"' . $nonce . '","secret":"VPNDYgDb7mTv2KuDTwWkAwRnDQtWj97E","timestamp":' . $time . '}');
-        $jy_token    = base64_encode('{"client_id":' . $client_id . ',"nonce":"' . $nonce . '","sign":"' . $sign . '","timestamp":' . $time . '}');
+        $sign = md5('{"client_id":' . $client_id . ',"nonce":"' . $nonce . '","secret":"VPNDYgDb7mTv2KuDTwWkAwRnDQtWj97E","timestamp":' . $time . '}');
+        $jy_token = base64_encode('{"client_id":' . $client_id . ',"nonce":"' . $nonce . '","sign":"' . $sign . '","timestamp":' . $time . '}');
         $request_url = 'https://api-sit.itingluo.com/apiv1/openapi/search/insertdict/info?word_type=word&value=' . $value;
-        $header      = array(
+        $header = array(
             'client_id:' . $client_id,
             'secret:' . $secret,
             'nonce:' . $nonce,
@@ -590,7 +589,7 @@ class OfficeExcel extends Pzlife
         return $this->httpRequest($request_url, '', $header);
     }
 
-    function getRandomString($len, $chars = null)
+    public function getRandomString($len, $chars = null)
     {
         if (is_null($chars)) {
             $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -624,7 +623,7 @@ class OfficeExcel extends Pzlife
             curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
         }
 
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $output = curl_exec($curl);
         curl_close($curl);
         return $output;
@@ -633,10 +632,10 @@ class OfficeExcel extends Pzlife
     public function saveReadExcel()
     {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
-        $path  = realpath("./") . "/1.txt";
-        $file  = fopen($path, "r");
+        $path = realpath("./") . "/1.txt";
+        $file = fopen($path, "r");
         $data1 = array();
-        $i     = 0;
+        $i = 0;
         // $phone = '';
         // $j     = '';
         while (!feof($file)) {
@@ -647,10 +646,10 @@ class OfficeExcel extends Pzlife
             $i++;
         }
         fclose($file);
-        $path  = realpath("./") . "/2.txt";
-        $file  = fopen($path, "r");
+        $path = realpath("./") . "/2.txt";
+        $file = fopen($path, "r");
         $data2 = array();
-        $i     = 0;
+        $i = 0;
         // $phone = '';
         // $j     = '';
         while (!feof($file)) {
@@ -661,18 +660,18 @@ class OfficeExcel extends Pzlife
             $i++;
         }
         fclose($file);
-        $data1     = array_unique(array_filter($data1));
-        $data2     = array_unique(array_filter($data2));
-        $new1      = [];
-        $new2      = [];
+        $data1 = array_unique(array_filter($data1));
+        $data2 = array_unique(array_filter($data2));
+        $new1 = [];
+        $new2 = [];
         $objReader = PHPExcel_IOFactory::createReader('Excel2007');
         // print_r(realpath("../"). "\yt_area_mobile.csv");die;
 
         $objPHPExcel = $objReader->load(realpath("./") . "/1207.xlsx");
         // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
         //选择标签页
-        $sheet       = $objPHPExcel->getSheet(0); //取得sheet(0)表
-        $highestRow  = $sheet->getHighestRow(); // 取得总行数//获取表格列数
+        $sheet = $objPHPExcel->getSheet(0); //取得sheet(0)表
+        $highestRow = $sheet->getHighestRow(); // 取得总行数//获取表格列数
         $columnCount = $sheet->getHighestColumn();
         for ($row = 1; $row <= $highestRow; $row++) {
             //列数循环 , 列数是以A列开始
@@ -727,7 +726,7 @@ class OfficeExcel extends Pzlife
             // $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
         }
         $outputFileName = "金卡1.xlsx";
-        $i              = 0;
+        $i = 0;
         foreach ($new1 as $key => $orderdata) {
             //行
             $col = $key + 2;
@@ -755,9 +754,9 @@ class OfficeExcel extends Pzlife
         // exit();
     }
 
-    function getMobileOwner($mobile)
+    public function getMobileOwner($mobile)
     {
-        $mobile      = substr($mobile, 0, 3);
+        $mobile = substr($mobile, 0, 3);
         $mobileowner = Db::query("SELECT * FROM yx_number_segment WHERE mobile =" . $mobile);
         if ($mobileowner) {
             return $mobileowner[0];
@@ -766,9 +765,9 @@ class OfficeExcel extends Pzlife
         }
     }
 
-    function getArea($name, $level)
+    public function getArea($name, $level)
     {
-        $areaSql  = "select * from yx_areas where delete_time=0 and area_name LIKE '%" . $name . "%' and level =  " . $level;
+        $areaSql = "select * from yx_areas where delete_time=0 and area_name LIKE '%" . $name . "%' and level =  " . $level;
         $areaInfo = Db::query($areaSql);
         if ($areaInfo) {
             return $areaInfo[0];
@@ -777,9 +776,9 @@ class OfficeExcel extends Pzlife
         }
     }
 
-    function getCity($name)
+    public function getCity($name)
     {
-        $areaSql  = "select * from yx_areas where delete_time=0 and area_name LIKE '%" . $name . "%' and (level = 2 or level = 3 ) ORDER BY level ASC LIMIT 1";
+        $areaSql = "select * from yx_areas where delete_time=0 and area_name LIKE '%" . $name . "%' and (level = 2 or level = 3 ) ORDER BY level ASC LIMIT 1";
         $areaInfo = Db::query($areaSql);
         if ($areaInfo) {
             return $areaInfo[0];
@@ -794,252 +793,252 @@ class OfficeExcel extends Pzlife
             [
                 'mobile' => 134,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 135,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 136,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 137,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 138,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 139,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 147,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 148,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 150,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 151,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 152,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 157,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 158,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 159,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 172,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 178,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 182,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 183,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 184,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 187,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 188,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 198,
                 'source' => 1,
-                'name'   => "中国移动",
+                'name' => "中国移动",
             ],
             [
                 'mobile' => 130,
                 'source' => 2,
-                'name'   => "中国联通",
+                'name' => "中国联通",
             ],
             [
                 'mobile' => 131,
                 'source' => 2,
-                'name'   => "中国联通",
+                'name' => "中国联通",
             ],
             [
                 'mobile' => 132,
                 'source' => 2,
-                'name'   => "中国联通",
+                'name' => "中国联通",
             ],
             [
                 'mobile' => 145,
                 'source' => 2,
-                'name'   => "中国联通",
+                'name' => "中国联通",
             ],
             [
                 'mobile' => 146,
                 'source' => 2,
-                'name'   => "中国联通",
+                'name' => "中国联通",
             ],
             [
                 'mobile' => 155,
                 'source' => 2,
-                'name'   => "中国联通",
+                'name' => "中国联通",
             ],
             [
                 'mobile' => 156,
                 'source' => 2,
-                'name'   => "中国联通",
+                'name' => "中国联通",
             ],
             [
                 'mobile' => 166,
                 'source' => 2,
-                'name'   => "中国联通",
+                'name' => "中国联通",
             ],
             [
                 'mobile' => 167,
                 'source' => 2,
-                'name'   => "中国联通",
+                'name' => "中国联通",
             ],
             [
                 'mobile' => 171,
                 'source' => 2,
-                'name'   => "中国联通",
+                'name' => "中国联通",
             ],
             [
                 'mobile' => 175,
                 'source' => 2,
-                'name'   => "中国联通",
+                'name' => "中国联通",
             ],
             [
                 'mobile' => 176,
                 'source' => 2,
-                'name'   => "中国联通",
+                'name' => "中国联通",
             ],
             [
                 'mobile' => 185,
                 'source' => 2,
-                'name'   => "中国联通",
+                'name' => "中国联通",
             ],
             [
                 'mobile' => 186,
                 'source' => 2,
-                'name'   => "中国联通",
+                'name' => "中国联通",
             ],
             [
                 'mobile' => 133,
                 'source' => 3,
-                'name'   => "中国电信",
+                'name' => "中国电信",
             ],
             [
                 'mobile' => 141,
                 'source' => 3,
-                'name'   => "中国电信",
+                'name' => "中国电信",
             ],
             [
                 'mobile' => 149,
                 'source' => 3,
-                'name'   => "中国电信",
+                'name' => "中国电信",
             ],
             [
                 'mobile' => 153,
                 'source' => 3,
-                'name'   => "中国电信",
+                'name' => "中国电信",
             ],
             [
                 'mobile' => 173,
                 'source' => 3,
-                'name'   => "中国电信",
+                'name' => "中国电信",
             ],
             [
                 'mobile' => 174,
                 'source' => 3,
-                'name'   => "中国电信",
+                'name' => "中国电信",
             ],
             [
                 'mobile' => 177,
                 'source' => 3,
-                'name'   => "中国电信",
+                'name' => "中国电信",
             ],
             [
                 'mobile' => 180,
                 'source' => 3,
-                'name'   => "中国电信",
+                'name' => "中国电信",
             ],
             [
                 'mobile' => 181,
                 'source' => 3,
-                'name'   => "中国电信",
+                'name' => "中国电信",
             ],
             [
                 'mobile' => 189,
                 'source' => 3,
-                'name'   => "中国电信",
+                'name' => "中国电信",
             ],
             [
                 'mobile' => 191,
                 'source' => 3,
-                'name'   => "中国电信",
+                'name' => "中国电信",
             ],
             [
                 'mobile' => 199,
                 'source' => 3,
-                'name'   => "中国电信",
+                'name' => "中国电信",
             ],
             [
                 'mobile' => 165,
                 'source' => 4,
-                'name'   => "虚拟运营商",
+                'name' => "虚拟运营商",
             ],
             [
                 'mobile' => 170,
                 'source' => 4,
-                'name'   => "虚拟运营商",
+                'name' => "虚拟运营商",
             ],
         ];
         // Db::table('yx_number_segment')->insertAll($data);
@@ -1048,7 +1047,7 @@ class OfficeExcel extends Pzlife
     //生产拓展码
     public function createDevelopCode()
     {
-        $two_codes           = [];
+        $two_codes = [];
         $two_keep_back_codes = [11, 22, 33, 44, 55, 66, 77, 88, 99];
         for ($i = 10; $i < 100; $i++) {
             if (!in_array($i, $two_keep_back_codes)) {
@@ -1079,7 +1078,7 @@ class OfficeExcel extends Pzlife
 
         // print_r($three_keep_back_codes);
         $remain_three_codes = array_diff($three_codes, $three_keep_back_codes);
-        $four_codes         = [];
+        $four_codes = [];
         foreach ($remain_three_codes as $key => $value) {
             for ($i = 0; $i < 10; $i++) {
                 $four_codes[] = $value . $i;
@@ -1111,7 +1110,7 @@ class OfficeExcel extends Pzlife
         }
 
         $remain_five_codes = array_diff($five_codes, $five_keep_back_codes);
-        $six_codes         = [];
+        $six_codes = [];
         foreach ($remain_five_codes as $key => $value) {
             for ($i = 0; $i < 10; $i++) {
                 $six_codes[] = $value . $i;
@@ -1122,8 +1121,8 @@ class OfficeExcel extends Pzlife
         foreach ($two_keep_back_codes as $key => $value) {
             $develop_data = [];
             $develop_data = [
-                'develop_no'  => $value,
-                'no_lenth'    => strlen($value),
+                'develop_no' => $value,
+                'no_lenth' => strlen($value),
                 'create_time' => time(),
             ];
             $all_develop_no[] = $develop_data;
@@ -1132,8 +1131,8 @@ class OfficeExcel extends Pzlife
         foreach ($three_keep_back_codes as $key => $value) {
             $develop_data = [];
             $develop_data = [
-                'develop_no'  => $value,
-                'no_lenth'    => strlen($value),
+                'develop_no' => $value,
+                'no_lenth' => strlen($value),
                 'create_time' => time(),
             ];
             $all_develop_no[] = $develop_data;
@@ -1142,8 +1141,8 @@ class OfficeExcel extends Pzlife
         foreach ($four_keep_back_codes as $key => $value) {
             $develop_data = [];
             $develop_data = [
-                'develop_no'  => $value,
-                'no_lenth'    => strlen($value),
+                'develop_no' => $value,
+                'no_lenth' => strlen($value),
                 'create_time' => time(),
             ];
             $all_develop_no[] = $develop_data;
@@ -1152,8 +1151,8 @@ class OfficeExcel extends Pzlife
         foreach ($five_keep_back_codes as $key => $value) {
             $develop_data = [];
             $develop_data = [
-                'develop_no'  => $value,
-                'no_lenth'    => strlen($value),
+                'develop_no' => $value,
+                'no_lenth' => strlen($value),
                 'create_time' => time(),
             ];
             $all_develop_no[] = $develop_data;
@@ -1166,8 +1165,8 @@ class OfficeExcel extends Pzlife
         for ($i = 0; $i < count($six_codes); $i++) {
             $develop_data = [];
             $develop_data = [
-                'develop_no'  => $six_codes[$i],
-                'no_lenth'    => strlen($six_codes[$i]),
+                'develop_no' => $six_codes[$i],
+                'no_lenth' => strlen($six_codes[$i]),
                 'create_time' => time(),
             ];
             $all_develop_no[] = $develop_data;
@@ -1175,7 +1174,7 @@ class OfficeExcel extends Pzlife
             if ($j >= 10000) {
                 Db::table('yx_develop_code')->insertAll($all_develop_no);
                 $all_develop_no = [];
-                $j              = 1;
+                $j = 1;
             }
         }
         if (!empty($all_develop_no)) {
@@ -1188,7 +1187,7 @@ class OfficeExcel extends Pzlife
     public function updateDevelopCode()
     {
 
-        $two_codes           = [];
+        $two_codes = [];
         //查询2位扩展码
         $two_keep_back_codes = [];
         $two_have_back_codes = Db::query("SELECT `develop_no` FROM yx_develop_code WHERE `no_lenth` = 2");
@@ -1213,7 +1212,7 @@ class OfficeExcel extends Pzlife
         foreach ($two_codes as $key => $value) {
             for ($i = 0; $i < 10; $i++) {
                 $no = 0;
-                $no =  $value . $i;
+                $no = $value . $i;
                 // $three_codes[] = $value . $i;
                 if (!in_array($no, $three_keep_back_codes)) {
                     $three_codes[] = $no;
@@ -1241,7 +1240,7 @@ class OfficeExcel extends Pzlife
         foreach ($three_codes as $key => $value) {
             for ($i = 0; $i < 10; $i++) {
                 $no = 0;
-                $no =  $value . $i;
+                $no = $value . $i;
                 // $three_codes[] = $value . $i;
                 if (!in_array($no, $four_keep_back_codes)) {
                     $four_codes[] = $no;
@@ -1274,8 +1273,8 @@ class OfficeExcel extends Pzlife
         foreach ($new_insert_four_codes as $key => $value) {
             $develop_data = [];
             $develop_data = [
-                'develop_no'  => $value,
-                'no_lenth'    => strlen($value),
+                'develop_no' => $value,
+                'no_lenth' => strlen($value),
                 'create_time' => time(),
             ];
             $all_develop_no[] = $develop_data;
@@ -1289,13 +1288,13 @@ class OfficeExcel extends Pzlife
     {
         try {
             $mobileredis = PhpredisNew::getConn();
-            $redis       = Phpredis::getConn();
+            $redis = Phpredis::getConn();
             // print_r($this->redis);
             ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
             /* 白名单设置 */
             $white_mobiles = Db::query("SELECT * FROM yx_whitelist ");
             foreach ($white_mobiles as $key => $value) {
-                $data   = [];
+                $data = [];
                 $prefix = substr(trim($value['mobile']), 0, 7);
                 // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                 // $newres = array_shift($res);
@@ -1307,9 +1306,9 @@ class OfficeExcel extends Pzlife
                     // print_r($source);die;
                     $newres = [];
                     $newres = [
-                        'source'      => $source['source'],
+                        'source' => $source['source'],
                         'province_id' => $source['province_id'],
-                        'city_id'     => $source['city_id'],
+                        'city_id' => $source['city_id'],
                     ];
                 }
                 $mobileredis->hset('yx:mobile:white', $value['mobile'], json_encode($newres));
@@ -1317,7 +1316,7 @@ class OfficeExcel extends Pzlife
             /* 黑名单设置 */
             $black_mobiles = Db::query("SELECT * FROM yx_blacklist ");
             foreach ($black_mobiles as $key => $value) {
-                $data   = [];
+                $data = [];
                 $prefix = substr(trim($value['mobile']), 0, 7);
                 // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                 // $newres = array_shift($res);
@@ -1329,9 +1328,9 @@ class OfficeExcel extends Pzlife
                     // print_r($source);die;
                     $newres = [];
                     $newres = [
-                        'source'      => $source['source'],
+                        'source' => $source['source'],
                         'province_id' => $source['province_id'],
-                        'city_id'     => $source['city_id'],
+                        'city_id' => $source['city_id'],
                     ];
                 }
                 $mobileredis->hset('yx:mobile:black', $value['mobile'], json_encode($newres));
@@ -1340,7 +1339,7 @@ class OfficeExcel extends Pzlife
             /* 空号设置 */
             $empty_mobiles = Db::query("SELECT * FROM yx_mobile ");
             foreach ($empty_mobiles as $key => $value) {
-                $data   = [];
+                $data = [];
                 $prefix = substr(trim($value['mobile']), 0, 7);
                 // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                 // $newres = array_shift($res);
@@ -1352,13 +1351,13 @@ class OfficeExcel extends Pzlife
                     // print_r($source);die;
                     $newres = [];
                     $newres = [
-                        'source'      => $source['source'],
+                        'source' => $source['source'],
                         'province_id' => $source['province_id'],
-                        'city_id'     => $source['city_id'],
+                        'city_id' => $source['city_id'],
                     ];
                 }
                 $newres['check_status'] = $value['check_status'];
-                $newres['update_time']  = $value['update_time'];
+                $newres['update_time'] = $value['update_time'];
                 $newres['check_result'] = $value['check_result'];
                 $mobileredis->hset('yx:mobile:empty', $value['mobile'], json_encode($newres));
             }
@@ -1367,7 +1366,7 @@ class OfficeExcel extends Pzlife
             $real_mobiles = Db::query("SELECT * FROM yx_real_mobile ");
 
             foreach ($real_mobiles as $key => $value) {
-                $data   = [];
+                $data = [];
                 $prefix = substr(trim($value['mobile']), 0, 7);
                 // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                 // $newres = array_shift($res);
@@ -1385,153 +1384,153 @@ class OfficeExcel extends Pzlife
                 if (empty($newres)) {
                     if ($prefix == 1650006) {
                         $newres = [
-                            'source'      => 1,
+                            'source' => 1,
                             'province_id' => 1802,
-                            'city_id'     => 1803,
+                            'city_id' => 1803,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif ($prefix == 1650713) {
                         $newres = [
-                            'source'      => 1,
+                            'source' => 1,
                             'province_id' => 1802,
-                            'city_id'     => 1885,
+                            'city_id' => 1885,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif ($prefix == 1651033) {
                         $newres = [
-                            'source'      => 1,
+                            'source' => 1,
                             'province_id' => 1426,
-                            'city_id'     => 1439,
+                            'city_id' => 1439,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif ($prefix == 1653427) {
                         $newres = [
-                            'source'      => 1,
+                            'source' => 1,
                             'province_id' => 499,
-                            'city_id'     => 586,
+                            'city_id' => 586,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif (in_array($prefix, [1660020, 1660021, 1660025, 1660027, 1660034, 1662236, 1662237, 1662215, 1662288, 1662290])) { //天津联通
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 19,
-                            'city_id'     => 20,
+                            'city_id' => 20,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif (in_array($prefix, [1660102, 1660114, 1660137, 1660152, 1660155])) { //北京联通
 
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 1,
-                            'city_id'     => 2,
+                            'city_id' => 2,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif (in_array($prefix, [1660170, 1660173, 1660178, 1660179, 1660181, 1660183, 1660184, 1660174, 1662102, 1662103, 1662107, 1662109, 1660214, 1662120, 1662122, 1662123, 1662152, 1662160, 1662167, 1662169, 1662171, 1662173, 1662174, 1662178, 1662179])) { //上海联通
 
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 841,
-                            'city_id'     => 842,
+                            'city_id' => 842,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif ($prefix == 1660271) {
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 1802,
-                            'city_id'     => 1803,
+                            'city_id' => 1803,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif ($prefix == 1660272) {
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 1802,
-                            'city_id'     => 1803,
+                            'city_id' => 1803,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif ($prefix == 1660351) {
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 240,
-                            'city_id'     => 241,
+                            'city_id' => 241,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif ($prefix == 1660371) {
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 1601,
-                            'city_id'     => 1602,
+                            'city_id' => 1602,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif ($prefix == 1660387) {
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 1601,
-                            'city_id'     => 1602,
+                            'city_id' => 1602,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif ($prefix == 1660396) {
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 1601,
-                            'city_id'     => 1788,
+                            'city_id' => 1788,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif ($prefix == 1660399) {
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 1601,
-                            'city_id'     => 1602,
+                            'city_id' => 1602,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif ($prefix == 1660427) {
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 499,
-                            'city_id'     => 586,
+                            'city_id' => 586,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif ($prefix == 1660471) {
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 377,
-                            'city_id'     => 378,
+                            'city_id' => 378,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif ($prefix == 1660532) {
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 1426,
-                            'city_id'     => 1439,
+                            'city_id' => 1439,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif ($prefix == 1660713) {
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 1802,
-                            'city_id'     => 1439,
+                            'city_id' => 1439,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif ($prefix == 1660875) {
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 2801,
-                            'city_id'     => 2837,
+                            'city_id' => 2837,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif (in_array($prefix, [1662303, 1662312, 1662331])) { //重庆联通
 
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 2454,
-                            'city_id'     => 2455,
+                            'city_id' => 2455,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif (in_array($prefix, [1662477])) { //广州联通
 
                         $newres = [
-                            'source'      => 2,
+                            'source' => 2,
                             'province_id' => 2076,
-                            'city_id'     => 2077,
+                            'city_id' => 2077,
                         ];
                         $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                     } elseif (substr(trim($value['mobile']), 0, 3) == 166) {
@@ -1561,13 +1560,13 @@ class OfficeExcel extends Pzlife
                     $source = $source[0];
                     $newres = [];
                     $newres = [
-                        'source'      => $source['source'],
+                        'source' => $source['source'],
                         'province_id' => $source['province_id'],
-                        'city_id'     => $source['city_id'],
+                        'city_id' => $source['city_id'],
                     ];
                 }
 
-                $newres['update_time']  = $value['update_time'];
+                $newres['update_time'] = $value['update_time'];
                 $newres['check_status'] = $value['check_status'];
                 $newres['check_result'] = $value['check_result'];
                 // print_r($newres);die;
@@ -1755,10 +1754,10 @@ class OfficeExcel extends Pzlife
     public function oneToOne()
     {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
-        $path  = realpath("./") . "/111.txt";
-        $file  = fopen($path, "r");
+        $path = realpath("./") . "/111.txt";
+        $file = fopen($path, "r");
         $data1 = array();
-        $i     = 0;
+        $i = 0;
         // $phone = '';
         // $j     = '';
         while (!feof($file)) {
@@ -1769,10 +1768,10 @@ class OfficeExcel extends Pzlife
             $i++;
         }
         fclose($file);
-        $path  = realpath("./") . "/112.txt";
-        $file  = fopen($path, "r");
+        $path = realpath("./") . "/112.txt";
+        $file = fopen($path, "r");
         $data2 = array();
-        $i     = 0;
+        $i = 0;
         // $phone = '';
         // $j     = '';
 
@@ -1809,10 +1808,10 @@ class OfficeExcel extends Pzlife
         $true_mobile = [];
 
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
-        $path  = realpath("./") . "/13213.txt";
-        $file  = fopen($path, "r");
+        $path = realpath("./") . "/13213.txt";
+        $file = fopen($path, "r");
         $data1 = array();
-        $i     = 0;
+        $i = 0;
         // $phone = '';
         // $j     = '';
         while (!feof($file)) {
@@ -1826,7 +1825,7 @@ class OfficeExcel extends Pzlife
         for ($i = 0; $i < count($mobile_data); $i++) {
             if (checkMobile(trim($mobile_data[$i])) == true) {
                 $prefix = substr(trim($mobile_data[$i]), 0, 7);
-                $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                $res = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                 $newres = array_shift($res);
                 //游戏通道分流
                 if ($newres) {
@@ -1861,7 +1860,7 @@ class OfficeExcel extends Pzlife
         }
         foreach ($data as $key => $value) {
             $data[$key]['task_content'] = $result[0]['title'];
-            $data[$key]['update_time']  = date('Y-m-d H:i:s', $value['create_time'] + ceil($key / 1000));
+            $data[$key]['update_time'] = date('Y-m-d H:i:s', $value['create_time'] + ceil($key / 1000));
             switch ($value['send_status']) {
                 case 2:
                     $data[$key]['send_status'] = '未知';
@@ -1918,7 +1917,7 @@ class OfficeExcel extends Pzlife
             $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
         }
         $outputFileName = $result[0]['task_no'] . "" . date('YmdHis', time()) . ".xlsx";
-        $i              = 0;
+        $i = 0;
         foreach ($data as $key => $orderdata) {
             //行
             $col = $key + 2;
@@ -1955,29 +1954,29 @@ class OfficeExcel extends Pzlife
 
         //第二批补发任务ID  15992，15994，
         $all_mobile = [];
-        $sendTask   = $this->getSendTask(15992);
-        $mobile     = explode(',', $sendTask['mobile_content']);
+        $sendTask = $this->getSendTask(15992);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
         $sendTask = $this->getSendTask(15994);
-        $mobile   = explode(',', $sendTask['mobile_content']);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
         $sendTask = $this->getSendTask(15993);
-        $mobile   = explode(',', $sendTask['mobile_content']);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
         $sendTask = $this->getSendTask(15995);
-        $mobile   = explode(',', $sendTask['mobile_content']);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
         // print_r(count($all_mobile));
         // die;
-        $ids   = [15939, 15940, 15941, 15942, 15943, 15944, 15945, 15946, 15952, 15953, 15954, 15964, 15965, 15966, 15967, 15968, 15969, 15970, 15971, 15984, 15985, 15987, 15988, 15989, 15990];
+        $ids = [15939, 15940, 15941, 15942, 15943, 15944, 15945, 15946, 15952, 15953, 15954, 15964, 15965, 15966, 15967, 15968, 15969, 15970, 15971, 15984, 15985, 15987, 15988, 15989, 15990];
         $error = 1;
         foreach ($ids as $is => $id) {
             /*  $sql = "SELECT
@@ -1994,8 +1993,8 @@ class OfficeExcel extends Pzlife
             ustl.task_id = " . $id;
             $task_log = Db::query($sql);
             $task_no = $task_log[0]['task_no']; */
-            $sendTask     = $this->getSendTask($id);
-            $all_log      = [];
+            $sendTask = $this->getSendTask($id);
+            $all_log = [];
             $new_task_log = [];
             try {
                 // foreach ($task_log as $key => $value) {
@@ -2096,8 +2095,8 @@ class OfficeExcel extends Pzlife
                 // }
 
                 // $task_log = array_filter($task_log);
-                $mobilesend  = explode(',', $sendTask['mobile_content']);
-                $mobilesend  = array_filter($mobilesend);
+                $mobilesend = explode(',', $sendTask['mobile_content']);
+                $mobilesend = array_filter($mobilesend);
                 $send_length = mb_strlen($sendTask['task_content'], 'utf8');
 
                 for ($i = 0; $i < count($mobilesend); $i++) {
@@ -2141,30 +2140,30 @@ class OfficeExcel extends Pzlife
                                     break;
                             }
                             $send_log = [
-                                'task_content'   => $sendTask['task_content'],
-                                'mobile'         => $mobilesend[$i],
-                                'send_status'    => '失败',
+                                'task_content' => $sendTask['task_content'],
+                                'mobile' => $mobilesend[$i],
+                                'send_status' => '失败',
                                 'status_message' => $status_message, //无效号码
-                                'create_time'    => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000),
+                                'create_time' => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000),
                             ];
                             // $error++;
                         } else {
                             $send_log = [
-                                'task_content'   => $sendTask['task_content'],
-                                'mobile'         => $mobilesend[$i],
-                                'send_status'    => '成功',
+                                'task_content' => $sendTask['task_content'],
+                                'mobile' => $mobilesend[$i],
+                                'send_status' => '成功',
                                 'status_message' => 'DELIVRD', //无效号码
-                                'create_time'    => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000),
+                                'create_time' => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000),
                             ];
                             $all_log[] = $send_log;
                         }
                     } else {
                         $send_log = [
-                            'task_content'   => $sendTask['task_content'],
-                            'mobile'         => $mobilesend[$i],
-                            'send_status'    => "失败",
+                            'task_content' => $sendTask['task_content'],
+                            'mobile' => $mobilesend[$i],
+                            'send_status' => "失败",
                             'status_message' => 'DB:0101', //无效号码
-                            'create_time'    => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000),
+                            'create_time' => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000),
                         ];
 
                         $all_log[] = $send_log;
@@ -2219,7 +2218,7 @@ class OfficeExcel extends Pzlife
                     $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
                 }
                 $outputFileName = $sendTask['task_no'] . "" . date('YmdHis', time()) . ".xlsx";
-                $i              = 0;
+                $i = 0;
                 foreach ($all_log as $key => $orderdata) {
                     //行
                     $col = $key + 2;
@@ -2243,7 +2242,7 @@ class OfficeExcel extends Pzlife
     private function getSendTask($id)
     {
         $getSendTaskSql = sprintf("select * from yx_user_send_task where delete_time=0 and id = %d", $id);
-        $sendTask       = Db::query($getSendTaskSql);
+        $sendTask = Db::query($getSendTaskSql);
         // print_r($sendTask);die;
         if (!$sendTask) {
             return [];
@@ -2257,24 +2256,24 @@ class OfficeExcel extends Pzlife
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
         // date_default_timezone_set('PRC');
         $redisMessageMarketingSend = 'index:meassage:marketing:kouliang';
-        $all_mobile                = [];
-        $sendTask                  = $this->getSendTask(15992);
-        $mobile                    = explode(',', $sendTask['mobile_content']);
+        $all_mobile = [];
+        $sendTask = $this->getSendTask(15992);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
         $sendTask = $this->getSendTask(15994);
-        $mobile   = explode(',', $sendTask['mobile_content']);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
         $sendTask = $this->getSendTask(15993);
-        $mobile   = explode(',', $sendTask['mobile_content']);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
         $sendTask = $this->getSendTask(15995);
-        $mobile   = explode(',', $sendTask['mobile_content']);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
@@ -2285,9 +2284,9 @@ class OfficeExcel extends Pzlife
             $this->redis->rPush('index:meassage:marketing:kouliang', $i);
         }
         // $this->redis->rPush('index:meassage:marketing:kouliang', 15956);
-        $all_log  = [];
+        $all_log = [];
         $true_log = [];
-        $j        = 1;
+        $j = 1;
         try {
             while (true) {
                 $send = $this->redis->lpop('index:meassage:marketing:kouliang');
@@ -2296,7 +2295,7 @@ class OfficeExcel extends Pzlife
                     break;
                 }
                 $rollback[] = $send;
-                $sendTask   = $this->getSendTask($send);
+                $sendTask = $this->getSendTask($send);
                 $mobilesend = [];
                 // print_r($sendTask);
                 // die;
@@ -2306,8 +2305,8 @@ class OfficeExcel extends Pzlife
                 if ($sendTask['free_trial'] != 2) {
                     continue;
                 }
-                $mobilesend  = explode(',', $sendTask['mobile_content']);
-                $mobilesend  = array_filter($mobilesend);
+                $mobilesend = explode(',', $sendTask['mobile_content']);
+                $mobilesend = array_filter($mobilesend);
                 $send_length = mb_strlen($sendTask['task_content'], 'utf8');
 
                 for ($i = 0; $i < count($mobilesend); $i++) {
@@ -2351,30 +2350,30 @@ class OfficeExcel extends Pzlife
                                     break;
                             }
                             $send_log = [
-                                'task_content'   => $sendTask['task_content'],
-                                'mobile'         => $mobilesend[$i],
-                                'send_status'    => '失败',
+                                'task_content' => $sendTask['task_content'],
+                                'mobile' => $mobilesend[$i],
+                                'send_status' => '失败',
                                 'status_message' => $status_message, //无效号码
-                                'create_time'    => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000),
+                                'create_time' => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000),
                             ];
                             // $error++;
                         } else {
                             $send_log = [
-                                'task_content'   => $sendTask['task_content'],
-                                'mobile'         => $mobilesend[$i],
-                                'send_status'    => '成功',
+                                'task_content' => $sendTask['task_content'],
+                                'mobile' => $mobilesend[$i],
+                                'send_status' => '成功',
                                 'status_message' => 'DELIVRD', //无效号码
-                                'create_time'    => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000),
+                                'create_time' => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000),
                             ];
                             $all_log[] = $send_log;
                         }
                     } else {
                         $send_log = [
-                            'task_content'   => $sendTask['task_content'],
-                            'mobile'         => $mobilesend[$i],
-                            'send_status'    => "失败",
+                            'task_content' => $sendTask['task_content'],
+                            'mobile' => $mobilesend[$i],
+                            'send_status' => "失败",
                             'status_message' => 'DB:0101', //无效号码
-                            'create_time'    => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000),
+                            'create_time' => date("Y-m-d H:i:s", $sendTask['update_time'] + $i / 1000),
                         ];
 
                         $all_log[] = $send_log;
@@ -2437,7 +2436,7 @@ class OfficeExcel extends Pzlife
                 }
                 // $outputFileName = $sendTask['task_no'] . "" . date('YmdHis', time()) . ".xlsx";
                 $outputFileName = $sendTask['task_no'] . ".xlsx";
-                $i              = 0;
+                $i = 0;
                 foreach ($all_log as $key => $orderdata) {
                     //行
                     $col = $key + 2;
@@ -2465,23 +2464,23 @@ class OfficeExcel extends Pzlife
         $this->redis = Phpredis::getConn();
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
         $all_mobile = [];
-        $sendTask   = $this->getSendTask(15992);
-        $mobile     = explode(',', $sendTask['mobile_content']);
+        $sendTask = $this->getSendTask(15992);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
         $sendTask = $this->getSendTask(15994);
-        $mobile   = explode(',', $sendTask['mobile_content']);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
         $sendTask = $this->getSendTask(15993);
-        $mobile   = explode(',', $sendTask['mobile_content']);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
         $sendTask = $this->getSendTask(15995);
-        $mobile   = explode(',', $sendTask['mobile_content']);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
@@ -2515,7 +2514,7 @@ class OfficeExcel extends Pzlife
                     break;
                 }
                 $rollback[] = $send;
-                $sendTask   = $this->getSendTask($send);
+                $sendTask = $this->getSendTask($send);
                 $mobilesend = [];
                 // print_r($sendTask);
                 // die;
@@ -2544,13 +2543,13 @@ class OfficeExcel extends Pzlife
         //第一批重复数据
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
         $all_mobile = [];
-        $sendTask   = $this->getSendTask(15992);
-        $mobile     = explode(',', $sendTask['mobile_content']);
+        $sendTask = $this->getSendTask(15992);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
         $sendTask = $this->getSendTask(15993);
-        $mobile   = explode(',', $sendTask['mobile_content']);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
@@ -2563,13 +2562,13 @@ class OfficeExcel extends Pzlife
         fclose($myfile);
         die;
         $sendTask = $this->getSendTask(15994);
-        $mobile   = explode(',', $sendTask['mobile_content']);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
 
         $sendTask = $this->getSendTask(15995);
-        $mobile   = explode(',', $sendTask['mobile_content']);
+        $mobile = explode(',', $sendTask['mobile_content']);
         foreach ($mobile as $key => $value) {
             $all_mobile[] = $value;
         }
@@ -2585,7 +2584,7 @@ class OfficeExcel extends Pzlife
         // }
 
         foreach ($ids as $is => $id) {
-            $sendTask   = $this->getSendTask($id);
+            $sendTask = $this->getSendTask($id);
             $mobilesend = explode(',', $sendTask['mobile_content']);
             for ($i = 0; $i < count($mobilesend); $i++) {
                 if (in_array($mobilesend[$i], $all_mobile)) {
@@ -2601,29 +2600,29 @@ class OfficeExcel extends Pzlife
     {
         echo getenv('path');
         die;
-        $bu   = [];
+        $bu = [];
         $path = realpath("./") . "/2003111457.txt";
         $file = fopen($path, "r");
         $data = array();
-        $i    = 0;
+        $i = 0;
         // $phone = '';
         // $j     = '';
         while (!feof($file)) {
             $cellVal = trim(fgets($file));
-            $bu[]    = $cellVal;
+            $bu[] = $cellVal;
         }
         fclose($file);
 
-        $one  = [];
+        $one = [];
         $path = realpath("./") . "/2003111458.txt";
         $file = fopen($path, "r");
         $data = array();
-        $i    = 0;
+        $i = 0;
         // $phone = '';
         // $j     = '';
         while (!feof($file)) {
             $cellVal = trim(fgets($file));
-            $one[]   = $cellVal;
+            $one[] = $cellVal;
         }
         fclose($file);
         print_r(count($bu));
@@ -2632,11 +2631,11 @@ class OfficeExcel extends Pzlife
         $has = array_diff($one, $bu);
         foreach ($has as $key => $value) {
             $send_log = [
-                'task_content'   => "【丝芙兰】天猫SEPHORA海外旗舰店盛大开业！3/5-3/8会员专享9折叠加300-30满减，戳 m.tb.cn/.TS2x7j 回T退订",
-                'mobile'         => $value,
-                'send_status'    => '成功',
+                'task_content' => "【丝芙兰】天猫SEPHORA海外旗舰店盛大开业！3/5-3/8会员专享9折叠加300-30满减，戳 m.tb.cn/.TS2x7j 回T退订",
+                'mobile' => $value,
+                'send_status' => '成功',
                 'status_message' => 'DELIVRD', //无效号码
-                'create_time'    => date("Y-m-d H:i:s", 1583377428 + $key / 1000),
+                'create_time' => date("Y-m-d H:i:s", 1583377428 + $key / 1000),
             ];
             $all_log[] = $send_log;
         }
@@ -2681,7 +2680,7 @@ class OfficeExcel extends Pzlife
             $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
         }
         $outputFileName = "2003111458" . "" . date('YmdHis', time()) . ".xlsx";
-        $i              = 0;
+        $i = 0;
         foreach ($all_log as $key => $orderdata) {
             //行
             $col = $key + 2;
@@ -2702,7 +2701,7 @@ class OfficeExcel extends Pzlife
         $url = "http://127.0.0.1:1007/index/send/getSmsBuiness";
         // $url = "http://127.0.0.1:1007/index/send/getSmsMarketingTask";
         // getSmsMarketingTask
-        $task   = Db::query("SELECT * FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '92'");
+        $task = Db::query("SELECT * FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '92'");
         $mobile = [];
         foreach ($task as $key => $value) {
             $mobile_content = explode(',', $value['mobile_content']);
@@ -2713,15 +2712,15 @@ class OfficeExcel extends Pzlife
         // echo count($mobile);
         echo "开始时间" . date('Y-m-d H:i:s', time());
         echo "\n";
-        $all_num   = count($mobile);
-        $send_num  = [];
-        $j         = 1;
+        $all_num = count($mobile);
+        $send_num = [];
+        $j = 1;
         $send_data = [];
         $send_data = [
-            'appid'        => '5e17dbaaddbb7',
-            'appkey'       => '50da9965e43a2fdf69118bf6791f6cd3',
+            'appid' => '5e17dbaaddbb7',
+            'appkey' => '50da9965e43a2fdf69118bf6791f6cd3',
             'signature_id' => 'guatGcEq',
-            'content'      => '1张9折券已飞奔向您！亲爱的测试会员，您所获赠的九折券自2020-03-30起生效，有效期截止2020-09-29，请在有效期间内前往门店选购哦！(在sephora.cn购物时需与官网账号绑定。累积消费积分1500分或四次不同日消费即自动兑换1张九折劵)/回T退订',
+            'content' => '1张9折券已飞奔向您！亲爱的测试会员，您所获赠的九折券自2020-03-30起生效，有效期截止2020-09-29，请在有效期间内前往门店选购哦！(在sephora.cn购物时需与官网账号绑定。累积消费积分1500分或四次不同日消费即自动兑换1张九折劵)/回T退订',
         ];
         for ($i = 0; $i < $all_num; $i++) {
             $send_num[] = $mobile[$i];
@@ -2734,7 +2733,7 @@ class OfficeExcel extends Pzlife
             //     $j = 1;
             // }
             $send_data['mobile'] = $mobile[$i];
-            $result              = sendRequest($url, 'post', $send_data);
+            $result = sendRequest($url, 'post', $send_data);
             // print_r($result);die;
         }
         // if ($send_num) {
@@ -2775,7 +2774,7 @@ class OfficeExcel extends Pzlife
         } */
         try {
             $redis = Phpredis::getConn();
-            $type  = 'Excel5';
+            $type = 'Excel5';
             /*   $objReader = PHPExcel_IOFactory::createReader('Excel5');
             // print_r(realpath("./") . "\asd.xlsx");die;
 
@@ -2893,17 +2892,17 @@ class OfficeExcel extends Pzlife
             $objPHPExcel = $objReader->load(realpath("./") . "/aswe.xlsx");
             // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
             //选择标签页
-            $sheet            = $objPHPExcel->getSheet(0); //取得sheet(0)表
-            $highestRow       = $sheet->getHighestRow(); // 取得总行数
-            $highestColumn    = $sheet->getHighestColumn();
+            $sheet = $objPHPExcel->getSheet(0); //取得sheet(0)表
+            $highestRow = $sheet->getHighestRow(); // 取得总行数
+            $highestColumn = $sheet->getHighestColumn();
             $highestColumnNum = PHPExcel_Cell::columnIndexFromString($highestColumn); //取得字段，这里测试表格中的第一行为数据的字段，因此先取出用来作后面数组的键名
-            $data             = array();
+            $data = array();
             for ($i = 1; $i < $highestRow; $i++) {
                 $value = [];
                 // $cellVal = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
                 for ($j = 0; $j < $highestColumnNum; $j++) {
                     $cellName = PHPExcel_Cell::stringFromColumnIndex($j) . $i;
-                    $cellVal  = $sheet->getCell($cellName)->getValue(); //取得列内容
+                    $cellVal = $sheet->getCell($cellName)->getValue(); //取得列内容
                     // // print_r($cellVal);die;
                     switch ($j) {
                         case '0':
@@ -2939,29 +2938,29 @@ class OfficeExcel extends Pzlife
                         Db::startTrans();
                         try {
                             if ($value['status_message'] == 1000) {
-                                $send_status    = 3;
+                                $send_status = 3;
                                 $status_message = "DELIVRD";
-                                $real_message   = "DELIVRD";
+                                $real_message = "DELIVRD";
                                 Db::table('yx_user_multimedia_message_log')->insert([
-                                    'uid'            => $value['uid'],
-                                    'task_no'        => $task[0]['task_no'],
-                                    'mobile'         => $value['mobile'],
-                                    'send_status'    => $send_status,
-                                    'create_time'    => $task[0]['update_time'],
-                                    'update_time'    => $value['time'],
-                                    'real_message'   => $real_message,
+                                    'uid' => $value['uid'],
+                                    'task_no' => $task[0]['task_no'],
+                                    'mobile' => $value['mobile'],
+                                    'send_status' => $send_status,
+                                    'create_time' => $task[0]['update_time'],
+                                    'update_time' => $value['time'],
+                                    'real_message' => $real_message,
                                     'status_message' => $status_message,
-                                    'task_id'        => $task[0]['id'],
-                                    'source'         => $task[0]['source'],
+                                    'task_id' => $task[0]['id'],
+                                    'source' => $task[0]['source'],
                                 ]);
                                 //推送给用户
                                 $redis->rpush('index:meassage:code:user:mulreceive:' . $value['uid'], json_encode([
-                                    'task_no'        => $task[0]['task_no'],
+                                    'task_no' => $task[0]['task_no'],
                                     'status_message' => $real_message,
-                                    'message_info'   => '发送成功',
-                                    'mobile'         => $value['mobile'],
+                                    'message_info' => '发送成功',
+                                    'mobile' => $value['mobile'],
                                     // 'send_time' => isset(trim($send_log['receive_time'])) ?  date('Y-m-d H:i:s', trim($send_log['receive_time'])) : date('Y-m-d H:i:s', time()),
-                                    'send_time'      => isset($value['time']) ? date('Y-m-d H:i:s', trim($value['time'])) : date('Y-m-d H:i:s', time()),
+                                    'send_time' => isset($value['time']) ? date('Y-m-d H:i:s', trim($value['time'])) : date('Y-m-d H:i:s', time()),
                                 ])); //写入用户带处理日志
                             } else { //失败 补发
                                 // $send_status = 4;
@@ -2995,14 +2994,14 @@ class OfficeExcel extends Pzlife
 
     public function imageTest()
     {
-        $image_data          = [];
+        $image_data = [];
         $value['image_path'] = "20200413/b29288993583d9cc5de893a8704fecf95e93cc10d9775.jpg";
         // $path = Config::get('qiniu.domain') . '/' . $value['image_path'];
         $md5 = md5(Config::get('qiniu.domain') . '/' . $value['image_path']);
         if (isset($image_data[$md5])) {
             $frame['content'] = $image_data[$md5];
         } else {
-            $imagebase        = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
+            $imagebase = base64_encode(file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']));
             $image_data[$md5] = $imagebase;
             $frame['content'] = $imagebase;
         }
@@ -3016,9 +3015,9 @@ class OfficeExcel extends Pzlife
     {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
         $model_path = realpath("./") . "/SMS.txt";
-        $file       = fopen($model_path, "r");
-        $data       = array();
-        $i          = 0;
+        $file = fopen($model_path, "r");
+        $data = array();
+        $i = 0;
         // $phone = '';
         // $j     = '';
         $SMS_model = [];
@@ -3026,41 +3025,41 @@ class OfficeExcel extends Pzlife
             $cellVal = trim(fgets($file));
             if (!empty($cellVal)) {
                 $cellVal = str_replace('"', '', $cellVal);
-                $data[]  = explode(',', $cellVal);
+                $data[] = explode(',', $cellVal);
             }
         }
         fclose($file);
         foreach ($data as $fkey => $fvalue) {
             // print_r($fvalue);
-            $tem                   = [];
-            $tem['num']            = $fvalue[2];
-            $tem['content']        = $fvalue[4];
+            $tem = [];
+            $tem['num'] = $fvalue[2];
+            $tem['content'] = $fvalue[4];
             $SMS_model[$fvalue[0]] = $tem;
         }
         // print_r($SMS_model);die;
-        $bu   = [];
+        $bu = [];
         $path = realpath("./") . "/text.txt";
         $file = fopen($path, "r");
         $data = array();
-        $i    = 0;
+        $i = 0;
         // $phone = '';
         // $j     = '';
         while (!feof($file)) {
             $cellVal = trim(fgets($file));
             if (!empty($cellVal)) {
                 $cellVal = str_replace('"', '', $cellVal);
-                $bu[]    = explode(',', $cellVal);
+                $bu[] = explode(',', $cellVal);
             }
         }
         fclose($file);
-        $path   = realpath("./") . "/textpressure.txt";
+        $path = realpath("./") . "/textpressure.txt";
         $myfile = fopen($path, "w");
-        $task   = Db::query("SELECT `mobile_content` FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '92'");
+        $task = Db::query("SELECT `mobile_content` FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '92'");
         foreach ($task as $key => $value) {
             $mobile = explode(',', $value['mobile_content']);
-            $num    = mt_rand(0, 29);
+            $num = mt_rand(0, 29);
             for ($i = 0; $i < count($mobile); $i++) {
-                $message    = $bu[$num];
+                $message = $bu[$num];
                 $message[3] = $mobile[$i];
                 fwrite($myfile, join(',', $message) . "\n");
                 // fwrite($myfile, "/n");
@@ -3071,16 +3070,16 @@ class OfficeExcel extends Pzlife
         unset($task);
 
         $all_path = realpath("./") . "/textpressure.txt";
-        $file     = fopen($all_path, "r");
-        $txt      = array();
-        $i        = 0;
+        $file = fopen($all_path, "r");
+        $txt = array();
+        $i = 0;
         // $phone = '';
         // $j     = '';
         while (!feof($file)) {
             $cellVal = trim(fgets($file));
             if (!empty($cellVal)) {
                 $cellVal = str_replace('"', '', $cellVal);
-                $txt[]   = explode(',', $cellVal);
+                $txt[] = explode(',', $cellVal);
             }
         }
         $SMSmessage = [];
@@ -3098,14 +3097,14 @@ class OfficeExcel extends Pzlife
                 }
             }
             /*  foreach ($file_data as $key => $value) {
-                // print_r($value[2]);
-                // print_r($model_check[$value[0]]);
+            // print_r($value[2]);
+            // print_r($model_check[$value[0]]);
 
-                // die;
-                if ($value[2] != $model_check[$value[0]]) {
-                    //校验失败
-                    return  [ 'code' => 200, "error"=>"校验失败"];
-                }
+            // die;
+            if ($value[2] != $model_check[$value[0]]) {
+            //校验失败
+            return  [ 'code' => 200, "error"=>"校验失败"];
+            }
             } */
             $j = 1;
             $insertSMS = [];
@@ -3115,27 +3114,27 @@ class OfficeExcel extends Pzlife
                 } else {
                 $model_check[$tvalue[2]] = 1;
                 } */
-                $SMS_real_send               = [];
-                $SMS_real_send               = [];
+                $SMS_real_send = [];
+                $SMS_real_send = [];
                 $SMS_real_send['mseeage_id'] = $tvalue[0];
-                $SMS_real_send['mobile']     = $tvalue[3];
+                $SMS_real_send['mobile'] = $tvalue[3];
                 $SMS_real_send['free_trial'] = 1;
                 // $SMS_real_send['real_num'] = 1;
-                $SMS_real_send['send_num']    = 1;
+                $SMS_real_send['send_num'] = 1;
                 $SMS_real_send['send_status'] = 1;
                 $SMS_real_send['template_id'] = $tvalue[2];
                 $SMS_real_send['create_time'] = time();
-                $content                      = $SMS_model[$tvalue[2]]['content'];
-                $content                      = str_replace('{FULL_NAME}', $tvalue[4], $content);
-                $content                      = str_replace('{RESERVED_FIELD_1}', $tvalue[7], $content);
-                $content                      = str_replace('{RESERVED_FIELD_2}', $tvalue[8], $content);
-                $content                      = str_replace('{RESERVED_FIELD_3}', $tvalue[9], $content);
-                $content                      = str_replace('{RESERVED_FIELD_4}', $tvalue[10], $content);
-                $content                      = str_replace('{RESERVED_FIELD_5}', $tvalue[11], $content);
-                $content                      = str_replace('{ACCOUNT_NUMBER}', $tvalue[1], $content);
-                $content                      = str_replace('{MOBILE}', $tvalue[3], $content);
-                $content                      = str_replace('{POINTS_AVAILABLE}', $tvalue[5], $content);
-                $content                      = str_replace('{TOTAL_POINTS}', $tvalue[6], $content);
+                $content = $SMS_model[$tvalue[2]]['content'];
+                $content = str_replace('{FULL_NAME}', $tvalue[4], $content);
+                $content = str_replace('{RESERVED_FIELD_1}', $tvalue[7], $content);
+                $content = str_replace('{RESERVED_FIELD_2}', $tvalue[8], $content);
+                $content = str_replace('{RESERVED_FIELD_3}', $tvalue[9], $content);
+                $content = str_replace('{RESERVED_FIELD_4}', $tvalue[10], $content);
+                $content = str_replace('{RESERVED_FIELD_5}', $tvalue[11], $content);
+                $content = str_replace('{ACCOUNT_NUMBER}', $tvalue[1], $content);
+                $content = str_replace('{MOBILE}', $tvalue[3], $content);
+                $content = str_replace('{POINTS_AVAILABLE}', $tvalue[5], $content);
+                $content = str_replace('{TOTAL_POINTS}', $tvalue[6], $content);
                 if (strpos($content, '【丝芙兰】') !== false) {
                 } else {
                     $content = '【丝芙兰】' . $content;
@@ -3151,8 +3150,8 @@ class OfficeExcel extends Pzlife
                     $real_length = ceil($send_length / 67);
                 }
                 $SMS_real_send['task_content'] = $content;
-                $SMS_real_send['real_num']     = $real_length;
-                $SMS_real_send['send_length']  = $send_length;
+                $SMS_real_send['real_num'] = $real_length;
+                $SMS_real_send['send_length'] = $send_length;
                 // array_push($insertSMS, $SMS_real_send);
                 // unset($SMSmessage[$i]);
                 $insertSMS[] = $SMS_real_send;
@@ -3187,7 +3186,7 @@ class OfficeExcel extends Pzlife
             }
             exit;
             $insertSMS = [];
-            $j         = 1;
+            $j = 1;
             for ($i = 0; $i < count($SMSmessage); $i++) {
                 if ($SMSmessage[$i]) {
                     array_push($insertSMS, $SMSmessage[$i]);
@@ -3228,7 +3227,7 @@ class OfficeExcel extends Pzlife
     {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
         $model_path = realpath("./uploads/SFL/UnZip/SMS/Communication_targets_SMS_1_20200529140223") . "/Communication_targets_SMS_1_20200529140223.txt";
-        $file       = fopen($model_path, "r");
+        $file = fopen($model_path, "r");
 
         // $error_path = realpath("./")."/_error.txt";
         // $error_file = fopen($error_path, "w");
@@ -3270,10 +3269,10 @@ class OfficeExcel extends Pzlife
                     }
 
                     /*  if ($value[2] == '100180395') {
-                        $black++;
-                    }else{
-                        $white++;
-                    } */
+                $black++;
+                }else{
+                $white++;
+                } */
                 }
             }
         }
@@ -3298,7 +3297,7 @@ class OfficeExcel extends Pzlife
         // $error_file = fopen($error_path, "w");
         //黑卡
         $black_error_path = realpath("./") . "/921.txt";
-        $black_error_file       = fopen($black_error_path, "r");
+        $black_error_file = fopen($black_error_path, "r");
         $black_error_mobile = [];
         $receive_alls = [];
         while (!feof($black_error_file)) {
@@ -3315,16 +3314,16 @@ class OfficeExcel extends Pzlife
         $white_error_file       = fopen($white_error_path, "r");
         $white_error_mobile = [];
         while (!feof($white_error_file)) {
-            $cellVal = trim(fgets($white_error_file));
-            if (!empty($cellVal)) {
-                $white_error_mobile[] = $cellVal;
-            }
+        $cellVal = trim(fgets($white_error_file));
+        if (!empty($cellVal)) {
+        $white_error_mobile[] = $cellVal;
+        }
         } */
 
         //黑卡写入文件地址
         /*  $black_receipt_path = realpath("./")."/100180395_receipt.txt";
         $black_receipt_file       = fopen($black_receipt_path, "w");
-        
+
         $white_receipt_path = realpath("./")."/100180396_receipt.txt";
         $white_receipt_file       = fopen($white_receipt_path, "w"); */
         // echo count($black_error_mobile);die;
@@ -3333,7 +3332,7 @@ class OfficeExcel extends Pzlife
         $j = 1;
         $model_path = realpath("./uploads\SFL\UnZip\SMS\Communication_targets_SMS_1_20200918224357") . "/Communication_targets_SMS_1_20200918224357.txt";
         // $model_path = realpath("./") . "/0624.txt";
-        $file       = fopen($model_path, "r");
+        $file = fopen($model_path, "r");
         while (!feof($file)) {
             $cellVal = trim(fgets($file));
             if (!empty($cellVal)) {
@@ -3347,10 +3346,10 @@ class OfficeExcel extends Pzlife
                     continue;
                 }
                 /*  if (!in_array($value[2],['529','100150820','100150821','100150822','100180393'])) {
-                    continue;
+                continue;
                 } */
                 /*  if (!in_array($value[2],['82301','82309','100125372','100180389'])) {
-                    continue;
+                continue;
                 } */
                 $receive = [];
                 $receive = [
@@ -3371,32 +3370,32 @@ class OfficeExcel extends Pzlife
                     }
                     /* $num = mt_rand(0,1000);
                     if ($num <= 33) {
-                        $receive['STATUS'] = 'SMS:2';
+                    $receive['STATUS'] = 'SMS:2';
                     } */
                     if (in_array($value[3], $black_error_mobile)) {
                         $receive['STATUS'] = 'SMS:2';
                     }
                     //  $this->redis->rpush('0625',json_encode($receive));
                     /*  if ($value[2] == 100180395) {//黑卡
-                        continue;
-                        if (in_array($value[3],$black_error_mobile)) {
-                            $receive['STATUS'] = 'SMS:2';
-                        }
-                        if (in_array($value[3],['13851739296','13936347542','18468947720'])) {
-                            $receive['STATUS'] = 'SMS:4';
-                        }
-                        // fwrite($black_receipt_file,json_encode($receive)."\n");
-                        // $this->redis->rpush('100180395',json_encode($receive));
-                    }else{
-                        if (in_array($value[3],$white_error_mobile)) {
-                            $receive['STATUS'] = 'SMS:2';
-                        }
-                        if (in_array($value[3],['13776601787','13796111777','13845416514','13951566424','15845910770','15946213875','18425106696','18425140306','18425487624','18425695852','18452141141','18452226356','18745414545'])) {
-                            $receive['STATUS'] = 'SMS:4';
-                        }
-                        // fwrite($white_receipt_file,json_encode($receive)."\n");
-                        $this->redis->rpush('100180396',json_encode($receive));
-                    }*/
+                continue;
+                if (in_array($value[3],$black_error_mobile)) {
+                $receive['STATUS'] = 'SMS:2';
+                }
+                if (in_array($value[3],['13851739296','13936347542','18468947720'])) {
+                $receive['STATUS'] = 'SMS:4';
+                }
+                // fwrite($black_receipt_file,json_encode($receive)."\n");
+                // $this->redis->rpush('100180395',json_encode($receive));
+                }else{
+                if (in_array($value[3],$white_error_mobile)) {
+                $receive['STATUS'] = 'SMS:2';
+                }
+                if (in_array($value[3],['13776601787','13796111777','13845416514','13951566424','15845910770','15946213875','18425106696','18425140306','18425487624','18425695852','18452141141','18452226356','18745414545'])) {
+                $receive['STATUS'] = 'SMS:4';
+                }
+                // fwrite($white_receipt_file,json_encode($receive)."\n");
+                $this->redis->rpush('100180396',json_encode($receive));
+                }*/
                 }
 
                 $receive_alls[] = $receive;
@@ -3632,7 +3631,7 @@ class OfficeExcel extends Pzlife
                         $all_log[] = $task_log;
                         // print_r($task_log);die;
                         $a++;
-                        $has_mobile[] =  $rvalue['mobile'];
+                        $has_mobile[] = $rvalue['mobile'];
                         if ($a > 200000) {
                             $this->derivedTablesForTaskReceipt($all_log, $value['nick_name'] . "_" . $j . '_营销' . '.xlsx');
                             $all_log = [];
@@ -3666,7 +3665,7 @@ class OfficeExcel extends Pzlife
                                 $j++;
                             }
                         }
-                        // for ($i=0; $i < count($nuknow_mobile); $i++) { 
+                        // for ($i=0; $i < count($nuknow_mobile); $i++) {
 
                         // }
                     }
@@ -3705,9 +3704,9 @@ class OfficeExcel extends Pzlife
             }
             die;
             /*  foreach ($user as $key => $value) {
-                // # code...
-                //
-               
+            // # code...
+            //
+
             } */
 
             $task = [];
@@ -3767,7 +3766,7 @@ class OfficeExcel extends Pzlife
                             $all_log[] = $task_log;
                             // print_r($task_log);die;
                             $a++;
-                            $has_mobile[] =  $rvalue['mobile'];
+                            $has_mobile[] = $rvalue['mobile'];
                             if ($a > 200000) {
                                 $this->derivedTablesForTaskReceipt($all_log, "future_" . $j . '_营销' . '.xlsx');
                                 $all_log = [];
@@ -3801,7 +3800,7 @@ class OfficeExcel extends Pzlife
                                     $j++;
                                 }
                             }
-                            // for ($i=0; $i < count($nuknow_mobile); $i++) { 
+                            // for ($i=0; $i < count($nuknow_mobile); $i++) {
 
                             // }
                         }
@@ -3841,60 +3840,59 @@ class OfficeExcel extends Pzlife
             }
 
             /*  foreach($task as $key => $value){
-                $send_task =  Db::query("SELECT * FROM `yx_user_send_task` WHERE `id` = ".$value['id']);
-                $send_task = $send_task[0];
-                // print_r($send_task);die;
-                $task_log = [];
-                $task_log = [
-                    'task_content' => $send_task['task_content'],
-                    'send_msg_id' => $send_task['send_msg_id'],
-                    'send_length' => $send_task['send_length'],
-                    'real_num' => $send_task['real_num'] / $send_task['send_num'] ,
-                    'create_time' => date('Y-m-d H:i:s',$send_task['create_time']),
-                ];
-                $mobile_content = explode(',',$send_task['mobile_content']);
-                if ($send_task['yidong_channel_id']) {
-                    $has_mobile = [];
-                    $task_receipt = Db::query("SELECT `*` FROM yx_send_task_receipt WHERE `task_id` = ".$value['id']." AND `mobile` IN (".$send_task['mobile_content'].") ");
-                    //有回执的
-                    foreach ($task_receipt as $rkey => $rvalue) {
-                        // print_r($rvalue);die;
-                        $task_log['mobile'] = $rvalue['mobile'];
-                        $task_log['status'] = $rvalue['status_message'];
-                        $all_log[] = $task_log;
-                        $j ++;
-                        $has_mobile[] =  $rvalue['mobile'];
-                    }
-                    $nuknow_mobile = [];
-                    $nuknow_mobile = array_diff($mobile_content,$has_mobile);
-                    
-                    if (!empty($nuknow_mobile)) {
-                        foreach ($nuknow_mobile as $nkey => $nvalue) {
-                            $task_log['mobile'] = $nvalue;
-                            $task_log['status'] = 'UNDELIV';
-                            $all_log[] = $task_log;
-                            $j++;
-                        }
-                        // for ($i=0; $i < count($nuknow_mobile); $i++) { 
-                            
-                        // }
-                    }
-                }else{
-                    for ($i=0; $i < count($mobile_content); $i++) { 
-                        $task_log['mobile'] = $mobile_content[$i];
-                        $task_log['status'] = 'MK:100C';
-                        $all_log[] = $task_log;
-                        $j++;
-                    }
-                }
-            }
-            $this->derivedTablesForTaskReceipt($all_log,'future_KOLON.xlsx'); */
+        $send_task =  Db::query("SELECT * FROM `yx_user_send_task` WHERE `id` = ".$value['id']);
+        $send_task = $send_task[0];
+        // print_r($send_task);die;
+        $task_log = [];
+        $task_log = [
+        'task_content' => $send_task['task_content'],
+        'send_msg_id' => $send_task['send_msg_id'],
+        'send_length' => $send_task['send_length'],
+        'real_num' => $send_task['real_num'] / $send_task['send_num'] ,
+        'create_time' => date('Y-m-d H:i:s',$send_task['create_time']),
+        ];
+        $mobile_content = explode(',',$send_task['mobile_content']);
+        if ($send_task['yidong_channel_id']) {
+        $has_mobile = [];
+        $task_receipt = Db::query("SELECT `*` FROM yx_send_task_receipt WHERE `task_id` = ".$value['id']." AND `mobile` IN (".$send_task['mobile_content'].") ");
+        //有回执的
+        foreach ($task_receipt as $rkey => $rvalue) {
+        // print_r($rvalue);die;
+        $task_log['mobile'] = $rvalue['mobile'];
+        $task_log['status'] = $rvalue['status_message'];
+        $all_log[] = $task_log;
+        $j ++;
+        $has_mobile[] =  $rvalue['mobile'];
+        }
+        $nuknow_mobile = [];
+        $nuknow_mobile = array_diff($mobile_content,$has_mobile);
+
+        if (!empty($nuknow_mobile)) {
+        foreach ($nuknow_mobile as $nkey => $nvalue) {
+        $task_log['mobile'] = $nvalue;
+        $task_log['status'] = 'UNDELIV';
+        $all_log[] = $task_log;
+        $j++;
+        }
+        // for ($i=0; $i < count($nuknow_mobile); $i++) {
+
+        // }
+        }
+        }else{
+        for ($i=0; $i < count($mobile_content); $i++) {
+        $task_log['mobile'] = $mobile_content[$i];
+        $task_log['status'] = 'MK:100C';
+        $all_log[] = $task_log;
+        $j++;
+        }
+        }
+        }
+        $this->derivedTablesForTaskReceipt($all_log,'future_KOLON.xlsx'); */
         } catch (\Exception $th) {
             //throw $th;
             exception($th);
         }
     }
-
 
     public function derivedTablesForTaskReceipt($receive_alls, $name)
     {
@@ -3966,7 +3964,7 @@ class OfficeExcel extends Pzlife
     {
         ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
         $black_error_path = realpath("./") . "/20200708.txt";
-        $black_error_file       = fopen($black_error_path, "r");
+        $black_error_file = fopen($black_error_path, "r");
         $black_error_mobile = [];
         while (!feof($black_error_file)) {
             $cellVal = trim(fgets($black_error_file));
@@ -3981,13 +3979,12 @@ class OfficeExcel extends Pzlife
         $result = $this->mobilesFiltrate(join(',', $black_error_mobile));
         // print_r($result);
         $white_receipt_path = realpath("./") . "/20200708new.txt";
-        $white_receipt_file       = fopen($white_receipt_path, "w");
+        $white_receipt_file = fopen($white_receipt_path, "w");
         foreach ($result as $key => $value) {
             fwrite($white_receipt_file, $value . "\n");
         }
-        fclose($white_receipt_file);;
+        fclose($white_receipt_file);
     }
-
 
     /* 第二版本号码清洗 */
     public function mobilesFiltrate($mobile)
@@ -4054,9 +4051,7 @@ class OfficeExcel extends Pzlife
 
             //未知或者空号
 
-
-
-            $vacant  = array_diff($remaining_mobile, $entity_mobiles);
+            $vacant = array_diff($remaining_mobile, $entity_mobiles);
             // echo count($vacant);
             // die;
             //空号检测
@@ -4064,10 +4059,10 @@ class OfficeExcel extends Pzlife
             //查出这个月内检测出的空号
             $the_month_time = date('Ymd', time());
             $the_month_checkvacant = [];
-            $the_month_checkvacant =  Db::query("SELECT `mobile` FROM  yx_mobile WHERE `mobile` IN (" . join(',', $vacant) . ") AND `check_status` = 2 AND `update_time` >= " . $the_month_time . "  GROUP BY  mobile  ");
+            $the_month_checkvacant = Db::query("SELECT `mobile` FROM  yx_mobile WHERE `mobile` IN (" . join(',', $vacant) . ") AND `check_status` = 2 AND `update_time` >= " . $the_month_time . "  GROUP BY  mobile  ");
             /*  print_r($the_month_checkvacant);
-                    echo"SELECT `mobile` FROM  yx_mobile WHERE `mobile` IN (" . join(',',$vacant) . ") AND `check_status` = 2 AND `update_time` >= ".$the_month_time."  GROUP BY  mobile  ";
-                    die; */
+            echo"SELECT `mobile` FROM  yx_mobile WHERE `mobile` IN (" . join(',',$vacant) . ") AND `check_status` = 2 AND `update_time` >= ".$the_month_time."  GROUP BY  mobile  ";
+            die; */
             $the_month_checkvacant_mobiles = [];
             if (!empty($the_month_checkvacant)) {
                 foreach ($the_month_checkvacant as $key => $value) {
@@ -4120,10 +4115,10 @@ class OfficeExcel extends Pzlife
             $j++;
             if ($j > 2000) {
                 $data = [
-                    'mobiles' => $check_mobile_data
+                    'mobiles' => $check_mobile_data,
                 ];
                 $headers = [
-                    'Authorization:' . base64_encode($secret_id . ':' . $ts), 'Content-Type:application/json'
+                    'Authorization:' . base64_encode($secret_id . ':' . $ts), 'Content-Type:application/json',
                 ];
                 $result = $this->sendRequest2($api, 'post', $data, $headers);
                 // print_r(json_decode($data),true);
@@ -4144,7 +4139,7 @@ class OfficeExcel extends Pzlife
                                 'check_result' => 3,
                                 'check_status' => $check_status,
                                 'update_time' => time(),
-                                'create_time' => time()
+                                'create_time' => time(),
                             ]);
                             // return false;
                             $real_mobile[] = $mobile;
@@ -4156,7 +4151,7 @@ class OfficeExcel extends Pzlife
                                 'check_result' => $check_result,
                                 'check_status' => $check_status,
                                 'update_time' => time(),
-                                'create_time' => time()
+                                'create_time' => time(),
                             ]);
                             $empty_mobile[] = $mobile;
                         }
@@ -4170,10 +4165,10 @@ class OfficeExcel extends Pzlife
         }
         if (!empty($check_mobile_data)) {
             $data = [
-                'mobiles' => $check_mobile_data
+                'mobiles' => $check_mobile_data,
             ];
             $headers = [
-                'Authorization:' . base64_encode($secret_id . ':' . $ts), 'Content-Type:application/json'
+                'Authorization:' . base64_encode($secret_id . ':' . $ts), 'Content-Type:application/json',
             ];
             $result = $this->sendRequest2($api, 'post', $data, $headers);
             // print_r(json_decode($data),true);
@@ -4202,7 +4197,7 @@ class OfficeExcel extends Pzlife
                             'check_result' => 3,
                             'check_status' => $check_status,
                             'update_time' => time(),
-                            'create_time' => time()
+                            'create_time' => time(),
                         ]);
                         // return false;
                         $real_mobile[] = $mobile;
@@ -4214,7 +4209,7 @@ class OfficeExcel extends Pzlife
                             'check_result' => $check_result,
                             'check_status' => $check_status,
                             'update_time' => time(),
-                            'create_time' => time()
+                            'create_time' => time(),
                         ]);
                         $empty_mobile[] = $mobile;
                     }
@@ -4227,7 +4222,7 @@ class OfficeExcel extends Pzlife
         return ['real_mobile' => $real_mobile, 'empty_mobile' => $empty_mobile];
     }
 
-    function sendRequest2($requestUrl, $method = 'get', $data = [], $headers)
+    public function sendRequest2($requestUrl, $method = 'get', $data = [], $headers)
     {
         $methonArr = ['get', 'post'];
         if (!in_array(strtolower($method), $methonArr)) {
@@ -4260,13 +4255,13 @@ class OfficeExcel extends Pzlife
 
     public function extractMobile()
     {
-        $file_path = realpath("./uploads\SFL\UnZip\MMS\Communication_targets_MMS_1_20201109093103") . "/Communication_targets_MMS_1_20201109093103.txt";
+        $file_path = realpath("./uploads\SFL\UnZip\MMS\Communication_targets_MMS_1_20201112093105") . "/Communication_targets_MMS_1_20201112093105.txt";
         // $model_path = realpath("./") . "/0624.txt";
-        $file       = fopen($file_path, "r");
-        $white_receipt_path = realpath("./") . "/100185707_1022white.txt";
-        $white_receipt_file       = fopen($white_receipt_path, "w");
-        $deduct_receipt_path = realpath("./") . "/100185707_1022.txt";
-        $deduct_receipt_file       = fopen($deduct_receipt_path, "w");
+        $file = fopen($file_path, "r");
+        $white_receipt_path = realpath("./") . "/100185816_1022white.txt";
+        $white_receipt_file = fopen($white_receipt_path, "w");
+        $deduct_receipt_path = realpath("./") . "/100185816_1022.txt";
+        $deduct_receipt_file = fopen($deduct_receipt_path, "w");
         $j = 1;
         $mobiles = [];
         $send_mobiles = [];
@@ -4305,10 +4300,10 @@ class OfficeExcel extends Pzlife
             18800232095,
             15000796805,
             13917823241,
-            18817718456
+            18817718456,
         ];
-        // $deduct = ceil(16826 / 31653 * 100);
-        $deduct = 100;
+        $deduct = ceil(29145 / 64145 * 100);
+        // $deduct = 100;
 
         while (!feof($file)) {
             $cellVal = trim(fgets($file));
@@ -4322,7 +4317,7 @@ class OfficeExcel extends Pzlife
                 if (checkMobile($value[3]) == false || strlen($value[3]) > 11) {
                     continue;
                 }
-                if ($value[2] != '100185760') {
+                if ($value[2] != '100185816') {
                     continue;
                 }
                 $mobiles[] = $value[3];
@@ -4355,14 +4350,14 @@ class OfficeExcel extends Pzlife
                 }
             }
         }
-        fclose($white_receipt_file);;
-        fclose($deduct_receipt_file);;
+        fclose($white_receipt_file);
+        fclose($deduct_receipt_file);
     }
 
     public function mobileSource()
     {
         $model_path = realpath("./") . "/20200902.txt";
-        $file       = fopen($model_path, "r");
+        $file = fopen($model_path, "r");
         $export_data = [];
         while (!feof($file)) {
             $data = [];

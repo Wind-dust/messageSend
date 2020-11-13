@@ -35,7 +35,7 @@ class HttpChannelCaiXinKuaiLeWangShiLianDian extends Pzlife
 
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
 
-        $content = 181;
+        $content = 182;
         $redisMessageCodeSend = 'index:meassage:code:send:' . $content; //彩信发送任务rediskey
         $redisMessageCodeDeliver = 'index:meassage:multimediamessage:deliver:' . $content; //彩信MsgId
         $user_info = $this->content();
@@ -271,6 +271,9 @@ class HttpChannelCaiXinKuaiLeWangShiLianDian extends Pzlife
                         if (is_array($value)) {
                             $task_id = $redis->hget('index:meassage:code:back_taskno:kuailewangshi_multimediamessage', trim($value['taskid']));
                             // print_r($value);die;
+                            if (!$task_id) {
+                                continue;
+                            }
                             $task = $this->getSendTask($task_id);
                             if ($task == false) {
                                 echo "error task_id" . "\n";
@@ -304,7 +307,9 @@ class HttpChannelCaiXinKuaiLeWangShiLianDian extends Pzlife
                             unset($send_status);
                         } else {
                             $task_id = $redis->hget('index:meassage:code:back_taskno:kuailewangshi_multimediamessage', trim($receive_data['statusbox']['taskid']));
-
+                            if (!$task_id) {
+                                break;
+                            }
                             $task = $this->getSendTask($task_id);
                             if ($task == false) {
                                 echo "error task_id" . "\n";
