@@ -182,12 +182,12 @@ class HttpChannelCaiXinChuangShi extends Pzlife
                             '; */
                             // print_r($callback);
                             $receive_data = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-                            if ($receive_data['returnstatus'] == 'Success') { //发送成功
+                            if ($receive_data['returnstatus'] == 'Success') { //发送成功   
+                                $redis->hset('index:meassage:code:back_taskno:chuangshi', $receive_data['taskID'], $key);
                                 unset($SendMobile[$key]);
                                 unset($SendTitle[$key]);
                                 unset($sendTask[$key]);
                                 unset($callback[$key]);
-                                $redis->hset('index:meassage:code:back_taskno:chuangshi', $receive_data['taskID'], $SendMobile['mar_task_id']);
                                 $task_num = 0;
                                 $nobile_num = 0;
                             } else {
@@ -196,7 +196,7 @@ class HttpChannelCaiXinChuangShi extends Pzlife
                                         $redis->rpush($redisMessageCodeSend, $val);
                                     }
                                 }
-                                $this->writeToRobot($content, $receive_data, '创世彩信通道');
+                                $this->writeToRobot($content, json_encode($receive_data), '创世彩信通道');
                                 exit;
                             }
 
@@ -252,21 +252,22 @@ class HttpChannelCaiXinChuangShi extends Pzlife
                         <successCounts>1</successCounts>
                         </returnsms>
                         '; */
-                        // print_r($callback);
+                        // print_r($res);
                         $receive_data = json_decode(json_encode(simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
                         if ($receive_data['returnstatus'] == 'Success') { //发送成功
+                            $redis->hset('index:meassage:code:back_taskno:chuangshi', $receive_data['taskID'], $key);
                             unset($SendMobile[$key]);
                             unset($SendTitle[$key]);
                             unset($sendTask[$key]);
                             unset($callback[$key]);
-                            $redis->hset('index:meassage:code:back_taskno:chuangshi', $receive_data['taskID'], $key);
+                            
                         } else {
                             foreach ($callback as $key => $value) {
                                 foreach ($value as $ne => $val) {
                                     $redis->rpush($redisMessageCodeSend, $val);
                                 }
                             }
-                            $this->writeToRobot($content, $receive_data, '创世彩信通道');
+                            $this->writeToRobot($content, json_encode($receive_data), '创世彩信通道');
                             exit;
                         }
 
@@ -323,7 +324,7 @@ class HttpChannelCaiXinChuangShi extends Pzlife
                     $redis->rpush($redisMessageCodeSend, $val);
                 }
             }
-            $this->writeToRobot($content, $receive_data, '创世彩信通道');
+            $this->writeToRobot($content, $th, '创世彩信通道');
             // exception($th);
             exit;
         }

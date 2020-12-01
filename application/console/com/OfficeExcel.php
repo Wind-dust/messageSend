@@ -4255,12 +4255,12 @@ class OfficeExcel extends Pzlife
 
     public function extractMobile()
     {
-        $file_path = realpath("./uploads\SFL\UnZip\MMS\Communication_targets_MMS_1_20201112093105") . "/Communication_targets_MMS_1_20201112093105.txt";
+        $file_path = realpath("./uploads\SFL\UnZip\SMS\Communication_targets_SMS_1_20201126165435") . "/Communication_targets_SMS_1_20201126165435.txt";
         // $model_path = realpath("./") . "/0624.txt";
         $file = fopen($file_path, "r");
-        $white_receipt_path = realpath("./") . "/100185816_1022white.txt";
+        $white_receipt_path = realpath("./") . "/100186368_1127white.txt";
         $white_receipt_file = fopen($white_receipt_path, "w");
-        $deduct_receipt_path = realpath("./") . "/100185816_1022.txt";
+        $deduct_receipt_path = realpath("./") . "/100186368_1127.txt";
         $deduct_receipt_file = fopen($deduct_receipt_path, "w");
         $j = 1;
         $mobiles = [];
@@ -4301,9 +4301,10 @@ class OfficeExcel extends Pzlife
             15000796805,
             13917823241,
             18817718456,
+            13472718707
         ];
-        $deduct = ceil(29145 / 64145 * 100);
-        // $deduct = 100;
+        // $deduct = ceil(150000 / 381124 * 100);
+      $deduct = 60;
 
         while (!feof($file)) {
             $cellVal = trim(fgets($file));
@@ -4317,7 +4318,7 @@ class OfficeExcel extends Pzlife
                 if (checkMobile($value[3]) == false || strlen($value[3]) > 11) {
                     continue;
                 }
-                if ($value[2] != '100185816') {
+                if ($value[2] != '100186368') {
                     continue;
                 }
                 $mobiles[] = $value[3];
@@ -4328,7 +4329,7 @@ class OfficeExcel extends Pzlife
                     foreach ($mobiles as $key => $value) {
                         if (in_array($value, $white_list)) {
                             fwrite($white_receipt_file, $value . "\n");
-                        } elseif (in_array($key, $deduct_mobile)) {
+                        } elseif (is_array($deduct_mobile) && in_array($key, $deduct_mobile)) {
                             fwrite($deduct_receipt_file, $value . "\n");
                         }
                     }
@@ -4356,9 +4357,11 @@ class OfficeExcel extends Pzlife
 
     public function mobileSource()
     {
-        $model_path = realpath("./") . "/20200902.txt";
-        $file = fopen($model_path, "r");
+        ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
         $export_data = [];
+       /*  $model_path = realpath("./") . "/20200902.txt";
+        $file = fopen($model_path, "r");
+        
         while (!feof($file)) {
             $data = [];
             $mobile = trim(fgets($file));
@@ -4375,7 +4378,28 @@ class OfficeExcel extends Pzlife
                 array_push($export_data, $data);
             }
         }
-        fclose($file);
+        fclose($file); */
+    
+        $task = Db::query("SELECT `mobile_content` FROM `messagesend`.`yx_user_send_task` WHERE `uid` = '291' AND `id` > '405732' AND `id` < '410428' ");
+        foreach ($task as $key => $value) {
+            $mobile = [];
+            $mobile = explode(',', $value['mobile_content']);
+            foreach ($mobile as $mkey => $mvalue) {
+                $prefix = substr(trim($mvalue), 0, 7);
+                // print_r($prefix);die;
+                $source = Db::query("SELECT * FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                $data = [];
+                $data = [
+                    'mobile' => $mvalue,
+                    'province' => isset($source[0]['province']) ? $source[0]['province'] : '',
+                    'city' => isset($source[0]['city']) ? $source[0]['city'] : '',
+                ];
+                // print_r($source);die;
+                array_push($export_data, $data);
+            }
+        }
+
+
         $objExcel = new PHPExcel();
         // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
         // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
@@ -4428,6 +4452,6 @@ class OfficeExcel extends Pzlife
             }
         }
         //imp_mobile_status_report_mms_1_20200531.xlsx
-        $objWriter->save('mobile.xlsx');
+        $objWriter->save('驰加汽车服务中心营销_20200925mobile.xlsx');
     }
 }
