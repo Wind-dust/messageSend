@@ -62,6 +62,7 @@ return [
     'httpchannelmodelsupmessagelingdao' => $commandPath . 'HttpChannelModelSupMessageLingDao', //领道视频短信移动通道
     'httpchannelmodelsupmessagelingdaoliandian' => $commandPath . 'HttpChannelModelSupMessageLingDaoLianDian', //领道视频短信联电通道
     'httpchannelmodelsupmessagesanti' => $commandPath . 'HttpChannelModelSupMessageSanTi',
+    'httpchannelmodelsupmessageshilegao' => $commandPath . 'HttpChannelModelSupMessageShiLeGao',
     'cmppmeilianruantongyidonggame' => $commandPath . 'CmppMeiLianRuanTongYiDongGame', //美联软通移动游戏
     'httpchannelcaixinbangzhixinyidong' => $commandPath . 'HttpChannelCaiXinBangZhiXinYiDong', //邦之信移动彩信
     'httpchannelcaixinbangzhixinliandian' => $commandPath . 'HttpChannelCaiXinBangZhiXinLianDian', //邦之信移动彩信
