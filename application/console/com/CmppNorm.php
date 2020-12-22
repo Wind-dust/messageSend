@@ -33,13 +33,30 @@ class CmppNorm extends Pzlife
         'master_num'    => 160,
         ]; */
         if ($content == 'test') { //本机测试
-            return [
+          /*   return [
                 // 'channel_host' => "47.103.200.251", //服务商ip
                 'channel_host' => "127.0.0.1", //服务商ip
                 'channel_port' => "7890", //短连接端口号   17890长连接端口号
                 'channel_source_addr' => "C48515", //企业id  企业代码
                 'channel_shared_secret' => 'c6S2ENJj', //网关登录密码
                 'channel_service_id' => "C48515",
+                'channel_dest_id' => "10694406674719", //短信接入码 短信端口号
+                'Sequence_Id' => 1,
+                'SP_ID' => "",
+                'bin_ip' => ["127.0.0.1", "47.103.200.251"], //客户端绑定IP
+                'free_trial' => 2,
+                'channel_flow_velocity' => 300,
+                'uid' => 1,
+                'title' => '本地测试样例',
+            ]; */
+
+            return [
+                'channel_host' => "47.103.200.251", //服务商ip
+                // 'channel_host' => "127.0.0.1", //服务商ip
+                'channel_port' => "7890", //短连接端口号   17890长连接端口号
+                'channel_source_addr' => "900003", //企业id  企业代码
+                'channel_shared_secret' => '888888', //网关登录密码
+                'channel_service_id' => "900003",
                 'channel_dest_id' => "10694406674719", //短信接入码 短信端口号
                 'Sequence_Id' => 1,
                 'SP_ID' => "",
@@ -566,19 +583,19 @@ class CmppNorm extends Pzlife
                                         $receive = 2;
                                         // usleep(5);
                                     } else if ($head['Command_Id'] == 0x00000008) {
-                                        echo "接收到心跳" . "\n"; //激活测试,无消息体结构
+                                        // echo "接收到心跳" . "\n"; //激活测试,无消息体结构
                                         $Command_Id = 0x80000008; //保持连接
                                         $Total_Length = 12;
-                                        $headData = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                        socket_write($socket, $headData, $Total_Length);
+                                        // $headData = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                        // socket_write($socket, $headData, $Total_Length);
 
-                                        // $new_body         = pack("C", 0) . pack("N", $Sequence_Id);
-                                        // $new_Total_Length = strlen($new_body) + 12;
-                                        // socket_write($socket, $headData . $new_body, $new_Total_Length);
+                                        $new_body         = pack("C", 0) . pack("N", $Sequence_Id);
+                                        $new_Total_Length = strlen($new_body) + 12;
+                                        socket_write($socket, $headData . $new_body, $new_Total_Length);
 
                                         $receive = 2;
                                     } else if ($head['Command_Id'] == 0x80000008) {
-                                        echo "激活测试应答" . "\n"; //激活测试,无消息体结构
+                                        // echo "激活测试应答" . "\n"; //激活测试,无消息体结构
                                     } else if ($head['Command_Id'] == 0x00000002) {
                                         // echo "未声明head['Command_Id']:" . $head['Command_Id'];
                                         $Command_Id = 0x80000002; //关闭连接
@@ -742,9 +759,14 @@ class CmppNorm extends Pzlife
                             } else { //心跳
                                 $Command_Id = 0x00000008; //保持连接
                                 $Total_Length = 12;
+                                // $headData = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                                $body = pack('c',$Sequence_Id);
+                                $Total_Length = strlen($body) + 12;
                                 $headData = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+                            
                                 if ($receive != 2) {
-                                    socket_write($socket, $headData, $Total_Length);
+                                    // socket_write($socket, $headData, $Total_Length);
+                                    socket_write($socket, $headData . $bodyData, $Total_Length);
                                 }
                                 usleep(998600);
                             }

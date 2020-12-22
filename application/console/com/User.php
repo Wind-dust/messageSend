@@ -367,6 +367,17 @@ $XML  = '<?xml version="1.0" encoding="utf-8" ?>
         return false;
     }
 
+    public function  arraytest(){
+                                    try {
+                                        $stat = ['DELIVRD','MK:1006'];
+        $stat = array_unique($stat);
+        $stat =array_diff($stat,['DELIVRD']);
+        print_r(end($stat));die;
+                                    } catch (\Exception $th) {
+                                        exception($th);
+                                    }
+       
+    }
 }
 
 

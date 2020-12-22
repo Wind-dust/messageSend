@@ -8,6 +8,12 @@ use cache\PhpredisNew;
 use Config;
 use Kafka\Producer;
 use Kafka\ProducerConfig;
+use PHPExcel;
+use PHPExcel_Cell;
+use PHPExcel_IOFactory;
+use PHPExcel_Style_Alignment;
+use PHPExcel_Style_Fill;
+use PHPExcel_Writer_Excel2007;
 use think\Db;
 
 class LocalScript extends Pzlife
@@ -2885,8 +2891,11 @@ class LocalScript extends Pzlife
         try {
             //code...
             while (true) {
-                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (SELECT id FROM `messagesend`.`yx_users` WHERE `pid` = '137') "); //道信核对
-                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (190,191,287,302) "); //道信核对
+                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (SELECT id FROM `messagesend`.`yx_users` WHERE `pid` = '137') "); //道信核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (47,49,51,52,55,97,101) "); //美田核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (256) "); //福维克核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (190,191,287,302) "); //7陌核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (157,158,159,160,161,162,163) "); //三盛核对
                 // $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
                 //行业
                 foreach ($uids as $key => $value) {
@@ -2894,6 +2903,7 @@ class LocalScript extends Pzlife
                     // $start_time = (int) strtotime('-4 days', strtotime(date('Y-m-d', time())));
                     $start_time = (int) strtotime('2020-11-01');
                     // echo $start_time;die;
+                    // echo "SELECT `id`,`create_time` FROM yx_user_send_code_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ";die;
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_code_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
                         continue;
                     }
@@ -3049,14 +3059,18 @@ class LocalScript extends Pzlife
         try {
             //code...
             while (true) {
-                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (SELECT id FROM `messagesend`.`yx_users` WHERE `pid` = '137') "); //道信核对
-                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (256) "); //道信核对
+                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (SELECT id FROM `messagesend`.`yx_users` WHERE `pid` = '137') "); //道信核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (47,49,51,52,55,97,101) "); //美田核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (256) "); //福维克核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (90,191,287,302) "); //7陌核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (279) "); //7陌核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (157,158,159,160,161,162,163) "); //三盛核对
                 // $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
 
                 //营销
                 foreach ($uids as $key => $value) {
                     // $start_time = (int) strtotime('-3 days', strtotime(date('Y-m-d', time())));
-                    $start_time = (int) strtotime('2020-10-01');
+                    $start_time = (int) strtotime('2020-11-01');
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
                         continue;
                     }
@@ -3982,15 +3996,15 @@ class LocalScript extends Pzlife
         $i = 1;
         $offect = 0;
         while (true) {
-           
-          //  $nums = Db::query("SELECT COUNT(*) AS `num` FROM `yx_send_code_task_receipt`")[0]['num'];
+
+            //  $nums = Db::query("SELECT COUNT(*) AS `num` FROM `yx_send_code_task_receipt`")[0]['num'];
             // print_r($nums);
-         //   $page = ceil($nums / 100);
+            //   $page = ceil($nums / 100);
             // print_r($page);
             // $receipts = Db::query("SELECT * FROM `yx_send_code_task_receipt` LIMIT " . $i . ",100 ");
-               
-            if (0 < date('H',time()) && date('H',time()) < 6) {
-                $offect = ($i-1) * 100;
+
+            if (0 < date('H', time()) && date('H', time()) < 6) {
+                $offect = ($i - 1) * 100;
                 $receipts = Db::query("SELECT * FROM `yx_send_code_task_receipt` LIMIT " . $offect . ",100 ");
                 // print_r($receipts);die;
                 // print_r("SELECT * FROM `yx_send_code_task_receipt` LIMIT " . $offect . ",100 ");
@@ -4004,22 +4018,22 @@ class LocalScript extends Pzlife
                     // $ids[] = $value['id'];
                 }
                 $i++;
-                
-                $redis->set("index:message:business:receipt:id",end($receipts)['id']);
-               
-            }else{
+
+                $redis->set("index:message:business:receipt:id", end($receipts)['id']);
+
+            } else {
                 sleep(300);
                 continue;
             }
-           
-             // $ids = join(',', $ids);
-                // Db::table('yx_send_code_task_receipt')->where("id in ($ids)")->delete();
+
+            // $ids = join(',', $ids);
+            // Db::table('yx_send_code_task_receipt')->where("id in ($ids)")->delete();
             // for ($i = 0; $i < $page; $i++) {
             //     $ids = [];
             // }
 
         }
-        
+
     }
 
     public function updateMobileForWhite()
@@ -4069,4 +4083,182 @@ class LocalScript extends Pzlife
             exception($th);
         }
     }
+
+    public function daoxinBufa()
+    {
+        ini_set('memory_limit', '1024M'); // 临时设置最大内存占用为3G
+        $msg_mobile_key = [];
+        $create_task = Db::query("SELECT id,mobile_content,send_msg_id FROM `messagesend`.`yx_user_send_task` WHERE `id` >= '1370488' AND `id` <= '1370553' AND `uid` = '326'");
+        foreach ($create_task as $key => $value) {
+            $mobiles = explode(',',$value['mobile_content']);
+            foreach ($mobiles as $mkey => $mvalue) {
+                $msg_mobile_key[$value['send_msg_id'].'_'.$mvalue] = $value['id'];
+            }
+        }
+        $create_task = [];
+        // print_r($msg_mobile_key);die;
+        $real_receipts = Db::query("SELECT * FROM `messagesend`.`yx_send_task_receipt` WHERE `task_id` IN (SELECT id FROM `messagesend`.`yx_user_send_task` WHERE `id` >= '1370488' AND `id` <= '1370553' AND `uid` = '326') ");
+        $receipts = [];
+        foreach ($real_receipts as $key => $value) {
+            $status = [];
+            $status = [
+                'status_message' => $value['status_message'],
+                'create_time' => $value['create_time'],
+            ];
+            $receipts[$value['task_id'].'_'.$value['mobile']] = $status;
+        }
+        $real_receipts = [];
+    //    print_r($receipts);die;
+      
+        $name1 = "pdl.xlsx";
+        $appid = '5fb3ac60293ad';
+        $appkey = '324d5afb7f08c77fcb52b6a0f9d22ff3';
+        $signature = '【Pandora珠宝】';
+
+        //    $appid = '5dc932e58565d';
+        //    $appkey = 'e10adc3949ba59abbe56e057f20f883e';
+        $types = 'Excel2007';
+        $objReader = PHPExcel_IOFactory::createReader($types);
+        // print_r(realpath("../"). "\yt_area_mobile.csv");die;
+
+        $objPHPExcel = $objReader->load(realpath("./") . "/" . $name1 . "");
+        // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
+        //选择标签页
+        $sheet = $objPHPExcel->getSheet(0); //取得sheet(0)表
+        $highestRow = $sheet->getHighestRow(); // 取得总行数
+        $send_task = [];
+        $export_data = [];
+        for ($i = 2; $i < $highestRow; $i++) {
+            $send_data = [];
+            $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
+            if (empty($mobile)) {
+                continue;
+            }
+            $content = $objPHPExcel->getActiveSheet()->getCell("B" . $i)->getValue();
+            $msg_id = $objPHPExcel->getActiveSheet()->getCell("C" . $i)->getValue();
+          /*   $strlen = 0;
+            $math_Content =$signature . $content;
+            $send_num = 1;
+            $strlen = strlen(iconv('utf-8', 'utf-16le', $math_Content)) / 2;
+            if ($strlen > 70) {
+                $real_num = ceil($strlen / 67) * $send_num;
+            } else {
+                $real_num = $send_num;
+            }
+            $data['mobile'] = $mobile;
+            $data['content'] = $signature . $content;
+            $data['msg_id'] = $msg_id;
+            $data['task_no'] = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+            $data['uid'] = 326;
+            $data['send_num'] = $send_num;
+            $data['real_num'] = $real_num;
+            $data['send_length'] = $strlen;
+            $data['free_trial'] = 2;
+            $data['develop_no'] = 7534;
+            $data['yidong_channel_id'] = 145;
+            $data['liantong_channel_id'] = 146;
+            $data['dianxin_channel_id'] = 146;
+            $data['send_status'] = 2;
+            $data['update_time'] = time();
+            $data['create_time'] = time();
+             $send_task[] = $data;
+
+            */
+            // print_r($data);die;
+            $taskid = 0;
+            $taskid = $msg_mobile_key[$msg_id.'_'.$mobile];
+            $status_data = [];
+            $exports = [];
+            $exports = [
+                'mobile' => $mobile,
+                'content' => $signature . $content,
+                'msg_id' =>  $msg_id,
+            ];
+            if (isset($receipts[$taskid.'_'.$mobile])) {
+                $status_data = $receipts[$taskid.'_'.$mobile];
+                $exports['status_message'] = $status_data['status_message'];
+                $exports['create_time'] = date('Y-m-d H:i:s',$status_data['create_time']);
+            }else{
+                $exports['status_message'] ='未知';
+                $exports['create_time'] = '';
+            }
+            $export_data[] = $exports;
+           
+        }
+
+        $objExcel = new PHPExcel();
+        // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+        // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
+        $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+        $objWriter->setOffice2003Compatibility(true);
+
+        //设置文件属性
+        $objProps = $objExcel->getProperties();
+        $objProps->setTitle("sheet1");
+        $objProps->setSubject( date('Y-m-d H:i:s', time()));
+
+        $objExcel->setActiveSheetIndex(0);
+        $objActSheet = $objExcel->getActiveSheet();
+
+        $date = date('Y-m-d H:i:s', time());
+
+        //设置当前活动sheet的名称
+        $objActSheet->setTitle("sheet1");
+        $CellList = array(
+            array('mobile', '手机号'),
+            array('content', '内容'),
+            array('msg_id', '消息id'),
+            array('status_message', '状态回执'),
+            array('create_time', '回执时间'),
+        );
+        foreach ($CellList as $i => $Cell) {
+            $row = chr(65 + $i);
+            $col = 1;
+            $objActSheet->setCellValue($row . $col, $Cell[1]);
+            $objActSheet->getColumnDimension($row)->setWidth(30);
+
+            $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+            $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+            $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+            $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+            $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+            $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        }
+        $outputFileName = "潘多拉.xlsx";
+        $i = 0;
+        foreach ($export_data as $key => $orderdata) {
+            //行
+            $col = $key + 2;
+            foreach ($CellList as $i => $Cell) {
+                //列
+                $row = chr(65 + $i);
+                $objActSheet->getRowDimension($i)->setRowHeight(15);
+                $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            }
+        }
+        $objWriter->save($outputFileName);
+        exit;
+       
+        /* $api = "http://sendapidev.shyuxi.com/index/send/getSmsMarketingTaskMsgId";
+        foreach ($send_task as $key => $value) {
+            $value['appid'] = $appid;
+            $value['appkey'] = $appkey;
+
+            $res = sendRequest($api, 'post', $value);
+            $res = json_decode($res, true);
+            if ($res['code'] == 200) {
+                fwrite($myfile, $value['msg_id']);
+            } else {
+                fwrite($defaultfile, $value['msg_id']);
+            }
+            // print_r($res);die;
+
+        } */
+        // $defaultfile = fopen("1221pandoradefault.txt", "w");
+        // 营销id： 1370488 ~ 1370553
+      
+    }
+
 }

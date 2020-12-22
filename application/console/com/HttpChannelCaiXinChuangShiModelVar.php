@@ -140,10 +140,21 @@ class HttpChannelCaiXinChuangShiModelVar extends Pzlife
                             }
 
                             if (!empty($value['image_path'])) {
+                                if (strpos($value['image_path'], 'shyuxi') == false) {
+                                    // $value['image_path'] = file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']);
+                                    // filtraImage(Config::get('qiniu.domain'), $value['image_path']);
+                                } else {
+                                    $value['image_path'] = filtraImage(Config::get('qiniu.domain'), $value['image_path']);
+                                }
                                 $i++;
                                 $semdname = $i . "." . explode('.', $value['image_path'])[1];
                                 $par .= '<img region="id' . $i . '_img1" src="' . $semdname . '"/>';
-                                $image_info = file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']);
+                                if (strpos( $value['image_path'], 'shyuxi') == false) {
+                                    $image_info = file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']);
+                                }else{
+                                    $image_info = file_get_contents($value['image_path']);
+                                }
+                                // $image_info = file_get_contents(Config::get('qiniu.domain') . '/' . $value['image_path']);
 
                                 // $jpg1_path=Config::get('qiniu.domain') . '/' . $value['image_path'];
                                 $jpg1_name = $semdname;
@@ -227,7 +238,7 @@ class HttpChannelCaiXinChuangShiModelVar extends Pzlife
                                         $redis->rpush($redisMessageCodeSend, $val);
                                     }
                                 }
-                                $this->writeToRobot($content, $receive_data, '创世彩信通道');
+                                $this->writeToRobot($content, $res, '创世彩信通道');
                                 exit;
                             }
 
@@ -297,7 +308,7 @@ class HttpChannelCaiXinChuangShiModelVar extends Pzlife
                                     $redis->rpush($redisMessageCodeSend, $val);
                                 }
                             }
-                            $this->writeToRobot($content, $receive_data, '创世彩信通道');
+                            $this->writeToRobot($content, $res, '创世彩信通道');
                             exit;
                         }
 
@@ -354,7 +365,7 @@ class HttpChannelCaiXinChuangShiModelVar extends Pzlife
                     $redis->rpush($redisMessageCodeSend, $val);
                 }
             }
-            $this->writeToRobot($content, $receive_data, '创世彩信通道');
+            $this->writeToRobot($content, $th, '创世彩信通道');
             exception($th);
             exit;
         }

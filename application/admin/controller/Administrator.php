@@ -987,6 +987,7 @@ class Administrator extends AdminController
      * @apiParam (入参) {String} [channel_template_id] 模板id
      * @apiParam (入参) {String} [channel_dest_id] 短信接入码 短信端口号
      * @apiParam (入参) {String} [channel_flow_velocity] 通道最大流速/秒
+     * @apiParam (入参) {String} [connect_num] 最大连接数 默认1
      * @apiSuccess (返回) {String} code 200:成功 / 3001:cmpp类接口必填端口 / 3002:通道名称为空 / 3003:地址为空 / 3004:必须确认通道支持运营商范围 / 3005:必须确认通道支持服务/ 3006:企业id,企业代码(账户)不能为空 / 3007:密码不能为空 / 3008:名称不能重复 / 3009:业务代码不能为空
      * @apiSampleRequest /admin/administrator/addSmsSendingChannel
      * @return array
@@ -1013,6 +1014,7 @@ class Administrator extends AdminController
         $channel_template_id = trim($this->request->post('channel_template_id'));
         $channel_dest_id = trim($this->request->post('channel_dest_id'));
         $channel_flow_velocity = trim($this->request->post('channel_flow_velocity'));
+        $connect_num = trim($this->request->post('connect_num'));
         if ($channel_type == 2 && empty($channel_port)) {
             return ['code' => '3001', 'msg' => 'cmpp类接口必填端口'];
         }
@@ -1037,7 +1039,7 @@ class Administrator extends AdminController
         if (empty($channel_service_id)) {
             return ['code' => '3009', 'msg' => '业务代码不能为空'];
         }
-        $result = $this->app->administrator->addSmsSendingChannel($title, $channel_type, $channel_host, $channel_port, $channel_source, $business_id, $channel_price, $channel_postway, $channel_source_addr, $channel_shared_secret, $channel_service_id, $channel_template_id, $channel_dest_id, $channel_flow_velocity);
+        $result = $this->app->administrator->addSmsSendingChannel($title, $channel_type, $channel_host, $channel_port, $channel_source, $business_id, $channel_price, $channel_postway, $channel_source_addr, $channel_shared_secret, $channel_service_id, $channel_template_id, $channel_dest_id, $channel_flow_velocity, $connect_num);
         return $result;
     }
 

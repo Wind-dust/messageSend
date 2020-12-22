@@ -50,9 +50,10 @@ class HttpChannelModelSupMessageKuaiLeWangShiLianTong extends Pzlife
             ini_set('user_agent', 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; GreenBrowser)');
             $send_task = [];
             $roallback = [];
-            while (true) {
-                $j = 1;
+            $j = 1;
 
+            while (true) {
+               
                 /*  $send_task    = [];
                 $model_var_task = [];//模板变量彩信任务
                 $model_task = [];//模板彩信任务

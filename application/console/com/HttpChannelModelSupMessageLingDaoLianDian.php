@@ -50,8 +50,9 @@ class HttpChannelModelSupMessageLingDaoLianDian extends Pzlife
         try {
             ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; GreenBrowser)');
             $send_task    = [];
+            $j = 1;
             while (true) {
-                $j = 1;
+               
                
                /*  $send_task    = [];
                 $model_var_task = [];//模板变量彩信任务
@@ -64,7 +65,7 @@ class HttpChannelModelSupMessageLingDaoLianDian extends Pzlife
                 $receive_id   = [];
                 $image_data = [];
                 $roallback = []; */
-                
+                $roallback = [];
                 // if (date('H') >= 18 || date('H') < 8) {
                 //     exit("8点前,18点后通道关闭");
                 // }
@@ -112,6 +113,7 @@ class HttpChannelModelSupMessageLingDaoLianDian extends Pzlife
                             $headers = [
                                 'Content-Type:text/plain'
                             ];
+                            // print_r($j);die;
                             $res = $this->sendRequest2($report_api,'post',$request_data,$headers);
                             $result = json_decode($res,true);
                             if ( isset($result['code'] ) && $result['code'] == 'T'){
@@ -164,11 +166,13 @@ class HttpChannelModelSupMessageLingDaoLianDian extends Pzlife
                                 $headers = [
                                     'Content-Type:text/plain'
                                 ];
+                                // print_r($j);die;
                                 $res = $this->sendRequest2($report_api,'post',$request_data,$headers);
                                 $result = json_decode($res,true);
                                 if ( isset($result['code'] ) && $result['code'] == 'T'){
                                     $redis->hset('index:meassage:code:back_taskno:lingdao', $result['data'], $key); 
                                     unset($send_task[$key]);
+                                    $j = 1;
                                 }else{
                                     
                                     foreach ($roallback as $rkey => $rvalue) {
@@ -176,6 +180,7 @@ class HttpChannelModelSupMessageLingDaoLianDian extends Pzlife
                                             $redis->rpush($redisMessageCodeSend, $rvalue);
                                         }
                                     }
+                                 
                                     $this->writeToRobot($content, $res, '领道视频短信通道');
                                     exit();
                                 }
@@ -183,6 +188,7 @@ class HttpChannelModelSupMessageLingDaoLianDian extends Pzlife
                                
                             }
                         }
+                        // die;
                         $appid = '350394'; //appid由企业彩信平台提供 是
                         $appkey = 'c89c00a99999432faf35893786c10a48';
                         // $timestamp =  //时间戳访问接口时间 单位：毫秒 是
@@ -216,7 +222,7 @@ class HttpChannelModelSupMessageLingDaoLianDian extends Pzlife
                         $result = json_decode($res, true);
                         
                         if (!empty($result['data']))  {
-                            print_r($result);
+                            // print_r($result);
                             foreach ($result['data'] as $key => $value) {
                                 # code...
                                 $develop_len = strlen($user_info['channel_dest_id']);

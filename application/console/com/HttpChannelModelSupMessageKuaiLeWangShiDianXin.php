@@ -17,7 +17,7 @@ class HttpChannelModelSupMessageKuaiLeWangShiDianXin extends Pzlife
         return [
             'CpName' => 'flswspyd',
             'uid' => 1079,
-            'CpPassword' => 'flswspyd',
+            'CpPassword' => 'df915f33',
             'channel_dest_id' => '1', //接入码
             // 'send_var_api'    => 'http://caixin.253.com/open/sendVarByTemplate', //模板变量发送地址老接口地址
             // http://ip:port/api/v2/mms/send?appid=&timestamp=&sign=
@@ -49,8 +49,9 @@ class HttpChannelModelSupMessageKuaiLeWangShiDianXin extends Pzlife
             ini_set('user_agent', 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; GreenBrowser)');
             $send_task = [];
             $roallback = [];
+            $j = 1;
             while (true) {
-                $j = 1;
+                
 
                 /*  $send_task    = [];
                 $model_var_task = [];//模板变量彩信任务
@@ -90,7 +91,7 @@ class HttpChannelModelSupMessageKuaiLeWangShiDianXin extends Pzlife
                         foreach ($send_task as $key => $value) {
                             $request_data = [];
                             $uid = $user_info['uid']; //appid由企业彩信平台提供 是
-                            $CpPassword = $user_info['ApiPassword'];
+                            $CpPassword = $user_info['CpPassword'];
                             $tm = $this->getMillisecond();
                             $request_data = [
                                 // 'mms_from' => 1,
@@ -132,7 +133,7 @@ class HttpChannelModelSupMessageKuaiLeWangShiDianXin extends Pzlife
                     foreach ($send_task as $key => $value) {
                         $request_data = [];
                         $uid = $user_info['uid']; //appid由企业彩信平台提供 是
-                        $CpPassword = $user_info['ApiPassword'];
+                        $CpPassword = $user_info['CpPassword'];
                         $tm = $this->getMillisecond();
                         $request_data = [
                             // 'mms_from' => 1,
