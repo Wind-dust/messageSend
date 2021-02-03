@@ -33,27 +33,30 @@ class CmppNorm extends Pzlife
         'master_num'    => 160,
         ]; */
         if ($content == 'test') { //本机测试
-          /*   return [
-                // 'channel_host' => "47.103.200.251", //服务商ip
-                'channel_host' => "127.0.0.1", //服务商ip
-                'channel_port' => "7890", //短连接端口号   17890长连接端口号
-                'channel_source_addr' => "C48515", //企业id  企业代码
-                'channel_shared_secret' => 'c6S2ENJj', //网关登录密码
-                'channel_service_id' => "C48515",
-                'channel_dest_id' => "10694406674719", //短信接入码 短信端口号
-                'Sequence_Id' => 1,
-                'SP_ID' => "",
-                'bin_ip' => ["127.0.0.1", "47.103.200.251"], //客户端绑定IP
-                'free_trial' => 2,
-                'channel_flow_velocity' => 300,
-                'uid' => 1,
-                'title' => '本地测试样例',
-            ]; */
-
+            /*  return [
+            // 'channel_host' => "47.103.200.251", //服务商ip
+            'channel_host' => "127.0.0.1", //服务商ip
+            'channel_port' => "7891", //短连接端口号   17890长连接端口号
+            'channel_source_addr' => "C54164", //企业id  企业代码
+            'channel_shared_secret' => '3teOpxBK', //网关登录密码
+            'channel_service_id' => "C54164",
+            'channel_dest_id' => "1066", //短信接入码 短信端口号
+            'Sequence_Id' => 1,
+            'SP_ID' => "",
+            'bin_ip' => ["127.0.0.1", "101.91.60.115"], //客户端绑定IP
+            'free_trial' => 2,
+            'channel_flow_velocity' => 300,
+            'uid' => 1,
+            'title' => '本地测试样例',
+            ];
+             */
             return [
-                'channel_host' => "47.103.200.251", //服务商ip
+                // 'channel_host' => "47.103.200.251", //服务商ip
+                'channel_host' => "47.100.55.62", //服务商ip
+                // 'channel_host' => "47.101.75.174", //服务商ip
                 // 'channel_host' => "127.0.0.1", //服务商ip
                 'channel_port' => "7890", //短连接端口号   17890长连接端口号
+                // 'channel_port' => "7890", //短连接端口号   17890长连接端口号
                 'channel_source_addr' => "900003", //企业id  企业代码
                 'channel_shared_secret' => '888888', //网关登录密码
                 'channel_service_id' => "900003",
@@ -66,6 +69,24 @@ class CmppNorm extends Pzlife
                 'uid' => 1,
                 'title' => '本地测试样例',
             ];
+        } elseif ($content == 'C54164') {
+            return [
+                // 'channel_host' => "47.103.200.251", //服务商ip
+                'channel_host' => "127.0.0.1", //服务商ip
+                'channel_port' => "7891", //短连接端口号   17890长连接端口号
+                'channel_source_addr' => "C54164", //企业id  企业代码
+                'channel_shared_secret' => '3teOpxBK', //网关登录密码
+                'channel_service_id' => "C54164",
+                'channel_dest_id' => "1066", //短信接入码 短信端口号
+                'Sequence_Id' => 1,
+                'SP_ID' => "",
+                'bin_ip' => ["127.0.0.1", "101.91.60.115"], //客户端绑定IP
+                'free_trial' => 2,
+                'channel_flow_velocity' => 300,
+                'uid' => 1,
+                'title' => '本地测试样例',
+            ];
+
         } else {
             $channel = Db::query("SELECT * FROM yx_sms_sending_channel WHERE `id` = " . $content . " AND channel_type = 2");
             if (empty($channel)) {
@@ -109,19 +130,23 @@ class CmppNorm extends Pzlife
         'content'     => '您的验证码是：8791【美丽田园】',
 
         ])); */
-
-        /*   $send = $redis->rPush($redisMessageCodeSend, json_encode([
-        'mobile'      => '15201926171',
-        'mar_task_id' => '',
-        'content'     => '【施华洛世奇】亲爱的会员，感谢您一路以来的支持！您已获得2020年会员周年礼券，购买正价商品满1999元即可获得闪耀玫瑰金色简约吊坠一条，请于2020年10月19日前使用。可前往“施华洛世奇会员中心”小程序查看该券。详询4006901078。 回TD退订',
+/*
+$send = $redis->rPush($redisMessageCodeSend, json_encode([
+'mobile'      => '15201926171',
+'mar_task_id' => '1',
+'content'     => '【施华洛世奇】亲爱的会员，感谢您一路以来的支持！您已获得2020年会员周年礼券，购买正价商品满1999元即可获得闪耀玫瑰金色简约吊坠一条，请于2020年10月19日前使用。可前往“施华洛世奇会员中心”小程序查看该券。详询4006901078。 回TD退订',
+// 'content'     => '【富泷科技】本次验证码为1815',
+// 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
+])); */
+        /*  for ($i = 0; $i < 500; $i++) {
+        $send = $redis->rPush($redisMessageCodeSend, json_encode([
+        'mobile' => '15201926171',
+        'mar_task_id' => 2,
+        'content' => '【富泷科技】本次验证码为1815',
         // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
-        ])); */
-        /*  $send = $redis->rPush($redisMessageCodeSend, json_encode([
-        'mobile'      => '15201926171',
-        'mar_task_id' => '',
-        'content'     => '【富泷科技】本次验证码为1815',
-        // 'content'     => '【长阳广电】尊敬的用户，您的有线宽带电视即将到期，我们可为您线上办理各项电视业务，如有需要，可致电5321383，我们将竭诚为您服务。',
-        ])); */
+        ]));
+        } */
+        // die;
         // $channel_total_data = [];
         $channel_total_data = $redis->get('index:message:channel:' . $content . '_' . date('Ymd'));
         if (!$channel_total_data) {
@@ -206,7 +231,7 @@ class CmppNorm extends Pzlife
                 // echo "认证连接中..." . "\n";
                 $headData = socket_read($socket, 12);
                 if ($headData != false) {
-                    // echo "连接成功..." . "\n";
+                    // echo "开始登陆..." . "\n";
                     $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                     // print_r($head);
                     $bodyData = socket_read($socket, $head['Total_Length'] - 12);
@@ -382,15 +407,18 @@ class CmppNorm extends Pzlife
                         socket_write($socket, $headData, $Total_Length);
                         socket_close($socket);
                         $this->writeToRobot($content, '通道方关闭当前链接，通道关闭', $contdata['title']);
-                        exit;
+                        exit("通道方关闭当前链接，通道关闭");
                         $receive = 2;
                     }
                 }
                 if ($verify_status == 0) { //验证成功并且所有信息已读完可进行发送操作
                     //
+                    // echo "登陆成功时间:".date('Y-m-d H:i:s',time()) . "\n";
+                    // sleep(1);
                     $pos = $redis->get('channel_pos_' . $content);
                     $pos = isset($pos) ? $pos : 0;
                     while (true) {
+                        // usleep(300);
                         $Sequence_Id = $redis->get('channel_' . $content);
                         $redis->set('channel_' . $content, $Sequence_Id + 1);
 
@@ -400,10 +428,13 @@ class CmppNorm extends Pzlife
                             //先接收
                             while (true) {
                                 $headData = socket_read($socket, 12);
-                                /* if (strlen($headData) < 12) {
-                                continue;
-                                } */
+                                // if (strlen($headData) < 12) {
+                                //     continue;
+                                // }
                                 if ($headData != false) {
+                                    // echo $headData;
+                                    // echo strlen($headData);
+                                    // echo "\n";
                                     $head = unpack("NTotal_Length/NCommand_Id/NSequence_Id", $headData);
                                     $bodyData = socket_read($socket, $head['Total_Length'] - 12);
                                     if ($head['Command_Id'] == 0x80000001) {
@@ -558,7 +589,7 @@ class CmppNorm extends Pzlife
                                                 if (isset($channel_total_data['error_data'][trim($Msg_Content['Stat'])])) {
                                                     $channel_total_data['error_data'][trim($Msg_Content['Stat'])]++;
                                                 } else {
-                                                    $channel_total_data['error_data'][trim($Msg_Content['Stat'])] == 1;
+                                                    $channel_total_data['error_data'][trim($Msg_Content['Stat'])] = 1;
                                                 }
 
                                             } else { //不在记录中的回执存入缓存，
@@ -586,11 +617,12 @@ class CmppNorm extends Pzlife
                                         // echo "接收到心跳" . "\n"; //激活测试,无消息体结构
                                         $Command_Id = 0x80000008; //保持连接
                                         $Total_Length = 12;
-                                        // $headData = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
+
                                         // socket_write($socket, $headData, $Total_Length);
 
-                                        $new_body         = pack("C", 0) . pack("N", $Sequence_Id);
+                                        $new_body = pack("a1", " ");
                                         $new_Total_Length = strlen($new_body) + 12;
+                                        $headData = pack("NNN", $new_Total_Length, $Command_Id, $Sequence_Id);
                                         socket_write($socket, $headData . $new_body, $new_Total_Length);
 
                                         $receive = 2;
@@ -614,8 +646,9 @@ class CmppNorm extends Pzlife
                             //在发送
 
                             $send = $redis->lPop($redisMessageCodeSend);
-                            if (!empty($send)) { //正式使用从缓存中读取数据并且有待发送数据
 
+                            if (!empty($send)) { //正式使用从缓存中读取数据并且有待发送数据
+                                // echo "发送短信\n";
                                 $send_status = 1;
                                 $send_data = [];
                                 $send_data = json_decode($send, true);
@@ -625,6 +658,9 @@ class CmppNorm extends Pzlife
                                 $txt_len = 140;
                                 $max_len = $txt_len - $txt_head;
                                 $code = $send_data['content']; //带签名
+                                if ($content == 213) {
+                                    $code = $code . '【沃祝福】';
+                                }
                                 $uer_num = 1; //本批接受信息的用户数量（一般小于100个用户，不同通道承载能力不同）
                                 $timestring = time();
                                 // echo "发送时间：" . date("Y-m-d H:i:s", time()) . "\n";
@@ -665,6 +701,7 @@ class CmppNorm extends Pzlife
                                         } else {
                                             $bodyData .= pack("a21", $Dest_Id);
                                         }
+                                        // echo pack("C", $uer_num);
                                         $bodyData .= pack("C", $uer_num);
                                         $p_n = 21 * $uer_num;
                                         $bodyData .= pack("a" . $p_n, $mobile);
@@ -747,26 +784,28 @@ class CmppNorm extends Pzlife
                                         $i = 0;
                                     }
                                     $send_data['my_submit_time'] = time(); //发送时间戳
-                                    $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, json_encode($send_data));
                                     $Total_Length = strlen($bodyData) + 12;
                                     $headData = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                     socket_write($socket, $headData . $bodyData, $Total_Length);
-
+                                    $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, json_encode($send_data));
                                     $send_status = 2;
                                     // usleep(2500);
                                 }
+
                                 unset($send_status);
                             } else { //心跳
                                 $Command_Id = 0x00000008; //保持连接
                                 $Total_Length = 12;
                                 // $headData = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                                $body = pack('c',$Sequence_Id);
-                                $Total_Length = strlen($body) + 12;
+                                // $body = pack('c', $Sequence_Id);
+                                // $Total_Length = strlen($body) + 12;
                                 $headData = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
-                            
+
                                 if ($receive != 2) {
                                     // socket_write($socket, $headData, $Total_Length);
-                                    socket_write($socket, $headData . $bodyData, $Total_Length);
+                                    socket_write($socket, $headData, 12);
+                                    // echo "发送心跳";
+                                    // echo "\n";
                                 }
                                 usleep(998600);
                             }
@@ -782,8 +821,8 @@ class CmppNorm extends Pzlife
                         //捕获异常
                          catch (Exception $e) {
                             if (isset($send_status) && $send_status == 1) {
-                                $redis->push($redisMessageCodeSend, $redisMessageCodeSend);
-                                $redis->hset($redisMessageCodeSequenceId, $Sequence_Id);
+                                $redis->rpush($redisMessageCodeSend, $redisMessageCodeSend);
+                                $redis->hset($redisMessageCodeSequenceId, $Sequence_Id, $redisMessageCodeSend);
                             }
                             socket_close($socket);
 
@@ -859,6 +898,7 @@ class CmppNorm extends Pzlife
                         }
                     }
                 }
+                echo "登录失败";
             }
         }
     }

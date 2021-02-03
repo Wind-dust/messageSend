@@ -170,7 +170,9 @@ return $result;
             }
             $Content = $signature['title'] . $Content;
         }
-
+        if (checkMessageContent($Content) == false){
+            return ['code' => '3013', 'msg' => '敏感词过滤'];
+        }
         // print_r($signature);die;
         if (empty($effective_mobile)) {
             return ['code' => '3010', 'msg' => '有效手机号为空'];
@@ -352,6 +354,10 @@ return $result;
             $Content = $signature['title'] . $Content;
         }
 
+        if (checkMessageContent($Content) == false){
+            return ['code' => '3013', 'msg' => '敏感词过滤'];
+        }
+        
         $effective_mobile = [];
 
         foreach ($Mobiles as $key => $value) {

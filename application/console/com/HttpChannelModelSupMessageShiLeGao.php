@@ -116,7 +116,7 @@ class HttpChannelModelSupMessageShiLeGao extends Pzlife
                             $res = $this->sendRequest2($user_info['send_var_api'],'post',$request_data,$headers);
                             $result = json_decode($res,true);
                             if ( isset($result['status'] ) && $result['status'] == 0){
-                                // $redis->hset('index:meassage:code:back_taskno:silegao', $result['data'], $key); 
+                                $redis->hset('index:meassage:code:back_taskno:silegao', $result['data'], $key); 
                                 unset($send_task[$key]);
                                 $j = 1;
                             }else{
@@ -168,7 +168,7 @@ class HttpChannelModelSupMessageShiLeGao extends Pzlife
                                 //   print_r($res);die;
                                 $result = json_decode($res,true);
                                 if ( isset($result['status'] ) && $result['status'] == 0){
-                                    // $redis->hset('index:meassage:code:back_taskno:lingdao', $result['data'], $key); 
+                                    $redis->hset('index:meassage:code:back_taskno:silegao', $result['data'], $key); 
                                     unset($send_task[$key]);
                                     $j = 1;
                                 }else{

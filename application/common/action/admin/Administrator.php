@@ -2313,6 +2313,27 @@ class Administrator extends CommonIndex
             if (!empty($had_yd_report) && !empty($had_lt_report)) {
                 $templage_report_status = 2;
             }
+        }elseif ($yd_report_status == 2 && $lt_report_status == 2) {
+            $had_dx_report =  DbAdministrator::getUserSupMessageTemplateThirdReport(['dx_report_status' => 2,'template_id' => $had_report['template_id']], 'id,template_id', true);
+            if (!empty($had_dx_report)) {
+                $templage_report_status = 2;
+            }
+        }elseif ($yd_report_status == 2 && $dx_report_status == 2) {
+            $had_lt_report =  DbAdministrator::getUserSupMessageTemplateThirdReport(['lt_report_status' => 2,'template_id' => $had_report['template_id']], 'id,template_id', true);
+            if (!empty($had_lt_report) ) {
+                $templage_report_status = 2;
+            }
+        }elseif ($lt_report_status == 2 && $dx_report_status == 2) {
+            $had_yd_report =  DbAdministrator::getUserSupMessageTemplateThirdReport(['yd_report_status' => 2,'template_id' => $had_report['template_id']], 'id,template_id', true);
+            if (!empty($had_yd_report) ) {
+                $templage_report_status = 2;
+            }
+        }elseif ($yd_report_status == 2 && $dx_report_status == 2 && $dx_report_status == 2 ) {
+            $templage_report_status = 2;
+        }
+
+        if ($templage_report_status == 2) {
+            $data['report_status'] = 2;
         }
         Db::startTrans();
         try {

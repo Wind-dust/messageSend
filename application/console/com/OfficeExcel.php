@@ -1582,7 +1582,7 @@ class OfficeExcel extends Pzlife
     /*    public function getReceiveInfo()
     {
     ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
-    $message = '亲爱的顾客：美丽田园致力于为您提供高品质的服务体验，从各个细节不断完善标准化服务流程。2020年1月1日起，为了保障您各方面的权益，将提供您更加清晰透明、无纸化的消费之旅。您每一次在xxx及指定门店的购买及消费信息，将通过美丽田园微信公众号（美丽田园Beauty Farm）即时推送给您，在您微信确认后方可完成订单结算。请您提前关注美丽田园公众号，对您的每次消费确认，亦可同时查询您的各类权益，祝您美与健康之旅愉快。退订回T';
+    $message = '亲爱的顾客：美丽田园致力于为您提供高品质的服务体验，从各个细节不断完善标准化服务流程。2020年1月1日起，为了保障您各方面的权益，将提供您更加清晰透明、无纸化的消费之旅。您每一次在xxx及指定门店的购买及消费信息，将通过美丽田园微信公众号（美丽田园Beauty Farm）即时推送给您，在您微���确认后方可完成订单结算。请您提前关注美丽田园公众号，对您的每次消费确认，亦可同时查询您的各类权益，祝您美与健康之旅愉快。退订回T';
     $objReader = PHPExcel_IOFactory::createReader('Excel2007');
     // print_r(realpath("../"). "\yt_area_mobile.csv");die;
 
@@ -4255,14 +4255,27 @@ class OfficeExcel extends Pzlife
 
     public function extractMobile()
     {
-        $file_path = realpath("./uploads\SFL\UnZip\MMS\Communication_targets_MMS_1_20201222162504") . "/Communication_targets_MMS_1_20201222162504.txt";
+//         干百分之40"100188176","Lancome MMS 0125 group1","95028","100088417","100088417_20210126093401.zip","2021-01-26 09:34:54"
+        // 干百分之35"100188183","Lancome MMS 0125 group８","67429","100088424","100088424_20210126093437.zip","2021-01-26 09:34:54"
+        // 出15万条"100188182","Lancome MMS 0125 group７","351375","100088423","100088423_20210126093405.zip","2021-01-26 09:34:54"
+        // 干百分之35"100188181","Lancome MMS 0125 group6","85953","100088422","100088422_20210126093405.zip","2021-01-26 09:34:54"
+        // 出18万条"100188177","Lancome MMS 0125 group2","436519","100088418","100088418_20210126093404.zip","2021-01-26 09:34:54"
+        // 干百分之35"100188178","Lancome MMS 0125 group3","81916","100088419","100088419_20210126093404.zip","2021-01-26 09:34:54"
+        // 干百分之35"100188180","Lancome MMS 0125 group5","75428","100088421","100088421_20210126093405.zip","2021-01-26 09:34:54"
+        // 干百分之45"100188179","Lancome MMS 0125 group4","148857","100088420","100088420_20210126093404.zip","2021-01-26 09:34:54"
+        $file_path = realpath("./uploads\SFL\UnZip\SMS\Communication_targets_SMS_1_20210130090116") . "/Communication_targets_SMS_1_20210130090116.txt";
         // $model_path = realpath("./") . "/0624.txt";
+        $model_id = '100188308';
+        // $deduct = ceil(2000000 / 5768335 * 100);
+        $deduct = 80;
         $file = fopen($file_path, "r");
-        $white_receipt_path = realpath("./") . "/100187113_1223white.txt";
+        $white_receipt_path = realpath("./") . "/" . $model_id . "_white.txt";
         $white_receipt_file = fopen($white_receipt_path, "w");
-        $deduct_receipt_path = realpath("./") . "/100187113_1223.txt";
-        $deduct_receipt_file = fopen($deduct_receipt_path, "w");
+        // $deduct_receipt_path = realpath("./") . "/100187621_1229.txt";
+        // $deduct_receipt_file = fopen($deduct_receipt_path, "w");
         $j = 1;
+        $s = 1;
+        $real_num = 0;
         $mobiles = [];
         $send_mobiles = [];
         $white_list = [
@@ -4301,11 +4314,11 @@ class OfficeExcel extends Pzlife
             15000796805,
             13917823241,
             18817718456,
-            13472718707, 18817973600,13801991996,15900856149,15021138946,15508970381,18817973600
+            13472718707, 18817973600, 13801991996, 15900856149, 15021138946, 15508970381, 18817973600, 15921133310,
         ];
-        $deduct = ceil(400000 / 1418017 * 100);
+        // $deduct = ceil(100000 / 222460 * 100);
         // $deduct = 100;
-
+        $a = 0;
         while (!feof($file)) {
             $cellVal = trim(fgets($file));
             if (!empty($cellVal)) {
@@ -4318,9 +4331,12 @@ class OfficeExcel extends Pzlife
                 if (checkMobile($value[3]) == false || strlen($value[3]) > 11) {
                     continue;
                 }
-                if ($value[2] != '100187113') {
+
+                if ($value[2] != $model_id) {
                     continue;
                 }
+                $real_num++;
+
                 $mobiles[] = $value[3];
                 $j++;
                 if ($j > 100) {
@@ -4330,7 +4346,20 @@ class OfficeExcel extends Pzlife
                         if (in_array($value, $white_list)) {
                             fwrite($white_receipt_file, $value . "\n");
                         } elseif (is_array($deduct_mobile) && in_array($key, $deduct_mobile)) {
-                            fwrite($deduct_receipt_file, $value . "\n");
+                            // fwrite($deduct_receipt_file, $value . "\n");
+                            $send_mobiles[] = $value;
+                            $a++;
+                            if ($a > 200000) {
+                                $deduct_send_path = realpath("./") . "/" . $model_id . "_" . $s . ".txt";
+                                $deduct_send_file = fopen($deduct_send_path, "w");
+                                foreach ($send_mobiles as $skey => $svalue) {
+                                    fwrite($deduct_send_file, $svalue . "\n");
+                                }
+                                fclose($deduct_send_file);
+                                $send_mobiles = [];
+                                $a = 1;
+                                $s++;
+                            }
                         }
                     }
                     $mobiles = [];
@@ -4338,6 +4367,7 @@ class OfficeExcel extends Pzlife
                 }
             }
         }
+        // echo "100186999模板去除空号及错号号码数:" . $real_num++;
         fclose($file);
         if (!empty($mobiles)) {
             $deduct = ceil($deduct / 100 * count($mobiles));
@@ -4347,12 +4377,24 @@ class OfficeExcel extends Pzlife
                 if (in_array($value, $white_list)) {
                     fwrite($white_receipt_file, $value . "\n");
                 } elseif (in_array($key, $deduct_mobile)) {
-                    fwrite($deduct_receipt_file, $value . "\n");
+                    // fwrite($deduct_receipt_file, $value . "\n");
+                    $send_mobiles[] = $value;
                 }
             }
         }
+        if (!empty($send_mobiles)) {
+            $deduct_send_path = realpath("./") . "/" . $model_id . "_" . $s . ".txt";
+            $deduct_send_file = fopen($deduct_send_path, "w");
+            foreach ($send_mobiles as $skey => $svalue) {
+                fwrite($deduct_send_file, $svalue . "\n");
+            }
+            fclose($deduct_send_file);
+            $send_mobiles = [];
+            $a = 1;
+            $s++;
+        }
         fclose($white_receipt_file);
-        fclose($deduct_receipt_file);
+        // fclose($deduct_receipt_file);
     }
 
     public function mobileSource()
@@ -4561,76 +4603,74 @@ class OfficeExcel extends Pzlife
 
         die;
 
-      /*   $export_data = [];
+        /*   $export_data = [];
         foreach ($task as $key => $value) {
-            // print_r($value);die;
-            $real_num = 1;
-            $len = strlen(iconv('utf-8', 'utf-16le', $value['task_content'])) / 2;
-            if ($len > 70) {
-                $real_num = ceil($len / 67);
-            }
-            $deliver_status = [];
-            $deliver_status = Db::query("SELECT * FROM `yx_send_task_receipt` WHERE `task_id` = " . $value['id'] . "  ");
-            $mobile_as_status = [];
-            $deliver_mobiles = [];
-            $mobile_data = explode(',', $value['mobile_content']);
-            foreach ($deliver_status as $dkey => $dvalue) {
+        // print_r($value);die;
+        $real_num = 1;
+        $len = strlen(iconv('utf-8', 'utf-16le', $value['task_content'])) / 2;
+        if ($len > 70) {
+        $real_num = ceil($len / 67);
+        }
+        $deliver_status = [];
+        $deliver_status = Db::query("SELECT * FROM `yx_send_task_receipt` WHERE `task_id` = " . $value['id'] . "  ");
+        $mobile_as_status = [];
+        $deliver_mobiles = [];
+        $mobile_data = explode(',', $value['mobile_content']);
+        foreach ($deliver_status as $dkey => $dvalue) {
 
-                if (!in_array($dvalue['mobile'], $deliver_mobiles)) {
-                    $deliver_mobiles[] = $dvalue['mobile'];
-                    $expot = [];
-                    $expot = [
-                        'mobile' => $dvalue['mobile'],
-                        'real_num' => $real_num,
-                        'status_message' => $dvalue['status_message'],
-                        'send_time' => date('Y-m-d H:i:s', $value['update_time']),
-                    ];
-                    $export_data[] = $expot;
-                    $i++;
-                    if ($i > 200000) {
-                        $this->exportForTable( $export_data, $j, '福维克营销内容截止到11月30日号码及状态');
-                        $export_data = [];
-                        $i = 1;
-                        $j++;
-                    }
-                }
-              
-              
-            }
-            $unknow_mobile = [];
-            $unknow_mobile = array_diff($mobile_data, $deliver_mobiles);
-            foreach ($unknow_mobile as $ukey => $uvalue) {
-                $expot = [];
-                $expot = [
-                    'mobile' => $uvalue,
-                    'real_num' => $real_num,
-                    'status_message' => 'DELIVRD',
-                    'send_time' => date('Y-m-d H:i:s', $value['update_time']),
-                ];
-                $export_data[] = $expot;
-                $i++;
-                if ($i > 200000) {
-                    $this->exportForTable( $export_data, $j, '福维克营销内容截止到11月30日号码及状态');
-                    $export_data = [];
-                    $i = 1;
-                    $j++;
-                }
-            }
-          
+        if (!in_array($dvalue['mobile'], $deliver_mobiles)) {
+        $deliver_mobiles[] = $dvalue['mobile'];
+        $expot = [];
+        $expot = [
+        'mobile' => $dvalue['mobile'],
+        'real_num' => $real_num,
+        'status_message' => $dvalue['status_message'],
+        'send_time' => date('Y-m-d H:i:s', $value['update_time']),
+        ];
+        $export_data[] = $expot;
+        $i++;
+        if ($i > 200000) {
+        $this->exportForTable( $export_data, $j, '福维克营销内容截止到11月30日号码及状态');
+        $export_data = [];
+        $i = 1;
+        $j++;
+        }
+        }
 
         }
-        
+        $unknow_mobile = [];
+        $unknow_mobile = array_diff($mobile_data, $deliver_mobiles);
+        foreach ($unknow_mobile as $ukey => $uvalue) {
+        $expot = [];
+        $expot = [
+        'mobile' => $uvalue,
+        'real_num' => $real_num,
+        'status_message' => 'DELIVRD',
+        'send_time' => date('Y-m-d H:i:s', $value['update_time']),
+        ];
+        $export_data[] = $expot;
+        $i++;
+        if ($i > 200000) {
+        $this->exportForTable( $export_data, $j, '福维克营销内容截止到11月30日号码及状态');
+        $export_data = [];
+        $i = 1;
+        $j++;
+        }
+        }
+
+        }
+
         if (!empty($export_data)) {
-            $this->exportForTable( $export_data, $j, '福维克营销内容截止到11月30日号码及状态');
-            $export_data = [];
-            $i = 1;
-            $j = 1;
+        $this->exportForTable( $export_data, $j, '福维克营销内容截止到11月30日号码及状态');
+        $export_data = [];
+        $i = 1;
+        $j = 1;
         } */
 
         $export_data = [];
         $start_time = strtotime($time_key);
-        $end_time = $start_time+86400;
-        $business_task = Db::query("SELECT `id`,`mobile_content`,`task_content`,`update_time`,`real_num` FROM yx_user_send_code_task WHERE `uid` = 256 AND `free_trial` = 2 AND  `delete_time` = 0 AND `yidong_channel_id` <> 0 AND  create_time >= ".$start_time." AND `create_time` <= ".$end_time." ");
+        $end_time = $start_time + 86400;
+        $business_task = Db::query("SELECT `id`,`mobile_content`,`task_content`,`update_time`,`real_num` FROM yx_user_send_code_task WHERE `uid` = 256 AND `free_trial` = 2 AND  `delete_time` = 0 AND `yidong_channel_id` <> 0 AND  create_time >= " . $start_time . " AND `create_time` <= " . $end_time . " ");
         // echo count($business_task);die;
         foreach ($business_task as $key => $value) {
             // print_r($value);die;
@@ -4656,13 +4696,13 @@ class OfficeExcel extends Pzlife
                     $export_data[] = $expot;
                     $i++;
                     if ($i > 200000) {
-                        $this->exportForTable( $export_data, $j, '福维克行业内容'.$time_key.'号码及状态');
+                        $this->exportForTable($export_data, $j, '福维克行业内容' . $time_key . '号码及状态');
                         $export_data = [];
                         $i = 1;
                         $j++;
                     }
                 }
-               
+
                 // print_r($export_data);die;
             }
 
@@ -4680,7 +4720,7 @@ class OfficeExcel extends Pzlife
                 $export_data[] = $expot;
                 $i++;
                 if ($i > 200000) {
-                    $this->exportForTable( $export_data, $j,'福维克行业内容'.$time_key.'号码及状态');
+                    $this->exportForTable($export_data, $j, '福维克行业内容' . $time_key . '号码及状态');
                     $export_data = [];
                     $i = 1;
                     $j++;
@@ -4689,7 +4729,7 @@ class OfficeExcel extends Pzlife
 //    print_r($export_data);die;
         }
         if (!empty($export_data)) {
-            $this->exportForTable( $export_data, $j, '福维克行业内容'.$time_key.'号码及状态');
+            $this->exportForTable($export_data, $j, '福维克行业内容' . $time_key . '号码及状态');
             $export_data = [];
             $i = 1;
             $j = 1;
@@ -4697,7 +4737,8 @@ class OfficeExcel extends Pzlife
 
     }
 
-    public function exportForTable( $export_data, $j, $name){
+    public function exportForTable($export_data, $j, $name)
+    {
         $objExcel = new PHPExcel();
         // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
         // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
@@ -4751,7 +4792,7 @@ class OfficeExcel extends Pzlife
             }
         }
         //福维克营销内容截止到11月30日号码及状态
-        $objWriter->save($name.$j.'.xlsx');
+        $objWriter->save($name . $j . '.xlsx');
     }
 
 }

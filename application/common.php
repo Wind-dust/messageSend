@@ -835,3 +835,11 @@ function daxie($number)
     }
     return $result;
 }
+
+
+function checkMessageContent($messages){
+    if (strpos($messages, '淘口令') || strpos($messages, '红包') || strpos($messages, '加微信') || strpos($messages, '+v') || strpos($messages, '加微') || strpos($messages, '加群') || strpos($messages, '加Q') || strpos($messages, '加q') || strpos($messages, '+q') || strpos($messages, '+Q') || strpos($messages, '理财') || strpos($messages, '网贷') || strpos($messages, '金融') || strpos($messages, '借款') || strpos($messages, '还款') || strpos($messages, 'p2p') || strpos($messages, 'P2P') || strpos($messages, '羊小咩')) {
+        return false;
+    }
+    return true;
+}

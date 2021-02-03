@@ -179,7 +179,7 @@ class HttpChannelModelSupMessageKuaiLeWangShiYiDong extends Pzlife
             fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
             fwrite($myfile, $th . "\n");
             fclose($myfile);
-            $this->writeToRobot($content, $th, '艾麒视频短信移动通道');
+            $this->writeToRobot($content, $th, '快乐网视视频短信通道');
             /*  $redis->rpush('index:meassage:code:send' . ":" . 22, json_encode([
         'mobile'      => 15201926171,
         'content'     => "【钰晰科技】微格彩信通道出现异常"
