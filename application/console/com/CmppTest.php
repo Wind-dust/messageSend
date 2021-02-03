@@ -102,11 +102,14 @@ class CmppTest extends Pzlife
         $redis->rPush($redisMessageCodeSend, json_encode($send));
         $code = $send['task_content']; //带签名
         // iconv('UTF-8','UCS-2',$code);
-        $code = iconv('UCS-2','UTF-8',$code);
-        // print_r($code);die;
+        // $code = iconv('UCS-2', 'UTF-8', $code);
+
         // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
-        // $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
-        
+        $code = mb_convert_encoding($code, 'UTF-8', 'GB2312');
+        $code = mb_convert_encoding($code, 'GB2312', 'UTF-8');
+        // print_r($code);
+        echo $code;
+        die;
         // $send = $send[0];
         $socket   = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $log_path = realpath("") . "/error/" . $content . ".log";
@@ -114,7 +117,7 @@ class CmppTest extends Pzlife
         fwrite($myfile, date('Y-m-d H:i:s', time()) . "\n");
         fwrite($myfile, " Begin" . "\n");
         fclose($myfile);
-        
+
         // $content = 0;
 
         // // print_r($contdata);die;
@@ -126,7 +129,7 @@ class CmppTest extends Pzlife
         $Dest_Id              = $contdata['channel_dest_id']; //短信接入码 短信端口号
         $Sequence_Id          = 1;
         // $SP_ID                = $contdata['SP_ID'];
-        $master_num           = isset($contdata['channel_flow_velocity']) ? $contdata['channel_flow_velocity']: 300; //通道最大提交量
+        $master_num           = isset($contdata['channel_flow_velocity']) ? $contdata['channel_flow_velocity'] : 300; //通道最大提交量
         $security_coefficient = 1; //通道饱和系数
         $security_master      = $master_num * $security_coefficient;
         $miao = 1000000;
@@ -331,7 +334,6 @@ class CmppTest extends Pzlife
                         $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                         socket_write($socket, $headData, $Total_Length);
                         $receive = 2;
-                        
                     } else if ($head['Command_Id'] == 0x80000008) {
                         // echo "激活测试应答" . "\n"; //激活测试,无消息体结构
                     } else if ($head['Command_Id'] == 0x00000002) {
@@ -532,7 +534,6 @@ class CmppTest extends Pzlife
                                         $headData     = pack("NNN", $Total_Length, $Command_Id, $Sequence_Id);
                                         socket_write($socket, $headData, $Total_Length);
                                         $receive = 2;
-                                        
                                     } else if ($head['Command_Id'] == 0x80000008) {
                                         // echo "激活测试应答" . "\n"; //激活测试,无消息体结构
                                     } else if ($head['Command_Id'] == 0x00000002) {
@@ -553,7 +554,7 @@ class CmppTest extends Pzlife
                             //在发送
 
                             // $send = $redis->lPop($redisMessageCodeSend);
-                           
+
                             if (!empty($send)) { //正式使用从缓存中读取数据并且有待发送数据
 
                                 $send_status = 1;
@@ -571,7 +572,7 @@ class CmppTest extends Pzlife
                                 $num1 = substr($timestring, 0, 8);
                                 $num2 = substr($timestring, 8) . $this->combination($i);
                                 // $code = mb_convert_encoding($code, 'GBK', 'UTF-8');
-                                $code = iconv('UCS-2','UTF-8',$code);
+                                $code = iconv('UCS-2', 'UTF-8', $code);
                                 // $code = mb_convert_encoding($code, 'UCS-2', 'UTF-8');
                                 // iconv("UTF-8","gbk",$code);
                                 // $redis->rPush($redisMessageCodeSend, json_encode($send_data));

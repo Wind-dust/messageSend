@@ -1414,7 +1414,7 @@ class Send extends MyController
         }
     }
 
-     /**
+    /**
      * @api              {post} / 薇格彩信平台回调接口
      * @apiDescription   chuangLanMmsSftpCallBack
      * @apiGroup         index_send
@@ -1430,7 +1430,7 @@ class Send extends MyController
     public function weigeMmsCallBack()
     {
         // print_r($this->request->post());die;
-       $receiptBack = $this->request->post();
+        $receiptBack = $this->request->post();
         $result = $this->app->send->weigeMmsCallBack($receiptBack);
         if ($result == 'SUCCESS') {
             echo 'SUCCESS';
@@ -1576,7 +1576,7 @@ class Send extends MyController
         return $result;
     }
 
-        /**
+    /**
      * @api              {post} / 模板视频短信提交
      * @apiDescription   submitTemplateSupMessage
      * @apiGroup         index_send
@@ -1634,11 +1634,11 @@ class Send extends MyController
         $report  = $this->request->post('report'); //状态说明
         // $task_id  = trim($this->request->post('ext_id')); //登陆密码
         // $phone  = trim($this->request->post('phone')); //登陆密码
-        
-        $report = str_replace('&quot;','"',$report);
+
+        $report = str_replace('&quot;', '"', $report);
         // print_r($report);die;
-        $report = json_decode($report,true);
-        
+        $report = json_decode($report, true);
+
         $result = $this->app->send->sanTiSupMessageCallBack($sign, $report);
         if ($result == 'OK') {
             echo 'SUCCESS';
@@ -1667,10 +1667,10 @@ class Send extends MyController
         $data   = $this->request->post(); //返回码
         // $task_id  = trim($this->request->post('ext_id')); //登陆密码
         // $phone  = trim($this->request->post('phone')); //登陆密码
-       if (empty($data)) {
+        if (empty($data)) {
             echo 'FAIL';
             exit;
-       }
+        }
         $result = $this->app->send->lingdaoSupMessageCallBack($data);
         if ($result == 'OK') {
             echo 'SUCCESS';

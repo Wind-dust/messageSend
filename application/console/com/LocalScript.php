@@ -6,12 +6,14 @@ use app\console\Pzlife;
 use cache\Phpredis;
 use cache\PhpredisNew;
 use Config;
-use Env;
-use Kafka\Produce;
 use Kafka\Producer;
 use Kafka\ProducerConfig;
-use Monolog\Handler\StdoutHandler;
-use Monolog\Logger;
+use PHPExcel;
+use PHPExcel_Cell;
+use PHPExcel_IOFactory;
+use PHPExcel_Style_Alignment;
+use PHPExcel_Style_Fill;
+use PHPExcel_Writer_Excel2007;
 use think\Db;
 
 class LocalScript extends Pzlife
@@ -49,7 +51,7 @@ class LocalScript extends Pzlife
                     array(
                         'topic' => 'test1',
                         'value' => 'test1....message.',
-                        'key'   => '',
+                        'key' => '',
                     ),
                 ));
                 var_dump($result);
@@ -90,19 +92,19 @@ class LocalScript extends Pzlife
             return ['code' => '4001'];
         }
         //接口POST请求方法
-        $news                  = [];
-        $requestUrl            = 'https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token=' . $access_token;
-        $type                  = "news";
-        $requestData           = [];
+        $news = [];
+        $requestUrl = 'https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token=' . $access_token;
+        $type = "news";
+        $requestData = [];
         $redisBatchgetMaterial = Config::get('redisKey.weixin.redisBatchgetMaterial');
-        $count                 = 20;
-        $page                  = 1;
-        $offset                = ($page - 1) * $count;
+        $count = 20;
+        $page = 1;
+        $offset = ($page - 1) * $count;
         do {
             $requestData = [
-                'type'   => $type,
+                'type' => $type,
                 'offset' => $offset,
-                'count'  => $count,
+                'count' => $count,
             ];
             $requsest_subject = json_decode($this->sendRequestWx($requestUrl, $requestData), true);
             if (!isset($requsest_subject['item'])) {
@@ -118,7 +120,7 @@ class LocalScript extends Pzlife
                         unset($value['content']);
                         $value['create_time'] = date("Y-m-d H:i:s", $BatchgetMaterial['content']['create_time']);
                         $value['update_time'] = date("Y-m-d H:i:s", $BatchgetMaterial['content']['update_time']);
-                        $news[]               = $value;
+                        $news[] = $value;
                     }
                 }
                 $page++;
@@ -134,7 +136,7 @@ class LocalScript extends Pzlife
         die;
     }
 
-    function sendRequestWx($requestUrl, $data = [])
+    public function sendRequestWx($requestUrl, $data = [])
     {
         $curl = curl_init();
         $data = json_encode($data);
@@ -160,13 +162,13 @@ class LocalScript extends Pzlife
     {
         $this->orderInit();
         $redisAccessTokenTencent = Config::get('redisKey.weixin.redisAccessTokenTencent');
-        $access_token            = $this->redis->get($redisAccessTokenTencent);
+        $access_token = $this->redis->get($redisAccessTokenTencent);
         if (empty($access_token)) {
             // $appid = Env::get('weixin.weixin_appid');
             $appid = 'wx112088ff7b4ab5f3';
             // $secret = Env::get('weixin.weixin_secret');
-            $secret           = 'db7915c4a840421683be99c6d798757f';
-            $requestUrl       = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' . $appid . '&secret=' . $secret;
+            $secret = 'db7915c4a840421683be99c6d798757f';
+            $requestUrl = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' . $appid . '&secret=' . $secret;
             $requsest_subject = json_decode(sendRequest($requestUrl), true);
             if (!isset($requsest_subject['access_token'])) {
                 return false;
@@ -182,11 +184,11 @@ class LocalScript extends Pzlife
 
     public function numberDetection()
     {
-        $secret_id  = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
+        $secret_id = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
         $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
-        $api        = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
-        $ts         = date("YmdHis", time());
-        $sig        = sha1($secret_id . $secret_key . $ts);
+        $api = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
+        $ts = date("YmdHis", time());
+        $sig = sha1($secret_id . $secret_key . $ts);
         // // echo $sig;
         $mobile = '15201926171';
         // return $this->encrypt($mobile, $secret_id);
@@ -218,7 +220,7 @@ class LocalScript extends Pzlife
         // print_r($data);
     }
 
-    function sendRequest2($requestUrl, $method = 'get', $data = [], $headers)
+    public function sendRequest2($requestUrl, $method = 'get', $data = [], $headers)
     {
         $methonArr = ['get', 'post'];
         if (!in_array(strtolower($method), $methonArr)) {
@@ -275,7 +277,7 @@ class LocalScript extends Pzlife
         // // print_r($max_id);
 
         $mobile_data = [];
-        $ALL_NUM     = Db::query("SELECT `mobile`,`real_message` FROM yx_send_task_receipt WHERE (`real_message` LIKE '%MK%' OR `real_message` LIKE '%MI%' OR `real_message` LIKE '%MN%' OR `real_message` LIKE '%MO%'  OR `real_message` LIKE '%UNDELI%') GROUP BY `mobile`,`real_message` ");
+        $ALL_NUM = Db::query("SELECT `mobile`,`real_message` FROM yx_send_task_receipt WHERE (`real_message` LIKE '%MK%' OR `real_message` LIKE '%MI%' OR `real_message` LIKE '%MN%' OR `real_message` LIKE '%MO%'  OR `real_message` LIKE '%UNDELI%') GROUP BY `mobile`,`real_message` ");
         /*  $max_num = $max_id[0]['id'];
         for ($i=0; $i < $max_num; $i++) {
         $receipts = Db::query('SELECT ');
@@ -309,12 +311,12 @@ class LocalScript extends Pzlife
         }
         $mobile_data = array_unique($mobile_data);
         // // echo count($mobile_data);
-        $i             = 1;
+        $i = 1;
         $insert_mobile = [];
         foreach ($mobile_data as $key => $value) {
             $mobile = [];
             $mobile = [
-                'mobile'      => $value,
+                'mobile' => $value,
                 'update_time' => time(),
                 'create_time' => time(),
             ];
@@ -323,7 +325,7 @@ class LocalScript extends Pzlife
             if ($i > 100) {
                 Db::table('yx_mobile')->insertAll($insert_mobile);
                 $insert_mobile = [];
-                $i             = 1;
+                $i = 1;
             }
         }
         if (!empty($insert_mobile)) {
@@ -338,7 +340,7 @@ class LocalScript extends Pzlife
         // // print_r($max_id);
 
         $mobile_data = [];
-        $ALL_NUM     = Db::query("SELECT `mobile` FROM yx_send_task_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile` ");
+        $ALL_NUM = Db::query("SELECT `mobile` FROM yx_send_task_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile` ");
         /*  $max_num = $max_id[0]['id'];
         for ($i=0; $i < $max_num; $i++) {
         $receipts = Db::query('SELECT ');
@@ -355,13 +357,13 @@ class LocalScript extends Pzlife
             $mobile_data[] = $value['mobile'];
         }
 
-        $mobile_data   = array_unique($mobile_data);
-        $i             = 1;
+        $mobile_data = array_unique($mobile_data);
+        $i = 1;
         $insert_mobile = [];
         foreach ($mobile_data as $key => $value) {
             $mobile = [];
             $mobile = [
-                'mobile'      => $value,
+                'mobile' => $value,
                 'update_time' => time(),
                 'create_time' => time(),
             ];
@@ -370,14 +372,14 @@ class LocalScript extends Pzlife
             if ($i > 100) {
                 Db::table('yx_real_mobile')->insertAll($insert_mobile);
                 $insert_mobile = [];
-                $i             = 1;
+                $i = 1;
             }
         }
         if (!empty($insert_mobile)) {
             Db::table('yx_real_mobile')->insertAll($insert_mobile);
         }
         $mobile_data = [];
-        $ALL_NUM     = Db::query("SELECT `mobile` FROM yx_send_code_task_receipt WHERE `real_message` = 'DELIVRD'  OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`");
+        $ALL_NUM = Db::query("SELECT `mobile` FROM yx_send_code_task_receipt WHERE `real_message` = 'DELIVRD'  OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`");
         /*  $max_num = $max_id[0]['id'];
         for ($i=0; $i < $max_num; $i++) {
         $receipts = Db::query('SELECT ');
@@ -393,13 +395,13 @@ class LocalScript extends Pzlife
             // ];
             $mobile_data[] = $value['mobile'];
         }
-        $mobile_data   = array_unique($mobile_data);
-        $i             = 1;
+        $mobile_data = array_unique($mobile_data);
+        $i = 1;
         $insert_mobile = [];
         foreach ($mobile_data as $key => $value) {
             $mobile = [];
             $mobile = [
-                'mobile'      => $value,
+                'mobile' => $value,
                 'update_time' => time(),
                 'create_time' => time(),
             ];
@@ -408,24 +410,24 @@ class LocalScript extends Pzlife
             if ($i > 100) {
                 Db::table('yx_real_mobile')->insertAll($insert_mobile);
                 $insert_mobile = [];
-                $i             = 1;
+                $i = 1;
             }
         }
         if (!empty($insert_mobile)) {
             Db::table('yx_real_mobile')->insertAll($insert_mobile);
         }
         $mobile_data = [];
-        $ALL_NUM     = Db::query("SELECT `mobile` FROM yx_user_send_code_task_log WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile` ");
+        $ALL_NUM = Db::query("SELECT `mobile` FROM yx_user_send_code_task_log WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile` ");
         foreach ($ALL_NUM as $key => $value) {
             $mobile_data[] = $value['mobile'];
         }
-        $mobile_data   = array_unique($mobile_data);
-        $i             = 1;
+        $mobile_data = array_unique($mobile_data);
+        $i = 1;
         $insert_mobile = [];
         foreach ($mobile_data as $key => $value) {
             $mobile = [];
             $mobile = [
-                'mobile'      => $value,
+                'mobile' => $value,
                 'update_time' => time(),
                 'create_time' => time(),
             ];
@@ -434,24 +436,24 @@ class LocalScript extends Pzlife
             if ($i > 100) {
                 Db::table('yx_real_mobile')->insertAll($insert_mobile);
                 $insert_mobile = [];
-                $i             = 1;
+                $i = 1;
             }
         }
         if (!empty($insert_mobile)) {
             Db::table('yx_real_mobile')->insertAll($insert_mobile);
         }
         $mobile_data = [];
-        $ALL_NUM     = Db::query("SELECT `mobile_content` FROM yx_user_send_game_task WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile_content` ");
+        $ALL_NUM = Db::query("SELECT `mobile_content` FROM yx_user_send_game_task WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile_content` ");
         foreach ($ALL_NUM as $key => $value) {
             $mobile_data[] = $value['mobile_content'];
         }
-        $mobile_data   = array_unique($mobile_data);
-        $i             = 1;
+        $mobile_data = array_unique($mobile_data);
+        $i = 1;
         $insert_mobile = [];
         foreach ($mobile_data as $key => $value) {
             $mobile = [];
             $mobile = [
-                'mobile'      => $value,
+                'mobile' => $value,
                 'update_time' => time(),
                 'create_time' => time(),
             ];
@@ -460,24 +462,24 @@ class LocalScript extends Pzlife
             if ($i > 100) {
                 Db::table('yx_real_mobile')->insertAll($insert_mobile);
                 $insert_mobile = [];
-                $i             = 1;
+                $i = 1;
             }
         }
         if (!empty($insert_mobile)) {
             Db::table('yx_real_mobile')->insertAll($insert_mobile);
         }
         $mobile_data = [];
-        $ALL_NUM     = Db::query("SELECT `mobile` FROM yx_user_send_task_log WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile` ");
+        $ALL_NUM = Db::query("SELECT `mobile` FROM yx_user_send_task_log WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile` ");
         foreach ($ALL_NUM as $key => $value) {
             $mobile_data[] = $value['mobile'];
         }
-        $mobile_data   = array_unique($mobile_data);
-        $i             = 1;
+        $mobile_data = array_unique($mobile_data);
+        $i = 1;
         $insert_mobile = [];
         foreach ($mobile_data as $key => $value) {
             $mobile = [];
             $mobile = [
-                'mobile'      => $value,
+                'mobile' => $value,
                 'update_time' => time(),
                 'create_time' => time(),
             ];
@@ -486,24 +488,24 @@ class LocalScript extends Pzlife
             if ($i > 100) {
                 Db::table('yx_real_mobile')->insertAll($insert_mobile);
                 $insert_mobile = [];
-                $i             = 1;
+                $i = 1;
             }
         }
         if (!empty($insert_mobile)) {
             Db::table('yx_real_mobile')->insertAll($insert_mobile);
         }
         $mobile_data = [];
-        $ALL_NUM     = Db::query("SELECT `mobile` FROM yx_user_multimedia_message_log WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile` ");
+        $ALL_NUM = Db::query("SELECT `mobile` FROM yx_user_multimedia_message_log WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile` ");
         foreach ($ALL_NUM as $key => $value) {
             $mobile_data[] = $value['mobile'];
         }
-        $mobile_data   = array_unique($mobile_data);
-        $i             = 1;
+        $mobile_data = array_unique($mobile_data);
+        $i = 1;
         $insert_mobile = [];
         foreach ($mobile_data as $key => $value) {
             $mobile = [];
             $mobile = [
-                'mobile'      => $value,
+                'mobile' => $value,
                 'update_time' => time(),
                 'create_time' => time(),
             ];
@@ -512,26 +514,26 @@ class LocalScript extends Pzlife
             if ($i > 100) {
                 Db::table('yx_real_mobile')->insertAll($insert_mobile);
                 $insert_mobile = [];
-                $i             = 1;
+                $i = 1;
             }
         }
         if (!empty($insert_mobile)) {
             Db::table('yx_real_mobile')->insertAll($insert_mobile);
         }
-        $mobile_data   = [];
+        $mobile_data = [];
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $mysql_connect->query("set names utf8mb4");
         $ALL_NUM = $mysql_connect->query("SELECT `mobile` FROM yx_sfl_send_task_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile` ");
         foreach ($ALL_NUM as $key => $value) {
             $mobile_data[] = $value['mobile'];
         }
-        $mobile_data   = array_unique($mobile_data);
-        $i             = 1;
+        $mobile_data = array_unique($mobile_data);
+        $i = 1;
         $insert_mobile = [];
         foreach ($mobile_data as $key => $value) {
             $mobile = [];
             $mobile = [
-                'mobile'      => $value,
+                'mobile' => $value,
                 'update_time' => time(),
                 'create_time' => time(),
             ];
@@ -540,24 +542,24 @@ class LocalScript extends Pzlife
             if ($i > 100) {
                 Db::table('yx_real_mobile')->insertAll($insert_mobile);
                 $insert_mobile = [];
-                $i             = 1;
+                $i = 1;
             }
         }
         if (!empty($insert_mobile)) {
             Db::table('yx_real_mobile')->insertAll($insert_mobile);
         }
         $mobile_data = [];
-        $ALL_NUM     = $mysql_connect->query("SELECT `mobile` FROM yx_sfl_send_multimediatask_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile` ");
+        $ALL_NUM = $mysql_connect->query("SELECT `mobile` FROM yx_sfl_send_multimediatask_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile` ");
         foreach ($ALL_NUM as $key => $value) {
             $mobile_data[] = $value['mobile'];
         }
-        $mobile_data   = array_unique($mobile_data);
-        $i             = 1;
+        $mobile_data = array_unique($mobile_data);
+        $i = 1;
         $insert_mobile = [];
         foreach ($mobile_data as $key => $value) {
             $mobile = [];
             $mobile = [
-                'mobile'      => $value,
+                'mobile' => $value,
                 'update_time' => time(),
                 'create_time' => time(),
             ];
@@ -566,7 +568,7 @@ class LocalScript extends Pzlife
             if ($i > 100) {
                 Db::table('yx_real_mobile')->insertAll($insert_mobile);
                 $insert_mobile = [];
-                $i             = 1;
+                $i = 1;
             }
         }
         if (!empty($insert_mobile)) {
@@ -592,11 +594,11 @@ class LocalScript extends Pzlife
 
     public function mobileCheckTest()
     {
-        $secret_id  = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
+        $secret_id = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
         $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
-        $api        = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
-        $ts         = date("YmdHis", time());
-        $sig        = sha1($secret_id . $secret_key . $ts);
+        $api = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
+        $ts = date("YmdHis", time());
+        $sig = sha1($secret_id . $secret_key . $ts);
         // // echo $sig;
         $mobile = '15201926171';
         // return $this->encrypt($mobile, $secret_id);
@@ -605,8 +607,8 @@ class LocalScript extends Pzlife
         $api = $api . $sig . "&sid=" . $secret_id . "&skey=" . $secret_key . "&ts=" . $ts;
         // $check_mobile = $this->decrypt('6C38881649F7003B910582D1095DA821',$secret_id);
         // // print_r($check_mobile);die;
-        $data         = [];
-        $mobiles      = Db::query("SELECT `mobile` FROM  yx_mobile limit 500");
+        $data = [];
+        $mobiles = Db::query("SELECT `mobile` FROM  yx_mobile limit 500");
         $check_mobile = [];
         foreach ($mobiles as $key => $value) {
             $check_mobile[] = $this->encrypt($value['mobile'], $secret_id);
@@ -636,28 +638,28 @@ class LocalScript extends Pzlife
         if ($result['code'] == 0) { //接口请求成功
             $mobiles = $result['mobiles'];
             foreach ($mobiles as $key => $value) {
-                $mobile       = $this->decrypt($value['mobile'], $secret_id);
+                $mobile = $this->decrypt($value['mobile'], $secret_id);
                 $check_result = $value['mobileStatus'];
                 $check_status = 2;
                 if ($check_result == 2) {
                     Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
                     Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
                     Db::table('yx_real_mobile')->insert([
-                        'mobile'       => $mobile,
+                        'mobile' => $mobile,
                         'check_result' => 3,
                         'check_status' => $check_status,
-                        'update_time'  => time(),
-                        'create_time'  => time(),
+                        'update_time' => time(),
+                        'create_time' => time(),
                     ]);
                 } else {
                     Db::table('yx_real_mobile')->where(['mobile' => $mobile])->delete();
                     Db::table('yx_mobile')->where(['mobile' => $mobile])->delete();
                     Db::table('yx_mobile')->insert([
-                        'mobile'       => $mobile,
+                        'mobile' => $mobile,
                         'check_result' => $check_result,
                         'check_status' => $check_status,
-                        'update_time'  => time(),
-                        'create_time'  => time(),
+                        'update_time' => time(),
+                        'create_time' => time(),
                     ]);
                 }
             }
@@ -672,10 +674,10 @@ class LocalScript extends Pzlife
             // $end_time = time();
             while (true) {
                 $all_mobiles = [];
-                $start_time  = $start_time;
+                $start_time = $start_time;
                 $end_time = $start_time + 86400;
                 // echo "SELECT `uid`,`task_no`,`mobile` FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `create_time` >= '".$start_time."' AND `create_time` < '".$end_time."' GROUP BY `uid`,`task_no`,`mobile`  ";die;
-                $mobile      = Db::query("SELECT `uid`,`task_no`,`mobile` FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' GROUP BY `uid`,`task_no`,`mobile`  ");
+                $mobile = Db::query("SELECT `uid`,`task_no`,`mobile` FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' GROUP BY `uid`,`task_no`,`mobile`  ");
                 $start_time = $end_time;
                 foreach ($mobile as $key => $value) {
                     // print_r($value);die;
@@ -685,11 +687,11 @@ class LocalScript extends Pzlife
                         if (in_array($time_key, $all_mobiles[$value['uid']][$value['mobile']]['date'])) {
                             $all_mobiles[$value['uid']][$value['mobile']]['day_times'][$time_key]++;
                         } else {
-                            $all_mobiles[$value['uid']][$value['mobile']]['date'][]               = $time_key;
+                            $all_mobiles[$value['uid']][$value['mobile']]['date'][] = $time_key;
                             $all_mobiles[$value['uid']][$value['mobile']]['day_times'][$time_key] = 1;
                         }
                     } else {
-                        $all_mobiles[$value['uid']][$value['mobile']]['date'][]               = $time_key;
+                        $all_mobiles[$value['uid']][$value['mobile']]['date'][] = $time_key;
                         $all_mobiles[$value['uid']][$value['mobile']]['day_times'][$time_key] = 1;
                     }
                     //    // print_r($all_mobiles);die;
@@ -701,8 +703,8 @@ class LocalScript extends Pzlife
                     foreach ($value as $ukey => $uvalue) {
                         $mobile_times = [];
                         $mobile_times = [
-                            'uid'       => $key,
-                            'mobile'    => $ukey,
+                            'uid' => $key,
+                            'mobile' => $ukey,
                             'day_times' => count($uvalue['date']),
                             'max_times' => max($uvalue['day_times']),
                             'all_times' => array_sum($uvalue['day_times']),
@@ -729,7 +731,7 @@ class LocalScript extends Pzlife
                 }
             }
             die;
-            $mobile      = Db::query("SELECT `uid`,`task_no`,`mobile` FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) GROUP BY `uid`,`task_no`,`mobile`  ");
+            $mobile = Db::query("SELECT `uid`,`task_no`,`mobile` FROM yx_user_send_task_log WHERE `uid` IN (SELECT `id` FROM yx_users WHERE `pid` = 137) GROUP BY `uid`,`task_no`,`mobile`  ");
             $all_mobiles = [];
             foreach ($mobile as $key => $value) {
                 // print_r($value);die;
@@ -739,11 +741,11 @@ class LocalScript extends Pzlife
                     if (in_array($time_key, $all_mobiles[$value['uid']][$value['mobile']]['date'])) {
                         $all_mobiles[$value['uid']][$value['mobile']]['day_times'][$time_key]++;
                     } else {
-                        $all_mobiles[$value['uid']][$value['mobile']]['date'][]               = $time_key;
+                        $all_mobiles[$value['uid']][$value['mobile']]['date'][] = $time_key;
                         $all_mobiles[$value['uid']][$value['mobile']]['day_times'][$time_key] = 1;
                     }
                 } else {
-                    $all_mobiles[$value['uid']][$value['mobile']]['date'][]               = $time_key;
+                    $all_mobiles[$value['uid']][$value['mobile']]['date'][] = $time_key;
                     $all_mobiles[$value['uid']][$value['mobile']]['day_times'][$time_key] = 1;
                 }
                 //    // print_r($all_mobiles);die;
@@ -755,8 +757,8 @@ class LocalScript extends Pzlife
                 foreach ($value as $ukey => $uvalue) {
                     $mobile_times = [];
                     $mobile_times = [
-                        'uid'       => $key,
-                        'mobile'    => $ukey,
+                        'uid' => $key,
+                        'mobile' => $ukey,
                         'day_times' => count($uvalue['date']),
                         'max_times' => max($uvalue['day_times']),
                         'all_times' => array_sum($uvalue['day_times']),
@@ -776,13 +778,13 @@ class LocalScript extends Pzlife
     {
         try {
             $mobileredis = PhpredisNew::getConn();
-            $redis       = Phpredis::getConn();
+            $redis = Phpredis::getConn();
             // print_r($this->redis);
             ini_set('memory_limit', '10240M'); // 临时设置最大内存占用为3G
             /* 白名单设置 */
             $white_mobiles = Db::query("SELECT * FROM yx_whitelist ");
             foreach ($white_mobiles as $key => $value) {
-                $data   = [];
+                $data = [];
                 $prefix = substr(trim($value['mobile']), 0, 7);
                 // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                 // $newres = array_shift($res);
@@ -794,9 +796,9 @@ class LocalScript extends Pzlife
                     // print_r($source);die;
                     $newres = [];
                     $newres = [
-                        'source'      => $source['source'],
+                        'source' => $source['source'],
                         'province_id' => $source['province_id'],
-                        'city_id'     => $source['city_id'],
+                        'city_id' => $source['city_id'],
                     ];
                 }
                 $mobileredis->hset('yx:mobile:white', $value['mobile'], json_encode($newres));
@@ -804,7 +806,7 @@ class LocalScript extends Pzlife
             /* 黑名单设置 */
             $black_mobiles = Db::query("SELECT * FROM yx_blacklist ");
             foreach ($black_mobiles as $key => $value) {
-                $data   = [];
+                $data = [];
                 $prefix = substr(trim($value['mobile']), 0, 7);
                 // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                 // $newres = array_shift($res);
@@ -816,9 +818,9 @@ class LocalScript extends Pzlife
                     // print_r($source);die;
                     $newres = [];
                     $newres = [
-                        'source'      => $source['source'],
+                        'source' => $source['source'],
                         'province_id' => $source['province_id'],
-                        'city_id'     => $source['city_id'],
+                        'city_id' => $source['city_id'],
                     ];
                 }
                 $mobileredis->hset('yx:mobile:black', $value['mobile'], json_encode($newres));
@@ -827,7 +829,7 @@ class LocalScript extends Pzlife
             /* 空号设置 */
             $empty_mobiles = Db::query("SELECT * FROM yx_mobile ");
             foreach ($empty_mobiles as $key => $value) {
-                $data   = [];
+                $data = [];
                 $prefix = substr(trim($value['mobile']), 0, 7);
                 // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                 // $newres = array_shift($res);
@@ -839,13 +841,13 @@ class LocalScript extends Pzlife
                     // print_r($source);die;
                     $newres = [];
                     $newres = [
-                        'source'      => $source['source'],
+                        'source' => $source['source'],
                         'province_id' => $source['province_id'],
-                        'city_id'     => $source['city_id'],
+                        'city_id' => $source['city_id'],
                     ];
                 }
                 $newres['check_status'] = $value['check_status'];
-                $newres['update_time']  = $value['update_time'];
+                $newres['update_time'] = $value['update_time'];
                 $newres['check_result'] = $value['check_result'];
                 $mobileredis->hset('yx:mobile:empty', $value['mobile'], json_encode($newres));
             }
@@ -854,7 +856,7 @@ class LocalScript extends Pzlife
             $real_mobiles = Db::query("SELECT * FROM yx_real_mobile ");
 
             foreach ($real_mobiles as $key => $value) {
-                $data   = [];
+                $data = [];
                 $prefix = substr(trim($value['mobile']), 0, 7);
                 // $res    = Db::query("SELECT `source`,`province_id`,`city_id` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                 // $newres = array_shift($res);
@@ -871,153 +873,153 @@ class LocalScript extends Pzlife
                 }
                 if ($prefix == 1650006) {
                     $newres = [
-                        'source'      => 1,
+                        'source' => 1,
                         'province_id' => 1802,
-                        'city_id'     => 1803,
+                        'city_id' => 1803,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif ($prefix == 1650713) {
                     $newres = [
-                        'source'      => 1,
+                        'source' => 1,
                         'province_id' => 1802,
-                        'city_id'     => 1885,
+                        'city_id' => 1885,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif ($prefix == 1651033) {
                     $newres = [
-                        'source'      => 1,
+                        'source' => 1,
                         'province_id' => 1426,
-                        'city_id'     => 1439,
+                        'city_id' => 1439,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif ($prefix == 1653427) {
                     $newres = [
-                        'source'      => 1,
+                        'source' => 1,
                         'province_id' => 499,
-                        'city_id'     => 586,
+                        'city_id' => 586,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif (in_array($prefix, [1660020, 1660021, 1660025, 1660027, 1660034, 1662236, 1662237, 1662215, 1662288, 1662290])) { //天津联通
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 19,
-                        'city_id'     => 20,
+                        'city_id' => 20,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif (in_array($prefix, [1660102, 1660114, 1660137, 1660152, 1660155])) { //北京联通
 
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 1,
-                        'city_id'     => 2,
+                        'city_id' => 2,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif (in_array($prefix, [1660170, 1660173, 1660178, 1660179, 1660181, 1660183, 1660184, 1660174, 1662102, 1662103, 1662107, 1662109, 1660214, 1662120, 1662122, 1662123, 1662152, 1662160, 1662167, 1662169, 1662171, 1662173, 1662174, 1662178, 1662179])) { //上海联通
 
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 841,
-                        'city_id'     => 842,
+                        'city_id' => 842,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif ($prefix == 1660271) {
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 1802,
-                        'city_id'     => 1803,
+                        'city_id' => 1803,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif ($prefix == 1660272) {
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 1802,
-                        'city_id'     => 1803,
+                        'city_id' => 1803,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif ($prefix == 1660351) {
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 240,
-                        'city_id'     => 241,
+                        'city_id' => 241,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif ($prefix == 1660371) {
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 1601,
-                        'city_id'     => 1602,
+                        'city_id' => 1602,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif ($prefix == 1660387) {
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 1601,
-                        'city_id'     => 1602,
+                        'city_id' => 1602,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif ($prefix == 1660396) {
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 1601,
-                        'city_id'     => 1788,
+                        'city_id' => 1788,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif ($prefix == 1660399) {
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 1601,
-                        'city_id'     => 1602,
+                        'city_id' => 1602,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif ($prefix == 1660427) {
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 499,
-                        'city_id'     => 586,
+                        'city_id' => 586,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif ($prefix == 1660471) {
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 377,
-                        'city_id'     => 378,
+                        'city_id' => 378,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif ($prefix == 1660532) {
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 1426,
-                        'city_id'     => 1439,
+                        'city_id' => 1439,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif ($prefix == 1660713) {
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 1802,
-                        'city_id'     => 1439,
+                        'city_id' => 1439,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif ($prefix == 1660875) {
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 2801,
-                        'city_id'     => 2837,
+                        'city_id' => 2837,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif (in_array($prefix, [1662303, 1662312, 1662331])) { //重庆联通
 
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 2454,
-                        'city_id'     => 2455,
+                        'city_id' => 2455,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif (in_array($prefix, [1662477])) { //广州联通
 
                     $newres = [
-                        'source'      => 2,
+                        'source' => 2,
                         'province_id' => 2076,
-                        'city_id'     => 2077,
+                        'city_id' => 2077,
                     ];
                     $redis->hset('index:mobile:source', $prefix, json_encode($newres));
                 } elseif (substr(trim($value['mobile']), 0, 3) == 166) {
@@ -1045,13 +1047,13 @@ class LocalScript extends Pzlife
                     $source = $source[0];
                     $newres = [];
                     $newres = [
-                        'source'      => $source['source'],
+                        'source' => $source['source'],
                         'province_id' => $source['province_id'],
-                        'city_id'     => $source['city_id'],
+                        'city_id' => $source['city_id'],
                     ];
                 }
 
-                $newres['update_time']  = $value['update_time'];
+                $newres['update_time'] = $value['update_time'];
                 $newres['check_status'] = $value['check_status'];
                 $newres['check_result'] = $value['check_result'];
                 $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
@@ -1072,7 +1074,7 @@ class LocalScript extends Pzlife
     public function resultSumForUserSendCondition($uid, $time)
     {
         $start_time = strtotime($time);
-        $end_time   = $start_time + 86400;
+        $end_time = $start_time + 86400;
         /* SELECT * FROM `yx_user_send_task` WHERE `uid` =205 AND `create_time` >= '1594310400' AND `create_time` <= '1594656000';
     SELECT SUM(`real_num`) FROM `yx_user_send_task` WHERE `uid` =205 AND `create_time` >= '1594310400' AND `create_time` <= '1594656000';
     SELECT SUM(`send_num`) FROM `yx_user_send_task` WHERE `uid` =205 AND `create_time` >= '1594310400' AND `create_time` <= '1594656000';
@@ -1085,18 +1087,18 @@ class LocalScript extends Pzlife
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         while (true) {
-            $year_businessSettlement  = [];
+            $year_businessSettlement = [];
             $month_businessSettlement = [];
-            $day_businessSettlement   = [];
-            $year_users               = [];
-            $month_users              = [];
-            $day_users                = [];
+            $day_businessSettlement = [];
+            $year_users = [];
+            $month_users = [];
+            $day_users = [];
             // $start_time               = strtotime('-10 days');
             // print_r($start_time);die;
             $Received = updateReceivedForMessage();
             array_push($Received, 'DELIVRD');
             $Received_status = '';
-            $or              = '';
+            $or = '';
             foreach ($Received as $key => $value) {
                 $Received_status .= $or . "'" . $value . "'";
                 $or = ',';
@@ -1106,15 +1108,15 @@ class LocalScript extends Pzlife
                 $end_time = $start_time + 86400;
                 if ($end_time > time()) {
                     // break;
-                    $end_time               = time();
+                    $end_time = time();
                     $day_businessSettlement = [];
-                    $day_users              = [];
-                    $code_task              = [];
-                    $code_task              = Db::query("SELECT * FROM yx_user_send_code_task WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
+                    $day_users = [];
+                    $code_task = [];
+                    $code_task = Db::query("SELECT * FROM yx_user_send_code_task WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
                     foreach ($code_task as $key => $value) {
 
                         $send_length = mb_strlen($value['task_content'], 'utf8');
-                        $num         = 1;
+                        $num = 1;
                         if ($send_length > 70) {
                             $num = ceil($send_length / 67);
                         }
@@ -1125,7 +1127,7 @@ class LocalScript extends Pzlife
                         }
                         $task_log = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `task_no` = '" . $value['task_no'] . "' ");
                         // print_r($task_log);die;
-                        $allnum       = count(explode(',', $value['mobile_content']));
+                        $allnum = count(explode(',', $value['mobile_content']));
                         $charging_num = $allnum * $num;
                         if (empty($task_log)) { //失败
                             $success_num = 0;
@@ -1181,12 +1183,12 @@ class LocalScript extends Pzlife
                         // $day_businessSettlement[$day][$value['uid']]['default'] = $num;
                         } */
                         } else {
-                            $day_users[$day][]                                         = $value['uid'];
-                            $day_businessSettlement[$day][$value['uid']]['num']        = $charging_num;
+                            $day_users[$day][] = $value['uid'];
+                            $day_businessSettlement[$day][$value['uid']]['num'] = $charging_num;
                             $day_businessSettlement[$day][$value['uid']]['mobile_num'] = $allnum;
-                            $day_businessSettlement[$day][$value['uid']]['success']    = $success_num;
-                            $day_businessSettlement[$day][$value['uid']]['unknown']    = $unknown_num;
-                            $day_businessSettlement[$day][$value['uid']]['default']    = $default_num;
+                            $day_businessSettlement[$day][$value['uid']]['success'] = $success_num;
+                            $day_businessSettlement[$day][$value['uid']]['unknown'] = $unknown_num;
+                            $day_businessSettlement[$day][$value['uid']]['default'] = $default_num;
                             /*  if ($value['status_message'] == 'DELIVRD') {
 
                         } elseif ($value['status_message'] == '') {
@@ -1201,7 +1203,7 @@ class LocalScript extends Pzlife
                         foreach ($day_businessSettlement as $dkey => $d_value) {
                             foreach ($d_value as $key => $value) {
                                 $success = isset($value['success']) ? $value['success'] : 0;
-                                $num     = isset($value['num']) ? $value['num'] : 0;
+                                $num = isset($value['num']) ? $value['num'] : 0;
                                 if ($key == 47 && $dkey == 20200122) {
                                     $num = $num + 5784;
                                 }
@@ -1210,14 +1212,14 @@ class LocalScript extends Pzlife
                                 }
                                 $day_user_settlement = [];
                                 $day_user_settlement = [
-                                    'timekey'     => $dkey,
-                                    'uid'         => $key,
-                                    'success'     => $success,
-                                    'unknown'     => isset($value['unknown']) ? $value['unknown'] : 0,
-                                    'default'     => isset($value['default']) ? $value['default'] : 0,
-                                    'num'         => $num,
-                                    'ratio'       => $success / $num * 100,
-                                    'mobile_num'  => $value['mobile_num'],
+                                    'timekey' => $dkey,
+                                    'uid' => $key,
+                                    'success' => $success,
+                                    'unknown' => isset($value['unknown']) ? $value['unknown'] : 0,
+                                    'default' => isset($value['default']) ? $value['default'] : 0,
+                                    'num' => $num,
+                                    'ratio' => $success / $num * 100,
+                                    'mobile_num' => $value['mobile_num'],
                                     'business_id' => '6',
                                     'create_time' => time(),
                                     'update_time' => time(),
@@ -1225,12 +1227,12 @@ class LocalScript extends Pzlife
                                 $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 6 AND `timekey` = ' . $dkey . ' AND `uid` = ' . $key);
                                 if ($has) {
                                     Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                        'success'     => $success,
-                                        'unknown'     => isset($value['unknown']) ? $value['unknown'] : 0,
-                                        'default'     => isset($value['default']) ? $value['default'] : 0,
-                                        'num'         => $num,
-                                        'mobile_num'  => $value['mobile_num'],
-                                        'ratio'       => $success / $num * 100,
+                                        'success' => $success,
+                                        'unknown' => isset($value['unknown']) ? $value['unknown'] : 0,
+                                        'default' => isset($value['default']) ? $value['default'] : 0,
+                                        'num' => $num,
+                                        'mobile_num' => $value['mobile_num'],
+                                        'ratio' => $success / $num * 100,
                                         'update_time' => time(),
                                     ]);
                                 } else {
@@ -1246,13 +1248,13 @@ class LocalScript extends Pzlife
                     break;
                 } else {
                     $day_businessSettlement = [];
-                    $day_users              = [];
-                    $code_task              = [];
-                    $code_task              = Db::query("SELECT * FROM yx_user_send_code_task WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
+                    $day_users = [];
+                    $code_task = [];
+                    $code_task = Db::query("SELECT * FROM yx_user_send_code_task WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
                     foreach ($code_task as $key => $value) {
 
                         $send_length = mb_strlen($value['task_content'], 'utf8');
-                        $num         = 1;
+                        $num = 1;
                         if ($send_length > 70) {
                             $num = ceil($send_length / 67);
                         }
@@ -1263,7 +1265,7 @@ class LocalScript extends Pzlife
                         }
                         $task_log = Db::query("SELECT * FROM yx_user_send_code_task_log WHERE `task_no` = '" . $value['task_no'] . "' ");
                         // print_r($task_log);die;
-                        $allnum       = count(explode(',', $value['mobile_content']));
+                        $allnum = count(explode(',', $value['mobile_content']));
                         $charging_num = $allnum * $num;
                         if (empty($task_log)) { //失败
                             $success_num = 0;
@@ -1319,12 +1321,12 @@ class LocalScript extends Pzlife
                         // $day_businessSettlement[$day][$value['uid']]['default'] = $num;
                         } */
                         } else {
-                            $day_users[$day][]                                         = $value['uid'];
-                            $day_businessSettlement[$day][$value['uid']]['num']        = $charging_num;
+                            $day_users[$day][] = $value['uid'];
+                            $day_businessSettlement[$day][$value['uid']]['num'] = $charging_num;
                             $day_businessSettlement[$day][$value['uid']]['mobile_num'] = $allnum;
-                            $day_businessSettlement[$day][$value['uid']]['success']    = $success_num;
-                            $day_businessSettlement[$day][$value['uid']]['unknown']    = $unknown_num;
-                            $day_businessSettlement[$day][$value['uid']]['default']    = $default_num;
+                            $day_businessSettlement[$day][$value['uid']]['success'] = $success_num;
+                            $day_businessSettlement[$day][$value['uid']]['unknown'] = $unknown_num;
+                            $day_businessSettlement[$day][$value['uid']]['default'] = $default_num;
                             /*  if ($value['status_message'] == 'DELIVRD') {
 
                         } elseif ($value['status_message'] == '') {
@@ -1340,7 +1342,7 @@ class LocalScript extends Pzlife
                         foreach ($day_businessSettlement as $dkey => $d_value) {
                             foreach ($d_value as $key => $value) {
                                 $success = isset($value['success']) ? $value['success'] : 0;
-                                $num     = isset($value['num']) ? $value['num'] : 0;
+                                $num = isset($value['num']) ? $value['num'] : 0;
                                 if ($key == 47 && $dkey == 20200122) {
                                     $num = $num + 5784;
                                 }
@@ -1349,14 +1351,14 @@ class LocalScript extends Pzlife
                                 }
                                 $day_user_settlement = [];
                                 $day_user_settlement = [
-                                    'timekey'     => $dkey,
-                                    'uid'         => $key,
-                                    'success'     => $success,
-                                    'unknown'     => isset($value['unknown']) ? $value['unknown'] : 0,
-                                    'default'     => isset($value['default']) ? $value['default'] : 0,
-                                    'num'         => $num,
-                                    'ratio'       => $success / $num * 100,
-                                    'mobile_num'  => $value['mobile_num'],
+                                    'timekey' => $dkey,
+                                    'uid' => $key,
+                                    'success' => $success,
+                                    'unknown' => isset($value['unknown']) ? $value['unknown'] : 0,
+                                    'default' => isset($value['default']) ? $value['default'] : 0,
+                                    'num' => $num,
+                                    'ratio' => $success / $num * 100,
+                                    'mobile_num' => $value['mobile_num'],
                                     'business_id' => '6',
                                     'create_time' => time(),
                                     'update_time' => time(),
@@ -1364,12 +1366,12 @@ class LocalScript extends Pzlife
                                 $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 6 AND `timekey` = ' . $dkey . ' AND `uid` = ' . $key);
                                 if ($has) {
                                     Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                        'success'     => $success,
-                                        'unknown'     => isset($value['unknown']) ? $value['unknown'] : 0,
-                                        'default'     => isset($value['default']) ? $value['default'] : 0,
-                                        'num'         => $num,
-                                        'mobile_num'  => $value['mobile_num'],
-                                        'ratio'       => $success / $num * 100,
+                                        'success' => $success,
+                                        'unknown' => isset($value['unknown']) ? $value['unknown'] : 0,
+                                        'default' => isset($value['default']) ? $value['default'] : 0,
+                                        'num' => $num,
+                                        'mobile_num' => $value['mobile_num'],
+                                        'ratio' => $success / $num * 100,
                                         'update_time' => time(),
                                     ]);
                                 } else {
@@ -1395,18 +1397,18 @@ class LocalScript extends Pzlife
     {
         ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
         while (true) {
-            $year_businessSettlement  = [];
+            $year_businessSettlement = [];
             $month_businessSettlement = [];
-            $day_businessSettlement   = [];
-            $year_users               = [];
-            $month_users              = [];
-            $day_users                = [];
+            $day_businessSettlement = [];
+            $year_users = [];
+            $month_users = [];
+            $day_users = [];
             // $start_time               = strtotime('-10 days');
             // print_r($start_time);die;
             $Received = updateReceivedForMessage();
             array_push($Received, 'DELIVRD');
             $Received_status = '';
-            $or              = '';
+            $or = '';
             foreach ($Received as $key => $value) {
                 $Received_status .= $or . "'" . $value . "'";
                 $or = ',';
@@ -1416,16 +1418,16 @@ class LocalScript extends Pzlife
                 $end_time = $start_time + 86400;
                 if ($end_time > time()) {
                     // break;
-                    $end_time               = time();
+                    $end_time = time();
                     $day_businessSettlement = [];
-                    $day_users              = [];
-                    $code_task              = [];
-                    $code_task              = Db::query("SELECT * FROM yx_user_send_task WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
+                    $day_users = [];
+                    $code_task = [];
+                    $code_task = Db::query("SELECT * FROM yx_user_send_task WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
                     foreach ($code_task as $key => $value) {
                         print_r($value);
                         die;
                         $send_length = mb_strlen($value['task_content'], 'utf8');
-                        $num         = 1;
+                        $num = 1;
                         if ($send_length > 70) {
                             $num = ceil($send_length / 67);
                         }
@@ -1436,7 +1438,7 @@ class LocalScript extends Pzlife
                         }
                         $task_log = Db::query("SELECT * FROM yx_user_send_task_log WHERE `task_no` = '" . $value['task_no'] . "' ");
                         // print_r($task_log);die;
-                        $allnum       = count(explode(',', $value['mobile_content']));
+                        $allnum = count(explode(',', $value['mobile_content']));
                         $charging_num = $allnum * $num;
                         if (empty($task_log)) { //失败
                             $success_num = 0;
@@ -1492,12 +1494,12 @@ class LocalScript extends Pzlife
                         // $day_businessSettlement[$day][$value['uid']]['default'] = $num;
                         } */
                         } else {
-                            $day_users[$day][]                                         = $value['uid'];
-                            $day_businessSettlement[$day][$value['uid']]['num']        = $charging_num;
+                            $day_users[$day][] = $value['uid'];
+                            $day_businessSettlement[$day][$value['uid']]['num'] = $charging_num;
                             $day_businessSettlement[$day][$value['uid']]['mobile_num'] = $allnum;
-                            $day_businessSettlement[$day][$value['uid']]['success']    = $success_num;
-                            $day_businessSettlement[$day][$value['uid']]['unknown']    = $unknown_num;
-                            $day_businessSettlement[$day][$value['uid']]['default']    = $default_num;
+                            $day_businessSettlement[$day][$value['uid']]['success'] = $success_num;
+                            $day_businessSettlement[$day][$value['uid']]['unknown'] = $unknown_num;
+                            $day_businessSettlement[$day][$value['uid']]['default'] = $default_num;
                             /*  if ($value['status_message'] == 'DELIVRD') {
 
                         } elseif ($value['status_message'] == '') {
@@ -1512,7 +1514,7 @@ class LocalScript extends Pzlife
                         foreach ($day_businessSettlement as $dkey => $d_value) {
                             foreach ($d_value as $key => $value) {
                                 $success = isset($value['success']) ? $value['success'] : 0;
-                                $num     = isset($value['num']) ? $value['num'] : 0;
+                                $num = isset($value['num']) ? $value['num'] : 0;
                                 if ($key == 47 && $dkey == 20200122) {
                                     $num = $num + 5784;
                                 }
@@ -1521,14 +1523,14 @@ class LocalScript extends Pzlife
                                 }
                                 $day_user_settlement = [];
                                 $day_user_settlement = [
-                                    'timekey'     => $dkey,
-                                    'uid'         => $key,
-                                    'success'     => $success,
-                                    'unknown'     => isset($value['unknown']) ? $value['unknown'] : 0,
-                                    'default'     => isset($value['default']) ? $value['default'] : 0,
-                                    'num'         => $num,
-                                    'ratio'       => $success / $num * 100,
-                                    'mobile_num'  => $value['mobile_num'],
+                                    'timekey' => $dkey,
+                                    'uid' => $key,
+                                    'success' => $success,
+                                    'unknown' => isset($value['unknown']) ? $value['unknown'] : 0,
+                                    'default' => isset($value['default']) ? $value['default'] : 0,
+                                    'num' => $num,
+                                    'ratio' => $success / $num * 100,
+                                    'mobile_num' => $value['mobile_num'],
                                     'business_id' => '5',
                                     'create_time' => time(),
                                     'update_time' => time(),
@@ -1536,12 +1538,12 @@ class LocalScript extends Pzlife
                                 $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 5 AND `timekey` = ' . $dkey . ' AND `uid` = ' . $key);
                                 if ($has) {
                                     Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                        'success'     => $success,
-                                        'unknown'     => isset($value['unknown']) ? $value['unknown'] : 0,
-                                        'default'     => isset($value['default']) ? $value['default'] : 0,
-                                        'num'         => $num,
-                                        'mobile_num'  => $value['mobile_num'],
-                                        'ratio'       => $success / $num * 100,
+                                        'success' => $success,
+                                        'unknown' => isset($value['unknown']) ? $value['unknown'] : 0,
+                                        'default' => isset($value['default']) ? $value['default'] : 0,
+                                        'num' => $num,
+                                        'mobile_num' => $value['mobile_num'],
+                                        'ratio' => $success / $num * 100,
                                         'update_time' => time(),
                                     ]);
                                 } else {
@@ -1557,13 +1559,13 @@ class LocalScript extends Pzlife
                     break;
                 } else {
                     $day_businessSettlement = [];
-                    $day_users              = [];
-                    $code_task              = [];
-                    $code_task              = Db::query("SELECT * FROM yx_user_send_task WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
+                    $day_users = [];
+                    $code_task = [];
+                    $code_task = Db::query("SELECT * FROM yx_user_send_task WHERE `create_time` < " . $end_time . " AND `create_time` >= " . $start_time);
                     foreach ($code_task as $key => $value) {
 
                         $send_length = mb_strlen($value['task_content'], 'utf8');
-                        $num         = 1;
+                        $num = 1;
                         if ($send_length > 70) {
                             $num = ceil($send_length / 67);
                         }
@@ -1574,7 +1576,7 @@ class LocalScript extends Pzlife
                         }
                         $task_log = Db::query("SELECT * FROM yx_user_send_task_log WHERE `task_no` = '" . $value['task_no'] . "' ");
                         // print_r($task_log);die;
-                        $allnum       = count(explode(',', $value['mobile_content']));
+                        $allnum = count(explode(',', $value['mobile_content']));
                         $charging_num = $allnum * $num;
                         if (empty($task_log)) { //失败
                             $success_num = 0;
@@ -1630,12 +1632,12 @@ class LocalScript extends Pzlife
                         // $day_businessSettlement[$day][$value['uid']]['default'] = $num;
                         } */
                         } else {
-                            $day_users[$day][]                                         = $value['uid'];
-                            $day_businessSettlement[$day][$value['uid']]['num']        = $charging_num;
+                            $day_users[$day][] = $value['uid'];
+                            $day_businessSettlement[$day][$value['uid']]['num'] = $charging_num;
                             $day_businessSettlement[$day][$value['uid']]['mobile_num'] = $allnum;
-                            $day_businessSettlement[$day][$value['uid']]['success']    = $success_num;
-                            $day_businessSettlement[$day][$value['uid']]['unknown']    = $unknown_num;
-                            $day_businessSettlement[$day][$value['uid']]['default']    = $default_num;
+                            $day_businessSettlement[$day][$value['uid']]['success'] = $success_num;
+                            $day_businessSettlement[$day][$value['uid']]['unknown'] = $unknown_num;
+                            $day_businessSettlement[$day][$value['uid']]['default'] = $default_num;
                             /*  if ($value['status_message'] == 'DELIVRD') {
 
                         } elseif ($value['status_message'] == '') {
@@ -1651,7 +1653,7 @@ class LocalScript extends Pzlife
                         foreach ($day_businessSettlement as $dkey => $d_value) {
                             foreach ($d_value as $key => $value) {
                                 $success = isset($value['success']) ? $value['success'] : 0;
-                                $num     = isset($value['num']) ? $value['num'] : 0;
+                                $num = isset($value['num']) ? $value['num'] : 0;
                                 if ($key == 47 && $dkey == 20200122) {
                                     $num = $num + 5784;
                                 }
@@ -1660,14 +1662,14 @@ class LocalScript extends Pzlife
                                 }
                                 $day_user_settlement = [];
                                 $day_user_settlement = [
-                                    'timekey'     => $dkey,
-                                    'uid'         => $key,
-                                    'success'     => $success,
-                                    'unknown'     => isset($value['unknown']) ? $value['unknown'] : 0,
-                                    'default'     => isset($value['default']) ? $value['default'] : 0,
-                                    'num'         => $num,
-                                    'ratio'       => $success / $num * 100,
-                                    'mobile_num'  => $value['mobile_num'],
+                                    'timekey' => $dkey,
+                                    'uid' => $key,
+                                    'success' => $success,
+                                    'unknown' => isset($value['unknown']) ? $value['unknown'] : 0,
+                                    'default' => isset($value['default']) ? $value['default'] : 0,
+                                    'num' => $num,
+                                    'ratio' => $success / $num * 100,
+                                    'mobile_num' => $value['mobile_num'],
                                     'business_id' => '5',
                                     'create_time' => time(),
                                     'update_time' => time(),
@@ -1675,12 +1677,12 @@ class LocalScript extends Pzlife
                                 $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 5 AND `timekey` = ' . $dkey . ' AND `uid` = ' . $key);
                                 if ($has) {
                                     Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                        'success'     => $success,
-                                        'unknown'     => isset($value['unknown']) ? $value['unknown'] : 0,
-                                        'default'     => isset($value['default']) ? $value['default'] : 0,
-                                        'num'         => $num,
-                                        'mobile_num'  => $value['mobile_num'],
-                                        'ratio'       => $success / $num * 100,
+                                        'success' => $success,
+                                        'unknown' => isset($value['unknown']) ? $value['unknown'] : 0,
+                                        'default' => isset($value['default']) ? $value['default'] : 0,
+                                        'num' => $num,
+                                        'mobile_num' => $value['mobile_num'],
+                                        'ratio' => $success / $num * 100,
                                         'update_time' => time(),
                                     ]);
                                 } else {
@@ -1705,7 +1707,7 @@ class LocalScript extends Pzlife
     private function getSendTask($id)
     {
         $getSendTaskSql = sprintf("select * from yx_user_send_task where delete_time=0 and id = %d", $id);
-        $sendTask       = Db::query($getSendTaskSql);
+        $sendTask = Db::query($getSendTaskSql);
         // print_r($sendTask);die;
         if (!$sendTask) {
             return [];
@@ -1722,9 +1724,9 @@ class LocalScript extends Pzlife
         $lastTime = (int) ($time * 1000);
         echo $lastTime;
         echo "\n";
-        $this->redis   = Phpredis::getConn();
-        $id            = 15939;
-        $sendTask      = $this->getSendTask($id);
+        $this->redis = Phpredis::getConn();
+        $id = 15939;
+        $sendTask = $this->getSendTask($id);
         $mobile_result = $this->mobilesFiltrate($sendTask['mobile_content'], $sendTask['uid'], 10);
 
         $time = microtime(true);
@@ -1744,17 +1746,17 @@ class LocalScript extends Pzlife
         $this->redis = Phpredis::getConn();
         try {
             // $deduct = 0;
-            $error_mobile     = []; //错号或者黑名单
+            $error_mobile = []; //错号或者黑名单
             $real_send_mobile = []; //实际发送号码
-            $deduct_mobile    = []; //扣量号码
-            $true_mobile      = []; //实号号码
-            $yidong_mobile    = []; //移动分区号码
-            $liantong_mobile  = []; //联通分区号码
-            $dianxin_mobile   = []; //电信分区号码
+            $deduct_mobile = []; //扣量号码
+            $true_mobile = []; //实号号码
+            $yidong_mobile = []; //移动分区号码
+            $liantong_mobile = []; //联通分区号码
+            $dianxin_mobile = []; //电信分区号码
             $host_city_mobile = []; //省会城市号码包含深圳
             $cool_city_mobile = []; //二线城市号码
-            $mobile           = str_replace('&quot;', '', $mobile);
-            $mobile_data      = explode(',', $mobile);
+            $mobile = str_replace('&quot;', '', $mobile);
+            $mobile_data = explode(',', $mobile);
             /* 10个号码之内不扣 */
             if (count($mobile_data) < 10) {
                 $deduct = 0;
@@ -1773,7 +1775,7 @@ class LocalScript extends Pzlife
             $mobile = join(',', $mobile_data);
             //白名单
             $white_mobiles = [];
-            $white_mobile  = Db::query("SELECT `mobile` FROM `yx_whitelist` WHERE mobile IN (" . $mobile . ") GROUP BY `mobile` ");
+            $white_mobile = Db::query("SELECT `mobile` FROM `yx_whitelist` WHERE mobile IN (" . $mobile . ") GROUP BY `mobile` ");
             // print_r("SELECT `mobile` FROM `yx_whitelist` WHERE mobile IN (".$mobile.") ");
             if (!empty($white_mobile)) {
                 foreach ($white_mobile as $key => $value) {
@@ -1882,14 +1884,14 @@ class LocalScript extends Pzlife
                 // echo count($real_send_mobile);die;
                 // print_r($real_send_mobile);die;
                 //扣量
-                $the_month      = date('Ymd', time());
+                $the_month = date('Ymd', time());
                 $the_month_time = strtotime($the_month - 1);
                 if ($deduct > 0 && count($real_send_mobile) > 0) {
                     //热门城市ID
                     $citys_id = [2, 20, 38, 241, 378, 500, 615, 694, 842, 860, 981, 1083, 1220, 1315, 1427, 1602, 1803, 1923, 2077, 2279, 2405, 2455, 2496, 2704, 2802, 2948, 3034, 3152, 3255, 3310, 3338, 2100];
 
-                    $remaining_mobile  = $real_send_mobile;
-                    $entity_mobiles    = []; //实号即能扣量号码
+                    $remaining_mobile = $real_send_mobile;
+                    $entity_mobiles = []; //实号即能扣量号码
                     $need_check_mobile = []; //需要检测号码
                     foreach ($remaining_mobile as $key => $value) {
                         //判断是否为实号
@@ -1902,8 +1904,8 @@ class LocalScript extends Pzlife
                             // print_r($vacant);die;
                             if (isset($vacant['update_time']) && $vacant['update_time'] >= $the_month_time) { //无效检测号码
                                 $entity_mobiles[] = $value;
-                                $mobile_info      = [];
-                                $mobile_info      = [
+                                $mobile_info = [];
+                                $mobile_info = [
                                     'mobile' => $value,
                                     'source' => $vacant['source'],
                                 ];
@@ -1965,8 +1967,8 @@ class LocalScript extends Pzlife
                         // ['real_mobile' => $real_mobile, 'empty_mobile' => $empty_mobile]
                         $check_empty_mobile = [];
                         $check_empty_mobile = $check_result['empty_mobile']; //检测出来的空号
-                        $check_real_mobile  = [];
-                        $check_real_mobile  = $check_result['real_mobile']; //检测出来的实号
+                        $check_real_mobile = [];
+                        $check_real_mobile = $check_result['real_mobile']; //检测出来的实号
                         if (!empty($check_empty_mobile)) {
                             foreach ($check_empty_mobile as $key => $value) {
                                 //划分运营商
@@ -2020,9 +2022,9 @@ class LocalScript extends Pzlife
                     // print_r($proportion); die;
                     if ($proportion * 100 > $deduct) {
                         //扣除部分
-                        $section      = $proportion * 100;
+                        $section = $proportion * 100;
                         $section_data = [];
-                        $j            = 1;
+                        $j = 1;
                         for ($i = 0; $i < count($cool_city_mobile); $i++) {
                             $section_data[] = $cool_city_mobile[$i];
                             $j++;
@@ -2047,7 +2049,7 @@ class LocalScript extends Pzlife
                                     }
                                 }
                                 $section_data = [];
-                                $j            = 1;
+                                $j = 1;
                             }
                         }
                         if (!empty($section_data)) {
@@ -2133,9 +2135,9 @@ class LocalScript extends Pzlife
                         }
                         $host_proportion = $deduct - $proportion * 100;
                         // print_r($host_proportion);die;
-                        $section      = 100;
+                        $section = 100;
                         $section_data = [];
-                        $j            = 1;
+                        $j = 1;
                         for ($i = 0; $i < count($host_city_mobile); $i++) {
                             $section_data[] = $host_city_mobile[$i];
                             $j++;
@@ -2161,7 +2163,7 @@ class LocalScript extends Pzlife
                                     }
                                 }
                                 $section_data = [];
-                                $j            = 1;
+                                $j = 1;
                             }
                         }
 
@@ -2215,7 +2217,7 @@ class LocalScript extends Pzlife
                     if (!empty($real_send_mobile)) {
                         foreach ($real_send_mobile as $key => $value) {
                             $prefix = substr(trim($value), 0, 7);
-                            $res    = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
+                            $res = Db::query("SELECT `source`,`province_id`,`province` FROM yx_number_source WHERE `mobile` = '" . $prefix . "' LIMIT 1 ");
                             $newres = array_shift($res);
                             if ($newres) {
                                 if ($newres['source'] == 1) { //移动
@@ -2244,21 +2246,21 @@ class LocalScript extends Pzlife
 
     public function secondCheckMobileApi($mobiledata = [])
     {
-        $mobileredis  = PhpredisNew::getConn();
-        $this->redis  = Phpredis::getConn();
-        $real_mobile  = [];
+        $mobileredis = PhpredisNew::getConn();
+        $this->redis = Phpredis::getConn();
+        $real_mobile = [];
         $empty_mobile = [];
-        $secret_id    = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
-        $secret_key   = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
-        $api          = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
-        $ts           = date("YmdHis", time());
-        $sig          = sha1($secret_id . $secret_key . $ts);
-        $api          = $api . $sig . "&sid=" . $secret_id . "&skey=" . $secret_key . "&ts=" . $ts;
+        $secret_id = '06FDC4A71F5E1FDE4C061DBA653DD2A5';
+        $secret_key = 'ef0587df-86dc-459f-ad82-41c6446b27a5';
+        $api = 'https://api.yunzhandata.com/api/deadnumber/v1.0/detect?sig=';
+        $ts = date("YmdHis", time());
+        $sig = sha1($secret_id . $secret_key . $ts);
+        $api = $api . $sig . "&sid=" . $secret_id . "&skey=" . $secret_key . "&ts=" . $ts;
         // $check_mobile = $this->decrypt('6C38881649F7003B910582D1095DA821',$secret_id);
         // print_r($check_mobile);die;
-        $data              = [];
+        $data = [];
         $check_mobile_data = [];
-        $j                 = 1;
+        $j = 1;
         // echo count($mobiledata);die;
         foreach ($mobiledata as $key => $value) {
             $check_mobile_data[] = encrypt($value, $secret_id);
@@ -2280,24 +2282,24 @@ class LocalScript extends Pzlife
                         $check_result = [];
                         $check_result = [
                             'mobileStatus' => 2,
-                            'mobile'       => $cvalue,
+                            'mobile' => $cvalue,
                         ];
                     } else {
                         $check_result = [
                             'mobileStatus' => 0,
-                            'mobile'       => $cvalue,
+                            'mobile' => $cvalue,
                         ];
                     }
                     $result['mobiles'][] = $check_result;
                 }
                 $result['code'] = 0;
-                $result         = json_encode($result);
+                $result = json_encode($result);
 
                 $result = json_decode($result, true);
                 if ($result['code'] == 0) { //接口请求成功
                     $mobiles = $result['mobiles'];
                     foreach ($mobiles as $mkey => $mvalue) {
-                        $mobile       = decrypt($mvalue['mobile'], $secret_id);
+                        $mobile = decrypt($mvalue['mobile'], $secret_id);
                         $check_result = $mvalue['mobileStatus'];
                         $check_status = 2;
                         if ($check_result == 2) { //实号
@@ -2317,12 +2319,12 @@ class LocalScript extends Pzlife
                             // {"source":1,"province_id":841,"city_id":842,"update_time":1591386721,"check_status":1,"check_result":1}
                             if (!empty($newres)) {
                                 $mobileredis->hset('yx:mobile:real', $mobile, json_encode([
-                                    'source'       => $newres['source'],
-                                    'province_id'  => $newres['province_id'],
-                                    'city_id'      => $newres['city_id'],
+                                    'source' => $newres['source'],
+                                    'province_id' => $newres['province_id'],
+                                    'city_id' => $newres['city_id'],
                                     'check_status' => 2,
                                     'check_result' => 3,
-                                    'update_time'  => time(),
+                                    'update_time' => time(),
                                 ]));
                             }
                             // return false;
@@ -2344,12 +2346,12 @@ class LocalScript extends Pzlife
                             // {"source":1,"province_id":841,"city_id":842,"update_time":1591386721,"check_status":1,"check_result":1}
                             if (!empty($newres)) {
                                 $mobileredis->hset('yx:mobile:empty', $mobile, json_encode([
-                                    'source'       => $newres['source'],
-                                    'province_id'  => $newres['province_id'],
-                                    'city_id'      => $newres['city_id'],
+                                    'source' => $newres['source'],
+                                    'province_id' => $newres['province_id'],
+                                    'city_id' => $newres['city_id'],
                                     'check_status' => 2,
                                     'check_result' => $check_result,
-                                    'update_time'  => time(),
+                                    'update_time' => time(),
                                 ]));
                             }
                             $empty_mobile[] = $mobile;
@@ -2359,8 +2361,8 @@ class LocalScript extends Pzlife
                     $empty_mobile = $mobiledata;
                 }
                 $check_mobile_data = [];
-                $j                 = 1;
-                $result            = [];
+                $j = 1;
+                $result = [];
             }
         }
         if (!empty($check_mobile_data)) {
@@ -2380,23 +2382,23 @@ class LocalScript extends Pzlife
                     $check_result = [];
                     $check_result = [
                         'mobileStatus' => 2,
-                        'mobile'       => $cvalue,
+                        'mobile' => $cvalue,
                     ];
                 } else {
                     $check_result = [
                         'mobileStatus' => 0,
-                        'mobile'       => $cvalue,
+                        'mobile' => $cvalue,
                     ];
                 }
                 $result['mobiles'][] = $check_result;
             }
             $result['code'] = 0;
-            $result         = json_encode($result);
-            $result         = json_decode($result, true);
+            $result = json_encode($result);
+            $result = json_decode($result, true);
             if ($result['code'] == 0) { //接口请求成功
                 $mobiles = $result['mobiles'];
                 foreach ($mobiles as $mkey => $mvalue) {
-                    $mobile       = decrypt($mvalue['mobile'], $secret_id);
+                    $mobile = decrypt($mvalue['mobile'], $secret_id);
                     $check_result = $mvalue['mobileStatus'];
                     $check_status = 2;
                     if ($check_result == 2) { //实号
@@ -2416,12 +2418,12 @@ class LocalScript extends Pzlife
                         // {"source":1,"province_id":841,"city_id":842,"update_time":1591386721,"check_status":1,"check_result":1}
                         if (!empty($newres)) {
                             $mobileredis->hset('yx:mobile:real', $mobile, json_encode([
-                                'source'       => $newres['source'],
-                                'province_id'  => $newres['province_id'],
-                                'city_id'      => $newres['city_id'],
+                                'source' => $newres['source'],
+                                'province_id' => $newres['province_id'],
+                                'city_id' => $newres['city_id'],
                                 'check_status' => 2,
                                 'check_result' => 3,
-                                'update_time'  => time(),
+                                'update_time' => time(),
                             ]));
                         }
                         // return false;
@@ -2443,12 +2445,12 @@ class LocalScript extends Pzlife
                         // {"source":1,"province_id":841,"city_id":842,"update_time":1591386721,"check_status":1,"check_result":1}
                         if (!empty($newres)) {
                             $mobileredis->hset('yx:mobile:empty', $mobile, json_encode([
-                                'source'       => $newres['source'],
-                                'province_id'  => $newres['province_id'],
-                                'city_id'      => $newres['city_id'],
+                                'source' => $newres['source'],
+                                'province_id' => $newres['province_id'],
+                                'city_id' => $newres['city_id'],
                                 'check_status' => 2,
                                 'check_result' => $check_result,
-                                'update_time'  => time(),
+                                'update_time' => time(),
                             ]));
                         }
                         $empty_mobile[] = $mobile;
@@ -2468,7 +2470,7 @@ class LocalScript extends Pzlife
         // $max_id = Db::query("SELECT `id` FROM yx_send_task_receipt ORDER BY `id` DESC limit 1 ");
         // // print_r($max_id);
         $mobileredis = PhpredisNew::getConn();
-        $redis       = Phpredis::getConn();
+        $redis = Phpredis::getConn();
         $mobile_data = [];
         try {
             $ALL_NUM = Db::query("SELECT `mobile`,`create_time` FROM yx_user_send_code_task_log WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`create_time` ");
@@ -2487,7 +2489,7 @@ class LocalScript extends Pzlife
                     if ($newres == false) {
                         continue;
                     }
-                    $newres['update_time']  = $value['create_time'];
+                    $newres['update_time'] = $value['create_time'];
                     $newres['check_status'] = 1;
                     $newres['check_result'] = 1;
                     $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
@@ -2515,7 +2517,7 @@ class LocalScript extends Pzlife
                     if ($newres == false) {
                         continue;
                     }
-                    $newres['update_time']  = $value['create_time'];
+                    $newres['update_time'] = $value['create_time'];
                     $newres['check_status'] = 1;
                     $newres['check_result'] = 1;
                     $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
@@ -2543,7 +2545,7 @@ class LocalScript extends Pzlife
                     if ($newres == false) {
                         continue;
                     }
-                    $newres['update_time']  = $value['create_time'];
+                    $newres['update_time'] = $value['create_time'];
                     $newres['check_status'] = 1;
                     $newres['check_result'] = 1;
                     $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
@@ -2566,7 +2568,7 @@ class LocalScript extends Pzlife
                     if ($newres == false) {
                         continue;
                     }
-                    $newres['update_time']  = $value['create_time'];
+                    $newres['update_time'] = $value['create_time'];
                     $newres['check_status'] = 1;
                     $newres['check_result'] = 1;
                     $mobileredis->hset('yx:mobile:real', $value['mobile_content'], json_encode($newres));
@@ -2588,7 +2590,7 @@ class LocalScript extends Pzlife
                         if ($newres == false) {
                             continue;
                         }
-                        $newres['update_time']  = $value['create_time'];
+                        $newres['update_time'] = $value['create_time'];
                         $newres['check_status'] = 1;
                         $newres['check_result'] = 1;
                         $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
@@ -2611,7 +2613,7 @@ class LocalScript extends Pzlife
                         if ($newres == false) {
                             continue;
                         }
-                        $newres['update_time']  = $value['create_time'];
+                        $newres['update_time'] = $value['create_time'];
                         $newres['check_status'] = 1;
                         $newres['check_result'] = 1;
                         $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
@@ -2636,7 +2638,7 @@ class LocalScript extends Pzlife
                         if ($newres == false) {
                             continue;
                         }
-                        $newres['update_time']  = $value['create_time'];
+                        $newres['update_time'] = $value['create_time'];
                         $newres['check_status'] = 1;
                         $newres['check_result'] = 1;
                         $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
@@ -2659,7 +2661,7 @@ class LocalScript extends Pzlife
                         if ($newres == false) {
                             continue;
                         }
-                        $newres['update_time']  = $value['create_time'];
+                        $newres['update_time'] = $value['create_time'];
                         $newres['check_status'] = 1;
                         $newres['check_result'] = 1;
                         $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
@@ -2667,7 +2669,7 @@ class LocalScript extends Pzlife
                 }
 
                 $mobile_data = [];
-                $ALL_NUM     = $mysql_connect->query("SELECT `mobile`,`create_time` FROM yx_sfl_send_multimediatask_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`create_time` ");
+                $ALL_NUM = $mysql_connect->query("SELECT `mobile`,`create_time` FROM yx_sfl_send_multimediatask_receipt WHERE `real_message` = 'DELIVRD' OR  `real_message` = 'DB:0141' OR `real_message` LIKE '%BLACK%' GROUP BY `mobile`,`create_time` ");
                 foreach ($ALL_NUM as $key => $value) {
                     $newres = $mobileredis->hget('yx:mobile:real', $value['mobile']);
                     if ($newres) {
@@ -2683,7 +2685,7 @@ class LocalScript extends Pzlife
                         if ($newres == false) {
                             continue;
                         }
-                        $newres['update_time']  = $value['create_time'];
+                        $newres['update_time'] = $value['create_time'];
                         $newres['check_status'] = 1;
                         $newres['check_result'] = 1;
                         $mobileredis->hset('yx:mobile:real', $value['mobile'], json_encode($newres));
@@ -2698,7 +2700,7 @@ class LocalScript extends Pzlife
 
     public function mobilecheckredis($mobile)
     {
-        $redis  = Phpredis::getConn();
+        $redis = Phpredis::getConn();
         $prefix = substr(trim($mobile), 0, 7);
         // 13001001850
         $newres = $redis->hget('index:mobile:source', $prefix);
@@ -2710,153 +2712,153 @@ class LocalScript extends Pzlife
         if (empty($newres)) {
             if ($prefix == 1650006) {
                 $newres = [
-                    'source'      => 1,
+                    'source' => 1,
                     'province_id' => 1802,
-                    'city_id'     => 1803,
+                    'city_id' => 1803,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif ($prefix == 1650713) {
                 $newres = [
-                    'source'      => 1,
+                    'source' => 1,
                     'province_id' => 1802,
-                    'city_id'     => 1885,
+                    'city_id' => 1885,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif ($prefix == 1651033) {
                 $newres = [
-                    'source'      => 1,
+                    'source' => 1,
                     'province_id' => 1426,
-                    'city_id'     => 1439,
+                    'city_id' => 1439,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif ($prefix == 1653427) {
                 $newres = [
-                    'source'      => 1,
+                    'source' => 1,
                     'province_id' => 499,
-                    'city_id'     => 586,
+                    'city_id' => 586,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif (in_array($prefix, [1660020, 1660021, 1660025, 1660027, 1660034, 1662236, 1662237, 1662215, 1662288, 1662290])) { //天津联通
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 19,
-                    'city_id'     => 20,
+                    'city_id' => 20,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif (in_array($prefix, [1660102, 1660114, 1660137, 1660152, 1660155])) { //北京联通
 
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 1,
-                    'city_id'     => 2,
+                    'city_id' => 2,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif (in_array($prefix, [1660170, 1660173, 1660178, 1660179, 1660181, 1660183, 1660184, 1660174, 1662102, 1662103, 1662107, 1662109, 1660214, 1662120, 1662122, 1662123, 1662152, 1662160, 1662167, 1662169, 1662171, 1662173, 1662174, 1662178, 1662179])) { //上海联通
 
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 841,
-                    'city_id'     => 842,
+                    'city_id' => 842,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif ($prefix == 1660271) {
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 1802,
-                    'city_id'     => 1803,
+                    'city_id' => 1803,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif ($prefix == 1660272) {
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 1802,
-                    'city_id'     => 1803,
+                    'city_id' => 1803,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif ($prefix == 1660351) {
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 240,
-                    'city_id'     => 241,
+                    'city_id' => 241,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif ($prefix == 1660371) {
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 1601,
-                    'city_id'     => 1602,
+                    'city_id' => 1602,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif ($prefix == 1660387) {
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 1601,
-                    'city_id'     => 1602,
+                    'city_id' => 1602,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif ($prefix == 1660396) {
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 1601,
-                    'city_id'     => 1788,
+                    'city_id' => 1788,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif ($prefix == 1660399) {
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 1601,
-                    'city_id'     => 1602,
+                    'city_id' => 1602,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif ($prefix == 1660427) {
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 499,
-                    'city_id'     => 586,
+                    'city_id' => 586,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif ($prefix == 1660471) {
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 377,
-                    'city_id'     => 378,
+                    'city_id' => 378,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif ($prefix == 1660532) {
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 1426,
-                    'city_id'     => 1439,
+                    'city_id' => 1439,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif ($prefix == 1660713) {
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 1802,
-                    'city_id'     => 1439,
+                    'city_id' => 1439,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif ($prefix == 1660875) {
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 2801,
-                    'city_id'     => 2837,
+                    'city_id' => 2837,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif (in_array($prefix, [1662303, 1662312, 1662331])) { //重庆联通
 
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 2454,
-                    'city_id'     => 2455,
+                    'city_id' => 2455,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif (in_array($prefix, [1662477])) { //广州联通
 
                 $newres = [
-                    'source'      => 2,
+                    'source' => 2,
                     'province_id' => 2076,
-                    'city_id'     => 2077,
+                    'city_id' => 2077,
                 ];
                 $redis->hset('index:mobile:source', $prefix, json_encode($newres));
             } elseif (substr(trim($mobile), 0, 3) == 166) {
@@ -2889,45 +2891,49 @@ class LocalScript extends Pzlife
         try {
             //code...
             while (true) {
-                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (SELECT id FROM `messagesend`.`yx_users` WHERE `pid` = '10') "); //道信核对
-                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (93) "); //道信核对
+                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (SELECT id FROM `messagesend`.`yx_users` WHERE `pid` = '137') "); //道信核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (47,49,51,52,55,97,101) "); //美田核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (256) "); //福维克核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (190,191,287,302) "); //7陌核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (157,158,159,160,161,162,163) "); //三盛核对
                 // $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
                 //行业
                 foreach ($uids as $key => $value) {
                     // continue;
                     // $start_time = (int) strtotime('-4 days', strtotime(date('Y-m-d', time())));
-                    $start_time = (int) strtotime('2020-09-01');
+                    $start_time = (int) strtotime('2020-11-01');
                     // echo $start_time;die;
+                    // echo "SELECT `id`,`create_time` FROM yx_user_send_code_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ";die;
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_code_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
                         continue;
                     }
                     while (true) {
 
                         $day_business_result = [];
-                        $end_time            = $start_time + 86400;
-                        $timekey             = date('Ymd', $start_time);
+                        $end_time = $start_time + 86400;
+                        $timekey = date('Ymd', $start_time);
                         // echo "uid:" . $value['id'] . "" . "timekey:" . $timekey;
                         // echo "\n";
                         $business_id = 6;
                         if ($end_time > time()) {
                             // break;
-                            $end_time            = time();
+                            $end_time = time();
                             $day_business_result = $this->selectSendResultForBusiness($value['id'], $value['pid'], $start_time, $end_time);
                             if ($day_business_result == false) {
                                 break;
                             } else {
-                                $day_business_result['uid']         = $value['id'];
-                                $day_business_result['timekey']     = $timekey;
+                                $day_business_result['uid'] = $value['id'];
+                                $day_business_result['timekey'] = $timekey;
                                 $day_business_result['business_id'] = $business_id;
-                                $has                                = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 6 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                                $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 6 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                                 if ($has) {
                                     Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                        'success'     => $day_business_result['success'],
-                                        'unknown'     => $day_business_result['unknown'],
-                                        'default'     => $day_business_result['default'],
-                                        'num'         => $day_business_result['num'],
-                                        'mobile_num'  => $day_business_result['mobile_num'],
-                                        'ratio'       => $day_business_result['ratio'],
+                                        'success' => $day_business_result['success'],
+                                        'unknown' => $day_business_result['unknown'],
+                                        'default' => $day_business_result['default'],
+                                        'num' => $day_business_result['num'],
+                                        'mobile_num' => $day_business_result['mobile_num'],
+                                        'ratio' => $day_business_result['ratio'],
                                         'update_time' => time(),
                                     ]);
                                 } else {
@@ -2945,8 +2951,8 @@ class LocalScript extends Pzlife
                         }
 
                         // die;
-                        $day_business_result['uid']         = $value['id'];
-                        $day_business_result['timekey']     = $timekey;
+                        $day_business_result['uid'] = $value['id'];
+                        $day_business_result['timekey'] = $timekey;
                         $day_business_result['business_id'] = $business_id;
                         $day_business_result['create_time'] = time();
                         $day_business_result['update_time'] = time();
@@ -2954,12 +2960,12 @@ class LocalScript extends Pzlife
                         $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 6 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                         if ($has) {
                             Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                'success'     => $day_business_result['success'],
-                                'unknown'     => $day_business_result['unknown'],
-                                'default'     => $day_business_result['default'],
-                                'num'         => $day_business_result['num'],
-                                'mobile_num'  => $day_business_result['mobile_num'],
-                                'ratio'       => $day_business_result['ratio'],
+                                'success' => $day_business_result['success'],
+                                'unknown' => $day_business_result['unknown'],
+                                'default' => $day_business_result['default'],
+                                'num' => $day_business_result['num'],
+                                'mobile_num' => $day_business_result['mobile_num'],
+                                'ratio' => $day_business_result['ratio'],
                                 'update_time' => time(),
                             ]);
                         } else {
@@ -2970,73 +2976,73 @@ class LocalScript extends Pzlife
                 }
                 //营销
                 /*  foreach ($uids as $key => $value) {
-                    // $start_time = (int) strtotime('-3 days', strtotime(date('Y-m-d', time())));
-                    $start_time = (int) strtotime('2020-09-01');
-                    if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
-                        continue;
-                    }
-                    while (true) {
-                        $end_time    = $start_time + 86400;
-                        $timekey     = date('Ymd', $start_time);
-                        $business_id = 5;
-                        // echo "uid:" . $value['id'] . "" . "timekey:" . $timekey;
-                        // echo "\n";
-                        if ($end_time > time()) {
-                            // break;
-                            $end_time             = time();
-                            $day_marketing_result = $this->selectSendResultForMarketing($value['id'], $value['pid'], $start_time, $end_time);
-                            if ($day_marketing_result == false) {
-                                break;
-                            }
-                            $day_marketing_result['uid']         = $value['id'];
-                            $day_marketing_result['timekey']     = $timekey;
-                            $day_marketing_result['business_id'] = $business_id;
-                            $has                                 = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
-                            if ($has) {
-                                Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                    'success'     => $day_marketing_result['success'],
-                                    'unknown'     => $day_marketing_result['unknown'],
-                                    'default'     => $day_marketing_result['default'],
-                                    'num'         => $day_marketing_result['num'],
-                                    'mobile_num'  => $day_marketing_result['mobile_num'],
-                                    'ratio'       => $day_marketing_result['ratio'],
-                                    'update_time' => time(),
-                                ]);
-                            } else {
-                                Db::table('yx_statistics_day')->insert($day_marketing_result);
-                            }
-                            break;
-                            //
-                        }
+                // $start_time = (int) strtotime('-3 days', strtotime(date('Y-m-d', time())));
+                $start_time = (int) strtotime('2020-09-01');
+                if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
+                continue;
+                }
+                while (true) {
+                $end_time    = $start_time + 86400;
+                $timekey     = date('Ymd', $start_time);
+                $business_id = 5;
+                // echo "uid:" . $value['id'] . "" . "timekey:" . $timekey;
+                // echo "\n";
+                if ($end_time > time()) {
+                // break;
+                $end_time             = time();
+                $day_marketing_result = $this->selectSendResultForMarketing($value['id'], $value['pid'], $start_time, $end_time);
+                if ($day_marketing_result == false) {
+                break;
+                }
+                $day_marketing_result['uid']         = $value['id'];
+                $day_marketing_result['timekey']     = $timekey;
+                $day_marketing_result['business_id'] = $business_id;
+                $has                                 = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                if ($has) {
+                Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                'success'     => $day_marketing_result['success'],
+                'unknown'     => $day_marketing_result['unknown'],
+                'default'     => $day_marketing_result['default'],
+                'num'         => $day_marketing_result['num'],
+                'mobile_num'  => $day_marketing_result['mobile_num'],
+                'ratio'       => $day_marketing_result['ratio'],
+                'update_time' => time(),
+                ]);
+                } else {
+                Db::table('yx_statistics_day')->insert($day_marketing_result);
+                }
+                break;
+                //
+                }
 
-                        $day_marketing_result = $this->selectSendResultForMarketing($value['id'], $value['pid'], $start_time, $end_time);
-                        if ($day_marketing_result == false) {
-                            $start_time = $end_time;
-                            continue;
-                        }
-                        $day_marketing_result['uid']         = $value['id'];
-                        $day_marketing_result['timekey']     = $timekey;
-                        $day_marketing_result['business_id'] = $business_id;
-                        $day_marketing_result['create_time'] = time();
-                        $day_marketing_result['update_time'] = time();
-                        $has                                 = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
-                        if ($has) {
-                            Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                'success'     => $day_marketing_result['success'],
-                                'unknown'     => $day_marketing_result['unknown'],
-                                'default'     => $day_marketing_result['default'],
-                                'num'         => $day_marketing_result['num'],
-                                'mobile_num'  => $day_marketing_result['mobile_num'],
-                                'ratio'       => $day_marketing_result['ratio'],
-                                'update_time' => time(),
-                            ]);
-                        } else {
-                            Db::table('yx_statistics_day')->insert($day_marketing_result);
-                        }
-                        // print_r($day_marketing_result);
-                        // die;
-                        $start_time = $end_time;
-                    }
+                $day_marketing_result = $this->selectSendResultForMarketing($value['id'], $value['pid'], $start_time, $end_time);
+                if ($day_marketing_result == false) {
+                $start_time = $end_time;
+                continue;
+                }
+                $day_marketing_result['uid']         = $value['id'];
+                $day_marketing_result['timekey']     = $timekey;
+                $day_marketing_result['business_id'] = $business_id;
+                $day_marketing_result['create_time'] = time();
+                $day_marketing_result['update_time'] = time();
+                $has                                 = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                if ($has) {
+                Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
+                'success'     => $day_marketing_result['success'],
+                'unknown'     => $day_marketing_result['unknown'],
+                'default'     => $day_marketing_result['default'],
+                'num'         => $day_marketing_result['num'],
+                'mobile_num'  => $day_marketing_result['mobile_num'],
+                'ratio'       => $day_marketing_result['ratio'],
+                'update_time' => time(),
+                ]);
+                } else {
+                Db::table('yx_statistics_day')->insert($day_marketing_result);
+                }
+                // print_r($day_marketing_result);
+                // die;
+                $start_time = $end_time;
+                }
                 } */
                 sleep(900);
             }
@@ -3053,42 +3059,46 @@ class LocalScript extends Pzlife
         try {
             //code...
             while (true) {
-                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (SELECT id FROM `messagesend`.`yx_users` WHERE `pid` = '137') "); //道信核对
-                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (301) "); //道信核对
+                $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (SELECT id FROM `messagesend`.`yx_users` WHERE `pid` = '137') "); //道信核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (47,49,51,52,55,97,101) "); //美田核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (256) "); //福维克核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (90,191,287,302) "); //7陌核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (279) "); //7陌核对
+                // $uids = Db::query("SELECT `id`,`pid` FROM yx_users WHERE `id` IN (157,158,159,160,161,162,163) "); //三盛核对
                 // $uids = Db::query("SELECT `id`,`pid` FROM yx_users "); //道信核对
 
                 //营销
                 foreach ($uids as $key => $value) {
                     // $start_time = (int) strtotime('-3 days', strtotime(date('Y-m-d', time())));
-                    $start_time = (int) strtotime('2020-10-01');
+                    $start_time = (int) strtotime('2020-11-01');
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_send_task WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
                         continue;
                     }
                     while (true) {
-                        $end_time    = $start_time + 86400;
-                        $timekey     = date('Ymd', $start_time);
+                        $end_time = $start_time + 86400;
+                        $timekey = date('Ymd', $start_time);
                         $business_id = 5;
                         // echo "uid:" . $value['id'] . "" . "timekey:" . $timekey;
                         // echo "\n";
                         if ($end_time > time()) {
                             // break;
-                            $end_time             = time();
+                            $end_time = time();
                             $day_marketing_result = $this->selectSendResultForMarketing($value['id'], $value['pid'], $start_time, $end_time);
                             if ($day_marketing_result == false) {
                                 break;
                             }
-                            $day_marketing_result['uid']         = $value['id'];
-                            $day_marketing_result['timekey']     = $timekey;
+                            $day_marketing_result['uid'] = $value['id'];
+                            $day_marketing_result['timekey'] = $timekey;
                             $day_marketing_result['business_id'] = $business_id;
-                            $has                                 = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                            $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                             if ($has) {
                                 Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                    'success'     => $day_marketing_result['success'],
-                                    'unknown'     => $day_marketing_result['unknown'],
-                                    'default'     => $day_marketing_result['default'],
-                                    'num'         => $day_marketing_result['num'],
-                                    'mobile_num'  => $day_marketing_result['mobile_num'],
-                                    'ratio'       => $day_marketing_result['ratio'],
+                                    'success' => $day_marketing_result['success'],
+                                    'unknown' => $day_marketing_result['unknown'],
+                                    'default' => $day_marketing_result['default'],
+                                    'num' => $day_marketing_result['num'],
+                                    'mobile_num' => $day_marketing_result['mobile_num'],
+                                    'ratio' => $day_marketing_result['ratio'],
                                     'update_time' => time(),
                                 ]);
                             } else {
@@ -3103,20 +3113,20 @@ class LocalScript extends Pzlife
                             $start_time = $end_time;
                             continue;
                         }
-                        $day_marketing_result['uid']         = $value['id'];
-                        $day_marketing_result['timekey']     = $timekey;
+                        $day_marketing_result['uid'] = $value['id'];
+                        $day_marketing_result['timekey'] = $timekey;
                         $day_marketing_result['business_id'] = $business_id;
                         $day_marketing_result['create_time'] = time();
                         $day_marketing_result['update_time'] = time();
-                        $has                                 = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                        $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                         if ($has) {
                             Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                'success'     => $day_marketing_result['success'],
-                                'unknown'     => $day_marketing_result['unknown'],
-                                'default'     => $day_marketing_result['default'],
-                                'num'         => $day_marketing_result['num'],
-                                'mobile_num'  => $day_marketing_result['mobile_num'],
-                                'ratio'       => $day_marketing_result['ratio'],
+                                'success' => $day_marketing_result['success'],
+                                'unknown' => $day_marketing_result['unknown'],
+                                'default' => $day_marketing_result['default'],
+                                'num' => $day_marketing_result['num'],
+                                'mobile_num' => $day_marketing_result['mobile_num'],
+                                'ratio' => $day_marketing_result['ratio'],
                                 'update_time' => time(),
                             ]);
                         } else {
@@ -3135,8 +3145,6 @@ class LocalScript extends Pzlife
             exception($th);
         }
     }
-
-
 
     public function checkSendStatusForBusinessChannel()
     {
@@ -3158,30 +3166,30 @@ class LocalScript extends Pzlife
                     while (true) {
 
                         $day_business_result = [];
-                        $end_time            = $start_time + 86400;
-                        $timekey             = date('Ymd', $start_time);
+                        $end_time = $start_time + 86400;
+                        $timekey = date('Ymd', $start_time);
                         // echo "uid:" . $value['id'] . "" . "timekey:" . $timekey;
                         // echo "\n";
                         $business_id = 6;
                         if ($end_time > time()) {
                             // break;
-                            $end_time            = time();
+                            $end_time = time();
                             $day_business_result = $this->selectSendResultForBusinessChannel($value['id'], $start_time, $end_time);
                             if ($day_business_result == false) {
                                 break;
                             } else {
-                                $day_business_result['uid']         = $value['id'];
-                                $day_business_result['timekey']     = $timekey;
+                                $day_business_result['uid'] = $value['id'];
+                                $day_business_result['timekey'] = $timekey;
                                 $day_business_result['business_id'] = $business_id;
-                                $has                                = Db::query('SELECT * FROM `yx_statistics_day_channel` WHERE `business_id` = 6 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                                $has = Db::query('SELECT * FROM `yx_statistics_day_channel` WHERE `business_id` = 6 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                                 if ($has) {
                                     Db::table('yx_statistics_day_channel')->where('id', $has[0]['id'])->update([
-                                        'success'     => $day_business_result['success'],
-                                        'unknown'     => $day_business_result['unknown'],
-                                        'default'     => $day_business_result['default'],
-                                        'num'         => $day_business_result['num'],
-                                        'mobile_num'  => $day_business_result['mobile_num'],
-                                        'ratio'       => $day_business_result['ratio'],
+                                        'success' => $day_business_result['success'],
+                                        'unknown' => $day_business_result['unknown'],
+                                        'default' => $day_business_result['default'],
+                                        'num' => $day_business_result['num'],
+                                        'mobile_num' => $day_business_result['mobile_num'],
+                                        'ratio' => $day_business_result['ratio'],
                                         'update_time' => time(),
                                     ]);
                                 } else {
@@ -3192,15 +3200,15 @@ class LocalScript extends Pzlife
                             //
 
                         }
-                        $day_business_result = $this->selectSendResultForBusinessChannel($value['id'],  $start_time, $end_time);
+                        $day_business_result = $this->selectSendResultForBusinessChannel($value['id'], $start_time, $end_time);
                         if ($day_business_result == false) {
                             $start_time = $end_time;
                             continue;
                         }
 
                         // die;
-                        $day_business_result['channel_id']         = $value['id'];
-                        $day_business_result['timekey']     = $timekey;
+                        $day_business_result['channel_id'] = $value['id'];
+                        $day_business_result['timekey'] = $timekey;
                         $day_business_result['business_id'] = $business_id;
                         $day_business_result['create_time'] = time();
                         $day_business_result['update_time'] = time();
@@ -3208,12 +3216,12 @@ class LocalScript extends Pzlife
                         $has = Db::query('SELECT * FROM `yx_statistics_day_channel` WHERE `business_id` = 6 AND `timekey` = ' . $timekey . ' AND `channel_id` = ' . $value['id']);
                         if ($has) {
                             Db::table('yx_statistics_day_channel')->where('id', $has[0]['id'])->update([
-                                'success'     => $day_business_result['success'],
-                                'unknown'     => $day_business_result['unknown'],
-                                'default'     => $day_business_result['default'],
-                                'num'         => $day_business_result['num'],
-                                'mobile_num'  => $day_business_result['mobile_num'],
-                                'ratio'       => $day_business_result['ratio'],
+                                'success' => $day_business_result['success'],
+                                'unknown' => $day_business_result['unknown'],
+                                'default' => $day_business_result['default'],
+                                'num' => $day_business_result['num'],
+                                'mobile_num' => $day_business_result['mobile_num'],
+                                'ratio' => $day_business_result['ratio'],
                                 'update_time' => time(),
                             ]);
                         } else {
@@ -3249,30 +3257,30 @@ class LocalScript extends Pzlife
                         continue;
                     }
                     while (true) {
-                        $end_time    = $start_time + 86400;
-                        $timekey     = date('Ymd', $start_time);
+                        $end_time = $start_time + 86400;
+                        $timekey = date('Ymd', $start_time);
                         $business_id = 5;
                         // echo "uid:" . $value['id'] . "" . "timekey:" . $timekey;
                         // echo "\n";
                         if ($end_time > time()) {
                             // break;
-                            $end_time             = time();
-                            $day_marketing_result = $this->selectSendResultForMarketingChannel($value['id'],  $start_time, $end_time);
+                            $end_time = time();
+                            $day_marketing_result = $this->selectSendResultForMarketingChannel($value['id'], $start_time, $end_time);
                             if ($day_marketing_result == false) {
                                 break;
                             }
-                            $day_marketing_result['channel_id']         = $value['id'];
-                            $day_marketing_result['timekey']     = $timekey;
+                            $day_marketing_result['channel_id'] = $value['id'];
+                            $day_marketing_result['timekey'] = $timekey;
                             $day_marketing_result['business_id'] = $business_id;
-                            $has                                 = Db::query('SELECT * FROM `yx_statistics_day_channel  ` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `channel_id` = ' . $value['id']);
+                            $has = Db::query('SELECT * FROM `yx_statistics_day_channel  ` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `channel_id` = ' . $value['id']);
                             if ($has) {
                                 Db::table('yx_statistics_day_channel')->where('id', $has[0]['id'])->update([
-                                    'success'     => $day_marketing_result['success'],
-                                    'unknown'     => $day_marketing_result['unknown'],
-                                    'default'     => $day_marketing_result['default'],
-                                    'num'         => $day_marketing_result['num'],
-                                    'mobile_num'  => $day_marketing_result['mobile_num'],
-                                    'ratio'       => $day_marketing_result['ratio'],
+                                    'success' => $day_marketing_result['success'],
+                                    'unknown' => $day_marketing_result['unknown'],
+                                    'default' => $day_marketing_result['default'],
+                                    'num' => $day_marketing_result['num'],
+                                    'mobile_num' => $day_marketing_result['mobile_num'],
+                                    'ratio' => $day_marketing_result['ratio'],
                                     'update_time' => time(),
                                 ]);
                             } else {
@@ -3287,20 +3295,20 @@ class LocalScript extends Pzlife
                             $start_time = $end_time;
                             continue;
                         }
-                        $day_marketing_result['channel_id']         = $value['id'];
-                        $day_marketing_result['timekey']     = $timekey;
+                        $day_marketing_result['channel_id'] = $value['id'];
+                        $day_marketing_result['timekey'] = $timekey;
                         $day_marketing_result['business_id'] = $business_id;
                         $day_marketing_result['create_time'] = time();
                         $day_marketing_result['update_time'] = time();
-                        $has                                 = Db::query('SELECT * FROM `yx_statistics_day_channel` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `channel_id` = ' . $value['id']);
+                        $has = Db::query('SELECT * FROM `yx_statistics_day_channel` WHERE `business_id` = 5 AND `timekey` = ' . $timekey . ' AND `channel_id` = ' . $value['id']);
                         if ($has) {
                             Db::table('yx_statistics_day_channel')->where('id', $has[0]['id'])->update([
-                                'success'     => $day_marketing_result['success'],
-                                'unknown'     => $day_marketing_result['unknown'],
-                                'default'     => $day_marketing_result['default'],
-                                'num'         => $day_marketing_result['num'],
-                                'mobile_num'  => $day_marketing_result['mobile_num'],
-                                'ratio'       => $day_marketing_result['ratio'],
+                                'success' => $day_marketing_result['success'],
+                                'unknown' => $day_marketing_result['unknown'],
+                                'default' => $day_marketing_result['default'],
+                                'num' => $day_marketing_result['num'],
+                                'mobile_num' => $day_marketing_result['mobile_num'],
+                                'ratio' => $day_marketing_result['ratio'],
                                 'update_time' => time(),
                             ]);
                         } else {
@@ -3340,15 +3348,15 @@ class LocalScript extends Pzlife
                         $result = $this->checkDaySendResult($business_id, $timekey, $value['id']);
                         if ($result !== false) {
                             // print_r($result);die;
-                            $has                                 = Db::query('SELECT * FROM `yx_statistics_month` WHERE `business_id` = ' . $business_id . ' AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                            $has = Db::query('SELECT * FROM `yx_statistics_month` WHERE `business_id` = ' . $business_id . ' AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                             if ($has) {
                                 Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                    'success'     => $result['success'],
-                                    'unknown'     => $result['unknown'],
-                                    'default'     => $result['default'],
-                                    'num'         => $result['num'],
-                                    'mobile_num'  =>  $result['mobile_num'],
-                                    'ratio'       => $result['ratio'],
+                                    'success' => $result['success'],
+                                    'unknown' => $result['unknown'],
+                                    'default' => $result['default'],
+                                    'num' => $result['num'],
+                                    'mobile_num' => $result['mobile_num'],
+                                    'ratio' => $result['ratio'],
                                     'update_time' => time(),
                                 ]);
                             } else {
@@ -3363,15 +3371,15 @@ class LocalScript extends Pzlife
                         $result = $this->checkDaySendResult($business_id, $timekey, $value['id']);
                         if ($result !== false) {
                             // print_r($result);die;
-                            $has                                 = Db::query('SELECT * FROM `yx_statistics_month` WHERE `business_id` = ' . $business_id . ' AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                            $has = Db::query('SELECT * FROM `yx_statistics_month` WHERE `business_id` = ' . $business_id . ' AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                             if ($has) {
                                 Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                    'success'     => $result['success'],
-                                    'unknown'     => $result['unknown'],
-                                    'default'     => $result['default'],
-                                    'num'         => $result['num'],
-                                    'mobile_num'  =>  $result['mobile_num'],
-                                    'ratio'       => $result['ratio'],
+                                    'success' => $result['success'],
+                                    'unknown' => $result['unknown'],
+                                    'default' => $result['default'],
+                                    'num' => $result['num'],
+                                    'mobile_num' => $result['mobile_num'],
+                                    'ratio' => $result['ratio'],
                                     'update_time' => time(),
                                 ]);
                             } else {
@@ -3383,15 +3391,15 @@ class LocalScript extends Pzlife
                         $result = $this->checkDaySendResult($business_id, $timekey, $value['id']);
                         if ($result !== false) {
                             // print_r($result);die;
-                            $has                                 = Db::query('SELECT * FROM `yx_statistics_month` WHERE `business_id` = ' . $business_id . ' AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                            $has = Db::query('SELECT * FROM `yx_statistics_month` WHERE `business_id` = ' . $business_id . ' AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                             if ($has) {
                                 Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                    'success'     => $result['success'],
-                                    'unknown'     => $result['unknown'],
-                                    'default'     => $result['default'],
-                                    'num'         => $result['num'],
-                                    'mobile_num'  =>  $result['mobile_num'],
-                                    'ratio'       => $result['ratio'],
+                                    'success' => $result['success'],
+                                    'unknown' => $result['unknown'],
+                                    'default' => $result['default'],
+                                    'num' => $result['num'],
+                                    'mobile_num' => $result['mobile_num'],
+                                    'ratio' => $result['ratio'],
                                     'update_time' => time(),
                                 ]);
                             } else {
@@ -3403,15 +3411,15 @@ class LocalScript extends Pzlife
                         $result = $this->checkDaySendResult($business_id, $timekey, $value['id']);
                         if ($result !== false) {
                             // print_r($result);die;
-                            $has                                 = Db::query('SELECT * FROM `yx_statistics_month` WHERE `business_id` = ' . $business_id . ' AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                            $has = Db::query('SELECT * FROM `yx_statistics_month` WHERE `business_id` = ' . $business_id . ' AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                             if ($has) {
                                 Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                    'success'     => $result['success'],
-                                    'unknown'     => $result['unknown'],
-                                    'default'     => $result['default'],
-                                    'num'         => $result['num'],
-                                    'mobile_num'  =>  $result['mobile_num'],
-                                    'ratio'       => $result['ratio'],
+                                    'success' => $result['success'],
+                                    'unknown' => $result['unknown'],
+                                    'default' => $result['default'],
+                                    'num' => $result['num'],
+                                    'mobile_num' => $result['mobile_num'],
+                                    'ratio' => $result['ratio'],
                                     'update_time' => time(),
                                 ]);
                             } else {
@@ -3419,14 +3427,12 @@ class LocalScript extends Pzlife
                             }
                         }
 
-
                         $i++;
                         if ($i > 12) {
                             break;
                         }
                     }
                 }
-
 
                 sleep(86400);
             }
@@ -3436,7 +3442,6 @@ class LocalScript extends Pzlife
             exception($th);
         }
     }
-
 
     private function checkDaySendResult($business_id, $timekey, $uid)
     {
@@ -3455,7 +3460,7 @@ class LocalScript extends Pzlife
         $default_num = Db::query("SELECT SUM(`default`) as default_num FROM yx_statistics_day WHERE `timekey` LIKE '" . $timekey . "%' AND `uid` = '" . $uid . "' AND business_id = " . $business_id);
         // echo "\n";
         // print_r("SELECT SUM(`num`) as num FROM yx_statistics_day WHERE `timekey` LIKE '".$timekey."%' AND `uid` = '".$uid."' AND business_id = ".$business_id);
-        $ratio =  $success[0]['success'] / $num[0]['num'] * 100;
+        $ratio = $success[0]['success'] / $num[0]['num'] * 100;
         $data = [];
         $data = [
             'mobile_num' => $mobile_num[0]['mobile_num'],
@@ -3474,11 +3479,11 @@ class LocalScript extends Pzlife
 
     private function selectSendResultForBusiness($uid, $pid, $start_time, $end_time)
     {
-        $all_num        = 0;
-        $mobile_num     = 0;
-        $success_num    = 0;
-        $unknow_num     = 0;
-        $default_num    = 0;
+        $all_num = 0;
+        $mobile_num = 0;
+        $success_num = 0;
+        $unknow_num = 0;
+        $default_num = 0;
         $settlement_num = 1;
         //行业计费
 
@@ -3531,17 +3536,17 @@ class LocalScript extends Pzlife
             }
         }
         $all_num = $success_num + $unknow_num + $default_num;
-        $ratio   = $success_num / $all_num * 100;
+        $ratio = $success_num / $all_num * 100;
         return ['mobile_num' => $mobile_num, 'num' => $all_num, 'success' => $success_num, 'unknown' => $unknow_num, 'default' => $default_num, 'ratio' => $ratio];
     }
 
     private function selectSendResultForBusinessChannel($uid, $start_time, $end_time)
     {
-        $all_num        = 0;
-        $mobile_num     = 0;
-        $success_num    = 0;
-        $unknow_num     = 0;
-        $default_num    = 0;
+        $all_num = 0;
+        $mobile_num = 0;
+        $success_num = 0;
+        $unknow_num = 0;
+        $default_num = 0;
         $settlement_num = 1;
         //行业计费
 
@@ -3583,10 +3588,9 @@ class LocalScript extends Pzlife
             echo "SELECT  send_length FROM `yx_user_send_code_task` WHERE `yidong_channel_id` = " . $uid . " AND yidong_channel_id <> 0  AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "'  ORDER BY `send_length` DESC LIMIT 1";
             die;
         }
-        $ratio   = $success_num / $all_num * 100;
+        $ratio = $success_num / $all_num * 100;
         return ['mobile_num' => $mobile_num, 'num' => $all_num, 'success' => $success_num, 'unknown' => $unknow_num, 'default' => $default_num, 'ratio' => $ratio];
     }
-
 
     public function SendResultForMarketingTest()
     {
@@ -3595,11 +3599,11 @@ class LocalScript extends Pzlife
 
     private function selectSendResultForMarketing($uid, $pid, $start_time, $end_time)
     {
-        $all_num        = 0;
-        $mobile_num     = 0;
-        $success_num    = 0;
-        $unknow_num     = 0;
-        $default_num    = 0;
+        $all_num = 0;
+        $mobile_num = 0;
+        $success_num = 0;
+        $unknow_num = 0;
+        $default_num = 0;
         $settlement_num = 1;
         //行业计费
 
@@ -3668,14 +3672,13 @@ class LocalScript extends Pzlife
         return ['mobile_num' => $mobile_num, 'num' => $all_num, 'success' => $success_num, 'unknown' => $unknow_num, 'default' => $default_num, 'ratio' => $ratio];
     }
 
-
-    private function selectSendResultForMarketingChannel($uid,  $start_time, $end_time)
+    private function selectSendResultForMarketingChannel($uid, $start_time, $end_time)
     {
-        $all_num        = 0;
-        $mobile_num     = 0;
-        $success_num    = 0;
-        $unknow_num     = 0;
-        $default_num    = 0;
+        $all_num = 0;
+        $mobile_num = 0;
+        $success_num = 0;
+        $unknow_num = 0;
+        $default_num = 0;
         $settlement_num = 1;
         //行业计费
 
@@ -3740,11 +3743,11 @@ class LocalScript extends Pzlife
 
     public function selectSendResultForMultimedia($uid, $pid, $start_time, $end_time)
     {
-        $all_num        = 0;
-        $mobile_num     = 0;
-        $success_num    = 0;
-        $unknow_num     = 0;
-        $default_num    = 0;
+        $all_num = 0;
+        $mobile_num = 0;
+        $success_num = 0;
+        $unknow_num = 0;
+        $default_num = 0;
         $settlement_num = 1;
         $max_len = Db::query("SELECT id FROM `yx_user_multimedia_message` WHERE `uid` = " . $uid . "  AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "' ");
         if (empty($max_len)) {
@@ -3752,7 +3755,7 @@ class LocalScript extends Pzlife
         }
         $mul_success_mobile_num = Db::query("SELECT `mobile`,`task_no` FROM `yx_user_multimedia_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_no`");
         $mul_default_mobile_num = Db::query("SELECT `mobile`,`task_no` FROM `yx_user_multimedia_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message NOT IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_no`");
-        $mobile_num =  Db::query("SELECT SUM(`real_num`) AS all_num FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ");
+        $mobile_num = Db::query("SELECT SUM(`real_num`) AS all_num FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ");
         // print_r("SELECT SUM(`real_num`) AS all_num FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ");
         // echo "\n";
         // echo "SELECT `mobile`,`task_no` FROM `yx_user_multimedia_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_no`";die;
@@ -3780,37 +3783,37 @@ class LocalScript extends Pzlife
                 foreach ($uids as $key => $value) {
                     // continue;
                     // $start_time = (int) strtotime('-4 days', strtotime(date('Y-m-d', time())));
-                    $start_time = (int) strtotime('2020-08-01');
+                    $start_time = (int) strtotime('2020-10-01');
                     if (!Db::query("SELECT `id`,`create_time` FROM yx_user_multimedia_message WHERE uid  = " . $value['id'] . " AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . time() . "' ")) {
                         continue;
                     }
                     while (true) {
 
                         $day_business_result = [];
-                        $end_time            = $start_time + 86400;
-                        $timekey             = date('Ymd', $start_time);
+                        $end_time = $start_time + 86400;
+                        $timekey = date('Ymd', $start_time);
                         // echo "uid:" . $value['id'] . "" . "timekey:" . $timekey;
                         // echo "\n";
                         $business_id = 8;
                         if ($end_time > time()) {
                             // break;
-                            $end_time            = time();
+                            $end_time = time();
                             $day_business_result = $this->selectSendResultForMultimedia($value['id'], $value['pid'], $start_time, $end_time);
                             if ($day_business_result == false) {
                                 break;
                             } else {
-                                $day_business_result['uid']         = $value['id'];
-                                $day_business_result['timekey']     = $timekey;
+                                $day_business_result['uid'] = $value['id'];
+                                $day_business_result['timekey'] = $timekey;
                                 $day_business_result['business_id'] = $business_id;
-                                $has                                = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 8 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                                $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 8 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                                 if ($has) {
                                     Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                        'success'     => $day_business_result['success'],
-                                        'unknown'     => $day_business_result['unknown'],
-                                        'default'     => $day_business_result['default'],
-                                        'num'         => $day_business_result['num'],
-                                        'mobile_num'  => $day_business_result['mobile_num'],
-                                        'ratio'       => $day_business_result['ratio'],
+                                        'success' => $day_business_result['success'],
+                                        'unknown' => $day_business_result['unknown'],
+                                        'default' => $day_business_result['default'],
+                                        'num' => $day_business_result['num'],
+                                        'mobile_num' => $day_business_result['mobile_num'],
+                                        'ratio' => $day_business_result['ratio'],
                                         'update_time' => time(),
                                     ]);
                                 } else {
@@ -3828,8 +3831,8 @@ class LocalScript extends Pzlife
                         }
 
                         // die;
-                        $day_business_result['uid']         = $value['id'];
-                        $day_business_result['timekey']     = $timekey;
+                        $day_business_result['uid'] = $value['id'];
+                        $day_business_result['timekey'] = $timekey;
                         $day_business_result['business_id'] = $business_id;
                         $day_business_result['create_time'] = time();
                         $day_business_result['update_time'] = time();
@@ -3837,12 +3840,12 @@ class LocalScript extends Pzlife
                         $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 8 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                         if ($has) {
                             Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                'success'     => $day_business_result['success'],
-                                'unknown'     => $day_business_result['unknown'],
-                                'default'     => $day_business_result['default'],
-                                'num'         => $day_business_result['num'],
-                                'mobile_num'  => $day_business_result['mobile_num'],
-                                'ratio'       => $day_business_result['ratio'],
+                                'success' => $day_business_result['success'],
+                                'unknown' => $day_business_result['unknown'],
+                                'default' => $day_business_result['default'],
+                                'num' => $day_business_result['num'],
+                                'mobile_num' => $day_business_result['mobile_num'],
+                                'ratio' => $day_business_result['ratio'],
                                 'update_time' => time(),
                             ]);
                         } else {
@@ -3866,11 +3869,11 @@ class LocalScript extends Pzlife
 
     public function selectSendResultForSupMessage($uid, $pid, $start_time, $end_time)
     {
-        $all_num        = 0;
-        $mobile_num     = 0;
-        $success_num    = 0;
-        $unknow_num     = 0;
-        $default_num    = 0;
+        $all_num = 0;
+        $mobile_num = 0;
+        $success_num = 0;
+        $unknow_num = 0;
+        $default_num = 0;
         $settlement_num = 1;
         $max_len = Db::query("SELECT id FROM `yx_user_sup_message`  WHERE `uid` = " . $uid . " AND yidong_channel_id <> 0  AND `create_time` >= '" . $start_time . "' AND `create_time` <= '" . $end_time . "' ");
         if (empty($max_len)) {
@@ -3878,7 +3881,7 @@ class LocalScript extends Pzlife
         }
         $mul_success_mobile_num = Db::query("SELECT `mobile`,`task_no` FROM `yx_user_sup_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_sup_message` WHERE  `uid` = " . $uid . " AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message IN ('DELIVRD') GROUP BY `mobile`,`task_no`");
         $mul_default_mobile_num = Db::query("SELECT `mobile`,`task_no` FROM `yx_user_sup_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_sup_message` WHERE  `uid` = " . $uid . " AND yidong_channel_id <> 0   AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message NOT IN ('DELIVRD') GROUP BY `mobile`,`task_no`");
-        $mobile_num =  Db::query("SELECT SUM(`real_num`) AS all_num FROM `yx_user_sup_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ");
+        $mobile_num = Db::query("SELECT SUM(`real_num`) AS all_num FROM `yx_user_sup_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ");
         // print_r("SELECT SUM(`real_num`) AS all_num FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ");
         // echo "\n";
         // echo "SELECT `mobile`,`task_no` FROM `yx_user_multimedia_message_log` WHERE `task_no` IN (SELECT `task_no` FROM `yx_user_multimedia_message` WHERE  `uid` = " . $uid . " AND `create_time` >= '" . $start_time . "' AND `create_time` < '" . $end_time . "' ) AND status_message IN ('REJECTD','REJECT','MA:0001','DB:0141','MA:0001','MK:100D','MK:100C','IC:0151','EXPIRED','-1012','-1013','4442','4446','4014','DELIVRD') GROUP BY `mobile`,`task_no`";die;
@@ -3913,30 +3916,30 @@ class LocalScript extends Pzlife
                     while (true) {
 
                         $day_business_result = [];
-                        $end_time            = $start_time + 86400;
-                        $timekey             = date('Ymd', $start_time);
+                        $end_time = $start_time + 86400;
+                        $timekey = date('Ymd', $start_time);
                         // echo "uid:" . $value['id'] . "" . "timekey:" . $timekey;
                         // echo "\n";
                         $business_id = 11;
                         if ($end_time > time()) {
                             // break;
-                            $end_time            = time();
+                            $end_time = time();
                             $day_business_result = $this->selectSendResultForSupMessage($value['id'], $value['pid'], $start_time, $end_time);
                             if ($day_business_result == false) {
                                 break;
                             } else {
-                                $day_business_result['uid']         = $value['id'];
-                                $day_business_result['timekey']     = $timekey;
+                                $day_business_result['uid'] = $value['id'];
+                                $day_business_result['timekey'] = $timekey;
                                 $day_business_result['business_id'] = $business_id;
-                                $has                                = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 11 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
+                                $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 11 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                                 if ($has) {
                                     Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                        'success'     => $day_business_result['success'],
-                                        'unknown'     => $day_business_result['unknown'],
-                                        'default'     => $day_business_result['default'],
-                                        'num'         => $day_business_result['num'],
-                                        'mobile_num'  => $day_business_result['mobile_num'],
-                                        'ratio'       => $day_business_result['ratio'],
+                                        'success' => $day_business_result['success'],
+                                        'unknown' => $day_business_result['unknown'],
+                                        'default' => $day_business_result['default'],
+                                        'num' => $day_business_result['num'],
+                                        'mobile_num' => $day_business_result['mobile_num'],
+                                        'ratio' => $day_business_result['ratio'],
                                         'update_time' => time(),
                                     ]);
                                 } else {
@@ -3954,8 +3957,8 @@ class LocalScript extends Pzlife
                         }
 
                         // die;
-                        $day_business_result['uid']         = $value['id'];
-                        $day_business_result['timekey']     = $timekey;
+                        $day_business_result['uid'] = $value['id'];
+                        $day_business_result['timekey'] = $timekey;
                         $day_business_result['business_id'] = $business_id;
                         $day_business_result['create_time'] = time();
                         $day_business_result['update_time'] = time();
@@ -3963,12 +3966,12 @@ class LocalScript extends Pzlife
                         $has = Db::query('SELECT * FROM `yx_statistics_day` WHERE `business_id` = 11 AND `timekey` = ' . $timekey . ' AND `uid` = ' . $value['id']);
                         if ($has) {
                             Db::table('yx_statistics_day')->where('id', $has[0]['id'])->update([
-                                'success'     => $day_business_result['success'],
-                                'unknown'     => $day_business_result['unknown'],
-                                'default'     => $day_business_result['default'],
-                                'num'         => $day_business_result['num'],
-                                'mobile_num'  => $day_business_result['mobile_num'],
-                                'ratio'       => $day_business_result['ratio'],
+                                'success' => $day_business_result['success'],
+                                'unknown' => $day_business_result['unknown'],
+                                'default' => $day_business_result['default'],
+                                'num' => $day_business_result['num'],
+                                'mobile_num' => $day_business_result['mobile_num'],
+                                'ratio' => $day_business_result['ratio'],
                                 'update_time' => time(),
                             ]);
                         } else {
@@ -3987,26 +3990,50 @@ class LocalScript extends Pzlife
 
     public function updateReceipt()
     {
-        $nums = Db::query("SELECT COUNT(*) AS `num` FROM `yx_send_code_task_receipt`")[0]['num'];
-        // print_r($nums);
-        $page = ceil($nums / 100);
-        // print_r($page);
-        for ($i = 0; $i < $page; $i++) {
-            # code...
-            $ids = [];
-            $receipts =  Db::query("SELECT * FROM `yx_send_code_task_receipt` LIMIT " . $i . ",100 ");
-            foreach ($receipts as $key => $value) {
+        $id = 0;
+        ini_set('memory_limit', '3072M'); // 临时设置最大内存占用为3G
+        $redis = Phpredis::getConn();
+        $i = 1;
+        $offect = 0;
+        while (true) {
 
-                $task = Db::query("SELECT `task_no` FROM `yx_user_send_code_task` WHERE `id` = " . $value['task_id']);
-                if (empty($task)) {
-                    continue;
+            //  $nums = Db::query("SELECT COUNT(*) AS `num` FROM `yx_send_code_task_receipt`")[0]['num'];
+            // print_r($nums);
+            //   $page = ceil($nums / 100);
+            // print_r($page);
+            // $receipts = Db::query("SELECT * FROM `yx_send_code_task_receipt` LIMIT " . $i . ",100 ");
+
+            if (0 < date('H', time()) && date('H', time()) < 6) {
+                $offect = ($i - 1) * 100;
+                $receipts = Db::query("SELECT * FROM `yx_send_code_task_receipt` LIMIT " . $offect . ",100 ");
+                // print_r($receipts);die;
+                // print_r("SELECT * FROM `yx_send_code_task_receipt` LIMIT " . $offect . ",100 ");
+                // echo "\n";
+                foreach ($receipts as $key => $value) {
+                    $task = Db::query("SELECT `task_no` FROM `yx_user_send_code_task` WHERE `id` = " . $value['task_id']);
+                    if (empty($task)) {
+                        continue;
+                    }
+                    Db::table('yx_user_send_code_task_log')->where(['task_no' => $task[0]['task_no'], 'mobile' => $value['mobile']])->update(['status_message' => $value['status_message'], 'real_message' => $value['real_message'], 'update_time' => $value['create_time']]);
+                    // $ids[] = $value['id'];
                 }
-                Db::table('yx_user_send_code_task_log')->where(['task_no' => $task[0]['task_no'], 'mobile' => $value['mobile']])->update(['status_message' => $value['status_message'], 'real_message' => $value['real_message'], 'update_time' => $value['create_time']]);
-                $ids[] = $value['id'];
+                $i++;
+
+                $redis->set("index:message:business:receipt:id", end($receipts)['id']);
+
+            } else {
+                sleep(300);
+                continue;
             }
-            $ids = join(',', $ids);
-            Db::table('yx_send_code_task_receipt')->where("id in ($ids)")->delete();
+
+            // $ids = join(',', $ids);
+            // Db::table('yx_send_code_task_receipt')->where("id in ($ids)")->delete();
+            // for ($i = 0; $i < $page; $i++) {
+            //     $ids = [];
+            // }
+
         }
+
     }
 
     public function updateMobileForWhite()
@@ -4024,7 +4051,7 @@ class LocalScript extends Pzlife
                 'mobile' => $value['mobile'],
                 'source' => 2,
                 'remark' => '发送频次超过2次',
-                'create_time' => time()
+                'create_time' => time(),
             ];
             Db::table('yx_whitelist')->insert($insert_data);
         }
@@ -4039,16 +4066,16 @@ class LocalScript extends Pzlife
                     $Content = '';
                     if ($value['business_id'] == 5) {
                     }
-                    $data['uid']          = 295;
-                    $data['source']       = '127.0.0.1';
+                    $data['uid'] = 295;
+                    $data['source'] = '127.0.0.1';
                     $data['task_content'] = $Content;
-                    $data['mobile_content'] =  $value['mobile'];
-                    $data['send_num']       = count(explode(',', $value['mobile']));
-                    $data['real_num']       = count(explode(',', $value['mobile']));
-                    $data['send_length']    = mb_strlen($Content);
-                    $data['free_trial']     = 2;
-                    $data['send_status']     = 2;
-                    $data['task_no']        = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+                    $data['mobile_content'] = $value['mobile'];
+                    $data['send_num'] = count(explode(',', $value['mobile']));
+                    $data['real_num'] = count(explode(',', $value['mobile']));
+                    $data['send_length'] = mb_strlen($Content);
+                    $data['free_trial'] = 2;
+                    $data['send_status'] = 2;
+                    $data['task_no'] = 'bus' . date('ymdHis') . substr(uniqid('', true), 15, 8);
                 }
             }
         } catch (\Exception $th) {
@@ -4056,4 +4083,182 @@ class LocalScript extends Pzlife
             exception($th);
         }
     }
+
+    public function daoxinBufa()
+    {
+        ini_set('memory_limit', '1024M'); // 临时设置最大内存占用为3G
+        $msg_mobile_key = [];
+        $create_task = Db::query("SELECT id,mobile_content,send_msg_id FROM `messagesend`.`yx_user_send_task` WHERE `id` >= '1370488' AND `id` <= '1370553' AND `uid` = '326'");
+        foreach ($create_task as $key => $value) {
+            $mobiles = explode(',',$value['mobile_content']);
+            foreach ($mobiles as $mkey => $mvalue) {
+                $msg_mobile_key[$value['send_msg_id'].'_'.$mvalue] = $value['id'];
+            }
+        }
+        $create_task = [];
+        // print_r($msg_mobile_key);die;
+        $real_receipts = Db::query("SELECT * FROM `messagesend`.`yx_send_task_receipt` WHERE `task_id` IN (SELECT id FROM `messagesend`.`yx_user_send_task` WHERE `id` >= '1370488' AND `id` <= '1370553' AND `uid` = '326') ");
+        $receipts = [];
+        foreach ($real_receipts as $key => $value) {
+            $status = [];
+            $status = [
+                'status_message' => $value['status_message'],
+                'create_time' => $value['create_time'],
+            ];
+            $receipts[$value['task_id'].'_'.$value['mobile']] = $status;
+        }
+        $real_receipts = [];
+    //    print_r($receipts);die;
+      
+        $name1 = "pdl.xlsx";
+        $appid = '5fb3ac60293ad';
+        $appkey = '324d5afb7f08c77fcb52b6a0f9d22ff3';
+        $signature = '【Pandora珠宝】';
+
+        //    $appid = '5dc932e58565d';
+        //    $appkey = 'e10adc3949ba59abbe56e057f20f883e';
+        $types = 'Excel2007';
+        $objReader = PHPExcel_IOFactory::createReader($types);
+        // print_r(realpath("../"). "\yt_area_mobile.csv");die;
+
+        $objPHPExcel = $objReader->load(realpath("./") . "/" . $name1 . "");
+        // $objPHPExcel = $objReader->load(realpath("./") . "/yt_area_mobile.csv");
+        //选择标签页
+        $sheet = $objPHPExcel->getSheet(0); //取得sheet(0)表
+        $highestRow = $sheet->getHighestRow(); // 取得总行数
+        $send_task = [];
+        $export_data = [];
+        for ($i = 2; $i < $highestRow; $i++) {
+            $send_data = [];
+            $mobile = $objPHPExcel->getActiveSheet()->getCell("A" . $i)->getValue();
+            if (empty($mobile)) {
+                continue;
+            }
+            $content = $objPHPExcel->getActiveSheet()->getCell("B" . $i)->getValue();
+            $msg_id = $objPHPExcel->getActiveSheet()->getCell("C" . $i)->getValue();
+          /*   $strlen = 0;
+            $math_Content =$signature . $content;
+            $send_num = 1;
+            $strlen = strlen(iconv('utf-8', 'utf-16le', $math_Content)) / 2;
+            if ($strlen > 70) {
+                $real_num = ceil($strlen / 67) * $send_num;
+            } else {
+                $real_num = $send_num;
+            }
+            $data['mobile'] = $mobile;
+            $data['content'] = $signature . $content;
+            $data['msg_id'] = $msg_id;
+            $data['task_no'] = 'mar' . date('ymdHis') . substr(uniqid('', true), 15, 8);
+            $data['uid'] = 326;
+            $data['send_num'] = $send_num;
+            $data['real_num'] = $real_num;
+            $data['send_length'] = $strlen;
+            $data['free_trial'] = 2;
+            $data['develop_no'] = 7534;
+            $data['yidong_channel_id'] = 145;
+            $data['liantong_channel_id'] = 146;
+            $data['dianxin_channel_id'] = 146;
+            $data['send_status'] = 2;
+            $data['update_time'] = time();
+            $data['create_time'] = time();
+             $send_task[] = $data;
+
+            */
+            // print_r($data);die;
+            $taskid = 0;
+            $taskid = $msg_mobile_key[$msg_id.'_'.$mobile];
+            $status_data = [];
+            $exports = [];
+            $exports = [
+                'mobile' => $mobile,
+                'content' => $signature . $content,
+                'msg_id' =>  $msg_id,
+            ];
+            if (isset($receipts[$taskid.'_'.$mobile])) {
+                $status_data = $receipts[$taskid.'_'.$mobile];
+                $exports['status_message'] = $status_data['status_message'];
+                $exports['create_time'] = date('Y-m-d H:i:s',$status_data['create_time']);
+            }else{
+                $exports['status_message'] ='未知';
+                $exports['create_time'] = '';
+            }
+            $export_data[] = $exports;
+           
+        }
+
+        $objExcel = new PHPExcel();
+        // $objWriter  = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+        // $sheets=$objWriter->getActiveSheet()->setTitle('金卡1.');//设置表格名称
+        $objWriter = new PHPExcel_Writer_Excel2007($objExcel);
+        $objWriter->setOffice2003Compatibility(true);
+
+        //设置文件属性
+        $objProps = $objExcel->getProperties();
+        $objProps->setTitle("sheet1");
+        $objProps->setSubject( date('Y-m-d H:i:s', time()));
+
+        $objExcel->setActiveSheetIndex(0);
+        $objActSheet = $objExcel->getActiveSheet();
+
+        $date = date('Y-m-d H:i:s', time());
+
+        //设置当前活动sheet的名称
+        $objActSheet->setTitle("sheet1");
+        $CellList = array(
+            array('mobile', '手机号'),
+            array('content', '内容'),
+            array('msg_id', '消息id'),
+            array('status_message', '状态回执'),
+            array('create_time', '回执时间'),
+        );
+        foreach ($CellList as $i => $Cell) {
+            $row = chr(65 + $i);
+            $col = 1;
+            $objActSheet->setCellValue($row . $col, $Cell[1]);
+            $objActSheet->getColumnDimension($row)->setWidth(30);
+
+            $objActSheet->getStyle($row . $col)->getFont()->setName('Courier New');
+            $objActSheet->getStyle($row . $col)->getFont()->setSize(10);
+            $objActSheet->getStyle($row . $col)->getFont()->setBold(true);
+            $objActSheet->getStyle($row . $col)->getFont()->getColor()->setARGB('FFFFFF');
+            $objActSheet->getStyle($row . $col)->getFill()->getStartColor()->setARGB('E26B0A');
+            $objActSheet->getStyle($row . $col)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        }
+        $outputFileName = "潘多拉.xlsx";
+        $i = 0;
+        foreach ($export_data as $key => $orderdata) {
+            //行
+            $col = $key + 2;
+            foreach ($CellList as $i => $Cell) {
+                //列
+                $row = chr(65 + $i);
+                $objActSheet->getRowDimension($i)->setRowHeight(15);
+                $objActSheet->setCellValue($row . $col, $orderdata[$Cell[0]]);
+                $objActSheet->getStyle($row . $col)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            }
+        }
+        $objWriter->save($outputFileName);
+        exit;
+       
+        /* $api = "http://sendapidev.shyuxi.com/index/send/getSmsMarketingTaskMsgId";
+        foreach ($send_task as $key => $value) {
+            $value['appid'] = $appid;
+            $value['appkey'] = $appkey;
+
+            $res = sendRequest($api, 'post', $value);
+            $res = json_decode($res, true);
+            if ($res['code'] == 200) {
+                fwrite($myfile, $value['msg_id']);
+            } else {
+                fwrite($defaultfile, $value['msg_id']);
+            }
+            // print_r($res);die;
+
+        } */
+        // $defaultfile = fopen("1221pandoradefault.txt", "w");
+        // 营销id： 1370488 ~ 1370553
+      
+    }
+
 }

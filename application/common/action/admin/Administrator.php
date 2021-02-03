@@ -536,9 +536,19 @@ class Administrator extends CommonIndex
             return ['code' => '3005'];
         }
 
-        $user = DbUser::getUserInfo(['id' => $uids[0]], 'id,reservation_service,user_status,market_deduct', true);
+        $user = DbUser::getUserInfo(['id' => $uids[0]], 'id,reservation_service,user_status,market_deduct,need_receipt_api,need_receipt_cmpp', true);
         if ($user['user_status'] != 2) {
             return ['code' => '3006'];
+        }
+        $isneed_receipt = 1;
+        $need_receipt_type = 1;
+        if ($user['need_receipt_cmpp'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 2;
+        } else
+        if ($user['need_receipt_api'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 1;
         }
         // print_r($num);die;
         // if ($num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
@@ -556,11 +566,14 @@ class Administrator extends CommonIndex
                 DbAdministrator::editUserSendTask(['free_trial' => $free_trial, 'yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id, 'send_status' => 2], $value['id']);
             }
             foreach ($real_usertask as $real => $usertask) {
-                // $res = $this->redis->rpush("index:meassage:marketing:sendtask",$usertask['id']); 
+                $usertask['send_time'] = isset($usertask['appointment_time']) ? $usertask['appointment_time'] : 0;
+                $usertask['deduct'] = $user['market_deduct'];
+                $usertask['isneed_receipt'] = $isneed_receipt;
+                $usertask['need_receipt_type'] = $need_receipt_type;
                 if (isset($usertask['appointment_time']) && $usertask['appointment_time'] > 0) {
-                    $res = $this->redis->rpush("index:meassage:marketingtiming:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => $usertask['appointment_time'], 'deduct' => $user['market_deduct']])); //定时
+                    $res = $this->redis->rpush("index:meassage:marketingtiming:sendtask", json_encode($usertask)); //定时
                 } else {
-                    $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $usertask['id'], 'send_time' => 0, 'deduct' => $user['market_deduct']])); //非定时
+                    $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode($usertask)); //非定时
                 }
                 // marketing
             }
@@ -789,9 +802,19 @@ class Administrator extends CommonIndex
             return ['code' => '3005'];
         }
 
-        $user = DbUser::getUserInfo(['id' => $uids[0]], 'id,reservation_service,user_status,business_deduct', true);
+        $user = DbUser::getUserInfo(['id' => $uids[0]], 'id,reservation_service,user_status,business_deduct,need_receipt_api,need_receipt_cmpp', true);
         if ($user['user_status'] != 2) {
             return ['code' => '3006'];
+        }
+        $isneed_receipt = 1;
+        $need_receipt_type = 1;
+        if ($user['need_receipt_cmpp'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 2;
+        } else
+        if ($user['need_receipt_api'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 1;
         }
         // print_r($num);die;
         /*  if ($num > $userEquities['num_balance'] && $user['reservation_service'] != 2) {
@@ -809,7 +832,10 @@ class Administrator extends CommonIndex
                 DbAdministrator::editUserSendCodeTask(['free_trial' => $free_trial,  'yidong_channel_id' => $yidong_channel_id, 'liantong_channel_id' => $liantong_channel_id, 'dianxin_channel_id' => $dianxin_channel_id, 'send_status' => 2], $value['id']);
             }
             foreach ($real_usertask as $real => $usertask) {
-                $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $usertask['id'], 'deduct' => $user['business_deduct']]));
+                $usertask['deduct'] = $user['business_deduct'];
+                $usertask['isneed_receipt'] = $isneed_receipt;
+                $usertask['need_receipt_type'] = $need_receipt_type;
+                $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode($usertask));
             }
             Db::commit();
             return ['code' => '200'];

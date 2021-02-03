@@ -1509,5 +1509,59 @@ CREATE TABLE `yx_notifications_settings` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `mobile` (`mobile`,`uid`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='用户通知设置表';
+DROP TABLE IF EXISTS `yx_statistics_year_channel`;
+CREATE TABLE `yx_statistics_year_channel` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
+  `timekey` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '时间标记',
+  `num` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '总数',
+  `mobile_num` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '手机号计数',
+  `success` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '成功总数',
+  `unknown` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '未知总数',
+  `default` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '失败总数',
+  `ratio` decimal(10,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '成功比例',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `user_business_timekey` (`channel_id`,`business_id`,`timekey`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='通道年度统计信息';
 
-NotificationsSettings
+DROP TABLE IF EXISTS `yx_statistics_month_channel`;
+CREATE TABLE `yx_statistics_month_channel` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
+  `timekey` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '时间标记',
+  `num` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '总数',
+  `mobile_num` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '手机号计数',
+  `success` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '成功总数',
+  `unknown` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '未知总数',
+  `default` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '失败总数',
+  `ratio` decimal(10,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '成功比例',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `user_business_timekey` (`channel_id`,`business_id`,`timekey`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='通道月度统计信息';
+
+DROP TABLE IF EXISTS `yx_statistics_day_channel`;
+CREATE TABLE `yx_statistics_day_channel` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `channel_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
+  `business_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '业务服务id',
+  `timekey` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '时间标记',
+  `num` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '总数',
+  `mobile_num` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '手机号计数',
+  `success` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '成功总数',
+  `unknown` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '未知总数',
+  `default` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '失败总数',
+  `ratio` decimal(10,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '成功比例',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `delete_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `user_business_timekey` (`channel_id`,`business_id`,`timekey`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='通道日统计信息';

@@ -126,7 +126,7 @@ return $result;
         $Mobiles = array_unique(array_filter($Mobiles));
         $Content = htmlspecialchars_decode($Content);
         // $Password = md5($Password);
-        $user = DbUser::getUserOne(['appid' => $Username], 'id,pid,nick_name,appkey,user_type,user_status,reservation_service,marketing_free_trial,marketing_free_credit,market_deduct', true);
+        $user = DbUser::getUserOne(['appid' => $Username], 'id,pid,nick_name,appkey,user_type,user_status,reservation_service,marketing_free_trial,marketing_free_credit,market_deduct,need_receipt_api,need_receipt_cmpp', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -141,7 +141,16 @@ return $result;
             return ['code' => '3009'];
         }
         // $send_num = count(array_filter($Mobiles));
-
+        $isneed_receipt = 1;
+        $need_receipt_type = 1;
+        if ($user['need_receipt_cmpp'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 2;
+        } else
+        if ($user['need_receipt_api'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 1;
+        }
         $effective_mobile = [];
         foreach ($Mobiles as $key => $value) {
             if (checkMobile($value) == false) {
@@ -166,8 +175,11 @@ return $result;
         if (empty($effective_mobile)) {
             return ['code' => '3010', 'msg' => '有效手机号为空'];
         }
-        if (mb_strlen($Content) > 70) {
-            $real_num = ceil(mb_strlen($Content) / 67) * $send_num;
+        $strlen = 0;
+        $math_Content = $Content;
+        $strlen = strlen(iconv('utf-8', 'utf-16le', $math_Content)) / 2;
+        if ($strlen > 70) {
+            $real_num = ceil($strlen / 67) * $send_num;
         } else {
             $real_num = $send_num;
         }
@@ -243,7 +255,12 @@ return $result;
 
             Db::commit();
             if ($data['free_trial'] == 2) {
-                $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => $id, 'send_time' => 0, 'deduct' => $user['market_deduct']]));
+                $data['id'] = $id;
+                $data['send_time'] = isset($data['appointment_time']) ? $data['appointment_time'] : 0;
+                $data['deduct'] = $user['market_deduct'];
+                $data['isneed_receipt'] = $isneed_receipt;
+                $data['need_receipt_type'] = $need_receipt_type;
+                $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode($data));
             }
             if ($data['free_trial'] == 1) {
                 $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
@@ -287,7 +304,7 @@ return $result;
         // print_r($this->redis);
         // die;
         $Mobiles = array_unique(array_filter($Mobiles));
-        $user    = DbUser::getUserOne(['appid' => $Username], 'id,pid,nick_name,appkey,user_type,user_status,reservation_service,free_trial,pid,business_deduct,business_free_credit', true);
+        $user    = DbUser::getUserOne(['appid' => $Username], 'id,pid,nick_name,appkey,user_type,user_status,reservation_service,free_trial,pid,business_deduct,business_free_credit,need_receipt_api,need_receipt_cmpp', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
@@ -296,6 +313,16 @@ return $result;
         }
         if ($Password != $user['appkey']) {
             return ['code' => '3000'];
+        }
+        $isneed_receipt = 1;
+        $need_receipt_type = 1;
+        if ($user['need_receipt_cmpp'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 2;
+        } else
+        if ($user['need_receipt_api'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 1;
         }
         // $prefix = substr($Mobiles, 0, 7);
         // $res    = DbProvinces::getNumberSource(['mobile' => $prefix], 'source,province_id,province', true);
@@ -342,8 +369,11 @@ return $result;
         if (empty($effective_mobile)) {
             return ['code' => '3001'];
         }
-        if (mb_strlen($Content) > 70) {
-            $real_num = ceil(mb_strlen($Content) / 67) * count($effective_mobile);
+        $strlen = 0;
+        $math_Content = $Content;
+        $strlen = strlen(iconv('utf-8', 'utf-16le', $math_Content)) / 2;
+        if ($strlen > 70) {
+            $real_num = ceil($strlen / 67) * count($effective_mobile);
         } else {
             $real_num = count($effective_mobile);
         }
@@ -410,7 +440,11 @@ return $result;
             $bId = DbAdministrator::addUserSendCodeTask($data); //
             Db::commit();
             if ($data['free_trial'] == 2) {
-                $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $bId, 'deduct' => $user['business_deduct']]));
+                $data['id'] = $bId;
+                $data['deduct'] = $user['business_deduct'];
+                $data['isneed_receipt'] = $isneed_receipt;
+                $data['need_receipt_type'] = $need_receipt_type;
+                $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode($data));
             }
             if ($data['free_trial'] == 1) {
                 $api = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=fa1c9682-f617-45f9-a6a3-6b65f671b457';
@@ -979,13 +1013,23 @@ return $result;
         // $connect = str_replace('&amp;','&',$connect);
 
         $this->redis = Phpredis::getConn();
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,nick_name,appkey,user_type,user_status,reservation_service,free_trial,business_deduct', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,nick_name,appkey,user_type,user_status,reservation_service,free_trial,business_deduct,need_receipt_api,need_receipt_cmpp', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
         // print_r($user);die;
         if ($appkey != $user['appkey']) {
             return ['code' => '3000'];
+        }
+        $isneed_receipt = 1;
+        $need_receipt_type = 1;
+        if ($user['need_receipt_cmpp'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 2;
+        } else
+        if ($user['need_receipt_api'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 1;
         }
         $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 6], 'id,num_balance', true);
         if (empty($user_equities)) {
@@ -1205,8 +1249,11 @@ return $result;
                 # code...
                 $id = DbAdministrator::addUserSendCodeTask($value);
                 if ($value['free_trial'] == 2) {
-                    // $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $id, 'deduct' => $user['business_deduct']]));
-                    $free_ids[] = $id;
+                    $value['id'] = $id;
+                    $value['deduct'] = $user['business_deduct'];
+                    $value['isneed_receipt'] = $isneed_receipt;
+                    $value['need_receipt_type'] = $need_receipt_type;
+                    $free_ids[] = $value;
                 } else {
                     $no_free[] = $id;
                 }
@@ -1215,7 +1262,7 @@ return $result;
             Db::commit();
             if (!empty($free_ids)) {
                 foreach ($free_ids as $key => $value) {
-                    $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value, 'deduct' => $user['business_deduct']]));
+                    $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode($value));
                 }
             }
             if (!empty($no_free)) {
@@ -1232,18 +1279,6 @@ return $result;
                 ];
                 $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
             }
-            /*  if ($save) {
-                DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
-                Db::commit();
-                if (!empty($free_taskno)) {
-                    //免审
-                    $free_ids = DbAdministrator::getUserSendCodeTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
-                    foreach ($free_ids as $key => $value) {
-                        $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value['id'], 'deduct' => $user['business_deduct']]));
-                    }
-                }
-            } */
-
             if (!empty($msg_id)) {
                 return ['code' => '200', 'msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
             }
@@ -1260,13 +1295,23 @@ return $result;
         // $connect = str_replace('&amp;','&',$connect);
 
         $this->redis = Phpredis::getConn();
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,nick_name,appkey,user_type,user_status,reservation_service,free_trial,business_deduct', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,nick_name,appkey,user_type,user_status,reservation_service,free_trial,business_deduct,need_receipt_api,need_receipt_cmpp', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
         // print_r($user);die;
         if ($appkey != $user['appkey']) {
             return ['code' => '3000'];
+        }
+        $isneed_receipt = 1;
+        $need_receipt_type = 1;
+        if ($user['need_receipt_cmpp'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 2;
+        } else
+        if ($user['need_receipt_api'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 1;
         }
         $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 6], 'id,num_balance', true);
         if (empty($user_equities)) {
@@ -1484,8 +1529,11 @@ return $result;
                 # code...
                 $id = DbAdministrator::addUserSendCodeTask($value);
                 if ($value['free_trial'] == 2) {
-                    // $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $id, 'deduct' => $user['business_deduct']]));
-                    $free_ids[] = $id;
+                    $value['id'] = $id;
+                    $value['deduct'] = $user['business_deduct'];
+                    $value['isneed_receipt'] = $isneed_receipt;
+                    $value['need_receipt_type'] = $need_receipt_type;
+                    $free_ids[] = $value;
                 } else {
                     $no_free[] = $id;
                 }
@@ -1494,7 +1542,7 @@ return $result;
             Db::commit();
             if (!empty($free_ids)) {
                 foreach ($free_ids as $key => $value) {
-                    $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value, 'deduct' => $user['business_deduct']]));
+                    $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode($value));
                 }
             }
             if (!empty($no_free)) {
@@ -1511,18 +1559,6 @@ return $result;
                 ];
                 $audit_api =   $this->sendRequest2($api, 'post', $check_data, $headers);
             }
-            /*  if ($save) {
-                DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
-                Db::commit();
-                if (!empty($free_taskno)) {
-                    //免审
-                    $free_ids = DbAdministrator::getUserSendCodeTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
-                    foreach ($free_ids as $key => $value) {
-                        $res = $this->redis->rpush("index:meassage:business:sendtask", json_encode(['id' => $value['id'], 'deduct' => $user['business_deduct']]));
-                    }
-                }
-            } */
-
             if (!empty($msg_id)) {
                 return ['code' => '200', 'msg_id' => $msg_id, 'task_no' => $all_task_no, 'task_no_mobile' => $task_as_mobile];
             }
@@ -1543,7 +1579,7 @@ return $result;
 
         $sign = md5('{"client_id":' . $client_id . ',"nonce":"' . $nonce . '","secret":"VPNDYgDb7mTv2KuDTwWkAwRnDQtWj97E","timestamp":' . $time . '}');
         $jy_token = base64_encode('{"client_id":' . $client_id . ',"nonce":"' . $nonce . '","sign":"' . $sign . '","timestamp":' . $time . '}');
-        $request_url = 'https://api-sit.itingluo.com/apiv1/openapi/search/analyze?text=' . $value;
+        $request_url = 'https://api.itingluo.com/apiv1/openapi/search/analyze?text=' . $value;
         $header  = array(
             'client_id:' . $client_id,
             'secret:' . $secret,
@@ -1581,12 +1617,22 @@ return $result;
     public function submitBatchCustomMarketing($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '', $msg_id = '', $develop_no = '')
     {
         $this->redis = Phpredis::getConn();
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,appkey,nick_name,user_type,user_status,reservation_service,marketing_free_trial,market_deduct', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,appkey,nick_name,user_type,user_status,reservation_service,marketing_free_trial,market_deduct,need_receipt_api,need_receipt_cmpp', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
         if ($appkey != $user['appkey']) {
             return ['code' => '3000'];
+        }
+        $isneed_receipt = 1;
+        $need_receipt_type = 1;
+        if ($user['need_receipt_cmpp'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 2;
+        } else
+        if ($user['need_receipt_api'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 1;
         }
         $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 5], 'id,num_balance', true);
         if (empty($user_equities)) {
@@ -1796,25 +1842,17 @@ return $result;
         // print_r($free_taskno);die;
         Db::startTrans();
         try {
-            /* $save = DbAdministrator::saveUserSendTask($trial);
-            if ($save) {
-                DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
-                Db::commit();
-                if (!empty($free_taskno)) {
-                    //免审
-                    $free_ids = DbAdministrator::getUserSendTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
-                    foreach ($free_ids as $key => $value) {
-                        $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => strval($value['id']), 'send_time' => 0, 'deduct' => $user['market_deduct']]));
-                    }
-                    // echo Db::getLastSQL();die;
-                }
-            } */
             $free_ids = [];
             $no_free = [];
             foreach ($trial as $key => $value) {
                 $id = DbAdministrator::addUserSendTask($value);
                 if ($value['free_trial'] == 2) {
-                    $free_ids[] = $id;
+                    $value['id'] = $id;
+                    $value['send_time'] = 0;
+                    $value['deduct'] = $user['market_deduct'];
+                    $value['isneed_receipt'] = $isneed_receipt;
+                    $value['need_receipt_type'] = $need_receipt_type;
+                    $free_ids[] = $value;
                 } else {
                     $no_free[] = $id;
                 }
@@ -1823,7 +1861,7 @@ return $result;
             Db::commit();
             if (!empty($free_ids)) {
                 foreach ($free_ids as $key => $value) {
-                    $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => strval($value), 'send_time' => 0, 'deduct' => $user['market_deduct']]));
+                    $this->redis->rpush("index:meassage:marketing:sendtask", json_encode($value));
                 }
             }
             if (!empty($no_free)) {
@@ -1854,12 +1892,22 @@ return $result;
     public function submitBatchCustomMarketingMsgId($appid, $appkey, $template_id = '', $connect, $ip, $signature_id = '', $msg_id = '', $develop_no = '')
     {
         $this->redis = Phpredis::getConn();
-        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,appkey,nick_name,user_type,user_status,reservation_service,marketing_free_trial,market_deduct', true);
+        $user = DbUser::getUserOne(['appid' => $appid], 'id,pid,appkey,nick_name,user_type,user_status,reservation_service,marketing_free_trial,market_deduct,need_receipt_api,need_receipt_cmpp', true);
         if (empty($user)) {
             return ['code' => '3000'];
         }
         if ($appkey != $user['appkey']) {
             return ['code' => '3000'];
+        }
+        $isneed_receipt = 1;
+        $need_receipt_type = 1;
+        if ($user['need_receipt_cmpp'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 2;
+        } else
+        if ($user['need_receipt_api'] == 2) {
+            $isneed_receipt = 2;
+            $need_receipt_type = 1;
         }
         $user_equities = DbAdministrator::getUserEquities(['uid' => $user['id'], 'business_id' => 5], 'id,num_balance', true);
         if (empty($user_equities)) {
@@ -2071,25 +2119,18 @@ return $result;
         // print_r($free_taskno);die;
         Db::startTrans();
         try {
-            /* $save = DbAdministrator::saveUserSendTask($trial);
-            if ($save) {
-                DbAdministrator::modifyBalance($user_equities['id'], $real_num, 'dec');
-                Db::commit();
-                if (!empty($free_taskno)) {
-                    //免审
-                    $free_ids = DbAdministrator::getUserSendTask([['task_no', 'IN', join(',', $free_taskno)]], 'id', false);
-                    foreach ($free_ids as $key => $value) {
-                        $res = $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => strval($value['id']), 'send_time' => 0, 'deduct' => $user['market_deduct']]));
-                    }
-                    // echo Db::getLastSQL();die;
-                }
-            } */
+            
             $free_ids = [];
             $no_free = [];
             foreach ($trial as $key => $value) {
                 $id = DbAdministrator::addUserSendTask($value);
                 if ($value['free_trial'] == 2) {
-                    $free_ids[] = $id;
+                    $value['id'] = $id;
+                    $value['send_time'] = 0;
+                    $value['deduct'] = $user['market_deduct'];
+                    $value['isneed_receipt'] = $isneed_receipt;
+                    $value['need_receipt_type'] = $need_receipt_type;
+                    $free_ids[] = $value;
                 } else {
                     $no_free[] = $id;
                 }
@@ -2098,7 +2139,7 @@ return $result;
             Db::commit();
             if (!empty($free_ids)) {
                 foreach ($free_ids as $key => $value) {
-                    $this->redis->rpush("index:meassage:marketing:sendtask", json_encode(['id' => strval($value), 'send_time' => 0, 'deduct' => $user['market_deduct']]));
+                    $this->redis->rpush("index:meassage:marketing:sendtask", json_encode($value));
                 }
             }
             if (!empty($no_free)) {

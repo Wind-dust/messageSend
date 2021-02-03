@@ -22,6 +22,7 @@ class Message extends AdminController {
      * @apiParam (入参) {String} free_trial 1:需要审核;2:审核通过;3:审核不通过
      * @apiParam (入参) {String} send_status 1：待发送,2:已发送
      * @apiParam (入参) {String} channel_id 0 未分配通道 1 已分配通道
+     * @apiParam (入参) {Number} uid 用户ID
      * @apiParam (入参) {String} page 页码 默认1
      * @apiParam (入参) {String} pageNum 条数 默认10
      * @apiParam (入参) {String} [title] 任务名称
