@@ -106,7 +106,7 @@ function getVercodeContent($code, $type = 0)
  */
 function randCaptcha($num)
 {
-    $key     = '';
+    $key = '';
     $pattern = '1234567890';
     for ($i = 0; $i < $num; $i++) {
         $key .= $pattern[mt_rand(0, 9)];
@@ -121,13 +121,13 @@ function randCaptcha($num)
  */
 function enUid($uid)
 {
-    $str    = 'AcEgIkMoQs';
+    $str = 'AcEgIkMoQs';
     $newuid = strrev($uid);
     $newStr = '';
     for ($i = 0; $i < strlen($newuid); $i++) {
         $newStr .= $str[$newuid[$i]];
     }
-    $tit    = getOneNum($newuid);
+    $tit = getOneNum($newuid);
     $result = $str[getOneNum($tit)] . $newStr;
     return $result;
     //    $cryptMethod = Env::get('cipher.userAesMethod', 'AES-256-CBC');
@@ -151,7 +151,7 @@ function deUid($enUid)
     if (empty($enUid)) {
         return '';
     }
-    $str      = 'AcEgIkMoQs';
+    $str = 'AcEgIkMoQs';
     $newEnUid = substr($enUid, 1);
     if (empty($newEnUid)) {
         return '';
@@ -187,8 +187,8 @@ function deUid($enUid)
 function enAdminId($adminId)
 {
     $cryptMethod = Env::get('cipher.userAesMethod', 'AES-128-CBC');
-    $cryptKey    = Env::get('cipher.userAesKey', 'pzlife');
-    $cryptIv     = Env::get('cipher.userAesIv', '1111111100000000');
+    $cryptKey = Env::get('cipher.userAesKey', 'pzlife');
+    $cryptIv = Env::get('cipher.userAesIv', '1111111100000000');
     if (strlen($adminId) > 15) {
         return 0;
     }
@@ -205,9 +205,9 @@ function enAdminId($adminId)
 function deAdminId($enAdminId)
 {
     $cryptMethod = Env::get('cipher.userAesMethod', 'AES-128-CBC');
-    $cryptKey    = Env::get('cipher.userAesKey', 'pzlife');
-    $cryptIv     = Env::get('cipher.userAesIv', '1111111100000000');
-    $decrypt     = openssl_decrypt(base64_decode($enAdminId), $cryptMethod, $cryptKey, 0, $cryptIv);
+    $cryptKey = Env::get('cipher.userAesKey', 'pzlife');
+    $cryptIv = Env::get('cipher.userAesIv', '1111111100000000');
+    $decrypt = openssl_decrypt(base64_decode($enAdminId), $cryptMethod, $cryptKey, 0, $cryptIv);
     if ($decrypt) {
         return $decrypt;
     } else {
@@ -380,7 +380,6 @@ function sendRequestText($requestUrl, $method = 'get', $text)
     return $res; // 显示获得的数据
 }
 
-
 /**
  * 获取所在的项目入口(index,admin)
  * @param $file
@@ -389,7 +388,7 @@ function sendRequestText($requestUrl, $method = 'get', $text)
  */
 function controllerBaseName($file)
 {
-    $path  = dirname(dirname($file));
+    $path = dirname(dirname($file));
     $index = intval(strrpos($path, '/'));
     return substr($path, bcadd($index, 1, 0));
 }
@@ -414,7 +413,7 @@ function classBasename($class)
  */
 function createOrderNo($prefix = 'odr')
 {
-    $orderNo = $prefix . date('ymdHis') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
+    $orderNo = $prefix . date('ymdHis') . substr(implode(null, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
     return $orderNo;
 }
 
@@ -428,8 +427,8 @@ function createOrderNo($prefix = 'odr')
  */
 function getDistrProfits($retailPrice, $costPrice, $marginPrice)
 {
-    $otherPrice   = bcmul($retailPrice, 0.006, 4); //售价的0.6%
-    $profits      = bcsub(bcsub(bcsub($retailPrice, $costPrice, 4), $marginPrice, 4), $otherPrice, 4); //利润(售价-进价-其他成本-售价*0.006)
+    $otherPrice = bcmul($retailPrice, 0.006, 4); //售价的0.6%
+    $profits = bcsub(bcsub(bcsub($retailPrice, $costPrice, 4), $marginPrice, 4), $otherPrice, 4); //利润(售价-进价-其他成本-售价*0.006)
     $distrProfits = bcmul($profits, 0.9, 2); //可分配利润
     $distrProfits = $distrProfits < 0 ? 0 : $distrProfits;
     return $distrProfits;
@@ -445,11 +444,11 @@ function getDistrProfits($retailPrice, $costPrice, $marginPrice)
  */
 function getOpenid($code, $encrypteddata = '', $iv = '')
 {
-    $appid         = Env::get('weixin.weixin_miniprogram_appid');
-    $secret        = Env::get('weixin.weixin_miniprogram_appsecret');
+    $appid = Env::get('weixin.weixin_miniprogram_appid');
+    $secret = Env::get('weixin.weixin_miniprogram_appsecret');
     $get_token_url = 'https://api.weixin.qq.com/sns/jscode2session?appid=' . $appid . '&secret=' . $secret . '&js_code=' . $code . '&grant_type=authorization_code';
-    $res           = sendRequest($get_token_url);
-    $result        = json_decode($res, true);
+    $res = sendRequest($get_token_url);
+    $result = json_decode($res, true);
     // Array([session_key] => N/G/1C4QKntLTDB9Mk0kPA==,[openid] => oAuSK5VaBgJRWjZTD3MDkTSEGwE8,[unionid] => o4Xj757Ljftj2Z6EUBdBGZD0qHhk)
     if (empty($result['session_key'])) {
         return false;
@@ -498,10 +497,10 @@ function decryptData($encryptedData, $iv, $sessionKey)
     if (strlen($iv) != 24) {
         return -41002;
     }
-    $aesIV     = base64_decode($iv);
+    $aesIV = base64_decode($iv);
     $aesCipher = base64_decode($encryptedData);
-    $result    = openssl_decrypt($aesCipher, "AES-128-CBC", $aesKey, 1, $aesIV);
-    $dataObj   = json_decode($result);
+    $result = openssl_decrypt($aesCipher, "AES-128-CBC", $aesKey, 1, $aesIV);
+    $dataObj = json_decode($result);
     if ($dataObj == null) {
         return -41003;
     }
@@ -521,24 +520,24 @@ function decryptData($encryptedData, $iv, $sessionKey)
 function getExpressList()
 {
     $ExpressList = [
-        'shunfeng'       => '顺丰速运',
-        'zhongtong'      => '中通快递',
-        'shentong'       => '申通快递',
-        'yunda'          => '韵达快递',
-        'tiantian'       => '天天快递',
-        'huitongkuaidi'  => '百世快递',
-        'ems'            => 'EMS',
-        'youshuwuliu'    => '优速物流',
-        'kuayue'         => '跨越速运',
-        'debangwuliu'    => '德邦物流',
-        'yuantong'       => '圆通速递',
-        'jiuyescm'       => '九曳快递',
-        'zhaijibian'     => '黑猫宅急便(宅急便)',
-        'ane66'          => '安能快递',
+        'shunfeng' => '顺丰速运',
+        'zhongtong' => '中通快递',
+        'shentong' => '申通快递',
+        'yunda' => '韵达快递',
+        'tiantian' => '天天快递',
+        'huitongkuaidi' => '百世快递',
+        'ems' => 'EMS',
+        'youshuwuliu' => '优速物流',
+        'kuayue' => '跨越速运',
+        'debangwuliu' => '德邦物流',
+        'yuantong' => '圆通速递',
+        'jiuyescm' => '九曳快递',
+        'zhaijibian' => '黑猫宅急便(宅急便)',
+        'ane66' => '安能快递',
         'youzhengguonei' => '中国邮政',
-        'rufengda'       => '如风达',
-        'wanxiangwuliu'  => '万象物流',
-        'SJPS'           => '商家派送',
+        'rufengda' => '如风达',
+        'wanxiangwuliu' => '万象物流',
+        'SJPS' => '商家派送',
     ];
     return $ExpressList;
 }
@@ -550,10 +549,10 @@ function getExpressList()
 function updateReceivedForMessage()
 {
     $Received = [
-        // 'REJECTD', 
-        // 'REJECT', 
-        // 'MK:1006', 
-        // 'MA:0001', 
+        // 'REJECTD',
+        // 'REJECT',
+        // 'MK:1006',
+        // 'MA:0001',
         // 'DB:0141',
         // 'MA:0001',
         // 'MK:100D',
@@ -579,7 +578,7 @@ function checkBankCard($cardNum)
     $arr_no = str_split($cardNum);
     $last_n = $arr_no[count($arr_no) - 1];
     krsort($arr_no);
-    $i     = 1;
+    $i = 1;
     $total = 0;
     foreach ($arr_no as $n) {
         if ($i % 2 == 0) {
@@ -635,8 +634,8 @@ function getBancardKey($cardNo)
  */
 function checkIdcard($idcard)
 {
-    $idcard    = strtoupper($idcard);
-    $regx      = "/(^\d{15}$)|(^\d{17}([0-9]|X)$)/";
+    $idcard = strtoupper($idcard);
+    $regx = "/(^\d{15}$)|(^\d{17}([0-9]|X)$)/";
     $arr_split = array();
     if (!preg_match($regx, $idcard)) {
         return false;
@@ -668,8 +667,8 @@ function checkIdcard($idcard)
             //检验18位身份证的校验码是否正确。
             //校验位按照ISO 7064:1983.MOD 11-2的规定生成，X可以认为是数字10。
             $arr_int = array(7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2);
-            $arr_ch  = array('1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2');
-            $sign    = 0;
+            $arr_ch = array('1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2');
+            $sign = 0;
 
             for ($i = 0; $i < 17; $i++) {
                 $b = (int) $idcard{
@@ -678,7 +677,7 @@ function checkIdcard($idcard)
                 $sign += $b * $w;
             }
 
-            $n       = $sign % 11;
+            $n = $sign % 11;
             $val_num = $arr_ch[$n];
 
             if ($val_num != substr($idcard, 17, 1)) {
@@ -700,8 +699,8 @@ function checkIdcard($idcard)
 function getPassword($str, $key, $algo = 'sha256')
 {
     //    $algo   = Config::get('conf.cipher_algo');
-    $md5    = hash_hmac('md5', $str, $key);
-    $key2   = strrev($key);
+    $md5 = hash_hmac('md5', $str, $key);
+    $key2 = strrev($key);
     $result = hash_hmac($algo, $md5, $key2);
     return $result;
 }
@@ -749,7 +748,6 @@ function getRandomString($len, $chars = null)
     }
     return $str;
 }
-
 
 /**
  * 返回数组的维度
@@ -836,9 +834,9 @@ function daxie($number)
     return $result;
 }
 
-
-function checkMessageContent($messages){
-    if (strpos($messages, '淘口令') || strpos($messages, '红包') || strpos($messages, '加微信') || strpos($messages, '+v') || strpos($messages, '加微') || strpos($messages, '加群') || strpos($messages, '加Q') || strpos($messages, '加q') || strpos($messages, '+q') || strpos($messages, '+Q') || strpos($messages, '理财') || strpos($messages, '网贷') || strpos($messages, '金融') || strpos($messages, '借款') || strpos($messages, '还款') || strpos($messages, 'p2p') || strpos($messages, 'P2P') || strpos($messages, '羊小咩')) {
+function checkMessageContent($messages)
+{
+    if (strpos($messages, '淘口令') || strpos($messages, '红包') || strpos($messages, '加微信') || strpos($messages, '+v') || strpos($messages, '加微') || strpos($messages, '加群') || strpos($messages, '加Q') || strpos($messages, '加q') || strpos($messages, '+q') || strpos($messages, '+Q') || strpos($messages, '理财') || strpos($messages, '网贷') || strpos($messages, '金融') || strpos($messages, '借款') || strpos($messages, '还款') || strpos($messages, 'p2p') || strpos($messages, 'P2P') || strpos($messages, '羊小咩') || strpos($messages, '借钱') || strpos($messages, '借贷') || strpos($messages, '贷款') || strpos($messages, '小额') || strpos($messages, '大额') || strpos($messages, '急用钱宝') || strpos($messages, '雪花优品') || strpos($messages, '秒下科技') || strpos($messages, '花花科技')) {
         return false;
     }
     return true;

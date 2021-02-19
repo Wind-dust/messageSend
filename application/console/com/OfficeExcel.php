@@ -4263,11 +4263,11 @@ class OfficeExcel extends Pzlife
         // 干百分之35"100188178","Lancome MMS 0125 group3","81916","100088419","100088419_20210126093404.zip","2021-01-26 09:34:54"
         // 干百分之35"100188180","Lancome MMS 0125 group5","75428","100088421","100088421_20210126093405.zip","2021-01-26 09:34:54"
         // 干百分之45"100188179","Lancome MMS 0125 group4","148857","100088420","100088420_20210126093404.zip","2021-01-26 09:34:54"
-        $file_path = realpath("./uploads\SFL\UnZip\SMS\Communication_targets_SMS_1_20210130090116") . "/Communication_targets_SMS_1_20210130090116.txt";
+        $file_path = realpath("./uploads\SFL\UnZip\SMS\Communication_targets_SMS_1_20210218103118") . "/Communication_targets_SMS_1_20210218103118.txt";
         // $model_path = realpath("./") . "/0624.txt";
-        $model_id = '100188308';
-        // $deduct = ceil(2000000 / 5768335 * 100);
-        $deduct = 80;
+        $model_id = '100188609';
+        // $deduct = ceil(500000 / 1485279 * 100);
+        $deduct = 65;
         $file = fopen($file_path, "r");
         $white_receipt_path = realpath("./") . "/" . $model_id . "_white.txt";
         $white_receipt_file = fopen($white_receipt_path, "w");
@@ -4376,7 +4376,7 @@ class OfficeExcel extends Pzlife
             foreach ($mobiles as $key => $value) {
                 if (in_array($value, $white_list)) {
                     fwrite($white_receipt_file, $value . "\n");
-                } elseif (in_array($key, $deduct_mobile)) {
+                } elseif (is_array($deduct_mobile) && in_array($key, $deduct_mobile)) {
                     // fwrite($deduct_receipt_file, $value . "\n");
                     $send_mobiles[] = $value;
                 }

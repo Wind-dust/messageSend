@@ -908,7 +908,7 @@ class SflUpload extends Pzlife
                         exception($e);
                     }
                 }
-                // die;
+                die;
                 // exit;
                 // print_r($this_id);
                 // die;
@@ -961,7 +961,7 @@ class SflUpload extends Pzlife
                         exception($e);
                     }
                 }
-                $deduct = ceil(2000000 / 5768335 * 100);
+                $deduct = ceil(1500000 / 3589441 * 100);
                 // $deduct = 65;
 
                 // $all_num = [0,1,2,3,4];
@@ -1114,7 +1114,7 @@ class SflUpload extends Pzlife
 
     /* save_type 入库方式 */
 
-    public function sflZip($time_key, $save_type = '')
+    public function sflZip($save_type = '')
     {
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $mysql_connect->query("set names utf8mb4");
