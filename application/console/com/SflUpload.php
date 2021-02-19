@@ -1114,7 +1114,7 @@ class SflUpload extends Pzlife
 
     /* save_type 入库方式 */
 
-    public function sflZip($save_type = '')
+    public function sflZip( $time_key,$save_type = '')
     {
         $mysql_connect = Db::connect(Config::get('database.db_sflsftp'));
         $mysql_connect->query("set names utf8mb4");
